@@ -111,16 +111,16 @@ Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
 Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 </code></pre>
 
-<p>参考:
-<a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a>
-「整然データってなに？」by <code>@f_nishihara</code></p>
+<p>参考:<br>
+<a href="http://r4ds.had.co.nz/tidy-data.html">http://r4ds.had.co.nz/tidy-data.html</a><br>
+<a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a><br></p>
 
 </section>
 <section>
 <h2 id="雑然データ-messy-data">雑然データ messy data</h2>
 
 <ul>
-<li>データを採る/作るときに楽な形(これ自体は悪くない)</li>
+<li>データを採る/作るときに楽な形（これは仕方ない）</li>
 <li>行にも列にも変数が混じっている</li>
 <li>1つの観測が縦も横バラバラな位置に</li>
 <li>1つのセルに複数の意味や値が含まれている</li>
@@ -137,18 +137,16 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 
 <p>↓下ごしらえ</p>
 
-<pre><code># A tibble: 20 x 5
-   lbound ubound region    sex death_rate
-    &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt;
- 1     50     54  Rural   Male       1.17
- 2     55     59  Rural   Male       1.81
- 3     60     64  Rural   Male       2.69
- 4     65     69  Rural   Male       4.10
- 5     70     74  Rural   Male       6.60
- 6     50     54  Rural Female       0.87
- 7     55     59  Rural Female       1.17
- 8     60     64  Rural Female       2.03
- 9     65     69  Rural Female       3.09
+<pre><code>   lbound ubound region    sex death_rate
+1      50     54  Rural   Male       1.17
+2      55     59  Rural   Male       1.81
+3      60     64  Rural   Male       2.69
+4      65     69  Rural   Male       4.10
+5      70     74  Rural   Male       6.60
+6      50     54  Rural Female       0.87
+7      55     59  Rural Female       1.17
+8      60     64  Rural Female       2.03
+9      65     69  Rural Female       3.09
 10     70     74  Rural Female       5.43
 11     50     54  Urban   Male       1.54
 12     55     59  Urban   Male       2.43
@@ -166,6 +164,8 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <section>
 <h2 id="ゑくせる手作業-シーシュポスの岩">ゑくせる手作業 ＝ シーシュポスの岩</h2>
 
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="240" align="right"></p>
+
 <ul>
 <li>膨大な単純作業がそもそもツラい</li>
 <li>人間だもの、ミスは防ぎきれない</li>
@@ -174,10 +174,27 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <li>新たなデータを追加 → 初めの工程からやり直し</li>
 </ul>
 
-<p>正確性が求められる退屈な仕事は人間よりも機械のほうが得意
+<p>正確性・再現性が求められる退屈な仕事は人間よりも機械のほうが得意</p>
+
+<p><strong>Reproduceble Research のためにも R にやらせよう</strong></p>
+
+</section>
+<section>
+<h2 id="今回の目標">今回の目標</h2>
+
+<h3 id="rでこんなことができるんだな">Rでこんなことができるんだな</h3>
+
+<h3 id="やりたくなったらこのへんを見ればいいんだな">やりたくなったらこのへんを見ればいいんだな</h3>
+
+<p><br>
+この2点さえ押さえれば、具体的なやり方は覚えなくて大丈夫
 </section>
 <section>
 <h2 id="tidyverse">tidyverse</h2>
+
+<p><a href="http://www.tidyverse.org/">
+<img src="figure/tidyverse-screenshot.png" width="320" align="right">
+</a></p>
 
 <p>Rでデータを上手に扱うためのパッケージ群</p>
 
@@ -187,58 +204,264 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <li>意味のわかるエラーメッセージ</li>
 <li><strong>シンプルな関数を繋げて使うようなデザイン</strong></li>
 </ul>
-
-<p>TODO: screenshot or logo <a href="https://www.tidyverse.org/">https://www.tidyverse.org/</a></p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
-<span class="c1"># ggplot2, dplyr, tidyr, purrr, readr, tibble など、</span>
-<span class="c1"># 主要なライブラリが一挙に読み込まれる</span></code></pre></div>
+<span class="c1"># 関連ライブラリが一挙に読み込まれる</span></code></pre></div>
+<p>Q. 素のRも覚えきってないのにいきなりパッケージ？<br>
+A. 大丈夫。誰も覚えきってない。</p>
+
 </section>
 <section>
-<h2 id="サンプルデータ-iris">サンプルデータ <code>iris</code></h2>
+<h2 id="よく見かけるサンプルデータ-iris">よく見かけるサンプルデータ <code>iris</code></h2>
 
 <p>Rに最初から入ってる。
 3種のアヤメ150個体に関する4個の計測値。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">head</span><span class="p">(</span>iris<span class="p">,</span> <span class="m">6L</span><span class="p">)</span></code></pre></div>
-<pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-1          5.1         3.5          1.4         0.2  setosa
-2          4.9         3.0          1.4         0.2  setosa
-3          4.7         3.2          1.3         0.2  setosa
-4          4.6         3.1          1.5         0.2  setosa
-5          5.0         3.6          1.4         0.2  setosa
-6          5.4         3.9          1.7         0.4  setosa
-</code></pre>
 
-<p>まあまあtidy。</p>
+<p>うっかり実行すると、</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris</code></pre></div>
+</section>
+<section>
+<h2 id="よく見かけるサンプルデータ-iris">よく見かけるサンプルデータ <code>iris</code></h2>
+
+<p>Rに最初から入ってる。
+3種のアヤメ150個体に関する4個の計測値。</p>
+
+<p>うっかり実行すると、ながーい！</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris</code></pre></div>
+<pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+1            5.1         3.5          1.4         0.2     setosa
+2            4.9         3.0          1.4         0.2     setosa
+3            4.7         3.2          1.3         0.2     setosa
+4            4.6         3.1          1.5         0.2     setosa
+5            5.0         3.6          1.4         0.2     setosa
+6            5.4         3.9          1.7         0.4     setosa
+7            4.6         3.4          1.4         0.3     setosa
+8            5.0         3.4          1.5         0.2     setosa
+9            4.4         2.9          1.4         0.2     setosa
+10           4.9         3.1          1.5         0.1     setosa
+11           5.4         3.7          1.5         0.2     setosa
+12           4.8         3.4          1.6         0.2     setosa
+13           4.8         3.0          1.4         0.1     setosa
+14           4.3         3.0          1.1         0.1     setosa
+15           5.8         4.0          1.2         0.2     setosa
+16           5.7         4.4          1.5         0.4     setosa
+17           5.4         3.9          1.3         0.4     setosa
+18           5.1         3.5          1.4         0.3     setosa
+19           5.7         3.8          1.7         0.3     setosa
+20           5.1         3.8          1.5         0.3     setosa
+21           5.4         3.4          1.7         0.2     setosa
+22           5.1         3.7          1.5         0.4     setosa
+23           4.6         3.6          1.0         0.2     setosa
+24           5.1         3.3          1.7         0.5     setosa
+25           4.8         3.4          1.9         0.2     setosa
+26           5.0         3.0          1.6         0.2     setosa
+27           5.0         3.4          1.6         0.4     setosa
+28           5.2         3.5          1.5         0.2     setosa
+29           5.2         3.4          1.4         0.2     setosa
+30           4.7         3.2          1.6         0.2     setosa
+31           4.8         3.1          1.6         0.2     setosa
+32           5.4         3.4          1.5         0.4     setosa
+33           5.2         4.1          1.5         0.1     setosa
+34           5.5         4.2          1.4         0.2     setosa
+35           4.9         3.1          1.5         0.2     setosa
+36           5.0         3.2          1.2         0.2     setosa
+37           5.5         3.5          1.3         0.2     setosa
+38           4.9         3.6          1.4         0.1     setosa
+39           4.4         3.0          1.3         0.2     setosa
+40           5.1         3.4          1.5         0.2     setosa
+41           5.0         3.5          1.3         0.3     setosa
+42           4.5         2.3          1.3         0.3     setosa
+43           4.4         3.2          1.3         0.2     setosa
+44           5.0         3.5          1.6         0.6     setosa
+45           5.1         3.8          1.9         0.4     setosa
+46           4.8         3.0          1.4         0.3     setosa
+47           5.1         3.8          1.6         0.2     setosa
+48           4.6         3.2          1.4         0.2     setosa
+49           5.3         3.7          1.5         0.2     setosa
+50           5.0         3.3          1.4         0.2     setosa
+51           7.0         3.2          4.7         1.4 versicolor
+52           6.4         3.2          4.5         1.5 versicolor
+53           6.9         3.1          4.9         1.5 versicolor
+54           5.5         2.3          4.0         1.3 versicolor
+55           6.5         2.8          4.6         1.5 versicolor
+56           5.7         2.8          4.5         1.3 versicolor
+57           6.3         3.3          4.7         1.6 versicolor
+58           4.9         2.4          3.3         1.0 versicolor
+59           6.6         2.9          4.6         1.3 versicolor
+60           5.2         2.7          3.9         1.4 versicolor
+61           5.0         2.0          3.5         1.0 versicolor
+62           5.9         3.0          4.2         1.5 versicolor
+63           6.0         2.2          4.0         1.0 versicolor
+64           6.1         2.9          4.7         1.4 versicolor
+65           5.6         2.9          3.6         1.3 versicolor
+66           6.7         3.1          4.4         1.4 versicolor
+67           5.6         3.0          4.5         1.5 versicolor
+68           5.8         2.7          4.1         1.0 versicolor
+69           6.2         2.2          4.5         1.5 versicolor
+70           5.6         2.5          3.9         1.1 versicolor
+71           5.9         3.2          4.8         1.8 versicolor
+72           6.1         2.8          4.0         1.3 versicolor
+73           6.3         2.5          4.9         1.5 versicolor
+74           6.1         2.8          4.7         1.2 versicolor
+75           6.4         2.9          4.3         1.3 versicolor
+76           6.6         3.0          4.4         1.4 versicolor
+77           6.8         2.8          4.8         1.4 versicolor
+78           6.7         3.0          5.0         1.7 versicolor
+79           6.0         2.9          4.5         1.5 versicolor
+80           5.7         2.6          3.5         1.0 versicolor
+81           5.5         2.4          3.8         1.1 versicolor
+82           5.5         2.4          3.7         1.0 versicolor
+83           5.8         2.7          3.9         1.2 versicolor
+84           6.0         2.7          5.1         1.6 versicolor
+85           5.4         3.0          4.5         1.5 versicolor
+86           6.0         3.4          4.5         1.6 versicolor
+87           6.7         3.1          4.7         1.5 versicolor
+88           6.3         2.3          4.4         1.3 versicolor
+89           5.6         3.0          4.1         1.3 versicolor
+90           5.5         2.5          4.0         1.3 versicolor
+91           5.5         2.6          4.4         1.2 versicolor
+92           6.1         3.0          4.6         1.4 versicolor
+93           5.8         2.6          4.0         1.2 versicolor
+94           5.0         2.3          3.3         1.0 versicolor
+95           5.6         2.7          4.2         1.3 versicolor
+96           5.7         3.0          4.2         1.2 versicolor
+97           5.7         2.9          4.2         1.3 versicolor
+98           6.2         2.9          4.3         1.3 versicolor
+99           5.1         2.5          3.0         1.1 versicolor
+100          5.7         2.8          4.1         1.3 versicolor
+101          6.3         3.3          6.0         2.5  virginica
+102          5.8         2.7          5.1         1.9  virginica
+103          7.1         3.0          5.9         2.1  virginica
+104          6.3         2.9          5.6         1.8  virginica
+105          6.5         3.0          5.8         2.2  virginica
+106          7.6         3.0          6.6         2.1  virginica
+107          4.9         2.5          4.5         1.7  virginica
+108          7.3         2.9          6.3         1.8  virginica
+109          6.7         2.5          5.8         1.8  virginica
+110          7.2         3.6          6.1         2.5  virginica
+111          6.5         3.2          5.1         2.0  virginica
+112          6.4         2.7          5.3         1.9  virginica
+113          6.8         3.0          5.5         2.1  virginica
+114          5.7         2.5          5.0         2.0  virginica
+115          5.8         2.8          5.1         2.4  virginica
+116          6.4         3.2          5.3         2.3  virginica
+117          6.5         3.0          5.5         1.8  virginica
+118          7.7         3.8          6.7         2.2  virginica
+119          7.7         2.6          6.9         2.3  virginica
+120          6.0         2.2          5.0         1.5  virginica
+121          6.9         3.2          5.7         2.3  virginica
+122          5.6         2.8          4.9         2.0  virginica
+123          7.7         2.8          6.7         2.0  virginica
+124          6.3         2.7          4.9         1.8  virginica
+125          6.7         3.3          5.7         2.1  virginica
+126          7.2         3.2          6.0         1.8  virginica
+127          6.2         2.8          4.8         1.8  virginica
+128          6.1         3.0          4.9         1.8  virginica
+129          6.4         2.8          5.6         2.1  virginica
+130          7.2         3.0          5.8         1.6  virginica
+131          7.4         2.8          6.1         1.9  virginica
+132          7.9         3.8          6.4         2.0  virginica
+133          6.4         2.8          5.6         2.2  virginica
+134          6.3         2.8          5.1         1.5  virginica
+135          6.1         2.6          5.6         1.4  virginica
+136          7.7         3.0          6.1         2.3  virginica
+137          6.3         3.4          5.6         2.4  virginica
+138          6.4         3.1          5.5         1.8  virginica
+139          6.0         3.0          4.8         1.8  virginica
+140          6.9         3.1          5.4         2.1  virginica
+141          6.7         3.1          5.6         2.4  virginica
+142          6.9         3.1          5.1         2.3  virginica
+143          5.8         2.7          5.1         1.9  virginica
+144          6.8         3.2          5.9         2.3  virginica
+145          6.7         3.3          5.7         2.5  virginica
+146          6.7         3.0          5.2         2.3  virginica
+147          6.3         2.5          5.0         1.9  virginica
+148          6.5         3.0          5.2         2.0  virginica
+149          6.2         3.4          5.4         2.3  virginica
+150          5.9         3.0          5.1         1.8  virginica
+</code></pre>
 
 </section>
 <section>
-<h2 id="dplyr">dplyr</h2>
+<h2 id="tibble-data-frameの改良版">tibble &mdash; data.frameの改良版</h2>
+
+<p><a href="http://tibble.tidyverse.org/">
+<img src="http://tibble.tidyverse.org/logo.png" align="right">
+</a></p>
+
+<ul>
+<li>巨大なデータをうっかり打ち込んでも画面を埋め尽くさない</li>
+<li>勝手な型変換などをしないので安全</li>
+<li>一応説明したけど、この先は区別せずdata.frameと呼ぶ</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tbl_iris <span class="o">=</span> as_tibble<span class="p">(</span>iris<span class="p">)</span>
+tbl_iris</code></pre></div>
+<pre><code># A tibble: 150 x 5
+   Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;  &lt;fctr&gt;
+ 1          5.1         3.5          1.4         0.2  setosa
+ 2          4.9         3.0          1.4         0.2  setosa
+ 3          4.7         3.2          1.3         0.2  setosa
+ 4          4.6         3.1          1.5         0.2  setosa
+ 5          5.0         3.6          1.4         0.2  setosa
+ 6          5.4         3.9          1.7         0.4  setosa
+ 7          4.6         3.4          1.4         0.3  setosa
+ 8          5.0         3.4          1.5         0.2  setosa
+ 9          4.4         2.9          1.4         0.2  setosa
+10          4.9         3.1          1.5         0.1  setosa
+# ... with 140 more rows
+</code></pre>
+
+</section>
+<section>
+<h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
 
 <p><a href="http://dplyr.tidyverse.org/">
 <img src="http://dplyr.tidyverse.org/logo.png" align="right">
 </a></p>
 
-<p>tidyverseの主要パッケージのひとつ。
-data.frameに対して抽出、部分的変更、要約、ソートなどの処理を施す担当。</p>
+<p>ひとつの関数はひとつの仕事。<br>
+繋げて使いやすいシンプルな関数がたくさん。</p>
 
-<ul>
-<li><code>filter()</code></li>
-<li><code>select()</code></li>
-<li><code>mutate()</code></li>
-<li><code>group_by()</code></li>
-<li><code>summarise()</code></li>
-<li><code>arrange()</code></li>
-<li><em>etc.</em></li>
-</ul>
+<dl>
+<dt>抽出</dt>
+<dd><code>filter()</code>, <code>select()</code>, <code>distinct()</code>, <code>sample_n()</code></dd>
+<dt>変更・追加</dt>
+<dd><code>mutate()</code>, <code>rename()</code></dd>
+<dt>要約・集計</dt>
+<dd><code>group_by()</code>, <code>summarise()</code>, <code>count()</code></dd>
+<dt>ソート</dt>
+<dd><code>arrange()</code></dd>
+<dt>結合</dt>
+<dd><code>left_join()</code>, <code>inner_join()</code>, <code>full_join()</code></dd>
+</dl>
+
+<p><em>etc.</em></p>
 
 </section>
 <section>
-<h2 id="dplyr">dplyr</h2>
+<h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
 
-<p>TODO: 後のtidyrくらい詳しくひとつの関数ごとに説明する？</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
-result <span class="o">=</span> iris <span class="o">%&gt;%</span>
+<p>いつもdata.frameが第一引数</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Sepal.Length <span class="o">&lt;</span> <span class="m">4.6</span><span class="p">)</span></code></pre></div>
+<pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          4.4         2.9          1.4         0.2  setosa
+2          4.3         3.0          1.1         0.1  setosa
+3          4.4         3.0          1.3         0.2  setosa
+4          4.5         2.3          1.3         0.3  setosa
+5          4.4         3.2          1.3         0.2  setosa
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>sample_n<span class="p">(</span>iris<span class="p">,</span> <span class="m">3L</span><span class="p">)</span></code></pre></div>
+<pre><code>   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
+8           5.0         3.4          1.5         0.2     setosa
+64          6.1         2.9          4.7         1.4 versicolor
+51          7.0         3.2          4.7         1.4 versicolor
+</code></pre>
+
+</section>
+<section>
+<h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> iris <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>arrange<span class="p">(</span>Petal.Width<span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 小さい順に並べ替え</span>
   dplyr<span class="o">::</span>filter<span class="p">(</span>Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行を除外</span>
   dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を除外</span>
@@ -254,33 +477,30 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 2  virginica        6.588       2.974 9.796356
 </code></pre>
 
-<p><code>%&gt;%</code> これは何？</p>
+<p>見慣れないこの記号 <code>%&gt;%</code> は何？</p>
 
 </section>
 <section>
 <h2 id="パイプ演算子">パイプ演算子 <code>%&gt;%</code></h2>
 
-<p>パイプの左側の変数を、右側の関数の第一引数にねじ込む</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
-<span class="m">1</span> <span class="o">%&gt;%</span> <span class="kp">sum</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span></code></pre></div>
+<p>パイプの左側の変数を、右側の関数の第一引数にねじ込む:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="m">1</span> <span class="o">%&gt;%</span> <span class="kp">sum</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span></code></pre></div>
 <pre><code>[1] 6
 </code></pre>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">sum</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span></code></pre></div>
 <pre><code>[1] 6
 </code></pre>
 
-<p>下ごしらえの流れ作業に便利</p>
+<p>下ごしらえの流れ作業に便利:</p>
 
 <pre><code>データ   %&gt;%   処理A   %&gt;%   処理B   %&gt;%   処理C   %&gt;%   処理D
 </code></pre>
 
 </section>
 <section>
-<h2 id="パイプ演算子">パイプ演算子 <code>%&gt;%</code></h2>
+<h2 id="パイプ演算子-を使わない">パイプ演算子 <code>%&gt;%</code> を使わない</h2>
 
-<p>特定の行や列を除外してから、グループごとに平均値を計算したい</p>
-
-<p>パイプを使わず、一時変数を使う方法:</p>
+<p>一時変数を使う方法:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tmp1 <span class="o">=</span> dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span> <span class="c1"># 行を除外</span>
 tmp2 <span class="o">=</span> dplyr<span class="o">::</span>select<span class="p">(</span>tmp1<span class="p">,</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">))</span>  <span class="c1"># 列を除外</span>
 tmp3 <span class="o">=</span> dplyr<span class="o">::</span>group_by<span class="p">(</span>tmp2<span class="p">,</span> Species<span class="p">)</span>           <span class="c1"># グループごとに</span>
@@ -295,11 +515,9 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
 
 </section>
 <section>
-<h2 id="パイプ演算子">パイプ演算子 <code>%&gt;%</code></h2>
+<h2 id="パイプ演算子-を使わない">パイプ演算子 <code>%&gt;%</code> を使わない</h2>
 
-<p>特定の行や列を除外してから、グループごとに平均値を計算したい</p>
-
-<p>パイプも一時変数も使わない力技:</p>
+<p>一時変数さえも使わない力技:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>            <span class="c1"># 平均を計算</span>
   dplyr<span class="o">::</span>group_by<span class="p">(</span>                          <span class="c1"># グループごとに</span>
     dplyr<span class="o">::</span>select<span class="p">(</span>                            <span class="c1"># 列を除外</span>
@@ -312,11 +530,9 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
 
 </section>
 <section>
-<h2 id="パイプ演算子">パイプ演算子 <code>%&gt;%</code></h2>
+<h2 id="パイプ演算子-を使う">パイプ演算子 <code>%&gt;%</code> を使う</h2>
 
-<p>特定の行や列を除外してから、グループごとに平均値を計算したい</p>
-
-<p>パイプを使えばスッキリ:</p>
+<p>慣れれば、論理の流れを追いやすい:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
 result <span class="o">=</span> iris <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>filter<span class="p">(</span>Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行を除外</span>
@@ -331,19 +547,15 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 2  virginica        6.588       2.974
 </code></pre>
 
-<p>慣れるまではちょっと大変かも。無理して使わなくでも大丈夫。<br>
-でも、一旦慣れれば断然読みやすい、書きやすい。</p>
+<p>慣れるまではちょっと大変かも。無理して使わなくても大丈夫。</p>
 
 </section>
 <section>
-<h2 id="tidyr">tidyr</h2>
+<h2 id="tidyr-data-frameの変形-整形担当">tidyr &mdash; data.frameの変形・整形担当</h2>
 
 <p><a href="http://tidyr.tidyverse.org/">
 <img src="http://tidyr.tidyverse.org/logo.png" align="right">
 </a></p>
-
-<p>tidyverseの主要パッケージのひとつ。
-data.frameを縦長・横長・入れ子に変形・整形するところを担当。</p>
 
 <ul>
 <li><code>gather()</code> 横長から縦長に</li>
@@ -508,21 +720,17 @@ data.frameを縦長・横長・入れ子に変形・整形するところを担�
 <img src="http://purrr.tidyverse.org/logo.png" align="right">
 </a></p>
 
-<p>tidyverseの主要パッケージのひとつ。
-listやループの処理担当。
-R標準の<code>sapply</code>とか<code>lapply</code>とかは使い方おぼえにくいので。。。</p>
+<p>listやループの処理担当。</p>
 
 <ul>
-<li><code>map()</code></li>
+<li><code>map()</code>, <code>walk()</code></li>
+<li><code>map_int()</code>, <code>map_dbl()</code>, <code>map_chr()</code></li>
+<li><code>map_dfr()</code></li>
+<li><code>pmap()</code>, <code>map2()</code></li>
 <li><code>flatten()</code></li>
 <li><em>etc.</em></li>
 </ul>
 
-</section>
-<section>
-<h2 id="purrr-map"><code>purrr::map()</code></h2>
-
-<p>TODO?
 </section>
 <section>
 <h2 id="例題-anscombe">例題 <code>anscombe</code></h2>
@@ -925,38 +1133,86 @@ R標準の<code>sapply</code>とか<code>lapply</code>とかは使い方おぼ�
 <section>
 <h2 id="例題-先ほどの伊東さんのデータ準備部分">例題 先ほどの伊東さんのデータ準備部分</h2>
 
-<p><a href="https://github.com/ito4303/esj65">https://github.com/ito4303/esj65</a>
+<p><a href="https://github.com/ito4303/esj65">https://github.com/ito4303/esj65</a></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">prefix <span class="o">=</span> <span class="s">&#34;https://raw.githubusercontent.com/ito4303/esj65/master/&#34;</span>
+s_file <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>prefix<span class="p">,</span> <span class="s">&#34;Stem_data.csv&#34;</span><span class="p">)</span>
+m_file <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>prefix<span class="p">,</span> <span class="s">&#34;Measurement_data.csv&#34;</span><span class="p">)</span>
+s_data <span class="o">=</span> readr<span class="o">::</span>read_csv<span class="p">(</span>s_file<span class="p">)</span>
+m_data <span class="o">=</span> readr<span class="o">::</span>read_csv<span class="p">(</span>m_file<span class="p">)</span>
+g_data <span class="o">=</span> m_data <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>inner_join<span class="p">(</span>s_data<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;Stem&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>filter<span class="p">(</span>
+    Year <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="m">1993</span><span class="p">,</span> <span class="m">2014</span><span class="p">),</span>
+    X1 <span class="o">&lt;</span> <span class="m">50</span><span class="p">,</span>
+    Species <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;Quercus glauca&#34;</span><span class="p">,</span> <span class="s">&#34;Symplocos prunifolia&#34;</span><span class="p">),</span>
+    <span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>DBH<span class="p">))</span> <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>transmute<span class="p">(</span>X <span class="o">=</span> X1<span class="p">,</span> Y <span class="o">=</span> Y1<span class="p">,</span> Year<span class="p">,</span> Species<span class="p">,</span> DBH<span class="p">)</span></code></pre></div>
+<p>TODO: step by step</p>
+
 </section>
 <section>
 <h2 id="例題-vadeaths">例題 <code>VADeaths</code></h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">VADeaths <span class="o">%&gt;%</span>
+  <span class="kp">as.data.frame</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;class&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span><span class="kp">class</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;lbound&#39;</span><span class="p">,</span> <span class="s">&#39;ubound&#39;</span><span class="p">),</span> <span class="s">&#39;-&#39;</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  tidyr<span class="o">::</span>gather<span class="p">(</span>people<span class="p">,</span> death_rate<span class="p">,</span> <span class="o">-</span>lbound<span class="p">,</span> <span class="o">-</span>ubound<span class="p">)</span> <span class="o">%&gt;%</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>people<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span> <span class="s">&#34; &#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>mutate<span class="p">(</span>death_rate <span class="o">=</span> death_rate <span class="o">*</span> <span class="m">0.1</span><span class="p">)</span></code></pre></div>
+<pre><code>   lbound ubound region    sex death_rate
+1      50     54  Rural   Male       1.17
+2      55     59  Rural   Male       1.81
+3      60     64  Rural   Male       2.69
+4      65     69  Rural   Male       4.10
+5      70     74  Rural   Male       6.60
+6      50     54  Rural Female       0.87
+7      55     59  Rural Female       1.17
+8      60     64  Rural Female       2.03
+9      65     69  Rural Female       3.09
+10     70     74  Rural Female       5.43
+11     50     54  Urban   Male       1.54
+12     55     59  Urban   Male       2.43
+13     60     64  Urban   Male       3.70
+14     65     69  Urban   Male       5.46
+15     70     74  Urban   Male       7.11
+16     50     54  Urban Female       0.84
+17     55     59  Urban Female       1.36
+18     60     64  Urban Female       1.93
+19     65     69  Urban Female       3.51
+20     70     74  Urban Female       5.00
+</code></pre>
+
+<p>TODO: step by step</p>
 
 </section>
 <section>
 <h2 id="参考">参考</h2>
 
-<p>&ldquo;R for Data Science&rdquo; Hadley Wickham and Garrett Grolemund
-<a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a>
-<a href="https://amzn.to/2tbRmVc">英語版書籍</a>
-<a href="http://r4ds.had.co.nz/">無料Web版</a></p>
+<dl>
+<dt>&ldquo;R for Data Science&rdquo; Hadley Wickham and Garrett Grolemund</dt>
+<dd><a href="http://r4ds.had.co.nz/">http://r4ds.had.co.nz/</a></dd>
+<dd><a href="https://amzn.to/2tbRmVc">英語版書籍</a>と
+<a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a>もある。</dd>
+<dt>各パッケージの公式ドキュメント</dt>
+<dd><a href="https://www.tidyverse.org/">tidyverse</a></dd>
+<dd><a href="http://dplyr.tidyverse.org/">dplyr</a></dd>
+<dd><a href="http://tidyr.tidyverse.org/">tidyr</a></dd>
+<dd><a href="http://purrrr.tidyverse.org/">purrr</a></dd>
+<dd><a href="http://readr.tidyverse.org/">readr</a></dd>
+<dd><a href="http://readxl.tidyverse.org/">readxl</a></dd>
+</dl>
 
-<p>各パッケージの公式ドキュメント</p>
-
-<ul>
-<li><a href="https://www.tidyverse.org/">tidyverse</a></li>
-<li><a href="http://tidyr.tidyverse.org/">tidyr</a></li>
-<li><a href="http://dplyr.tidyverse.org/">dplyr</a></li>
-<li><a href="http://purrrr.tidyverse.org/">purrr</a></li>
-</ul>
-
+<p>パッケージ名とかで検索すれば日本語サイトの解説も結構ひっかかる。
 </section>
 <section>
-<h2 id="エラーや疑問の解決方法">エラーや疑問の解決方法</h2>
+<h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
 
 <ul>
+<li>公式ドキュメントを読む</li>
 <li>エラー文をちゃんと読む</li>
-<li>エラー文をGoogleにコピペする -&gt; だいたいStackOverflowや個人ウェブサイトに先例が見つかる</li>
+<li>エラー文をコピペしてウェブ検索 → StackOverflowや個人サイトに先例</li>
 <li>身近な経験者に訊く</li>
-<li>Slackの <a href="https://github.com/tokyor/r-wakalang">r-wakalang</a> に質問を投稿する</li>
+<li>Slackのr-wakalangに質問を投稿する <a href="https://github.com/tokyor/r-wakalang">https://github.com/tokyor/r-wakalang</a></li>
 </ul>
 
 </section>
