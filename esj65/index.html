@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<title>ESJ65-W12 それもRにやらせよう --- 整然データの下ごしらえ</title>
+<title>ESJ65-W07 それもRにやらせよう — 整然データの下ごしらえ</title>
 <link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
 <link rel="stylesheet" href="/slides/reveal-theme.css">
 <script type="text/x-mathjax-config">
@@ -43,7 +43,7 @@ MathJax.Hub.Config({
 
 <div class="affiliation">
 総研大<br>
-SOKENDAI (The Graduate University for Advanced Studies)
+(SOKENDAI, The Graduate University for Advanced Studies)
 </div>
 
 <div class="footnote">
@@ -52,7 +52,7 @@ SOKENDAI (The Graduate University for Advanced Studies)
 生態学会65＠札幌
 </a><br>
 <a href="http://hosho.ees.hokudai.ac.jp/~kubo/ce/EcoSj2018.html">
-[W12] データ解析で出会う統計的問題: R の新しい作図・作表
+[W07] データ解析で出会う統計的問題: R の新しい作図・作表
 </a>
 </div>
 
@@ -87,6 +87,7 @@ but every messy dataset is messy in its own way<br>
 <li>1行は1つの観測</li>
 <li>1列は1つの変数</li>
 <li>1セルは1つの値</li>
+<li>(ggplotしたくなる形)</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">mtcars</code></pre></div>
 <pre><code>                     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
@@ -133,11 +134,11 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <h2 id="雑然データ-messy-data">雑然データ messy data</h2>
 
 <ul>
-<li>データを採るときに楽な形（これは仕方ない）</li>
 <li>行にも列にも変数が混じっている</li>
 <li>1つの観測が縦も横バラバラな位置に</li>
 <li>1つのセルに複数の意味や値が含まれている</li>
 <li>セルの結合？もってのほか！</li>
+<li>(データを採るときに楽な形。これは仕方ない)</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">VADeaths</code></pre></div>
 <pre><code>      Rural Male Rural Female Urban Male Urban Female
@@ -177,32 +178,34 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <section>
 <h2 id="ゑくせる手作業-シーシュポスの岩">ゑくせる手作業 ＝ シーシュポスの岩</h2>
 
-<p><img src="https://upload.wikimedia.org/wikipedia/commons/4/43/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="240" align="right"></p>
+<p><img src="figure/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right"></p>
 
 <ul>
 <li>膨大な単純作業がそもそもツラい</li>
 <li>人間だもの、ミスは防ぎきれない</li>
 <li>なるべく防ぐためのチェックもツラい</li>
-<li>ミスを発見 → 初めの工程からやり直し</li>
-<li>新たなデータを追加 → 初めの工程からやり直し</li>
+<li>ミスを発見 → 初めからやり直し</li>
+<li>新たなデータ・研究 → 初めからやり直し</li>
+<li>どんなに経験を積んでも良くならない</li>
 </ul>
 
-<p>正確性・再現性が求められる退屈な仕事は人間よりも機械のほうが得意</p>
+<p><br>
+規則性のある退屈な仕事は人間よりも機械のほうが得意</p>
 
-<p>動くプログラムを一旦書いてしまえば、データが変わっても平気</p>
+<p>動くプログラムを一旦書いてしまえば、データが変わっても使える財産</p>
 
-<p><strong>Reproduceble Research のためにも R にやらせよう</strong></p>
+<p><strong>Reproducible Research, 再現性のためにも R にやらせよう</strong></p>
 
 </section>
 <section>
 <h2 id="今回の目標">今回の目標</h2>
 
-<h3 id="rでこんなことができるんだな">Rでこんなことができるんだな</h3>
+<h3 id="いまのrってこんなことができるんだな">いまのRってこんなことができるんだな</h3>
 
-<h3 id="やりたくなったらこのへんを見ればいいんだな">やりたくなったらこのへんを見ればいいんだな</h3>
+<h3 id="やりたくなったらこのへんを調べればいいんだな">やりたくなったらこのへんを調べればいいんだな</h3>
 
 <p><br>
-この2点さえ押さえれば、具体的なやり方は覚えなくて大丈夫
+この2点さえ押さえれば、具体的なやり方は覚えなくても大丈夫
 </section>
 <section>
 <h2 id="tidyverse">tidyverse</h2>
@@ -229,7 +232,7 @@ A. 大丈夫。誰も覚えきってない。</p>
 <section>
 <h2 id="よく見かけるサンプルデータ-iris">よく見かけるサンプルデータ <code>iris</code></h2>
 
-<p>Rに最初から入ってる。
+<p>Rに最初から入ってるdata.frame。<br>
 3種のアヤメ150個体に関する4個の計測値。</p>
 
 <p>うっかり実行すると、</p>
@@ -238,7 +241,7 @@ A. 大丈夫。誰も覚えきってない。</p>
 <section>
 <h2 id="よく見かけるサンプルデータ-iris">よく見かけるサンプルデータ <code>iris</code></h2>
 
-<p>Rに最初から入ってる。
+<p>Rに最初から入ってるdata.frame。<br>
 3種のアヤメ150個体に関する4個の計測値。</p>
 
 <p>うっかり実行すると、ながーい！</p>
@@ -401,7 +404,7 @@ A. 大丈夫。誰も覚えきってない。</p>
 <h2 id="tibble-data-frameの改良版">tibble &mdash; data.frameの改良版</h2>
 
 <p><a href="http://tibble.tidyverse.org/">
-<img src="http://tibble.tidyverse.org/logo.png" align="right">
+<img src="figure/hex-tibble.png" width="120" align="right">
 </a></p>
 
 <ul>
@@ -431,7 +434,7 @@ A. 大丈夫。誰も覚えきってない。</p>
 <h2 id="tibble-data-frameの改良版">tibble &mdash; data.frameの改良版</h2>
 
 <p><a href="http://tibble.tidyverse.org/">
-<img src="http://tibble.tidyverse.org/logo.png" align="right">
+<img src="figure/hex-tibble.png" width="120" align="right">
 </a></p>
 
 <ul>
@@ -439,13 +442,13 @@ A. 大丈夫。誰も覚えきってない。</p>
 <li><strong>列の名前や型を勝手に変更しない</strong></li>
 <li>一応説明したけど、この先は区別せずdata.frameと呼ぶ</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">df <span class="o">=</span> <span class="kt">data.frame</span><span class="p">(</span><span class="s">&#39;x-1&#39;</span> <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;b&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">))</span>
-df<span class="p">[[</span><span class="s">&#39;x.1&#39;</span><span class="p">]]</span>   <span class="c1"># 名前が違う！中身も勝手にfactor型に！</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">df <span class="o">=</span> <span class="kt">data.frame</span><span class="p">(</span><span class="s">&#34;x-1&#34;</span> <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;b&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">))</span>
+df<span class="p">[[</span><span class="s">&#34;x.1&#34;</span><span class="p">]]</span>   <span class="c1"># 名前が違う！中身も勝手にfactor型に！</span></code></pre></div>
 <pre><code>[1] b e e r
 Levels: b e r
 </code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tbl <span class="o">=</span> tibble<span class="p">(</span><span class="s">&#39;x-1&#39;</span> <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;b&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">))</span>
-tbl<span class="p">[[</span><span class="s">&#39;x-1&#39;</span><span class="p">]]</span>  <span class="c1"># 当然character型のまま</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tbl <span class="o">=</span> tibble<span class="p">(</span><span class="s">&#34;x-1&#34;</span> <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;b&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;e&#34;</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">))</span>
+tbl<span class="p">[[</span><span class="s">&#34;x-1&#34;</span><span class="p">]]</span>  <span class="c1"># 当然character型のまま</span></code></pre></div>
 <pre><code>[1] &quot;b&quot; &quot;e&quot; &quot;e&quot; &quot;r&quot;
 </code></pre>
 
@@ -454,7 +457,7 @@ tbl<span class="p">[[</span><span class="s">&#39;x-1&#39;</span><span class="p">
 <h2 id="readr-data-frameの読み書き">readr &mdash; data.frameの読み書き</h2>
 
 <p><a href="http://readr.tidyverse.org/">
-<img src="http://readr.tidyverse.org/logo.png" align="right">
+<img src="figure/hex-readr.png" width="120" align="right">
 </a></p>
 
 <p>標準の <code>read.table()</code> や <code>write.table()</code> より便利:</p>
@@ -464,8 +467,8 @@ tbl<span class="p">[[</span><span class="s">&#39;x-1&#39;</span><span class="p">
 <li>列の名前や型を勝手に変更しない</li>
 <li>生data.frameではなく安全なtibbleとして返してくれる</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#39;iris.tsv&#39;</span><span class="p">)</span>
-readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#39;iris.tsv&#39;</span><span class="p">)</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#34;iris.tsv&#34;</span><span class="p">)</span>
+readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#34;iris.tsv&#34;</span><span class="p">)</span></code></pre></div>
 <pre><code># A tibble: 150 x 5
    Sepal.Length Sepal.Width Petal.Length Petal.Width Species
           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;   &lt;chr&gt;
@@ -487,7 +490,7 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 <h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
 
 <p><a href="http://dplyr.tidyverse.org/">
-<img src="http://dplyr.tidyverse.org/logo.png" align="right">
+<img src="figure/hex-dplyr.png" width="120" align="right">
 </a></p>
 
 <p>ひとつの関数はひとつの仕事。<br>
@@ -535,8 +538,8 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 <p>小さな関数を繋げて使う。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> iris <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>arrange<span class="p">(</span>Petal.Width<span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 小さい順に並べ替え</span>
-  dplyr<span class="o">::</span>filter<span class="p">(</span>Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行を除外</span>
-  dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を除外</span>
+  dplyr<span class="o">::</span>filter<span class="p">(</span>Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行を除外</span>
+  dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を除外</span>
   dplyr<span class="o">::</span>group_by<span class="p">(</span>Species<span class="p">)</span> <span class="o">%&gt;%</span>             <span class="c1"># グループごとに</span>
   dplyr<span class="o">::</span>summarise_all<span class="p">(</span><span class="kp">mean</span><span class="p">)</span> <span class="o">%&gt;%</span>           <span class="c1"># 平均を計算</span>
   dplyr<span class="o">::</span>mutate<span class="p">(</span>area <span class="o">=</span> Sepal.Length <span class="o">*</span> Sepal.Width <span class="o">/</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span>
@@ -574,13 +577,13 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 <h2 id="パイプ演算子-を使わない">パイプ演算子 <code>%&gt;%</code> を使わない</h2>
 
 <p>一時変数を使う方法:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tmp1 <span class="o">=</span> dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span> <span class="c1"># 行を除外</span>
-tmp2 <span class="o">=</span> dplyr<span class="o">::</span>select<span class="p">(</span>tmp1<span class="p">,</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">))</span>  <span class="c1"># 列を除外</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tmp1 <span class="o">=</span> dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">)</span> <span class="c1"># 行を除外</span>
+tmp2 <span class="o">=</span> dplyr<span class="o">::</span>select<span class="p">(</span>tmp1<span class="p">,</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">))</span>  <span class="c1"># 列を除外</span>
 tmp3 <span class="o">=</span> dplyr<span class="o">::</span>group_by<span class="p">(</span>tmp2<span class="p">,</span> Species<span class="p">)</span>           <span class="c1"># グループごとに</span>
 result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>tmp3<span class="p">,</span> <span class="kp">mean</span><span class="p">)</span>       <span class="c1"># 平均を計算</span></code></pre></div>
 <p>もしくは全部同じ名前で:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span>  <span class="c1"># 行を除外</span>
-result <span class="o">=</span> dplyr<span class="o">::</span>select<span class="p">(</span>result<span class="p">,</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">))</span> <span class="c1"># 列を除外</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">)</span>  <span class="c1"># 行を除外</span>
+result <span class="o">=</span> dplyr<span class="o">::</span>select<span class="p">(</span>result<span class="p">,</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">))</span> <span class="c1"># 列を除外</span>
 result <span class="o">=</span> dplyr<span class="o">::</span>group_by<span class="p">(</span>result<span class="p">,</span> Species<span class="p">)</span>          <span class="c1"># グループごとに</span>
 result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>result<span class="p">,</span> <span class="kp">mean</span><span class="p">)</span>        <span class="c1"># 平均を計算</span></code></pre></div>
 <p>これらは全然悪くない。
@@ -594,8 +597,8 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>            <span class="c1"># 平均を計算</span>
   dplyr<span class="o">::</span>group_by<span class="p">(</span>                          <span class="c1"># グループごとに</span>
     dplyr<span class="o">::</span>select<span class="p">(</span>                            <span class="c1"># 列を除外</span>
-      dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">),</span> <span class="c1"># 行を除外</span>
-      <span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">)),</span>                    <span class="c1"># 列を除外</span>
+      dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">),</span> <span class="c1"># 行を除外</span>
+      <span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">)),</span>                    <span class="c1"># 列を除外</span>
     Species<span class="p">),</span>                               <span class="c1"># グループごとに</span>
   <span class="kp">mean</span><span class="p">)</span>                                   <span class="c1"># 平均を計算</span></code></pre></div>
 <p>論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
@@ -608,8 +611,8 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
 <p>慣れれば、論理の流れを追いやすい:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
 result <span class="o">=</span> iris <span class="o">%&gt;%</span>
-  dplyr<span class="o">::</span>filter<span class="p">(</span>Species <span class="o">!=</span> <span class="s">&#39;setosa&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行を除外</span>
-  dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>matches<span class="p">(</span><span class="s">&#39;^Petal&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を除外</span>
+  dplyr<span class="o">::</span>filter<span class="p">(</span>Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行を除外</span>
+  dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を除外</span>
   dplyr<span class="o">::</span>group_by<span class="p">(</span>Species<span class="p">)</span> <span class="o">%&gt;%</span>             <span class="c1"># グループごとに</span>
   dplyr<span class="o">::</span>summarise_all<span class="p">(</span><span class="kp">mean</span><span class="p">)</span> <span class="o">%&gt;%</span>           <span class="c1"># 平均を計算</span>
   <span class="kp">print</span><span class="p">()</span>                                  <span class="c1"># 表示してみる</span></code></pre></div>
@@ -627,7 +630,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <h2 id="tidyr-data-frameの変形-整形担当">tidyr &mdash; data.frameの変形・整形担当</h2>
 
 <p><a href="http://tidyr.tidyverse.org/">
-<img src="http://tidyr.tidyverse.org/logo.png" align="right">
+<img src="figure/hex-tidyr.png" width="120" align="right">
 </a></p>
 
 <ul>
@@ -643,7 +646,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <section>
 <h2 id="tidyr-gather-横長から縦長に"><code>tidyr::gather()</code> 横長から縦長に</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>                           <span class="c1"># 最初の2行だけ</span>
-  rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
+  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
   <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                   <span class="c1"># 途中経過を表示</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span>     <span class="c1"># 縦長に変形</span></code></pre></div>
 <pre><code>  id Sepal.Length Sepal.Width Petal.Length Petal.Width Species
@@ -666,7 +669,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <section>
 <h2 id="tidyr-spread-縦長から横長に"><code>tidyr::spread()</code> 縦長から横長に</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>                           <span class="c1"># 最初の2行だけ</span>
-  rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
+  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># 縦長に変形</span>
   <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                   <span class="c1"># 途中経過を表示</span>
   tidyr<span class="o">::</span>spread<span class="p">(</span>name<span class="p">,</span> value<span class="p">)</span>                    <span class="c1"># 横長に戻す</span></code></pre></div>
@@ -690,10 +693,10 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <section>
 <h2 id="tidyr-separate-列を分離"><code>tidyr::separate()</code> 列を分離</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>                           <span class="c1"># 最初の2行だけ</span>
-  rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
+  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># 縦長に変形</span>
   <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                   <span class="c1"># 途中経過を表示</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;part&#39;</span><span class="p">,</span> <span class="s">&#39;measure&#39;</span><span class="p">))</span>   <span class="c1"># 列を分離</span></code></pre></div>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;part&#34;</span><span class="p">,</span> <span class="s">&#34;measure&#34;</span><span class="p">))</span>   <span class="c1"># 列を分離</span></code></pre></div>
 <pre><code>  id Species         name value
 1  1  setosa Sepal.Length   5.1
 2  2  setosa Sepal.Length   4.9
@@ -790,7 +793,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <h2 id="purrr">purrr</h2>
 
 <p><a href="http://purrr.tidyverse.org/">
-<img src="http://purrr.tidyverse.org/logo.png" align="right">
+<img src="figure/hex-purrr.png" width="120" align="right">
 </a></p>
 
 <p>listやループの処理担当。</p>
@@ -812,7 +815,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span>       <span class="c1"># あとで必要なID列</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span>       <span class="c1"># あとで必要なID列</span>
   <span class="c1"># 横長のままでは扱いにくいの縦長にしたい</span></code></pre></div>
 <pre><code>   id x1 x2 x3 x4    y1   y2    y3    y4
 1   1 10 10 10  8  8.04 9.14  7.46  6.58
@@ -834,7 +837,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>key<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">)</span>         <span class="c1"># 縦長に変形</span>
   <span class="c1"># key列の x1 とかを x, 1 の2列に分離したい</span></code></pre></div>
 <pre><code>   id key value
@@ -934,9 +937,9 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>key<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">)</span> <span class="o">%&gt;%</span>     <span class="c1"># 縦長に変形</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>key<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;axis&#39;</span><span class="p">,</span> <span class="s">&#39;group&#39;</span><span class="p">),</span> <span class="m">1L</span><span class="p">)</span>      <span class="c1"># 列を分離</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>key<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">)</span>      <span class="c1"># 列を分離</span>
   <span class="c1"># xとyのペアが1行になってほしい</span>
   <span class="c1"># xとyが新たな列名になるように横長にしたい</span></code></pre></div>
 <pre><code>   id axis group value
@@ -1036,9 +1039,9 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>key<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">)</span> <span class="o">%&gt;%</span>     <span class="c1"># 縦長に変形</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>key<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;axis&#39;</span><span class="p">,</span> <span class="s">&#39;group&#39;</span><span class="p">),</span> <span class="m">1L</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 列を分離</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>key<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 列を分離</span>
   tidyr<span class="o">::</span>spread<span class="p">(</span>axis<span class="p">,</span> value<span class="p">)</span>             <span class="c1"># axis列をx列とy列に</span></code></pre></div>
 <pre><code>   id group  x     y
 1   1     1 10  8.04
@@ -1093,9 +1096,9 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_anscombe <span class="o">=</span> anscombe <span class="o">%&gt;%</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># あとで必要なID列</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>key<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">)</span> <span class="o">%&gt;%</span>     <span class="c1"># 縦長に変形</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>key<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;axis&#39;</span><span class="p">,</span> <span class="s">&#39;group&#39;</span><span class="p">),</span> <span class="m">1L</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 列を分離</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>key<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 列を分離</span>
   tidyr<span class="o">::</span>spread<span class="p">(</span>axis<span class="p">,</span> value<span class="p">)</span> <span class="o">%&gt;%</span>         <span class="c1"># axis列をx列とy列に</span>
   dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>id<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># 使い終わったID列を消す</span>
   dplyr<span class="o">::</span>arrange<span class="p">(</span>group<span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># グループごとに並べる</span>
@@ -1186,15 +1189,15 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
 
-<p>tidyrのネストを使って要約</p>
+<p>tidyrのネストを使って要約 (中級者向け)</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_anscombe <span class="o">%&gt;%</span>
-  tidyr<span class="o">::</span>nest<span class="p">(</span><span class="o">-</span>group<span class="p">)</span> <span class="o">%&gt;%</span>       <span class="c1"># group列でネストして</span>
-  dplyr<span class="o">::</span>mutate<span class="p">(</span>data <span class="o">=</span> purrr<span class="o">::</span>map<span class="p">(</span>data<span class="p">,</span> <span class="o">~</span><span class="p">{</span>
-    <span class="m">.</span>x <span class="o">%&gt;%</span>
+  tidyr<span class="o">::</span>nest<span class="p">(</span><span class="o">-</span>group<span class="p">)</span> <span class="o">%&gt;%</span>    <span class="c1"># group列でネストして</span>
+  dplyr<span class="o">::</span>mutate<span class="p">(</span>data <span class="o">=</span> purrr<span class="o">::</span>map<span class="p">(</span>data<span class="p">,</span> <span class="kr">function</span><span class="p">(</span>data_i<span class="p">)</span> <span class="p">{</span>
+    data_i <span class="o">%&gt;%</span>               <span class="c1"># 入れ子の内側の各データをいじって</span>
       summarise_all<span class="p">(</span>funs<span class="p">(</span><span class="kp">mean</span><span class="p">,</span> sd<span class="p">))</span> <span class="o">%&gt;%</span>
-      dplyr<span class="o">::</span>mutate<span class="p">(</span>cor_xy <span class="o">=</span> cor<span class="p">(</span><span class="m">.</span>x<span class="o">$</span>x<span class="p">,</span> <span class="m">.</span>x<span class="o">$</span>y<span class="p">))</span>
+      dplyr<span class="o">::</span>mutate<span class="p">(</span>cor_xy <span class="o">=</span> cor<span class="p">(</span>data_i<span class="o">$</span>x<span class="p">,</span> data_i<span class="o">$</span>y<span class="p">))</span>
   <span class="p">}))</span> <span class="o">%&gt;%</span>
-  tidyr<span class="o">::</span>unnest<span class="p">()</span></code></pre></div>
+  tidyr<span class="o">::</span>unnest<span class="p">()</span>            <span class="c1"># 入れ子を解消</span></code></pre></div>
 <pre><code># A tibble: 4 x 6
   group x_mean   y_mean     x_sd     y_sd    cor_xy
   &lt;chr&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
@@ -1209,11 +1212,11 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <h2 id="例題-先ほどの伊東さんのデータ準備部分">例題: 先ほどの伊東さんのデータ準備部分</h2>
 
 <p><code>m_data</code> をベースに、2つをまとめた <code>g_data</code> を作りたい</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># prefix = &#34;https://raw.githubusercontent.com/ito4303/esj65/master/&#34;</span>
-prefix <span class="o">=</span> <span class="s">&#34;.&#34;</span>
-m_data <span class="o">=</span> <span class="kp">file.path</span><span class="p">(</span>prefix<span class="p">,</span> <span class="s">&#34;Measurement_data.csv&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> read_csv<span class="p">()</span>
-s_data <span class="o">=</span> <span class="kp">file.path</span><span class="p">(</span>prefix<span class="p">,</span> <span class="s">&#34;Stem_data.csv&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> read_csv<span class="p">()</span>
-m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">prefix <span class="o">=</span> <span class="s">&#34;https://raw.githubusercontent.com/ito4303/esj65/master/&#34;</span>
+m_data <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>prefix<span class="p">,</span> <span class="s">&#34;Measurement_data.csv&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> read_csv<span class="p">()</span>
+s_data <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>prefix<span class="p">,</span> <span class="s">&#34;Stem_data.csv&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> read_csv<span class="p">()</span>
+m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
+s_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span></code></pre></div>
 <pre><code># A tibble: 3 x 4
    Stem  Year   DBH Comment
   &lt;chr&gt; &lt;int&gt; &lt;dbl&gt;   &lt;chr&gt;
@@ -1221,7 +1224,7 @@ m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 2 WF004  2014   3.8    &lt;NA&gt;
 3   315  1993  16.1    &lt;NA&gt;
 </code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">s_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span></code></pre></div>
+
 <pre><code># A tibble: 3 x 9
    Indv  Stem     X     Y    X1    Y1              Species Start   End
   &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;                &lt;chr&gt; &lt;int&gt; &lt;int&gt;
@@ -1337,7 +1340,7 @@ m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <section>
 <h2 id="例題-vadeaths">例題: <code>VADeaths</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># matrixからdata.frameに</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;class&#39;</span><span class="p">)</span>       <span class="c1"># 行名を列に</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;class&#34;</span><span class="p">)</span>       <span class="c1"># 行名を列に</span>
                                             <span class="c1"># 縦長に変形</span>
                                                   <span class="c1"># 地域と性別を分離</span>
                                             <span class="c1"># 下限と上限を分離</span></code></pre></div>
@@ -1353,7 +1356,7 @@ m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <section>
 <h2 id="例題-vadeaths">例題: <code>VADeaths</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># matrixからdata.frameに</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;class&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行名を列に</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;class&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行名を列に</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>people<span class="p">,</span> death<span class="p">,</span> <span class="o">-</span><span class="kp">class</span><span class="p">)</span>      <span class="c1"># 縦長に変形</span>
                                                   <span class="c1"># 地域と性別を分離</span>
                                             <span class="c1"># 下限と上限を分離</span></code></pre></div>
@@ -1384,7 +1387,7 @@ m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <section>
 <h2 id="例題-vadeaths">例題: <code>VADeaths</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># matrixからdata.frameに</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;class&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行名を列に</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;class&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行名を列に</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>people<span class="p">,</span> death<span class="p">,</span> <span class="o">-</span><span class="kp">class</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 縦長に変形</span>
   tidyr<span class="o">::</span>separate<span class="p">(</span>people<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span>     <span class="c1"># 地域と性別を分離</span>
                                             <span class="c1"># 下限と上限を分離</span></code></pre></div>
@@ -1415,10 +1418,10 @@ m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <section>
 <h2 id="例題-vadeaths">例題: <code>VADeaths</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># matrixからdata.frameに</span>
-  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#39;class&#39;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行名を列に</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;class&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 行名を列に</span>
   tidyr<span class="o">::</span>gather<span class="p">(</span>people<span class="p">,</span> death<span class="p">,</span> <span class="o">-</span><span class="kp">class</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 縦長に変形</span>
   tidyr<span class="o">::</span>separate<span class="p">(</span>people<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 地域と性別を分離</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span><span class="kp">class</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;lbound&#39;</span><span class="p">,</span> <span class="s">&#39;ubound&#39;</span><span class="p">),</span> <span class="s">&#39;-&#39;</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span><span class="kp">class</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span>
                                             <span class="c1"># 下限と上限を分離</span></code></pre></div>
 <pre><code>   lbound ubound region    sex death
 1      50     54  Rural   Male  11.7
@@ -1446,7 +1449,7 @@ m_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 </section>
 <section>
 <h2 id="例題-数値-単位になっちゃってる列を処理">例題: 数値+単位になっちゃってる列を処理</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">women2 <span class="o">=</span> women <span class="o">%&gt;%</span> sample_n<span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span> tibble<span class="o">::</span>as_tibble<span class="p">()</span> <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span class="p">(</span>height <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>height<span class="p">,</span> <span class="s">&#39;in&#39;</span><span class="p">),</span> weight <span class="o">=</span> <span class="kp">paste</span><span class="p">(</span>weight<span class="p">,</span> <span class="s">&#39;lbs&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">women2 <span class="o">=</span> women <span class="o">%&gt;%</span> sample_n<span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span> tibble<span class="o">::</span>as_tibble<span class="p">()</span> <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span class="p">(</span>height <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>height<span class="p">,</span> <span class="s">&#34;in&#34;</span><span class="p">),</span> weight <span class="o">=</span> <span class="kp">paste</span><span class="p">(</span>weight<span class="p">,</span> <span class="s">&#34;lbs&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
 <pre><code># A tibble: 2 x 2
   height  weight
    &lt;chr&gt;   &lt;chr&gt;
@@ -1463,8 +1466,8 @@ women2 <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span c
 </code></pre>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 単位を新しい列に分ける</span>
 women2 <span class="o">%&gt;%</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>height<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;height&#39;</span><span class="p">,</span> <span class="s">&#39;uh&#39;</span><span class="p">),</span> <span class="m">-2L</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>weight<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;weight&#39;</span><span class="p">,</span> <span class="s">&#39;uw&#39;</span><span class="p">),</span> <span class="s">&#39; &#39;</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span></code></pre></div>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>height<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;height&#34;</span><span class="p">,</span> <span class="s">&#34;uh&#34;</span><span class="p">),</span> <span class="m">-2L</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>weight<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;weight&#34;</span><span class="p">,</span> <span class="s">&#34;uw&#34;</span><span class="p">),</span> <span class="s">&#34; &#34;</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span></code></pre></div>
 <pre><code># A tibble: 2 x 4
   height    uh weight    uw
    &lt;int&gt; &lt;chr&gt;  &lt;int&gt; &lt;chr&gt;
@@ -1491,7 +1494,10 @@ women2 <span class="o">%&gt;%</span>
 </dl>
 
 <p>パッケージや関数の名前で検索すれば、<br>
-日本語で解説してるサイトも結構ひっかかる。
+日本語で解説してるサイトも結構ひっかかる。</p>
+
+<p><a href="https://en.wikipedia.org/wiki/Sisyphus">https://en.wikipedia.org/wiki/Sisyphus</a></p>
+
 </section>
 <section>
 <h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
@@ -1503,7 +1509,12 @@ women2 <span class="o">%&gt;%</span>
 → StackOverflowや個人サイトに先例</li>
 <li>身近な経験者に訊く</li>
 <li>Slackのr-wakalangに質問を投稿する<br>
-<a href="https://github.com/tokyor/r-wakalang">https://github.com/tokyor/r-wakalang</a></li>
+<a href="https://github.com/tokyor/r-wakalang">https://github.com/tokyor/r-wakalang</a> <br>
+内容によってチャンネルを選ぶ:<br>
+<code>#r_beginners</code>, <code>#statistics</code>, <code>#ggplot2</code>, etc.</li>
+<li>質問するときは、状況を再現できる小さな例
+<a href="http://reprex.tidyverse.org/">(reprex)</a>
+を添えて</li>
 </ul>
 
 </section>
@@ -1515,7 +1526,7 @@ women2 <span class="o">%&gt;%</span>
 <li>マウスでぽちぽちセルの切り貼りをするのはやめて、<br>
 そういうことはRにやらせよう。</li>
 <li>いまRを使うなら、tidyverseの機能を使うと捗る。</li>
-<li>調べ方がわかれば、具体的な方法は覚えなくても大丈夫。</li>
+<li>調べ方がわかれば、具体的な方法を全部覚えなくても大丈夫。</li>
 </ul>
 
 </section>
