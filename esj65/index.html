@@ -1477,7 +1477,7 @@ s_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 1   72in 164 lbs
 2   67in 142 lbs
 </code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 単位を捨てる</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 単位を捨てる (スペースの有無によらず可能)</span>
 women2 <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span class="p">(</span>weight <span class="o">=</span> readr<span class="o">::</span>parse_number<span class="p">(</span>weight<span class="p">))</span></code></pre></div>
 <pre><code># A tibble: 2 x 2
   height weight
@@ -1498,6 +1498,25 @@ women2 <span class="o">%&gt;%</span>
 
 </section>
 <section>
+<h2 id="発表後の質問を受けて追加">(発表後の質問を受けて追加)</h2>
+
+<p>さらに複雑な文字列の抽出・置換をしたい場合は
+<a href="http://stringrr.tidyverse.org/">stringrパッケージ</a>
+で正規表現を使う:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kt">c</span><span class="p">(</span><span class="s">&#34;Who am I? 24601!&#34;</span><span class="p">,</span> <span class="s">&#34;p = 0.02 *&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  str_extract<span class="p">(</span><span class="s">&#34;[\\d\\.]+&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 連続する数字または小数点を抽出</span>
+  <span class="kp">as.numeric</span><span class="p">()</span>                  <span class="c1"># 整数に変換</span></code></pre></div>
+<pre><code>[1] 24601.00     0.02
+</code></pre>
+
+<p>全角英数字を半角に変換</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kt">c</span><span class="p">(</span><span class="s">&#34;ｔｐ５３&#34;</span><span class="p">,</span> <span class="s">&#34;ＫＲＡＳ&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  stringi<span class="o">::</span>stri_trans_nfkc<span class="p">()</span></code></pre></div>
+<pre><code>[1] &quot;tp53&quot; &quot;KRAS&quot;
+</code></pre>
+
+</section>
+<section>
 <h2 id="参考">参考</h2>
 
 <dl>
@@ -1512,6 +1531,7 @@ women2 <span class="o">%&gt;%</span>
 <dd><a href="http://purrrr.tidyverse.org/">purrr</a></dd>
 <dd><a href="http://readr.tidyverse.org/">readr</a></dd>
 <dd><a href="http://readxl.tidyverse.org/">readxl</a></dd>
+<dd><a href="http://stringr.tidyverse.org/">stringr</a></dd>
 </dl>
 
 <p>パッケージや関数の名前で検索すれば、<br>
