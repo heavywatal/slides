@@ -156,8 +156,8 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <h2 id="雑然データ-messy-data">雑然データ messy data</h2>
 
 <ul>
-<li>行にも列にも変数が混じっている</li>
-<li>1つの観測が縦も横バラバラな位置に</li>
+<li>1つの観測が縦横バラバラに散らばっている</li>
+<li>1つの変数が複数列にまたがっている</li>
 <li>1つのセルに複数の意味や値が含まれている</li>
 <li>セルの結合？もってのほか！</li>
 <li>(データを採るときに楽な形。これは仕方ない)</li>
@@ -242,7 +242,7 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <li>統一的な使い勝手</li>
 <li>暗黙の処理をなるべくしない</li>
 <li>意味のわかるエラーメッセージ</li>
-<li><strong>シンプルな関数を繋げて使うようなデザイン</strong></li>
+<li><strong>シンプルな関数を繋げて使うデザイン</strong></li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
 <span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
@@ -430,7 +430,7 @@ A. 大丈夫。誰も覚えきってない。</p>
 </a></p>
 
 <ul>
-<li><strong>巨大なデータをうっかり打ち込んでも画面を埋め尽くさない</strong></li>
+<li><strong>巨大なデータをうっかり表示しても画面を埋め尽くさない</strong></li>
 <li>列の名前や型を勝手に変更しない</li>
 <li>一応説明したけど、この先は区別せずdata.frameと呼ぶ</li>
 </ul>
@@ -460,7 +460,7 @@ A. 大丈夫。誰も覚えきってない。</p>
 </a></p>
 
 <ul>
-<li>巨大なデータをうっかり打ち込んでも画面を埋め尽くさない</li>
+<li>巨大なデータをうっかり表示しても画面を埋め尽くさない</li>
 <li><strong>列の名前や型を勝手に変更しない</strong></li>
 <li>一応説明したけど、この先は区別せずdata.frameと呼ぶ</li>
 </ul>
@@ -476,18 +476,17 @@ tbl<span class="p">[[</span><span class="s">&#34;x-1&#34;</span><span class="p">
 
 </section>
 <section>
-<h2 id="readr-data-frameの読み書き">readr &mdash; data.frameの読み書き</h2>
+<h2 id="readr-data-frameの読み書き担当">readr &mdash; data.frameの読み書き担当</h2>
 
 <p><a href="http://readr.tidyverse.org/">
 <img src="figure/hex-readr.png" width="120" align="right">
 </a></p>
 
-<p>標準の <code>read.table()</code> や <code>write.table()</code> より便利:</p>
-
 <ul>
-<li>オプションをごちゃごちゃ付けなくてもいい感じに動く</li>
+<li>生data.frameではなく安全なtibbleとして読んでくれる</li>
 <li>列の名前や型を勝手に変更しない</li>
-<li>生data.frameではなく安全なtibbleとして返してくれる</li>
+<li>オプションをごちゃごちゃ付けなくてもいい感じに動く<br>
+(R標準の <code>read.table()</code> とかは意外と難しい)</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#34;iris.tsv&#34;</span><span class="p">)</span>
 readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#34;iris.tsv&#34;</span><span class="p">)</span></code></pre></div>
@@ -538,7 +537,7 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 <h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
 
 <p>いつもdata.frameが第一引数。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Sepal.Length <span class="o">&lt;</span> <span class="m">4.6</span><span class="p">)</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Sepal.Length <span class="o">&lt;</span> <span class="m">4.6</span><span class="p">)</span>   <span class="c1"># 条件にあう行を抽出</span></code></pre></div>
 <pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 1          4.4         2.9          1.4         0.2  setosa
 2          4.3         3.0          1.1         0.1  setosa
@@ -546,7 +545,7 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 4          4.5         2.3          1.3         0.3  setosa
 5          4.4         3.2          1.3         0.2  setosa
 </code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>sample_n<span class="p">(</span>iris<span class="p">,</span> <span class="m">3L</span><span class="p">)</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>sample_n<span class="p">(</span>iris<span class="p">,</span> <span class="m">3L</span><span class="p">)</span>                 <span class="c1"># ランダムに3行抽出</span></code></pre></div>
 <pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width    Species
 60           5.2         2.7          3.9         1.4 versicolor
 14           4.3         3.0          1.1         0.1     setosa
@@ -608,8 +607,8 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
 result <span class="o">=</span> dplyr<span class="o">::</span>select<span class="p">(</span>result<span class="p">,</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">))</span> <span class="c1"># 列を除外</span>
 result <span class="o">=</span> dplyr<span class="o">::</span>group_by<span class="p">(</span>result<span class="p">,</span> Species<span class="p">)</span>          <span class="c1"># グループごとに</span>
 result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>result<span class="p">,</span> <span class="kp">mean</span><span class="p">)</span>        <span class="c1"># 平均を計算</span></code></pre></div>
-<p>これらは全然悪くない。
-でも変数名を何度も入力するのがやや冗長。</p>
+<p>どちらも悪くない。
+何度も変数名を入力するのがやや冗長。</p>
 
 </section>
 <section>
@@ -623,6 +622,8 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
       <span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">)),</span>                    <span class="c1"># 列を除外</span>
     Species<span class="p">),</span>                               <span class="c1"># グループごとに</span>
   <span class="kp">mean</span><span class="p">)</span>                                   <span class="c1"># 平均を計算</span></code></pre></div>
+<p>改行さえしない超人技:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>dplyr<span class="o">::</span>group_by<span class="p">(</span>dplyr<span class="o">::</span>select<span class="p">(</span>dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">),</span> <span class="o">-</span>matches<span class="p">(</span><span class="s">&#34;^Petal&#34;</span><span class="p">)),</span> Species<span class="p">),</span> <span class="kp">mean</span><span class="p">)</span></code></pre></div>
 <p>論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
 さっきのほうがぜんぜんマシ。</p>
 
@@ -655,28 +656,34 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <img src="figure/hex-tidyr.png" width="120" align="right">
 </a></p>
 
-<ul>
-<li><code>gather()</code> 横長から縦長に</li>
-<li><code>spread()</code> 縦長から横長に</li>
-<li><code>nest()</code> 入れ子に</li>
-<li><code>unnest()</code> 入れ子解消</li>
-<li><code>separate()</code> 1列を複数の列に分離</li>
-<li><em>etc.</em></li>
-</ul>
+<dl>
+<dt>横長から縦長に</dt>
+<dd><code>gather()</code></dd>
+<dt>縦長から横長に</dt>
+<dd><code>spread()</code></dd>
+<dt>入れ子構造をつくる、解消する</dt>
+<dd><code>nest()</code>, <code>unnest()</code></dd>
+<dt>1列を複数の列に分離</dt>
+<dd><code>separate()</code></dd>
+</dl>
+
+<p><em>etc.</em></p>
 
 </section>
 <section>
 <h2 id="tidyr-gather-横長から縦長に"><code>tidyr::gather()</code> 横長から縦長に</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>                           <span class="c1"># 最初の2行だけ</span>
-  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
-  <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                   <span class="c1"># 途中経過を表示</span>
-  tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span>     <span class="c1"># 縦長に変形</span></code></pre></div>
+
+<p>複数列にまたがる値を1列にする(ここでは<code>value</code>)。<br>
+そのラベルも合わせて移動(ここでは<code>name</code>)。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">long_iris <span class="o">=</span> iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>             <span class="c1"># 最初の2行だけ</span>
+  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                <span class="c1"># IDカラムを追加</span>
+  <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                 <span class="c1"># 途中経過を表示</span>
+  tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># 縦長に変形</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
 <pre><code>  id Sepal.Length Sepal.Width Petal.Length Petal.Width Species
 1  1          5.1         3.5          1.4         0.2  setosa
 2  2          4.9         3.0          1.4         0.2  setosa
-</code></pre>
-
-<pre><code>  id Species         name value
+  id Species         name value
 1  1  setosa Sepal.Length   5.1
 2  2  setosa Sepal.Length   4.9
 3  1  setosa  Sepal.Width   3.5
@@ -690,11 +697,11 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 </section>
 <section>
 <h2 id="tidyr-spread-縦長から横長に"><code>tidyr::spread()</code> 縦長から横長に</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>                           <span class="c1"># 最初の2行だけ</span>
-  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
-  tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># 縦長に変形</span>
-  <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                   <span class="c1"># 途中経過を表示</span>
-  tidyr<span class="o">::</span>spread<span class="p">(</span>name<span class="p">,</span> value<span class="p">)</span>                    <span class="c1"># 横長に戻す</span></code></pre></div>
+
+<p>1列に収まっていた値(<code>value</code>)を複数列の行列に変換。<br>
+そのラベル(<code>name</code>)を列の名前にする。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">long_iris <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                     <span class="c1"># gatherしたやつ</span>
+  tidyr<span class="o">::</span>spread<span class="p">(</span>name<span class="p">,</span> value<span class="p">)</span>                  <span class="c1"># 横長に戻す</span></code></pre></div>
 <pre><code>  id Species         name value
 1  1  setosa Sepal.Length   5.1
 2  2  setosa Sepal.Length   4.9
@@ -714,11 +721,8 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 </section>
 <section>
 <h2 id="tidyr-separate-列を分離"><code>tidyr::separate()</code> 列を分離</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>                           <span class="c1"># 最初の2行だけ</span>
-  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># IDカラムを追加</span>
-  tidyr<span class="o">::</span>gather<span class="p">(</span>name<span class="p">,</span> value<span class="p">,</span> <span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># 縦長に変形</span>
-  <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                                   <span class="c1"># 途中経過を表示</span>
-  tidyr<span class="o">::</span>separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;part&#34;</span><span class="p">,</span> <span class="s">&#34;measure&#34;</span><span class="p">))</span>   <span class="c1"># 列を分離</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">long_iris <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                     <span class="c1"># gatherしたやつ</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;part&#34;</span><span class="p">,</span> <span class="s">&#34;measure&#34;</span><span class="p">))</span> <span class="c1"># 列を分離</span></code></pre></div>
 <pre><code>  id Species         name value
 1  1  setosa Sepal.Length   5.1
 2  2  setosa Sepal.Length   4.9
@@ -744,7 +748,9 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 </section>
 <section>
 <h2 id="tidyr-nest-入れ子にする"><code>tidyr::nest()</code> 入れ子にする</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">nested <span class="o">=</span> iris <span class="o">%&gt;%</span>
+
+<p>グループ毎にdata.frameを区切ってlist型の列に入れる。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">nested_iris <span class="o">=</span> iris <span class="o">%&gt;%</span>
   tidyr<span class="o">::</span>nest<span class="p">(</span><span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
 <pre><code># A tibble: 3 x 2
      Species                  data
@@ -753,7 +759,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 2 versicolor &lt;data.frame [50 x 4]&gt;
 3  virginica &lt;data.frame [50 x 4]&gt;
 </code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">nested<span class="o">$</span>data<span class="p">[[</span><span class="m">1L</span><span class="p">]]</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">nested_iris<span class="o">$</span>data<span class="p">[[</span><span class="m">1L</span><span class="p">]]</span></code></pre></div>
 <pre><code>   Sepal.Length Sepal.Width Petal.Length Petal.Width
 1           5.1         3.5          1.4         0.2
 2           4.9         3.0          1.4         0.2
@@ -829,7 +835,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <li><em>etc.</em></li>
 </ul>
 
-<p>標準の <code>lapply()</code>, <code>sapply()</code>, <code>vapply()</code>, <code>unlist()</code> などの代わりに</p>
+<p>標準Rの <code>lapply()</code>, <code>sapply()</code>, <code>vapply()</code>, <code>unlist()</code> などの代わりに</p>
 
 </section>
 <section>
@@ -838,7 +844,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
   tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span>       <span class="c1"># あとで必要なID列</span>
-  <span class="c1"># 横長のままでは扱いにくいの縦長にしたい</span></code></pre></div>
+  <span class="c1"># xやyの値が何列にも広がってる。これを1列に(縦長に)したい</span></code></pre></div>
 <pre><code>   id x1 x2 x3 x4    y1   y2    y3    y4
 1   1 10 10 10  8  8.04 9.14  7.46  6.58
 2   2  8  8  8  8  6.95 8.14  6.77  5.76
@@ -1124,7 +1130,7 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
   tidyr<span class="o">::</span>spread<span class="p">(</span>axis<span class="p">,</span> value<span class="p">)</span> <span class="o">%&gt;%</span>         <span class="c1"># axis列をx列とy列に</span>
   dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>id<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># 使い終わったID列を消す</span>
   dplyr<span class="o">::</span>arrange<span class="p">(</span>group<span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># グループごとに並べる</span>
-  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+  <span class="kp">print</span><span class="p">()</span>                                <span class="c1"># ggplotしたい形！</span></code></pre></div>
 <pre><code>   group  x     y
 1      1 10  8.04
 2      1  7  4.82
@@ -1262,7 +1268,7 @@ s_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <p><code>m_data</code> をベースに、2つをまとめた <code>g_data</code> を作りたい</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">g_data <span class="o">=</span> m_data <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>inner_join<span class="p">(</span>s_data<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;Stem&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 共通する列で結合</span>
-  <span class="kp">print</span><span class="p">()</span>                                     <span class="c1"># 次は行数を削りたい</span></code></pre></div>
+  <span class="kp">print</span><span class="p">()</span>                                     <span class="c1"># 使う行を絞りたい</span></code></pre></div>
 <pre><code># A tibble: 18,202 x 12
     Stem  Year   DBH Comment  Indv     X     Y    X1    Y1
    &lt;chr&gt; &lt;int&gt; &lt;dbl&gt;   &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -1287,12 +1293,12 @@ s_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <p><code>m_data</code> をベースに、2つをまとめた <code>g_data</code> を作りたい</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">g_data <span class="o">=</span> m_data <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>inner_join<span class="p">(</span>s_data<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;Stem&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 共通する列で結合</span>
-  dplyr<span class="o">::</span>filter<span class="p">(</span>                              <span class="c1"># 条件にあう行を抽出</span>
+  dplyr<span class="o">::</span>filter<span class="p">(</span>                              <span class="c1"># 使う行を絞りたい</span>
     Year <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="m">1993</span><span class="p">,</span> <span class="m">2014</span><span class="p">),</span>
     X1 <span class="o">&lt;</span> <span class="m">50</span><span class="p">,</span>
     Species <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;Quercus glauca&#34;</span><span class="p">,</span> <span class="s">&#34;Symplocos prunifolia&#34;</span><span class="p">),</span>
     <span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>DBH<span class="p">)</span>
-  <span class="p">)</span> <span class="o">%&gt;%</span>                                       <span class="c1"># 次は不要な列を消したい</span>
+  <span class="p">)</span> <span class="o">%&gt;%</span>                                       <span class="c1"># 使う列を絞りたい</span>
   <span class="kp">print</span><span class="p">()</span></code></pre></div>
 <pre><code># A tibble: 542 x 12
     Stem  Year   DBH Comment  Indv     X     Y    X1    Y1
@@ -1318,14 +1324,15 @@ s_data <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p"
 <p><code>m_data</code> をベースに、2つをまとめた <code>g_data</code> を作りたい</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">g_data <span class="o">=</span> m_data <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>inner_join<span class="p">(</span>s_data<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;Stem&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 共通する列で結合</span>
-  dplyr<span class="o">::</span>filter<span class="p">(</span>                              <span class="c1"># 条件にあう行を抽出</span>
+  dplyr<span class="o">::</span>filter<span class="p">(</span>                              <span class="c1"># 使う行を絞りたい</span>
     Year <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="m">1993</span><span class="p">,</span> <span class="m">2014</span><span class="p">),</span>
     X1 <span class="o">&lt;</span> <span class="m">50</span><span class="p">,</span>
     Species <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;Quercus glauca&#34;</span><span class="p">,</span> <span class="s">&#34;Symplocos prunifolia&#34;</span><span class="p">),</span>
     <span class="o">!</span><span class="kp">is.na</span><span class="p">(</span>DBH<span class="p">)</span>
-  <span class="p">)</span> <span class="o">%&gt;%</span>                                       <span class="c1"># 必要な列だけ残す</span>
-  dplyr<span class="o">::</span>transmute<span class="p">(</span>X <span class="o">=</span> X1<span class="p">,</span> Y <span class="o">=</span> Y1<span class="p">,</span> Year<span class="p">,</span> Species<span class="p">,</span> DBH<span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="kp">print</span><span class="p">()</span>                                     <span class="c1"># ついでにXとか改名</span></code></pre></div>
+  <span class="p">)</span> <span class="o">%&gt;%</span>                                       <span class="c1"># 使う列を絞りたい</span>
+  dplyr<span class="o">::</span>select<span class="p">(</span>X1<span class="p">,</span> Y1<span class="p">,</span> Year<span class="p">,</span> Species<span class="p">,</span> DBH<span class="p">)</span> <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>rename<span class="p">(</span>X <span class="o">=</span> X1<span class="p">,</span> Y <span class="o">=</span> Y1<span class="p">)</span> <span class="o">%&gt;%</span>           <span class="c1"># 列名を変更</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
 <pre><code># A tibble: 542 x 5
        X     Y  Year              Species   DBH
    &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;                &lt;chr&gt; &lt;dbl&gt;
@@ -1499,7 +1506,7 @@ women2 <span class="o">%&gt;%</span>
 
 </section>
 <section>
-<h2 id="発表後の質問を受けて追加">(発表後の質問を受けて追加)</h2>
+<h2 id="質問を受けて補足-文字列処理">(質問を受けて補足) 文字列処理</h2>
 
 <p>さらに複雑な文字列の抽出・置換をしたい場合は
 <a href="http://stringrr.tidyverse.org/">stringrパッケージ</a>
@@ -1518,6 +1525,41 @@ women2 <span class="o">%&gt;%</span>
 
 </section>
 <section>
+<h2 id="質問を受けて補足-名前の衝突">(質問を受けて補足) 名前の衝突</h2>
+
+<p><code>filter(...)</code> でも動くのにわざわざ頭に <code>dplyr::</code> 付ける？</p>
+
+<ul>
+<li>今回の発表では、どのパッケージ由来かをなるべく明示したかった</li>
+<li>ほかのパッケージや自分の作業によって、<br>
+<strong>同じ名前の関数で上書きされちゃっても大丈夫なように:</strong></li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">filter <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span> <span class="kr">return</span><span class="p">(</span><span class="kc">NULL</span><span class="p">)</span>    <span class="c1"># うっかり同名の関数を作る</span>
+filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span class="o">&lt;</span> <span class="m">1.2</span><span class="p">)</span>        <span class="c1"># 新しいほうが使われちゃう</span></code></pre></div>
+<pre><code>NULL
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span class="o">&lt;</span> <span class="m">1.2</span><span class="p">)</span> <span class="c1"># 明示したので大丈夫</span></code></pre></div>
+<pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          4.3         3.0          1.1         0.1  setosa
+2          4.6         3.6          1.0         0.2  setosa
+</code></pre>
+
+</section>
+<section>
+<h2 id="質問を受けて補足-布教">(質問を受けて補足) 布教</h2>
+
+<p><img src="figure/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right"></p>
+
+<p>頑なにエクセルを使い込む熟練のシーシュポスたちにどうやってRの利用を広めていくか？</p>
+
+<ul>
+<li>彼らが苦労してる作業を魔法のように一瞬で解決して見せる。</li>
+<li>その魔法を使うのは意外と難しくない、と思わせる。</li>
+<li>というのを地道に続けていくしかない・・・？</li>
+</ul>
+
+</section>
+<section>
 <h2 id="参考">参考</h2>
 
 <dl>
@@ -1526,20 +1568,20 @@ women2 <span class="o">%&gt;%</span>
 <dd><a href="https://amzn.to/2tbRmVc">英語版書籍</a></dd>
 <dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
 <dt>各パッケージの公式ドキュメント</dt>
-<dd><a href="https://www.tidyverse.org/">tidyverse</a></dd>
-<dd><a href="http://dplyr.tidyverse.org/">dplyr</a></dd>
-<dd><a href="http://tidyr.tidyverse.org/">tidyr</a></dd>
-<dd><a href="http://purrrr.tidyverse.org/">purrr</a></dd>
-<dd><a href="http://readr.tidyverse.org/">readr</a></dd>
-<dd><a href="http://readxl.tidyverse.org/">readxl</a></dd>
-<dd><a href="http://stringr.tidyverse.org/">stringr</a></dd>
+<dd><a href="https://www.tidyverse.org/">tidyverse</a>,
+<a href="http://dplyr.tidyverse.org/">dplyr</a>,
+<a href="http://tidyr.tidyverse.org/">tidyr</a>,
+<a href="http://purrr.tidyverse.org/">purrr</a>,
+<a href="http://tibble.tidyverse.org/">tibble</a>,
+<a href="http://readr.tidyverse.org/">readr</a>,
+<a href="http://readxl.tidyverse.org/">readxl</a>,
+<a href="http://stringr.tidyverse.org/">stringr</a></dd>
+<dt>整然データとは何か &mdash; <a href="https://twitter.com/f_nishihara">@f_nishihara</a></dt>
+<dd><a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a></dd>
+<dd><a href="http://id.fnshr.info/2017/01/09/tidy-data-intro/">http://id.fnshr.info/2017/01/09/tidy-data-intro/</a></dd>
 </dl>
 
-<p>パッケージや関数の名前で検索すれば、<br>
-日本語で解説してるサイトも結構ひっかかる。</p>
-
-<p><a href="https://en.wikipedia.org/wiki/Sisyphus">https://en.wikipedia.org/wiki/Sisyphus</a></p>
-
+<p><a href="https://en.wikipedia.org/wiki/Sisyphus">https://en.wikipedia.org/wiki/Sisyphus</a>
 </section>
 <section>
 <h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
@@ -1547,7 +1589,7 @@ women2 <span class="o">%&gt;%</span>
 <ul>
 <li>公式ドキュメントを読む</li>
 <li>エラー文をちゃんと読む</li>
-<li>エラー文をコピペしてウェブ検索<br>
+<li>パッケージ名やエラー文をコピペしてウェブ検索<br>
 → StackOverflowや個人サイトに先例</li>
 <li>身近な経験者に訊く</li>
 <li>Slackのr-wakalangに質問を投稿する<br>
