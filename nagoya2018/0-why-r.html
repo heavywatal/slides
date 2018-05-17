@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>nagoya2018-0: どうしてRを使うの？</title>
+
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/reveal-theme.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="nagoya2018-0: どうしてRを使うの？">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/nagoya2018/0-why-r.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.41-DEV" />
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  showProcessingMessages: false,
+  messageStyle: "none",
+  displayAlign: "left",
+  displayIndent: "2em",
+  tex2jax: {
+    inlineMath: [['$','$']],
+    displayMath: [['\\[', '\\]']]
+  }
+});
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-41178626-2', 'auto');
+ga('send', 'pageview');
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="rにやらせて楽しよう-データの可視化と下ごしらえ-draft">Rにやらせて楽しよう — データの可視化と下ごしらえ (DRAFT)</h1>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+総研大 先導科学研究科<br>
+(SOKENDAI, The Graduate University for Advanced Studies)
+</div>
+
+<ol>
+<li><a href="0-why-r.html">どうしてRを使うの？</a></li>
+<li><a href="1-basic-r.html">Rの基本</a></li>
+<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a></li>
+<li><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a></li>
+</ol>
+
+<div class="footnote">
+2018-05-18
+名古屋大学 アドバンス生命理学特論 IGER Seminar
+</div>
+
+</section>
+<section>
+<h2 id="科学の営み-巨人の肩に立つ">科学の営み = 巨人の肩に立つ</h2>
+
+<figure style="position: absolute; top: 40px; right: 40px;">
+<a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
+<img src="figure/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
+<figcaption class="url">
+https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
+</figcaption>
+</a>
+</figure>
+
+<p>先人たちの積み重ねに基づいて、新しい発見をする</p>
+
+<dl>
+<dt>記録を残すことは何より重要</dt>
+<dd>実験や野外観察では些細なことも漏らさず記録。</dd>
+<dd>生データは何重にもバックアップ。</dd>
+<dd>みんな結構できてる(はず)。</dd>
+<dt>データの整理・解析・作図も不可欠、だけど</dt>
+<dd>再現不能の職人技で切り抜けちゃう人も多い。</dd>
+<dd>コピペ、メニュー選択、配色と配置を微調整&hellip;</dd>
+<dt>解析の過程に疑義が生じたら&hellip;？ 別の人がその研究を発展させたいとき&hellip;？</dt>
+<dd>❌「ありまぁす！」</dd>
+<dd>⭕「誰でも確実に再現できるプロトコルがこちらです」</dd>
+</dl>
+
+<p><strong>Reproducible Research (再現可能な研究)</strong> が巨人を大きくする。</p>
+
+</section>
+<section>
+<h2 id="再現不可能な職人的研究の例">再現不可能な職人的研究の例</h2>
+
+<p>動物園の混合展示において、各種の動物はどのように分布・行動しているか、
+それらを決める要因は何か。膨大な観察データに基づく超大作卒論。</p>
+
+<figure>
+<img src="figure/messy/thesis-ss.png" width="800">
+</figure>
+
+</section>
+<section>
+<h2 id="生データ-ここはまだそんなに悪くない">生データ: ここはまだそんなに悪くない</h2>
+
+<p>週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。</p>
+
+<div style="position: relative; margin: 20px 0;">
+<img src="figure/messy/dir-0826.png" class="screenshot" height="500">
+<img src="figure/messy/file-0826-zebra.png" class="screenshot" height="450"
+     style="position: absolute; left: 270px; top: 50px;">
+</div>
+
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製-集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+
+<p>ちゃんと合ってるのかな&hellip;</p>
+
+<div style="position: relative; margin: 20px 0;">
+<img src="figure/messy/dir-z.png" class="screenshot" height="560"
+     style="position: absolute; z-index: 255;">
+<img src="figure/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 270px; top: 50px;">
+</div>
+
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製-集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+
+<p>範囲を選択してt検定したりグラフを描いたり。<br>
+ファイルもタブもたくさん&hellip;</p>
+
+<div style="position: relative; margin: 20px 0;">
+<img src="figure/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480">
+<img src="figure/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+     style="position: absolute; left: 270px; top: 50px;">
+</div>
+
+</section>
+<section>
+<h2 id="目と手で数え上げ-画像編集ソフトでドットの濃淡に">目と手で数え上げ、画像編集ソフトでドットの濃淡に</h2>
+
+<p>泣きながら何十枚も&hellip;</p>
+
+<div style="position: relative; margin: 20px 0;">
+<img src="figure/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
+<img src="figure/messy/file-map.png" class="screenshot" height="640"
+     style="position: absolute; left: 240px; top: -50px;">
+</div>
+
+</section>
+<section>
+<h2 id="目作業-手作業-シーシュポスの岩">目作業・手作業 ＝ シーシュポスの岩</h2>
+
+<figure style="float: right;">
+<a href="https://en.wikipedia.org/wiki/Sisyphus">
+<img src="figure/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="320">
+<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
+</a>
+</figure>
+
+<ul>
+<li>膨大な単純作業がそもそもツラい</li>
+<li>人間だもの、ミスは防ぎきれない</li>
+<li>なるべくミスを防ぐためのチェックもツラい</li>
+<li>ミスを発見 → 初めからやり直し</li>
+<li>新たなデータ・研究 → 初めからやり直し</li>
+<li>熟練してもツラいまま</li>
+<li>そのときの自分しかできない、記録に残らない<br>
+→ 検証のしようがない</li>
+<li>卒論なら努力賞でいいかもしれないけど、科学の手続きとしては問題。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="rにやらせて楽しよう">Rにやらせて楽しよう</h2>
+
+<ul>
+<li>規則性のある退屈な仕事は人間よりも機械のほうが得意。</li>
+<li>一度書いたプログラムは、データが変わっても<strong>使いまわせる</strong>。</li>
+<li>記述されたプログラムの正しさを<strong>検証できる</strong>。</li>
+<li><strong>自分以外の人でも再現できる</strong>。</li>
+<li>部分的に改変しながらいろんな解析を試せる。<br>
+→ <strong>仮説検証</strong>だけでなく、<strong>仮説生成(探索的データ解析)</strong>もやりやすい</li>
+<li>上達すれば、より良いプログラムをもっと手早く書けるようになる。</li>
+</ul>
+
+<figure>
+<a href="http://r4ds.had.co.nz/introduction.html">
+<img src="figure/data-science.png">
+<figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="rとは">Rとは</h2>
+
+<figure style="float: right;">
+<a href="https://cran.r-project.org/">
+<img src="figure/Rlogo.svg" height="200">
+<figcaption class="url">https://cran.r-project.org/</figcaption>
+</a>
+</figure>
+
+<p>統計解析と作図の機能が充実したプログラミング言語</p>
+
+<dl>
+<dt>クロスプラットフォーム</dt>
+<dd>Linux, Mac, Windowsで動く。</dd>
+<dt>オープンソース</dt>
+<dd>永久に無償で、すべての機能を使える。</dd>
+<dd>集合知によって常に進化している。</dd>
+<dt>コミュニティ</dt>
+<dd>相談できる人や参考になるウェブサイトがたくさん見つかる。</dd>
+</dl>
+
+<p>ほかのプログラミング言語でもできなくはない。<br>
+Pythonもいいよ。</p>
+
+</section>
+<section>
+<h2 id="rを使うとこんなご利益があるよ">Rを使うとこんなご利益があるよ！</h2>
+
+<p>TODO
+</section>
+<section>
+<h2 id="本講義の目標">本講義の目標</h2>
+
+<h3 id="まっとうな科学を-もっと楽にやりたいな-済">まっとうな科学を、もっと楽にやりたいな (済)</h3>
+
+<h3 id="あれもこれもrでやれそうだな">あれもこれもRでやれそうだな</h3>
+
+<h3 id="やりたくなったらこのへんを調べればいいんだな">やりたくなったらこのへんを調べればいいんだな</h3>
+
+<p><br>
+この3点さえ押さえれば、具体的なやり方は覚えなくても大丈夫</p>
+
+<p>この発表スライドもオンラインで読める
+<br>
+<a href="https://heavywatal.github.io/slides/">https://heavywatal.github.io/slides/</a></p>
+
+</section>
+<section>
+<h2 id="参考">参考</h2>
+
+<dl>
+<dt>再現可能性のすゝめ &mdash; 高橋康介(著) 石田基広(監修)</dt>
+<dd><a href="https://www.amazon.co.jp/gp/product/4320112431/ref=as_li_ss_il?ie=UTF8&psc=1&linkCode=li3&tag=heavywatal-22&linkId=31a5a582668029b751a57b8846353978" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=4320112431&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=heavywatal-22" height="150px"></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=heavywatal-22&l=li3&o=9&a=4320112431" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /></dd>
+<dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
+<dd><a href="http://r4ds.had.co.nz/">http://r4ds.had.co.nz/</a></dd>
+<dd><a href="https://amzn.to/2tbRmVc">英語版書籍</a></dd>
+<dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
+<dt>協力</dt>
+<dd>総研大 博士課程 M. S. さん (現在はRユーザー)</dd>
+</dl>
+
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/lib/js/head.min.js"></script>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: false,
+  controlsTutorial: false,
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  center: false,
+  embedded: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+
+</body>
+</html>

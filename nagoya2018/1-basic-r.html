@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>nagoya2018-1: Rの基本</title>
+
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/reveal-theme.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="nagoya2018-1: Rの基本">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/nagoya2018/1-basic-r.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.41-DEV" />
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  showProcessingMessages: false,
+  messageStyle: "none",
+  displayAlign: "left",
+  displayIndent: "2em",
+  tex2jax: {
+    inlineMath: [['$','$']],
+    displayMath: [['\\[', '\\]']]
+  }
+});
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_CHTML"></script>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-41178626-2', 'auto');
+ga('send', 'pageview');
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="rにやらせて楽しよう-データの可視化と下ごしらえ-draft">Rにやらせて楽しよう — データの可視化と下ごしらえ (DRAFT)</h1>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+総研大 先導科学研究科<br>
+(SOKENDAI, The Graduate University for Advanced Studies)
+</div>
+
+<ol>
+<li><a href="0-why-r.html">どうしてRを使うの？</a></li>
+<li><a href="1-basic-r.html">Rの基本</a></li>
+<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a></li>
+<li><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a></li>
+</ol>
+
+<div class="footnote">
+2018-05-18
+名古屋大学 アドバンス生命理学特論 IGER Seminar
+</div>
+
+</section>
+<section>
+<h2 id="このパートの内容-rの基本-15分">このパートの内容: Rの基本 ~15分</h2>
+
+<ul>
+<li>Rのインストール</li>
+<li>Rとの対話</li>
+<li>プロジェクトの作成</li>
+<li>表形式ファイルの読み書き</li>
+<li>パッケージの利用</li>
+<li>疑問やエラーが生じたら</li>
+</ul>
+
+</section>
+<section>
+<h2 id="r環境のインストール">R環境のインストール</h2>
+
+<dl>
+<dt>R本体</dt>
+<dd>コマンドを解釈して実行するコア部分</dd>
+<dd>よく使われる関数なども標準パッケージとして同梱</dd>
+<dd><a href="https://cran.rstudio.com/">https://cran.rstudio.com/</a> からダウンロードしてインストール</dd>
+<dt>RStudio Desktop</dt>
+<dd>Rをより快適に使うための総合開発環境(IDE)</dd>
+<dd>必須ではないけど、結構みんな使ってるらしい</dd>
+<dd><a href="https://www.rstudio.com/">https://www.rstudio.com/</a> からダウンロードしてインストール</dd>
+</dl>
+
+<p><img src="figure/rstudio-300x260.png">
+</section>
+<section>
+<h2 id="とりあえず起動してコンソールにコマンドを打つ">とりあえず起動してコンソールにコマンドを打つ</h2>
+
+<p><code>x = 2980</code> のようにして作った変数はワークスペースに溜まっていく。</p>
+
+<p><img src="figure/rstudio/console.png" class="screenshot" width="100%"></p>
+
+</section>
+<section>
+<h2 id="rstudioの設定-毎回まっさらな環境で始めよう">RStudioの設定: 毎回まっさらな環境で始めよう</h2>
+
+<p>安全のため、ワークスペース <code>.RData</code> は保存しない、読み込まないように。</p>
+
+<figure>
+<a href="http://r4ds.had.co.nz/workflow-projects.html">
+<img src="figure/rstudio-workspace.png" width="75%"
+     style="object-fit: cover; object-position: top; height: 480px;">
+<figcaption class="url">http://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="プロジェクト-を作成する">&ldquo;プロジェクト&rdquo;を作成する</h2>
+
+<p>New Project &gt; New Directory &gt; <code>~/project/nagoya2018</code></p>
+
+<p><img src="figure/rstudio/create-new-project.png" class="screenshot" width="90%"></p>
+
+</section>
+<section>
+<h2 id="ファイルをプロジェクト内に配置する">ファイルをプロジェクト内に配置する</h2>
+
+<p>データ、Rスクリプト、解析結果を分離したほうがいい。<br>
+例えばこんな感じのディレクトリ(=フォルダ)構造を目指す:</p>
+
+<pre><code>nagoya2018/               # プロジェクトの最上階
+├── data/                 # 元データを置くところ
+│   ├── iris.tsv
+│   └── mtcars.tsv
+├── nagoya2018.Rproj      # これダブルクリックでRStudioを起動
+├── hello.R
+├── output/               # 結果の出力先
+│   ├── iris-petal.png
+│   └── iris-summary.tsv
+├── transform.R           # データ整理・変形のスクリプト
+└── visualize.R           # 作図のスクリプト
+</code></pre>
+
+<p>プロジェクト最上階を作業ディレクトリとし、<br>
+ファイル読み書きの基準にする。(後で詳しく)</p>
+
+</section>
+<section>
+<h2 id="rスクリプトに書いてから-実行する">Rスクリプトに書いてから、実行する</h2>
+
+<p>途中まで書いて <kbd>tab</kbd> を押すと、続きを提案・補完してくれる。<br>
+実行したい部分を選択して <kbd>ctrl-return</kbd> 。</p>
+
+<p><img src="figure/rstudio/run-selection.png" class="screenshot" width="100%"></p>
+
+</section>
+<section>
+<h2 id="データの型">データの型</h2>
+
+<ul>
+<li><code>NULL</code>: 空っぽ</li>
+<li>vector: 基本型。<code>x = 3</code> のように作っても実は長さ1のベクトル
+
+<ul>
+<li>logical: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
+<li>numeric: 数値 (整数 <code>42L</code> と 実数 <code>3.1416</code>)</li>
+<li>character: 文字列 (<code>&quot;historgram.png&quot;</code>)</li>
+<li>factor: 因子 (文字列っぽいけど微妙に違う)</li>
+<li>↑それぞれに欠損値 <code>NA</code> も定義されてる</li>
+</ul></li>
+<li>matrix: 二次元の行列。vector同様、全要素が同じ型。</li>
+<li>list: 異なる型でも詰め込める太っ腹ベクトル。</li>
+<li><strong>data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong><br>
+<strong>tibble</strong> とか <strong>tbl_df</strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="data-frame-長方形のテーブル-重要">data.frame: 長方形のテーブル。重要。</h2>
+
+<p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">print</span><span class="p">(</span>iris<span class="p">)</span></code></pre></div>
+<pre><code>     Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+            &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;fctr&gt;
+  1:          5.1         3.5          1.4         0.2    setosa
+  2:          4.9         3.0          1.4         0.2    setosa
+  3:          4.7         3.2          1.3         0.2    setosa
+  4:          4.6         3.1          1.5         0.2    setosa
+ ---                                                            
+147:          6.3         2.5          5.0         1.9 virginica
+148:          6.5         3.0          5.2         2.0 virginica
+149:          6.2         3.4          5.4         2.3 virginica
+150:          5.9         3.0          5.1         1.8 virginica
+</code></pre>
+
+<p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
+
+</section>
+<section>
+<h2 id="data-frameの読み書き">data.frameの読み書き</h2>
+
+<ul>
+<li>カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。</li>
+<li>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">package.install<span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>           <span class="c1"># パッケージのやつを使うよ</span>
+readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
+readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span></code></pre></div>
+<pre><code>     Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+            &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;char&gt;
+  1:          5.1         3.5          1.4         0.2    setosa
+  2:          4.9         3.0          1.4         0.2    setosa
+  3:          4.7         3.2          1.3         0.2    setosa
+ ---                                                            
+148:          6.5         3.0          5.2         2.0 virginica
+149:          6.2         3.4          5.4         2.3 virginica
+150:          5.9         3.0          5.1         1.8 virginica
+</code></pre>
+
+</section>
+<section>
+<h2 id="パッケージ">パッケージ</h2>
+
+<p>便利な関数やデータセットなどをひとまとめにしたもの。</p>
+
+<dl>
+<dt>Standard Packages</dt>
+<dd>Rの標準機能。何もしなくても使用可能</dd>
+<dt>Contributed Packages</dt>
+<dd>有志により開発され、
+<a href="https://cran.rstudio.com/web/packages/index.html">CRAN</a>
+にまとめて公開されている。</dd>
+<dd>要インストール。使う前に読み込むおまじないが必要。</dd>
+</dl>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
+update.packages<span class="p">()</span>          <span class="c1"># たまには更新しよう</span></code></pre></div>
+<dl>
+<dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
+<dd>大丈夫。誰も覚えきってない。</dd>
+<dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="tidyverse">tidyverse</h2>
+
+<p><a href="https://www.tidyverse.org/">
+<img src="figure/hex-badges.png" width="320" align="right">
+</a></p>
+
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
+<span class="c1"># 関連パッケージが一挙に読み込まれる</span></code></pre></div>
+<ul>
+<li>統一的な使い勝手</li>
+<li>暗黙の処理をなるべくしない</li>
+<li>意味のわかるエラーメッセージ</li>
+<li>シンプルな関数を繋げて使うデザイン</li>
+</ul>
+
+<figure>
+<a href="http://r4ds.had.co.nz/introduction.html">
+<img src="figure/data-science.png">
+<figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="ほかにもたくさん">ほかにもたくさん</h2>
+
+<ul>
+<li><a href="https://readxl.tidyverse.org/">readxl</a>: エクセル形式の読み込み</li>
+<li><a href="https://stringr.tidyverse.org/">stringr</a>: 文字列の処理</li>
+<li><a href="https://www.bioconductor.org/">Bioconductor</a>: バイオインフォマティクス関連</li>
+<li><a href="http://igraph.org/r/">igraph</a>: グラフ(ネットワーク)関連</li>
+<li><a href="https://cran.r-project.org/package=rgl">rgl</a>: 3Dの作図</li>
+<li><a href="https://rmarkdown.rstudio.com/">R Markdown</a>:
+Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
+この発表スライドもそうやって作った。<br>
+レポート作成や共同研究者への報告にも便利！</li>
+</ul>
+
+<p>たくさんありすぎて選べない？<br>
+まずは人気のパッケージを <a href="https://awesome-r.com/">https://awesome-r.com/</a> で探してみるとか。
+</section>
+<section>
+<h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
+
+<ul>
+<li>RStudio内にヘルプを表示: <code>?sum</code>, <code>help.start()</code></li>
+<li>変数の構造を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
+<li>エラー文をちゃんと読む: <code>No such file or directory</code></li>
+<li>パッケージの公式ドキュメントをちゃんと読む</li>
+<li>パッケージ名やエラー文をコピペしてウェブ検索<br>
+→ <a href="https://stackoverflow.com/questions/tagged/r">StackOverflow</a>
+や個人サイトに解決策</li>
+<li>身近な経験者に訊く</li>
+<li>Slackの
+<a href="https://github.com/tokyor/r-wakalang">r-wakalang</a>
+で質問を投稿する。<br>
+内容によってチャンネルを選ぶ: <code>#r_beginners</code>, <code>#statistics</code></li>
+<li>質問するときは、状況を再現できる小さな例
+<a href="https://reprex.tidyverse.org/">(reprex)</a>
+を添えて</li>
+</ul>
+
+</section>
+<section>
+<h2 id="このパートのまとめ-rの基本">このパートのまとめ: Rの基本</h2>
+
+<ul>
+<li>R本体とRStudioのインストール。</li>
+<li>コンソールでRと対話できるけど、スクリプトに書いてから実行しよう。</li>
+<li>プロジェクトの構造を決めて、ファイルの読み書きをスムーズに。</li>
+<li>数値や文字列という基本型があり、data.frameという構造が特に重要。</li>
+<li>パッケージを使うことで効率よく作業できる。</li>
+<li>疑問の答えは、Rの中にも、インターネットにもある。</li>
+</ul>
+
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/lib/js/head.min.js"></script>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: false,
+  controlsTutorial: false,
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  center: false,
+  embedded: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+
+</body>
+</html>
