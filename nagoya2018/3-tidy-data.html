@@ -48,7 +48,7 @@ ga('send', 'pageview');
 <div class="reveal">
 <div class="slides">
 <section>
-<h1 id="rにやらせて楽しよう-データの可視化と下ごしらえ-draft">Rにやらせて楽しよう — データの可視化と下ごしらえ (DRAFT)</h1>
+<h1 id="rにやらせて楽しよう-データの可視化と下ごしらえ">Rにやらせて楽しよう — データの可視化と下ごしらえ</h1>
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki)
@@ -59,12 +59,15 @@ ga('send', 'pageview');
 (SOKENDAI, The Graduate University for Advanced Studies)
 </div>
 
-<ol>
-<li><a href="0-why-r.html">どうしてRを使うの？</a></li>
-<li><a href="1-basic-r.html">Rの基本</a></li>
-<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a></li>
-<li><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a></li>
-</ol>
+<p><style>
+.reveal .current-deck {font-weight: bold;}
+</style>
+<ol start="0">
+<li><a href="0-why-r.html">どうしてRを使うの？</a>
+<li><a href="1-basic-r.html">Rの基本</a>
+<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a>
+<li class="current-deck"><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a>
+</ol></p>
 
 <div class="footnote">
 2018-05-18
@@ -90,8 +93,7 @@ but every messy dataset is messy in its own way<br>
 <dd>実験ノート、フィールドノート、</dd>
 <dd>データベース、シミュレーション。。。</dd>
 <dt>解析や作図に使えるデータ形式はほぼ決まってる</dt>
-<dd><code>glm(..., data, ...)</code>,
-<code>ggplot(data, ...)</code>, &hellip;</dd>
+<dd><code>ggplot(data, ...)</code>, <code>glm(..., data, ...)</code>, &hellip;</dd>
 </dl>
 
 </section>
@@ -104,40 +106,18 @@ but every messy dataset is messy in its own way<br>
 <li>1セルは1つの値</li>
 <li>(ggplotしたくなる形)</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">mtcars</code></pre></div>
-<pre><code>                     mpg cyl  disp  hp drat    wt  qsec vs am gear carb
-Mazda RX4           21.0   6 160.0 110 3.90 2.620 16.46  0  1    4    4
-Mazda RX4 Wag       21.0   6 160.0 110 3.90 2.875 17.02  0  1    4    4
-Datsun 710          22.8   4 108.0  93 3.85 2.320 18.61  1  1    4    1
-Hornet 4 Drive      21.4   6 258.0 110 3.08 3.215 19.44  1  0    3    1
-Hornet Sportabout   18.7   8 360.0 175 3.15 3.440 17.02  0  0    3    2
-Valiant             18.1   6 225.0 105 2.76 3.460 20.22  1  0    3    1
-Duster 360          14.3   8 360.0 245 3.21 3.570 15.84  0  0    3    4
-Merc 240D           24.4   4 146.7  62 3.69 3.190 20.00  1  0    4    2
-Merc 230            22.8   4 140.8  95 3.92 3.150 22.90  1  0    4    2
-Merc 280            19.2   6 167.6 123 3.92 3.440 18.30  1  0    4    4
-Merc 280C           17.8   6 167.6 123 3.92 3.440 18.90  1  0    4    4
-Merc 450SE          16.4   8 275.8 180 3.07 4.070 17.40  0  0    3    3
-Merc 450SL          17.3   8 275.8 180 3.07 3.730 17.60  0  0    3    3
-Merc 450SLC         15.2   8 275.8 180 3.07 3.780 18.00  0  0    3    3
-Cadillac Fleetwood  10.4   8 472.0 205 2.93 5.250 17.98  0  0    3    4
-Lincoln Continental 10.4   8 460.0 215 3.00 5.424 17.82  0  0    3    4
-Chrysler Imperial   14.7   8 440.0 230 3.23 5.345 17.42  0  0    3    4
-Fiat 128            32.4   4  78.7  66 4.08 2.200 19.47  1  1    4    1
-Honda Civic         30.4   4  75.7  52 4.93 1.615 18.52  1  1    4    2
-Toyota Corolla      33.9   4  71.1  65 4.22 1.835 19.90  1  1    4    1
-Toyota Corona       21.5   4 120.1  97 3.70 2.465 20.01  1  0    3    1
-Dodge Challenger    15.5   8 318.0 150 2.76 3.520 16.87  0  0    3    2
-AMC Javelin         15.2   8 304.0 150 3.15 3.435 17.30  0  0    3    2
-Camaro Z28          13.3   8 350.0 245 3.73 3.840 15.41  0  0    3    4
-Pontiac Firebird    19.2   8 400.0 175 3.08 3.845 17.05  0  0    3    2
-Fiat X1-9           27.3   4  79.0  66 4.08 1.935 18.90  1  1    4    1
-Porsche 914-2       26.0   4 120.3  91 4.43 2.140 16.70  0  1    5    2
-Lotus Europa        30.4   4  95.1 113 3.77 1.513 16.90  1  1    5    2
-Ford Pantera L      15.8   8 351.0 264 4.22 3.170 14.50  0  1    5    4
-Ferrari Dino        19.7   6 145.0 175 3.62 2.770 15.50  0  1    5    6
-Maserati Bora       15.0   8 301.0 335 3.54 3.570 14.60  0  1    5    8
-Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">print</span><span class="p">(</span>mtcars<span class="p">)</span></code></pre></div>
+<pre><code>      mpg   cyl  disp    hp  drat    wt  qsec    vs    am  gear  carb
+    &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt; &lt;num&gt;
+ 1:  21.0     6   160   110  3.90 2.620 16.46     0     1     4     4
+ 2:  21.0     6   160   110  3.90 2.875 17.02     0     1     4     4
+ 3:  22.8     4   108    93  3.85 2.320 18.61     1     1     4     1
+ 4:  21.4     6   258   110  3.08 3.215 19.44     1     0     3     1
+---                                                                  
+29:  15.8     8   351   264  4.22 3.170 14.50     0     1     5     4
+30:  19.7     6   145   175  3.62 2.770 15.50     0     1     5     6
+31:  15.0     8   301   335  3.54 3.570 14.60     0     1     5     8
+32:  21.4     4   121   109  4.11 2.780 18.60     1     1     4     2
 </code></pre>
 
 <p>参考:<br>
@@ -149,10 +129,9 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 <h2 id="雑然データ-messy-data">雑然データ messy data</h2>
 
 <ul>
-<li>1つの観測が縦横バラバラに散らばっている</li>
+<li>1つの観測を特定するには縦も横も見ないと</li>
 <li>1つの変数が複数列にまたがっている</li>
 <li>1つのセルに複数の意味や値が含まれている</li>
-<li>セルの結合？もってのほか！</li>
 <li>(データを採るときに楽な形。これは仕方ない)</li>
 </ul>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">VADeaths</code></pre></div>
@@ -191,22 +170,36 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 
 </section>
 <section>
-<h2 id="tidyverseの出番">tidyverseの出番</h2>
+<h2 id="tidyverseに便利な道具が揃ってる">tidyverseに便利な道具が揃ってる</h2>
+
+<p><a href="https://www.tidyverse.org/">
+<img src="figure/tidyverse/hex-badges.png" width="320" align="right">
+</a></p>
+
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
+<span class="c1"># 関連パッケージが一挙に読み込まれる</span></code></pre></div>
+<ul>
+<li>統一的な使い勝手</li>
+<li>シンプルな関数を繋げて使うデザイン</li>
+</ul>
 
 <figure>
 <a href="http://r4ds.had.co.nz/wrangle-intro.html">
-<img src="figure/data-science-wrangle.png">
+<img src="figure/r4ds/data-science-wrangle.png">
 <figcaption class="url">http://r4ds.had.co.nz/wrangle-intro.html</figcaption>
 </a>
 </figure>
 
-<p>マウスやエクセルを使ってポチポチやる場合の地獄についてはパート0参照
+<p>マウスとコピペでポチポチやる場合の地獄についてはパート0参照</p>
+
 </section>
 <section>
 <h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
 
 <p><a href="https://dplyr.tidyverse.org/">
-<img src="figure/hex-dplyr.png" width="120" align="right">
+<img src="figure/tidyverse/hex-dplyr.png" width="120" align="right">
 </a></p>
 
 <p>ひとつの関数はひとつの仕事。<br>
@@ -289,7 +282,7 @@ Volvo 142E          21.4   4 121.0 109 4.11 2.780 18.60  1  1    4    2
 
 </section>
 <section>
-<h2 id="パイプ演算子-を使わない">パイプ演算子 <code>%&gt;%</code> を使わない</h2>
+<h2 id="パイプ演算子-を使わない方法">パイプ演算子 <code>%&gt;%</code> を使わない方法</h2>
 
 <p>一時変数を使う方法:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tmp1 <span class="o">=</span> dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Species <span class="o">!=</span> <span class="s">&#34;setosa&#34;</span><span class="p">)</span> <span class="c1"># 行を除外</span>
@@ -306,7 +299,7 @@ result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span
 
 </section>
 <section>
-<h2 id="パイプ演算子-を使わない">パイプ演算子 <code>%&gt;%</code> を使わない</h2>
+<h2 id="パイプ演算子-を使わない方法">パイプ演算子 <code>%&gt;%</code> を使わない方法</h2>
 
 <p>一時変数を使わない力技:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> dplyr<span class="o">::</span>summarise_all<span class="p">(</span>            <span class="c1"># 平均を計算</span>
@@ -343,10 +336,31 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 </section>
 <section>
+<h2 id="名前の衝突-上書きなどによる事故を防ぐ">名前の衝突・上書きなどによる事故を防ぐ</h2>
+
+<p><code>filter(...)</code> でも動くのにわざわざ頭に <code>dplyr::</code> 付ける？</p>
+
+<ul>
+<li>今回の発表では、どのパッケージ由来かをなるべく明示したかった</li>
+<li>ほかのパッケージや自分の作業によって、<br>
+<strong>同じ名前の関数で上書きされちゃっても大丈夫なように:</strong></li>
+</ul>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">filter <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span> <span class="kr">return</span><span class="p">(</span><span class="kc">NULL</span><span class="p">)</span>     <span class="c1"># うっかり同名の関数を作る</span>
+filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span class="o">&lt;</span> <span class="m">1.2</span><span class="p">)</span>         <span class="c1"># 新しいほうが使われちゃう</span></code></pre></div>
+<pre><code>NULL
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span class="o">&lt;</span> <span class="m">1.2</span><span class="p">)</span>  <span class="c1"># 明示したので大丈夫</span></code></pre></div>
+<pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          4.3         3.0          1.1         0.1  setosa
+2          4.6         3.6          1.0         0.2  setosa
+</code></pre>
+
+</section>
+<section>
 <h2 id="tidyr-data-frameの変形-整形担当">tidyr &mdash; data.frameの変形・整形担当</h2>
 
 <p><a href="https://tidyr.tidyverse.org/">
-<img src="figure/hex-tidyr.png" width="120" align="right">
+<img src="figure/tidyverse/hex-tidyr.png" width="120" align="right">
 </a></p>
 
 <dl>
@@ -467,15 +481,12 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 # ... with 42 more rows
 </code></pre>
 
-<p>入れ子にされたlistの列どうする？
-<code>purrr::map()</code>の出番！</p>
-
 </section>
 <section>
 <h2 id="purrr">purrr</h2>
 
 <p><a href="https://purrr.tidyverse.org/">
-<img src="figure/hex-purrr.png" width="120" align="right">
+<img src="figure/tidyverse/hex-purrr.png" width="120" align="right">
 </a></p>
 
 <p>listやループの処理担当。</p>
@@ -491,6 +502,47 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 
 <p>標準Rの <code>lapply()</code>, <code>sapply()</code>, <code>vapply()</code>, <code>unlist()</code> などの代わりに</p>
 
+</section>
+<section>
+<h2 id="purrr-map-リストの各要素に関数を適用"><code>purrr::map()</code>: リストの各要素に関数を適用</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">v <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>      <span class="c1"># 長さ3のベクトル</span>
+v <span class="o">+</span> <span class="m">10</span>              <span class="c1"># それぞれに+10</span></code></pre></div>
+<pre><code>[1] 11 12 13
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">plus_ten <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">)</span> <span class="p">{</span>x <span class="o">+</span> <span class="m">10</span><span class="p">}</span>  <span class="c1"># +10する関数</span>
+purrr<span class="o">::</span>map<span class="p">(</span>v<span class="p">,</span> plus_ten<span class="p">)</span>          <span class="c1"># それぞれに適用</span></code></pre></div>
+<pre><code>[[1]]
+[1] 11
+
+[[2]]
+[1] 12
+
+[[3]]
+[1] 13
+</code></pre>
+
+<p>この例ではあまり嬉しくないけど、使いどころは結構ある</p>
+
+</section>
+<section>
+<h2 id="ディレクトリ内の複数ファイルを一気に読む">ディレクトリ内の複数ファイルを一気に読む</h2>
+
+<pre><code>nagoya2018/            # プロジェクトの最上階
+├── data/              # データを置くディレクトリ
+│   ├── cheetah.tsv    # 同じ形のデータ
+│   ├── giraffe.tsv
+│   └── zebra.tsv
+├─
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># &#34;data/cheetah.tsv&#34;, ...</span>
+files <span class="o">=</span> fs<span class="o">::</span>dir_ls<span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">,</span> glob<span class="o">=</span><span class="s">&#34;*.tsv&#34;</span><span class="p">)</span>
+
+<span class="c1"># それぞれ読んで、</span>
+purrr<span class="o">::</span>map<span class="p">(</span>files<span class="p">,</span> readr<span class="o">::</span>read_tsv<span class="p">)</span> <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>bind_rows<span class="p">()</span>  <span class="c1"># 1つのdata.frameに結合</span>
+
+<span class="c1"># それぞれ読んで、1つのdata.frameに結合</span>
+purrr<span class="o">::</span>map_dfr<span class="p">(</span>files<span class="p">,</span> readr<span class="o">::</span>read_tsv<span class="p">)</span></code></pre></div>
 </section>
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
@@ -598,21 +650,19 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
   dplyr<span class="o">::</span>select<span class="p">(</span><span class="o">-</span>id<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># 使い終わったID列を消す</span>
   dplyr<span class="o">::</span>arrange<span class="p">(</span>group<span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># グループごとに並べる</span>
   <span class="kp">print</span><span class="p">()</span>                                <span class="c1"># ggplotしたい形！</span></code></pre></div>
-<p>```
-     group     x     y
-    <char> <num> <num>
+<pre><code>     group     x     y
+    &lt;char&gt; &lt;num&gt; &lt;num&gt;
  1:      1    10  8.04
  2:      1     7  4.82
  3:      1     5  5.68
- 4:      1     8  6.95</p>
-
-</section>
-<section>
+ 4:      1     8  6.95
+---                   
 41:      4     8  7.04
 42:      4     8  5.25
 43:      4    19 12.50
 44:      4     8  5.56
-```
+</code></pre>
+
 </section>
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
@@ -622,6 +672,8 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
   geom_point<span class="p">(</span>size <span class="o">=</span> <span class="m">3</span><span class="p">)</span> <span class="o">+</span>
   stat_smooth<span class="p">(</span>method <span class="o">=</span> lm<span class="p">,</span> se <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> fullrange <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">+</span>
   facet_wrap<span class="p">(</span><span class="o">~</span> group<span class="p">,</span> nrow <span class="o">=</span> <span class="m">1L</span><span class="p">)</span></code></pre></div>
+<p><img src="figure/plot_anscombe-1.png" title="plot of chunk plot_anscombe" alt="plot of chunk plot_anscombe" width="98%" /></p>
+
 </section>
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
@@ -796,36 +848,37 @@ result <span class="o">=</span> iris <span class="o">%&gt;%</span>
 </section>
 <section>
 <h2 id="例題-数値-単位になっちゃってる列を処理">例題: 数値+単位になっちゃってる列を処理</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">women2 <span class="o">=</span> women <span class="o">%&gt;%</span> sample_n<span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span> tibble<span class="o">::</span>as_tibble<span class="p">()</span> <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span class="p">(</span>height <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>height<span class="p">,</span> <span class="s">&#34;in&#34;</span><span class="p">),</span> weight <span class="o">=</span> <span class="kp">paste</span><span class="p">(</span>weight<span class="p">,</span> <span class="s">&#34;lbs&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
-<pre><code>   height  weight
-   &lt;char&gt;  &lt;char&gt;
-1:   72in 164 lbs
-2:   67in 142 lbs
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">women2 <span class="o">=</span> women <span class="o">%&gt;%</span> sample_n<span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span class="p">(</span>height <span class="o">=</span> <span class="kp">paste0</span><span class="p">(</span>height<span class="p">,</span> <span class="s">&#34;in&#34;</span><span class="p">),</span> weight <span class="o">=</span> <span class="kp">paste</span><span class="p">(</span>weight<span class="p">,</span> <span class="s">&#34;lbs&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>  height  weight
+1   72in 164 lbs
+2   67in 142 lbs
 </code></pre>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 単位を捨てる (スペースの有無によらず可能)</span>
 women2 <span class="o">%&gt;%</span> dplyr<span class="o">::</span>mutate<span class="p">(</span>weight <span class="o">=</span> readr<span class="o">::</span>parse_number<span class="p">(</span>weight<span class="p">))</span></code></pre></div>
-<pre><code># A tibble: 2 x 2
-  height weight
-  &lt;chr&gt;   &lt;dbl&gt;
-1 72in      164
-2 67in      142
+<pre><code>  height weight
+1   72in    164
+2   67in    142
 </code></pre>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 単位を新しい列に分ける</span>
 women2 <span class="o">%&gt;%</span>
   tidyr<span class="o">::</span>separate<span class="p">(</span>height<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;height&#34;</span><span class="p">,</span> <span class="s">&#34;uh&#34;</span><span class="p">),</span> <span class="m">-2L</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
   tidyr<span class="o">::</span>separate<span class="p">(</span>weight<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;weight&#34;</span><span class="p">,</span> <span class="s">&#34;uw&#34;</span><span class="p">),</span> <span class="s">&#34; &#34;</span><span class="p">,</span> convert<span class="o">=</span><span class="kc">TRUE</span><span class="p">)</span></code></pre></div>
-<pre><code># A tibble: 2 x 4
-  height uh    weight uw   
-   &lt;int&gt; &lt;chr&gt;  &lt;int&gt; &lt;chr&gt;
-1     72 in       164 lbs  
-2     67 in       142 lbs  
+<pre><code>  height uh weight  uw
+1     72 in    164 lbs
+2     67 in    142 lbs
 </code></pre>
 
 </section>
 <section>
 <h2 id="文字列処理">文字列処理</h2>
 
-<p>さらに複雑な文字列の抽出・置換をしたい場合は
+<p>全角英数字を半角に変換</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kt">c</span><span class="p">(</span><span class="s">&#34;ｔｐ５３&#34;</span><span class="p">,</span> <span class="s">&#34;ＫＲＡＳ&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  stringi<span class="o">::</span>stri_trans_nfkc<span class="p">()</span></code></pre></div>
+<pre><code>[1] &quot;tp53&quot; &quot;KRAS&quot;
+</code></pre>
+
+<p>複雑な抽出・置換をしたい場合は
 <a href="https://stringrr.tidyverse.org/">stringrパッケージ</a>
 で正規表現を使う:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kt">c</span><span class="p">(</span><span class="s">&#34;Who am I? 24601!&#34;</span><span class="p">,</span> <span class="s">&#34;p = 0.02 *&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
@@ -834,32 +887,21 @@ women2 <span class="o">%&gt;%</span>
 <pre><code>[1] 24601.00     0.02
 </code></pre>
 
-<p>全角英数字を半角に変換</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kt">c</span><span class="p">(</span><span class="s">&#34;ｔｐ５３&#34;</span><span class="p">,</span> <span class="s">&#34;ＫＲＡＳ&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  stringi<span class="o">::</span>stri_trans_nfkc<span class="p">()</span></code></pre></div>
-<pre><code>[1] &quot;tp53&quot; &quot;KRAS&quot;
-</code></pre>
-
 </section>
 <section>
-<h2 id="名前の衝突">名前の衝突</h2>
-
-<p><code>filter(...)</code> でも動くのにわざわざ頭に <code>dplyr::</code> 付ける？</p>
+<h2 id="まとめ">まとめ</h2>
 
 <ul>
-<li>今回の発表では、どのパッケージ由来かをなるべく明示したかった</li>
-<li>ほかのパッケージや自分の作業によって、<br>
-<strong>同じ名前の関数で上書きされちゃっても大丈夫なように:</strong></li>
+<li>解析や作図の前にデータを整える必要がある。</li>
+<li><strong>規則性のある形なら</strong>だいたいRでなんとかできる。
+
+<ul>
+<li>最初の生データは記録しやすい形でいいけど、<br>
+あとで機械的に変換することを念頭に。</li>
+</ul></li>
+<li>いまRを使うなら、tidyverseの機能を使うと捗る。</li>
+<li>それだけ分かってれば、具体的な方法を全部覚えなくても大丈夫。</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">filter <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span> <span class="kr">return</span><span class="p">(</span><span class="kc">NULL</span><span class="p">)</span>     <span class="c1"># うっかり同名の関数を作る</span>
-filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span class="o">&lt;</span> <span class="m">1.2</span><span class="p">)</span>         <span class="c1"># 新しいほうが使われちゃう</span></code></pre></div>
-<pre><code>NULL
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">dplyr<span class="o">::</span>filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span class="o">&lt;</span> <span class="m">1.2</span><span class="p">)</span>  <span class="c1"># 明示したので大丈夫</span></code></pre></div>
-<pre><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
-1          4.3         3.0          1.1         0.1  setosa
-2          4.6         3.6          1.0         0.2  setosa
-</code></pre>
 
 </section>
 <section>
@@ -883,18 +925,6 @@ filter<span class="p">(</span>iris<span class="p">,</span> Petal.Length <span cl
 <dd><a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a></dd>
 <dd><a href="http://id.fnshr.info/2017/01/09/tidy-data-intro/">http://id.fnshr.info/2017/01/09/tidy-data-intro/</a></dd>
 </dl>
-
-</section>
-<section>
-<h2 id="まとめ">まとめ</h2>
-
-<ul>
-<li>解析や作図の前に、使いやすい形にデータを整えよう。</li>
-<li>マウスでぽちぽちセルの切り貼りをするのはやめて、<br>
-そういうことはRにやらせよう。</li>
-<li>いまRを使うなら、tidyverseの機能を使うと捗る。</li>
-<li>調べ方がわかれば、具体的な方法を全部覚えなくても大丈夫。</li>
-</ul>
 
 </section>
 </div>

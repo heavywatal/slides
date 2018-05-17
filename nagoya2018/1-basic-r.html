@@ -48,7 +48,7 @@ ga('send', 'pageview');
 <div class="reveal">
 <div class="slides">
 <section>
-<h1 id="rにやらせて楽しよう-データの可視化と下ごしらえ-draft">Rにやらせて楽しよう — データの可視化と下ごしらえ (DRAFT)</h1>
+<h1 id="rにやらせて楽しよう-データの可視化と下ごしらえ">Rにやらせて楽しよう — データの可視化と下ごしらえ</h1>
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki)
@@ -59,12 +59,15 @@ ga('send', 'pageview');
 (SOKENDAI, The Graduate University for Advanced Studies)
 </div>
 
-<ol>
-<li><a href="0-why-r.html">どうしてRを使うの？</a></li>
-<li><a href="1-basic-r.html">Rの基本</a></li>
-<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a></li>
-<li><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a></li>
-</ol>
+<p><style>
+.reveal .current-deck {font-weight: bold;}
+</style>
+<ol start="0">
+<li><a href="0-why-r.html">どうしてRを使うの？</a>
+<li class="current-deck"><a href="1-basic-r.html">Rの基本</a>
+<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a>
+<li><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a>
+</ol></p>
 
 <div class="footnote">
 2018-05-18
@@ -134,13 +137,14 @@ ga('send', 'pageview');
 <section>
 <h2 id="ファイルをプロジェクト内に配置する">ファイルをプロジェクト内に配置する</h2>
 
-<p>データ、Rスクリプト、解析結果を分離したほうがいい。<br>
+<p><strong>データ、スクリプト、結果を分離する。</strong><br>
+(Excelで作業するとこれがゴチャマゼになりがち)<br>
 例えばこんな感じのディレクトリ(=フォルダ)構造を目指す:</p>
 
 <pre><code>nagoya2018/               # プロジェクトの最上階
 ├── data/                 # 元データを置くところ
 │   ├── iris.tsv
-│   └── mtcars.tsv
+│   └── diamonds.xlsx
 ├── nagoya2018.Rproj      # これダブルクリックでRStudioを起動
 ├── hello.R
 ├── output/               # 結果の出力先
@@ -168,7 +172,7 @@ ga('send', 'pageview');
 
 <ul>
 <li><code>NULL</code>: 空っぽ</li>
-<li>vector: 基本型。<code>x = 3</code> のように作っても実は長さ1のベクトル
+<li>vector: 基本型。一次元の配列。
 
 <ul>
 <li>logical: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
@@ -183,6 +187,25 @@ ga('send', 'pageview');
 <strong>tibble</strong> とか <strong>tbl_df</strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
 </ul>
 
+</section>
+<section>
+<h2 id="vector-1次元の配列-基本">vector: 1次元の配列。基本。</h2>
+
+<p>1個の値でもベクトル扱い。<br>
+同じ長さ(または長さ1)の相手との計算が得意。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">2</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
+x <span class="o">+</span> x           <span class="c1"># 同じ長さ同士の計算</span></code></pre></div>
+<pre><code>[1]  4 16 12
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">y <span class="o">=</span> <span class="m">42</span>          <span class="c1"># 長さ1の数値ベクトル</span>
+x <span class="o">+</span> y           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span></code></pre></div>
+<pre><code>[1] 44 50 48
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># こういうfor文は書かずに済む</span>
+z <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+<span class="kr">for</span> <span class="p">(</span>i <span class="kr">in</span> <span class="kp">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+  z<span class="p">[</span>i<span class="p">]</span> <span class="o">=</span> x<span class="p">[</span>i<span class="p">]</span> <span class="o">+</span> y
+<span class="p">}</span></code></pre></div>
 </section>
 <section>
 <h2 id="data-frame-長方形のテーブル-重要">data.frame: 長方形のテーブル。重要。</h2>
@@ -228,6 +251,8 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 150:          5.9         3.0          5.1         1.8 virginica
 </code></pre>
 
+<p>readxlパッケージを使うとExcelファイルも読み込める。</p>
+
 </section>
 <section>
 <h2 id="パッケージ">パッケージ</h2>
@@ -257,7 +282,7 @@ update.packages<span class="p">()</span>          <span class="c1"># たまに�
 <h2 id="tidyverse">tidyverse</h2>
 
 <p><a href="https://www.tidyverse.org/">
-<img src="figure/hex-badges.png" width="320" align="right">
+<img src="figure/tidyverse/hex-badges.png" width="320" align="right">
 </a></p>
 
 <p>Rでデータを上手に扱うためのパッケージ群</p>
@@ -266,14 +291,13 @@ update.packages<span class="p">()</span>          <span class="c1"># たまに�
 <span class="c1"># 関連パッケージが一挙に読み込まれる</span></code></pre></div>
 <ul>
 <li>統一的な使い勝手</li>
-<li>暗黙の処理をなるべくしない</li>
-<li>意味のわかるエラーメッセージ</li>
+<li>暗黙の処理をなるべくしない安全設計</li>
 <li>シンプルな関数を繋げて使うデザイン</li>
 </ul>
 
 <figure>
 <a href="http://r4ds.had.co.nz/introduction.html">
-<img src="figure/data-science.png">
+<img src="figure/r4ds/data-science.png">
 <figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -281,6 +305,13 @@ update.packages<span class="p">()</span>          <span class="c1"># たまに�
 </section>
 <section>
 <h2 id="ほかにもたくさん">ほかにもたくさん</h2>
+
+<p><a href="https://readxl.tidyverse.org/">
+<img src="figure/tidyverse/hex-readxl.png" width="120" align="right">
+</a>
+<a href="https://stringr.tidyverse.org/">
+<img src="figure/tidyverse/hex-stringr.png" width="120" align="right">
+</a></p>
 
 <ul>
 <li><a href="https://readxl.tidyverse.org/">readxl</a>: エクセル形式の読み込み</li>
@@ -295,7 +326,8 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 </ul>
 
 <p>たくさんありすぎて選べない？<br>
-まずは人気のパッケージを <a href="https://awesome-r.com/">https://awesome-r.com/</a> で探してみるとか。
+まずは人気のパッケージを <a href="https://awesome-r.com/">https://awesome-r.com/</a> で探してみるとか。</p>
+
 </section>
 <section>
 <h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
