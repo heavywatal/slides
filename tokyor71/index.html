@@ -87,7 +87,7 @@ Watal M. Iwasaki = 岩嵜 航<br>
 <dt><img src="figure/bicycle.jpg" height="220" align="right" style="transform: translate(-10px, 40px);">
 Likes</dt>
 <dd>🍺 Beer, Sake, Whisky, Cooking</dd>
-<dd>♬ Heavy Metal, Clasical, Folk</dd>
+<dd>♬ Heavy Metal, Classical, Folk</dd>
 </dl>
 
 </section>
@@ -145,7 +145,7 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR</code></pre></div>
 │       ├── simulation.hpp
 │       └── tissue.hpp
 └── lib/
-    └── libtumopp.dylib
+    └── libtumopp.dylib    # libtumopp.so on Linux
 </code></pre>
 
 <p>Output structure:</p>
@@ -182,8 +182,8 @@ results <span class="o">=</span> tumopp<span class="p">(</span>some_parameter_se
 <section>
 <h2 id="seamless-r-and-c-integration-with-rcpp-http-www-rcpp-org">Seamless R and C++ integration with <a href="http://www.rcpp.org/">Rcpp</a></h2>
 
-<p>It is typically used to eliminate bottlnecks in R code.<br>
-Many online example shows the ways to define a short function:</p>
+<p>It is typically used to eliminate bottlenecks in R code.<br>
+Many online examples show the ways to define a short function:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>Rcpp<span class="p">)</span>
 
 Rcpp<span class="o">::</span>cppFunction<span class="p">(</span><span class="s">&#39;
@@ -194,6 +194,9 @@ Rcpp<span class="o">::</span>cppFunction<span class="p">(</span><span class="s">
 </span><span class="s">&#39;</span><span class="p">)</span>
 
 fibonacci<span class="p">(</span><span class="m">8L</span><span class="p">)</span></code></pre></div>
+<pre><code>[1] 21
+</code></pre>
+
 <p>But I already have C++ functions in my library.<br>
 How can I use them in R?</p>
 
@@ -243,7 +246,8 @@ usethis<span class="o">::</span>use_git<span class="p">()</span></code></pre></d
 <li><code>@useDynLib</code> is needed to import compiled C++ functions.</li>
 <li><code>&quot;_PACKAGE&quot;</code> is a special string to generate package documentation.</li>
 <li><code>.onUnload</code> is recommended in <a href="http://adv-r.had.co.nz/Rcpp.html">http://adv-r.had.co.nz/Rcpp.html</a>,<br>
-but not used in the major packages these days&hellip;?</li>
+but not used in the major packages these days&hellip;?<br>
+<strong>Hadley said</strong>: <em>&ldquo;It is polite to define it, but easy to forget.&rdquo;</em></li>
 </ul>
 
 </section>
@@ -365,7 +369,11 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 
 <p><span class="cite">
 <a href="http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/">http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/</a>
-</span>
+</span></p>
+
+<p>🚧 <strong><a href="https://github.com/rwinlib/gcc-8">Rtools 4 with gcc 8</a> is under development.</strong>
+(Thanks, Yutani-san!)</p>
+
 </section>
 <section>
 <h2 id="tasks-and-questions">Tasks and Questions</h2>
@@ -382,7 +390,7 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 <a href="https://github.com/wesm/feather">feather</a>?
 <a href="https://arrow.apache.org/">arrow</a>?<br>
 ⬜ C++ and R on Windows: WSL? Cygwin? MSYS? Docker?<br>
-⬜ Talk over beers with YOU! 🍻
+✅ Talk over beers with YOU! 🍻
 </section>
 <section>
 <h2 id="reference">Reference</h2>
@@ -398,6 +406,7 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 <li><a href="https://teuder.github.io/rcpp4everyone_ja/">https://teuder.github.io/rcpp4everyone_ja/</a></li>
 <li><a href="https://clang.llvm.org/cxx_status.html">https://clang.llvm.org/cxx_status.html</a></li>
 <li><a href="https://gcc.gnu.org/projects/cxx-status.html">https://gcc.gnu.org/projects/cxx-status.html</a></li>
+<li><a href="https://github.com/rwinlib/gcc-8">https://github.com/rwinlib/gcc-8</a></li>
 </ul>
 
 </section>
