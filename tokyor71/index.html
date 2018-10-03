@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.45-DEV" />
+<meta name="generator" content="Hugo 0.50-DEV" />
 <script type="text/x-mathjax-config">
 MathJax.Hub.Config({
   showProcessingMessages: false,
@@ -36,7 +36,7 @@ MathJax.Hub.Config({
 <script src="https://use.fontawesome.com/releases/v5.1.0/js/solid.js"></script>
 <script src="https://use.fontawesome.com/releases/v5.1.0/js/fontawesome.js"></script>
 
-<script>
+<script type="application/javascript">
 var doNotTrack = false;
 if (!doNotTrack) {
 	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -97,18 +97,18 @@ Likes</dt>
 <h2 id="tumopp-tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
 
 <figure>
-<img src="figure/tumopp/Fig1.png" height="200">
-<img src="figure/tumopp/neighborhood.png" height="200">
-<img src="figure/tumopp/param-p.png" height="200">
-<img src="figure/tumopp/Fig3.png" height="200">
-<img src="figure/tumopp/param-k.png" height="200">
-<img src="figure/tumopp/driver.gif" height="200"><br>
-<img src="figure/tumopp/Cmoore_Lconst.gif" height="100">
-<img src="figure/tumopp/Cmoore_Llinear.gif" height="100">
-<img src="figure/tumopp/Cmoore_Lstep.gif" height="100">
-<img src="figure/tumopp/Chex_Lconst.gif" height="100">
-<img src="figure/tumopp/Chex_Llinear.gif" height="100">
-<img src="figure/tumopp/Chex_Lstep.gif" height="100">
+<img src="/slides/figure/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/figure/tumopp/neighborhood.png" height="200">
+<img src="/slides/figure/tumopp/param-p.png" height="200">
+<img src="/slides/figure/tumopp/paper/Fig3.png" height="200">
+<img src="/slides/figure/tumopp/param-k.png" height="200">
+<img src="/slides/figure/tumopp/driver.gif" height="200"><br>
+<img src="/slides/figure/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/figure/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/figure/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/figure/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/figure/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/figure/tumopp/Chex_Lstep.gif" height="100">
 <figcaption class="url">Iwasaki and Innan (2017)</figcaption>
 </figure>
 
@@ -231,12 +231,10 @@ usethis<span class="o">::</span>use_git<span class="p">()</span></code></pre></d
 
 </section>
 <section>
-<h2 id="package-wide-settings-in-r-code">Package-wide settings in R code</h2>
-
-<p>Modify <code>R/tumopp-package.R</code>:</p>
+<h2 id="package-wide-settings-in-r-tumopp-package-r">Package-wide settings in <code>R/tumopp-package.R</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; @useDynLib tumopp, .registration = TRUE</span>
+<span class="c1">#&#39; @importFrom Rcpp sourceCpp</span>
 <span class="c1">#&#39; @importFrom magrittr %&gt;%</span>
-<span class="c1">#&#39; @importFrom rlang .data</span>
 <span class="c1">#&#39; @aliases NULL tumopp-package</span>
 <span class="c1">#&#39; @keywords internal</span>
 <span class="s">&#34;_PACKAGE&#34;</span>
@@ -246,6 +244,7 @@ usethis<span class="o">::</span>use_git<span class="p">()</span></code></pre></d
 <span class="p">}</span></code></pre></div>
 <ul>
 <li><code>@useDynLib</code> is needed to import compiled C++ functions.</li>
+<li><code>@importFrom Rcpp sourceCpp</code> seems necessary to load Rcpp.</li>
 <li><code>&quot;_PACKAGE&quot;</code> is a special string to generate package documentation.</li>
 <li><code>.onUnload</code> is recommended in <a href="http://adv-r.had.co.nz/Rcpp.html">http://adv-r.had.co.nz/Rcpp.html</a>,<br>
 but not used in the major packages these days&hellip;?<br>
