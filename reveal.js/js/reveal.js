@@ -220,6 +220,12 @@
 			// The display mode that will be used to show slides
 			display: 'block',
 
+			// Hide cursor if inactive
+			hideInactiveCursor: true,
+
+			// Time before the cursor is hidden (in ms)
+			hideCursorTime: 5000,
+
 			// Script dependencies to load
 			dependencies: []
 
@@ -282,6 +288,12 @@
 		// Delays updates to the URL due to a Chrome thumbnailer bug
 		writeURLTimeout = 0,
 
+		// Is the mouse pointer currently hidden from view
+		cursorHidden = false,
+
+		// Timeout used to determine when the cursor is inactive
+		cursorInactiveTimeout = 0,
+
 		// Flags if the interaction event listeners are bound
 		eventsAreBound = false,
 
@@ -306,17 +318,17 @@
 
 		// Holds information about the keyboard shortcuts
 		keyboardShortcuts = {
-			'N  ,  SPACE':			'Next slide',
-			'P':					'Previous slide',
-			'&#8592;  ,  H':		'Navigate left',
-			'&#8594;  ,  L':		'Navigate right',
-			'&#8593;  ,  K':		'Navigate up',
-			'&#8595;  ,  J':		'Navigate down',
-			'Home':					'First slide',
-			'End':					'Last slide',
-			'B  ,  .':				'Pause',
-			'F':					'Fullscreen',
-			'ESC, O':				'Slide overview'
+			'N  ,  SPACE':						'Next slide',
+			'P':								'Previous slide',
+			'&#8592;  ,  H':					'Navigate left',
+			'&#8594;  ,  L':					'Navigate right',
+			'&#8593;  ,  K':					'Navigate up',
+			'&#8595;  ,  J':					'Navigate down',
+			'Home  ,  &#8984;/CTRL &#8592;':	'First slide',
+			'End  ,  &#8984;/CTRL &#8594;':		'Last slide',
+			'B  ,  .':							'Pause',
+			'F':								'Fullscreen',
+			'ESC, O':							'Slide overview'
 		},
 
 		// Holds custom key code mappings
@@ -436,26 +448,15 @@
 			scriptsToPreload = 0;
 
 		// Called once synchronous scripts finish loading
-		function proceed() {
+		function afterSynchronousScriptsLoaded() {
+			// Load asynchronous scripts
 			if( scriptsAsync.length ) {
-				// Load asynchronous scripts
-				head.js.apply( null, scriptsAsync );
+				scriptsAsync.forEach( function( s ) {
+					loadScript( s.src, s.callback );
+				} );
 			}
 
 			start();
-		}
-
-		function loadScript( s ) {
-			head.ready( s.src.match( /([\w\d_\-]*)\.?js(\?[\w\d.=&]*)?$|[^\\\/]*$/i )[0], function() {
-				// Extension may contain callback functions
-				if( typeof s.callback === 'function' ) {
-					s.callback.apply( this );
-				}
-
-				if( --scriptsToPreload === 0 ) {
-					proceed();
-				}
-			});
 		}
 
 		for( var i = 0, len = config.dependencies.length; i < len; i++ ) {
@@ -464,13 +465,11 @@
 			// Load if there's no condition or the condition is truthy
 			if( !s.condition || s.condition() ) {
 				if( s.async ) {
-					scriptsAsync.push( s.src );
+					scriptsAsync.push( s );
 				}
 				else {
-					scripts.push( s.src );
+					scripts.push( s );
 				}
-
-				loadScript( s );
 			}
 		}
 
@@ -478,11 +477,70 @@
 			scriptsToPreload = scripts.length;
 
 			// Load synchronous scripts
-			head.js.apply( null, scripts );
+			scripts.forEach( function( s ) {
+				loadScript( s.src, function() {
+
+					if( typeof s.callback === 'function' ) s.callback();
+
+					if( --scriptsToPreload === 0 ) {
+
+						afterSynchronousScriptsLoaded();
+
+					}
+
+				} );
+			} );
 		}
 		else {
-			proceed();
+			afterSynchronousScriptsLoaded();
 		}
+
+	}
+
+	/**
+	 * Loads a JavaScript file from the given URL and executes it.
+	 *
+	 * @param {string} url Address of the .js file to load
+	 * @param {function} callback Method to invoke when the script
+	 * has loaded and executed
+	 */
+	function loadScript( url, callback ) {
+
+		var script = document.createElement( 'script' );
+		script.type = 'text/javascript';
+		script.async = false;
+		script.defer = false;
+		script.src = url;
+
+		if( callback ) {
+
+			// Success callback
+			script.onload = script.onreadystatechange = function( event ) {
+				if( event.type === "load" || (/loaded|complete/.test( script.readyState ) ) ) {
+
+					// Kill event listeners
+					script.onload = script.onreadystatechange = script.onerror = null;
+
+					callback();
+
+				}
+			};
+
+			// Error callback
+			script.onerror = function( err ) {
+
+				// Kill event listeners
+				script.onload = script.onreadystatechange = script.onerror = null;
+
+				callback( new Error( 'Failed loading script: ' + script.src + '\n' + err) );
+
+			};
+
+		}
+
+		// Append the script at the end of <head>
+		var head = document.querySelector( 'head' );
+		head.insertBefore( script, head.lastChild );
 
 	}
 
@@ -593,8 +651,7 @@
 		dom.speakerNotes.setAttribute( 'tabindex', '0' );
 
 		// Overlay graphic which is displayed during the paused mode
-		dom.pauseOverlay = createSingletonNode( dom.wrapper, 'div', 'pause-overlay', '<button class="resume-button">Resume presentation</button>' );
-		dom.resumeButton = dom.pauseOverlay.querySelector( '.resume-button' );
+		dom.pauseOverlay = createSingletonNode( dom.wrapper, 'div', 'pause-overlay', config.controls ? '<button class="resume-button">Resume presentation</button>' : null );
 
 		dom.wrapper.setAttribute( 'role', 'application' );
 
@@ -1208,6 +1265,18 @@
 			disableRollingLinks();
 		}
 
+		// Auto-hide the mouse pointer when its inactive
+		if( config.hideInactiveCursor ) {
+			document.addEventListener( 'mousemove', onDocumentCursorActive, false );
+			document.addEventListener( 'mousedown', onDocumentCursorActive, false );
+		}
+		else {
+			showCursor();
+
+			document.removeEventListener( 'mousemove', onDocumentCursorActive, false );
+			document.removeEventListener( 'mousedown', onDocumentCursorActive, false );
+		}
+
 		// Iframe link previews
 		if( config.previewLinks ) {
 			enablePreviewLinks();
@@ -1299,7 +1368,7 @@
 			dom.progress.addEventListener( 'click', onProgressClicked, false );
 		}
 
-		dom.resumeButton.addEventListener( 'click', resume, false );
+		dom.pauseOverlay.addEventListener( 'click', resume, false );
 
 		if( config.focusBodyOnPageVisibilityChange ) {
 			var visibilityChange;
@@ -1364,7 +1433,7 @@
 		dom.wrapper.removeEventListener( 'touchmove', onTouchMove, false );
 		dom.wrapper.removeEventListener( 'touchend', onTouchEnd, false );
 
-		dom.resumeButton.removeEventListener( 'click', resume, false );
+		dom.pauseOverlay.removeEventListener( 'click', resume, false );
 
 		if ( config.progress && dom.progress ) {
 			dom.progress.removeEventListener( 'click', onProgressClicked, false );
@@ -2435,6 +2504,32 @@
 	}
 
 	/**
+	 * Shows the mouse pointer after it has been hidden with
+	 * #hideCursor.
+	 */
+	function showCursor() {
+
+		if( cursorHidden ) {
+			cursorHidden = false;
+			dom.wrapper.style.cursor = '';
+		}
+
+	}
+
+	/**
+	 * Hides the mouse pointer when it's on top of the .reveal
+	 * container.
+	 */
+	function hideCursor() {
+
+		if( cursorHidden === false ) {
+			cursorHidden = true;
+			dom.wrapper.style.cursor = 'none';
+		}
+
+	}
+
+	/**
 	 * Enters the paused mode which fades everything on screen to
 	 * black.
 	 */
@@ -2576,28 +2671,6 @@
 
 		layout();
 
-		// Apply the new state
-		stateLoop: for( var i = 0, len = state.length; i < len; i++ ) {
-			// Check if this state existed on the previous slide. If it
-			// did, we will avoid adding it repeatedly
-			for( var j = 0; j < stateBefore.length; j++ ) {
-				if( stateBefore[j] === state[i] ) {
-					stateBefore.splice( j, 1 );
-					continue stateLoop;
-				}
-			}
-
-			document.documentElement.classList.add( state[i] );
-
-			// Dispatch custom event matching the state's name
-			dispatchEvent( state[i] );
-		}
-
-		// Clean up the remains of the previous state
-		while( stateBefore.length ) {
-			document.documentElement.classList.remove( stateBefore.pop() );
-		}
-
 		// Update the overview if it's currently active
 		if( isOverview() ) {
 			updateOverview();
@@ -2646,6 +2719,28 @@
 			}
 		}
 
+		// Apply the new state
+		stateLoop: for( var i = 0, len = state.length; i < len; i++ ) {
+			// Check if this state existed on the previous slide. If it
+			// did, we will avoid adding it repeatedly
+			for( var j = 0; j < stateBefore.length; j++ ) {
+				if( stateBefore[j] === state[i] ) {
+					stateBefore.splice( j, 1 );
+					continue stateLoop;
+				}
+			}
+
+			document.documentElement.classList.add( state[i] );
+
+			// Dispatch custom event matching the state's name
+			dispatchEvent( state[i] );
+		}
+
+		// Clean up the remains of the previous state
+		while( stateBefore.length ) {
+			document.documentElement.classList.remove( stateBefore.pop() );
+		}
+
 		if( slideChanged ) {
 			dispatchEvent( 'slidechanged', {
 				'indexh': indexh,
@@ -2671,6 +2766,7 @@
 		updateParallax();
 		updateSlideNumber();
 		updateNotes();
+		updateFragments();
 
 		// Update the URL hash
 		writeURL();
@@ -2895,14 +2991,11 @@
 					element.classList.add( reverse ? 'future' : 'past' );
 
 					if( config.fragments ) {
-						var pastFragments = toArray( element.querySelectorAll( '.fragment' ) );
-
-						// Show all fragments on prior slides
-						while( pastFragments.length ) {
-							var pastFragment = pastFragments.pop();
-							pastFragment.classList.add( 'visible' );
-							pastFragment.classList.remove( 'current-fragment' );
-						}
+						// Show all fragments in prior slides
+						toArray( element.querySelectorAll( '.fragment' ) ).forEach( function( fragment ) {
+							fragment.classList.add( 'visible' );
+							fragment.classList.remove( 'current-fragment' );
+						} );
 					}
 				}
 				else if( i > index ) {
@@ -2910,14 +3003,11 @@
 					element.classList.add( reverse ? 'past' : 'future' );
 
 					if( config.fragments ) {
-						var futureFragments = toArray( element.querySelectorAll( '.fragment.visible' ) );
-
-						// No fragments in future slides should be visible ahead of time
-						while( futureFragments.length ) {
-							var futureFragment = futureFragments.pop();
-							futureFragment.classList.remove( 'visible' );
-							futureFragment.classList.remove( 'current-fragment' );
-						}
+						// Hide all fragments in future slides
+						toArray( element.querySelectorAll( '.fragment.visible' ) ).forEach( function( fragment ) {
+							fragment.classList.remove( 'visible' );
+							fragment.classList.remove( 'current-fragment' );
+						} );
 					}
 				}
 			}
@@ -3966,9 +4056,9 @@
 		var bits = hash.slice( 2 ).split( '/' ),
 			name = hash.replace( /#|\//gi, '' );
 
-		// If the first bit is invalid and there is a name we can
-		// assume that this is a named link
-		if( isNaN( parseInt( bits[0], 10 ) ) && name.length ) {
+		// If the first bit is not fully numeric and there is a name we
+		// can assume that this is a named link
+		if( !/^[0-9]*$/.test( bits[0] ) && name.length ) {
 			var element;
 
 			// Ensure the named link is a valid HTML ID attribute
@@ -3980,10 +4070,13 @@
 			// Ensure that we're not already on a slide with the same name
 			var isSameNameAsCurrentSlide = currentSlide ? currentSlide.getAttribute( 'id' ) === name : false;
 
-			if( element && !isSameNameAsCurrentSlide ) {
-				// Find the position of the named slide and navigate to it
-				var indices = Reveal.getIndices( element );
-				slide( indices.h, indices.v );
+			if( element ) {
+				// If the slide exists and is not the current slide...
+				if ( !isSameNameAsCurrentSlide ) {
+					// ...find the position of the named slide and navigate to it
+					var indices = Reveal.getIndices(element);
+					slide(indices.h, indices.v);
+				}
 			}
 			// If the slide doesn't exist, navigate to the current slide
 			else {
@@ -4096,6 +4189,25 @@
 	function getSlides() {
 
 		return toArray( dom.wrapper.querySelectorAll( SLIDES_SELECTOR + ':not(.stack)' ));
+
+	}
+
+	/**
+	 * Returns an array of objects where each object represents the
+	 * attributes on its respective slide.
+	 */
+	function getSlidesAttributes() {
+
+		return getSlides().map( function( slide ) {
+
+			var attributes = {};
+			for( var i = 0; i < slide.attributes.length; i++ ) {
+				var attribute = slide.attributes[ i ];
+				attributes[ attribute.name ] = attribute.value;
+			}
+			return attributes;
+
+		} );
 
 	}
 
@@ -4292,6 +4404,73 @@
 	}
 
 	/**
+	 * Refreshes the fragments on the current slide so that they
+	 * have the appropriate classes (.visible + .current-fragment).
+	 *
+	 * @param {number} [index] The index of the current fragment
+	 * @param {array} [fragments] Array containing all fragments
+	 * in the current slide
+	 *
+	 * @return {{shown: array, hidden: array}}
+	 */
+	function updateFragments( index, fragments ) {
+
+		var changedFragments = {
+			shown: [],
+			hidden: []
+		};
+
+		if( currentSlide && config.fragments ) {
+
+			fragments = fragments || sortFragments( currentSlide.querySelectorAll( '.fragment' ) );
+
+			if( fragments.length ) {
+
+				if( typeof index !== 'number' ) {
+					var currentFragment = sortFragments( currentSlide.querySelectorAll( '.fragment.visible' ) ).pop();
+					if( currentFragment ) {
+						index = parseInt( currentFragment.getAttribute( 'data-fragment-index' ) || 0, 10 );
+					}
+				}
+
+				toArray( fragments ).forEach( function( el, i ) {
+
+					if( el.hasAttribute( 'data-fragment-index' ) ) {
+						i = parseInt( el.getAttribute( 'data-fragment-index' ), 10 );
+					}
+
+					// Visible fragments
+					if( i <= index ) {
+						if( !el.classList.contains( 'visible' ) ) changedFragments.shown.push( el );
+						el.classList.add( 'visible' );
+						el.classList.remove( 'current-fragment' );
+
+						// Announce the fragments one by one to the Screen Reader
+						dom.statusDiv.textContent = getStatusText( el );
+
+						if( i === index ) {
+							el.classList.add( 'current-fragment' );
+							startEmbeddedContent( el );
+						}
+					}
+					// Hidden fragments
+					else {
+						if( el.classList.contains( 'visible' ) ) changedFragments.hidden.push( el );
+						el.classList.remove( 'visible' );
+						el.classList.remove( 'current-fragment' );
+					}
+
+				} );
+
+			}
+
+		}
+
+		return changedFragments;
+
+	}
+
+	/**
 	 * Navigate to the specified slide fragment.
 	 *
 	 * @param {?number} index The index of the fragment that
@@ -4326,53 +4505,24 @@
 					index += offset;
 				}
 
-				var fragmentsShown = [],
-					fragmentsHidden = [];
+				var changedFragments = updateFragments( index, fragments );
 
-				toArray( fragments ).forEach( function( element, i ) {
-
-					if( element.hasAttribute( 'data-fragment-index' ) ) {
-						i = parseInt( element.getAttribute( 'data-fragment-index' ), 10 );
-					}
-
-					// Visible fragments
-					if( i <= index ) {
-						if( !element.classList.contains( 'visible' ) ) fragmentsShown.push( element );
-						element.classList.add( 'visible' );
-						element.classList.remove( 'current-fragment' );
-
-						// Announce the fragments one by one to the Screen Reader
-						dom.statusDiv.textContent = getStatusText( element );
-
-						if( i === index ) {
-							element.classList.add( 'current-fragment' );
-							startEmbeddedContent( element );
-						}
-					}
-					// Hidden fragments
-					else {
-						if( element.classList.contains( 'visible' ) ) fragmentsHidden.push( element );
-						element.classList.remove( 'visible' );
-						element.classList.remove( 'current-fragment' );
-					}
-
-				} );
-
-				if( fragmentsHidden.length ) {
-					dispatchEvent( 'fragmenthidden', { fragment: fragmentsHidden[0], fragments: fragmentsHidden } );
+				if( changedFragments.hidden.length ) {
+					dispatchEvent( 'fragmenthidden', { fragment: changedFragments.hidden[0], fragments: changedFragments.hidden } );
 				}
 
-				if( fragmentsShown.length ) {
-					dispatchEvent( 'fragmentshown', { fragment: fragmentsShown[0], fragments: fragmentsShown } );
+				if( changedFragments.shown.length ) {
+					dispatchEvent( 'fragmentshown', { fragment: changedFragments.shown[0], fragments: changedFragments.shown } );
 				}
 
 				updateControls();
 				updateProgress();
+
 				if( config.fragmentInURL ) {
 					writeURL();
 				}
 
-				return !!( fragmentsShown.length || fragmentsHidden.length );
+				return !!( changedFragments.shown.length || changedFragments.hidden.length );
 
 			}
 
@@ -4668,6 +4818,22 @@
 	}
 
 	/**
+	 * Called whenever there is mouse input at the document level
+	 * to determine if the cursor is active or not.
+	 *
+	 * @param {object} event
+	 */
+	function onDocumentCursorActive( event ) {
+
+		showCursor();
+
+		clearTimeout( cursorInactiveTimeout );
+
+		cursorInactiveTimeout = setTimeout( hideCursor, config.hideCursorTime );
+
+	}
+
+	/**
 	 * Handler for the document level 'keypress' event.
 	 *
 	 * @param {object} event
@@ -4699,15 +4865,23 @@
 
 		onUserInput( event );
 
-		// Check if there's a focused element that could be using
-		// the keyboard
+		// Is there a focused element that could be using the keyboard?
 		var activeElementIsCE = document.activeElement && document.activeElement.contentEditable !== 'inherit';
 		var activeElementIsInput = document.activeElement && document.activeElement.tagName && /input|textarea/i.test( document.activeElement.tagName );
 		var activeElementIsNotes = document.activeElement && document.activeElement.className && /speaker-notes/i.test( document.activeElement.className);
 
+		// Whitelist specific modified + keycode combinations
+		var prevSlideShortcut = event.shiftKey && event.keyCode === 32;
+		var firstSlideShortcut = ( event.metaKey || event.ctrlKey ) && event.keyCode === 37;
+		var lastSlideShortcut = ( event.metaKey || event.ctrlKey ) && event.keyCode === 39;
+
+		// Prevent all other events when a modifier is pressed
+		var unusedModifier = 	!prevSlideShortcut && !firstSlideShortcut && !lastSlideShortcut &&
+								( event.shiftKey || event.altKey || event.ctrlKey || event.metaKey );
+
 		// Disregard the event if there's a focused element or a
 		// keyboard modifier key is present
-		if( activeElementIsCE || activeElementIsInput || activeElementIsNotes || (event.shiftKey && event.keyCode !== 32) || event.altKey || event.ctrlKey || event.metaKey ) return;
+		if( activeElementIsCE || activeElementIsInput || activeElementIsNotes || unusedModifier ) return;
 
 		// While paused only allow resume keyboard events; 'b', 'v', '.'
 		var resumeKeyCodes = [66,86,190,191];
@@ -4791,9 +4965,9 @@
 				// n, page down
 				case 78: case 34: navigateNext(); break;
 				// h, left
-				case 72: case 37: navigateLeft(); break;
+				case 72: case 37: firstSlideShortcut ? slide( 0 ) : navigateLeft(); break;
 				// l, right
-				case 76: case 39: navigateRight(); break;
+				case 76: case 39: lastSlideShortcut ? slide( Number.MAX_VALUE ) : navigateRight(); break;
 				// k, up
 				case 75: case 38: navigateUp(); break;
 				// j, down
@@ -5455,6 +5629,10 @@
 		// Returns an Array of all slides
 		getSlides: getSlides,
 
+		// Returns an Array of objects representing the attributes on
+		// the slides
+		getSlidesAttributes: getSlidesAttributes,
+
 		// Returns the total number of slides
 		getTotalSlides: getTotalSlides,
 
@@ -5505,6 +5683,11 @@
 			return query;
 		},
 
+		// Returns the top-level DOM element
+		getRevealElement: function() {
+			return dom.wrapper || document.querySelector( '.reveal' );
+		},
+
 		// Returns true if we're currently on the first slide
 		isFirstSlide: function() {
 			return ( indexh === 0 && indexv === 0 );
@@ -5546,12 +5729,12 @@
 		// Forward event binding to the reveal DOM element
 		addEventListener: function( type, listener, useCapture ) {
 			if( 'addEventListener' in window ) {
-				( dom.wrapper || document.querySelector( '.reveal' ) ).addEventListener( type, listener, useCapture );
+				Reveal.getRevealElement().addEventListener( type, listener, useCapture );
 			}
 		},
 		removeEventListener: function( type, listener, useCapture ) {
 			if( 'addEventListener' in window ) {
-				( dom.wrapper || document.querySelector( '.reveal' ) ).removeEventListener( type, listener, useCapture );
+				Reveal.getRevealElement().removeEventListener( type, listener, useCapture );
 			}
 		},
 
