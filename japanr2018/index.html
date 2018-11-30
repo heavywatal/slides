@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Japan.R 2018 Rcpp</title>
+
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/reveal-theme.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Japan.R 2018 Rcpp">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/japanr2018/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.53-DEV" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.css" integrity="sha384-9eLZqc9ds8eNjO3TmqPeYcDj8n+Qfa4nuSiGYa6DjLNcv9BtN69ZIulL9+8CqC9Y" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/katex.min.js" integrity="sha384-K3vbOmF2BtaVai+Qk37uypf7VrgBubhQreNQe9aGsz9lB63dIFiQVlJbr92dw2Lx" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.0/dist/contrib/auto-render.min.js" integrity="sha384-kmZOZB5ObwgQnS/DuDg6TScgOiWWBiVt0plIRkZCmE6rDZGrEOQeHM5PcHi+nyqe" crossorigin="anonymous"
+    onload="renderMathInElement(document.body);"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+
+<script defer src="https://use.fontawesome.com/releases/v5.5.0/js/brands.js"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.5.0/js/solid.js"></script>
+<script defer src="https://use.fontawesome.com/releases/v5.5.0/js/fontawesome.js"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1>
+<span style="font-size: 1.2rem; color: #999999;">
+みんなのRcpp 35.4 (仮)</span><br>
+<span style="font-size: 1.5rem">
+Rcppパッケージで外部C++ライブラリを使う</span><br>
+<span style="font-size: 1.2rem; color: #999999;">
+Using external C++ libraries in Rcpp packages</span>
+</h1>
+
+<div class="author">
+Watal M. Iwasaki
+&nbsp;
+<a href="https://twitter.com/heavywatal"><code>@heavywatal</code></a>
+</div>
+
+<div class="affiliation">
+SOKENDAI, The Graduate University for Advanced Studies
+</div>
+
+<div class="footnote">
+2018-12-01
+<a href="https://japanr.connpass.com/event/105802/">Japan.R 2018</a>
+</div>
+
+<p><a href="https://heavywatal.github.io/slides/japanr2018/">https://heavywatal.github.io/slides/japanr2018/</a>
+</section>
+<section>
+<h2 id="rcpp-http-www-rcpp-org-a-bridge-between-r-and-c"><a href="http://www.rcpp.org/">Rcpp</a>: a bridge between R and C++</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">r_sum <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>n<span class="p">)</span> <span class="p">{</span>
+  s <span class="o">=</span> <span class="m">0</span><span class="p">;</span> <span class="kr">for</span> <span class="p">(</span>i <span class="kr">in</span> <span class="kp">seq_len</span><span class="p">(</span>n<span class="p">))</span> <span class="p">{</span>s <span class="o">=</span> s <span class="o">+</span> <span class="m">1</span><span class="p">};</span> s
+<span class="p">}</span>
+
+Rcpp<span class="o">::</span>cppFunction<span class="p">(</span><span class="s">&#34;double rcpp_sum(int n) {
+</span><span class="s">  double s = 0.0; for (int i=0; i&lt;n; ++i) {s += 1.0;} return s;
+</span><span class="s">}&#34;</span><span class="p">)</span>
+
+n <span class="o">=</span> <span class="m">1000000L</span>
+rbenchmark<span class="o">::</span>benchmark<span class="p">(</span>r_sum<span class="p">(</span>n<span class="p">),</span> rcpp_sum<span class="p">(</span>n<span class="p">))[,</span><span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="p">]</span></code></pre></div>
+<pre><code>         test replications elapsed relative
+1    r_sum(n)          100   2.873   21.765
+2 rcpp_sum(n)          100   0.132    1.000
+</code></pre>
+
+<p>⚡ Rcpp helps improving performance.</p>
+
+<p>📦 ~1500 CRAN packages depend on Rcpp.</p>
+
+<p>🎉 <a href="http://dirk.eddelbuettel.com/blog/2018/11/07/">Happy 10th birthday and version 1.0.0  (2018-11-05)</a>.</p>
+
+</section>
+<section>
+<h2 id="online-resources-for-developing-rcpp-packages">Online resources for developing Rcpp packages</h2>
+
+<ul>
+<li><a href="http://dirk.eddelbuettel.com/code/rcpp/Rcpp-package.pdf">Rcpp-package.pdf</a> by Dirk Eddelbuettel and Romain François</li>
+<li><a href="http://r-pkgs.had.co.nz/src.html">Compiled code (<code>src/</code>) - R packages</a> by Hadley Wickham</li>
+<li><a href="https://heavywatal.github.io/rstats/devtools">https://heavywatal.github.io/rstats/devtools</a><br>
+<a href="https://heavywatal.github.io/rstats/rcpp">https://heavywatal.github.io/rstats/rcpp</a> (404)</li>
+<li><span class="fragment" data-fragment-index="1">
+<strong><a href="https://teuder.github.io/rcpp4everyone_ja/">みんなのRcpp</a></strong> and
+<strong><a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for everyone</a></strong>
+by <strong>津駄@teuder</strong> さん
+</span></li>
+</ul>
+
+<p><div class="fragment" data-fragment-index="1">
+<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい。 <a href="https://t.co/6I7GGemCDZ">https://t.co/6I7GGemCDZ</a></p>&mdash; HOXOM Inc. (@hoxom_inc) <a href="https://twitter.com/hoxom_inc/status/1057162394772811776?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい <a href="https://t.co/0CRbCrO06B">https://t.co/0CRbCrO06B</a></p>&mdash; 職業、イケメン。テラモナギ (@teramonagi) <a href="https://twitter.com/teramonagi/status/1057162274421432320?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい。 <a href="https://t.co/3M7Sy6tAw7">https://t.co/3M7Sy6tAw7</a></p>&mdash; niszet📚技術書典5 い04でした (@niszet0) <a href="https://twitter.com/niszet0/status/1057181653745852417?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい。 <a href="https://t.co/1EH6CUVBmD">https://t.co/1EH6CUVBmD</a></p>&mdash; hoxo_m (@hoxo_m) <a href="https://twitter.com/hoxo_m/status/1057159960130289665?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい。 <a href="https://t.co/wtbAOgBpa8">https://t.co/wtbAOgBpa8</a></p>&mdash; Shinichi Takayanagi (@_stakaya) <a href="https://twitter.com/_stakaya/status/1057162337419898880?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
+<blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい <a href="https://t.co/VQn0YOD59i">https://t.co/VQn0YOD59i</a></p>&mdash; 凸ぽん (@kyusque) <a href="https://twitter.com/kyusque/status/1057178516607840256?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
+</div>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<style>
+twitter-widget {
+  display: inline-block !important;
+  width: 32% !important;
+}
+</style></p>
+
+</section>
+<section>
+<h2 id="but-lacking-how-to-use-external-libraries">But lacking &ldquo;how to use external libraries&rdquo; 😢</h2>
+
+<p><a href="https://teuder.github.io/rcpp4everyone_ja/350_package.html">
+<img src="figure/rcpp4everyone35.png" width="100%" style="margin: -1.5rem -1.5rem -2.4rem;">
+<!-- <img src="figure/rcpp4everyone35.png" width="100%" style="transform: translate(-10px, -40px);"> -->
+</a></p>
+
+<p>Necessity is the mother of invention. Let&rsquo;s do it 💪</p>
+
+</section>
+<section>
+<h2 id="structure-of-a-typical-c-c-library">Structure of a typical C/C++ library</h2>
+
+<p>Source repository:</p>
+
+<pre><code>evolution/
+├── README.md
+└── src/
+    ├── individual.hpp      # header file for declaration
+    ├── individual.cpp      # source file for definition
+    ├── population.hpp
+    └── population.cpp
+</code></pre>
+
+<p>Compiled and installed:</p>
+
+<pre><code>${PREFIX}/                  # e.g., /usr/local/
+├── include/                # header files
+│   └── evolution/
+│       ├── individual.hpp
+│       └── population.hpp
+└── lib/
+    └── libevolution.a      # shared library (.dylib, .dll)
+</code></pre>
+
+<p>Libraries can be header-only,
+e.g., <a href="http://eigen.tuxfamily.org">Eigen</a>, <a href="https://github.com/nlohmann/json">nlohmann/json</a>.</p>
+
+</section>
+<section>
+<h2 id="basic-steps-to-incorporate-c-c-libraries">Basic steps to incorporate C/C++ libraries</h2>
+
+<ul>
+<li><p>Write <code>src/Makevars</code> to instruct compilers and linkers:</p>
+<div class="highlight"><pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX11
+<span class="nv">PKG_CPPFLAGS</span><span class="o">=</span>-DSTRICT_R_HEADERS -I/usr/local/include
+<span class="nv">PKG_LIBS</span><span class="o">=</span>-L/usr/local/lib -Wl,-rpath,/usr/local/lib -levolution
+</code></pre></div></li>
+
+<li><p>Use <code>configure</code> script to</p>
+
+<ul>
+<li>Generate <code>src/Makevars</code> from a template <code>src/Makevars.in</code>.</li>
+<li>Inspect build environments: OS, compilers, etc.</li>
+<li>Detect installed libraries.</li>
+<li>Do anything you want.<br>
+e.g., <code>git</code>, <code>cmake</code>, etc.</li>
+</ul></li>
+</ul>
+
+<p><span class="cite">
+<a href="http://r-pkgs.had.co.nz/src.html#make">http://r-pkgs.had.co.nz/src.html#make</a><br>
+<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup">https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup</a>
+</span></p>
+
+</section>
+<section>
+<h2 id="various-styles-to-incorporate-c-c-libraries">Various styles to incorporate C/C++ libraries</h2>
+
+<ul>
+<li>Find and use installed libraries. Fail if not found.
+
+<ul>
+<li>😍 Simple. 😨 Requires users&rsquo; knowledge and effort.</li>
+<li>e.g., <a href="https://github.com/r-lib/xml2">xml2</a>,
+<a href="https://github.com/ropensci/magick">magick</a>,
+<a href="https://github.com/eddelbuettel/rcppgsl">RcppGSL</a></li>
+</ul></li>
+<li>Keep source code copies in <code>inst/include/</code> and <code>src/</code>.
+
+<ul>
+<li>😍 Robust. Developers control everything. 😨 Redundant.</li>
+<li>e.g., <a href="https://github.com/eddelbuettel/bh/">BH</a>,
+<a href="https://github.com/RcppCore/RcppArmadillo">RcppArmadillo</a>,
+<a href="https://github.com/RcppCore/RcppEigen">RcppEigen</a>,
+<a href="https://github.com/RcppCore/RcppParallel">RcppParallel</a>,
+<a href="https://github.com/eddelbuettel/rcpptoml">RcppTOML</a></li>
+</ul></li>
+<li>Fetch and track source codes with <a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules">Git submodule</a>
+
+<ul>
+<li>🙂 Less redundant. 🙁 Foreign materials in package structure.</li>
+<li>e.g., <a href="https://github.com/igraph/rigraph">rigraph</a>,
+<a href="https://github.com/stan-dev/rstan">rstan (StanHeaders)</a></li>
+</ul></li>
+<li>Find and use installed libraries. Install if not found.
+
+<ul>
+<li>😍 Lean. Not requires users&rsquo; effort.</li>
+<li>e.g., <a href="https://heavywatal.github.io/rtumopp/">tumopp</a></li>
+</ul></li>
+</ul>
+
+</section>
+<section>
+<h2 id="let-s-discuss-later">Let&rsquo;s discuss later 🍻</h2>
+
+<ul>
+<li>Any other ways to handle external C++ libraries?</li>
+<li>Where to share these knowledge?
+
+<ul>
+<li>My own website</li>
+<li>みんなのRcpp</li>
+<li>Rcpp official documentation</li>
+</ul></li>
+<li>How are Windows users doing?</li>
+</ul>
+
+<h2 id="thank-you-for-your-attention">Thank you for your attention 🤘</h2>
+
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: false,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  mouseWheel: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
