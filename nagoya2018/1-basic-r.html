@@ -17,10 +17,9 @@
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
 <meta name="generator" content="Hugo 0.56.0-DEV" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.css" integrity="sha384-dbVIfZGuN1Yq7/1Ocstc1lUEm+AT+/rCkibIcC/OmWo5f0EA48Vf8CytHzGrSwbQ" crossorigin="anonymous">
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/katex.min.js" integrity="sha384-2BKqo+exmr9su6dir+qCw08N2ZKRucY4PrGQPPWU1A7FtlCGjmEGFqXCv5nyM5Ij" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.1/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   renderMathInElement(document.body, {
@@ -31,8 +30,18 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 </script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
 
-<script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
 
 <script type="application/javascript">
 var doNotTrack = false;
@@ -214,17 +223,17 @@ z <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><spa
 <p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
 Rに最初から入ってて、例としてよく使われる。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">print</span><span class="p">(</span>iris<span class="p">)</span></code></pre></div>
-<pre><code>     Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
-            &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;fctr&gt;
-  1:          5.1         3.5          1.4         0.2    setosa
-  2:          4.9         3.0          1.4         0.2    setosa
-  3:          4.7         3.2          1.3         0.2    setosa
-  4:          4.6         3.1          1.5         0.2    setosa
- ---                                                            
-147:          6.3         2.5          5.0         1.9 virginica
-148:          6.5         3.0          5.2         2.0 virginica
-149:          6.2         3.4          5.4         2.3 virginica
-150:          5.9         3.0          5.1         1.8 virginica
+<pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;fct&gt;
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
 </code></pre>
 
 <p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
@@ -241,15 +250,17 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>           <span class="c1"># パッケージのやつを使うよ</span>
 readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
 readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span></code></pre></div>
-<pre><code>     Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
-            &lt;num&gt;       &lt;num&gt;        &lt;num&gt;       &lt;num&gt;    &lt;char&gt;
-  1:          5.1         3.5          1.4         0.2    setosa
-  2:          4.9         3.0          1.4         0.2    setosa
-  3:          4.7         3.2          1.3         0.2    setosa
- ---                                                            
-148:          6.5         3.0          5.2         2.0 virginica
-149:          6.2         3.4          5.4         2.3 virginica
-150:          5.9         3.0          5.1         1.8 virginica
+<pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;chr&gt;
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
 </code></pre>
 
 <p>readxlパッケージを使うとExcelファイルも読み込める。</p>
