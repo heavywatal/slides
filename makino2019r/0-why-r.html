@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Why do we use R? — Hands-on R Lecture for Makino Lab</title>
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Why do we use R? — Hands-on R Lecture for Makino Lab">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/makino2019r/0-why-r.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.56.0-DEV" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="hands-on-r-lecture-for-makino-lab">Hands-on R Lecture for Makino Lab</h1>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<p><style>
+.reveal .current-deck {font-weight: bold;}
+</style>
+<ol start="0">
+<li class="current-deck"><a href="0-why-r.html">Why do we use R?</a>
+<li><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+</ol></p>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br><br>
+2019-10-09 生物棟大会議室
+</div>
+</section>
+<section>
+<h2 id="科学の営み-巨人の肩に立つ">科学の営み = 巨人の肩に立つ</h2>
+
+<figure style="position: absolute; top: 32px; right: 40px;">
+<a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
+<img src="figure/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
+<figcaption class="url">
+https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
+</figcaption>
+</a>
+</figure>
+
+<p>先人たちの積み重ねに基づいて、新しい発見をする</p>
+
+<dl>
+<dt>記録を残すことは何より重要</dt>
+<dd>実験や野外観察では些細なことも漏らさず記録。</dd>
+<dd>生データは何重にもバックアップ。</dd>
+<dd>みんな結構できてる(はず)。</dd>
+<dt>データ整理・解析・作図も不可欠、だけど&hellip;</dt>
+<dd>再現不能の職人技で切り抜けちゃう人も多い。</dd>
+<dd>コピペ、メニュー選択、配色と配置を微調整&hellip;</dd>
+<dt>疑義が生じたら&hellip;？ 別の人がその研究を発展させたいとき&hellip;？</dt>
+<dd>💩「ありまぁす！」</dd>
+<dd>✅「誰でも確実に再現できるプロトコルがこちらです」</dd>
+</dl>
+
+<p><strong>Reproducible Research (再現可能な研究)</strong> が巨人を大きくする。</p>
+
+</section>
+<section>
+<h2 id="再現不可能な職人的研究の例">再現不可能な職人的研究の例</h2>
+
+<p>動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
+それらを決める要因は何か。膨大な観察データに基づく超大作卒論。</p>
+
+<figure>
+<img src="figure/messy/thesis.png" width="800">
+</figure>
+</section>
+<section>
+<h2 id="生データ-ここはまだそんなに悪くない">生データ: ここはまだそんなに悪くない</h2>
+
+<p>週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。</p>
+
+<figure style="position: relative; margin: 20px 0;">
+<img src="figure/messy/dir-0826.png" class="screenshot" height="500">
+<img src="figure/messy/file-0826-zebra.png" class="screenshot" height="450"
+     style="position: absolute; left: 270px; top: 50px;">
+</figure>
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製-集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+
+<figure style="position: relative;">
+<img src="figure/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="figure/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+</figure>
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製-集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+
+<figure style="position: relative;">
+<img src="figure/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="figure/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+<img src="figure/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
+     style="position: absolute; left: 30px; top: 20px; z-index: 200;">
+<img src="figure/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+     style="position: absolute; left: 260px; top: 40px; z-index: 300;">
+</figure>
+</section>
+<section>
+<h2 id="目と手で数え-濃淡を計算し-画像ソフトで塗る">目と手で数え、濃淡を計算し、画像ソフトで塗る</h2>
+
+<p>泣きながら何十枚も&hellip;。無料期間が終わって今は使えない&hellip;。</p>
+
+<p><figure style="position: relative; margin: 20px 0;">
+<img src="figure/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
+<img src="figure/messy/photoshop.jpg" width="530"
+     style="position: absolute; left: 200px; top: -10px;">
+</figure>
+<img src="figure/messy/zebra_AM.jpg" width="300">
+<img src="figure/messy/zebra_PM.jpg" width="300"></p>
+
+</section>
+<section>
+<h2 id="目作業-手作業-シーシュポスの岩">目作業・手作業 ＝ シーシュポスの岩</h2>
+
+<figure style="float: right;">
+<a href="https://en.wikipedia.org/wiki/Sisyphus">
+<img src="figure/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="320">
+<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
+</a>
+</figure>
+
+<ul>
+<li><strong>膨大な単純作業</strong>がそもそもツラい</li>
+<li>人間だもの、<strong>ミスは防ぎきれない</strong></li>
+<li>なるべくミスを防ぐためのチェックもツラい</li>
+<li>ミスを発見 → <strong>初めからやり直し</strong></li>
+<li>新たなデータ・研究 → <strong>初めからやり直し</strong></li>
+<li>熟練してもツラいまま</li>
+<li>そのときの自分しかできない、記録に残らない<br>
+→ <strong>検証のしようがない</strong></li>
+<li>卒論なら努力賞でいいかもしれないけど、科学の手続きとしては問題。</li>
+</ul>
+</section>
+<section>
+<h2 id="プログラミングで大量のファイルを捌く">プログラミングで大量のファイルを捌く</h2>
+
+<p>先の例に負けず生データはどっさり。でも頑張るのは機械。</p>
+
+<figure>
+<img src="figure/tek/finder.png" height="420">
+<img src="figure/tek/fig5.png" height="420">
+<figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="こんな感じの図もrでラクラク描けるよ">こんな感じの図もRでラクラク描けるよ</h2>
+
+<figure>
+<img src="/slides/figure/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/figure/tumopp/neighborhood.png" height="200">
+<img src="/slides/figure/tumopp/param-p.png" height="200">
+<img src="/slides/figure/tumopp/paper/Fig3.png" height="200">
+<img src="/slides/figure/tumopp/param-k.png" height="200">
+<img src="/slides/figure/tumopp/driver.gif" height="200"><br>
+<img src="/slides/figure/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/figure/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/figure/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/figure/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/figure/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/figure/tumopp/Chex_Lstep.gif" height="100">
+<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="rにやらせて楽しよう">Rにやらせて楽しよう</h2>
+
+<ul>
+<li>規則性のある退屈な仕事は人間よりも機械のほうが得意。</li>
+<li>一度書いたプログラムは、データが変わっても<strong>使いまわせる</strong>。</li>
+<li><strong>自分以外の人でも再現・検証</strong>できる</li>
+<li><strong>きれいな図を簡単に</strong>描ける</li>
+<li>部分的に改変しながらいろんな解析を試せる。<br>
+→ <strong>仮説検証</strong>だけでなく、<strong>仮説生成(探索的データ解析)</strong>もやりやすい</li>
+<li>やれば上達する。どんどん楽になる！</li>
+</ul>
+
+<figure>
+<a href="http://r4ds.had.co.nz/introduction.html">
+<img src="figure/r4ds/data-science.png">
+<figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="r-is-a-programming-language-environment">R is a programming language/environment</h2>
+
+<p>for statistical computing and graphics</p>
+
+<figure style="float: right;">
+<a href="https://cran.r-project.org/">
+<img src="/slides/figure/rstats/Rlogo.svg" height="200">
+<figcaption class="url">https://cran.r-project.org/</figcaption>
+</a>
+</figure>
+
+<dl>
+<dt>Cross-platform</dt>
+<dd>Linux, Mac, Windows</dd>
+<dt>Open source</dt>
+<dd>Free of charge.</dd>
+<dd>Improved by collective intelligence.</dd>
+<dt>Community</dt>
+<dd>Easy to find many websites and people to consult.</dd>
+</dl>
+
+<p>There are some alternatives.<br>
+<a href="https://www.python.org/">Python</a> is comparable.
+<a href="https://julialang.org/">Julia</a> is rising.</p>
+
+</section>
+<section>
+<h2 id="goal-of-this-hands-on-lecture">Goal of this hands-on lecture</h2>
+
+<h3 id="strike-want-to-do-reproducible-research-effortlessly-strike">✅ <strike>Want to do reproducible research effortlessly</strike></h3>
+
+<h3 id="know-you-can-do-this-and-that-with-r">⬜ Know you can do this and that with R</h3>
+
+<h3 id="know-who-where-how-to-consult">⬜ Know who/where/how to consult</h3>
+
+<p><br>
+That&rsquo;s all. You don&rsquo;t have to remember details.</p>
+
+<p>This slide deck is also available online:
+<br>
+<a href="https://heavywatal.github.io/slides/">https://heavywatal.github.io/slides/</a></p>
+
+</section>
+<section>
+<h2 id="reference">Reference</h2>
+
+<dl>
+<dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
+<dd><a href="http://r4ds.had.co.nz/">http://r4ds.had.co.nz/</a></dd>
+<dd><a href="https://amzn.to/2tbRmVc">English book</a></dd>
+<dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
+<dt>Older versions</dt>
+<dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
+岩嵜航 2018</dd>
+<dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
+<dt>Irreproducible thesis</dt>
+<dd>SOKENDAI student M. S. (now R user)</dd>
+</dl>
+
+<p><a href="1-basic-r.html" rel="next" class="readmore">
+1. R basics
+</a>
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: false,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  mouseWheel: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>

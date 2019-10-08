@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>R basics — Hands-on R Lecture for Makino Lab</title>
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="R basics — Hands-on R Lecture for Makino Lab">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/makino2019r/1-basic-r.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.56.0-DEV" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="hands-on-r-lecture-for-makino-lab">Hands-on R Lecture for Makino Lab</h1>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<p><style>
+.reveal .current-deck {font-weight: bold;}
+</style>
+<ol start="0">
+<li><a href="0-why-r.html">Why do we use R?</a>
+<li class="current-deck"><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+</ol></p>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br><br>
+2019-10-09 生物棟大会議室
+</div>
+</section>
+<section>
+<h2 id="r-basics-index">R basics: Index</h2>
+
+<ul>
+<li>Setup Mac and R environment</li>
+<li>Conversation with R</li>
+<li>Create a &ldquo;project&rdquo; and &ldquo;script&rdquo;</li>
+<li>Read and write table files</li>
+<li>Package</li>
+<li>Errors and questions</li>
+</ul>
+</section>
+<section>
+<h2 id="mac-keyboard-shortcuts">Mac keyboard shortcuts</h2>
+
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Switch apps</td>
+<td><kbd>command</kbd><kbd>tab</kbd></td>
+</tr>
+
+<tr>
+<td>Quit apps</td>
+<td><kbd>command</kbd><kbd>q</kbd></td>
+</tr>
+
+<tr>
+<td>Spotlight</td>
+<td><kbd>command</kbd><kbd>space</kbd></td>
+</tr>
+
+<tr>
+<td>Cut, Copy, Paste</td>
+<td><kbd>command</kbd><kbd>x</kbd>, -<kbd>c</kbd>, -<kbd>v</kbd></td>
+</tr>
+
+<tr>
+<td>Select all</td>
+<td><kbd>command</kbd><kbd>a</kbd></td>
+</tr>
+
+<tr>
+<td>Undo</td>
+<td><kbd>command</kbd><kbd>z</kbd></td>
+</tr>
+
+<tr>
+<td>Find</td>
+<td><kbd>command</kbd><kbd>f</kbd></td>
+</tr>
+
+<tr>
+<td>Save</td>
+<td><kbd>command</kbd><kbd>s</kbd></td>
+</tr>
+</tbody>
+</table>
+
+<p>See <a href="https://support.apple.com/HT201236">https://support.apple.com/HT201236</a>
+</section>
+<section>
+<h2 id="setup-mac-environment">Setup Mac environment</h2>
+
+<ul>
+<li>Update macOS</li>
+<li>Set OS language to English (System Preferences → Language &amp; Region)</li>
+
+<li><p>Install <strong>Command Line Tools</strong> via <strong>Terminal.app</strong>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">xcode-select --install</code></pre></div>
+<p>Full Xcode is not necessary, but you can have it if you like.</p></li>
+
+<li><p>Install <a href="/mac/homebrew.html">Homebrew</a> (software manager):</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">/usr/bin/ruby -e <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install<span class="k">)</span><span class="s2">&#34;</span></code></pre></div></li>
+
+<li><p>Try installing something:</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew install wget
+wget https://www.lifesci.tohoku.ac.jp/evolgenomics/wp-content/themes/makino/images/logo2.png</code></pre></div>
+<p>You may need to restart shell to reload <code>PATH</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># command not found: brew</span>
+<span class="nb">exec</span> <span class="nv">$SHELL</span> -l</code></pre></div></li>
+</ul>
+
+</section>
+<section>
+<h2 id="setup-r-environment">Setup R environment</h2>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew cask install r rstudio</code></pre></div>
+<dl>
+<dt><a href="https://cran.rstudio.com/">R</a></dt>
+<dd>Core software to interpret and execute commands.</dd>
+<dd>Standard packages and functions are included.</dd>
+<dt><a href="https://www.rstudio.com/">RStudio Desktop</a></dt>
+<dd>Integrated environment to help users interact with R.</dd>
+<dd>Not necessary, but many people like it.</dd>
+</dl>
+
+<p><img src="figure/rstudio-300x260.png"></p>
+
+</section>
+<section>
+<h2 id="launch-rstudio-and-play-with-console">Launch RStudio and play with Console</h2>
+
+<p>Details will be explained later.</p>
+
+<p><img src="figure/rstudio/console.png" class="screenshot" width="100%"></p>
+
+</section>
+<section>
+<h2 id="create-project">Create &ldquo;Project&rdquo;</h2>
+
+<p>File → New Project&hellip; → New Directory → <code>~/project/r-training-2019</code></p>
+
+<p><img src="figure/rstudio/create-new-project.png" class="screenshot" width="90%"></p>
+
+</section>
+<section>
+<h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
+
+<p>File → New File → R script</p>
+
+<p><img src="figure/rstudio/newfile.png" width="100%"></p>
+
+</section>
+<section>
+<h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
+
+<p>File → New File → R script</p>
+
+<p><img src="figure/rstudio/script-console.png" width="100%"></p>
+
+</section>
+<section>
+<h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
+
+<p>Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
+Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
+
+<p><img src="figure/rstudio/101.png" width="100%"></p>
+
+</section>
+<section>
+<h2 id="save-r-script-in-the-project-kbd-command-kbd-kbd-s-kbd">Save R script in the project: <kbd>command</kbd><kbd>s</kbd></h2>
+
+<p>Separate data, scripts, and results, e.g.,</p>
+
+<pre><code>r-training-2019/           # プロジェクトの最上階
+├── data/                  # 元データを置くところ
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+├── r-training-2019.Rproj  # これダブルクリックでRStudioを起動
+├── hello.R
+├── output/                # 結果の出力先
+│   ├── iris-petal.png
+│   └── iris-summary.tsv
+├── transform.R            # データ整理・変形のスクリプト
+└── visualize.R            # 作図のスクリプト
+</code></pre>
+
+<p>プロジェクト最上階を作業ディレクトリとし、<br>
+ファイル読み書きの基準にする。(後で詳しく)</p>
+
+</section>
+<section>
+<h2 id="configure-rstudio-not-to-save-load-workspace">Configure RStudio not to save/load workspace</h2>
+
+<p>Open &ldquo;Preferences&rdquo; with <kbd>command</kbd><kbd>,</kbd></p>
+
+<figure>
+<a href="http://r4ds.had.co.nz/workflow-projects.html">
+<img src="figure/rstudio-workspace.png" width="75%"
+     style="object-fit: cover; object-position: top; height: 480px;">
+<figcaption class="url">http://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="attitude-toward-programming-in-r">Attitude toward programming in R</h2>
+
+<dl>
+<dt>Don&rsquo;t fear errors</dt>
+<dd>Even experts cause errors very often.</dd>
+<dd>An error is a message from R. Try to understand it.</dd>
+<dt>Google it</dt>
+<dd>Some R users in the world have already solved your problems.</dd>
+<dd>Queries can be 日本語, Engligh, or whole error message.</dd>
+<dd>それでも分からなかったら <a href="https://github.com/tokyor/r-wakalang">r-wakalang</a> で相談しよう。</dd>
+</dl>
+
+<figure style="float: right; margin: 0;">
+<img src="figure/error.png" height="300">
+</figure>
+
+<dl>
+<dt>Copy-and-paste is easier and faster</dt>
+<dd>見つけたコードはまずコピペして使ってみよう。</dd>
+<dd>動くようなら自分のデータに合わせて改変しよう。</dd>
+<dd>(ただし、ライセンスには注意&hellip;)</dd>
+</dl>
+</section>
+<section>
+<h2 id="create-objects-variables-変数">Create objects/variables (変数)</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
+x            <span class="c1"># What&#39;s in x?</span></code></pre></div>
+<pre><code>[1] 42
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">y <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
+y            <span class="c1"># What&#39;s in y?</span></code></pre></div>
+<pre><code>[1] &quot;24601&quot;
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">+</span> y        <span class="c1"># Error!</span></code></pre></div>
+<pre><code>Error in x + y: non-numeric argument to binary operator
+</code></pre>
+
+</section>
+<section>
+<h2 id="object-types-型">Object types (型)</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">class</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
+<pre><code>[1] &quot;numeric&quot;
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">is.numeric</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
+<pre><code>[1] TRUE
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">is.character</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
+<pre><code>[1] FALSE
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.character</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
+<pre><code>[1] &quot;42&quot;
+</code></pre>
+
+<p>Try applying the same functions to <code>y</code>.</p>
+
+</section>
+<section>
+<h2 id="object-types-型">Object types (型)</h2>
+
+<ul>
+<li><code>NULL</code>: 空っぽ</li>
+<li>vector: 基本型。一次元の配列。
+
+<ul>
+<li>logical: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
+<li>numeric: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
+<li>character: 文字列 (<code>&quot;historgram.png&quot;</code>)</li>
+<li>factor: 因子 (文字列っぽいけど微妙に違う)</li>
+<li>↑それぞれに欠損値 <code>NA</code> も定義されてる</li>
+</ul></li>
+<li>matrix: 二次元の行列。vector同様、全要素が同じ型。</li>
+<li>list: 異なる型でも詰め込める太っ腹ベクトル。</li>
+<li><strong>data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong><br>
+<strong>tibble</strong> とか <strong>tbl_df</strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
+</ul>
+</section>
+<section>
+<h2 id="vector-1-dimensional-array">vector: 1-dimensional array</h2>
+
+<p>1個の値でもベクトル扱い。<br>
+同じ長さ(または長さ1)の相手との計算が得意。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
+x <span class="o">+</span> x           <span class="c1"># 同じ長さ同士の計算</span></code></pre></div>
+<pre><code>[1]  2  4 18
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">y <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
+x <span class="o">+</span> y           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span></code></pre></div>
+<pre><code>[1] 11 12 19
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">sqrt</span><span class="p">(</span>x<span class="p">)</span>         <span class="c1"># square root</span></code></pre></div>
+<pre><code>[1] 1.000000 1.414214 3.000000
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># We don&#39;t have to write for-loop like this</span>
+z <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+<span class="kr">for</span> <span class="p">(</span>i <span class="kr">in</span> <span class="kp">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+  z<span class="p">[</span>i<span class="p">]</span> <span class="o">=</span> <span class="kp">sqrt</span><span class="p">(</span>x<span class="p">[</span>i<span class="p">])</span>
+<span class="p">}</span></code></pre></div>
+</section>
+<section>
+<h2 id="data-frame-rectangle-table-important">data.frame: rectangle table (IMPORTANT!)</h2>
+
+<p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">print</span><span class="p">(</span>iris<span class="p">)</span></code></pre></div>
+<pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;fct&gt;
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
+</code></pre>
+
+<p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
+
+</section>
+<section>
+<h2 id="read-and-write-data-frame">Read and Write data.frame</h2>
+
+<ul>
+<li>You can read <code>.xlsx</code> files with readxl package, but</li>
+<li>Prefer plain text format, e.g., <code>.csv</code> and <code>.tsv</code>.</li>
+
+<li><p>Use <strong>relative path</strong> from <strong>working directory</strong>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
+readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
+readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span></code></pre></div></li>
+
+<li><p>Check your current working directory and its contents:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">getwd</span><span class="p">()</span>               <span class="c1"># Get working directory</span>
+<span class="kp">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
+<span class="kp">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span></code></pre></div></li>
+</ul>
+
+</section>
+<section>
+<h2 id="r-package">R package</h2>
+
+<p>便利な関数やデータセットなどをひとまとめにしたもの。</p>
+
+<dl>
+<dt>Standard Packages</dt>
+<dd>Rの標準機能。何もしなくても使用可能</dd>
+<dt>Contributed Packages</dt>
+<dd>有志により開発され、
+<a href="https://cran.rstudio.com/web/packages/index.html">CRAN</a>
+にまとめて公開されている。</dd>
+<dd>要インストール。使う前に読み込むおまじないが必要。</dd>
+</dl>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
+update.packages<span class="p">()</span>          <span class="c1"># たまには更新しよう</span></code></pre></div>
+<dl>
+<dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
+<dd>大丈夫。誰も覚えきってない。</dd>
+<dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="tidyverse">tidyverse</h2>
+
+<p><a href="https://www.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-badges.png" width="260" align="right">
+</a></p>
+
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
+<span class="c1"># 関連パッケージが一挙に読み込まれる</span></code></pre></div>
+<ul>
+<li>統一的な使い勝手</li>
+<li>暗黙の処理をなるべくしない安全設計</li>
+<li>シンプルな関数を繋げて使うデザイン</li>
+</ul>
+
+<figure>
+<a href="http://r4ds.had.co.nz/introduction.html">
+<img src="figure/r4ds/data-science.png">
+<figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="many-other-useful-packages">Many other useful packages</h2>
+
+<p><a href="https://readxl.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-readxl.png" width="120" align="right">
+</a>
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-stringr.png" width="120" align="right">
+</a></p>
+
+<ul>
+<li><a href="https://readxl.tidyverse.org/">readxl</a>: エクセル形式の読み込み</li>
+<li><a href="https://stringr.tidyverse.org/">stringr</a>: 文字列の処理</li>
+<li><a href="https://www.bioconductor.org/">Bioconductor</a>: バイオインフォマティクス関連</li>
+<li><a href="http://igraph.org/r/">igraph</a>: グラフ(ネットワーク)関連</li>
+<li><a href="https://cran.r-project.org/package=rgl">rgl</a>: 3Dの作図</li>
+<li><a href="https://rmarkdown.rstudio.com/">R Markdown</a>:
+Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
+この発表スライドもそうやって作った。<br>
+レポート作成や共同研究者への報告にも便利！</li>
+</ul>
+
+<p>たくさんありすぎて選べない？<br>
+まずは人気のパッケージを <a href="https://awesome-r.com/">https://awesome-r.com/</a> で探してみるとか。</p>
+
+</section>
+<section>
+<h2 id="how-to-solve-problems">How to solve problems</h2>
+
+<ul>
+<li>RStudio内にヘルプを表示: <code>?sum</code>, <code>help.start()</code></li>
+<li>変数の構造を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
+<li>エラー文をちゃんと読む: <code>No such file or directory</code></li>
+<li>パッケージの公式ドキュメントをちゃんと読む</li>
+<li>パッケージ名やエラー文をコピペしてウェブ検索<br>
+→ <a href="https://stackoverflow.com/questions/tagged/r">StackOverflow</a>
+や個人サイトに解決策</li>
+<li>身近な経験者に訊く</li>
+<li>Slackの
+<a href="https://github.com/tokyor/r-wakalang">r-wakalang</a>
+で質問を投稿する。<br>
+内容によってチャンネルを選ぶ: <code>#r_beginners</code>, <code>#ggplot2</code></li>
+<li>状況を再現できる小さな例
+<a href="https://reprex.tidyverse.org/">(reprex)</a>
+を添えて質問すると回答を得やすい。</li>
+</ul>
+</section>
+<section>
+<h2 id="r-basics-summary">R basics: Summary</h2>
+
+<ul>
+<li>Install R and RStudio via Homebrew.</li>
+<li>Write R script, and send it to Console.</li>
+<li>Place files in a &ldquo;Project&rdquo; structure.</li>
+<li>Variables have types: numeric vector, data.frame, etc.</li>
+<li>Use packages.</li>
+</ul>
+
+<p><a href="2-ggplot.html" rel="next" class="readmore">
+2. Visualization with R
+</a>
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: false,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  mouseWheel: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
