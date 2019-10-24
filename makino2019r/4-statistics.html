@@ -94,6 +94,10 @@ if (!doNotTrack) {
 <li><strike>Theoretical background of statistical analysis</strike></li>
 <li>How to perform statistical analysis with R</li>
 </ul>
+
+<p><br><br>
+Launch RStudio, and load <code>tidyverse</code>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span></code></pre></div>
 </section>
 <section>
 <h2 id="relationship-between-cty-燃費-displ-排気量">Relationship between <code>cty</code> (燃費) &amp; <code>displ</code> (排気量)?</h2>
@@ -110,7 +114,7 @@ model_object <span class="o">=</span> model_function<span class="p">(</span>form
 <span class="c1"># View its summary</span>
 <span class="kp">summary</span><span class="p">(</span>model_object<span class="p">)</span>
 
-<span class="c1"># Get estimated coefficients</span>
+<span class="c1"># Get the estimated coefficients</span>
 coef<span class="p">(</span>model_object<span class="p">)</span></code></pre></div>
 <p>where</p>
 
@@ -318,7 +322,7 @@ ggplot<span class="p">(</span>mpg<span class="p">,</span> aes<span class="p">(</
 <section>
 <h2 id="model-comparison">Model comparison</h2>
 
-<p>There are many statistics, e.g., AIC, BID, etc.</p>
+<p>There are many statistics, e.g., AIC, BIC, etc.</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">fit1 <span class="o">=</span> lm<span class="p">(</span>cty <span class="o">~</span> displ<span class="p">,</span> data <span class="o">=</span> mpg<span class="p">)</span> <span class="c1">#family = gaussian(&#34;identity&#34;)</span>
 fit2 <span class="o">=</span> glm<span class="p">(</span>cty <span class="o">~</span> displ<span class="p">,</span> data <span class="o">=</span> mpg<span class="p">,</span> family <span class="o">=</span> Gamma<span class="p">(</span>link <span class="o">=</span> <span class="s">&#34;log&#34;</span><span class="p">))</span>
 fit3 <span class="o">=</span> glm<span class="p">(</span>cty <span class="o">~</span> displ<span class="p">,</span> data <span class="o">=</span> mpg<span class="p">,</span> family <span class="o">=</span> Gamma<span class="p">(</span>link <span class="o">=</span> <span class="s">&#34;inverse&#34;</span><span class="p">))</span>
@@ -431,6 +435,19 @@ tidy<span class="p">(</span>fit<span class="p">)</span></code></pre></div>
 
 </section>
 <section>
+<h2 id="tests-仮説検定">Tests 仮説検定</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">chisq.test<span class="p">()</span>
+fisher.test<span class="p">()</span>
+kruskal.test<span class="p">()</span>
+ks.test<span class="p">()</span>
+t.test<span class="p">()</span>
+var.test<span class="p">()</span>
+wilcox.test<span class="p">()</span>
+<span class="c1"># etc.</span></code></pre></div>
+<p>See <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/00Index.html"><code>stats</code> package</a> for more details.</p>
+
+</section>
+<section>
 <h2 id="probability-distributions-確率分布">Probability distributions 確率分布</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 確率密度関数 (PDF)</span>
 dnorm<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">1.96</span><span class="p">))</span></code></pre></div>
@@ -446,12 +463,12 @@ qnorm<span class="p">(</span><span class="kt">c</span><span class="p">(</span><s
 </code></pre>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 乱数生成</span>
 rnorm<span class="p">(</span><span class="m">4</span><span class="p">)</span></code></pre></div>
-<pre><code>## [1] -0.8429118  1.3705091  0.2310199 -0.9313555
+<pre><code>## [1] -1.1716709  0.5996302  1.0447831  0.6504804
 </code></pre>
 
 </section>
 <section>
-<h2 id="caution">Caution</h2>
+<h2 id="計算機の限界に注意">計算機の限界に注意</h2>
 
 <p><code>1 - pnorm(...)</code>や<code>log(pnorm(...))</code>のほうが直感的に分かりやすいので、
 <code>lower.tail = FALSE</code>や<code>log.p = TRUE</code>は不要なようにも思われるが、
