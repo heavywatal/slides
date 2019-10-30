@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>File management with Git&#43;GitHub — Hands-on R Lecture for Makino Lab</title>
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="File management with Git&#43;GitHub — Hands-on R Lecture for Makino Lab">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/makino2019r/5-git.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.56.0-DEV" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<style>
+.fa-share-alt-square {
+  color: #f03c2e;
+  transform: rotate(45deg);
+}
+.fa-tint {
+  color: #949494;
+}
+.fa-coffee {
+  color: #62982f;
+}
+</style></p>
+
+<h1 id="hands-on-r-lecture-for-makino-lab"><a href=".">Hands-on R Lecture for Makino Lab</a></h1>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+
+<ol start="0">
+<li><a href="0-why-r.html">Why do we use R?</a>
+<li><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+<li><a href="4-statistics.html">Statistical analysis with R</a>
+<li class="current-deck"><a href="5-git.html">File management with Git+GitHub</a>
+</ol>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br>
+2019-10-30 生物棟大会議室
+</div>
+</section>
+<section>
+<h2 id="reproducible-research-再現可能な研究">Reproducible Research (再現可能な研究)</h2>
+
+<h3 id="programming">Programming!</h3>
+
+<h3 id="backup">Backup!</h3>
+</section>
+<section>
+<h2 id="source-codes-grow-messy">Source codes grow messy</h2>
+
+<p>Lots of unused codes, just in case&hellip;</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
+
+<span class="c1"># diamonds %&gt;%</span>
+<span class="c1">#   select(carat, price) %&gt;%</span>
+<span class="c1">#   filter(carat &gt; 1)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># ... long long old code worked in the past ...</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+
+result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  select<span class="p">(</span>carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">)</span> <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span><span class="kp">cut</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  summarize_all<span class="p">(</span><span class="kp">mean</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+</section>
+<section>
+<h2 id="directories-grow-messy">Directories grow messy</h2>
+
+<p>Lots of different versions. Which is the latest?</p>
+
+<pre><code>% ls
+analysis.R
+analysis2.R
+analysis-20180129.R
+analysis-20180129fix.R
+analysis-kuma-edit.R
+analysis-yoko-edit.R
+analysis完全版.R
+analysis最終.R
+analysis最終2.R
+analysis最終改.R
+analysis決定版！.R
+plot.R
+plot2.R
+plot最終.R
+plot論文.R
+</code></pre>
+
+</section>
+<section>
+<h2 id="timestamp-in-filename-is-not-enough">Timestamp in filename is not enough</h2>
+
+<p>You found a bug. How can you find its origin, and fix all the copies?</p>
+
+<figure>
+<img src="figure/messy/yuki-zawa.png" width="480"
+     style="object-fit: cover; object-position: top; height: 500px;">
+</figure>
+</section>
+<section>
+<h2 id="version-control-with-git-github">Version control with Git + GitHub</h2>
+
+<ul>
+<li>Only the latest files are visible.</li>
+<li>You can easily browse and rollback the version history.</li>
+</ul>
+
+<figure>
+<a href="https://github.com/heavywatal/tumopp">
+<img src="figure/messy/github-repository.png" height="500" class="screenshot">
+</a>
+&nbsp;
+<a href="https://github.com/heavywatal/tumopp/commits/master">
+<img src="figure/messy/github-history.png" height="500" class="screenshot">
+</a>
+</figure>
+</section>
+<section>
+<h2 id="online-storages-and-time-machine-are-useful">Online Storages and Time Machine are useful</h2>
+
+<ul>
+<li><a href="https://dropbox.com">Dropbox<i class="fab fa-fw fa-dropbox"></i></a> や
+<a href="https://drive.google.com/">Google Drive<i class="fab fa-fw fa-google-drive"></i></a>
+では、保存のたびに履歴が残る。</li>
+<li><a href="https://support.apple.com/HT201250">Time Machine<i class="fas fa-fw fa-clock"></i></a>
+では、一定時間間隔で履歴が残る。</li>
+</ul>
+
+<p><br>
+But they are not designed for version control or collaborative work.</p>
+
+<ul>
+<li>履歴の保持期間が限られている。 (e.g., &lt;180 days on Dropbox)</li>
+<li>オフラインだったりバッテリー駆動だったりすると保存漏れが起きる。</li>
+<li>いつのバージョンに戻したらいいのか、日時以外の手掛かりが無い。</li>
+<li>ファイル変更の競合・衝突に対処しにくい。</li>
+</ul>
+</section>
+<section>
+<h2 id="git-i-class-fas-fa-fw-fa-share-alt-square-i-and-github-i-class-fab-fa-fw-fa-github-i">Git<i class="fas fa-fw fa-share-alt-square"></i> and GitHub<i class="fab fa-fw fa-github"></i></h2>
+
+<ul>
+<li>いつでも好きなところに戻れる安心感
+
+<ul>
+<li>履歴を残すタイミングは任意 = 手動。</li>
+<li>バージョン(リビジョン)ごとにメッセージを残せる。</li>
+<li>差分を簡単に見られる。</li>
+</ul></li>
+<li>複数マシンや複数人での並列作業にも使える
+
+<ul>
+<li>オフラインでも作業できる。</li>
+<li>ブランチを作ることで競合・衝突の影響を抑えられる。</li>
+<li>もし競合・衝突が起きてもうまく対処する機能がある。</li>
+<li>課題を管理する機能もある。</li>
+</ul></li>
+<li>読み方はギット、ギットハブ。(ちなみに画像のGIFはジフ)</li>
+</ul>
+
+<p>e.g., <a href="https://github.com/tidyverse/stringr/commits/master">https://github.com/tidyverse/stringr/commits/master</a>
+</section>
+<section>
+<h2 id="git-i-class-fas-fa-fw-fa-share-alt-square-i-and-github-i-class-fab-fa-fw-fa-github-i">Git<i class="fas fa-fw fa-share-alt-square"></i> and GitHub<i class="fab fa-fw fa-github"></i></h2>
+
+<dl>
+<dt><a href="https://git-scm.com/">Git<i class="fas fa-fw fa-share-alt-square"></i></a></dt>
+<dd>分散型バージョン管理システムとして最も広く使われるオープンソース・ソフトウェア。</dd>
+<dd>手元のコンピュータ上でこれを操作して、変更履歴を記録・閲覧したり送受信したりする。</dd>
+<dt><a href="https://github.com">GitHub<i class="fab fa-fw fa-github"></i></a></dt>
+<dd>Gitをより便利に使うためのオンラインサービス。</dd>
+<dd>それを運営する会社の名前でもある。</dd>
+<dd>多人数でプロジェクトを共有するプラットフォームとしても有用。</dd>
+</dl>
+</section>
+<section>
+<h2 id="alternative-tools-and-services">Alternative tools and services</h2>
+
+<ul>
+<li>Version Control System (VCS)
+
+<ul>
+<li><a href="https://git-scm.com/">Git<i class="fas fa-fw fa-share-alt-square"></i> <code>git</code></a></li>
+<li><a href="https://www.mercurial-scm.org/">Mercurial<i class="fas fa-fw fa-tint"></i> <code>hg</code></a></li>
+<li>その他 svn, cvs, rcs など。</li>
+</ul></li>
+<li>Hosting Service
+
+<ul>
+<li><a href="https://github.com">GitHub<i class="fab fa-fw fa-github"></i></a>:
+公開リポジトリは無料。教職員・学生なら非公開も無料。</li>
+<li><a href="https://bitbucket.org/">Bitbucket<i class="fab fa-fw fa-bitbucket"></i></a>:
+非公開リポジトリも無料。</li>
+<li><a href="https://about.gitlab.com/">GitLab<i class="fab fa-fw fa-gitlab"></i></a>:
+非公開リポジトリも無料。ローカル版もあり。</li>
+<li><a href="https://gitea.io/en-us/">Gitea<i class="fas fa-fw fa-coffee"></i></a>:
+ローカル版のみ。</li>
+<li>その他 SourceForge, Google Code など。</li>
+</ul></li>
+</ul>
+
+<p>VCSは基本的にGit一択。<br>
+ホスティングサービスは、使い方や予算などに応じて選択。
+</section>
+<section>
+<h2 id="git-i-class-fas-fa-fw-fa-share-alt-square-i-basics-export-local-changes">Git<i class="fas fa-fw fa-share-alt-square"></i> basics: Export local changes</h2>
+
+<dl>
+<dt><i class="fas fa-fw fa-folder"></i> working directory (working tree)</dt>
+<dd>手元のファイルの変更はまだリポジトリに登録されていない</dd>
+<dd>↓ <code>git add</code></dd>
+<dt><i class="fas fa-fw fa-folder-plus"></i> staging area (index)</dt>
+<dd>次のコミットに含めるファイルをマークする段階</dd>
+<dd>↓ <code>git commit</code></dd>
+<dt><i class="fas fa-fw fa-code-branch"></i> local repository</dt>
+<dd>変更履歴が <code>.git/</code> 内に記録されている</dd>
+<dd>↓ <code>git push</code></dd>
+<dt><i class="fab fa-fw fa-github"></i> remote repository</dt>
+<dd>GitHubなど別マシンのリポジトリに反映</dd>
+</dl>
+</section>
+<section>
+<h2 id="git-i-class-fas-fa-fw-fa-share-alt-square-i-basics-import-changes">Git<i class="fas fa-fw fa-share-alt-square"></i> basics: Import changes</h2>
+
+<dl>
+<dt><i class="fab fa-fw fa-github"></i> remote repository</dt>
+<dd>↓ <code>git fetch</code></dd>
+<dt><i class="fas fa-fw fa-code-branch"></i> local repository</dt>
+<dd>変更が <code>.git/</code> に取り込まれたが、見えてるファイルには反映されてない</dd>
+<dd>↓ <code>git checkout</code> or <code>git merge</code></dd>
+<dt><i class="fas fa-fw fa-folder"></i> working directory</dt>
+<dd>手元のファイルが最新版に同期されている</dd>
+</dl>
+</section>
+<section>
+<h2 id="github-i-class-fab-fa-fw-fa-github-i-functions">GitHub<i class="fab fa-fw fa-github"></i> functions</h2>
+
+<ul>
+<li><p>Basic: version control of plain texts</p>
+
+<ul>
+<li>Source code:
+e.g., <a href="https://github.com/tidyverse/ggplot2">ggplot2</a>, <a href="https://github.com/stan-dev/rstan">rstan</a></li>
+<li>Manuscript and supplementary information:
+e.g., <a href="https://github.com/hadley/r4ds">R4DS</a>, <a href="https://github.com/hadley/adv-r/">Advanced R programming</a></li>
+</ul></li>
+
+<li><p>GitHub Pages: hosting websites</p>
+
+<ul>
+<li>Website: <a href="https://heavywatal.github.io/rtumopp/">https://heavywatal.github.io/rtumopp/</a></li>
+<li>Source code: <a href="https://github.com/heavywatal/rtumopp/tree/master/docs">https://github.com/heavywatal/rtumopp/tree/master/docs</a></li>
+</ul></li>
+</ul>
+
+</section>
+<section>
+<h2 id="github-i-class-fab-fa-fw-fa-github-i-functions">GitHub<i class="fab fa-fw fa-github"></i> functions</h2>
+
+<ul>
+<li><p>Issues:
+バグ報告、機能要望、課題の列挙などに使われる。
+タグを付けたり、特定の人にassignすることもできる。<br>
+e.g., <a href="https://github.com/gohugoio/hugo/issues">https://github.com/gohugoio/hugo/issues</a>, <a href="https://github.com/nlohmann/json/issues">https://github.com/nlohmann/json/issues</a></p></li>
+
+<li><p>Projects:
+プロジェクトのタスク管理のためのツール。
+もちろんissueとも連携可能。<br>
+e.g., <a href="https://github.com/r-lib/pillar/projects/1">https://github.com/r-lib/pillar/projects/1</a></p></li>
+
+<li><p>Wiki:
+チーム内のちょっとした情報共有などに。
+でもできればそういう文書もちゃんとGitで管理したほうがいい。<br>
+e.g., <a href="https://github.com/gnab/remark/wiki">https://github.com/gnab/remark/wiki</a></p></li>
+</ul>
+
+</section>
+<section>
+<h2 id="a-href-lectures-git2019makino-html-let-s-start-using-a"><a href="/lectures/git2019makino.html">Let&rsquo;s start using!</a></h2>
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: false,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  mouseWheel: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
