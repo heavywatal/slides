@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>2. データ構造の処理 — Rによるデータ前処理実習 2019</title>
+<link rel="stylesheet" href="/slides/reveal.js/css/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="2. データ構造の処理 — Rによるデータ前処理実習 2019">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tmd2019/2-structure.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.56.0-DEV" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="rによるデータ前処理実習">Rによるデータ前処理実習</h1>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<p><style>
+.reveal .current-deck {font-weight: bold;}
+.reveal .subtitle {font-size: 90%;}
+</style>
+<ol>
+<li><a href="1-introduction.html">入門: 前処理とは。Rを使うメリット。Rの基本</a>
+<li class="current-deck"><a href="2-structure.html">データ構造の処理: 抽出、集約、結合、変形など</a>
+<li><a href="3-content.html">データ内容の処理: 数値、文字列、日時など</a>
+<li><a href="4-practice.html">実践: 現実の問題に対処してみる</a>
+</ol></p>
+
+<div class="footnote">
+2019-12-20 東京医科歯科大学
+</div>
+</section>
+<section>
+<h2 id="前処理は大きく2つに分けられる">前処理は大きく2つに分けられる</h2>
+
+<ul>
+<li><strong>データ構造を対象とする処理</strong> (今回の主題)
+
+<ul>
+<li>使いたい部分だけ抽出</li>
+<li>グループごとに特徴を要約</li>
+<li>大きい順に並べ替え</li>
+<li>異なるテーブルの結合</li>
+<li>変形: 縦長 ↔ 横長</li>
+</ul></li>
+<li>データ内容を対象とする処理 (次回の主題)
+
+<ul>
+<li>数値を変換する (e.g., 対数、座標系)</li>
+<li>変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数</li>
+<li>欠損値 <code>NA</code> に対処</li>
+<li>文字列から数値や日時を抜き出す</li>
+</ul></li>
+</ul>
+</section>
+<section>
+<h2 id="tidyverseに便利な道具が揃ってる">tidyverseに便利な道具が揃ってる</h2>
+
+<p><a href="https://www.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-badges.png" width="260" align="right">
+</a></p>
+
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
+<span class="c1"># core packages are loaded</span></code></pre></div>
+<ul>
+<li>統一的な使い勝手</li>
+<li>シンプルな関数を繋げて使うデザイン</li>
+</ul>
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/figure/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+<p>data.frame処理に使うのは主に <a href="/rstats/dplyr.html">dplyr</a> と <a href="/rstats/tidyr.html">tidyr</a></p>
+
+</section>
+<section>
+<h2 id="dplyr-data-frameの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
+
+<p><a href="https://dplyr.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-dplyr.png" width="120" align="right">
+</a></p>
+
+<p>シンプルな関数がたくさん。繋げて使う (piping)</p>
+
+<dl>
+<dt>抽出</dt>
+<dd>列: <code>select()</code>,</dd>
+<dd>行: <code>filter()</code>, <code>distinct()</code>, <code>sample_n()</code></dd>
+<dt>要約・集計</dt>
+<dd><code>group_by()</code>, <code>summarize()</code>, <code>count()</code></dd>
+<dt>ソート</dt>
+<dd><code>arrange()</code></dd>
+<dt>結合</dt>
+<dd>行方向: <code>bind_rows()</code></dd>
+<dd>列方向: <code>left_join()</code>, <code>inner_join()</code>, <code>full_join()</code></dd>
+<dt>列の追加・変更</dt>
+<dd><code>mutate()</code>, <code>rename()</code></dd>
+</dl>
+
+</section>
+<section>
+<h2 id="dplyr-使用例">dplyr 使用例</h2>
+
+<p>小さな関数を繋げて使う流れ作業:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>              <span class="c1"># 生データから出発して</span>
+  select<span class="p">(</span>carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">)</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を抽出して</span>
+  filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span>            <span class="c1"># 行を抽出して</span>
+  group_by<span class="p">(</span><span class="kp">cut</span><span class="p">)</span> <span class="o">%&gt;%</span>                <span class="c1"># グループ化して</span>
+  summarize_all<span class="p">(</span><span class="kp">mean</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># それぞれ平均を計算</span>
+  <span class="kp">print</span><span class="p">()</span>                          <span class="c1"># 表示してみる</span></code></pre></div>
+<pre><code>        cut    carat    price
+      &lt;ord&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1      Fair 2.297692 11972.12
+2      Good 2.139226 14628.99
+3 Very Good 2.120232 15133.04
+4   Premium 2.155707 14992.23
+5     Ideal 2.147463 15589.13
+</code></pre>
+
+<p>この見慣れぬ記号 <code>%&gt;%</code> は何？</p>
+
+</section>
+<section>
+<h2 id="pipe-operator-パイプ演算子">Pipe operator (パイプ演算子) <code>%&gt;%</code></h2>
+
+<p>パイプの左側の変数を、右側の関数の第一引数にねじ込む:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">diamonds <span class="o">%&gt;%</span> filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span>
+filter<span class="p">(</span>diamonds<span class="p">,</span> carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span>     <span class="c1"># これと同じ</span>
+
+<span class="c1"># 前処理の流れ作業に便利:</span>
+diamonds <span class="o">%&gt;%</span> select<span class="p">(</span>carat<span class="p">,</span> price<span class="p">)</span> <span class="o">%&gt;%</span> filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="kc">...</span>
+<span class="c1">#   data %&gt;%  do_A()  %&gt;%  do_B()  %&gt;%  do_C()  %&gt;% ...</span></code></pre></div>
+<p>[問] パイプを使わない形に書き換えよう:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">seq_len</span><span class="p">(</span><span class="m">6</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="kp">sum</span><span class="p">()</span></code></pre></div>
+<pre><code>[1] 21
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kc">letters</span> <span class="o">%&gt;%</span> <span class="kp">toupper</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">3</span><span class="p">)</span></code></pre></div>
+<pre><code>[1] &quot;A&quot; &quot;B&quot; &quot;C&quot;
+</code></pre>
+
+<p>[解答例]</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">sum</span><span class="p">(</span><span class="kp">seq_len</span><span class="p">(</span><span class="m">6</span><span class="p">))</span>
+<span class="kp">head</span><span class="p">(</span><span class="kp">toupper</span><span class="p">(</span><span class="kc">letters</span><span class="p">),</span> <span class="m">3</span><span class="p">)</span></code></pre></div>
+</section>
+<section>
+<h2 id="パイプ演算子-を使わない方法">パイプ演算子 <code>%&gt;%</code> を使わない方法</h2>
+
+<p>😐 一時変数を使って:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tmp1 <span class="o">=</span> select<span class="p">(</span>diamonds<span class="p">,</span> carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">)</span>   <span class="c1"># 列を抽出して</span>
+tmp2 <span class="o">=</span> filter<span class="p">(</span>tmp1<span class="p">,</span> carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span>               <span class="c1"># 行を抽出して</span>
+tmp3 <span class="o">=</span> group_by<span class="p">(</span>tmp2<span class="p">,</span> <span class="kp">cut</span><span class="p">)</span>                   <span class="c1"># グループ化して</span>
+result <span class="o">=</span> summarize_all<span class="p">(</span>tmp3<span class="p">,</span> <span class="kp">mean</span><span class="p">)</span>           <span class="c1"># それぞれ平均を計算</span></code></pre></div>
+<p>😐 もしくは全部同じ名前で:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> select<span class="p">(</span>diamonds<span class="p">,</span> carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">)</span> <span class="c1"># 列を抽出して</span>
+result <span class="o">=</span> filter<span class="p">(</span>result<span class="p">,</span> carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span>           <span class="c1"># 行を抽出して</span>
+result <span class="o">=</span> group_by<span class="p">(</span>result<span class="p">,</span> <span class="kp">cut</span><span class="p">)</span>               <span class="c1"># グループ化して</span>
+result <span class="o">=</span> summarize_all<span class="p">(</span>result<span class="p">,</span> <span class="kp">mean</span><span class="p">)</span>         <span class="c1"># それぞれ平均を計算</span></code></pre></div>
+<p>どちらも悪くない。
+何度も変数名を入力するのがやや冗長。</p>
+
+</section>
+<section>
+<h2 id="パイプ演算子-を使わない方法">パイプ演算子 <code>%&gt;%</code> を使わない方法</h2>
+
+<p>😫 一時変数を使わずに:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> summarize_all<span class="p">(</span>                <span class="c1"># それぞれ平均を計算</span>
+    group_by<span class="p">(</span>                            <span class="c1"># グループ化して</span>
+      filter<span class="p">(</span>                              <span class="c1"># 行を抽出して</span>
+        select<span class="p">(</span>diamonds<span class="p">,</span> carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">),</span> <span class="c1"># 列を抽出して</span>
+        carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">),</span>                        <span class="c1"># 行を抽出して</span>
+      <span class="kp">cut</span><span class="p">),</span>                              <span class="c1"># グループ化して</span>
+    <span class="kp">mean</span><span class="p">)</span>                              <span class="c1"># それぞれ平均を計算</span></code></pre></div>
+<p>🤪 改行さえせずに:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> summarize_all<span class="p">(</span>group_by<span class="p">(</span>filter<span class="p">(</span>select<span class="p">(</span>diamonds<span class="p">,</span> carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">),</span> carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">),</span> <span class="kp">cut</span><span class="p">),</span> <span class="kp">mean</span><span class="p">)</span></code></pre></div>
+<p>論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
+さっきのほうがぜんぜんマシ。</p>
+
+</section>
+<section>
+<h2 id="パイプ演算子-を使おう">パイプ演算子 <code>%&gt;%</code> を使おう</h2>
+
+<p>😁 慣れれば、論理の流れを追いやすい:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  select<span class="p">(</span>carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">)</span> <span class="o">%&gt;%</span>    <span class="c1"># 列を抽出して</span>
+  filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span>            <span class="c1"># 行を抽出して</span>
+  group_by<span class="p">(</span><span class="kp">cut</span><span class="p">)</span> <span class="o">%&gt;%</span>                <span class="c1"># グループ化して</span>
+  summarize_all<span class="p">(</span><span class="kp">mean</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># それぞれ平均を計算</span>
+  <span class="kp">print</span><span class="p">()</span>                          <span class="c1"># 表示してみる</span></code></pre></div>
+<pre><code>        cut    carat    price
+      &lt;ord&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+1      Fair 2.297692 11972.12
+2      Good 2.139226 14628.99
+3 Very Good 2.120232 15133.04
+4   Premium 2.155707 14992.23
+5     Ideal 2.147463 15589.13
+</code></pre>
+
+<p>慣れるまではちょっと大変かも。
+無理して使わなくても大丈夫。</p>
+
+</section>
+<section>
+<h2 id="dplyrを使ってみる準備">dplyrを使ってみる準備</h2>
+
+<p>パッケージを読み込んで、データを見てみる</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># install.packages(&#34;tidyverse&#34;)</span>
+<span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
+<span class="kp">print</span><span class="p">(</span>diamonds<span class="p">)</span>
+View<span class="p">(</span>diamonds<span class="p">)</span>  <span class="c1"># RStudio</span></code></pre></div>
+<pre><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+
+</section>
+<section>
+<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
+
+<p><strong>列の番号</strong>で指定:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  select<span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">7</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut price
+      &lt;dbl&gt;     &lt;ord&gt; &lt;int&gt;
+    1  0.23     Ideal   326
+    2  0.21   Premium   326
+    3  0.23      Good   327
+    4  0.29   Premium   334
+   --                      
+53937  0.72      Good  2757
+53938  0.70 Very Good  2757
+53939  0.86   Premium  2757
+53940  0.75     Ideal  2757
+</code></pre>
+
+<p>別解: <code>diamonds[, c(1, 2, 7)]</code></p>
+
+</section>
+<section>
+<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
+
+<p><strong>列の名前</strong>で指定:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  select<span class="p">(</span>carat<span class="p">,</span> <span class="kp">cut</span><span class="p">,</span> price<span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut price
+      &lt;dbl&gt;     &lt;ord&gt; &lt;int&gt;
+    1  0.23     Ideal   326
+    2  0.21   Premium   326
+    3  0.23      Good   327
+    4  0.29   Premium   334
+   --                      
+53937  0.72      Good  2757
+53938  0.70 Very Good  2757
+53939  0.86   Premium  2757
+53940  0.75     Ideal  2757
+</code></pre>
+
+<p>別解: <code>diamonds[, c(&quot;carat&quot;, &quot;cut&quot;, &quot;price&quot;)]</code></p>
+
+</section>
+<section>
+<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
+
+<p><strong>捨てる列</strong>をマイナス指定:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  select<span class="p">(</span><span class="o">-</span>carat<span class="p">,</span> <span class="o">-</span><span class="kp">cut</span><span class="p">,</span> <span class="o">-</span>price<span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      color clarity depth table     x     y     z
+      &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1     E     SI2  61.5    55  3.95  3.98  2.43
+    2     E     SI1  59.8    61  3.89  3.84  2.31
+    3     E     VS1  56.9    65  4.05  4.07  2.31
+    4     I     VS2  62.4    58  4.20  4.23  2.63
+   --                                            
+53937     D     SI1  63.1    55  5.69  5.75  3.61
+53938     D     SI1  62.8    60  5.66  5.68  3.56
+53939     H     SI2  61.0    58  6.15  6.12  3.74
+53940     D     SI2  62.2    55  5.83  5.87  3.64
+</code></pre>
+
+</section>
+<section>
+<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
+
+<p>名前の<strong>部分一致</strong>で指定:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  select<span class="p">(</span>starts_with<span class="p">(</span><span class="s">&#34;c&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut color clarity
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt;
+    1  0.23     Ideal     E     SI2
+    2  0.21   Premium     E     SI1
+    3  0.23      Good     E     VS1
+    4  0.29   Premium     I     VS2
+   --                              
+53937  0.72      Good     D     SI1
+53938  0.70 Very Good     D     SI1
+53939  0.86   Premium     H     SI2
+53940  0.75     Ideal     D     SI2
+</code></pre>
+
+<p>See <a href="https://tidyselect.r-lib.org/reference/select_helpers.html">tidyselect helpers</a> for more details.</p>
+
+</section>
+<section>
+<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
+
+<p>等号 <code>==</code> で<strong>完全一致する行</strong>のみ残す:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>cut <span class="o">==</span> <span class="s">&#34;Ideal&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat   cut color clarity depth table price     x     y     z
+      &lt;dbl&gt; &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23 Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.23 Ideal     J     VS1  62.8    56   340  3.93  3.90  2.46
+    3  0.31 Ideal     J     SI2  62.2    54   344  4.35  4.37  2.71
+    4  0.30 Ideal     I     SI2  62.0    54   348  4.31  4.34  2.68
+   --                                                              
+21548  0.71 Ideal     E     SI1  61.9    56  2756  5.71  5.73  3.54
+21549  0.71 Ideal     G     VS1  61.4    56  2756  5.76  5.73  3.53
+21550  0.72 Ideal     D     SI1  60.8    57  2757  5.75  5.76  3.50
+21551  0.75 Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+
+<p>別解: <code>diamonds[diamonds[[&quot;cut&quot;]] == &quot;Ideal&quot;, ]</code></p>
+
+</section>
+<section>
+<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
+
+<p>不等号で<strong>一致しない行</strong>のみ残す:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>price <span class="o">&gt;=</span> <span class="m">1000</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.70     Ideal     E     SI1  62.5    57  2757  5.70  5.72  3.57
+    2  0.86      Fair     E     SI2  55.1    69  2757  6.45  6.33  3.52
+    3  0.70     Ideal     G     VS2  61.6    56  2757  5.70  5.67  3.50
+    4  0.71 Very Good     E     VS2  62.4    57  2759  5.68  5.73  3.56
+   --                                                                  
+39438  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+39439  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+39440  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+39441  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+
+<p>不等号: <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code></p>
+
+</section>
+<section>
+<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
+
+<p>複数の値のうち<strong>どれかに一致する行</strong>のみ残す:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>cut <span class="o">%in%</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;Ideal&#34;</span><span class="p">,</span> <span class="s">&#34;Good&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat   cut color clarity depth table price     x     y     z
+      &lt;dbl&gt; &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23 Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.23  Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    3  0.31  Good     J     SI2  63.3    58   335  4.34  4.35  2.75
+    4  0.30  Good     J     SI1  64.0    55   339  4.25  4.28  2.73
+   --                                                              
+26454  0.71 Ideal     G     VS1  61.4    56  2756  5.76  5.73  3.53
+26455  0.72 Ideal     D     SI1  60.8    57  2757  5.75  5.76  3.50
+26456  0.72  Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+26457  0.75 Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+
+</section>
+<section>
+<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
+
+<p>2つの条件を<strong>両方満たす行</strong>のみ残す (AND):</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span> <span class="o">&amp;</span> price <span class="o">&lt;</span> <span class="m">14000</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>    carat       cut color clarity depth table price     x     y     z
+    &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+  1  2.06   Premium     J      I1  61.2    58  5203  8.10  8.07  4.95
+  2  2.14      Fair     J      I1  69.4    57  5405  7.74  7.70  5.36
+  3  2.15      Fair     J      I1  65.5    57  5430  8.01  7.95  5.23
+  4  2.22      Fair     J      I1  66.7    56  5607  8.04  8.02  5.36
+ --                                                                  
+641  2.07   Premium     H     SI1  62.7    58 13993  8.14  8.09  5.09
+642  2.07      Good     I     SI1  63.6    58 13993  8.09  7.99  5.11
+643  2.13 Very Good     J     SI1  62.8    58 13996  8.13  8.17  5.12
+644  2.11   Premium     J     SI1  62.4    58 13996  8.27  8.17  5.13
+</code></pre>
+
+</section>
+<section>
+<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
+
+<p>2つの条件の<strong>いずれかを満たす行</strong>のみ残す (OR):</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>carat <span class="o">&gt;</span> <span class="m">2</span> <span class="o">|</span> price <span class="o">&lt;</span> <span class="m">14000</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53023  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53024  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53025  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53026  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+
+</section>
+<section>
+<h2 id="重複行の除去-distinct">重複行の除去: <code>distinct()</code></h2>
+
+<p>指定した列に関してユニークな行のみ残す:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  distinct<span class="p">(</span><span class="kp">cut</span><span class="p">,</span> color<span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>       cut color
+     &lt;ord&gt; &lt;ord&gt;
+ 1   Ideal     E
+ 2 Premium     E
+ 3    Good     E
+ 4 Premium     I
+--              
+32    Fair     G
+33    Fair     J
+34    Fair     I
+35    Fair     D
+</code></pre>
+
+<p><code>.keep_all = TRUE</code>
+オプションを付けると指定しなかった列も残せる。</p>
+
+</section>
+<section>
+<h2 id="値によらず行の抽出-sample-n">値によらず行の抽出: <code>sample_n()</code></h2>
+
+<p><strong>行数を指定</strong>してランダムにサンプル:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  sample_n<span class="p">(</span><span class="m">42L</span><span class="p">,</span> replace <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>   carat       cut color clarity depth table price     x     y     z
+   &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1  1.39 Very Good     I      I1  62.6  57.0  3914  7.10  7.15  4.46
+ 2  0.30     Ideal     G     VS1  63.1  55.0   624  4.25  4.31  2.70
+ 3  0.87     Ideal     E     SI1  61.5  57.0  5112  6.12  6.15  3.77
+ 4  0.34 Very Good     G     SI1  60.8  59.0   507  4.46  4.56  2.74
+--                                                                  
+39  0.70   Premium     F     SI1  62.5  59.0  2354  5.67  5.65  3.54
+40  1.03   Premium     G     SI1  58.4  58.0  5249  6.66  6.62  3.88
+41  0.59     Ideal     G     VS2  62.6  54.0  1789  5.38  5.32  3.35
+42  0.73     Ideal     I     VS1  62.1  55.8  2302  5.77  5.81  3.60
+</code></pre>
+
+<p>行数ではなく<strong>割合を指定</strong>するなら <code>sample_frac()</code></p>
+
+</section>
+<section>
+<h2 id="要約-集計-summarize">要約・集計: <code>summarize()</code></h2>
+
+<p>列の<strong>合計、平均、最大</strong>などを求める:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  summarize<span class="p">(</span><span class="kp">sum</span><span class="p">(</span>carat<span class="p">),</span> <span class="kp">mean</span><span class="p">(</span>carat<span class="p">),</span> <span class="kp">max</span><span class="p">(</span>price<span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>  sum(carat) mean(carat) max(price)
+       &lt;dbl&gt;       &lt;dbl&gt;      &lt;int&gt;
+1   43040.87   0.7979397      18823
+</code></pre>
+
+<p>vectorを受け取って1つの値を返す集約関数:<br>
+<code>min()</code>, <code>max()</code>, <code>mean()</code>, <code>median()</code>, <code>var()</code>, <code>sd()</code>, etc.</p>
+
+</section>
+<section>
+<h2 id="要約-集計-summarize">要約・集計: <code>summarize()</code></h2>
+
+<p>列の値を<strong>グループごとに</strong>集計する:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  group_by<span class="p">(</span><span class="kp">cut</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  summarize<span class="p">(</span>avg_carat <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>carat<span class="p">),</span>
+            max_price <span class="o">=</span> <span class="kp">max</span><span class="p">(</span>price<span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>        cut avg_carat max_price
+      &lt;ord&gt;     &lt;dbl&gt;     &lt;int&gt;
+1      Fair 1.0461366     18574
+2      Good 0.8491847     18788
+3 Very Good 0.8063814     18818
+4   Premium 0.8919549     18823
+5     Ideal 0.7028370     18806
+</code></pre>
+
+</section>
+<section>
+<h2 id="要約-集計-count">要約・集計: <code>count()</code></h2>
+
+<p>指定した列の組み合わせ出現数を数える:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  count<span class="p">(</span><span class="kp">cut</span><span class="p">,</span> color<span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>     cut color     n
+   &lt;ord&gt; &lt;ord&gt; &lt;int&gt;
+ 1  Fair     D   163
+ 2  Fair     E   224
+ 3  Fair     F   312
+ 4  Fair     G   314
+--                  
+32 Ideal     G  4884
+33 Ideal     H  3115
+34 Ideal     I  2093
+35 Ideal     J   896
+</code></pre>
+
+<p><code>diamonds %&gt;% group_by(cut, color) %&gt;% tally()</code> と同じ。</p>
+
+</section>
+<section>
+<h2 id="行のソート-arrange">行のソート: <code>arrange()</code></h2>
+
+<p>指定した列の値が<strong>小さい順に上から</strong>並べる:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  arrange<span class="p">(</span>color<span class="p">,</span> desc<span class="p">(</span>carat<span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># 色の昇順。色が同じなら大きさ降順</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  3.40      Fair     D      I1  66.8    52 15964  9.42  9.34  6.27
+    2  2.75     Ideal     D      I1  60.9    57 13156  9.04  8.98  5.49
+    3  2.58 Very Good     D     SI2  58.9    63 14749  9.08  9.01  5.33
+    4  2.57   Premium     D     SI2  58.9    58 17924  8.99  8.94  5.28
+   --                                                                  
+53937  0.27 Very Good     J    VVS2  60.8    57   443  4.16  4.20  2.54
+53938  0.24 Very Good     J    VVS2  62.8    57   336  3.94  3.96  2.48
+53939  0.24     Ideal     J    VVS2  62.8    57   432  3.96  3.94  2.48
+53940  0.23     Ideal     J     VS1  62.8    56   340  3.93  3.90  2.46
+</code></pre>
+
+<p>逆にするには <code>desc()</code> を使う。</p>
+
+</section>
+<section>
+<h2 id="行の結合-bind-rows">行の結合: <code>bind_rows()</code></h2>
+
+<p>例。先頭と末尾を6行ずつ取ってひとつの表に結合する:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">bind_rows<span class="p">(</span><span class="kp">head</span><span class="p">(</span>diamonds<span class="p">),</span> <span class="kp">tail</span><span class="p">(</span>diamonds<span class="p">))</span></code></pre></div>
+<pre><code>   carat       cut color clarity depth table price     x     y     z
+   &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+ 2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+ 3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+ 4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+--                                                                  
+ 9  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+10  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+11  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+12  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+
+</section>
+<section>
+<h2 id="共通する列で結合-full-join">共通する列で結合: <code>full_join()</code></h2>
+
+<p>他方に無い部分を <code>NA</code> で補完して<strong>左右とも全行</strong>保持:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">full_join<span class="p">(</span>band_members<span class="p">,</span> band_instruments<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span></code></pre></div>
+<pre><code>   name    band  plays
+  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
+1  Mick  Stones   &lt;NA&gt;
+2  John Beatles guitar
+3  Paul Beatles   bass
+4 Keith    &lt;NA&gt; guitar
+</code></pre>
+
+<pre><code>band_members          band_instruments
+   name    band          name  plays
+  &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+</code></pre>
+
+</section>
+<section>
+<h2 id="共通する列で結合-left-join">共通する列で結合: <code>left_join()</code></h2>
+
+<p>右側に無い部分を <code>NA</code> で補完して<strong>左側だけ全行</strong>保持:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">left_join<span class="p">(</span>band_members<span class="p">,</span> band_instruments<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span></code></pre></div>
+<pre><code>   name    band  plays
+  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
+1  Mick  Stones   &lt;NA&gt;
+2  John Beatles guitar
+3  Paul Beatles   bass
+</code></pre>
+
+<pre><code>band_members          band_instruments
+   name    band          name  plays
+  &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+</code></pre>
+
+<p>その逆は <code>right_join()</code></p>
+
+</section>
+<section>
+<h2 id="共通する列で結合-inner-join">共通する列で結合: <code>inner_join()</code></h2>
+
+<p>左右ともに<strong>共通する値のある行だけ</strong>保持:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">inner_join<span class="p">(</span>band_members<span class="p">,</span> band_instruments<span class="p">,</span> by <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span></code></pre></div>
+<pre><code>   name    band  plays
+  &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
+1  John Beatles guitar
+2  Paul Beatles   bass
+</code></pre>
+
+<pre><code>band_members          band_instruments
+   name    band          name  plays
+  &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;  &lt;chr&gt;
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+</code></pre>
+
+</section>
+<section>
+<h2 id="joinまとめ">joinまとめ</h2>
+
+<figure>
+<a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
+<img src="/slides/figure/r4ds/join.png" height="550">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="join例題-nycflights13-データセット">join例題: <code>nycflights13</code> データセット</h2>
+
+<p>関連するdata.frameをいろいろな方法で結合してみよう。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>nycflights13<span class="p">)</span>
+data<span class="p">(</span>package <span class="o">=</span> <span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
+<span class="c1"># airlines, airports, flights, planes, weather</span></code></pre></div>
+<figure>
+<a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
+<img src="/slides/figure/r4ds/relational-nycflights.png" height="320">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="新しい列の追加-mutate">新しい列の追加: <code>mutate()</code></h2>
+
+<p>既存の列名を指定すると上書き:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">result <span class="o">=</span> diamonds <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>ratio <span class="o">=</span> price <span class="o">/</span> carat<span class="p">,</span>
+         price <span class="o">=</span> price <span class="o">*</span> <span class="m">108.36</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      carat       cut color clarity depth table     price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55  35325.36  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61  35325.36  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65  35433.72  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58  36192.24  4.20  4.23  2.63
+   --                                                                      
+53937  0.72      Good     D     SI1  63.1    55 298748.52  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60 298748.52  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58 298748.52  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55 298748.52  5.83  5.87  3.64
+         ratio
+         &lt;dbl&gt;
+    1 1417.391
+    2 1552.381
+    3 1421.739
+    4 1151.724
+   --         
+53937 3829.167
+53938 3938.571
+53939 3205.814
+53940 3676.000
+</code></pre>
+
+</section>
+<section>
+<h2 id="tidyr-data-frameの変形-整形担当">tidyr &mdash; data.frameの変形・整形担当</h2>
+
+<p><a href="https://tidyr.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-tidyr.png" width="120" align="right">
+</a></p>
+
+<dl>
+<dt>横長から縦長に</dt>
+<dd><code>pivot_longer()</code></dd>
+<dt>縦長から横長に</dt>
+<dd><code>pivot_wider()</code></dd>
+<dt>入れ子構造をつくる、解消する</dt>
+<dd><code>nest()</code>, <code>unnest()</code></dd>
+<dt>1列を複数の列に分離</dt>
+<dd><code>separate()</code></dd>
+</dl>
+
+<p><em>etc.</em></p>
+
+</section>
+<section>
+<h2 id="tidyr-pivot-longer-横長から縦長に"><code>tidyr::pivot_longer()</code> 横長から縦長に</h2>
+
+<p>複数列にまたがる値を1列にする。<br>
+そのラベルも合わせて移動。</p>
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#gathering">
+<img src="/slides/figure/r4ds/tidy-gather.png" width="800">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#gathering</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyr-pivot-longer-横長から縦長に"><code>tidyr::pivot_longer()</code> 横長から縦長に</h2>
+
+<p>複数列にまたがる値を1列にする(ここでは<code>value</code>)。<br>
+そのラベルも合わせて移動(ここでは<code>name</code>)。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris_long <span class="o">=</span> iris <span class="o">%&gt;%</span> <span class="kp">head</span><span class="p">(</span><span class="m">2L</span><span class="p">)</span> <span class="o">%&gt;%</span>     <span class="c1"># 最初の2行だけ</span>
+  rownames_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>        <span class="c1"># ID列を追加</span>
+  <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>                         <span class="c1"># 途中経過を表示</span>
+  pivot_longer<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="o">-</span>id<span class="p">,</span> <span class="o">-</span>Species<span class="p">),</span> names_to <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">,</span> values_to <span class="o">=</span> <span class="s">&#34;value&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span>                             <span class="c1"># id, Species以外の値を移動</span></code></pre></div>
+<pre><code>     id Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+  &lt;chr&gt;        &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;   &lt;fct&gt;
+1     1          5.1         3.5          1.4         0.2  setosa
+2     2          4.9         3.0          1.4         0.2  setosa
+     id Species         name value
+  &lt;chr&gt;   &lt;fct&gt;        &lt;chr&gt; &lt;dbl&gt;
+1     1  setosa Sepal.Length   5.1
+2     1  setosa  Sepal.Width   3.5
+3     1  setosa Petal.Length   1.4
+4     1  setosa  Petal.Width   0.2
+5     2  setosa Sepal.Length   4.9
+6     2  setosa  Sepal.Width   3.0
+7     2  setosa Petal.Length   1.4
+8     2  setosa  Petal.Width   0.2
+</code></pre>
+
+</section>
+<section>
+<h2 id="tidyr-pivot-wider-縦長から横長に"><code>tidyr::pivot_wider()</code> 縦長から横長に</h2>
+
+<p>1列に収まっていた値を複数列の行列に変換。<br>
+そのラベルを列の名前にする。</p>
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#spreading">
+<img src="/slides/figure/r4ds/tidy-spread.png" height="480">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#spreading</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyr-pivot-wider-縦長から横長に"><code>tidyr::pivot_wider()</code> 縦長から横長に</h2>
+
+<p>1列に収まっていた値(<code>value</code>)を複数列の行列に変換。<br>
+そのラベル(<code>name</code>)を列の名前にする。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris_long <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>              <span class="c1"># さっきlong-formatにしたやつ</span>
+  pivot_wider<span class="p">(</span>names_from <span class="o">=</span> name<span class="p">,</span> values_from <span class="o">=</span> value<span class="p">)</span>   <span class="c1"># 横長に戻す</span></code></pre></div>
+<pre><code>     id Species         name value
+  &lt;chr&gt;   &lt;fct&gt;        &lt;chr&gt; &lt;dbl&gt;
+1     1  setosa Sepal.Length   5.1
+2     1  setosa  Sepal.Width   3.5
+3     1  setosa Petal.Length   1.4
+4     1  setosa  Petal.Width   0.2
+5     2  setosa Sepal.Length   4.9
+6     2  setosa  Sepal.Width   3.0
+7     2  setosa Petal.Length   1.4
+8     2  setosa  Petal.Width   0.2
+</code></pre>
+
+<pre><code>     id Species Sepal.Length Sepal.Width Petal.Length Petal.Width
+  &lt;chr&gt;   &lt;fct&gt;        &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+1     1  setosa          5.1         3.5          1.4         0.2
+2     2  setosa          4.9         3.0          1.4         0.2
+</code></pre>
+
+</section>
+<section>
+<h2 id="tidyr-separate-列を分離"><code>tidyr::separate()</code> 列を分離</h2>
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#separate">
+<img src="/slides/figure/r4ds/tidy-separate.png" width="800">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyr-separate-列を分離"><code>tidyr::separate()</code> 列を分離</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris_long <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;part&#34;</span><span class="p">,</span> <span class="s">&#34;measure&#34;</span><span class="p">))</span> <span class="c1"># 列を分離</span></code></pre></div>
+<pre><code>     id Species         name value
+  &lt;chr&gt;   &lt;fct&gt;        &lt;chr&gt; &lt;dbl&gt;
+1     1  setosa Sepal.Length   5.1
+2     1  setosa  Sepal.Width   3.5
+3     1  setosa Petal.Length   1.4
+4     1  setosa  Petal.Width   0.2
+5     2  setosa Sepal.Length   4.9
+6     2  setosa  Sepal.Width   3.0
+7     2  setosa Petal.Length   1.4
+8     2  setosa  Petal.Width   0.2
+</code></pre>
+
+<pre><code>     id Species  part measure value
+  &lt;chr&gt;   &lt;fct&gt; &lt;chr&gt;   &lt;chr&gt; &lt;dbl&gt;
+1     1  setosa Sepal  Length   5.1
+2     1  setosa Sepal   Width   3.5
+3     1  setosa Petal  Length   1.4
+4     1  setosa Petal   Width   0.2
+5     2  setosa Sepal  Length   4.9
+6     2  setosa Sepal   Width   3.0
+7     2  setosa Petal  Length   1.4
+8     2  setosa Petal   Width   0.2
+</code></pre>
+
+</section>
+<section>
+<h2 id="tidyr-separate-列を融合"><code>tidyr::separate()</code> 列を融合</h2>
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#unite">
+<img src="/slides/figure/r4ds/tidy-unite.png" width="800">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyr-nest-入れ子にする"><code>tidyr::nest()</code> 入れ子にする</h2>
+
+<p>グループ毎にdata.frameを区切ってlist型の列に入れる。</p>
+
+<figure>
+<a href="https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/">
+<img src="/slides/figure/rstats/nest-pack-chop.png" height="500">
+<br>
+<figcaption class="url">https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyr-nest-入れ子にする"><code>tidyr::nest()</code> 入れ子にする</h2>
+
+<p>グループ毎にdata.frameを区切ってlist型の列に入れる。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris_nested <span class="o">=</span> iris <span class="o">%&gt;%</span>
+  as_tibble<span class="p">()</span> <span class="o">%&gt;%</span>
+  nest<span class="p">(</span>data <span class="o">=</span> <span class="o">-</span>Species<span class="p">)</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>     Species              data
+       &lt;fct&gt;   &lt;vctrs_list_of&gt;
+1     setosa &lt;tbl_df [50 x 4]&gt;
+2 versicolor &lt;tbl_df [50 x 4]&gt;
+3  virginica &lt;tbl_df [50 x 4]&gt;
+</code></pre>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">iris_nested<span class="o">$</span>data<span class="p">[[</span><span class="m">1L</span><span class="p">]]</span></code></pre></div>
+<pre><code>   Sepal.Length Sepal.Width Petal.Length Petal.Width
+          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+ 1          5.1         3.5          1.4         0.2
+ 2          4.9         3.0          1.4         0.2
+ 3          4.7         3.2          1.3         0.2
+ 4          4.6         3.1          1.5         0.2
+--                                                  
+47          5.1         3.8          1.6         0.2
+48          4.6         3.2          1.4         0.2
+49          5.3         3.7          1.5         0.2
+50          5.0         3.3          1.4         0.2
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span>                  <span class="c1"># data.frameに変換</span>
+                                         <span class="c1"># 行名を列に</span>
+                                         <span class="c1"># 縦長に変形したい</span></code></pre></div>
+<pre><code>      Rural Male Rural Female Urban Male Urban Female
+50-54       11.7          8.7       15.4          8.4
+55-59       18.1         11.7       24.3         13.6
+60-64       26.9         20.3       37.0         19.3
+65-69       41.0         30.9       54.6         35.1
+70-74       66.0         54.3       71.1         50.0
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span>      <span class="c1"># 行名を列に</span>
+                                         <span class="c1"># 縦長に変形したい</span></code></pre></div>
+<pre><code>    age Rural Male Rural Female Urban Male Urban Female
+1 50-54       11.7          8.7       15.4          8.4
+2 55-59       18.1         11.7       24.3         13.6
+3 60-64       26.9         20.3       37.0         19.3
+4 65-69       41.0         30.9       54.6         35.1
+5 70-74       66.0         54.3       71.1         50.0
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 行名を列に</span>
+  pivot_longer<span class="p">(</span><span class="o">-</span>age<span class="p">)</span>                     <span class="c1"># age以外を移動して縦長化</span>
+                                         <span class="c1"># 新しいname列を分割</span></code></pre></div>
+<pre><code>     age         name value
+   &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt;
+ 1 50-54   Rural Male  11.7
+ 2 50-54 Rural Female   8.7
+ 3 50-54   Urban Male  15.4
+ 4 50-54 Urban Female   8.4
+--                         
+17 70-74   Rural Male  66.0
+18 70-74 Rural Female  54.3
+19 70-74   Urban Male  71.1
+20 70-74 Urban Female  50.0
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 行名を列に</span>
+  pivot_longer<span class="p">(</span><span class="o">-</span>age<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># age以外を移動して縦長化</span>
+  separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span>     <span class="c1"># 新しいname列を分割</span></code></pre></div>
+<pre><code>     age region    sex value
+   &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
+ 1 50-54  Rural   Male  11.7
+ 2 50-54  Rural Female   8.7
+ 3 50-54  Urban   Male  15.4
+ 4 50-54  Urban Female   8.4
+--                          
+17 70-74  Rural   Male  66.0
+18 70-74  Rural Female  54.3
+19 70-74  Urban   Male  71.1
+20 70-74  Urban Female  50.0
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">va_deaths <span class="o">=</span> <span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 行名を列に</span>
+  pivot_longer<span class="p">(</span><span class="o">-</span>age<span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># age以外を移動して縦長化</span>
+  separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 新しいname列を分割</span>
+  separate<span class="p">(</span>age<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> convert <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span></code></pre></div>
+<pre><code>   lbound ubound region    sex value
+    &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
+ 1     50     54  Rural   Male  11.7
+ 2     50     54  Rural Female   8.7
+ 3     50     54  Urban   Male  15.4
+ 4     50     54  Urban Female   8.4
+--                                  
+17     70     74  Rural   Male  66.0
+18     70     74  Rural Female  54.3
+19     70     74  Urban   Male  71.1
+20     70     74  Urban Female  50.0
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-別解">例題1: <code>VADeaths</code> 別解</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">va_deaths <span class="o">=</span> <span class="kp">as.data.frame</span><span class="p">(</span>VADeaths<span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
+  tibble<span class="o">::</span>rownames_to_column<span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 行名を列に</span>
+  tidyr<span class="o">::</span>pivot_longer<span class="p">(</span>                   <span class="c1"># 縦長に変形したい</span>
+    <span class="o">-</span>age<span class="p">,</span>                                <span class="c1"># age以外の列に入ってる値を移動</span>
+    names_to <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span>       <span class="c1"># 元の列名を2つに分離</span>
+    names_sep <span class="o">=</span> <span class="s">&#34; &#34;</span><span class="p">,</span>                     <span class="c1"># スペースで切る</span>
+    values_to <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>             <span class="c1"># 値の行き先の列名</span>
+  tidyr<span class="o">::</span>separate<span class="p">(</span>age<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> convert <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span></code></pre></div>
+<pre><code>   lbound ubound region    sex death
+    &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
+ 1     50     54  Rural   Male  11.7
+ 2     50     54  Rural Female   8.7
+ 3     50     54  Urban   Male  15.4
+ 4     50     54  Urban Female   8.4
+--                                  
+17     70     74  Rural   Male  66.0
+18     70     74  Rural Female  54.3
+19     70     74  Urban   Male  71.1
+20     70     74  Urban Female  50.0
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題1-vadeaths-作図例">例題1: <code>VADeaths</code> 作図例</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">va_deaths <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>lbound<span class="p">,</span> death<span class="p">))</span> <span class="o">+</span>
+  geom_point<span class="p">(</span>aes<span class="p">(</span>color <span class="o">=</span> sex<span class="p">,</span> shape <span class="o">=</span> region<span class="p">),</span> size <span class="o">=</span> <span class="m">5</span><span class="p">)</span> <span class="o">+</span>
+  theme_classic<span class="p">(</span>base_size <span class="o">=</span> <span class="m">16</span><span class="p">)</span></code></pre></div>
+<p><img src="figure/vadeaths_plot-1.png" alt="plot of chunk vadeaths_plot"></p>
+
+</section>
+<section>
+<h2 id="例題2-anscombe">例題2: <code>anscombe</code></h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
+  rowid_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span>              <span class="c1"># IDをつけておく</span>
+                                     <span class="c1"># x y で始まる列の値を移して縦長に</span></code></pre></div>
+<pre><code>      id    x1    x2    x3    x4    y1    y2    y3    y4
+   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1    10    10    10     8  8.04  9.14  7.46  6.58
+ 2     2     8     8     8     8  6.95  8.14  6.77  5.76
+ 3     3    13    13    13     8  7.58  8.74 12.74  7.71
+ 4     4     9     9     9     8  8.81  8.77  7.11  8.84
+--                                                      
+ 8     8     4     4     4    19  4.26  3.10  5.39 12.50
+ 9     9    12    12    12     8 10.84  9.13  8.15  5.56
+10    10     7     7     7     8  4.82  7.26  6.42  7.91
+11    11     5     5     5     8  5.68  4.74  5.73  6.89
+</code></pre>
+
+<p>ggplot does not accept this format. Let&rsquo;s transformt it.</p>
+
+</section>
+<section>
+<h2 id="例題2-anscombe">例題2: <code>anscombe</code></h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
+  rowid_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
+  pivot_longer<span class="p">(</span>matches<span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span>      <span class="c1"># x y で始まる列の値を移して縦長に</span>
+
+                                     <span class="c1"># name列を分割</span></code></pre></div>
+<pre><code>      id  name value
+   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;
+ 1     1    x1 10.00
+ 2     1    x2 10.00
+ 3     1    x3 10.00
+ 4     1    x4  8.00
+--                  
+85    11    y1  5.68
+86    11    y2  4.74
+87    11    y3  5.73
+88    11    y4  6.89
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題2-anscombe">例題2: <code>anscombe</code></h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">anscombe <span class="o">%&gt;%</span>
+  rowid_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
+  pivot_longer<span class="p">(</span>matches<span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># x y で始まる列の値を移して縦長に</span>
+  separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">,</span> convert <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+                                     <span class="c1"># name列を分割</span></code></pre></div>
+<pre><code>      id  axis group value
+   &lt;int&gt; &lt;chr&gt; &lt;int&gt; &lt;dbl&gt;
+ 1     1     x     1 10.00
+ 2     1     x     2 10.00
+ 3     1     x     3 10.00
+ 4     1     x     4  8.00
+--                        
+85    11     y     1  5.68
+86    11     y     2  4.74
+87    11     y     3  5.73
+88    11     y     4  6.89
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題2-anscombe">例題2: <code>anscombe</code></h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_anscombe <span class="o">=</span> anscombe <span class="o">%&gt;%</span>
+  rowid_to_column<span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
+  pivot_longer<span class="p">(</span>matches<span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># x y で始まる列の値を移して縦長に</span>
+  separate<span class="p">(</span>name<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">,</span> convert <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+                                     <span class="c1"># name列を分割</span>
+  pivot_wider<span class="p">(</span>names_from <span class="o">=</span> axis<span class="p">,</span> values_from <span class="o">=</span> value<span class="p">)</span> <span class="o">%&gt;%</span>
+                                     <span class="c1"># axis列内の x y を列にして横長化</span>
+  dplyr<span class="o">::</span>arrange<span class="p">(</span>group<span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># グループごとに並べる</span>
+  <span class="kp">print</span><span class="p">()</span>                            <span class="c1"># ggplotしたい形！</span></code></pre></div>
+<pre><code>      id group     x     y
+   &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1     1    10  8.04
+ 2     2     1     8  6.95
+ 3     3     1    13  7.58
+ 4     4     1     9  8.81
+--                        
+41     8     4    19 12.50
+42     9     4     8  5.56
+43    10     4     8  7.91
+44    11     4     8  6.89
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題2-anscombe-別解">例題2: <code>anscombe</code> 別解</h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_anscombe <span class="o">=</span> anscombe <span class="o">%&gt;%</span>
+  tidyr<span class="o">::</span>pivot_longer<span class="p">(</span>                <span class="c1"># 縦長に変形したい</span>
+    everything<span class="p">(),</span>                     <span class="c1"># すべての列について</span>
+    names_to <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;.value&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span>  <span class="c1"># 新しい列名</span>
+    names_sep <span class="o">=</span> <span class="m">1L</span><span class="p">,</span>                   <span class="c1"># 切る位置</span>
+    names_ptypes <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>group <span class="o">=</span> <span class="kt">integer</span><span class="p">()))</span> <span class="o">%&gt;%</span>   <span class="c1"># 型変換</span>
+  dplyr<span class="o">::</span>arrange<span class="p">(</span>group<span class="p">)</span> <span class="o">%&gt;%</span>           <span class="c1"># グループごとに並べる</span>
+  <span class="kp">print</span><span class="p">()</span>                             <span class="c1"># ggplotしたい形！</span></code></pre></div>
+<pre><code>   group     x     y
+   &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1     1    10  8.04
+ 2     1     8  6.95
+ 3     1    13  7.58
+ 4     1     9  8.81
+--                  
+41     4    19 12.50
+42     4     8  5.56
+43     4     8  7.91
+44     4     8  6.89
+</code></pre>
+
+</section>
+<section>
+<h2 id="例題2-anscombe-作図例">例題2: <code>anscombe</code> 作図例</h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>tidy_anscombe<span class="p">,</span> aes<span class="p">(</span>x<span class="p">,</span> y<span class="p">))</span> <span class="o">+</span>
+  geom_point<span class="p">(</span>size <span class="o">=</span> <span class="m">3</span><span class="p">)</span> <span class="o">+</span>
+  stat_smooth<span class="p">(</span>method <span class="o">=</span> lm<span class="p">,</span> se <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> fullrange <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">+</span>
+  facet_wrap<span class="p">(</span><span class="o">~</span> group<span class="p">,</span> nrow <span class="o">=</span> <span class="m">1L</span><span class="p">)</span></code></pre></div>
+<p><img src="figure/plot_anscombe-1.png" title="plot of chunk plot_anscombe" alt="plot of chunk plot_anscombe" width="98%" /></p>
+
+</section>
+<section>
+<h2 id="例題2-anscombe-要約">例題2: <code>anscombe</code> 要約</h2>
+
+<p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_anscombe <span class="o">%&gt;%</span>
+  dplyr<span class="o">::</span>group_by<span class="p">(</span>group<span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># group列でグループ化して</span>
+  dplyr<span class="o">::</span>summarize<span class="p">(</span>            <span class="c1"># x, y列を使ってsummarize</span>
+    mean_x <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>x<span class="p">),</span>
+    mean_y <span class="o">=</span> <span class="kp">mean</span><span class="p">(</span>y<span class="p">),</span>
+    sd_x <span class="o">=</span> sd<span class="p">(</span>x<span class="p">),</span>
+    sd_y <span class="o">=</span> sd<span class="p">(</span>y<span class="p">),</span>
+    cor_xy <span class="o">=</span> cor<span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span>
+  <span class="p">)</span></code></pre></div>
+<pre><code>  group mean_x   mean_y     sd_x     sd_y    cor_xy
+  &lt;int&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1     1      9 7.500909 3.316625 2.031568 0.8164205
+2     2      9 7.500909 3.316625 2.031657 0.8162365
+3     3      9 7.500000 3.316625 2.030424 0.8162867
+4     4      9 7.500909 3.316625 2.030579 0.8165214
+</code></pre>
+
+</section>
+<section>
+<h2 id="reference">Reference</h2>
+
+<dl>
+<dt>R for Data Science &mdash; Hadley Wickham &amp; Garrett Grolemund</dt>
+<dd><a href="https://r4ds.had.co.nz/">Website</a>, <a href="https://amzn.to/2tbRmVc">Book</a></dd>
+<dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
+</dl>
+
+<p><a href="https://amzn.to/2Q8GlhE">RユーザのためのRStudio[実践]入門</a> &mdash; 松村優哉ほか<br>
+<a href="https://amzn.to/2PFe4jF">前処理大全</a> &mdash; 本橋智光</p>
+
+<dl>
+<dt>過去の講義資料</dt>
+<dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
+岩嵜航 2018</dd>
+<dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
+<dd>「<a href="https://heavywatal.github.io/slides/makino2019r/">Hands-on R Lecture for Makino Lab</a>」
+岩嵜航 2019 東北大学</dd>
+<dt>Official documents:</dt>
+<dd><a href="https://www.tidyverse.org/">tidyverse</a>,
+<a href="https://ggplot2.tidyverse.org/">ggplot2</a>,
+<a href="https://dplyr.tidyverse.org/">dplyr</a>,
+<a href="https://tidyr.tidyverse.org/">tidyr</a>,
+<a href="https://purrr.tidyverse.org/">purrr</a>,
+<a href="https://tibble.tidyverse.org/">tibble</a>,
+<a href="https://readr.tidyverse.org/">readr</a>,
+<a href="https://readxl.tidyverse.org/">readxl</a></dd>
+</dl>
+
+<p><a href="./" class="readmore">
+目次に戻る
+</a></p>
+
+</section>
+</div>
+</div>
+<script src="/slides/reveal.js/js/reveal.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: false,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  mouseWheel: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  viewDistance: 1,
+  dependencies: [
+    { src: '\/slides\/reveal.js\/plugin\/notes\/notes.js', async: true }
+  ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>

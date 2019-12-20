@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Rによるデータ前処理実習 2019 東京医科歯科大</title>
+<link rel="stylesheet" href="/slides/css/theme-plain.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Rによるデータ前処理実習 2019 東京医科歯科大">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tmd2019/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.56.0-DEV" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+</head>
+<body>
+<main>
+<header>
+<h1>Rによるデータ前処理実習 2019 東京医科歯科大</h1>
+</header>
+
+
+<ul>
+<li>講師: 岩嵜航 (東北大学生命科学研究科)</li>
+<li>日程: 2019年12月20日、27日</li>
+<li>場所: 東京医科歯科大学 PC実習室？</li>
+</ul>
+
+<h2 id="概要">概要</h2>
+
+<ol>
+<li>授業内容 (100&ndash;150字程度)<br>
+データを元に可視化や検定・予測を行うためのソフトウェアは華々しく発展していますが、
+それらを利用するためにはまず入力データを整える必要があり、
+「データ分析に費やす労力の8割は前処理」などとも言われています。
+その地味ながら重要な作業をなるべく楽に行うためにRを使う方法を学びましょう。</li>
+<li>授業タイトル
+
+<ol>
+<li>入門: 前処理とは。Rを使うメリット。Rの基本。</li>
+<li>データ構造の処理: 抽出、集約、結合、変形など。</li>
+<li>データ内容の処理: 数値、文字列、日時など。</li>
+<li>実践: 現実の問題に対処してみる。</li>
+</ol></li>
+<li>受講するうえで必要になる前提知識
+
+<ul>
+<li>ファイル、フォルダ、クリックなど一般的なパソコンの基礎知識と経験</li>
+</ul></li>
+<li>教科書
+
+<ul>
+<li>なし</li>
+</ul></li>
+<li>参考書
+
+<ul>
+<li><a href="https://r4ds.had.co.nz/">Hadley Wickham, Garrett Grolemund &ldquo;R for Data Science&rdquo;</a></li>
+<li><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&amp;linkCode=ll1&amp;tag=heavywatal-22&amp;linkId=8a3fd4e9a0c944b1b41242bbab8d147b">本橋智光「前処理大全」</a></li>
+</ul></li>
+<li>その他 (注意事項等)
+
+<ul>
+<li>講義資料は公開予定: <a href="https://heavywatal.github.io/slides/tmd2019/">https://heavywatal.github.io/slides/tmd2019/</a></li>
+</ul></li>
+</ol>
+
+<h2 id="講義資料">講義資料</h2>
+
+<p>全4回。リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。</p>
+
+<ul>
+<a href="/slides/tmd2019/1-introduction.html"><li>入門: 前処理とは。Rを使うメリット。Rの基本</li></a>
+<a href="/slides/tmd2019/2-structure.html"><li>データ構造の処理: 抽出、集約、結合、変形など</li></a>
+</ul>
+</main>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
