@@ -61,7 +61,7 @@ if (!doNotTrack) {
 <div class="reveal">
 <div class="slides">
 <section>
-<h1 id="rによるデータ前処理実習">Rによるデータ前処理実習</h1>
+<h1 id="rによるデータ前処理実習"><a href=".">Rによるデータ前処理実習</a></h1>
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -84,7 +84,7 @@ if (!doNotTrack) {
 </ol></p>
 
 <div class="footnote">
-2019-12-20 東京医科歯科大学
+2019-12-20 東京医科歯科大学 M&Dタワー 情報検索室1
 </div>
 </section>
 <section>
@@ -345,6 +345,16 @@ but every messy dataset is messy in its own way<br>
 西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
 </div>
+</section>
+<section>
+<h2 id="整然データのご利益">整然データのご利益</h2>
+
+<p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>diamonds<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">,</span> y <span class="o">=</span> price<span class="p">))</span> <span class="o">+</span>
+  geom_point<span class="p">(</span>mapping <span class="o">=</span> aes<span class="p">(</span>color <span class="o">=</span> color<span class="p">,</span> size <span class="o">=</span> clarity<span class="p">))</span> <span class="o">+</span>
+  facet_wrap<span class="p">(</span><span class="o">~</span> <span class="kp">cut</span><span class="p">)</span></code></pre></div>
+<p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
+
 </section>
 <section>
 <h2 id="本日2時限目の話題-データ変形-整形">本日2時限目の話題: データ変形・整形</h2>
@@ -801,6 +811,8 @@ View<span class="p">(</span>iris<span class="p">)</span>      <span class="c1">#
  $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
 </code></pre>
 
+<p>ほかのデータもいろいろ見てみよう, e.g., <code>mtcars</code>, <code>quakes</code>, <code>data()</code></p>
+
 </section>
 <section>
 <h2 id="data-frameを眺める">data.frameを眺める</h2>
@@ -844,6 +856,21 @@ iris<span class="p">[</span><span class="m">2</span><span class="p">,</span> <sp
 </div>
 </section>
 <section>
+<h2 id="data-frameの新規作成">data.frameの新規作成</h2>
+
+<p>同じ長さの <strong>列(column) vector</strong> を結合して作る:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+y <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
+mydata <span class="o">=</span> <span class="kt">data.frame</span><span class="p">(</span>x<span class="p">,</span> y<span class="p">)</span>
+<span class="kp">print</span><span class="p">(</span>mydata<span class="p">)</span></code></pre></div>
+<pre><code>  x y
+1 1 A
+2 2 B
+3 3 C
+</code></pre>
+
+</section>
+<section>
 <h2 id="data-frameの読み書き">data.frameの読み書き</h2>
 
 <ul>
@@ -861,6 +888,8 @@ iris2 <span class="o">=</span> readr<span class="o">::</span>read_tsv<span class
 <span class="kp">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
 <span class="kp">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span></code></pre></div></li>
 </ul>
+
+<p>R組み込みデータや自作データを読み書きしてみよう</p>
 
 </section>
 <section>
