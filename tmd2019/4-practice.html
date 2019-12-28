@@ -92,7 +92,7 @@ if (!doNotTrack) {
 
 <ul>
 <li><strong>前処理、加工 → 整然データ</strong></li>
-<li>可視化、仮説生成 (ここを目標にしたい)</li>
+<li>可視化、仮説生成 (ここ目標にしたいので軽く作図の解説)</li>
 <li>統計解析、仮説検証</li>
 </ul></li>
 <li>報告、発表</li>
@@ -200,8 +200,7 @@ if (!doNotTrack) {
 <li>Rやパッケージに付属のデータ (のうちtidyじゃないもの)
 
 <ul>
-<li><code>VADeath</code>, <code>anscombe</code></li>
-<li><code>HairEyeColor</code>, <code>Titanic</code>, <code>economics</code></li>
+<li><code>VADeath</code>, <code>anscombe</code>, <code>economics</code></li>
 </ul></li>
 <li>何か適当なパブリックデータ
 
@@ -215,6 +214,77 @@ if (!doNotTrack) {
 「地域・年齢別人口」とかいい感じにmessy。</li>
 </ul></li>
 </ul>
+</section>
+<section>
+<h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
+
+<p>「地域・年齢別人口」CSVをダウンロードして、読み込む</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">infile <span class="o">=</span> <span class="s">&#34;131105_population_20170401.csv&#34;</span>
+raw_df <span class="o">=</span> readr<span class="o">::</span>read_csv<span class="p">(</span>infile<span class="p">)</span>
+<span class="kp">names</span><span class="p">(</span>raw_df<span class="p">)</span></code></pre></div>
+<pre><code> [1] &quot;都道府県コード又は市区町村コード&quot; &quot;地域コード&quot;                      
+ [3] &quot;都道府県名&quot;                       &quot;市区町村名&quot;                      
+ [5] &quot;調査年月日&quot;                       &quot;地域名&quot;                          
+ [7] &quot;総人口&quot;                           &quot;男性&quot;                            
+ [9] &quot;女性&quot;                             &quot;0-4歳の男性&quot;                     
+[11] &quot;0-4歳の女性&quot;                      &quot;5-9歳の男性&quot;                     
+[13] &quot;5-9歳の女性&quot;                      &quot;10-14歳の男性&quot;                   
+[15] &quot;10-14歳の女性&quot;                    &quot;15-19歳の男性&quot;                   
+[17] &quot;15-19歳の女性&quot;                    &quot;20-24歳の男性&quot;                   
+[19] &quot;20-24歳の女性&quot;                    &quot;25-29歳の男性&quot;                   
+[21] &quot;25-29歳の女性&quot;                    &quot;30-34歳の男性&quot;                   
+[23] &quot;30-34歳の女性&quot;                    &quot;35-39歳の男性&quot;                   
+[25] &quot;35-39歳の女性&quot;                    &quot;40-44歳の男性&quot;                   
+[27] &quot;40-44歳の女性&quot;                    &quot;45-49歳の男性&quot;                   
+[29] &quot;45-49歳の女性&quot;                    &quot;50-54歳の男性&quot;                   
+[31] &quot;50-54歳の女性&quot;                    &quot;55-59歳の男性&quot;                   
+[33] &quot;55-59歳の女性&quot;                    &quot;60-64歳の男性&quot;                   
+[35] &quot;60-64歳の女性&quot;                    &quot;65-69歳の男性&quot;                   
+[37] &quot;65-69歳の女性&quot;                    &quot;70-74歳の男性&quot;                   
+[39] &quot;70-74歳の女性&quot;                    &quot;75-79歳の男性&quot;                   
+[41] &quot;75-79歳の女性&quot;                    &quot;80-84歳の男性&quot;                   
+[43] &quot;80-84歳の女性&quot;                    &quot;85歳の男性以上&quot;                  
+[45] &quot;85歳の女性以上&quot;                   &quot;不詳者の男性&quot;                    
+[47] &quot;不詳者の女性&quot;                     &quot;世帯数&quot;                          
+[49] &quot;備考&quot;                            
+</code></pre>
+
+</section>
+<section>
+<h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
+
+<p>ggplotしたくなる形に変形</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_df <span class="o">=</span> raw_df <span class="o">%&gt;%</span>
+  select<span class="p">(</span><span class="s">&#34;地域名&#34;</span><span class="p">,</span> matches<span class="p">(</span><span class="s">&#34;の.+性$&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  rename<span class="p">(</span>place <span class="o">=</span> 地域名<span class="p">)</span> <span class="o">%&gt;%</span>
+  pivot_longer<span class="p">(</span><span class="o">-</span>place<span class="p">,</span> names_to <span class="o">=</span> <span class="s">&#34;category&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  separate<span class="p">(</span><span class="kp">category</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span> sep <span class="o">=</span> <span class="s">&#34;の&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  filter<span class="p">(</span>str_detect<span class="p">(</span>age<span class="p">,</span> <span class="s">&#34;\\d&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>age <span class="o">=</span> parse_number<span class="p">(</span>age<span class="p">))</span> <span class="o">%&gt;%</span>
+  mutate<span class="p">(</span>place <span class="o">=</span> str_replace<span class="p">(</span>place<span class="p">,</span> <span class="s">&#34;\\S丁目&#34;</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="kp">print</span><span class="p">()</span></code></pre></div>
+<pre><code>      place   age   sex value
+      &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
+   1   駒場     0  男性    65
+   2   駒場     0  女性    63
+   3   駒場     5  男性    85
+  --                         
+2990 東が丘    75  女性    39
+2991 東が丘    80  男性    22
+2992 東が丘    80  女性    41
+</code></pre>
+
+</section>
+<section>
+<h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
+
+<p>作図してみる</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_df <span class="o">%&gt;%</span>
+  ggplot<span class="p">(</span>aes<span class="p">(</span>age<span class="p">,</span> value<span class="p">))</span> <span class="o">+</span>
+  geom_col<span class="p">(</span>aes<span class="p">(</span>fill <span class="o">=</span> sex<span class="p">))</span> <span class="o">+</span>
+  facet_wrap<span class="p">(</span><span class="o">~</span> place<span class="p">,</span> nrow <span class="o">=</span> <span class="m">3L</span><span class="p">)</span></code></pre></div>
+<p><img src="figure/meguro_plot-1.png" alt="plot of chunk meguro_plot"></p>
+
 </section>
 <section>
 <h2 id="reference">Reference</h2>
