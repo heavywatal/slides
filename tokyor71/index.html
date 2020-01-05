@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.56.0-DEV" />
+<meta name="generator" content="Hugo 0.63.0-DEV" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -64,43 +64,37 @@ if (!doNotTrack) {
 <h1 style="font-size: 2.2rem">
 Writing an R package interface<br>to C++ libraries<br>with Rcpp
 </h1>
-
 <div class="author">
 Watal M. Iwasaki
 &nbsp;
 <a href="https://twitter.com/heavywatal"><code>@heavywatal</code></a>
 </div>
-
 <div class="affiliation">
 SOKENDAI, The Graduate University for Advanced Studies
 </div>
-
 <div class="footnote">
 2018-07-15
 <a href="https://tokyor.connpass.com/event/92522/">Tokyo.R #71</a>
 </div>
 </section>
 <section>
-<h2 id="img-src-slides-heavywatal-svg-height-48-style-vertical-align-text-bottom-heavywatal"><img src="/slides/heavywatal.svg" height="48" style="vertical-align: text-bottom;"> @heavywatal</h2>
-
-<p><img src="figure/google-map.png" height="580" align="right">
+<h2 id="img-srcslidesheavywatalsvg-height48-stylevertical-align-text-bottom-heavywatal"><img src="/slides/heavywatal.svg" height="48" style="vertical-align: text-bottom;"> @heavywatal</h2>
+<img src="figure/google-map.png" height="580" align="right">
 Watal M. Iwasaki = 岩嵜 航<br>
-<a href="https://heavywatal.github.io/">https://heavywatal.github.io/</a></p>
-
+https://heavywatal.github.io/
 <dl>
 <dt>PhD in Life Sciences, Tohoku University, Sendai</dt>
 <dd>Evolutionary theory of complexity and diversity in biological systems.</dd>
 <dt>Postdoc in SOKENDAI, Hayama</dt>
 <dd>Evolution of diversity within a tumor/cancer.</dd>
-<dt><img src="figure/bicycle.jpg" height="220" align="right" style="transform: translate(-10px, 40px);">
-Likes</dt>
-<dd>🍺 Beer, Sake, Whisky, Cooking</dd>
-<dd>♬ Heavy Metal, Classical, Folk</dd>
 </dl>
+<img src="figure/bicycle.jpg" height="220" align="right" style="transform: translate(-10px, 40px);">
+Likes
+: 🍺 Beer, Sake, Whisky, Cooking
+: ♬ Heavy Metal, Classical, Folk
 </section>
 <section>
-<h2 id="tumopp-tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
-
+<h2 id="tumopp-----tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
 <figure>
 <img src="/slides/figure/tumopp/paper/Fig1.png" height="200">
 <img src="/slides/figure/tumopp/neighborhood.png" height="200">
@@ -118,13 +112,11 @@ Likes</dt>
 </figure>
 </section>
 <section>
-<h2 id="tumopp-tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
-
+<h2 id="tumopp-----tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
 <p>Available via <a href="https://brew.sh/">Homebrew</a>/<a href="http://linuxbrew.sh/">Linuxbrew</a>:</p>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew install heavywatal/tap/tumopp
-tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR</code></pre></div>
-<p>Dependencies:</p>
-
+tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR
+</code></pre></div><p>Dependencies:</p>
 <ul>
 <li>Unix-like OS (macOS, Linux, etc.)</li>
 <li>C++14 compiler (clang++ &gt;= Apple LLVM 8.1, g++ &gt;= 5.3)</li>
@@ -133,15 +125,12 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR</code></pre></div>
 <li><a href="https://github.com/heavywatal/sfmt-class">sfmt-class</a></li>
 <li><a href="https://github.com/heavywatal/cxxwtl">cxxwtl</a></li>
 </ul>
-
 <p><a href="https://github.com/heavywatal/tumopp">https://github.com/heavywatal/tumopp</a></p>
 
 </section>
 <section>
-<h2 id="tumopp-tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
-
+<h2 id="tumopp-----tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
 <p>Library structure:</p>
-
 <pre><code>CMAKE_INSTALL_PREFIX/
 ├── bin/
 │   └── tumopp
@@ -152,21 +141,16 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR</code></pre></div>
 │       └── tissue.hpp
 └── lib/
     └── libtumopp.dylib    # libtumopp.so on Linux
-</code></pre>
-
-<p>Output structure:</p>
-
+</code></pre><p>Output structure:</p>
 <pre><code>OUTPUT_DIR/
 ├── drivers.tsv.gz
 ├── population.tsv.gz
 ├── program_options.conf
 └── snapshots.tsv.gz
 </code></pre>
-
 </section>
 <section>
 <h2 id="workflow">Workflow</h2>
-
 <ol>
 <li>Run tumopp with some parameter sets from the command line.</li>
 <li><strong>Write results to TSV files</strong></li>
@@ -174,45 +158,38 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR</code></pre></div>
 <li><strong>Read TSV files as data.frames</strong></li>
 <li>Visualize and analyze with tidyverse packages</li>
 </ol>
-
 <p>Not too bad.<br>
 But it will be more convenient if I can run tumopp in R:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>tumopp<span class="p">)</span>
-results <span class="o">=</span> tumopp<span class="p">(</span>some_parameter_sets<span class="p">)</span> <span class="o">%&gt;%</span> <span class="kp">print</span><span class="p">()</span></code></pre></div>
-<pre><code>     max  coord dimensions shape delta0  rho0 population  drivers
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">tumopp</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="nf">tumopp</span><span class="p">(</span><span class="n">some_parameter_sets</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">(</span><span class="p">)</span>
+</code></pre></div><pre><code>     max  coord dimensions shape delta0  rho0 population  drivers
    &lt;int&gt; &lt;char&gt;      &lt;int&gt; &lt;int&gt;  &lt;num&gt; &lt;num&gt;     &lt;list&gt;   &lt;list&gt;
 1: 10000    hex          3   100    0.1   0.5   &lt;tbl_df&gt; &lt;tbl_df&gt;
 </code></pre>
-
 </section>
 <section>
-<h2 id="seamless-r-and-c-integration-with-rcpp-http-www-rcpp-org">Seamless R and C++ integration with <a href="http://www.rcpp.org/">Rcpp</a></h2>
-
+<h2 id="seamless-r-and-c-integration-with-rcpphttpwwwrcpporg">Seamless R and C++ integration with <a href="http://www.rcpp.org/">Rcpp</a></h2>
 <p>It is typically used to eliminate bottlenecks in R code.<br>
 Many online examples show the ways to define a short function:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>Rcpp<span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">Rcpp</span><span class="p">)</span>
 
-Rcpp<span class="o">::</span>cppFunction<span class="p">(</span><span class="s">&#39;
+<span class="n">Rcpp</span><span class="o">::</span><span class="nf">cppFunction</span><span class="p">(</span><span class="s">&#39;</span><span class="s">
 </span><span class="s">int fibonacci(int x) {
 </span><span class="s">  if (x &lt; 2) return x;
 </span><span class="s">  return fibonacci(x - 1) + fibonacci(x - 2);
 </span><span class="s">}
 </span><span class="s">&#39;</span><span class="p">)</span>
 
-fibonacci<span class="p">(</span><span class="m">8L</span><span class="p">)</span></code></pre></div>
-<pre><code>[1] 21
-</code></pre>
-
-<p>But I already have C++ functions in my library.<br>
+<span class="nf">fibonacci</span><span class="p">(</span><span class="m">8L</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] 21
+</code></pre><p>But I already have C++ functions in my library.<br>
 How can I use them in R?</p>
 
 </section>
 <section>
-<h2 id="create-an-r-rcpp-package-from-scratch">Create an R+Rcpp package from scratch</h2>
-
+<h2 id="create-an-rrcpp-package-from-scratch">Create an R+Rcpp package from scratch</h2>
 <p>Package components
 <span class="cite">(See <a href="http://r-pkgs.had.co.nz/">http://r-pkgs.had.co.nz/</a> for details)<span>:</p>
-
 <pre><code>DESCRIPTION  # Package metadata
 LICENSE
 NAMESPACE    # List of objects to import/export
@@ -220,121 +197,104 @@ R/           # R code (*.R)
 man/         # Object documentation (*.Rd)
 src/         # C++ source code (*.cpp)
 vignettes/   # Long-form guide
-</code></pre>
-
-<p>Use <a href="https://devtools.r-lib.org/">devtools</a> and/or
+</code></pre><p>Use <a href="https://devtools.r-lib.org/">devtools</a> and/or
 <a href="http://usethis.r-lib.org/">usethis</a> to setup a skeleton:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">usethis<span class="o">::</span>create_package<span class="p">(</span><span class="s">&#34;tumopp&#34;</span><span class="p">)</span>
-usethis<span class="o">::</span>use_mit_license<span class="p">()</span>
-usethis<span class="o">::</span>use_roxygen_md<span class="p">()</span>
-usethis<span class="o">::</span>use_package_doc<span class="p">()</span>
-usethis<span class="o">::</span>use_rcpp<span class="p">()</span>
-usethis<span class="o">::</span>use_git<span class="p">()</span></code></pre></div>
-<p>Then, modify <code>DESCRIPTION</code>, <code>R/</code>, and <code>src/</code>.
-<!-- or `Rcpp::Rcpp.package.skeleton()`? --></p>
-
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">usethis</span><span class="o">::</span><span class="nf">create_package</span><span class="p">(</span><span class="s">&#34;</span><span class="s">tumopp&#34;</span><span class="p">)</span>
+<span class="n">usethis</span><span class="o">::</span><span class="nf">use_mit_license</span><span class="p">(</span><span class="p">)</span>
+<span class="n">usethis</span><span class="o">::</span><span class="nf">use_roxygen_md</span><span class="p">(</span><span class="p">)</span>
+<span class="n">usethis</span><span class="o">::</span><span class="nf">use_package_doc</span><span class="p">(</span><span class="p">)</span>
+<span class="n">usethis</span><span class="o">::</span><span class="nf">use_rcpp</span><span class="p">(</span><span class="p">)</span>
+<span class="n">usethis</span><span class="o">::</span><span class="nf">use_git</span><span class="p">(</span><span class="p">)</span>
+</code></pre></div><p>Then, modify <code>DESCRIPTION</code>, <code>R/</code>, and <code>src/</code>.</p>
+<!-- or `Rcpp::Rcpp.package.skeleton()`? -->
 </section>
 <section>
-<h2 id="package-wide-settings-in-r-tumopp-package-r">Package-wide settings in <code>R/tumopp-package.R</code></h2>
+<h2 id="package-wide-settings-in-rtumopp-packager">Package-wide settings in <code>R/tumopp-package.R</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; @useDynLib tumopp, .registration = TRUE</span>
 <span class="c1">#&#39; @importFrom Rcpp sourceCpp</span>
 <span class="c1">#&#39; @importFrom magrittr %&gt;%</span>
 <span class="c1">#&#39; @aliases NULL tumopp-package</span>
 <span class="c1">#&#39; @keywords internal</span>
-<span class="s">&#34;_PACKAGE&#34;</span>
+<span class="s">&#34;</span><span class="s">_PACKAGE&#34;</span>
 
-<span class="m">.</span>onUnload <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>libpath<span class="p">)</span> <span class="p">{</span>
-  <span class="kp">library.dynam.unload</span><span class="p">(</span><span class="s">&#34;tumopp&#34;</span><span class="p">,</span> libpath<span class="p">)</span>
-<span class="p">}</span></code></pre></div>
-<ul>
+<span class="n">.onUnload</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">libpath</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nf">library.dynam.unload</span><span class="p">(</span><span class="s">&#34;</span><span class="s">tumopp&#34;</span><span class="p">,</span> <span class="n">libpath</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><ul>
 <li><code>@useDynLib</code> is needed to import compiled C++ functions.</li>
 <li><code>@importFrom Rcpp sourceCpp</code> seems necessary to load Rcpp.</li>
 <li><code>&quot;_PACKAGE&quot;</code> is a special string to generate package documentation.</li>
-<li><code>.onUnload</code> is recommended in <a href="http://adv-r.had.co.nz/Rcpp.html">http://adv-r.had.co.nz/Rcpp.html</a>,<br>
+<li><code>.onUnload</code> is recommended in <a href="http://adv-r.had.co.nz/Rcpp.html,%3Cbr%3E">http://adv-r.had.co.nz/Rcpp.html,&lt;br&gt;</a>
 but not used in the major packages these days&hellip;?<br>
-<strong>Hadley said</strong>: <em>&ldquo;It is polite to define it, but easy to forget.&rdquo;</em></li>
+<strong>Hadley said</strong>: <em>&ldquo;It is polite to define it, but easy to forget.&quot;</em></li>
 </ul>
 </section>
 <section>
 <h2 id="define-rcpp-function-to-use-external-libraries">Define Rcpp function to use external libraries</h2>
-
 <p>Create <code>src/run.cpp</code>:</p>
 <div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// [[Rcpp::plugins(cpp14)]]
-</span><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&lt;Rcpp.h&gt;</span><span class="cp">
-</span><span class="cp">#include</span> <span class="cpf">&lt;tumopp/simulation.hpp&gt;</span><span class="cp">
+</span><span class="c1"></span><span class="cp">#</span><span class="cp">include</span> <span class="cpf">&lt;Rcpp.h&gt;</span><span class="cp">
+</span><span class="cp"></span><span class="cp">#</span><span class="cp">include</span> <span class="cpf">&lt;tumopp/simulation.hpp&gt;</span><span class="cp">
 </span><span class="cp"></span>
 <span class="c1">//&#39; Run C++ simulation
-</span><span class="c1">//&#39; @param args command line arguments as a string vector
-</span><span class="c1">// [[Rcpp::export]]
-</span><span class="c1"></span><span class="n">Rcpp</span><span class="o">::</span><span class="n">CharacterVector</span>
-<span class="n">cpp_tumopp</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&gt;&amp;</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">tumopp</span><span class="o">::</span><span class="n">Simulation</span> <span class="n">simulation</span><span class="p">(</span><span class="n">args</span><span class="p">);</span>
-    <span class="n">simulation</span><span class="p">.</span><span class="n">run</span><span class="p">();</span>
-    <span class="k">return</span> <span class="n">Rcpp</span><span class="o">::</span><span class="n">CharacterVector</span><span class="o">::</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">Rcpp</span><span class="o">::</span><span class="n">Named</span><span class="p">(</span><span class="s">&#34;config&#34;</span><span class="p">,</span> <span class="n">simulation</span><span class="p">.</span><span class="n">config_string</span><span class="p">()),</span>
-        <span class="n">Rcpp</span><span class="o">::</span><span class="n">Named</span><span class="p">(</span><span class="s">&#34;specimens&#34;</span><span class="p">,</span> <span class="n">simulation</span><span class="p">.</span><span class="n">specimens</span><span class="p">()),</span>
-        <span class="n">Rcpp</span><span class="o">::</span><span class="n">Named</span><span class="p">(</span><span class="s">&#34;drivers&#34;</span><span class="p">,</span> <span class="n">simulation</span><span class="p">.</span><span class="n">drivers</span><span class="p">())</span>
-    <span class="p">);</span>
+</span><span class="c1"></span><span class="c1">//&#39; @param args command line arguments as a string vector
+</span><span class="c1"></span><span class="c1">// [[Rcpp::export]]
+</span><span class="c1"></span><span class="n">Rcpp</span><span class="o">:</span><span class="o">:</span><span class="n">CharacterVector</span>
+<span class="n">cpp_tumopp</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">:</span><span class="o">:</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">:</span><span class="o">:</span><span class="n">string</span><span class="o">&gt;</span><span class="o">&amp;</span> <span class="n">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">tumopp</span><span class="o">:</span><span class="o">:</span><span class="n">Simulation</span> <span class="n">simulation</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="p">;</span>
+    <span class="n">simulation</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">Rcpp</span><span class="o">:</span><span class="o">:</span><span class="n">CharacterVector</span><span class="o">:</span><span class="o">:</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">Rcpp</span><span class="o">:</span><span class="o">:</span><span class="n">Named</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">config</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">simulation</span><span class="p">.</span><span class="n">config_string</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">,</span>
+        <span class="n">Rcpp</span><span class="o">:</span><span class="o">:</span><span class="n">Named</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">specimens</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">simulation</span><span class="p">.</span><span class="n">specimens</span><span class="p">(</span><span class="p">)</span><span class="p">)</span><span class="p">,</span>
+        <span class="n">Rcpp</span><span class="o">:</span><span class="o">:</span><span class="n">Named</span><span class="p">(</span><span class="sa"></span><span class="s">&#34;</span><span class="s">drivers</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">simulation</span><span class="p">.</span><span class="n">drivers</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
+    <span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre></div>
-<p>Try <code>devtools::check()</code>.</p>
+</code></pre></div><p>Try <code>devtools::check()</code>.</p>
 
 </section>
 <section>
 <h2 id="configure-compile-options">Configure compile options</h2>
-
 <p>Error: R does not know where my C++ library is located:</p>
-
 <pre><code>run.cpp:3:10: fatal error: 'tumopp/simulation.hpp' file not found
 #include &lt;tumopp/simulation.hpp&gt;
          ^~~~~~~~~~~~~~~~~~~~~~~
-</code></pre>
-
-<p>Write compile options to <code>src/Makevars</code> directly:</p>
+</code></pre><p>Write compile options to <code>src/Makevars</code> directly:</p>
 <div class="highlight"><pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX14
 <span class="nv">PKG_CPPFLAGS</span><span class="o">=</span>-DSTRICT_R_HEADERS -I/usr/local/include
 <span class="nv">PKG_LIBS</span><span class="o">=</span>-L/usr/local/lib -Wl,-rpath,/usr/local/lib -ltumopp
-</code></pre></div>
-<p>Or use <code>configure</code>/<code>CMake</code> script to generate it from <code>src/Makevars.in</code>:</p>
+</code></pre></div><p>Or use <code>configure</code>/<code>CMake</code> script to generate it from <code>src/Makevars.in</code>:</p>
 <div class="highlight"><pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX14
 <span class="nv">PKG_CPPFLAGS</span><span class="o">=</span>-DSTRICT_R_HEADERS @CPPFLAGS@
 <span class="nv">PKG_LIBS</span><span class="o">=</span>@LDFLAGS@ @LDLIBS@
-</code></pre></div>
-<p><span class="cite">
-<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup">https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup</a>
-</span></p>
-
+</code></pre></div><span class="cite">
+https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup
+</span>
 </section>
 <section>
-<h2 id="transform-c-strings-to-data-frame">Transform C++ strings to data.frame</h2>
-
+<h2 id="transform-c-strings-to-dataframe">Transform C++ strings to data.frame</h2>
 <p>Create <code>R/tumopp</code>:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; `tumopp()` returns full results with config columns in a data.frame</span>
 <span class="c1">#&#39; @param args command line arguments as a string vector</span>
 <span class="c1">#&#39; @export</span>
-tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>args <span class="o">=</span> <span class="kt">character</span><span class="p">(</span><span class="m">0L</span><span class="p">))</span> <span class="p">{</span>
-  result <span class="o">=</span> cpp_tumopp<span class="p">(</span><span class="kt">c</span><span class="p">(</span><span class="m">0L</span><span class="p">,</span> <span class="m">0L</span><span class="p">,</span> <span class="kp">args</span><span class="p">))</span>
-  population <span class="o">=</span> readr<span class="o">::</span>read_tsv<span class="p">(</span>result<span class="p">[</span><span class="s">&#34;specimens&#34;</span><span class="p">])</span>
-  drivers <span class="o">=</span> readr<span class="o">::</span>read_tsv<span class="p">(</span>result<span class="p">[</span><span class="s">&#34;drivers&#34;</span><span class="p">])</span>
-  readr<span class="o">::</span>read_tsv<span class="p">(</span>result<span class="p">[</span><span class="s">&#34;config&#34;</span><span class="p">])</span> <span class="o">%&gt;%</span>
-    dplyr<span class="o">::</span>mutate<span class="p">(</span>population <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>population<span class="p">))</span> <span class="o">%&gt;%</span>
-    dplyr<span class="o">::</span>mutate<span class="p">(</span>drivers <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>drivers<span class="p">))</span>
-<span class="p">}</span></code></pre></div>
-<pre><code>     max  coord dimensions shape delta0  rho0 population  drivers
+<span class="n">tumopp</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">args</span> <span class="o">=</span> <span class="nf">character</span><span class="p">(</span><span class="m">0L</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">result</span> <span class="o">=</span> <span class="nf">cpp_tumopp</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">0L</span><span class="p">,</span> <span class="m">0L</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span><span class="p">)</span>
+  <span class="n">population</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">result</span><span class="n">[</span><span class="s">&#34;</span><span class="s">specimens&#34;</span><span class="n">]</span><span class="p">)</span>
+  <span class="n">drivers</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">result</span><span class="n">[</span><span class="s">&#34;</span><span class="s">drivers&#34;</span><span class="n">]</span><span class="p">)</span>
+  <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="n">result</span><span class="n">[</span><span class="s">&#34;</span><span class="s">config&#34;</span><span class="n">]</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">population</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">population</span><span class="p">)</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">drivers</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">drivers</span><span class="p">)</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><pre><code>     max  coord dimensions shape delta0  rho0 population  drivers
    &lt;int&gt; &lt;char&gt;      &lt;int&gt; &lt;int&gt;  &lt;num&gt; &lt;num&gt;     &lt;list&gt;   &lt;list&gt;
 1: 10000    hex          3   100    0.1   0.5   &lt;tbl_df&gt; &lt;tbl_df&gt;
-</code></pre>
-
-<p>There must be some more efficient ways&hellip;
+</code></pre><p>There must be some more efficient ways&hellip;
 <a href="https://github.com/wesm/feather">feather</a>?
 <a href="https://arrow.apache.org/">arrow</a>?</p>
 
 </section>
 <section>
 <h2 id="workflow-improvement">Workflow improvement</h2>
-
 <p><strong>Before using Rcpp</strong>:</p>
-
 <ol>
 <li>Run tumopp with some parameter sets</li>
 <li><strong>Write results to TSV files</strong></li>
@@ -342,9 +302,7 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 <li><strong>Read TSV files as data.frames</strong></li>
 <li>Visualize and analyze</li>
 </ol>
-
 <p><strong>Thanks to Rcpp</strong>:</p>
-
 <ol>
 <li>Start R</li>
 <li>Run tumopp with some parameter sets in R</li>
@@ -354,13 +312,11 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 
 </section>
 <section>
-<h2 id="problem-modern-c-11-14-17-supported">Problem: Modern C++11/14/17 supported?</h2>
-
+<h2 id="problem-modern-c111417-supported">Problem: Modern C++11/14/17 supported?</h2>
 <ul>
 <li>Rcpp <a href="https://github.com/RcppCore/Rcpp/blob/master/inst/NEWS.Rd">0.12.10</a>: C++17</li>
 <li>R <a href="https://cran.r-project.org/doc/manuals/r-release/NEWS.html">3.4.0</a>: C++17</li>
 <li>OS and compiler
-
 <ul>
 <li>macOS <a href="https://trac.macports.org/wiki/XcodeVersionInfo">(clang)</a>: C++17</li>
 <li>Ubuntu <a href="https://packages.ubuntu.com/bionic/gcc">18.04 (gcc-7.3)</a>: C++17</li>
@@ -368,20 +324,17 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 <li>CentOS 7 + <a href="https://github.com/Linuxbrew/homebrew-core/blob/master/Formula/gcc.rb">Linuxbrew (gcc-5.5)</a>: C++14</li>
 <li><strong>Windows + <a href="https://cran.r-project.org/bin/windows/Rtools/">Rtools (gcc-4.9)</a>: C++11</strong> ❌</li>
 <li>Windows + WSL + Ubuntu: ❓❓❓</li>
-</ul></li>
 </ul>
-
-<p><span class="cite">
-<a href="http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/">http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/</a>
-</span></p>
-
+</li>
+</ul>
+<span class="cite">
+http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/
+</span>
 <p>🚧 <strong><a href="https://github.com/rwinlib/gcc-8">Rtools 4 with gcc 8</a> is under development.</strong>
-(Thanks, Yutani-san!)</p>
-
+(Thanks, Yutani-san!)
 </section>
 <section>
 <h2 id="tasks-and-questions">Tasks and Questions</h2>
-
 <p>✅ Core C++ library for tumor growth simulation<br>
 ✅ R interface package using <strong>Rcpp</strong> and <strong>devtools</strong><br>
 🚧 Visualization and analysis using <strong>tidyverse</strong> packages<br>
@@ -398,7 +351,6 @@ tumopp <span class="o">=</span> <span class="kr">function</span><span class="p">
 </section>
 <section>
 <h2 id="reference">Reference</h2>
-
 <ul>
 <li><a href="https://github.com/heavywatal/tumopp">https://github.com/heavywatal/tumopp</a></li>
 <li><a href="https://github.com/heavywatal/rtumopp">https://github.com/heavywatal/rtumopp</a></li>

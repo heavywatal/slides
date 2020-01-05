@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.56.0-DEV" />
+<meta name="generator" content="Hugo 0.63.0-DEV" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -69,66 +69,59 @@ Rcppパッケージで外部C++ライブラリを使う</span><br>
 <span style="font-size: 1.2rem; color: #999999;">
 Using external C++ libraries in Rcpp packages</span>
 </h1>
-
 <div class="author">
 Watal M. Iwasaki
 &nbsp;
 <a href="https://twitter.com/heavywatal"><code>@heavywatal</code></a>
 </div>
-
 <div class="affiliation">
 SOKENDAI, The Graduate University for Advanced Studies
 </div>
-
 <div class="footnote">
 2018-12-01
 <a href="https://japanr.connpass.com/event/105802/">Japan.R 2018</a>
 </div>
-
 <p><a href="https://heavywatal.github.io/slides/japanr2018/">https://heavywatal.github.io/slides/japanr2018/</a>
 </section>
 <section>
-<h2 id="rcpp-http-www-rcpp-org-a-bridge-between-r-and-c"><a href="http://www.rcpp.org/">Rcpp</a>: a bridge between R and C++</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">r_for <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>n<span class="p">)</span> <span class="p">{</span>
-  s <span class="o">=</span> <span class="m">0</span><span class="p">;</span> <span class="kr">for</span> <span class="p">(</span>i <span class="kr">in</span> <span class="kp">seq_len</span><span class="p">(</span>n<span class="p">))</span> <span class="p">{</span>s <span class="o">=</span> s <span class="o">+</span> <span class="m">1</span> <span class="o">/</span> i<span class="p">};</span> s
+<h2 id="rcpphttpwwwrcpporg-a-bridge-between-r-and-c"><a href="http://www.rcpp.org/">Rcpp</a>: a bridge between R and C++</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">r_for</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span> <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span> <span class="o">/</span> <span class="n">i</span><span class="p">}</span><span class="p">;</span> <span class="n">s</span>
 <span class="p">}</span>
-r_vec <span class="o">=</span> <span class="kr">function</span><span class="p">(</span>n<span class="p">)</span> <span class="kp">sum</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="kp">seq_len</span><span class="p">(</span>n<span class="p">))</span>
+<span class="n">r_vec</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="nf">sum</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="nf">seq_len</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">)</span>
 
-Rcpp<span class="o">::</span>cppFunction<span class="p">(</span><span class="s">&#34;double rcpp(int n) {
+<span class="n">Rcpp</span><span class="o">::</span><span class="nf">cppFunction</span><span class="p">(</span><span class="s">&#34;</span><span class="s">double rcpp(int n) {
 </span><span class="s">  double s = 0; for (int i = 1; i &lt;= n; ++i) {s += 1.0 / i;} return s;
 </span><span class="s">}&#34;</span><span class="p">)</span>  <span class="c1"># Compilation takes a few seconds here</span>
 
-n <span class="o">=</span> <span class="m">1000000L</span>
-rbenchmark<span class="o">::</span>benchmark<span class="p">(</span>r_for<span class="p">(</span>n<span class="p">),</span> r_vec<span class="p">(</span>n<span class="p">),</span> rcpp<span class="p">(</span>n<span class="p">))[,</span><span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="p">]</span></code></pre></div>
-<pre><code>      test replications elapsed relative
+<span class="n">n</span> <span class="o">=</span> <span class="m">1000000L</span>
+<span class="n">rbenchmark</span><span class="o">::</span><span class="nf">benchmark</span><span class="p">(</span><span class="nf">r_for</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">,</span> <span class="nf">r_vec</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">,</span> <span class="nf">rcpp</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>
+</code></pre></div><pre><code>      test replications elapsed relative
 1 r_for(n)          100   3.968   29.835
 2 r_vec(n)          100   0.473    3.556
 3  rcpp(n)          100   0.133    1.000
-</code></pre>
-
-<p>⚡ Rcpp helps improving performance.</p>
-
-<p>📦 ~1500 CRAN packages depend on Rcpp.</p>
-
-<p>🎉 <a href="http://dirk.eddelbuettel.com/blog/2018/11/07/">Happy 10th birthday and version 1.0.0  (2018-11-05)</a>.</p>
+</code></pre><p>⚡ Rcpp helps improving performance.<br>
+📦 ~1500 CRAN packages depend on Rcpp.<br>
+🎉 <a href="http://dirk.eddelbuettel.com/blog/2018/11/07/">Happy 10th birthday and version 1.0.0  (2018-11-05)</a>.</p>
 
 </section>
 <section>
 <h2 id="online-resources-for-developing-rcpp-packages">Online resources for developing Rcpp packages</h2>
-
 <ul>
 <li><a href="http://dirk.eddelbuettel.com/code/rcpp/Rcpp-package.pdf">Rcpp-package.pdf</a> by Dirk Eddelbuettel and Romain François</li>
 <li><a href="http://r-pkgs.had.co.nz/src.html">Compiled code (<code>src/</code>) - R packages</a> by Hadley Wickham</li>
-<li><a href="https://heavywatal.github.io/rstats/devtools">https://heavywatal.github.io/rstats/devtools</a><br>
+<li><a href="https://heavywatal.github.io/rstats/devtools">https://heavywatal.github.io/rstats/devtools</a> <br>
 <a href="https://heavywatal.github.io/rstats/rcpp">https://heavywatal.github.io/rstats/rcpp</a> (404)</li>
-<li><span class="fragment" data-fragment-index="1">
-<strong><a href="https://teuder.github.io/rcpp4everyone_ja/">みんなのRcpp</a></strong> and
-<strong><a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for everyone</a></strong>
+<li>
+<span class="fragment" data-fragment-index="1">
+<a href="https://teuder.github.io/rcpp4everyone_ja/">みんなのRcpp</a>
+and
+<a href="https://teuder.github.io/rcpp4everyone_en/">Rcpp for everyone</a>
 by <strong>津駄@teuder</strong> さん
-</span></li>
+</span>
+</li>
 </ul>
-
-<p><div class="fragment" data-fragment-index="1">
+<div class="fragment" data-fragment-index="1">
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい。 <a href="https://t.co/6I7GGemCDZ">https://t.co/6I7GGemCDZ</a></p>&mdash; HOXOM Inc. (@hoxom_inc) <a href="https://twitter.com/hoxom_inc/status/1057162394772811776?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい <a href="https://t.co/0CRbCrO06B">https://t.co/0CRbCrO06B</a></p>&mdash; 職業、イケメン。テラモナギ (@teramonagi) <a href="https://twitter.com/teramonagi/status/1057162274421432320?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
 <blockquote class="twitter-tweet" data-lang="en"><p lang="ja" dir="ltr">この内容が無料で読めるなんてすごい。 <a href="https://t.co/3M7Sy6tAw7">https://t.co/3M7Sy6tAw7</a></p>&mdash; niszet📚技術書典5 い04でした (@niszet0) <a href="https://twitter.com/niszet0/status/1057181653745852417?ref_src=twsrc%5Etfw">October 30, 2018</a></blockquote>
@@ -142,25 +135,19 @@ twitter-widget {
   display: inline-block !important;
   width: 32% !important;
 }
-</style></p>
-
+</style>
 </section>
 <section>
-<h2 id="but-lacking-how-to-use-external-libraries">But lacking &ldquo;how to use external libraries&rdquo; 😢</h2>
-
-<p><a href="https://teuder.github.io/rcpp4everyone_ja/350_package.html">
+<h2 id="but-lacking-how-to-use-external-libraries-">But lacking &ldquo;how to use external libraries&rdquo; 😢</h2>
+<a href="https://teuder.github.io/rcpp4everyone_ja/350_package.html">
 <img src="figure/rcpp4everyone35.png" width="100%" style="margin: -1.5rem -1.5rem -2.4rem;">
 <!-- <img src="figure/rcpp4everyone35.png" width="100%" style="transform: translate(-10px, -40px);"> -->
-</a></p>
-
-<p>Necessity is the mother of invention. Let&rsquo;s do it 💪</p>
-
+</a>
+<p>Necessity is the mother of invention. Let's do it 💪
 </section>
 <section>
-<h2 id="structure-of-a-typical-c-c-library">Structure of a typical C/C++ library</h2>
-
+<h2 id="structure-of-a-typical-cc-library">Structure of a typical C/C++ library</h2>
 <p>Source repository:</p>
-
 <pre><code>evolution/
 ├── README.md
 └── src/
@@ -168,10 +155,7 @@ twitter-widget {
     ├── individual.cpp      # source file for definition
     ├── population.hpp
     └── population.cpp
-</code></pre>
-
-<p>Compiled and installed:</p>
-
+</code></pre><p>Compiled and installed:</p>
 <pre><code>${PREFIX}/                  # e.g., /usr/local/
 ├── include/                # header files
 │   └── evolution/
@@ -179,53 +163,48 @@ twitter-widget {
 │       └── population.hpp
 └── lib/
     └── libevolution.a      # shared library (.dylib, .dll)
-</code></pre>
-
-<p>Libraries can be header-only,
+</code></pre><p>Libraries can be header-only,
 e.g., <a href="http://eigen.tuxfamily.org">Eigen</a>, <a href="https://github.com/nlohmann/json">nlohmann/json</a>.</p>
 
 </section>
 <section>
-<h2 id="basic-steps-to-incorporate-c-c-libraries">Basic steps to incorporate C/C++ libraries</h2>
-
+<h2 id="basic-steps-to-incorporate-cc-libraries">Basic steps to incorporate C/C++ libraries</h2>
 <ul>
-<li><p>Write <code>src/Makevars</code> to instruct compilers and linkers:</p>
+<li>
+<p>Write <code>src/Makevars</code> to instruct compilers and linkers:</p>
 <div class="highlight"><pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX11
 <span class="nv">PKG_CPPFLAGS</span><span class="o">=</span>-DSTRICT_R_HEADERS -I/usr/local/include
 <span class="nv">PKG_LIBS</span><span class="o">=</span>-L/usr/local/lib -Wl,-rpath,/usr/local/lib -levolution
 </code></pre></div></li>
-
-<li><p>Use <code>configure</code> script to</p>
-
+<li>
+<p>Use <code>configure</code> script to</p>
 <ul>
 <li>Generate <code>src/Makevars</code> from a template <code>src/Makevars.in</code>.</li>
 <li>Inspect build environments: OS, compilers, etc.</li>
 <li>Detect installed libraries.</li>
 <li>Do anything you want.<br>
 e.g., <code>git</code>, <code>cmake</code>, etc.</li>
-</ul></li>
 </ul>
-
-<p><span class="cite">
-<a href="http://r-pkgs.had.co.nz/src.html#make">http://r-pkgs.had.co.nz/src.html#make</a><br>
-<a href="https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup">https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup</a>
-</span></p>
+</li>
+</ul>
+<span class="cite">
+http://r-pkgs.had.co.nz/src.html#make<br>
+https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup
+</span>
 
 </section>
 <section>
-<h2 id="various-styles-to-incorporate-c-c-libraries">Various styles to incorporate C/C++ libraries</h2>
-
+<h2 id="various-styles-to-incorporate-cc-libraries">Various styles to incorporate C/C++ libraries</h2>
 <ul>
 <li>Find and use installed libraries. Fail if not found.
-
 <ul>
 <li>😍 Simple. 😨 Requires users&rsquo; knowledge and effort.</li>
 <li>e.g., <a href="https://github.com/r-lib/xml2">xml2</a>,
 <a href="https://github.com/ropensci/magick">magick</a>,
 <a href="https://github.com/eddelbuettel/rcppgsl">RcppGSL</a></li>
-</ul></li>
+</ul>
+</li>
 <li>Keep source code copies in <code>inst/include/</code> and <code>src/</code>.
-
 <ul>
 <li>😍 Robust. Developers control everything. 😨 Redundant.</li>
 <li>e.g., <a href="https://github.com/eddelbuettel/bh/">BH</a>,
@@ -233,38 +212,37 @@ e.g., <code>git</code>, <code>cmake</code>, etc.</li>
 <a href="https://github.com/RcppCore/RcppEigen">RcppEigen</a>,
 <a href="https://github.com/RcppCore/RcppParallel">RcppParallel</a>,
 <a href="https://github.com/eddelbuettel/rcpptoml">RcppTOML</a></li>
-</ul></li>
+</ul>
+</li>
 <li>Fetch and track source codes with <a href="https://git-scm.com/book/en/v2/Git-Tools-Submodules">Git submodule</a>
-
 <ul>
 <li>🙂 Less redundant. 🙁 Foreign materials in package structure.</li>
 <li>e.g., <a href="https://github.com/igraph/rigraph">rigraph</a>,
 <a href="https://github.com/stan-dev/rstan">rstan (StanHeaders)</a></li>
-</ul></li>
+</ul>
+</li>
 <li>Find and use installed libraries. Install if not found.
-
 <ul>
 <li>😍 Lean. Not requires users&rsquo; effort.</li>
 <li>e.g., <a href="https://heavywatal.github.io/rtumopp/">tumopp</a></li>
-</ul></li>
+</ul>
+</li>
 </ul>
 </section>
 <section>
-<h2 id="let-s-discuss-later">Let&rsquo;s discuss later 🍻</h2>
-
+<h2 id="lets-discuss-later-">Let's discuss later 🍻</h2>
 <ul>
 <li>Any other ways to handle external C++ libraries?</li>
 <li>Where to share these knowledge?
-
 <ul>
 <li>My own website</li>
 <li>みんなのRcpp</li>
 <li>Rcpp official documentation</li>
-</ul></li>
+</ul>
+</li>
 <li>How are Windows users doing?</li>
 </ul>
-
-<h2 id="thank-you-for-your-attention">Thank you for your attention 🤘</h2>
+<h2 id="thank-you-for-your-attention-">Thank you for your attention 🤘</h2>
 </section>
 </div>
 </div>

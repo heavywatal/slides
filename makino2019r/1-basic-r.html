@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.56.0-DEV" />
+<meta name="generator" content="Hugo 0.63.0-DEV" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -62,17 +62,13 @@ if (!doNotTrack) {
 <div class="slides">
 <section>
 <h1 id="hands-on-r-lecture-for-makino-lab"><a href=".">Hands-on R Lecture for Makino Lab</a></h1>
-
-<p><link rel="stylesheet" href="style.css"></p>
-
+<link rel="stylesheet" href="style.css">
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki)
 </div>
-
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野
 </div>
-
 <ol start="0">
 <li><a href="0-why-r.html">Why do we use R?</a>
 <li class="current-deck"><a href="1-basic-r.html">R basics</a>
@@ -81,7 +77,6 @@ if (!doNotTrack) {
 <li><a href="4-statistics.html">Statistical analysis with R</a>
 <li><a href="5-git.html">File management with Git+GitHub</a>
 </ol>
-
 <div class="footnote">
 資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br>
 2019-10-09 生物棟大会議室
@@ -89,7 +84,6 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="r-basics-index">R basics: Index</h2>
-
 <ul>
 <li>Setup Mac and R environment</li>
 <li>Conversation with R</li>
@@ -101,7 +95,6 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="mac-keyboard-shortcuts">Mac keyboard shortcuts</h2>
-
 <table>
 <thead>
 <tr>
@@ -109,78 +102,73 @@ if (!doNotTrack) {
 <th>Command</th>
 </tr>
 </thead>
-
 <tbody>
 <tr>
 <td>Switch apps</td>
 <td><kbd>command</kbd><kbd>tab</kbd></td>
 </tr>
-
 <tr>
 <td>Quit apps</td>
 <td><kbd>command</kbd><kbd>q</kbd></td>
 </tr>
-
 <tr>
 <td>Spotlight</td>
 <td><kbd>command</kbd><kbd>space</kbd></td>
 </tr>
-
 <tr>
 <td>Cut, Copy, Paste</td>
 <td><kbd>command</kbd><kbd>x</kbd>, -<kbd>c</kbd>, -<kbd>v</kbd></td>
 </tr>
-
 <tr>
 <td>Select all</td>
 <td><kbd>command</kbd><kbd>a</kbd></td>
 </tr>
-
 <tr>
 <td>Undo</td>
 <td><kbd>command</kbd><kbd>z</kbd></td>
 </tr>
-
 <tr>
 <td>Find</td>
 <td><kbd>command</kbd><kbd>f</kbd></td>
 </tr>
-
 <tr>
 <td>Save</td>
 <td><kbd>command</kbd><kbd>s</kbd></td>
 </tr>
 </tbody>
 </table>
-
 <p>See <a href="https://support.apple.com/HT201236">https://support.apple.com/HT201236</a>
 </section>
 <section>
 <h2 id="setup-mac-environment">Setup Mac environment</h2>
-
 <ul>
-<li>Set OS language to English (System Preferences → Language &amp; Region)</li>
-
-<li><p>Install <strong>Command Line Tools</strong> via <strong>Terminal.app</strong>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">xcode-select --install</code></pre></div>
-<p>Full Xcode is not necessary, but you can have it if you like.</p></li>
-
-<li><p>Install <a href="/mac/homebrew.html">Homebrew</a> (software manager):</p>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">/usr/bin/ruby -e <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install<span class="k">)</span><span class="s2">&#34;</span></code></pre></div></li>
-
-<li><p>Try installing something with Homebrew:</p>
+<li>
+<p>Set OS language to English (System Preferences → Language &amp; Region)</p>
+</li>
+<li>
+<p>Install <strong>Command Line Tools</strong> via <strong>Terminal.app</strong>:</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">xcode-select --install
+</code></pre></div><p>Full Xcode is not necessary, but you can have it if you like.</p>
+</li>
+<li>
+<p>Install <a href="/mac/homebrew.html">Homebrew</a> (software manager):</p>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">/usr/bin/ruby -e <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install<span class="k">)</span><span class="s2">&#34;</span>
+</code></pre></div></li>
+<li>
+<p>Try installing something with Homebrew:</p>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew install wget
-wget https://www.lifesci.tohoku.ac.jp/evolgenomics/wp-content/themes/makino/images/logo2.png</code></pre></div>
-<p>You may need to restart shell to reload <code>PATH</code></p>
+wget https://www.lifesci.tohoku.ac.jp/evolgenomics/wp-content/themes/makino/images/logo2.png
+</code></pre></div><p>You may need to restart shell to reload <code>PATH</code></p>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># command not found: brew</span>
-<span class="nb">exec</span> <span class="nv">$SHELL</span> -l</code></pre></div></li>
+<span class="nb">exec</span> <span class="nv">$SHELL</span> -l
+</code></pre></div></li>
 </ul>
 
 </section>
 <section>
 <h2 id="setup-r-environment">Setup R environment</h2>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew cask install r rstudio</code></pre></div>
-<dl>
+<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew cask install r rstudio
+</code></pre></div><dl>
 <dt><a href="https://cran.rstudio.com/">R</a></dt>
 <dd>Core software to interpret and execute commands.</dd>
 <dd>Standard packages and functions are included.</dd>
@@ -188,56 +176,37 @@ wget https://www.lifesci.tohoku.ac.jp/evolgenomics/wp-content/themes/makino/imag
 <dd>Integrated environment to help users interact with R.</dd>
 <dd>Not necessary, but many people like it.</dd>
 </dl>
-
-<p><img src="/slides/figure/rstudio/rstudio-300x260.png"></p>
-
+<img src="/slides/figure/rstudio/rstudio-300x260.png">
 </section>
 <section>
 <h2 id="launch-rstudio-and-play-with-console">Launch RStudio and play with Console</h2>
-
 <p>Details will be explained later.</p>
-
-<p><img src="/slides/figure/rstudio/console.png" class="screenshot" width="100%"></p>
-
+<img src="/slides/figure/rstudio/console.png" class="screenshot" width="100%">
 </section>
 <section>
 <h2 id="create-project">Create &ldquo;Project&rdquo;</h2>
-
 <p>File → New Project&hellip; → New Directory → <code>~/project/r-training-2019</code></p>
-
-<p><img src="/slides/figure/rstudio/create-new-project.png" class="screenshot" width="90%"></p>
-
+<img src="/slides/figure/rstudio/create-new-project.png" class="screenshot" width="90%">
 </section>
 <section>
 <h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
-
 <p>File → New File → R script</p>
-
-<p><img src="/slides/figure/rstudio/newfile.png" width="100%"></p>
-
+<img src="/slides/figure/rstudio/newfile.png" width="100%">
 </section>
 <section>
 <h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
-
 <p>File → New File → R script</p>
-
-<p><img src="/slides/figure/rstudio/script-console.png" width="100%"></p>
-
+<img src="/slides/figure/rstudio/script-console.png" width="100%">
 </section>
 <section>
 <h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
-
 <p>Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
 Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
-
-<p><img src="/slides/figure/rstudio/101.png" width="100%"></p>
-
+<img src="/slides/figure/rstudio/101.png" width="100%">
 </section>
 <section>
-<h2 id="save-r-script-in-the-project-kbd-command-kbd-kbd-s-kbd">Save R script in the project: <kbd>command</kbd><kbd>s</kbd></h2>
-
+<h2 id="save-r-script-in-the-project-kbdcommandkbdkbdskbd">Save R script in the project: <kbd>command</kbd><kbd>s</kbd></h2>
 <p>Separate data, scripts, and results, e.g.,</p>
-
 <pre><code>r-training-2019/           # プロジェクトの最上階
 ├── data/                  # 元データを置くところ
 │   ├── iris.tsv
@@ -249,17 +218,13 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 │   └── iris-summary.tsv
 ├── transform.R            # データ整理・変形のスクリプト
 └── visualize.R            # 作図のスクリプト
-</code></pre>
-
-<p>プロジェクト最上階を作業ディレクトリとし、<br>
+</code></pre><p>プロジェクト最上階を作業ディレクトリとし、<br>
 ファイル読み書きの基準にする。(後で詳しく)</p>
 
 </section>
 <section>
-<h2 id="configure-rstudio-not-to-save-load-workspace">Configure RStudio not to save/load workspace</h2>
-
+<h2 id="configure-rstudio-not-to-saveload-workspace">Configure RStudio not to save/load workspace</h2>
 <p>Open &ldquo;Preferences&rdquo; with <kbd>command</kbd><kbd>,</kbd></p>
-
 <figure>
 <a href="http://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/figure/rstudio/rstudio-workspace.png" width="75%"
@@ -270,9 +235,8 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 </section>
 <section>
 <h2 id="attitude-toward-programming-in-r">Attitude toward programming in R</h2>
-
 <dl>
-<dt>Don&rsquo;t fear errors</dt>
+<dt>Don't fear errors</dt>
 <dd>Even experts cause errors very often.</dd>
 <dd>An error is a message from R. Try to understand it.</dd>
 <dt>Google it</dt>
@@ -280,11 +244,9 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 <dd>Queries can be 日本語, Engligh, or whole error message.</dd>
 <dd>それでも分からなかったら <a href="https://github.com/tokyor/r-wakalang">r-wakalang</a> で相談しよう。</dd>
 </dl>
-
 <figure style="float: right; margin: 0;">
 <img src="/slides/figure/rstats/error.png" height="300">
 </figure>
-
 <dl>
 <dt>Copy-and-paste is easier and faster</dt>
 <dd>見つけたコードはまずコピペして使ってみよう。</dd>
@@ -293,87 +255,74 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 </dl>
 </section>
 <section>
-<h2 id="create-objects-variables-変数">Create objects/variables (変数)</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
-x            <span class="c1"># What&#39;s in x?</span></code></pre></div>
-<pre><code>[1] 42
+<h2 id="create-objectsvariables-変数">Create objects/variables (変数)</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
+<span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
+</code></pre></div><pre><code>[1] 42
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">24601&#34;</span>  <span class="c1"># Create y</span>
+<span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
+</code></pre></div><pre><code>[1] &quot;24601&quot;
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error!</span>
+</code></pre></div><pre><code>Error in x + y: non-numeric argument to binary operator
 </code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">y <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
-y            <span class="c1"># What&#39;s in y?</span></code></pre></div>
-<pre><code>[1] &quot;24601&quot;
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">+</span> y        <span class="c1"># Error!</span></code></pre></div>
-<pre><code>Error in x + y: non-numeric argument to binary operator
-</code></pre>
+</section>
+<section>
+<h2 id="object-types-型">Object types (型)</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] &quot;numeric&quot;
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] TRUE
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] FALSE
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] &quot;42&quot;
+</code></pre><p>Try applying the same functions to <code>y</code>.</p>
 
 </section>
 <section>
 <h2 id="object-types-型">Object types (型)</h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">class</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
-<pre><code>[1] &quot;numeric&quot;
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">is.numeric</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
-<pre><code>[1] TRUE
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">is.character</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
-<pre><code>[1] FALSE
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">as.character</span><span class="p">(</span>x<span class="p">)</span></code></pre></div>
-<pre><code>[1] &quot;42&quot;
-</code></pre>
-
-<p>Try applying the same functions to <code>y</code>.</p>
-
-</section>
-<section>
-<h2 id="object-types-型">Object types (型)</h2>
-
 <ul>
 <li><code>NULL</code>: 空っぽ</li>
 <li>vector: 基本型。一次元の配列。
-
 <ul>
 <li>logical: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
 <li>numeric: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
 <li>character: 文字列 (<code>&quot;historgram.png&quot;</code>)</li>
 <li>factor: 因子 (文字列っぽいけど微妙に違う)</li>
 <li>↑それぞれに欠損値 <code>NA</code> も定義されてる</li>
-</ul></li>
+</ul>
+</li>
 <li>matrix: 二次元の行列。vector同様、全要素が同じ型。</li>
 <li>list: 異なる型でも詰め込める太っ腹ベクトル。</li>
-<li><strong>data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong><br>
+<li><strong>data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong> <br>
 <strong>tibble</strong> とか <strong>tbl_df</strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
 </ul>
 </section>
 <section>
 <h2 id="vector-1-dimensional-array">vector: 1-dimensional array</h2>
-
 <p>1個の値でもベクトル扱い。<br>
 同じ長さ(または長さ1)の相手との計算が得意。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">x <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
-x <span class="o">+</span> x           <span class="c1"># 同じ長さ同士の計算</span></code></pre></div>
-<pre><code>[1]  2  4 18
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">y <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
-x <span class="o">+</span> y           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span></code></pre></div>
-<pre><code>[1] 11 12 19
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">sqrt</span><span class="p">(</span>x<span class="p">)</span>         <span class="c1"># square root</span></code></pre></div>
-<pre><code>[1] 1.000000 1.414214 3.000000
-</code></pre>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># We don&#39;t have to write for-loop like this</span>
-z <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
-<span class="kr">for</span> <span class="p">(</span>i <span class="kr">in</span> <span class="kp">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
-  z<span class="p">[</span>i<span class="p">]</span> <span class="o">=</span> <span class="kp">sqrt</span><span class="p">(</span>x<span class="p">[</span>i<span class="p">])</span>
-<span class="p">}</span></code></pre></div>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
+<span class="n">x</span> <span class="o">+</span> <span class="n">x</span>           <span class="c1"># 同じ長さ同士の計算</span>
+</code></pre></div><pre><code>[1]  2  4 18
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
+<span class="n">x</span> <span class="o">+</span> <span class="n">y</span>           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span>
+</code></pre></div><pre><code>[1] 11 12 19
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># square root</span>
+</code></pre></div><pre><code>[1] 1.000000 1.414214 3.000000
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># We don&#39;t have to write for-loop like this</span>
+<span class="n">z</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">z</span><span class="n">[i</span><span class="n">]</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="n">[i</span><span class="n">]</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
 </section>
 <section>
-<h2 id="data-frame-rectangle-table-important">data.frame: rectangle table (IMPORTANT!)</h2>
-
+<h2 id="dataframe-rectangle-table-important">data.frame: rectangle table (IMPORTANT!)</h2>
 <p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
 Rに最初から入ってて、例としてよく使われる。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">print</span><span class="p">(</span>iris<span class="p">)</span></code></pre></div>
-<pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+</code></pre></div><pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
            &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;fct&gt;
   1          5.1         3.5          1.4         0.2    setosa
   2          4.9         3.0          1.4         0.2    setosa
@@ -384,36 +333,37 @@ Rに最初から入ってて、例としてよく使われる。</p>
 148          6.5         3.0          5.2         2.0 virginica
 149          6.2         3.4          5.4         2.3 virginica
 150          5.9         3.0          5.1         1.8 virginica
-</code></pre>
-
-<p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
+</code></pre><p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
 
 </section>
 <section>
-<h2 id="read-and-write-data-frame">Read and Write data.frame</h2>
-
+<h2 id="read-and-write-dataframe">Read and Write data.frame</h2>
 <ul>
-<li>You can read <code>.xlsx</code> files with readxl package, but</li>
-<li>Prefer plain text format, e.g., <code>.csv</code> and <code>.tsv</code>.</li>
-
-<li><p>Use <strong>relative path</strong> from <strong>working directory</strong>.</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
-<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
-readr<span class="o">::</span>write_tsv<span class="p">(</span>iris<span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
-readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span></code></pre></div></li>
-
-<li><p>Check your current working directory and its contents:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="kp">getwd</span><span class="p">()</span>               <span class="c1"># Get working directory</span>
-<span class="kp">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
-<span class="kp">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span></code></pre></div></li>
+<li>
+<p>You can read <code>.xlsx</code> files with readxl package, but</p>
+</li>
+<li>
+<p>Prefer plain text format, e.g., <code>.csv</code> and <code>.tsv</code>.</p>
+</li>
+<li>
+<p>Use <strong>relative path</strong> from <strong>working directory</strong>.</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
+<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">data/iris.tsv&#34;</span><span class="p">)</span>
+<span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;</span><span class="s">data/iris.tsv&#34;</span><span class="p">)</span>
+</code></pre></div></li>
+<li>
+<p>Check your current working directory and its contents:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">(</span><span class="p">)</span>               <span class="c1"># Get working directory</span>
+<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;</span><span class="s">.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
+<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;</span><span class="s">data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
+</code></pre></div></li>
 </ul>
 
 </section>
 <section>
 <h2 id="r-package">R package</h2>
-
 <p>便利な関数やデータセットなどをひとまとめにしたもの。</p>
-
 <dl>
 <dt>Standard Packages</dt>
 <dd>Rの標準機能。何もしなくても使用可能</dd>
@@ -423,10 +373,10 @@ readr<span class="o">::</span>read_tsv<span class="p">(</span><span class="s">&#
 にまとめて公開されている。</dd>
 <dd>要インストール。使う前に読み込むおまじないが必要。</dd>
 </dl>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
-<span class="kn">library</span><span class="p">(</span>readr<span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
-update.packages<span class="p">()</span>          <span class="c1"># たまには更新しよう</span></code></pre></div>
-<dl>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
+<span class="nf">update.packages</span><span class="p">(</span><span class="p">)</span>          <span class="c1"># たまには更新しよう</span>
+</code></pre></div><dl>
 <dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
 <dd>大丈夫。誰も覚えきってない。</dd>
 <dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
@@ -435,39 +385,33 @@ update.packages<span class="p">()</span>          <span class="c1"># たまに�
 </section>
 <section>
 <h2 id="tidyverse">tidyverse</h2>
-
-<p><a href="https://www.tidyverse.org/">
+<a href="https://www.tidyverse.org/">
 <img src="/slides/figure/rstats/hex-badges.png" width="260" align="right">
-</a></p>
-
+</a>
 <p>Rでデータを上手に扱うためのパッケージ群</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">install.packages<span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
-<span class="kn">library</span><span class="p">(</span>tidyverse<span class="p">)</span>
-<span class="c1"># 関連パッケージが一挙に読み込まれる</span></code></pre></div>
-<ul>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">tidyverse&#34;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="c1"># 関連パッケージが一挙に読み込まれる</span>
+</code></pre></div><ul>
 <li>統一的な使い勝手</li>
 <li>暗黙の処理をなるべくしない安全設計</li>
 <li>シンプルな関数を繋げて使うデザイン</li>
 </ul>
-
 <figure>
 <a href="http://r4ds.had.co.nz/introduction.html">
 <img src="/slides/figure/r4ds/data-science.png">
 <figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
-
 </section>
 <section>
 <h2 id="many-other-useful-packages">Many other useful packages</h2>
-
-<p><a href="https://readxl.tidyverse.org/">
+<a href="https://readxl.tidyverse.org/">
 <img src="/slides/figure/rstats/hex-readxl.png" width="120" align="right">
 </a>
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/figure/rstats/hex-stringr.png" width="120" align="right">
-</a></p>
-
+</a>
 <ul>
 <li><a href="https://readxl.tidyverse.org/">readxl</a>: エクセル形式の読み込み</li>
 <li><a href="https://stringr.tidyverse.org/">stringr</a>: 文字列の処理</li>
@@ -479,14 +423,11 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 この発表スライドもそうやって作った。<br>
 レポート作成や共同研究者への報告にも便利！</li>
 </ul>
-
 <p>たくさんありすぎて選べない？<br>
-まずは人気のパッケージを <a href="https://awesome-r.com/">https://awesome-r.com/</a> で探してみるとか。</p>
-
+まずは人気のパッケージを <a href="https://awesome-r.com/">https://awesome-r.com/</a> で探してみるとか。
 </section>
 <section>
 <h2 id="how-to-solve-problems">How to solve problems</h2>
-
 <ul>
 <li>RStudio内にヘルプを表示: <code>?sum</code>, <code>help.start()</code></li>
 <li>変数の構造を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
@@ -507,7 +448,6 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 </section>
 <section>
 <h2 id="r-basics-summary">R basics: Summary</h2>
-
 <ul>
 <li>Install R and RStudio via Homebrew.</li>
 <li>Write R script, and send it to Console.</li>
@@ -519,7 +459,6 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 </section>
 <section>
 <h2 id="reference">Reference</h2>
-
 <dl>
 <dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
 <dd><a href="http://r4ds.had.co.nz/">http://r4ds.had.co.nz/</a></dd>
@@ -530,8 +469,7 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 岩嵜航 2018</dd>
 <dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
 </dl>
-
-<p><a href="2-ggplot.html" rel="next" class="readmore">
+<a href="2-ggplot.html" rel="next" class="readmore">
 2. Visualization with R
 </a>
 </section>

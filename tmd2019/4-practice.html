@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.56.0-DEV" />
+<meta name="generator" content="Hugo 0.63.0-DEV" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -62,42 +62,36 @@ if (!doNotTrack) {
 <div class="slides">
 <section>
 <h1 id="rによるデータ前処理実習"><a href=".">Rによるデータ前処理実習</a></h1>
-
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
 </div>
-
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
 (Graduate School of Life Sciences, Tohoku University)
 </div>
-
 <ol>
 <li><a href="1-introduction.html">入門: 前処理とは。Rを使うメリット。Rの基本</a>
 <li><a href="2-structure.html">データ構造の処理: 抽出、集約、結合、変形など</a>
 <li><a href="3-content.html">データ内容の処理: 数値、文字列、日時など</a>
 <li class="current-deck"><a href="4-practice.html">実践: 現実の問題に対処してみる</a>
 </ol>
-
 <div class="footnote">
 2019-12-28 東京医科歯科大学 M&Dタワー 情報検索室1
 </div>
 </section>
 <section>
 <h2 id="最終回-実践してみよう">最終回: 実践してみよう</h2>
-
 <ol>
 <li>データの取得、読み込み</li>
 <li>探索的データ解析
-
 <ul>
 <li><strong>前処理、加工 → 整然データ</strong></li>
 <li>可視化、仮説生成 (ここ目標にしたいので軽く作図の解説)</li>
 <li>統計解析、仮説検証</li>
-</ul></li>
+</ul>
+</li>
 <li>報告、発表</li>
 </ol>
-
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/figure/r4ds/data-science.png">
@@ -106,104 +100,94 @@ if (!doNotTrack) {
 </figure>
 </section>
 <section>
-<h2 id="ggplotの基本-指示を-していく">ggplotの基本: 指示を <code>+</code> していく</h2>
-
+<h2 id="ggplotの基本-指示を--していく">ggplotの基本: 指示を <code>+</code> していく</h2>
 <ul>
 <li><code>ggplot()</code> このデータでよろしく</li>
 <li><code>geom_*()</code> 点や線をよろしく</li>
 <li><code>theme_*()</code> 軸とか背景の見た目をよろしく</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>data <span class="o">=</span> diamonds<span class="p">)</span>               <span class="c1"># diamondsデータでキャンバス準備</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span>               <span class="c1"># diamondsデータでキャンバス準備</span>
 <span class="c1"># geom_histogram(aes(x = carat)) +    # x軸caratのヒストグラムで</span>
-<span class="c1"># theme_classic(base_size = 20)       # クラシックなテーマで</span></code></pre></div>
-<p><img src="figure/ggplot-plus0-1.png" alt="plot of chunk ggplot-plus0"></p>
+<span class="c1"># theme_classic(base_size = 20)       # クラシックなテーマで</span>
+</code></pre></div><p><img src="figure/ggplot-plus0-1.png" alt="plot of chunk ggplot-plus0"></p>
 
 </section>
 <section>
-<h2 id="ggplotの基本-指示を-していく">ggplotの基本: 指示を <code>+</code> していく</h2>
-
+<h2 id="ggplotの基本-指示を--していく">ggplotの基本: 指示を <code>+</code> していく</h2>
 <ul>
 <li><code>ggplot()</code> このデータでよろしく</li>
 <li><code>geom_*()</code> 点や線をよろしく</li>
 <li><code>theme_*()</code> 軸とか背景の見た目をよろしく</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>data <span class="o">=</span> diamonds<span class="p">)</span> <span class="o">+</span>             <span class="c1"># diamondsデータでキャンバス準備</span>
-  geom_histogram<span class="p">(</span>aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">))</span>      <span class="c1"># x軸caratのヒストグラムで</span>
-<span class="c1"># theme_classic(base_size = 20)       # クラシックなテーマで</span></code></pre></div>
-<p><img src="figure/ggplot-plus1-1.png" alt="plot of chunk ggplot-plus1"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>             <span class="c1"># diamondsデータでキャンバス準備</span>
+  <span class="nf">geom_histogram</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">)</span><span class="p">)</span>      <span class="c1"># x軸caratのヒストグラムで</span>
+<span class="c1"># theme_classic(base_size = 20)       # クラシックなテーマで</span>
+</code></pre></div><p><img src="figure/ggplot-plus1-1.png" alt="plot of chunk ggplot-plus1"></p>
 
 </section>
 <section>
-<h2 id="ggplotの基本-指示を-していく">ggplotの基本: 指示を <code>+</code> していく</h2>
-
+<h2 id="ggplotの基本-指示を--していく">ggplotの基本: 指示を <code>+</code> していく</h2>
 <ul>
 <li><code>ggplot()</code> このデータでよろしく</li>
 <li><code>geom_*()</code> 点や線をよろしく</li>
 <li><code>theme_*()</code> 軸とか背景の見た目をよろしく</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>data <span class="o">=</span> diamonds<span class="p">)</span> <span class="o">+</span>             <span class="c1"># diamondsデータでキャンバス準備</span>
-  geom_histogram<span class="p">(</span>aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">))</span> <span class="o">+</span>    <span class="c1"># x軸caratのヒストグラムで</span>
-  theme_classic<span class="p">(</span>base_size <span class="o">=</span> <span class="m">20</span><span class="p">)</span>       <span class="c1"># クラシックなテーマで</span></code></pre></div>
-<p><img src="figure/ggplot-plus2-1.png" alt="plot of chunk ggplot-plus2"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>             <span class="c1"># diamondsデータでキャンバス準備</span>
+  <span class="nf">geom_histogram</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>    <span class="c1"># x軸caratのヒストグラムで</span>
+  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>       <span class="c1"># クラシックなテーマで</span>
+</code></pre></div><p><img src="figure/ggplot-plus2-1.png" alt="plot of chunk ggplot-plus2"></p>
 
 </section>
 <section>
 <h2 id="aesthetic-mapping-でデータと見せ方を紐付け">Aesthetic mapping でデータと見せ方を紐付け</h2>
-
 <p><code>aes()</code> の中で列名を指定する。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>diamonds<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">,</span> y <span class="o">=</span> price<span class="p">))</span> <span class="o">+</span>
-  geom_point<span class="p">(</span>mapping <span class="o">=</span> aes<span class="p">(</span>color <span class="o">=</span> color<span class="p">,</span> size <span class="o">=</span> clarity<span class="p">))</span></code></pre></div>
-<p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">)</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
 
 </section>
 <section>
 <h2 id="データによらず一律で見せ方を変える">データによらず一律で見せ方を変える</h2>
-
 <p><code>aes()</code> の外で値を指定する。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>diamonds<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">,</span> y <span class="o">=</span> price<span class="p">))</span> <span class="o">+</span>
-  geom_point<span class="p">(</span>color <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> size <span class="o">=</span> <span class="m">6</span><span class="p">,</span> alpha <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span></code></pre></div>
-<p><img src="figure/aes-nomap-1.png" alt="plot of chunk aes-nomap"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">darkorange&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">6</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/aes-nomap-1.png" alt="plot of chunk aes-nomap"></p>
 
 </section>
 <section>
 <h2 id="値に応じて切り分けて表示-1変数facet">値に応じて切り分けて表示 (1変数facet)</h2>
-
 <p>ggplotの真骨頂！
 これをR標準グラフィックスでやるのは結構たいへん。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>diamonds<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">,</span> y <span class="o">=</span> price<span class="p">))</span> <span class="o">+</span>
-  geom_point<span class="p">(</span>mapping <span class="o">=</span> aes<span class="p">(</span>color <span class="o">=</span> color<span class="p">,</span> size <span class="o">=</span> clarity<span class="p">))</span> <span class="o">+</span>
-  facet_wrap<span class="p">(</span><span class="o">~</span> clarity<span class="p">,</span> ncol <span class="o">=</span> <span class="m">4L</span><span class="p">)</span></code></pre></div>
-<p><img src="figure/facet-wrap-1.png" alt="plot of chunk facet-wrap"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4L</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/facet-wrap-1.png" alt="plot of chunk facet-wrap"></p>
 
 </section>
 <section>
 <h2 id="値に応じて切り分けて表示-2変数facet">値に応じて切り分けて表示 (≥2変数facet)</h2>
-
 <p>ggplotの真骨頂！
 これをR標準グラフィックスでやるのは結構たいへん。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">ggplot<span class="p">(</span>diamonds<span class="p">,</span> aes<span class="p">(</span>x <span class="o">=</span> carat<span class="p">,</span> y <span class="o">=</span> price<span class="p">))</span> <span class="o">+</span>
-  geom_point<span class="p">(</span>mapping <span class="o">=</span> aes<span class="p">(</span>color <span class="o">=</span> color<span class="p">,</span> size <span class="o">=</span> clarity<span class="p">))</span> <span class="o">+</span>
-  facet_grid<span class="p">(</span>cut <span class="o">~</span> clarity<span class="p">)</span></code></pre></div>
-<p><img src="figure/facet-grid-1.png" alt="plot of chunk facet-grid"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_grid</span><span class="p">(</span><span class="n">cut</span> <span class="o">~</span> <span class="n">clarity</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/facet-grid-1.png" alt="plot of chunk facet-grid"></p>
 
 </section>
 <section>
 <h2 id="多変量データを俯瞰する">多変量データを俯瞰する</h2>
-
 <p><img src="figure/facet-diamonds-1.png" alt="plot of chunk facet-diamonds">
 </section>
 <section>
 <h2 id="好きなデータをいじくり倒してみよう">好きなデータをいじくり倒してみよう</h2>
-
 <ul>
 <li>自分がこれから解析したいデータ (もし手元にあれば)</li>
 <li>Rやパッケージに付属のデータ (のうちtidyじゃないもの)
-
 <ul>
 <li><code>VADeath</code>, <code>anscombe</code>, <code>economics</code></li>
-</ul></li>
+</ul>
+</li>
 <li>何か適当なパブリックデータ
-
 <ul>
 <li><a href="https://www.data.go.jp/data/dataset?res_format=CSV">data.go.jp</a>: データカタログサイト</li>
 <li><a href="https://www.itdashboard.go.jp/Statistics/opendata">IT DASHBOARD</a>: 内閣官房</li>
@@ -212,17 +196,17 @@ if (!doNotTrack) {
 <li><a href="https://www.data.jma.go.jp/gmd/risk/obsdl/index.php">気象庁</a></li>
 <li><a href="https://www.city.meguro.tokyo.jp/gyosei/hirakareta/opendata/opendata.html">目黒区オープンデータ</a>:
 「地域・年齢別人口」とかいい感じにmessy。</li>
-</ul></li>
+</ul>
+</li>
 </ul>
 </section>
 <section>
 <h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
-
 <p>「地域・年齢別人口」CSVをダウンロードして、読み込む</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">infile <span class="o">=</span> <span class="s">&#34;131105_population_20170401.csv&#34;</span>
-raw_df <span class="o">=</span> readr<span class="o">::</span>read_csv<span class="p">(</span>infile<span class="p">)</span>
-<span class="kp">names</span><span class="p">(</span>raw_df<span class="p">)</span></code></pre></div>
-<pre><code> [1] &quot;都道府県コード又は市区町村コード&quot; &quot;地域コード&quot;                      
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">infile</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">131105_population_20170401.csv&#34;</span>
+<span class="n">raw_df</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">raw_df</span><span class="p">)</span>
+</code></pre></div><pre><code> [1] &quot;都道府県コード又は市区町村コード&quot; &quot;地域コード&quot;                      
  [3] &quot;都道府県名&quot;                       &quot;市区町村名&quot;                      
  [5] &quot;調査年月日&quot;                       &quot;地域名&quot;                          
  [7] &quot;総人口&quot;                           &quot;男性&quot;                            
@@ -248,22 +232,20 @@ raw_df <span class="o">=</span> readr<span class="o">::</span>read_csv<span clas
 [47] &quot;不詳者の女性&quot;                     &quot;世帯数&quot;                          
 [49] &quot;備考&quot;                            
 </code></pre>
-
 </section>
 <section>
 <h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
-
 <p>ggplotしたくなる形に変形</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_df <span class="o">=</span> raw_df <span class="o">%&gt;%</span>
-  select<span class="p">(</span><span class="s">&#34;地域名&#34;</span><span class="p">,</span> matches<span class="p">(</span><span class="s">&#34;の.+性$&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  rename<span class="p">(</span>place <span class="o">=</span> 地域名<span class="p">)</span> <span class="o">%&gt;%</span>
-  pivot_longer<span class="p">(</span><span class="o">-</span>place<span class="p">,</span> names_to <span class="o">=</span> <span class="s">&#34;category&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  separate<span class="p">(</span><span class="kp">category</span><span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span> sep <span class="o">=</span> <span class="s">&#34;の&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  filter<span class="p">(</span>str_detect<span class="p">(</span>age<span class="p">,</span> <span class="s">&#34;\\d&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  mutate<span class="p">(</span>age <span class="o">=</span> parse_number<span class="p">(</span>age<span class="p">))</span> <span class="o">%&gt;%</span>
-  mutate<span class="p">(</span>place <span class="o">=</span> str_replace<span class="p">(</span>place<span class="p">,</span> <span class="s">&#34;\\S丁目&#34;</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  <span class="kp">print</span><span class="p">()</span></code></pre></div>
-<pre><code>      place   age   sex value
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">=</span> <span class="n">raw_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="s">&#34;</span><span class="s">地域名&#34;</span><span class="p">,</span> <span class="nf">matches</span><span class="p">(</span><span class="s">&#34;</span><span class="s">の.+性$&#34;</span><span class="p">)</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">rename</span><span class="p">(</span><span class="n">place</span> <span class="o">=</span> 地域名<span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">place</span><span class="p">,</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">category&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">separate</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;</span><span class="s">age&#34;</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">sex&#34;</span><span class="p">)</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">の&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">str_detect</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">\\d&#34;</span><span class="p">)</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="nf">parse_number</span><span class="p">(</span><span class="n">age</span><span class="p">)</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">place</span> <span class="o">=</span> <span class="nf">str_replace</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">\\S丁目&#34;</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">&#34;</span><span class="p">)</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">print</span><span class="p">(</span><span class="p">)</span>
+</code></pre></div><pre><code>      place   age   sex value
       &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
    1   駒場     0  男性    65
    2   駒場     0  女性    63
@@ -273,31 +255,26 @@ raw_df <span class="o">=</span> readr<span class="o">::</span>read_csv<span clas
 2991 東が丘    80  男性    22
 2992 東が丘    80  女性    41
 </code></pre>
-
 </section>
 <section>
 <h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
-
 <p>作図してみる</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r">tidy_df <span class="o">%&gt;%</span>
-  ggplot<span class="p">(</span>aes<span class="p">(</span>age<span class="p">,</span> value<span class="p">))</span> <span class="o">+</span>
-  geom_col<span class="p">(</span>aes<span class="p">(</span>fill <span class="o">=</span> sex<span class="p">))</span> <span class="o">+</span>
-  facet_wrap<span class="p">(</span><span class="o">~</span> place<span class="p">,</span> nrow <span class="o">=</span> <span class="m">3L</span><span class="p">)</span></code></pre></div>
-<p><img src="figure/meguro_plot-1.png" alt="plot of chunk meguro_plot"></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">ggplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_col</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="n">sex</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">place</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">3L</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/meguro_plot-1.png" alt="plot of chunk meguro_plot"></p>
 
 </section>
 <section>
 <h2 id="reference">Reference</h2>
-
 <dl>
 <dt>R for Data Science &mdash; Hadley Wickham &amp; Garrett Grolemund</dt>
 <dd><a href="https://r4ds.had.co.nz/">Website</a>, <a href="https://amzn.to/2tbRmVc">Book</a></dd>
 <dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
 </dl>
-
 <p><a href="https://amzn.to/2Q8GlhE">RユーザのためのRStudio[実践]入門</a> &mdash; 松村優哉ほか<br>
 <a href="https://amzn.to/2PFe4jF">前処理大全</a> &mdash; 本橋智光</p>
-
 <dl>
 <dt>過去の講義資料</dt>
 <dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
@@ -306,11 +283,9 @@ raw_df <span class="o">=</span> readr<span class="o">::</span>read_csv<span clas
 <dd>「<a href="https://heavywatal.github.io/slides/makino2019r/">Hands-on R Lecture for Makino Lab</a>」
 岩嵜航 2019 東北大学</dd>
 </dl>
-
-<p><a href="./" class="readmore">
+<a href="./" class="readmore">
 目次に戻る
-</a></p>
-
+</a>
 </section>
 </div>
 </div>
