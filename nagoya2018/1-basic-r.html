@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.63.0-DEV" />
+<meta name="generator" content="Hugo 0.65.3" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -187,8 +187,8 @@ if (!doNotTrack) {
 </code></pre></div><pre><code>[1] 44 50 48
 </code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># こういうfor文は書かずに済む</span>
 <span class="n">z</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">z</span><span class="n">[i</span><span class="n">]</span> <span class="o">=</span> <span class="n">x</span><span class="n">[i</span><span class="n">]</span> <span class="o">+</span> <span class="n">y</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">z[i]</span> <span class="o">=</span> <span class="n">x[i]</span> <span class="o">+</span> <span class="n">y</span>
 <span class="p">}</span>
 </code></pre></div>
 </section>
@@ -217,10 +217,10 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <li>カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。</li>
 <li>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</li>
 </ul>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">data/iris.tsv&#34;</span><span class="p">)</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;</span><span class="s">data/iris.tsv&#34;</span><span class="p">)</span>
+<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
+<span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
 </code></pre></div><pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
            &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;chr&gt;
   1          5.1         3.5          1.4         0.2    setosa
@@ -247,9 +247,9 @@ Rに最初から入ってて、例としてよく使われる。</p>
 にまとめて公開されている。</dd>
 <dd>要インストール。使う前に読み込むおまじないが必要。</dd>
 </dl>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
-<span class="nf">update.packages</span><span class="p">(</span><span class="p">)</span>          <span class="c1"># たまには更新しよう</span>
+<span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
 </code></pre></div><dl>
 <dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
 <dd>大丈夫。誰も覚えきってない。</dd>
@@ -263,7 +263,7 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <img src="/slides/figure/rstats/hex-badges.png" width="260" align="right">
 </a>
 <p>Rでデータを上手に扱うためのパッケージ群</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">tidyverse&#34;</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
 <span class="c1"># 関連パッケージが一挙に読み込まれる</span>
 </code></pre></div><ul>

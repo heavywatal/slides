@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.63.0-DEV" />
+<meta name="generator" content="Hugo 0.65.3" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -86,16 +86,16 @@ SOKENDAI, The Graduate University for Advanced Studies
 <section>
 <h2 id="rcpphttpwwwrcpporg-a-bridge-between-r-and-c"><a href="http://www.rcpp.org/">Rcpp</a>: a bridge between R and C++</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">r_for</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">s</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span> <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span> <span class="o">/</span> <span class="n">i</span><span class="p">}</span><span class="p">;</span> <span class="n">s</span>
+  <span class="n">s</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span> <span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="n">n</span><span class="p">))</span> <span class="p">{</span><span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="m">1</span> <span class="o">/</span> <span class="n">i</span><span class="p">};</span> <span class="n">s</span>
 <span class="p">}</span>
-<span class="n">r_vec</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="nf">sum</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="nf">seq_len</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">)</span>
+<span class="n">r_vec</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="nf">sum</span><span class="p">(</span><span class="m">1</span> <span class="o">/</span> <span class="nf">seq_len</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
 
-<span class="n">Rcpp</span><span class="o">::</span><span class="nf">cppFunction</span><span class="p">(</span><span class="s">&#34;</span><span class="s">double rcpp(int n) {
+<span class="n">Rcpp</span><span class="o">::</span><span class="nf">cppFunction</span><span class="p">(</span><span class="s">&#34;double rcpp(int n) {
 </span><span class="s">  double s = 0; for (int i = 1; i &lt;= n; ++i) {s += 1.0 / i;} return s;
 </span><span class="s">}&#34;</span><span class="p">)</span>  <span class="c1"># Compilation takes a few seconds here</span>
 
 <span class="n">n</span> <span class="o">=</span> <span class="m">1000000L</span>
-<span class="n">rbenchmark</span><span class="o">::</span><span class="nf">benchmark</span><span class="p">(</span><span class="nf">r_for</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">,</span> <span class="nf">r_vec</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">,</span> <span class="nf">rcpp</span><span class="p">(</span><span class="n">n</span><span class="p">)</span><span class="p">)</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>
+<span class="n">rbenchmark</span><span class="o">::</span><span class="nf">benchmark</span><span class="p">(</span><span class="nf">r_for</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="nf">r_vec</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="nf">rcpp</span><span class="p">(</span><span class="n">n</span><span class="p">))</span><span class="n">[</span><span class="p">,</span><span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>
 </code></pre></div><pre><code>      test replications elapsed relative
 1 r_for(n)          100   3.968   29.835
 2 r_vec(n)          100   0.473    3.556
@@ -143,7 +143,7 @@ twitter-widget {
 <img src="figure/rcpp4everyone35.png" width="100%" style="margin: -1.5rem -1.5rem -2.4rem;">
 <!-- <img src="figure/rcpp4everyone35.png" width="100%" style="transform: translate(-10px, -40px);"> -->
 </a>
-<p>Necessity is the mother of invention. Let's do it 💪
+<p>Necessity is the mother of invention. Let&rsquo;s do it 💪
 </section>
 <section>
 <h2 id="structure-of-a-typical-cc-library">Structure of a typical C/C++ library</h2>
@@ -230,7 +230,7 @@ https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-clean
 </ul>
 </section>
 <section>
-<h2 id="lets-discuss-later-">Let's discuss later 🍻</h2>
+<h2 id="lets-discuss-later-">Let&rsquo;s discuss later 🍻</h2>
 <ul>
 <li>Any other ways to handle external C++ libraries?</li>
 <li>Where to share these knowledge?

@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.63.0-DEV" />
+<meta name="generator" content="Hugo 0.65.3" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"></script>
@@ -309,8 +309,8 @@ but every messy dataset is messy in its own way<br>
 <section>
 <h2 id="整然データのご利益">整然データのご利益</h2>
 <p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">)</span><span class="p">)</span> <span class="o">+</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
   <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">cut</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
 
@@ -598,7 +598,7 @@ but every messy dataset is messy in its own way<br>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
 <span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
 </code></pre></div><pre><code>[1] 42
-</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;</span><span class="s">24601&#34;</span>  <span class="c1"># Create y</span>
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
 <span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
 </code></pre></div><pre><code>[1] &quot;24601&quot;
 </code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error!</span>
@@ -651,8 +651,8 @@ but every messy dataset is messy in its own way<br>
 </code></pre></div><pre><code>[1] 1.000000 1.414214 3.000000
 </code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># We don&#39;t have to write for-loop like this</span>
 <span class="n">z</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">)</span><span class="p">)</span> <span class="p">{</span>
-  <span class="n">z</span><span class="n">[i</span><span class="n">]</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="n">[i</span><span class="n">]</span><span class="p">)</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+  <span class="n">z[i]</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x[i]</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre></div>
 </section>
@@ -697,20 +697,20 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <section>
 <h2 id="dataframeを眺める">data.frameを眺める</h2>
 <p>部分的なdata.frameを取得する:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris</span><span class="n">[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
-<span class="n">iris</span><span class="n">[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
-<span class="n">iris</span><span class="n">[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
-<span class="n">iris</span><span class="n">[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
+<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
+<span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
+<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
 </code></pre></div><p>vectorとして取得する:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris</span><span class="n">[</span><span class="n">[3</span><span class="n">]</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[[3]]</span>                  <span class="c1"># 3列目</span>
 <span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># Petal.Length列</span>
-<span class="n">iris</span><span class="n">[</span><span class="n">[</span><span class="s">&#34;</span><span class="s">Petal.Length&#34;</span><span class="n">]</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
-<span class="n">iris</span><span class="n">[</span><span class="n">[</span><span class="s">&#34;</span><span class="s">Petal.Length&#34;</span><span class="n">]</span><span class="n">]</span><span class="n">[2</span><span class="n">]</span>  <span class="c1"># Petal.Length列の2番目</span>
+<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># Petal.Length列</span>
+<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># Petal.Length列の2番目</span>
 </code></pre></div><p>結果がdata.frameになるかvectorになるか微妙:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris</span><span class="n">[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
-<span class="n">iris</span><span class="n">[</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
-<span class="n">iris</span><span class="n">[2</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                 <span class="c1"># 2行目3列目</span>
-<span class="n">iris</span><span class="n">[2</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
+<span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
+<span class="n">iris[2</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                 <span class="c1"># 2行目3列目</span>
+<span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
 </code></pre></div>
 </section>
 <section>
@@ -738,7 +738,7 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <h2 id="dataframeの新規作成">data.frameの新規作成</h2>
 <p>同じ長さの <strong>列(column) vector</strong> を結合して作る:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;</span><span class="s">A&#34;</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">B&#34;</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">C&#34;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
 <span class="n">mydata</span> <span class="o">=</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
 </code></pre></div><pre><code>  x y
@@ -758,16 +758,16 @@ Rに最初から入ってて、例としてよく使われる。</p>
 </li>
 <li>
 <p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;</span><span class="s">data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
-<span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;</span><span class="s">data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
+<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
+<span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
 </code></pre></div></li>
 <li>
 <p>現在の作業ディレクトリとその中身を確認しておこう:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">(</span><span class="p">)</span>               <span class="c1"># Get Working Directory</span>
-<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;</span><span class="s">.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
-<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;</span><span class="s">data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get Working Directory</span>
+<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
+<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
 </code></pre></div></li>
 </ul>
 <p>R組み込みデータや自作データを読み書きしてみよう</p>
@@ -785,9 +785,9 @@ Rに最初から入ってて、例としてよく使われる。</p>
 にまとめて公開されている。</dd>
 <dd>要インストール。使う前に読み込むおまじないが必要。</dd>
 </dl>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
-<span class="nf">update.packages</span><span class="p">(</span><span class="p">)</span>          <span class="c1"># たまには更新しよう</span>
+<span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
 </code></pre></div><dl>
 <dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
 <dd>大丈夫。誰も覚えきってない。</dd>
@@ -801,7 +801,7 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <img src="/slides/figure/rstats/hex-badges.png" width="260" align="right">
 </a>
 <p>Rでデータを上手に扱うためのパッケージ群</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;</span><span class="s">tidyverse&#34;</span><span class="p">)</span>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
 <span class="c1"># 関連パッケージが一挙に読み込まれる</span>
 </code></pre></div><ul>
