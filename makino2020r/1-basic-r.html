@@ -156,12 +156,10 @@ if (!doNotTrack) {
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">/bin/bash -c <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh<span class="k">)</span><span class="s2">&#34;</span>
 </code></pre></div></li>
 <li>
-<p>Try installing something with Homebrew:</p>
+<p>Try installing some softwares:</p>
 <div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew install wget
-wget https://www.lifesci.tohoku.ac.jp/evolgenomics/wp-content/themes/makino/images/logo2.png
-</code></pre></div><p>You may need to restart shell to reload <code>PATH</code></p>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh"><span class="c1"># command not found: brew</span>
-<span class="nb">exec</span> <span class="nv">$SHELL</span> -l
+wget https://cran.r-project.org/Rlogo.svg
+ls
 </code></pre></div></li>
 </ul>
 
@@ -187,7 +185,7 @@ wget https://www.lifesci.tohoku.ac.jp/evolgenomics/wp-content/themes/makino/imag
 </section>
 <section>
 <h2 id="create-project">Create &ldquo;Project&rdquo;</h2>
-<p>File → New Project&hellip; → New Directory → <code>~/project/r-training-2019</code></p>
+<p>File → New Project&hellip; → New Directory → <code>~/project/r-training-2020</code></p>
 <img src="/slides/figure/rstudio/create-new-project.png" class="screenshot" width="90%">
 </section>
 <section>
@@ -209,11 +207,11 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 <section>
 <h2 id="save-r-script-in-the-project-kbdcommandkbdkbdskbd">Save R script in the project: <kbd>command</kbd><kbd>s</kbd></h2>
 <p>Separate data, scripts, and results, e.g.,</p>
-<pre><code>r-training-2019/           # プロジェクトの最上階
+<pre><code>r-training-2020/           # プロジェクトの最上階
 ├── data/                  # 元データを置くところ
 │   ├── iris.tsv
 │   └── diamonds.xlsx
-├── r-training-2019.Rproj  # これダブルクリックでRStudioを起動
+├── r-training-2020.Rproj  # これダブルクリックでRStudioを起動
 ├── hello.R
 ├── output/                # 結果の出力先
 │   ├── iris-petal.png
@@ -226,34 +224,36 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 </section>
 <section>
 <h2 id="configure-rstudio-not-to-saveload-workspace">Configure RStudio not to save/load workspace</h2>
-<p>Open &ldquo;Preferences&rdquo; with <kbd>command</kbd><kbd>,</kbd></p>
-<figure>
-<a href="http://r4ds.had.co.nz/workflow-projects.html">
-<img src="/slides/figure/rstudio/rstudio-workspace.png" width="75%"
-     style="object-fit: cover; object-position: top; height: 480px;">
-<figcaption class="url">http://r4ds.had.co.nz/workflow-projects.html</figcaption>
+<p><i class="fab fa-fw fa-lg fa-apple"></i> RStudio → Preferences   <kbd>command</kbd><kbd>,</kbd><br>
+<i class="fab fa-fw fa-lg fa-windows"></i> Tools → Global options<br>
+&ldquo;Restore &hellip;&rdquo; の<strong>チェックを外し</strong>て、 &ldquo;Save &hellip;&rdquo; の<strong>Never</strong>を選択</p>
+<figure style="margin: 0;">
+<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<img src="/slides/figure/rstudio/preferences-workspace.png" width="75%"
+     style="object-fit: cover; object-position: top; height: 450px;">
+<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
 </a>
 </figure>
 
 </section>
 <section>
-<h2 id="attitude-toward-programming-in-r">Attitude toward programming in R</h2>
+<h2 id="rと接する上での心構え">Rと接する上での心構え</h2>
 <dl>
-<dt>Don&rsquo;t fear errors</dt>
-<dd>Even experts cause errors very often.</dd>
-<dd>An error is a message from R. Try to understand it.</dd>
-<dt>Google it</dt>
-<dd>Some R users in the world have already solved your problems.</dd>
-<dd>Queries can be 日本語, Engligh, or whole error message.</dd>
+<dt>エラー文を恐れない</dt>
+<dd>熟練プログラマでも頻繁にエラーを起こす。</dd>
+<dd>エラーはRからのメッセージ。意図を読み取って修正しよう。</dd>
+<dt>困ったらウェブ検索</dt>
+<dd>あなたの問題は全世界のRユーザーが既に通った道。</dd>
+<dd>日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。</dd>
 <dd>それでも分からなかったら <a href="https://github.com/tokyor/r-wakalang">r-wakalang</a> で相談しよう。</dd>
 </dl>
 <figure style="float: right; margin: 0;">
 <img src="/slides/figure/rstats/error.png" height="300">
 </figure>
 <dl>
-<dt>Copy-and-paste is easier and faster</dt>
-<dd>見つけたコードはまずコピペして使ってみよう。</dd>
-<dd>動くようなら自分のデータに合わせて改変しよう。</dd>
+<dt>(コードの)コピペ推奨</dt>
+<dd>打ち間違いによるエラーを防げるし、早い。</dd>
+<dd>ネット上で見つけたコードもまずはコピペしてから自分用に改変。</dd>
 <dd>(ただし、ライセンスには注意&hellip;)</dd>
 </dl>
 
@@ -268,7 +268,8 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 </code></pre></div><pre><code>[1] &quot;24601&quot;
 </code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error!</span>
 </code></pre></div><pre><code>Error in x + y: non-numeric argument to binary operator
-</code></pre>
+</code></pre><p>Rでは代入演算子として矢印 <code>&lt;-</code> も使えるけど私は <code>=</code> 推奨。</p>
+
 </section>
 <section>
 <h2 id="object-types-型">Object types (型)</h2>
@@ -286,25 +287,27 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 <section>
 <h2 id="object-types-型">Object types (型)</h2>
 <ul>
-<li><code>NULL</code>: 空っぽ</li>
-<li>vector: 基本型。一次元の配列。
+<li><code>vector</code>: 基本型。一次元の配列。
 <ul>
-<li>logical: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
-<li>numeric: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
-<li>character: 文字列 (<code>&quot;historgram.png&quot;</code>)</li>
-<li>factor: 因子 (文字列っぽいけど微妙に違う)</li>
-<li>↑それぞれに欠損値 <code>NA</code> も定義されてる</li>
+<li><code>logical</code>: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
+<li><code>numeric</code>: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
+<li><code>character</code>: 文字列 (<code>&quot;historgram.png&quot;</code>)</li>
+<li><code>factor</code>: 因子 (文字列っぽいけど微妙に違う)</li>
 </ul>
 </li>
-<li>matrix: 二次元の行列。vector同様、全要素が同じ型。</li>
-<li>list: 異なる型でも詰め込める太っ腹ベクトル。</li>
-<li><strong>data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong> <br>
-<strong>tibble</strong> とか <strong>tbl_df</strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
+<li><code>array</code>: 多次元配列。<code>vector</code>同様、全要素が同じ型。
+<ul>
+<li><code>matrix</code>: 行列 = 二次元の配列。</li>
+</ul>
+</li>
+<li><code>list</code>: 異なる型でも詰め込める太っ腹ベクトル。</li>
+<li><strong><code>data.frame</code>: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong> <br>
+<strong><code>tibble</code></strong> とか <strong><code>tbl_df</code></strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
 </ul>
 
 </section>
 <section>
-<h2 id="vector-1-dimensional-array">vector: 1-dimensional array</h2>
+<h2 id="vector-1-dimensional-array"><code>vector</code>: 1-dimensional array</h2>
 <p>1個の値でもベクトル扱い。<br>
 同じ長さ(または長さ1)の相手との計算が得意。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
@@ -317,15 +320,32 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 </code></pre></div><pre><code>[1] 1.000000 1.414214 3.000000
 </code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># We don&#39;t have to write for-loop like this</span>
 <span class="n">z</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">))</span> <span class="p">{</span>
   <span class="n">z[i]</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x[i]</span><span class="p">)</span>
 <span class="p">}</span>
 </code></pre></div>
 </section>
 <section>
-<h2 id="dataframe-rectangle-table-important">data.frame: rectangle table (IMPORTANT!)</h2>
-<p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
-Rに最初から入ってて、例としてよく使われる。</p>
+<h2 id="matrix-2-dimensional-array-行列"><code>matrix</code>: 2-dimensional array (行列)</h2>
+<p>1本の <code>vector</code> を折り曲げて長方形にしたもの。<br>
+中身は全て同じ型。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+<span class="n">x</span>
+</code></pre></div><pre><code>     [,1] [,2] [,3] [,4]
+[1,]    1    3    5    7
+[2,]    2    4    6    8
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<span class="n">y</span>
+</code></pre></div><pre><code>     [,1] [,2] [,3] [,4]
+[1,]    1    2    3    4
+[2,]    5    6    7    8
+</code></pre><p>Let&rsquo;s try <code>x + y</code>, <code>dim(x)</code>, <code>nrow(x)</code>, <code>ncol(x)</code>.</p>
+
+</section>
+<section>
+<h2 id="dataframe-rectangle-table-important"><code>data.frame</code>: rectangle table (IMPORTANT!)</h2>
+<p>同じ長さの列 <code>vector</code> を複数束ねた長方形の表。<br>
+e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
 </code></pre></div><pre><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
            &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;fct&gt;
@@ -338,33 +358,122 @@ Rに最初から入ってて、例としてよく使われる。</p>
 148          6.5         3.0          5.2         2.0 virginica
 149          6.2         3.4          5.4         2.3 virginica
 150          5.9         3.0          5.1         1.8 virginica
-</code></pre><p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
+</code></pre><p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。</p>
 
 </section>
 <section>
-<h2 id="read-and-write-dataframe">Read and Write data.frame</h2>
+<h2 id="dataframeを眺める">data.frameを眺める</h2>
+<p>概要を掴む:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>   <span class="c1"># 先頭だけ見てみる</span>
+<span class="nf">nrow</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 行数: Number of ROWs</span>
+<span class="nf">ncol</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 列数: Number of COLumns</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>     <span class="c1"># 列名</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>   <span class="c1"># 要約</span>
+<span class="nf">View</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># RStudioで閲覧</span>
+</code></pre></div><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">str</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>       <span class="c1"># 構造が分かる形で表示</span>
+</code></pre></div><pre><code>tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
+ $ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num [1:150] 1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+ $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+</code></pre><p>ほかのデータもいろいろ見てみよう, e.g., <code>mtcars</code>, <code>quakes</code>, <code>data()</code></p>
+
+</section>
+<section>
+<h2 id="dataframeを眺める">data.frameを眺める</h2>
+<p>部分的なdata.frameを取得する:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
+<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
+<span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
+<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
+</code></pre></div><p>vectorとして取得する:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[[3]]</span>                  <span class="c1"># 3列目</span>
+<span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># Petal.Length列</span>
+<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># Petal.Length列</span>
+<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># Petal.Length列の2番目</span>
+</code></pre></div><p>結果がdata.frameになるかvectorになるか微妙:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
+<span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
+<span class="n">iris[2</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                 <span class="c1"># 2行目3列目</span>
+<span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
+</code></pre></div>
+</section>
+<section>
+<h2 id="行-row-列-column-の憶え方">行 (row), 列 (column) の憶え方</h2>
+<div class="column-container">
+  <div class="column">
+    <figure>
+    <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
+    <img src="/slides/figure/free/front-row.jpg" height="480">
+    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    </a>
+    </figure>
+  </div>
+  <div class="column">
+    <figure>
+    <a href="https://en.wikipedia.org/wiki/Rhodes">
+    <img src="/slides/figure/free/apollon-columns.jpg" height="480">
+    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    </a>
+    </figure>
+  </div>
+</div>
+</section>
+<section>
+<h2 id="dataframeの新規作成">data.frameの新規作成</h2>
+<p>同じ長さの <strong>列(column) vector</strong> を結合して作る:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
+<span class="n">mydata</span> <span class="o">=</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</code></pre></div><pre><code>  x y
+1 1 A
+2 2 B
+3 3 C
+</code></pre>
+</section>
+<section>
+<h2 id="dataframeの読み書き">data.frameの読み書き</h2>
 <ul>
 <li>
-<p>You can read <code>.xlsx</code> files with readxl package, but</p>
+<p>readxlパッケージを使えば <code>.xlsx</code> ファイルも読める、けど</p>
 </li>
 <li>
-<p>Prefer plain text format, e.g., <code>.csv</code> and <code>.tsv</code>.</p>
+<p>カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。</p>
 </li>
 <li>
-<p>Use <strong>relative path</strong> from <strong>working directory</strong>.</p>
+<p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
+<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
+<span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
 </code></pre></div></li>
 <li>
-<p>Check your current working directory and its contents:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get working directory</span>
+<p>現在の作業ディレクトリとその中身を確認しておこう:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get Working Directory</span>
 <span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
 <span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
 </code></pre></div></li>
 </ul>
+<p>R組み込みデータや自作データを読み書きしてみよう</p>
 
+</section>
+<section>
+<h2 id="ts-time-series-時系列型"><code>ts</code>: time series (時系列型)</h2>
+<p><code>vector</code> with labels and print format.</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">timeser</span> <span class="o">=</span> <span class="nf">ts</span><span class="p">(</span><span class="kc">LETTERS</span><span class="p">,</span> <span class="n">start</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">2020</span><span class="p">,</span> <span class="m">5</span><span class="p">),</span> <span class="n">freq</span> <span class="o">=</span> <span class="m">12</span><span class="p">)</span>
+<span class="n">timeser</span>
+</code></pre></div><pre><code>     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+2020                   A   B   C   D   E   F   G   H
+2021   I   J   K   L   M   N   O   P   Q   R   S   T
+2022   U   V   W   X   Y   Z                        
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">is</span><span class="p">(</span><span class="n">timeser</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] &quot;ts&quot;        &quot;structure&quot; &quot;oldClass&quot;  &quot;vector&quot;   
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.character</span><span class="p">(</span><span class="n">timeser</span><span class="p">)</span>
+</code></pre></div><pre><code>[1] TRUE
+</code></pre>
 </section>
 <section>
 <h2 id="r-package">R package</h2>
@@ -403,9 +512,9 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <li>シンプルな関数を繋げて使うデザイン</li>
 </ul>
 <figure>
-<a href="http://r4ds.had.co.nz/introduction.html">
+<a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/figure/r4ds/data-science.png">
-<figcaption class="url">http://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
 </section>
@@ -421,7 +530,7 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <li><a href="https://readxl.tidyverse.org/">readxl</a>: エクセル形式の読み込み</li>
 <li><a href="https://stringr.tidyverse.org/">stringr</a>: 文字列の処理</li>
 <li><a href="https://www.bioconductor.org/">Bioconductor</a>: バイオインフォマティクス関連</li>
-<li><a href="http://igraph.org/r/">igraph</a>: グラフ(ネットワーク)関連</li>
+<li><a href="https://igraph.org/r/">igraph</a>: グラフ(ネットワーク)関連</li>
 <li><a href="https://cran.r-project.org/package=rgl">rgl</a>: 3Dの作図</li>
 <li><a href="https://rmarkdown.rstudio.com/">R Markdown</a>:
 Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
@@ -468,7 +577,7 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 <h2 id="reference">Reference</h2>
 <dl>
 <dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
-<dd><a href="http://r4ds.had.co.nz/">http://r4ds.had.co.nz/</a></dd>
+<dd><a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a></dd>
 <dd><a href="https://amzn.to/2tbRmVc">Book</a></dd>
 <dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
 <dt>Older versions</dt>
