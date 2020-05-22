@@ -812,7 +812,7 @@ if (!doNotTrack) {
   <span class="nf">as_tibble</span><span class="p">()</span> <span class="o">%&gt;%</span>
   <span class="nf">nest</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="n">Species</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span>
 </code></pre></div><pre><code>     Species              data
-       &lt;fct&gt;   &lt;vctrs_list_of&gt;
+       &lt;fct&gt;            &lt;list&gt;
 1     setosa &lt;tbl_df [50 x 4]&gt;
 2 versicolor &lt;tbl_df [50 x 4]&gt;
 3  virginica &lt;tbl_df [50 x 4]&gt;
@@ -1042,8 +1042,8 @@ if (!doNotTrack) {
   <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_longer</span><span class="p">(</span>                <span class="c1"># 縦長に変形したい</span>
     <span class="nf">everything</span><span class="p">(),</span>                     <span class="c1"># すべての列について</span>
     <span class="n">names_to</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;.value&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span>  <span class="c1"># 新しい列名</span>
-    <span class="n">names_sep</span> <span class="o">=</span> <span class="m">1L</span><span class="p">,</span>                   <span class="c1"># 切る位置</span>
-    <span class="n">names_ptypes</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">group</span> <span class="o">=</span> <span class="nf">integer</span><span class="p">()))</span> <span class="o">%&gt;%</span>   <span class="c1"># 型変換</span>
+    <span class="n">names_sep</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span> <span class="o">%&gt;%</span>               <span class="c1"># 切る位置</span>
+  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">group</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="n">group</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 型変換</span>
   <span class="n">dplyr</span><span class="o">::</span><span class="nf">arrange</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>           <span class="c1"># グループごとに並べる</span>
   <span class="nf">print</span><span class="p">()</span>                             <span class="c1"># ggplotしたい形！</span>
 </code></pre></div><pre><code>   group     x     y
@@ -1064,7 +1064,7 @@ if (!doNotTrack) {
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">tidy_anscombe</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span> <span class="o">+</span>
   <span class="nf">geom_point</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">fullrange</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">fullrange</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">+</span>
   <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">group</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/plot_anscombe-1.png" title="plot of chunk plot_anscombe" alt="plot of chunk plot_anscombe" width="98%" /></p>
 
