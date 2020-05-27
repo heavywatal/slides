@@ -61,7 +61,7 @@ if (!doNotTrack) {
 <div class="reveal">
 <div class="slides">
 <section>
-<h1 id="hands-on-r-lecture-for-makino-lab"><a href=".">Hands-on R Lecture for Makino Lab</a></h1>
+<h1 id="hands-on-introduction-to-r-2020"><a href=".">Hands-on Introduction to R 2020</a></h1>
 <link rel="stylesheet" href="style.css">
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki)
@@ -84,14 +84,12 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="r-basics-index">R basics: Index</h2>
-<ul>
-<li>Setup Mac and R environment</li>
-<li>Conversation with R</li>
-<li>Create a &ldquo;project&rdquo; and &ldquo;script&rdquo;</li>
-<li>Read and write table files</li>
-<li>Package</li>
-<li>Errors and questions</li>
-</ul>
+<p>🖥 Setup R environment</p>
+<p>👽 Conversation with R</p>
+<p>📁 Create a &ldquo;project&rdquo; and &ldquo;script&rdquo;</p>
+<p>➕ Basic operations and types</p>
+<p>📦 Package</p>
+<p>❓ Errors and questions</p>
 
 </section>
 <section>
@@ -153,7 +151,7 @@ if (!doNotTrack) {
 <h2 id="setup-mac-environment">Setup Mac environment</h2>
 <ul>
 <li>
-<p>Set OS language to English (System Preferences → Language &amp; Region)</p>
+<p>Set OS language to <strong>English</strong> (System Preferences → Language &amp; Region)</p>
 </li>
 <li>
 <p>Install <strong>Command Line Tools</strong> via <strong>Terminal.app</strong>:</p>
@@ -189,8 +187,22 @@ ls
 </section>
 <section>
 <h2 id="launch-rstudio-and-play-with-console">Launch RStudio and play with Console</h2>
-<p>Details will be explained later.</p>
+<p><strong>Workspace (Environment)</strong> = a set of temporary objects</p>
 <img src="/slides/figure/rstudio/console.png" class="screenshot" width="100%">
+</section>
+<section>
+<h2 id="configure-rstudio-not-to-saveload-workspace">Configure RStudio NOT to save/load workspace</h2>
+<p><i class="fab fa-fw fa-lg fa-apple"></i> RStudio → Preferences   <kbd>command</kbd><kbd>,</kbd><br>
+<i class="fab fa-fw fa-lg fa-windows"></i> Tools → Global options</p>
+<p><strong>Uncheck</strong> &ldquo;Restore &hellip;&quot;, Choose <strong>Never</strong> for &ldquo;Save workspace &hellip;&quot;.</p>
+<figure style="margin: 0;">
+<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<img src="/slides/figure/rstudio/preferences-workspace.png" width="75%"
+     style="object-fit: cover; object-position: top; height: 450px;">
+<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+
 </section>
 <section>
 <h2 id="create-project">Create &ldquo;Project&rdquo;</h2>
@@ -229,20 +241,6 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 └── visualize.R            # 作図のスクリプト
 </code></pre><p>プロジェクト最上階を作業ディレクトリとし、<br>
 ファイル読み書きの基準にする。(後で詳しく)</p>
-
-</section>
-<section>
-<h2 id="configure-rstudio-not-to-saveload-workspace">Configure RStudio NOT to save/load workspace</h2>
-<p><i class="fab fa-fw fa-lg fa-apple"></i> RStudio → Preferences   <kbd>command</kbd><kbd>,</kbd><br>
-<i class="fab fa-fw fa-lg fa-windows"></i> Tools → Global options</p>
-<p><strong>Uncheck</strong> &ldquo;Restore &hellip;&quot;, Choose <strong>Never</strong> for &ldquo;Save workspace &hellip;&quot;.</p>
-<figure style="margin: 0;">
-<a href="https://r4ds.had.co.nz/workflow-projects.html">
-<img src="/slides/figure/rstudio/preferences-workspace.png" width="75%"
-     style="object-fit: cover; object-position: top; height: 450px;">
-<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
-</a>
-</figure>
 
 </section>
 <section>
@@ -314,6 +312,21 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 <strong><code>tibble</code></strong> とか <strong><code>tbl_df</code></strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
 </ul>
 
+</section>
+<section>
+<h2 id="function-関数">Function (関数)</h2>
+<p>変数を受け取って、何か仕事して、返す命令セット</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>  <span class="c1"># 1と3を渡すとvectorが返ってくる</span>
+<span class="n">x</span>
+</code></pre></div><pre><code>[1] 1 2 3
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># vectorを渡すと足し算が返ってくる</span>
+</code></pre></div><pre><code>[1] 6
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">square</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">something</span><span class="p">)</span> <span class="p">{</span>  <span class="c1"># 自分の関数を定義</span>
+  <span class="n">something</span> <span class="o">**</span> <span class="m">2</span>
+<span class="p">}</span>
+<span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># 使ってみる</span>
+</code></pre></div><pre><code>[1] 1 4 9
+</code></pre>
 </section>
 <section>
 <h2 id="vector-1-dimensional-array"><code>vector</code>: 1-dimensional array</h2>
@@ -575,6 +588,8 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 <dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
 岩嵜航 2018</dd>
 <dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
+<dd>「<a href="https://heavywatal.github.io/slides/tmd2019/">Rによるデータ前処理実習</a>」
+岩嵜航 2019 東京医科歯科大</dd>
 </dl>
 <a href="2-ggplot.html" rel="next" class="readmore">
 2. Visualization with R
