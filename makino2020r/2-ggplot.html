@@ -89,7 +89,7 @@ if (!doNotTrack) {
 <li>データの取得、読み込み</li>
 <li>探索的データ解析
 <ul>
-<li>前処理、加工 (地味。意外と重い。次回の主題)</li>
+<li>前処理、加工 (地味。意外と重い。<a href="3-tidy-data.html">次回の主題</a>)</li>
 <li><strong>可視化、仮説生成</strong> (派手！楽しい！今回の主題)</li>
 <li>統計解析、仮説検証 (みんな勉強したがる)</li>
 </ul>
@@ -306,7 +306,7 @@ Rに最初から入ってて、例としてよく使われる。</p>
 </section>
 <section>
 <h2 id="いきなりggplot2から使い始めても大丈夫">いきなりggplot2から使い始めても大丈夫</h2>
-<p>R標準のプロットとは根本的に違う。</p>
+<p>R標準のプロットとは根本的に違う部品で組み立てる。</p>
 <div class="goldmark-p-workaround">
 <svg width="288pt" height="266pt"
  viewBox="0.00 0.00 288.35 265.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -549,7 +549,7 @@ Error in ggplot(data = diamonds) : could not find function &quot;ggplot&quot;
 
 </section>
 <section>
-<h2 id="ggplot-に渡すのは整然データ-tidy-data"><code>ggplot()</code> に渡すのは整然データ tidy data</h2>
+<h2 id="ggplot-に渡すのはa-href3-tidy-datahtml整然データ-tidy-dataa"><code>ggplot()</code> に渡すのは<a href="3-tidy-data.html">整然データ tidy data</a></h2>
 <ul>
 <li>1行は1つの観測</li>
 <li>1列は1つの変数</li>
@@ -584,10 +584,18 @@ Error in ggplot(data = diamonds) : could not find function &quot;ggplot&quot;
 </section>
 <section>
 <h2 id="データによらず一律で見せ方を変える">データによらず一律で見せ方を変える</h2>
-<p><code>aes()</code> の外で値を指定する。</p>
+<p><code>aes()</code> の外で値を指定する。
+<a href="https://ggplot2.tidyverse.org/articles/ggplot2-specs.html">変えられるとこ一覧</a></p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
   <span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">6</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/aes-nomap-1.png" alt="plot of chunk aes-nomap"></p>
+
+</section>
+<section>
+<h2 id="点と線は-color-面は-fill">点と線は <code>color</code>, 面は <code>fill</code></h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkgreen&#34;</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;gold&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/fill-1.png" alt="plot of chunk fill"></p>
 
 </section>
 <section>
@@ -603,17 +611,17 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 
 </section>
 <section>
-<h2 id="値に応じて切り分けて表示-1変数facet">値に応じて切り分けて表示 (1変数facet)</h2>
+<h2 id="値に応じてパネル切り分け-1変数facet">値に応じてパネル切り分け (1変数facet)</h2>
 <p>ggplotの真骨頂！
-これをR標準グラフィックスでやるのは結構たいへん。</p>
+これをR標準機能でやるのは結構たいへん。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4L</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/facet-wrap-1.png" alt="plot of chunk facet-wrap"></p>
 
 </section>
 <section>
-<h2 id="値に応じて切り分けて表示-2変数facet">値に応じて切り分けて表示 (≥2変数facet)</h2>
+<h2 id="値に応じてパネル切り分け-2変数facet">値に応じてパネル切り分け (≥2変数facet)</h2>
 <p>ggplotの真骨頂！
-これをR標準グラフィックスでやるのは結構たいへん。</p>
+これをR標準機能でやるのは結構たいへん。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_grid</span><span class="p">(</span><span class="n">cut</span> <span class="o">~</span> <span class="n">clarity</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/facet-grid-1.png" alt="plot of chunk facet-grid"></p>
 
@@ -623,7 +631,7 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 <p><img src="figure/facet-diamonds-1.png" alt="plot of chunk facet-diamonds">
 </section>
 <section>
-<h2 id="値を変えず座標軸を変える-scale_-coord_">値を変えず座標軸を変える <code>scale_*</code>, <code>coord_*</code></h2>
+<h2 id="値を変えず座標軸を変える-scale_httpsggplot2tidyverseorgreferencesection-scales-coord_httpsggplot2tidyverseorgreferencesection-coordinate-systems">値を変えず座標軸を変える <a href="https://ggplot2.tidyverse.org/reference/#section-scales"><code>scale_*</code></a>, <a href="https://ggplot2.tidyverse.org/reference/#section-coordinate-systems"><code>coord_*</code></a></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p2</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="m">0.25</span><span class="p">)</span> <span class="o">+</span>
   <span class="nf">scale_x_log10</span><span class="p">()</span> <span class="o">+</span>
   <span class="nf">scale_y_log10</span><span class="p">(</span><span class="n">breaks</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">5</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span> <span class="o">*</span> <span class="m">1000</span><span class="p">)</span> <span class="o">+</span>
@@ -635,7 +643,7 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 <section>
 <h2 id="データと関係ない部分の見た目を調整-theme">データと関係ない部分の見た目を調整 <code>theme</code></h2>
 <p><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">既存の <code>theme_*()</code></a>
-をベースに、<code>theme()</code> 関数で微調整。</p>
+をベースに、<a href="https://ggplot2.tidyverse.org/reference/theme.html"><code>theme()</code></a>関数で微調整。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p3</span> <span class="o">+</span> <span class="nf">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span>
   <span class="n">panel.background</span> <span class="o">=</span> <span class="nf">element_rect</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;khaki&#34;</span><span class="p">),</span> <span class="c1"># 箱</span>
   <span class="n">panel.grid.major</span> <span class="o">=</span> <span class="nf">element_line</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;red&#34;</span><span class="p">),</span>  <span class="c1"># 線</span>
@@ -716,37 +724,35 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 <section>
 <h2 id="発展的な内容">発展的な内容</h2>
 <dl>
-<dt>ggplot2をさらに拡張する<a href="https://www.ggplot2-exts.org/">パッケージ</a>も続々</dt>
-<dd>アニメーション gganimate</dd>
-<dd>ラベル付け ggrepel</dd>
-<dd>グラフ/ネットワーク ggraph</dd>
-<dd>系統樹 ggtree</dd>
+<dt>ggplot2を<a href="https://exts.ggplot2.tidyverse.org/">さらに拡張するパッケージも続々</a></dt>
+<dd>アニメーション <a href="https://gganimate.com/">gganimate</a></dd>
+<dd>重なりを避けてラベル付け <a href="https://ggrepel.slowkow.com/">ggrepel</a></dd>
+<dd>グラフ/ネットワーク <a href="https://ggraph.data-imaginist.com/">ggraph</a></dd>
+<dd>系統樹 <a href="https://github.com/YuLab-SMU/ggtree">ggtree</a></dd>
+<dd>地図 <a href="https://ggplot2.tidyverse.org/reference/ggsf.html#examples"><code>geom_sf</code></a></dd>
+<dd>学術論文向けのいろいろ <a href="https://rpkgs.datanovia.com/ggpubr/">ggpubr</a></dd>
 </dl>
 <img src="/slides/figure/tumopp/driver.gif" align="right" height="200">
 <dl>
-<dt>もちろん地図とかも描ける</dt>
-<dd><a href="https://www.google.co.jp/search?q=ggplot+%E5%9C%B0%E5%9B%B3">OK, Google. &ldquo;ggplot 地図&rdquo;</a></dd>
 <dt>ggplot2は3Dが苦手</dt>
 <dd>本当に3Dが必要? 色分けやファセットで足りない?</dd>
-<dd>別のパッケージ(rgl, plotly)でやる。</dd>
+<dd>別のパッケージでやる:
+<a href="http://rgl.neoscientists.org/gallery.shtml">rgl</a>,
+<a href="https://plotly.com/r/3d-charts/">plotly</a>, etc.</dd>
 </dl>
 
 </section>
 <section>
-<h2 id="visualization-with-r-summary">Visualization with R: Summary</h2>
+<h2 id="summary-visualization-with-r">Summary: Visualization with R</h2>
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/slides/figure/rstats/hex-ggplot2.png" width="120" align="right">
+</a>
+<h3 id="-まずデータ全体を可視化してみよう">✅ まずデータ全体を可視化してみよう</h3>
+<h3 id="-一貫性のある文法で合理的に描けるggplot2">✅ 一貫性のある文法で合理的に描けるggplot2</h3>
+<h3 id="-画像出力まできっちりプログラミング">✅ 画像出力まできっちりプログラミング</h3>
+<hr>
 <dl>
-<dt>First of all, plot it!</dt>
-<dd>要約統計量ばかり見てると大事なものを見逃す</dd>
-<dt>What kind of plot?</dt>
-<dd>だいたい何でもggplot2でできるよ。</dd>
-<dt>How to write?</dt>
-<dd>たす <code>p = ggplot(data) + geom_*() + scale_*() + theme_*()</code></dd>
-<dd>保存 <code>ggsave(&quot;fig1.png&quot;, p, width=4, height=3, dpi=300)</code></dd>
-<dd>忘れるたびに調べる。徐々に身につく。</dd>
-<dt>ちゃんと描こうと思うと結構な量のプログラムになるね&hellip;</dt>
-<dd>そうだけど、一度書いたら後で使い回せるよ。</dd>
-<dt>Challenge</dt>
-<dd>Visualize preinstalled datasets in as many ways as possible.</dd>
+<dt>手元のデータでいろいろ可視化してみよう</dt>
 <dd>e.g., <code>iris</code>, <code>diamonds</code>, <code>mpg</code>, <code>economics</code>, <code>txhousing</code>.</dd>
 </dl>
 

@@ -206,7 +206,9 @@ ls
 </section>
 <section>
 <h2 id="create-project">Create &ldquo;Project&rdquo;</h2>
-<p>File → New Project&hellip; → New Directory → <code>~/project/r-training-2020</code></p>
+<p>File → New Project&hellip; → New Directory → New Project →<br>
+→ Directory name: <code>r-training-2020</code><br>
+→ as subdirectory of: <code>~/project</code></p>
 <img src="/slides/figure/rstudio/create-new-project.png" class="screenshot" width="90%">
 </section>
 <section>
@@ -241,6 +243,7 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 └── visualize.R            # 作図のスクリプト
 </code></pre><p>プロジェクト最上階を作業ディレクトリとし、<br>
 ファイル読み書きの基準にする。(後で詳しく)</p>
+<p>ほんの一例です。好きな構造に決めてください。</p>
 
 </section>
 <section>
@@ -276,7 +279,8 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 </code></pre><p>Rでは代入演算子として矢印 <code>&lt;-</code> も使えるけど私は <code>=</code> 推奨。</p>
 <p>この <code>x</code> と <code>y</code> を足そうとするとエラーになる。なぜ？</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error! Why?</span>
-</code></pre></div>
+</code></pre></div><pre><code>Error in x + y: non-numeric argument to binary operator
+</code></pre>
 </section>
 <section>
 <h2 id="object-types-型">Object types (型)</h2>
@@ -350,7 +354,7 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 <section>
 <h2 id="matrix-2-dimensional-array-行列"><code>matrix</code>: 2-dimensional array (行列)</h2>
 <p>1本の <code>vector</code> を折り曲げて長方形にしたもの。<br>
-中身は全て同じ型。</p>
+中身は全て同じ型。機械学習とか画像処理とかで使う。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">v</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">)</span>              <span class="c1"># c(1, 2, 3, 4, 5, 6, 7, 8)</span>
 <span class="n">x</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>    <span class="c1"># 2行に畳む。列ごとに詰める</span>
 <span class="n">x</span>
@@ -471,8 +475,8 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
-<span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
+<span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
+<span class="n">iris2</span> <span class="o">=</span> <span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
 </code></pre></div></li>
 <li>
 <p>現在の作業ディレクトリとその中身を確認しておこう:</p>

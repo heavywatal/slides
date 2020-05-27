@@ -83,7 +83,47 @@ if (!doNotTrack) {
 
 </section>
 <section>
-<h2 id="使える形にデータを整える">使える形にデータを整える</h2>
+<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<ol>
+<li>コンピュータ環境の整備</li>
+<li>データの取得、読み込み</li>
+<li>探索的データ解析
+<ul>
+<li><strong>前処理、加工</strong> (地味。意外と重い。今回の主題)</li>
+<li>可視化、仮説生成 (派手！楽しい！<a href="2-ggplot.html">前回の主題</a>)</li>
+<li>統計解析、仮説検証 (みんな勉強したがる)</li>
+</ul>
+</li>
+<li>報告、発表</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/figure/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="可視化だいじわかった">可視化だいじ。わかった。</h2>
+<p>情報の整理 → <strong>正しい解析・新しい発見・仮説生成</strong></p>
+<figure>
+<a href="https://r4ds.had.co.nz/explore-intro.html">
+<img src="/slides/figure/r4ds/data-science-explore.png">
+<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+</a>
+</figure>
+<p>でも<strong>データ分析に費やす労力の8割は前処理</strong>らしいよ。。。</p>
+
+</section>
+<section>
+<h2 id="機械処理しやすい形-vs-人が読み書きしやすい形">機械処理しやすい形 vs 人が読み書きしやすい形</h2>
+<dl>
+<dt>作図や解析に使えるデータ形式はほぼ決まってる</dt>
+<dd><code>ggplot(data, ...)</code>, <code>glm(..., data, ...)</code>, &hellip;</dd>
+<dt>出発点となるデータはさまざま</dt>
+<dd>実験ノート、フィールドノート、データベース、&hellip;</dd>
+</dl>
 <blockquote>
 <p>Happy families are all alike;<br>
 every unhappy family is unhappy in its own way<br>
@@ -94,22 +134,18 @@ every unhappy family is unhappy in its own way<br>
 but every messy dataset is messy in its own way<br>
 &mdash; Hadley Wickham</p>
 </blockquote>
-<dl>
-<dt>出発点となるデータはさまざま</dt>
-<dd>laboratory notebook, field notebook、</dd>
-<dd>database, simulation&hellip;</dd>
-<dt>解析や作図に使えるデータ形式はほぼ決まってる</dt>
-<dd><code>ggplot(data, ...)</code>, <code>glm(..., data, ...)</code>, &hellip;</dd>
-</dl>
 
 </section>
 <section>
 <h2 id="整然データ-tidy-data">整然データ tidy data</h2>
 <ul>
-<li>Each <strong>variable (変数)</strong> must have its own <strong>column (列)</strong>.</li>
-<li>Each <strong>observation (観測)</strong> must have its own <strong>row (行)</strong>.</li>
-<li>Each <strong>value</strong> must have its own <strong>cell</strong>.</li>
+<li><strong>縦1列</strong>は1つの<strong>変数</strong></li>
+<li><strong>横1行</strong>は1つの<strong>観測</strong></li>
+<li><strong>1セル</strong>は1つの<strong>値</strong></li>
 </ul>
+<div class="cite">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</div>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
 </code></pre></div><pre><code>      carat       cut color clarity depth table price     x     y     z
       &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -122,12 +158,10 @@ but every messy dataset is messy in its own way<br>
 53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
 53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
 53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
-</code></pre><p><a href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a><br>
-<a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a><br></p>
-
+</code></pre>
 </section>
 <section>
-<h2 id="tidy-data-nbsp-vs-nbsp-messy-data">tidy data   vs   messy data</h2>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/figure/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
@@ -135,20 +169,20 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/figure/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
     <div style="position: absolute; top: 440px;">
-    Each variable has its own column.<br>
-    Each observation has its own row.<br>
-    Each value has its own cell.<br><br>
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
     </div>
   </div>
 </div>
 <div class="cite" style="position: absolute; bottom: 18px; right: 24px;">
-<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
 西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
 </div>
 </section>
 <section>
-<h2 id="tidy-data-nbsp-vs-nbsp-messy-data">tidy data   vs   messy data</h2>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/figure/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
@@ -156,20 +190,20 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/figure/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
     <div style="position: absolute; top: 440px;">
-    <strong>Each variable has its own column.</strong><br>
-    Each observation has its own row.<br>
-    Each value has its own cell.<br><br>
+    <strong>縦1列は1つの変数</strong><br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
     </div>
   </div>
 </div>
 <div class="cite" style="position: absolute; bottom: 18px; right: 24px;">
-<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
 西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
 </div>
 </section>
 <section>
-<h2 id="tidy-data-nbsp-vs-nbsp-messy-data">tidy data   vs   messy data</h2>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/figure/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
@@ -177,20 +211,20 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/figure/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
     <div style="position: absolute; top: 440px;">
-    Each variable has its own column.<br>
-    <strong>Each observation has its own row.</strong><br>
-    Each value has its own cell.<br><br>
+    縦1列は1つの変数<br>
+    <strong>横1行は1つの観測</strong><br>
+    1セルは1つの値<br>
     </div>
   </div>
 </div>
 <div class="cite" style="position: absolute; bottom: 18px; right: 24px;">
-<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
 西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
 </div>
 </section>
 <section>
-<h2 id="tidy-data-nbsp-vs-nbsp-messy-data">tidy data   vs   messy data</h2>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/figure/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
@@ -198,17 +232,27 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/figure/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
     <div style="position: absolute; top: 440px;">
-    Each variable has its own column.<br>
-    Each observation has its own row.<br>
-    <strong>Each value has its own cell.</strong><br><br>
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    <strong>1セルは1つの値</strong><br>
     </div>
   </div>
 </div>
 <div class="cite" style="position: absolute; bottom: 18px; right: 24px;">
-<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
 西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
 </div>
+
+</section>
+<section>
+<h2 id="整然データのご利益の一例">整然データのご利益の一例</h2>
+<p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">cut</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
+
 </section>
 <section>
 <h2 id="today-we-learn-data-preparation">Today we learn data preparation</h2>
@@ -219,7 +263,7 @@ but every messy dataset is messy in its own way<br>
 60-64       26.9         20.3       37.0         19.3
 65-69       41.0         30.9       54.6         35.1
 70-74       66.0         54.3       71.1         50.0
-</code></pre><p>↓下ごしらえ</p>
+</code></pre><p>↓ 作図・解析で使いやすい整然データに変形</p>
 <pre><code>   lbound ubound region    sex death
     &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
  1     50     54  Rural   Male  11.7
