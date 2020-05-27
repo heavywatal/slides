@@ -525,28 +525,29 @@ boxplot(), hist(), ...&#45;&gt;graphics</title>
 
 </section>
 <section>
-<h2 id="よくあるエラー">よくあるエラー</h2>
-<p>パッケージ名は <code>ggplot2</code>、関数名は <code>ggplot</code>:</p>
-<pre><code>&gt; ggplot2(data = diamonds)
-Error in ggplot2(data = diamonds) : could not find function &quot;ggplot2&quot;
-</code></pre><p>関数名は合ってるはずなのに&hellip;</p>
-<pre><code>&gt; ggplot(data = diamonds)
-Error in ggplot(data = diamonds) : could not find function &quot;ggplot&quot;
-</code></pre><p>パッケージ読み込みは新しくRを起動するたびに必要:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
-</code></pre></div>
-</section>
-<section>
-<h2 id="途中経過を取っておける">途中経過を取っておける</h2>
+<h2 id="途中経過オブジェクトを取っておける">途中経過オブジェクトを取っておける</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span>
 <span class="n">p2</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span>
 <span class="n">p3</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span>
-<span class="n">p4</span> <span class="o">=</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">,</span> <span class="n">base_family</span> <span class="o">=</span> <span class="s">&#34;Helvetica&#34;</span><span class="p">)</span>
-<span class="n">p5</span> <span class="o">=</span> <span class="n">p4</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">clarity</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">p5</span><span class="p">)</span>
+<span class="n">p4</span> <span class="o">=</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">clarity</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/ggplot-object-1.png" alt="plot of chunk ggplot-object"></p>
 <p><code>p2</code> とか <code>p3</code> あとで使うよ</p>
 
+</section>
+<section>
+<h2 id="よくあるエラー">よくあるエラー</h2>
+<p>関数名を <code>ggplot2</code> だと勘違い:</p>
+<pre><code>&gt; ggplot2(diamonds)
+Error in ggplot2(diamonds) : could not find function &quot;ggplot2&quot;
+</code></pre><p><strong>ggplot2</strong> はパッケージ名。<br>
+今度こそ関数名は合ってるはずなのに&hellip;</p>
+<pre><code>&gt; ggplot(diamonds)
+Error in ggplot(diamonds) : could not find function &quot;ggplot&quot;
+</code></pre><p>パッケージ読み込みを忘れてた。新しくRを起動するたびに必要:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># includes ggplot2</span>
+<span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>    <span class="c1"># OK!</span>
+</code></pre></div>
 </section>
 <section>
 <h2 id="ggplot-に渡すのはa-href3-tidy-datahtml整然データ-tidy-dataa"><code>ggplot()</code> に渡すのは<a href="3-tidy-data.html">整然データ tidy data</a></h2>
