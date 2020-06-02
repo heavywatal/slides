@@ -310,12 +310,7 @@ Launch RStudio, and load <code>tidyverse</code>.</p>
 <section>
 <h2 id="model-comparison">Model comparison</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">MASS</span><span class="p">)</span>
-</code></pre></div><pre><code>## 
-## Attaching package: 'MASS'
-</code></pre><pre><code>## The following object is masked from 'package:dplyr':
-## 
-##     select
-</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">full_model</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">cty</span> <span class="o">~</span> <span class="n">displ</span> <span class="o">+</span> <span class="n">cyl</span> <span class="o">+</span> <span class="n">drv</span> <span class="o">+</span> <span class="n">class</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">Gamma</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="s">&#34;inverse&#34;</span><span class="p">))</span>
+<span class="n">full_model</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">cty</span> <span class="o">~</span> <span class="n">displ</span> <span class="o">+</span> <span class="n">cyl</span> <span class="o">+</span> <span class="n">drv</span> <span class="o">+</span> <span class="n">class</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">Gamma</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="s">&#34;inverse&#34;</span><span class="p">))</span>
 <span class="nf">stepAIC</span><span class="p">(</span><span class="n">full_model</span><span class="p">)</span>
 </code></pre></div><pre><code>## Start:  AIC=943.41
 ## cty ~ displ + cyl + drv + class
@@ -510,31 +505,97 @@ for Bayesian modeling and inference.</p>
 </section>
 <section>
 <h2 id="random-number-generator-乱数生成器">Random Number Generator (乱数生成器)</h2>
-<p>2.1.15
+<p><code>r</code> + 分布の名前 + <code>(length, parameters, ...)</code></p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">set.seed</span><span class="p">(</span><span class="m">24601</span><span class="p">)</span>  <span class="c1"># 乱数シードをセット</span>
+<span class="c1"># 平均50、標準偏差10の正規分布から5個生成</span>
+<span class="nf">rnorm</span><span class="p">(</span><span class="m">5L</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</code></pre></div><pre><code>## [1] 47.43849 55.83482 54.73519 31.21979 47.25679
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># もう1回実行すると違う結果</span>
+<span class="nf">rnorm</span><span class="p">(</span><span class="m">5L</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</code></pre></div><pre><code>## [1] 43.63798 52.56991 47.42713 37.70879 17.77750
+</code></pre><dl>
+<dt>疑似乱数</dt>
+<dd>内部状態に依存して<strong>決定論的に</strong>生成される数列。</dd>
+<dd><strong>乱数シード</strong>は、内部状態を指定する「復活の呪文🏰」</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="random-number-generator-乱数生成器">Random Number Generator (乱数生成器)</h2>
+<p>内部状態が同じなら、生成される乱数も同じ。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">set.seed</span><span class="p">(</span><span class="m">24601</span><span class="p">)</span>  <span class="c1"># 内部状態をリセット</span>
+<span class="nf">rnorm</span><span class="p">(</span><span class="m">5L</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>  <span class="c1"># 生成するときに内部状態が変化するけど</span>
+</code></pre></div><pre><code>## [1] -0.2561510  0.5834819  0.4735194 -1.8780212 -0.2743209
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">set.seed</span><span class="p">(</span><span class="m">24601</span><span class="p">)</span>  <span class="c1"># 内部状態をリセット</span>
+<span class="nf">rnorm</span><span class="p">(</span><span class="m">5L</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>  <span class="c1"># 同じ結果</span>
+</code></pre></div><pre><code>## [1] -0.2561510  0.5834819  0.4735194 -1.8780212 -0.2743209
+</code></pre><p>シミュレーションや解析に再現性を求める場合は設定必須。<br>
+(どんなシードでも同じ結論になる、が理想ではあるけど)</p>
+<p>「ほしい結果が出るような乱数シードを探す」
+とかやっちゃ<strong>ダメ絶対‼️</strong></p>
+<p>2.1.15</p>
+
 </section>
 <section>
 <h2 id="for-loop">For-loop</h2>
-<p>2.1.16
+<p>Rではほぼ使わないけど、この教科書では使いたいらしい。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+  <span class="nf">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div><pre><code>## [1] 1
+## [1] 2
+## [1] 3
+</code></pre><p>2.1.16</p>
+
 </section>
 <section>
 <h2 id="histogram">Histogram</h2>
-<p>2.2.2
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_histogram</span><span class="p">(</span><span class="n">bins</span> <span class="o">=</span> <span class="m">40L</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/histogram-1.png" alt="plot of chunk histogram"></p>
+<p>2.2.2</p>
+
 </section>
 <section>
 <h2 id="kernel-density-estimation-カーネル密度推定">Kernel Density Estimation (カーネル密度推定)</h2>
-<p>2.2.3
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_rug</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">0.1</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.05</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_density</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_density</span><span class="p">(</span><span class="n">adjust</span> <span class="o">=</span> <span class="m">1</span> <span class="o">/</span> <span class="m">4</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;red&#34;</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_density</span><span class="p">(</span><span class="n">adjust</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;blue&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/kde-1.png" alt="plot of chunk kde"></p>
+<p>2.2.3</p>
+
 </section>
 <section>
 <h2 id="summary-statistics-要約統計量">Summary Statistics (要約統計量)</h2>
-<p>2.2.4, 2.2.5
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 平均値: 普通の算術平均。tailに引っ張られる。</span>
+<span class="nf">mean</span><span class="p">(</span><span class="n">diamonds[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span><span class="p">)</span>
+</code></pre></div><pre><code>## [1] 3932.8
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 中央値: 順位で真ん中にある値。</span>
+<span class="nf">median</span><span class="p">(</span><span class="n">diamonds[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span><span class="p">)</span>
+</code></pre></div><pre><code>## [1] 2401
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># 四分位点: 上位・下位25%にある値。</span>
+<span class="nf">quantile</span><span class="p">(</span><span class="n">diamonds[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span><span class="p">,</span> <span class="n">probs</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0.25</span><span class="p">,</span> <span class="m">0.75</span><span class="p">))</span>
+</code></pre></div><pre><code>##     25%     75% 
+##  950.00 5324.25
+</code></pre><p>2.2.4, 2.2.5</p>
+
 </section>
 <section>
 <h2 id="correlation-相関">Correlation (相関)</h2>
-<ul>
-<li>Covariance (共分散)</li>
-<li>Correlation (相関)</li>
-</ul>
-<p>2.2.6
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># Covariance (共分散) &gt; 0 なら、</span>
+<span class="c1"># carat が大きくなるほど price も大きくなる</span>
+<span class="nf">cov</span><span class="p">(</span><span class="n">diamonds[[</span><span class="s">&#34;carat&#34;</span><span class="n">]]</span><span class="p">,</span> <span class="n">diamonds[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span><span class="p">)</span>
+</code></pre></div><pre><code>## [1] 1742.765
+</code></pre><p>この値だけ見てもその度合いは想像しにくいので、</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">#</span>
+<span class="c1"># ↓ 値が [-1, 1] になるように正規化したもの</span>
+<span class="c1"># Correlation (相関)</span>
+<span class="nf">cor</span><span class="p">(</span><span class="n">diamonds[[</span><span class="s">&#34;carat&#34;</span><span class="n">]]</span><span class="p">,</span> <span class="n">diamonds[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span><span class="p">)</span>
+</code></pre></div><pre><code>## [1] 0.9215913
+</code></pre><p>2.2.6</p>
+
 </section>
 <section>
 <h2 id="autocorrelation-自己相関">Autocorrelation (自己相関)</h2>

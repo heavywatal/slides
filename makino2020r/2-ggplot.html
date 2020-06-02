@@ -259,7 +259,6 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <p>描けるっちゃ描けるけど。カスタマイズしていくのは難しい。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">plot</span><span class="p">(</span><span class="n">iris</span><span class="o">$</span><span class="n">Sepal.Length</span><span class="p">,</span> <span class="n">iris</span><span class="o">$</span><span class="n">Sepal.Width</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/plot-1.png" alt="plot of chunk plot"></p>
-<p>きれいなグラフを簡単に描けるパッケージを使いたい。</p>
 
 </section>
 <section>
@@ -267,7 +266,6 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <p>描けるっちゃ描けるけど。カスタマイズしていくのは難しい。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">hist</span><span class="p">(</span><span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/hist-1.png" alt="plot of chunk hist"></p>
-<p>きれいなグラフを簡単に描けるパッケージを使いたい。</p>
 
 </section>
 <section>
@@ -275,7 +273,6 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <p>描けるっちゃ描けるけど。カスタマイズしていくのは難しい。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">plot</span><span class="p">(</span><span class="nf">density</span><span class="p">(</span><span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span><span class="p">))</span>
 </code></pre></div><p><img src="figure/plot-density-1.png" alt="plot of chunk plot-density"></p>
-<p>きれいなグラフを簡単に描けるパッケージを使いたい。</p>
 
 </section>
 <section>
@@ -306,7 +303,7 @@ Rに最初から入ってて、例としてよく使われる。</p>
 </section>
 <section>
 <h2 id="いきなりggplot2から使い始めても大丈夫">いきなりggplot2から使い始めても大丈夫</h2>
-<p>R標準のプロットとは根本的に違う部品で組み立てる。</p>
+<p>R標準のやつとは根本的に違うシステムで作図する。</p>
 <div class="goldmark-p-workaround">
 <svg width="288pt" height="266pt"
  viewBox="0.00 0.00 288.35 265.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -532,7 +529,7 @@ boxplot(), hist(), ...&#45;&gt;graphics</title>
 <span class="n">p4</span> <span class="o">=</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">clarity</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/ggplot-object-1.png" alt="plot of chunk ggplot-object"></p>
-<p><code>p2</code> とか <code>p3</code> あとで使うよ</p>
+<p>普段はあんまりやらなけど、今日は <code>p2</code> とか使う</p>
 
 </section>
 <section>
@@ -584,18 +581,47 @@ Error in ggplot(diamonds) : could not find function &quot;ggplot&quot;
 
 </section>
 <section>
-<h2 id="データによらず一律で見せ方を変える">データによらず一律で見せ方を変える</h2>
-<p><code>aes()</code> の外で値を指定する。
-<a href="https://ggplot2.tidyverse.org/articles/ggplot2-specs.html">変えられるとこ一覧</a></p>
+<h2 id="データによらず一律でaestheticsを変える">データによらず一律でaestheticsを変える</h2>
+<p><code>aes()</code> の外で値を指定する。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
   <span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">6</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/aes-nomap-1.png" alt="plot of chunk aes-nomap"></p>
 
 </section>
 <section>
-<h2 id="点と線は-color-面は-fill">点と線は <code>color</code>, 面は <code>fill</code></h2>
+<h2 id="aesthetics一覧httpsggplot2tidyverseorgarticlesggplot2-specshtml"><a href="https://ggplot2.tidyverse.org/articles/ggplot2-specs.html">aesthetics一覧</a></h2>
+<ul>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_colour_fill_alpha.html">色・透明度を変える</a>
+<ul>
+<li><code>color</code>: 点、線、文字の色</li>
+<li><code>fill</code>: 面の色</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_alpha.html"><code>alpha</code></a>: 不透明度 (0が透明、1が不透明)</li>
+</ul>
+</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_linetype_size_shape.html">大きさ・形を変える</a>
+<ul>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_size.html"><code>size</code></a>: 点や文字の大きさ、線の太さ</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_shape.html"><code>shape</code></a>: 点の形</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_linetype.html"><code>linetype</code></a>: 線の種類</li>
+</ul>
+</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_group_order.html">単にグループ分けする</a>
+<ul>
+<li><code>group</code>: 折れ線グラフやポリゴンの切り分けなど</li>
+</ul>
+</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_position.html">座標、始点、終点</a>
+<ul>
+<li><strong><code>x</code></strong>, <strong><code>y</code></strong>, <code>xmin</code>, <code>xmax</code>, <code>ymin</code>, <code>ymax</code>, <code>xend</code>, <code>yend</code></li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="点と線と文字は-color-面は-fill">点と線と文字は <code>color</code>, 面は <code>fill</code></h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkgreen&#34;</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;gold&#34;</span><span class="p">)</span>
+  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkgreen&#34;</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;gold&#34;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.6</span><span class="p">)</span>
 </code></pre></div><p><img src="figure/fill-1.png" alt="plot of chunk fill"></p>
 
 </section>
@@ -603,10 +629,10 @@ Error in ggplot(diamonds) : could not find function &quot;ggplot&quot;
 <h2 id="色パレットの変更-scale_color_">色パレットの変更 <code>scale_color_*()</code></h2>
 <p>個々の色を自分で決めず、既存のパレットを利用するのが吉。<br>
 e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;n=5">ColorBrewer</a>,
-<a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html">viridis</a>
-(色覚多様性の対策にも有効)</p>
+<a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">viridis</a>
+(色覚多様性・グレースケール対策にも有効)</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p2</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">scale_color_viridis_d</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;plasma&#34;</span><span class="p">)</span>
+  <span class="nf">scale_color_viridis_d</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;plasma&#34;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme_dark</span><span class="p">()</span>
 <span class="c1"># scale_color_brewer(palette = &#34;Spectral&#34;)</span>
 </code></pre></div><p><img src="figure/plasma-1.png" alt="plot of chunk plasma"></p>
 
@@ -628,7 +654,7 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 
 </section>
 <section>
-<h2 id="多変量データの俯瞰に便利">多変量データの俯瞰に便利</h2>
+<h2 id="多変量データの俯瞰5次元くらいまで有効">多変量データの俯瞰、5次元くらいまで有効</h2>
 <p><img src="figure/facet-diamonds-1.png" alt="plot of chunk facet-diamonds">
 </section>
 <section>
@@ -646,8 +672,8 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 <p><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">既存の <code>theme_*()</code></a>
 をベースに、<a href="https://ggplot2.tidyverse.org/reference/theme.html"><code>theme()</code></a>関数で微調整。</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">p3</span> <span class="o">+</span> <span class="nf">theme_bw</span><span class="p">()</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span>
-  <span class="n">panel.background</span> <span class="o">=</span> <span class="nf">element_rect</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;khaki&#34;</span><span class="p">),</span> <span class="c1"># 箱</span>
-  <span class="n">panel.grid.major</span> <span class="o">=</span> <span class="nf">element_line</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;red&#34;</span><span class="p">),</span>  <span class="c1"># 線</span>
+  <span class="n">panel.background</span> <span class="o">=</span> <span class="nf">element_rect</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;white&#34;</span><span class="p">),</span> <span class="c1"># 箱</span>
+  <span class="n">panel.grid</span>       <span class="o">=</span> <span class="nf">element_line</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;blue&#34;</span><span class="p">),</span> <span class="c1"># 線</span>
   <span class="n">axis.title</span>       <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">32</span><span class="p">),</span>      <span class="c1"># 文字</span>
   <span class="n">axis.text</span>        <span class="o">=</span> <span class="nf">element_blank</span><span class="p">()</span>               <span class="c1"># 消す</span>
 <span class="p">)</span>
@@ -655,11 +681,15 @@ e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;
 
 </section>
 <section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<img src="/slides/figure/rstats/ggplot-layers.png" height = "600">
+</section>
+<section>
 <h2 id="論文のfigureみたいに並べる">論文のFigureみたいに並べる</h2>
 <p>別のパッケージ
-(<a href="https://cran.r-project.org/package=cowplot">cowplot</a>
+(<a href="https://wilkelab.org/cowplot/">cowplot</a>
 や
-<a href="https://github.com/thomasp85/patchwork">patchwork</a>)
+<a href="https://patchwork.data-imaginist.com/">patchwork</a>)
 の助けを借りて</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">pAB</span> <span class="o">=</span> <span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
 <span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">pAB</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">),</span> <span class="n">ncol</span><span class="o">=</span><span class="m">1L</span><span class="p">)</span>
