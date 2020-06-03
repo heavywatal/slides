@@ -1224,9 +1224,9 @@ That's all.
 <h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
   <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">)</span>                     <span class="c1"># age以外を移動して縦長化</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span>     <span class="c1"># age以外を移動して縦長化</span>
                                          <span class="c1"># 新しいname列を分割</span>
-</code></pre></div><pre><code>     age         name value
+</code></pre></div><pre><code>     age         name death
    &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt;
  1 50-54   Rural Male  11.7
  2 50-54 Rural Female   8.7
@@ -1243,9 +1243,9 @@ That's all.
 <h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
   <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># age以外を移動して縦長化</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># age以外を移動して縦長化</span>
   <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span>     <span class="c1"># 新しいname列を分割</span>
-</code></pre></div><pre><code>     age region    sex value
+</code></pre></div><pre><code>     age region    sex death
    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
  1 50-54  Rural   Male  11.7
  2 50-54  Rural Female   8.7
@@ -1262,11 +1262,11 @@ That's all.
 <h2 id="例題1-vadeaths-を縦長にしたい">例題1: <code>VADeaths</code> を縦長にしたい</h2>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">va_deaths</span> <span class="o">=</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
   <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># age以外を移動して縦長化</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># age以外を移動して縦長化</span>
   <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 新しいname列を分割</span>
   <span class="nf">separate</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
   <span class="nf">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span>
-</code></pre></div><pre><code>   lbound ubound region    sex value
+</code></pre></div><pre><code>   lbound ubound region    sex death
     &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
  1     50     54  Rural   Male  11.7
  2     50     54  Rural Female   8.7
