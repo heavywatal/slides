@@ -125,7 +125,7 @@ if (!doNotTrack) {
 <ul>
 <li>logical: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
 <li>numeric: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
-<li>character: 文字列 (<code>&quot;historgram.png&quot;</code>)</li>
+<li>character: 文字列 (<code>&quot;a string&quot;</code>)</li>
 <li>factor: 因子 (文字列っぽいけど微妙に違う)</li>
 <li>↑それぞれに欠損値 <code>NA</code> も定義されてる</li>
 </ul>
@@ -272,28 +272,17 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
   &lt;dbl&gt; &lt;chr&gt;
 1     1     a
 </code></pre><p>問: <code>starwars</code> データセットで試してみよう</p>
-<pre><code>             name height  mass hair_color  skin_color eye_color birth_year gender homeworld species
-            &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;
- 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male  Tatooine   Human
- 2          C-3PO    167    75       &lt;NA&gt;        gold    yellow      112.0   &lt;NA&gt;  Tatooine   Droid
- 3          R2-D2     96    32       &lt;NA&gt; white, blue       red       33.0   &lt;NA&gt;     Naboo   Droid
- 4    Darth Vader    202   136       none       white    yellow       41.9   male  Tatooine   Human
---                                                                                                 
-84    Poe Dameron     NA    NA      brown       light     brown         NA   male      &lt;NA&gt;   Human
-85            BB8     NA    NA       none        none     black         NA   none      &lt;NA&gt;   Droid
-86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA female      &lt;NA&gt;    &lt;NA&gt;
-87  Padmé Amidala    165    45      brown       light     brown       46.0 female     Naboo   Human
-       films  vehicles starships
-      &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
- 1 &lt;chr [5]&gt; &lt;chr [2]&gt; &lt;chr [2]&gt;
- 2 &lt;chr [6]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
- 3 &lt;chr [7]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
- 4 &lt;chr [4]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
---                              
-84 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
-85 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
-86 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
-87 &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
+<pre><code>             name height  mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+            &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;    &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
+ 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male masculine  Tatooine   Human &lt;chr [5]&gt; &lt;chr [2]&gt; &lt;chr [2]&gt;
+ 2          C-3PO    167    75       &lt;NA&gt;        gold    yellow      112.0   none masculine  Tatooine   Droid &lt;chr [6]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+ 3          R2-D2     96    32       &lt;NA&gt; white, blue       red       33.0   none masculine     Naboo   Droid &lt;chr [7]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+ 4    Darth Vader    202   136       none       white    yellow       41.9   male masculine  Tatooine   Human &lt;chr [4]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
+--                                                                                                                                         
+84    Poe Dameron     NA    NA      brown       light     brown         NA   male masculine      &lt;NA&gt;   Human &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
+85            BB8     NA    NA       none        none     black         NA   none masculine      &lt;NA&gt;   Droid &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA   &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt; &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+87  Padmé Amidala    165    45      brown       light     brown       46.0 female  feminine     Naboo   Human &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
 </code></pre>
 </section>
 <section>
@@ -320,7 +309,9 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">df</span> <span class="o">=</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="kc">NA</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;a&#34;</span><span class="p">,</span> <span class="kc">NA</span><span class="p">,</span> <span class="s">&#34;b&#34;</span><span class="p">))</span>
 <span class="n">df</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">z</span> <span class="o">=</span> <span class="nf">coalesce</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-</code></pre></div><pre><code>Error: Argument 2 must be a double vector, not a character vector
+</code></pre></div><pre><code>Error: Problem with `mutate()` input `z`.
+✖ Can't combine `..1` &lt;double&gt; and `..2` &lt;character&gt;.
+ℹ Input `z` is `coalesce(x, y)`.
 </code></pre><p>問: <code>starwars</code> データセットで試してみよう</p>
 
 </section>
@@ -481,28 +472,17 @@ http://userguide.icu-project.org/strings/regexp
 <span class="nf">str_detect</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="s">&#34;^a&#34;</span><span class="p">)</span>
 </code></pre></div><pre><code>[1]  TRUE  TRUE  TRUE FALSE
 </code></pre><p>問: <code>starwars</code> の <code>name</code> 列で <code>filter()</code> してみよう</p>
-<pre><code>             name height  mass hair_color  skin_color eye_color birth_year gender homeworld species
-            &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;
- 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male  Tatooine   Human
- 2          C-3PO    167    75       &lt;NA&gt;        gold    yellow      112.0   &lt;NA&gt;  Tatooine   Droid
- 3          R2-D2     96    32       &lt;NA&gt; white, blue       red       33.0   &lt;NA&gt;     Naboo   Droid
- 4    Darth Vader    202   136       none       white    yellow       41.9   male  Tatooine   Human
---                                                                                                 
-84    Poe Dameron     NA    NA      brown       light     brown         NA   male      &lt;NA&gt;   Human
-85            BB8     NA    NA       none        none     black         NA   none      &lt;NA&gt;   Droid
-86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA female      &lt;NA&gt;    &lt;NA&gt;
-87  Padmé Amidala    165    45      brown       light     brown       46.0 female     Naboo   Human
-       films  vehicles starships
-      &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
- 1 &lt;chr [5]&gt; &lt;chr [2]&gt; &lt;chr [2]&gt;
- 2 &lt;chr [6]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
- 3 &lt;chr [7]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
- 4 &lt;chr [4]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
---                              
-84 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
-85 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
-86 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
-87 &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
+<pre><code>             name height  mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+            &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;    &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
+ 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male masculine  Tatooine   Human &lt;chr [5]&gt; &lt;chr [2]&gt; &lt;chr [2]&gt;
+ 2          C-3PO    167    75       &lt;NA&gt;        gold    yellow      112.0   none masculine  Tatooine   Droid &lt;chr [6]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+ 3          R2-D2     96    32       &lt;NA&gt; white, blue       red       33.0   none masculine     Naboo   Droid &lt;chr [7]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+ 4    Darth Vader    202   136       none       white    yellow       41.9   male masculine  Tatooine   Human &lt;chr [4]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
+--                                                                                                                                         
+84    Poe Dameron     NA    NA      brown       light     brown         NA   male masculine      &lt;NA&gt;   Human &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
+85            BB8     NA    NA       none        none     black         NA   none masculine      &lt;NA&gt;   Droid &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA   &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt; &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+87  Padmé Amidala    165    45      brown       light     brown       46.0 female  feminine     Naboo   Human &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
 </code></pre>
 </section>
 <section>
@@ -534,28 +514,17 @@ http://userguide.icu-project.org/strings/regexp
 </code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">str_replace</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="s">&#34;(..)$&#34;</span><span class="p">,</span> <span class="s">&#34;!!\\1&#34;</span><span class="p">)</span>
 </code></pre></div><pre><code>[1] &quot;app!!le&quot;   &quot;apric!!ot&quot; &quot;avoca!!do&quot; &quot;bana!!na&quot; 
 </code></pre><p>問: <code>starwars</code> の <code>name</code> 列の数字を全部ゼロにしてみよう</p>
-<pre><code>             name height  mass hair_color  skin_color eye_color birth_year gender homeworld species
-            &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;
- 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male  Tatooine   Human
- 2          C-3PO    167    75       &lt;NA&gt;        gold    yellow      112.0   &lt;NA&gt;  Tatooine   Droid
- 3          R2-D2     96    32       &lt;NA&gt; white, blue       red       33.0   &lt;NA&gt;     Naboo   Droid
- 4    Darth Vader    202   136       none       white    yellow       41.9   male  Tatooine   Human
---                                                                                                 
-84    Poe Dameron     NA    NA      brown       light     brown         NA   male      &lt;NA&gt;   Human
-85            BB8     NA    NA       none        none     black         NA   none      &lt;NA&gt;   Droid
-86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA female      &lt;NA&gt;    &lt;NA&gt;
-87  Padmé Amidala    165    45      brown       light     brown       46.0 female     Naboo   Human
-       films  vehicles starships
-      &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
- 1 &lt;chr [5]&gt; &lt;chr [2]&gt; &lt;chr [2]&gt;
- 2 &lt;chr [6]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
- 3 &lt;chr [7]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
- 4 &lt;chr [4]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
---                              
-84 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
-85 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
-86 &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
-87 &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
+<pre><code>             name height  mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+            &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;    &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
+ 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male masculine  Tatooine   Human &lt;chr [5]&gt; &lt;chr [2]&gt; &lt;chr [2]&gt;
+ 2          C-3PO    167    75       &lt;NA&gt;        gold    yellow      112.0   none masculine  Tatooine   Droid &lt;chr [6]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+ 3          R2-D2     96    32       &lt;NA&gt; white, blue       red       33.0   none masculine     Naboo   Droid &lt;chr [7]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+ 4    Darth Vader    202   136       none       white    yellow       41.9   male masculine  Tatooine   Human &lt;chr [4]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
+--                                                                                                                                         
+84    Poe Dameron     NA    NA      brown       light     brown         NA   male masculine      &lt;NA&gt;   Human &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [1]&gt;
+85            BB8     NA    NA       none        none     black         NA   none masculine      &lt;NA&gt;   Droid &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA   &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt; &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
+87  Padmé Amidala    165    45      brown       light     brown       46.0 female  feminine     Naboo   Human &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
 </code></pre>
 </section>
 <section>
