@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>2. 統計モデルの基本 — 統計モデリング概論 DSHC 2021</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="2. 統計モデルの基本 — 統計モデリング概論 DSHC 2021">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2021/2-stats-model.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.83.1" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="統計モデリング概論-dshc-2021"><a href=".">統計モデリング概論 DSHC 2021</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li class="current-deck"><a href="2-stats-model.html">統計モデルの基本</a>
+<li><a href="3-glm.html">一般化線形モデル</a>
+<li><a href="4-bayesian.html">階層ベイズモデル</a>
+</ol>
+<div class="footnote">
+2021-06-30 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2021/">https://heavywatal.github.io/slides/tokiomarine2021/</a>
+</div>
+
+</section>
+<section>
+<h2 id="直線あてはめ-統計モデルの出発点">直線あてはめ: 統計モデルの出発点</h2>
+<img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
+<ul>
+<li>身長が高いほど体重も重い。いい感じ。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<p><img src="figure/lm-bad-1.png" alt="plot of chunk lm-bad"></p>
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸のばらつき</strong>が横軸に応じて変化？</li>
+</ul>
+
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<p><img src="figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸のばらつき</strong>が横軸に応じて変化？</li>
+<li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
+</ul>
+
+</section>
+<section>
+<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p><span style="color: #888888;">    ⬇ いろんな確率分布を扱いたい</span></p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p><span style="color: #888888;">    ⬇ 個体差などの変量効果を扱いたい</span></p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p><span style="color: #888888;">    ⬇ もっと自由なモデリングを！</span></p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+<p><cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012 より改変</cite></p>
+
+</section>
+<section>
+<h2 id="回帰モデルの2段階">回帰モデルの2段階</h2>
+<ol>
+<li>
+<p>Define a <strong>family of models</strong>: だいたいどんな形か、式をたてる</p>
+<ul>
+<li>直線: $y = a_1 + a_2 x$</li>
+<li>対数: $\log y = a_1 + a_2 x$</li>
+<li>二次曲線: $y = a_1 + a_2 x^2$</li>
+</ul>
+</li>
+<li>
+<p>Generate a <strong>fitted model</strong>: データに合うようにパラメータを調整</p>
+<ul>
+<li>$y = 3x + 7$,</li>
+<li>$y = 9x^2$</li>
+</ul>
+</li>
+</ol>
+<p><a href="https://r4ds.had.co.nz/model-basics.html" class="url"><a href="https://r4ds.had.co.nz/model-basics.html">https://r4ds.had.co.nz/model-basics.html</a></a></p>
+
+</section>
+<section>
+<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
+<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
+ </p>
+<p><img src="figure/weight-height-1.png" alt="plot of chunk weight-height"></p>
+
+</section>
+<section>
+<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
+<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
+じゃあ切片と傾き、どう決める？</p>
+<p><img src="figure/weight-lines-1.png" alt="plot of chunk weight-lines"></p>
+
+</section>
+<section>
+<h2 id="最小二乗法">最小二乗法</h2>
+<p>回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。</p>
+<p><img src="figure/weight-residual-1.png" alt="plot of chunk weight-residual"></p>
+
+</section>
+<section>
+<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
+<p>ランダムに試してみて、上位のものを採用</p>
+<p><img src="figure/weight-goodlines-1.png" alt="plot of chunk weight-goodlines"></p>
+
+</section>
+<section>
+<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
+<p><strong>グリッドサーチ</strong>: パラメータ空間の一定範囲内を均等に試す</p>
+<p><img src="figure/weight-grid-1.png" alt="plot of chunk weight-grid"></p>
+<p>こうした<strong>最適化</strong>の手法はいろいろあるけど、ここでは扱わない。</p>
+
+</section>
+<section>
+<h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
+<span class="n">result</span><span class="o">$</span><span class="n">par</span>
+</code></pre></div><pre><code>intercept     slope 
+-66.63000  77.04308 
+</code></pre><p><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
+
+</section>
+<section>
+<h2 id="さてもう少し複雑なあてはめをするために">さて、もう少し複雑なあてはめをするために</h2>
+<p>統計モデルの重要な部品「<strong>確率分布</strong>」を扱う。</p>
+<img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
+</section>
+<section>
+<h2 id="確率分布">確率分布</h2>
+<p>発生する事象(値)と頻度の関係。</p>
+<p>手元のデータを数えて作るのが<strong>経験分布</strong><br>
+e.g., サイコロを12回投げた結果、学生1000人の身長</p>
+<p><img src="figure/distribution-1.png" alt="plot of chunk distribution"></p>
+<p>一方、少数のパラメータと数式で作るのが<strong>理論分布</strong>。<br>
+(こちらを単に「確率分布」と呼ぶことが多い印象）</p>
+
+</section>
+<section>
+<h2 id="確率変数xはパラメータthetaの確率分布fに従う">確率変数$X$はパラメータ$\theta$の確率分布$f$に従う&hellip;?</h2>
+<p>$X \sim f(\theta)$</p>
+<p>e.g.,<br>
+コインを3枚投げたうち表の出る枚数 $X$ は<strong>二項分布に従う</strong>。<br>
+$X \sim \text{Binomial}(n = 3, p = 0.5)$</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<p><img src="figure/dbinom-1.png" alt="plot of chunk dbinom"></p>
+  </div>
+  <div class="column" style="padding-top: 10px;">
+\[\begin{split}
+\text{Prob}(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+k &\in \{0, 1, 2, \ldots, n\}
+\end{split}\]
+  </div>
+</div>
+<p>一緒に実験🪙🪙🪙してみよう。</p>
+
+</section>
+<section>
+<h2 id="試行を繰り返して記録してみる">試行を繰り返して記録してみる</h2>
+<p>コインを3枚投げたうち表の出た枚数 $X$</p>
+<p>試行1: <strong>表</strong> 裏 <strong>表</strong> → $X = 2$<br>
+試行2: 裏 裏 裏 → $X = 0$<br>
+試行3: <strong>表</strong> 裏 裏 → $X = 1, 2, 1, 3, 0, 2, \ldots$</p>
+<p><img src="figure/rbinom-1.png" alt="plot of chunk rbinom"></p>
+<div style="text-align: right;">
+試行回数を増やすほど<b>二項分布</b>の形に近づく
+</div>
+</section>
+<section>
+<h2 id="コイントスしなくても-x-らしきものを生成できる">コイントスしなくても $X$ らしきものを生成できる</h2>
+<ul>
+<li>コインを3枚投げたうち表の出る枚数 $X$</li>
+<li>$n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$</li>
+</ul>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<img src="figure/dbinom-1.png" alt="plot of chunk dbinom">
+  </div>
+  <div class="column" style="padding-top: 10px;">
+$X \sim \text{Binomial}(n = 3, p = 0.5)$
+<p>   ⬇ サンプル</p>
+<p>{2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
+  </div>
+</div>
+<p>これらはとてもよく似ているので<br>
+<strong>「コインをn枚投げたうち表の出る枚数は二項分布に従う」</strong><br>
+みたいな言い方をする。逆に言うと<br>
+<strong>「二項分布とはn回試行のうちの成功回数を確率変数とする分布」</strong><br>
+のように理解できる。</p>
+
+</section>
+<section>
+<h2 id="統計モデリングの一環とも捉えられる">統計モデリングの一環とも捉えられる</h2>
+<p>コイン3枚投げを繰り返して得たデータ {2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
+<p>   ⬇ たった2つのパラメータで記述。情報を圧縮。</p>
+<p>$n = 3, p = 0.5$ の二項分布で説明・再現できるぞ</p>
+<figure>
+<img src="math-model.drawio.svg" width="600"><br>
+<figcaption><cite>「データ解析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+<p>こういうふうに現象と対応した確率分布、ほかにもある？</p>
+
+</section>
+<section>
+<h2 id="有名な確率分布それに従うもの">有名な確率分布、それに「従う」もの</h2>
+<dl>
+<dt>離散一様分布</dt>
+<dd>コインの表裏、サイコロの出目1–6</dd>
+<dt>二項分布</dt>
+<dd>成功率p、試行回数nのうちの成功回数</dd>
+<dt>ポアソン分布</dt>
+<dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
+<dt>幾何分布</dt>
+<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
+<dt>ガンマ分布</dt>
+<dd>ポアソン過程でk回起こるまでの待ち時間</dd>
+<dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
+<dt>正規分布</dt>
+<dd>確率変数の和、平均値</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="離散一様分布">離散一様分布</h2>
+<p>同じ確率で起こるn通りの事象のうちXが起こる確率</p>
+<p>e.g., コインの表裏、サイコロの出目1–6</p>
+<p><img src="figure/dunif-1.png" alt="plot of chunk dunif"></p>
+<p>🔰 一様分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="二項分布">二項分布</h2>
+<p>確率pで当たるクジをn回引いてX回当たる確率</p>
+<p>\[
+\text{Prob}(X = k) = \binom n k p^k (1 - p)^{n - k}
+\]</p>
+<p><img src="figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
+<p>🔰 1%の当たりを狙って100連ガチャを回した場合を可視化してみよう</p>
+<p>🔰 二項分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="ポアソン分布">ポアソン分布</h2>
+<p>平均$\lambda$で単位時間(空間)あたりに発生する事象の回数</p>
+<p>e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数</p>
+<p><img src="figure/dpoisson-1.png" alt="plot of chunk dpoisson"></p>
+<p>🔰 ポアソン分布になりそうな例を考えてみよう</p>
+<p>二項分布の極限。めったに起きないことを何回も試行。</p>
+
+</section>
+<section>
+<h2 id="指数分布">指数分布</h2>
+<p>ポアソン過程の事象の発生間隔 (平均$1 / \lambda$)</p>
+<p>e.g., メッセージの受信間隔、国道沿いに落ちてる手袋の間隔</p>
+<p><img src="figure/dexp-1.png" alt="plot of chunk dexp"></p>
+<p>🔰 指数分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="ガンマ分布">ガンマ分布</h2>
+<p>ポアソン過程の事象k回発生までの待ち時間</p>
+<p>e.g., メッセージを2つ受信するまでの待ち時間</p>
+<p><img src="figure/dgamma-1.png" alt="plot of chunk dgamma"></p>
+<p>🔰 ガンマ分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="正規分布">正規分布</h2>
+<p>標本平均を何度もサンプルしたもの(中心極限定理)</p>
+<p>e.g., 一様分布 $X \in [0, 100)$ から取った標本40個の平均値</p>
+<p><img src="figure/central-limit-1.png" alt="plot of chunk central-limit"></p>
+<p>これ以外にも、正規分布はいろんなところに現れる</p>
+
+</section>
+<section>
+<h2 id="正規分布に近づくもの">正規分布に近づくもの</h2>
+<p>大きい$n$の二項分布</p>
+<p><img src="figure/binom-normal-1.png" alt="plot of chunk binom-normal"></p>
+<p>大きい$\lambda$のポアソン分布</p>
+<p><img src="figure/poisson-normal-1.png" alt="plot of chunk poisson-normal"></p>
+
+</section>
+<section>
+<h2 id="有名な確率分布対応関係ふりかえり">有名な確率分布対応関係ふりかえり</h2>
+<figure style="float: right;">
+<img src="math-model.drawio.svg" width="300"><br>
+</figure>
+<dl>
+<dt>離散一様分布</dt>
+<dd>コインの表裏、サイコロの出目1–6</dd>
+<dt>二項分布</dt>
+<dd>成功率p、試行回数nのうちの成功回数</dd>
+<dt>ポアソン分布</dt>
+<dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
+<dt>幾何分布</dt>
+<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
+<dt>ガンマ分布</dt>
+<dd>ポアソン過程でk回起こるまでの待ち時間</dd>
+<dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
+<dt>正規分布</dt>
+<dd>確率変数の和、平均値</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="pythonで乱数生成可視化">Pythonで乱数生成・可視化</h2>
+<p><a href="https://numpy.org/doc/stable/reference/random/generator.html">https://numpy.org/doc/stable/reference/random/generator.html</a></p>
+<p><a href="https://seaborn.pydata.org/tutorial/distributions.html">https://seaborn.pydata.org/tutorial/distributions.html</a></p>
+
+</section>
+<section>
+<h2 id="確率分布に従わないことが多い">確率分布に「従わない」ことが多い</h2>
+<p>現実には、確率分布をあてはめただけではうまく説明できない。</p>
+<p>それはなぜ？と考えていくのがまさに統計モデリングの仕事。</p>
+<p>e.g., ポアソン分布になるはずなのに、分散が大きすぎるぞ。<br>
+e.g., 指数分布になるはずなのに、ひと山型で分散が小さいぞ。</p>
+<p>「何も無ければこうなるはず」をまず理解しないと進めない。</p>
+
+</section>
+<section>
+<h2 id="何分布パラメータどうする">何分布？　パラメータどうする？</h2>
+<p>ある植物が作った種子を数える。50個体ぶん。</p>
+<p><img src="figure/poisson-seed-1.png" alt="plot of chunk poisson-seed"></p>
+<p>カウントデータだからポアソン分布っぽい。<br>
+ポアソン分布のパラメータ $\lambda$ はどう決める？</p>
+
+</section>
+<section>
+<h2 id="何分布パラメータどうする">何分布？　パラメータどうする？</h2>
+<p>ある植物が作った種子を数える。50個体ぶん。</p>
+<p><img src="figure/poisson-seed-lambda-1.png" alt="plot of chunk poisson-seed-lambda"></p>
+<p>カウントデータだからポアソン分布っぽい。<br>
+ポアソン分布のパラメータ $\lambda$ はどう決める？</p>
+
+</section>
+<section>
+<h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
+<p><ruby>尤<rt>もっと</rt></ruby>もらしさ。
+モデルのあてはまりの良さの尺度のひとつ。</p>
+<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>。<br>
+定義通り素直に書くと<br>
+$\text{Prob}(D \mid M)$</p>
+<p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
+$L(M \mid D)$</p>
+<p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+$L(\theta \mid D)$ とか $L(\theta)$ とか</p>
+
+</section>
+<section>
+<h2 id="尤度を手計算できる例">尤度を手計算できる例</h2>
+<p>コインを5枚投げた結果 $D$: 表 4, 裏 1</p>
+<p>表が出る確率 $p = 0.5$ と仮定:</p>
+<div>\[\begin{split}
+L(0.5 \mid D)
+  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
+\end{split}\]</div>
+<p>表が出る確率 $p = 0.8$ と仮定:</p>
+<div>\[\begin{split}
+L(0.8 \mid D)
+  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
+\end{split}\]</div>
+<p>$L(0.8 \mid D) &gt; L(0.5 \mid D)$</p>
+<p>$p = 0.8$ のほうがより尤もらしい。</p>
+
+</section>
+<section>
+<h2 id="種子数ポアソン分布の例でも尤度を計算してみる">種子数ポアソン分布の例でも尤度を計算してみる</h2>
+<p>ある植物が作った種子を数える。$n = 50$個体ぶん。</p>
+<div>\[\begin{split}
+L(\lambda \mid D)
+  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
+\end{split}\]</div>
+<p><img src="figure/poisson-seed-likelihood-1.png" alt="plot of chunk poisson-seed-likelihood"></p>
+<p>この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。</p>
+
+</section>
+<section>
+<h2 id="最尤推定-umuaximum-uluikelihood-ueustimation">最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation</h2>
+<p><strong>対数尤度</strong> (log likelihood) のほうが扱いやすい。<br>
+一階微分が0になる $\lambda$ を求めると&hellip;<strong>標本平均</strong>と一致</p>
+<div>\[\begin{split}
+\log L(\lambda \mid D)
+  &= \sum _i ^n \left[ X_i \log (\lambda) - \lambda - \log (X_i !) \right] \\
+\frac {\mathrm d \log L(\lambda \mid D)} {\mathrm d \lambda}
+  &= \frac 1 \lambda \sum _i ^n X_i - n = 0 \\
+\hat \lambda &= \frac 1 n \sum _i ^n X_i
+\end{split}\]</div>
+<p><img src="figure/poisson-mle-1.png" alt="plot of chunk poisson-mle"></p>
+
+</section>
+<section>
+<h2 id="最尤推定を使っても真のλは得られない">最尤推定を使っても“真のλ”は得られない</h2>
+<p>今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”から取った。<br>
+「50個体サンプル→最尤推定」を1,000回繰り返してみると:</p>
+<p><img src="figure/poisson-mle-repl-1.png" alt="plot of chunk poisson-mle-repl"></p>
+<p>サンプルの取れ方によってはかなりズレた推定をしてしまう。</p>
+
+</section>
+<section>
+<h2 id="サンプル数を増やすほどマシにはなる">サンプル数を増やすほどマシにはなる</h2>
+<p>“$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:</p>
+<p><img src="figure/poisson-mle-nsam-1.png" alt="plot of chunk poisson-mle-nsam"></p>
+<p>Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
+A. 推定したい統計量とか、許容できる誤差とかによる。</p>
+
+</section>
+<section>
+<h2 id="すべてのモデルは間違っている">すべてのモデルは間違っている</h2>
+<p>確率分布がいい感じに最尤推定できたとしても、<br>
+それはあくまでモデル。仮定。近似。</p>
+<blockquote>
+<p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
+</blockquote>
+
+</section>
+<section>
+<h2 id="統計モデリングの道具-----まとめ">統計モデリングの道具 &mdash; まとめ</h2>
+<ul>
+<li><strong>確率変数</strong> $X$</li>
+<li><strong>確率分布</strong> $X \sim f(\theta)$
+<ul>
+<li>少ない<strong>パラメータ</strong> $\theta$ でばらつきの様子を記述</li>
+<li>この現象はこの分布を作りがち(〜に従う)という知見あり</li>
+</ul>
+</li>
+<li><strong>尤度</strong>
+<ul>
+<li>あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$</li>
+<li>データ固定でモデル探索 → <strong>尤度関数</strong> $L(M \mid D)$</li>
+<li>対数を取ったほうが扱いやすい → <strong>対数尤度</strong> $\log L(M \mid D)$</li>
+<li>これを最大化するようなパラメータ $\hat \theta$ 探し ＝ <strong>最尤法</strong></li>
+</ul>
+</li>
+</ul>
+<a href="3-glm.html" rel="next" class="readmore">
+3. 一般化線形モデル (GLM)
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>1. 導入 — 統計モデリング概論 DSHC 2021</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="1. 導入 — 統計モデリング概論 DSHC 2021">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2021/1-introduction.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.83.1" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="統計モデリング概論-dshc-2021"><a href=".">統計モデリング概論 DSHC 2021</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li class="current-deck"><a href="1-introduction.html">導入</a>
+<li><a href="2-stats-model.html">統計モデルの基本</a>
+<li><a href="3-glm.html">一般化線形モデル</a>
+<li><a href="4-bayesian.html">階層ベイズモデル</a>
+</ol>
+<div class="footnote">
+2021-06-30 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2021/">https://heavywatal.github.io/slides/tokiomarine2021/</a>
+</div>
+
+</section>
+<section>
+<h2 id="データを使ってやりたいこと">データを使ってやりたいこと</h2>
+<ul>
+<li>現象を<strong>理解</strong>したい</li>
+<li>将来を<strong>予測</strong>したい</li>
+<li>ものを<strong>分類・判別</strong>したい</li>
+<li>挙動を<strong>制御</strong>したい</li>
+<li>新しい何かを<strong>生成</strong>したい</li>
+</ul>
+
+</section>
+<section>
+<h2 id="データ解析って必要-生データ見ればいいべ">データ解析って必要？ 生データ見ればいいべ？</h2>
+<p>往々にして複雑過ぎ、情報多すぎ、そのままでは手に負えない</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</code></pre></div><pre><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre><p>ダイヤモンド53,940個について10項目の値を持つデータセット</p>
+
+</section>
+<section>
+<h2 id="要約統計量を見てみよう">要約統計量を見てみよう</h2>
+<p>各列の<strong>平均</strong>とか<strong>標準偏差</strong>とか:</p>
+<pre><code>   stat carat depth table    price     x     y     z
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  mean  0.80 61.75 57.46  3932.80  5.73  5.73  3.54
+2    sd  0.47  1.43  2.23  3989.44  1.12  1.14  0.71
+3   max  5.01 79.00 95.00 18823.00 10.74 58.90 31.80
+</code></pre><p>大きさ <code>carat</code> と価格 <code>price</code> の<strong>相関係数</strong>は 0.92 (かなり高い)。</p>
+<hr>
+<p><strong>生のままよりは把握しやすい</strong>かも。</p>
+<p>しかし要注意&hellip;</p>
+
+</section>
+<section>
+<h2 id="平均値ばかり見て可視化を怠ると構造を見逃す">平均値ばかり見て可視化を怠ると構造を見逃す</h2>
+<figure style="position: relative;">
+<a href="https://www.autodeskresearch.com/publications/samestats">
+<img src="/slides/figure/rstats/datasaurus.png" width="800">
+<figcaption class="url">https://www.autodeskresearch.com/publications/samestats/</figcaption>
+</a>
+<img src="/slides/figure/rstats/DataDino-600x455.gif" width="180"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+</section>
+<section>
+<h2 id="データ可視化は理解の第一歩">データ可視化は理解の第一歩</h2>
+<p>情報をうまく絞って整理 → <strong>直感的にわかる</strong></p>
+<p><img src="figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds"></p>
+<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
+その度合いは <code>clarity</code> によって異なるらしい。</p>
+
+</section>
+<section>
+<h2 id="統計とは">統計とは</h2>
+<p>データをうまくまとめ、それに基づいて推論するための手法。</p>
+<ul>
+<li><strong>記述統計</strong>: データそのものを要約する
+<ul>
+<li>要約統計量 (e.g., 平均、標準偏差、etc.)</li>
+<li>作図、作表</li>
+</ul>
+</li>
+<li><strong>推測統計</strong>: データの背後にある母集団・生成過程を考える
+<ul>
+<li>数理モデル</li>
+<li>確率分布</li>
+<li>パラメータ(母数)</li>
+</ul>
+</li>
+</ul>
+<p>「グラフを眺めてなんとなく分かる」以上の分析には<strong>モデル</strong>が必要</p>
+
+</section>
+<section>
+<h2 id="モデルとは">モデルとは</h2>
+<p>対象システムを単純化・理想化して扱いやすくしたもの</p>
+<dl>
+<dt>Mathematical Model 数理モデル<img src="../lifesci2020seminar/figure/hill-equation.png" width="150" align="right" style="margin: 0 -5px;"></dt>
+<dd>数学的な方程式として記述されるもの。</dd>
+<dd>e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span></dd>
+<dd><br>
+</dd>
+<dt>Computational Model 数値計算モデル<img src="/slides/figure/tumopp/Chex_Lconst.gif" width="140" align="right"></dt>
+<dd>数値計算の手続きとして記述されるもの。</dd>
+<dd>e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span></dd>
+<dd><br>
+</dd>
+<dt>Concrete Model 具象モデル<img src="../lifesci2020seminar/figure/weisberg-sfbay.jpg" width="260" align="right"></dt>
+<dd>具体的な事物で作られるもの。</dd>
+<dd>e.g., San Francisco Bay-Delta Model</dd>
+</dl>
+<cite>
+Weisberg 2012 "Simulation and Similarity" (科学とモデル)
+</cite>
+
+</section>
+<section>
+<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
+<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
+ </p>
+<figure>
+<img src="math-model.drawio.svg"><br>
+<figcaption><cite>「データ解析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+</section>
+<section>
+<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
+<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
+e.g., $\text{price} = A \times \text{carat} + B + \epsilon$</p>
+<p><img src="figure/lm-diamonds-1.png" alt="plot of chunk lm-diamonds"></p>
+<p>新しく採れたダイヤモンドの価格予想とかにも使える。</p>
+<p>もっと良い数式、もっといいパラメータ(A, Bなど)を探せそう。</p>
+
+</section>
+<section>
+<h2 id="モデリングにおける2つのアプローチ">モデリングにおける2つのアプローチ</h2>
+<figure>
+<img src="model-approaches.drawio.svg"><br>
+<figcaption><cite>「データ解析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+</section>
+<section>
+<h2 id="どっちも知っておいて使い分けたい">どっちも知っておいて使い分けたい</h2>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>統計モデリング</th>
+<th>近年の機械学習</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>モデル構造</td>
+<td>単純化したい</td>
+<td>性能のためなら複雑化</td>
+</tr>
+<tr>
+<td>モデル解釈</td>
+<td><strong>主目的</strong></td>
+<td>難しい。重視しない</td>
+</tr>
+<tr>
+<td>予測・生成</td>
+<td>うまくすれば頑健</td>
+<td><strong>主目的</strong>。強力。高精度</td>
+</tr>
+<tr>
+<td>データ量</td>
+<td>少なくてもそれなり</td>
+<td>大量に必要</td>
+</tr>
+<tr>
+<td>計算量</td>
+<td>場合による</td>
+<td>場合による</td>
+</tr>
+<tr>
+<td>例</td>
+<td>一般化線形モデル<br>階層ベイズモデル</td>
+<td>ランダムフォレスト<br>ニューラルネットワーク</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section>
+<h2 id="本講義の主題-統計モデリング特に回帰">本講義の主題: 統計モデリング、特に回帰</h2>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="figure/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="回帰-教師あり機械学習の一種とも言える">回帰: 教師あり機械学習の一種とも言える</h2>
+<figure>
+<a href="https://www.mathworks.com/help/stats/machine-learning-in-matlab.html">
+<img src="figure/machinelearningtypes.jpg" width="450">
+<figcaption class="url">https://www.mathworks.com/help/stats/machine-learning-in-matlab.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="本講義の流れ">本講義の流れ</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="figure/kubo-book.jpg" width="300" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに</p>
+<ol>
+<li>イントロ←いまここ</li>
+<li>統計モデルの基本
+<ul>
+<li>確率変数・確率分布・パラメータ</li>
+<li>尤度・最尤推定</li>
+</ul>
+</li>
+<li>一般化線形モデル、混合モデル</li>
+<li>ベイズ統計、階層ベイズモデル</li>
+</ol>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/2Q0f6JQ">科学とモデル&mdash;シミュレーションの哲学 入門</a> Michael Weisberg 2017<br>
+(原著: <a href="https://amzn.to/3bdvhuI">Simulation and Similarity</a> 2013)</li>
+</ul>
+<a href="2-stats-model.html" rel="next" class="readmore">
+2. 統計モデルの基本
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
