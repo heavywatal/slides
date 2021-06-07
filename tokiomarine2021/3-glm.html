@@ -82,79 +82,243 @@ if (!doNotTrack) {
 
 </section>
 <section>
-<h2 id="一般化線形モデルの材料">一般化線形モデルの材料</h2>
-<ul>
-<li>非説明変数、説明変数</li>
-<li>線形予測子</li>
-<li>リンク関数</li>
-<li>誤差構造 = 確率分布</li>
-<li>パラメータ</li>
-</ul>
+<h2 id="前章で見た統計モデル">前章で見た統計モデル</h2>
+<p>確率変数$X$はパラメータ$\theta$の確率分布$f$に&quot;従う&quot;: 
+$X \sim f(\theta) $</p>
+<p>e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分布に従う:</p>
+<div>\[\begin{split}
+X \sim \text{Poisson}(\lambda)
+\end{split}\]</div>
+<p><img src="figure/only-dist-1.png" alt="plot of chunk only-dist"></p>
+<p>これを一般化線形モデル(GLM)として見ることもできる。</p>
 
 </section>
 <section>
-<h2 id="一般化線形モデルの例">一般化線形モデルの例</h2>
-<p>単回帰、正規分布、恒等リンク</p>
-<p><img src="figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
-<p>これ、どこかで見覚えが&hellip;</p>
+<h2 id="一般化線形モデルglmとして記述してみる">一般化線形モデル(GLM)として記述してみる</h2>
+<p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+平均値$\lambda_i$は<strong>他のデータによらず$\beta_0$で一定</strong>。</p>
+<div>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\lambda_i &= \beta_0
+\end{split}\]</div>
+<p><img src="figure/glm-without-x-1.png" alt="plot of chunk glm-without-x"></p>
+<p>種子数をY軸にして、式を2つに分けただけ&hellip;?<br>
+<strong>説明変数</strong>を含むモデルを見ればご利益が分かるかも。</p>
 
 </section>
 <section>
-<h2 id="最小二乗法の線形回帰--一般化線形モデルの特殊ケース">最小二乗法の線形回帰 = 一般化線形モデルの特殊ケース</h2>
-<p><img src="figure/lm-weight-1.png" alt="plot of chunk lm-weight"></p>
-<p>残差二乗を最小化するパラメータ = 正規分布で尤度最大化するパラメータ</p>
+<h2 id="説明変数が1つある一般化線形モデル">説明変数が1つある一般化線形モデル</h2>
+<p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+平均値の対数$\log(\lambda_i)$は<strong>その個体の大きさ$x_i$に比例</strong>する。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<figure>
+<img src="glm.drawio.svg" width="100%"><br>
+</figure>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
+  </div>
+</div>
+<p>この場合は<strong>単回帰</strong>。説明変数が複数あると<strong>重回帰</strong>。</p>
 
 </section>
 <section>
-<h2 id="ポアソン分布対数リンクにしたらピッタリ">ポアソン分布＋対数リンクにしたらピッタリ</h2>
-<p><img src="figure/glm-seeds-1.png" alt="plot of chunk glm-seeds">
-</section>
-<section>
-<h2 id="pythonでglm">PythonでGLM</h2>
-<dl>
-<dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
-<dd>統計モデリング寄り</dd>
-<dd>AICやp値などの指標も適宜計算してくれるので楽</dd>
-<dt><a href="https://scikit-learn.org">scikit-learn</a></dt>
-<dd>機械学習寄り</dd>
-<dd>回帰以外のさまざまな手法も統一的な書き方で使える</dd>
-</dl>
-
-</section>
-<section>
-<h2 id="statsmodelsを触ってみる">statsmodelsを触ってみる</h2>
-<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span>
-</code></pre></div>
-</section>
-<section>
-<h2 id="scikit-learnを触ってみる">scikit-learnを触ってみる</h2>
+<h2 id="複数の説明変数を同時に扱う重回帰">複数の説明変数を同時に扱う重回帰</h2>
+<p>\[\begin{split}
+y_i &= \text{Poisson}(\lambda_i) \\
+\log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\end{split}\]</p>
+<p>気温も湿度も高いほどビールが売れる、とか</p>
+<p><img src="figure/multiple-regression-1.png" alt="plot of chunk multiple-regression"></p>
+<p>今度は<strong>確率分布</strong>と<strong>連結関数</strong>を変えてみよう。</p>
 
 </section>
 <section>
 <h2 id="ロジスティック回帰">ロジスティック回帰</h2>
-<p>二項分布＋logitリンクのGLM</p>
+<ul>
+<li>確率分布: <strong>二項分布</strong></li>
+<li>連結関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
-<p>風が吹けば桶屋が儲かる？</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>街角の10人のうち何人半袖か。<br>
+その日の気温によって割合が変化。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
+  </div>
+</div>
+</section>
+<section>
+<h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
+<ul>
+<li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
+<li>連結関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>風が吹けば桶屋が儲かる。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Bernoulli}(p_i) \\
+  &= \text{Binomial}(1,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
 <p><img src="figure/wind-1.png" alt="plot of chunk wind"></p>
+  </div>
+</div>
 
 </section>
 <section>
-<h2 id="重回帰で複数の変数の影響を同時に扱う">重回帰で複数の変数の影響を同時に扱う</h2>
-<p>多重共線性
-</section>
-<section>
-<h2 id="交互作用">交互作用</h2>
-<p>🔰 statsmodelsで交互作用ありモデルを作ってみる
-</section>
-<section>
-<h2 id="モデル選択">モデル選択</h2>
-<p>「正しい」ものを選ぶわけではない。</p>
-<blockquote>
-<p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
-</blockquote>
-<p>じゃあどんなものが useful か？</p>
+<h2 id="一般線形モデル-化無し-はglmの一種">一般線形モデル (“化”無し) はGLMの一種</h2>
+<ul>
+<li>確率分布: <strong>正規分布</strong></li>
+<li>連結関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
+</ul>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
+\text{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
+  </div>
+</div>
+<p>最小二乗法の直線あてはめと同じ。
+分散分析もこの枠組で考えられる。</p>
 
+</section>
+<section>
+<h2 id="分散分析-uanualysis-uouf-uvauriance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
+<p><strong>質的な説明変数</strong>を持つ正規分布・恒等連結のGLM、と解釈可能。<br>
+<span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">→</th>
+<th style="text-align:center">$x_1$ ☀️ 晴れ</th>
+<th style="text-align:center">$x_2$ ☔️ 雨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☁️ くもり</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
+\end{split}\]</p>
+<p>くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。</p>
+<p>GLMなら確率分布・連結関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="共分散分析-uanualysis-of-ucovauriance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
+<p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
+正規分布・等分散・恒等連結などが仮定される。</p>
+<p><img src="figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
+<p>GLMなら確率分布・連結関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
+<p>確率分布・連結関数を変えて柔軟にモデリングできる。<br>
+特定の組み合わせには名前がある。</p>
+<table>
+<thead>
+<tr>
+<th>名前</th>
+<th>確率分布</th>
+<th>連結関数</th>
+<th>説明変数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ポアソン回帰</td>
+<td>ポアソン分布</td>
+<td>log</td>
+<td></td>
+</tr>
+<tr>
+<td>ロジスティック回帰</td>
+<td>二項分布</td>
+<td>logit</td>
+<td></td>
+</tr>
+<tr>
+<td>一般線形回帰</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td></td>
+</tr>
+<tr>
+<td>分散分析</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td>質的変数</td>
+</tr>
+<tr>
+<td>共分散分析</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td>質的変数+量的変数</td>
+</tr>
+</tbody>
+</table>
+<p>ほかにもいろいろある。</p>
+
+</section>
+<section>
+<h2 id="データはひとつモデルはたくさん">データはひとつ、モデルはたくさん</h2>
+<p><img src="figure/many-models-1.png" alt="plot of chunk many-models"></p>
+<p>さて、どうやって選ぶ？</p>
+
+</section>
+<section>
+<h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
+<p><ruby>尤<rt>もっと</rt></ruby>もらしさ。
+モデルのあてはまりの良さの尺度のひとつ。</p>
+<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>。<br>
+定義通り素直に書くと<br>
+$\text{Prob}(D \mid M)$</p>
+<p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
+$L(M \mid D)$</p>
+<p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+$L(\theta \mid D)$ とか $L(\theta)$ とか</p>
+
+</section>
+<section>
+<h2 id="逸脱度-deviation">逸脱度 deviation</h2>
+<p>尤度の対数を取ってマイナス2倍したもの。
 </section>
 <section>
 <h2 id="過適合-over-fitting">過適合 over-fitting</h2>
@@ -164,12 +328,11 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
-<p>\[
-\text{AIC} = -2 \ln L + 2 \text{パラメータ数}
-\]</p>
+<div>\[\begin{split}
+  \text{AIC} = -2 \ln L + 2 \text{パラメータ数}
+\end{split}\]</div>
 <p>AICが小さいほど良いモデル。</p>
 <p>尤度は高めたいが、パラメータを増やすとペナルティ。</p>
-<p>🔰 statsmodelsでAICを確認</p>
 
 </section>
 <section>
@@ -183,6 +346,28 @@ if (!doNotTrack) {
 
 </section>
 <section>
+<h2 id="モデル選択">モデル選択</h2>
+<p>「正しい」ものを選ぶわけではない。</p>
+<blockquote>
+<p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
+</blockquote>
+<p>じゃあどんなものが useful か？</p>
+
+</section>
+<section>
+<h2 id="現実的な注意">現実的な注意</h2>
+<ul>
+<li>多重共線性(マルチコ)</li>
+<li>値を変換する。e.g., log</li>
+<li>割り算した値を使わない。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="交互作用">交互作用</h2>
+<p>🔰 statsmodelsで交互作用ありモデルを作ってみる
+</section>
+<section>
 <h2 id="過分散">過分散</h2>
 <p>ポアソン分布なら平均が決まると分散も決まる。</p>
 <p>平均値から考えるよりも分散が大きい場合にどうするか。</p>
@@ -190,6 +375,22 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
+
+</section>
+<section>
+<h2 id="一般化加法モデル-gam">一般化加法モデル GAM</h2>
+
+</section>
+<section>
+<h2 id="pythonでglm">PythonでGLM</h2>
+<dl>
+<dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
+<dd>統計モデリング寄り</dd>
+<dd>AICやp値などの指標も適宜計算してくれるので楽</dd>
+<dt><a href="https://scikit-learn.org">scikit-learn</a></dt>
+<dd>機械学習寄り</dd>
+<dd>回帰以外のさまざまな手法も統一的な書き方で使える</dd>
+</dl>
 
 </section>
 <section>

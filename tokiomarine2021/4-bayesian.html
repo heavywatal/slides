@@ -83,9 +83,13 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="コイントス4回たまたま表が1回だったら">コイントス4回、たまたま表が1回だったら</h2>
-<p>最尤法(頻度主義): 「表が出る確率1/4のコインだろう」</p>
-<p>ベイズ主義: 1/4らへんにピークはあるが、不確実さも確率分布で表現</p>
-
+<p>最尤法(頻度主義): 表が出る確率1/4のコインだろう。</p>
+<p>ベイズ主義: 1/4らへんにピークはあるが、不確実さも確率分布で表現。
+加法定理・乗法定理を駆使して評価しよう。</p>
+<div>\[\begin{split}
+p(X)   &= \sum^Y p(X,Y) \\
+p(X,Y) &= p(Y \mid X) P(X)
+\end{split}\]</div>
 </section>
 <section>
 <h2 id="コイントスの回数が増えていったら">コイントスの回数が増えていったら</h2>
@@ -95,11 +99,80 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="ベイズの定理">ベイズの定理</h2>
-<p>条件付き確率、事前分布、事後分布、尤度
+<p>モデルの事後分布 $p(\mathcal M _i \mid \mathcal D)$ は、</p>
+<ul>
+<li>$p(\mathcal M _i)$: どのモデルがアリかなという好み(事前分布)と、</li>
+<li>$p(\mathcal D \mid \mathcal M _i)$:
+そのモデルの下での観察データの出やすさ
+(<em>model evidence</em>; <em>marginal likelihood</em> <strong>周辺尤度</strong>)</li>
+</ul>
+<p>の積に比例する (<strong>式 3.66</strong>)。</p>
+<div>\[
+p(\mathcal M _i \mid \mathcal D)
+   \propto p(\mathcal M _i) p(\mathcal D \mid \mathcal M _i)
+\]</div>
+<p>条件付き確率、事前分布、事後分布、尤度</p>
+<div>\[
+\text{posterior} \propto \text{prior} \times \text{likelihood}
+\]</div>
 </section>
 <section>
-<h2 id="mcmc">MCMC</h2>
-<p>事後分布的なものから乱数サンプルを集めて事後分布の代わりにする
+<h2 id="逐次学習">逐次学習</h2>
+<p>データを追加するごとに事後分布が更新される。
+</section>
+<section>
+<h2 id="ベータ分布を例に">ベータ分布を例に</h2>
+<p>コイントス3回続けて表が出たからといって $p = 1$ なわけがない、
+という事前情報をうまく取り入れて過学習を避けたい。</p>
+<div>\[\begin{split}
+\text{Binomial}(m \mid n,~p) = \binom n m p^m (1 - p)^{(n - m)}
+\end{split}\]</div>
+<div>\[\begin{split}
+\text{Beta}(\mu \mid a, b) =
+   \frac{\Gamma(a + b)}{\Gamma(a) \Gamma(b)} \mu^{a-1} (1 - \mu)^{b-1}
+\end{split}\]</div>
+<p>sequential approach 逐次学習</p>
+
+</section>
+<section>
+<h2 id="共役事前分布">共役事前分布</h2>
+<p>事後分布が事前分布と同じ形なので計算しやすい、という組み合わせ。</p>
+<table>
+<thead>
+<tr>
+<th>尤度関数</th>
+<th>共役事前分布</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>二項分布</td>
+<td>ベータ分布</td>
+</tr>
+<tr>
+<td>ポアソン分布</td>
+<td>ガンマ分布</td>
+</tr>
+<tr>
+<td>正規分布</td>
+<td>ガンマ分布</td>
+</tr>
+<tr>
+<td>正規分布 (分散既知)</td>
+<td>正規分布</td>
+</tr>
+</tbody>
+</table>
+
+</section>
+<section>
+<h2 id="解析に解くのは難しい">解析に解くのは難しい</h2>
+<p>コイン投げモデルのベータ分布は美しい例だけど現実はもっと複雑。</p>
+<p>→現実的な計算方法としてのMCMC</p>
+<p>事後分布的なものから乱数サンプルを集めて事後分布の代わりにする</p>
+<p>このとき、共役事前分布を使うことが正しいとも限らない。<br>
+計算コストがかかっても<strong>無情報事前分布</strong>を使うのが安全。</p>
+
 </section>
 <section>
 <h2 id="モンテカルロ法">モンテカルロ法</h2>
@@ -124,6 +197,21 @@ if (!doNotTrack) {
 <p>記憶を失う
 </section>
 <section>
+<h2 id="パラメータを更新する方法いろいろ">パラメータを更新する方法いろいろ</h2>
+<ul>
+<li>Metropolis</li>
+<li>Gibbs</li>
+<li>Hamiltonian</li>
+</ul>
+
+</section>
+<section>
+<h2 id="山をうろうろした軌跡事後分布">山をうろうろした軌跡→事後分布</h2>
+<p>尤度に比例した確率分布</p>
+<p>MAP推定</p>
+
+</section>
+<section>
 <h2 id="trace-plot-mcmc結果の可視化">trace plot: MCMC結果の可視化</h2>
 <ul>
 <li>chain</li>
@@ -131,14 +219,6 @@ if (!doNotTrack) {
 <li>収束</li>
 </ul>
 
-</section>
-<section>
-<h2 id="最尤推定とベイズ推定の関係">最尤推定とベイズ推定の関係</h2>
-<p>MAP推定
-</section>
-<section>
-<h2 id="事前分布の選び方">事前分布の選び方</h2>
-<p>共役事前分布
 </section>
 <section>
 <h2 id="mcmcソフトウェア">MCMCソフトウェア</h2>
@@ -216,12 +296,53 @@ model {
 
 </section>
 <section>
+<h2 id="functions-"><code>functions {...}</code></h2>
+<p>関数定義
+</section>
+<section>
+<h2 id="data-"><code>data {...}</code></h2>
+<p>Rから受け取る定数の宣言。
+</section>
+<section>
+<h2 id="transformed-data-"><code>transformed data {...}</code></h2>
+<p>定数の宣言と代入。
+決め打ちのハイパーパラメータとか。
+決定論的な変換のみ可能。
+</section>
+<section>
+<h2 id="parameters-"><code>parameters {...}</code></h2>
+<p>サンプリングされる変数の宣言。</p>
+<p>値の範囲を指定する。</p>
+
+</section>
+<section>
+<h2 id="transformed-parameters-"><code>transformed parameters {...}</code></h2>
+<p>変数の宣言と代入。
+モデルで使いやすい形にパラメータを変形しておくとか？
+</section>
+<section>
+<h2 id="model-"><code>model {...}</code></h2>
+<p>唯一の必須ブロック。</p>
+<p>サンプルされないローカル変数を宣言してもよいが、制約をかけることはできない。</p>
+
+</section>
+<section>
+<h2 id="generated-quantities-"><code>generated quantities {...}</code></h2>
+<p>サンプリング後の値を使って好きなことをするとこ？
+<code>normal_rng()</code>などによる乱数生成が許される唯一のブロック。
+ここを使わずR/Pythonで結果を受け取ってからどうにかするほうが簡単。
+</section>
+<section>
+<h2 id="階層じゃないベイズモデルを作ってみる">階層じゃないベイズモデルを作ってみる</h2>
+<p>種子の色と数。二項分布、ベータ分布。
+</section>
+<section>
 <h2 id="普通の線形単回帰をわざわざstanでやってみる">普通の線形単回帰をわざわざStanでやってみる</h2>
 
 </section>
 <section>
 <h2 id="過分散を階層ベイズモデルで扱う">過分散を階層ベイズモデルで扱う</h2>
-
+<p>個体差→過分散
 </section>
 <section>
 <h2 id="階層ベイズモデルのほかの応用先">階層ベイズモデルのほかの応用先</h2>
