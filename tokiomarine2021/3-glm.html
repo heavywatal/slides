@@ -154,6 +154,7 @@ y_i &\sim \text{Binomial}(n,~p_i) \\
 <p><img src="figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
   </div>
 </div>
+
 </section>
 <section>
 <h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
@@ -200,7 +201,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 </section>
 <section>
 <h2 id="分散分析-uanualysis-uouf-uvauriance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
-<p><strong>質的な説明変数</strong>を持つ正規分布・恒等連結のGLM、と解釈可能。<br>
+<p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等連結</strong>のGLM、と解釈可能。<br>
 <span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
 <table>
 <thead>
@@ -299,40 +300,83 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 </section>
 <section>
 <h2 id="データはひとつモデルはたくさん">データはひとつ、モデルはたくさん</h2>
-<p><img src="figure/many-models-1.png" alt="plot of chunk many-models"></p>
-<p>さて、どうやって選ぶ？</p>
+<p>どう選ぶ？</p>
+<ol>
+<li>メカニズム的に納得できるものを選ぶ
+<ul>
+<li>ポアソン過程の<strong>カウント</strong>ならポアソン分布、<strong>間隔</strong>ならガンマ分布</li>
+<li>n回中k回のように<strong>割合的なカウント</strong>なら二項分布</li>
+</ul>
+</li>
+<li>データを可視化してみて、それっぽい形のやつを選ぶ
+<ul>
+<li><strong>左右対称のひと山</strong>ならとりあえず正規分布</li>
+<li><strong>負の値を取らない</strong>ならガンマ分布</li>
+<li>直線的か、指数関数的か、頭打ちか、などなど</li>
+</ul>
+</li>
+</ol>
+<p>客観的な指標もほしい。<br>
+モデルの尤もらしさといえば&hellip;</p>
 
 </section>
 <section>
 <h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
-<p><ruby>尤<rt>もっと</rt></ruby>もらしさ。
-モデルのあてはまりの良さの尺度のひとつ。</p>
-<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>。<br>
-定義通り素直に書くと<br>
+<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>:<br>
 $\text{Prob}(D \mid M)$</p>
 <p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
 $L(M \mid D)$</p>
 <p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
-$L(\theta \mid D)$ とか $L(\theta)$ とか</p>
+$L(\theta \mid D)$ or $L(\theta)$</p>
+<p><strong>対数尤度</strong> $\log L$ の形にしたほうがいろいろ便利。</p>
+<hr>
+<p>各モデルで最適なパラメータを探して、比較:<br>
+$\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$</p>
 
 </section>
 <section>
-<h2 id="逸脱度-deviation">逸脱度 deviation</h2>
-<p>尤度の対数を取ってマイナス2倍したもの。
+<h2 id="たしかに尤度はあてはまりの良さを表してそう">たしかに尤度はあてはまりの良さを表してそう</h2>
+<p>この場合は直線回帰よりもポアソン回帰が良さそう:</p>
+<p><img src="figure/compare-loglik-1.png" alt="plot of chunk compare-loglik"></p>
+<p>この調子で、より尤度の高いモデルを探していけばいいだろうか？</p>
+
 </section>
 <section>
-<h2 id="過適合-over-fitting">過適合 over-fitting</h2>
-<p>パラメータを増やすほど<strong>現データへの</strong>適合度・尤度は高まる。</p>
-<p>が、新たなデータに対する予測は悪くなる。</p>
+<h2 id="あてはまりが良ければいいってもんでもない">あてはまりが良ければいいってもんでもない</h2>
+<dl>
+<dt>過剰適合 / 過学習 / overfitting</dt>
+<dd>パラメータを増やせば<strong>現データへの</strong>適合度・尤度を高くできるが、<br>
+予測・理解の役には立たなくなる。</dd>
+</dl>
+<p><img src="figure/saturated-model-1.png" alt="plot of chunk saturated-model"></p>
+<p><strong>帰無モデル</strong>: 説明変数なし。切片のみ。<br>
+<strong>飽和モデル</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル</p>
+
+</section>
+<section>
+<h2 id="説明変数を加えても尤度があまり改善されない場合">説明変数を加えても尤度があまり改善されない場合</h2>
+<p>種の数 $y$ は体サイズ $x$ で回帰すると良さそう。<br>
+観察時の天気 $x2$ (色) も考慮すると尤度は上がるけど&hellip;&hellip;?</p>
+<p><img src="figure/many-models-1.png" alt="plot of chunk many-models"></p>
 
 </section>
 <section>
 <h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
-<div>\[\begin{split}
-  \text{AIC} = -2 \ln L + 2 \text{パラメータ数}
-\end{split}\]</div>
-<p>AICが小さいほど良いモデル。</p>
-<p>尤度は高めたいが、パラメータを増やすとペナルティ。</p>
+<p>\[\begin{split}
+\text{AIC} &= D + 2k \\
+           &= -2 \log L^* + 2k
+\end{split}\]</p>
+<ul>
+<li>$D$: 逸脱度 deviance</li>
+<li>$k$: パラメータ数</li>
+<li>AICが小さいほど良いモデル。
+<ul>
+<li>尤度は上げたい(逸脱度は下げたい)。</li>
+<li>パラメータ数 $k$ が増えるとペナルティ。</li>
+</ul>
+</li>
+</ul>
+<p>未知のデータへの予測誤差が小さくなるような補正。</p>
 
 </section>
 <section>
@@ -341,17 +385,16 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか</p>
 <li>BIC</li>
 <li>WAIC</li>
 <li>WBIC</li>
-<li>尤度比検定</li>
 </ul>
 
 </section>
 <section>
-<h2 id="モデル選択">モデル選択</h2>
-<p>「正しい」ものを選ぶわけではない。</p>
+<h2 id="モデル選択の心構え">モデル選択の心構え</h2>
+<p>「正しい」ものを選べるわけではない。</p>
 <blockquote>
 <p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
 </blockquote>
-<p>じゃあどんなものが useful か？</p>
+<p>予測・理解に useful なものを何らかの基準で選ぶだけ。</p>
 
 </section>
 <section>
@@ -365,20 +408,16 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか</p>
 </section>
 <section>
 <h2 id="交互作用">交互作用</h2>
-<p>🔰 statsmodelsで交互作用ありモデルを作ってみる
+<p>解釈が案外難しいのでむやみに使わない。
 </section>
 <section>
-<h2 id="過分散">過分散</h2>
-<p>ポアソン分布なら平均が決まると分散も決まる。</p>
-<p>平均値から考えるよりも分散が大きい場合にどうするか。</p>
-
-</section>
-<section>
-<h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
-
-</section>
-<section>
-<h2 id="一般化加法モデル-gam">一般化加法モデル GAM</h2>
+<h2 id="glmまとめ">GLMまとめ</h2>
+<ul>
+<li>何はともあれ散布図を描く</li>
+<li>確率分布・連結関数・説明変数を考える</li>
+<li>パラメータを最尤推定する</li>
+<li>情報量基準を使って良さげなモデルを選ぶ</li>
+</ul>
 
 </section>
 <section>
@@ -394,7 +433,76 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか</p>
 
 </section>
 <section>
-<h2 id="次">次</h2>
+<h2 id="glm練習問題">GLM練習問題</h2>
+
+</section>
+<section>
+<h2 id="ポアソン分布のはずなのにおかしい">ポアソン分布のはずなのに、おかしい</h2>
+<p>生存種子</p>
+<p>二項分布・ポアソン分布なら平均が決まると分散も決まる。</p>
+<p>個体差が過分散を起こしてるっぽい。</p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>個体差をそのままモデルに組み込むと<strong>過剰適合</strong><br>
+(パラメータ数 ≥ サンプルサイズ)</p>
+<p>個体差を「平均0、標準偏差$s$の正規分布」としてモデル化</p>
+<p>パラメータ1つの追加で済む</p>
+
+</section>
+<section>
+<h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
+<p>固定効果と変量効果(random effect)が混合したモデル
+</section>
+<section>
+<h2 id="混合分布">混合分布</h2>
+<p>積分
+</section>
+<section>
+<h2 id="ポアソン-ガンマ混合分布">ポアソン-ガンマ混合分布</h2>
+<p>負の二項分布に一致
+</section>
+<section>
+<h2 id="固定効果にするか変量効果にするか">固定効果にするか、変量効果にするか</h2>
+<p>推定したパラメータを予測に使うなら固定効果</p>
+<dl>
+<dt>予測に使えそうなので固定効果向き</dt>
+<dd>連続値</dd>
+<dd>性別、職業など</dd>
+<dt>予測に使えないので変量効果向き</dt>
+<dd>たまたま取れた個体たち</dd>
+<dd>たまたま分けたグループ {A, B, C}</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="glmmまとめ">GLMMまとめ</h2>
+<ul>
+<li>GLMは統計モデリングの考え方の基礎</li>
+<li>GLMMは現実のデータ解析に向けた強化</li>
+<li>グループ差の推定などはGLMMでも厳しい</li>
+</ul>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="figure/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/2Q0f6JQ">科学とモデル&mdash;シミュレーションの哲学 入門</a> Michael Weisberg 2017<br>
+(原著: <a href="https://amzn.to/3bdvhuI">Simulation and Similarity</a> 2013)</li>
+</ul>
 <a href="4-bayesian.html" rel="next" class="readmore">
 4. 階層ベイズモデル
 </a>

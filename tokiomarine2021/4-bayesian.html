@@ -83,55 +83,86 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="コイントス4回たまたま表が1回だったら">コイントス4回、たまたま表が1回だったら</h2>
-<p>最尤法(頻度主義): 表が出る確率1/4のコインだろう。</p>
-<p>ベイズ主義: 1/4らへんにピークはあるが、不確実さも確率分布で表現。
-加法定理・乗法定理を駆使して評価しよう。</p>
-<div>\[\begin{split}
-p(X)   &= \sum^Y p(X,Y) \\
-p(X,Y) &= p(Y \mid X) P(X)
-\end{split}\]</div>
-</section>
-<section>
-<h2 id="コイントスの回数が増えていったら">コイントスの回数が増えていったら</h2>
-<p>最尤法(頻度主義): 推定値が1/2に近づいていく</p>
-<p>ベイズ主義: 確率分布がどんどん尖っていく</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<dl>
+<dt>最尤法(頻度主義)</dt>
+<dd>尤もらしいパラメータを点推定。</dd>
+<dd>データが少ないとき過剰適合気味。</dd>
+<dd>表が出る確率 p = 0.25 のコインだろう。<br>
+(信じ難いけどデータはこう言っている)</dd>
+</dl>
+<br>
+<dl>
+<dt>ベイズ推定</dt>
+<dd>推定結果は確率分布そのもの。</dd>
+<dd>データが少ないなりの不確実さも表現。</dd>
+<dd>p = 0.25 らへんである確率は高いが、<br>
+p = 0.6 とかである可能性もまあある。
+</div>
+<div class="column" style="flex-shrink: 1.4;">
+</dd>
+</dl>
+<p><img src="figure/freq-vs-bayes-1.png" alt="plot of chunk freq-vs-bayes"><img src="figure/freq-vs-bayes-2.png" alt="plot of chunk freq-vs-bayes"></p>
+  </div>
+</div>
 
 </section>
 <section>
+<h2 id="コイントスの回数が増えていったら">コイントスの回数が増えていったら</h2>
+<p><strong>最尤法(頻度主義)</strong>: 推定値が真の値に近づいていく</p>
+<p><img src="figure/coin-frequentist-1.png" alt="plot of chunk coin-frequentist"></p>
+<p><strong>ベイズ推定</strong>: 確率分布がどんどん尖り、確信が強まる</p>
+<p><img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian"></p>
+
+</section>
+<section>
+<h2 id="確率おさらい">確率おさらい</h2>
+<dl>
+<dt>同時分布/結合確率: <span style="font-weight: normal;"> $A$かつ$B$の確率</span></dt>
+<dd>$\text{Prob}(A, B) = \text{Prob}(A \cap B) = \text{Prob}(A) \text{Prob}(B)$</dd>
+<dt>周辺確率: <span style="font-weight: normal;"> $B$によらず$A$になる確率</span></dt>
+<dd>$\text{Prob}(A) = \sum_B \text{Prob}(A, B)$</dd>
+<dt>条件付き確率: <span style="font-weight: normal;"> $B$のとき$A$になる確率</span></dt>
+<dd>$\text{Prob}(A \mid B) = \frac {\text{Prob}(A, B)} {\text{Prob}(B)}$</dd>
+<dt>乗法定理</dt>
+<dd>$\text{Prob}(A,B) = \text{Prob}(A \mid B) \text{Prob}(B) = \text{Prob}(B \mid A) \text{Prob}(A)$</dd>
+</dl>
+<p>これらを組み合わせると<strong>ベイズの定理</strong>が導かれる。
+</section>
+<section>
 <h2 id="ベイズの定理">ベイズの定理</h2>
-<p>モデルの事後分布 $p(\mathcal M _i \mid \mathcal D)$ は、</p>
+<p>乗法定理から出発して移項:</p>
+<div>\[\begin{split}
+\text{Prob}(A \mid B) \text{Prob}(B) &= \text{Prob}(B \mid A) \text{Prob}(A) \\
+\text{Prob}(A \mid B) &= \frac {\text{Prob}(B \mid A) \text{Prob}(A)} {\text{Prob}(B)}
+\end{split}\]</div>
+<p>モデル $\mathcal M$ とデータ $\mathcal D$ に置き換え、分母の正規化項を外すと:</p>
+<div>\[\begin{split}
+\text{Prob}(\mathcal M \mid \mathcal D) \propto
+  \text{Prob}(\mathcal D \mid \mathcal M) \text{Prob}(\mathcal M)
+\end{split}\]</div>
+<p>モデルの<strong>事後分布</strong> $\text{Prob}(\mathcal M \mid \mathcal D)$ は次の積に比例する:</p>
 <ul>
-<li>$p(\mathcal M _i)$: どのモデルがアリかなという好み(事前分布)と、</li>
-<li>$p(\mathcal D \mid \mathcal M _i)$:
-そのモデルの下での観察データの出やすさ
-(<em>model evidence</em>; <em>marginal likelihood</em> <strong>周辺尤度</strong>)</li>
+<li>$\text{Prob}(\mathcal D \mid \mathcal M)$:
+モデル$\mathcal M$の下での観察データ$\mathcal D$の出やすさ (<strong>尤度</strong>)</li>
+<li>$\text{Prob}(\mathcal M)$:
+データ$\mathcal D$を得る前の思い込み (<strong>事前分布</strong>)</li>
 </ul>
-<p>の積に比例する (<strong>式 3.66</strong>)。</p>
-<div>\[
-p(\mathcal M _i \mid \mathcal D)
-   \propto p(\mathcal M _i) p(\mathcal D \mid \mathcal M _i)
-\]</div>
-<p>条件付き確率、事前分布、事後分布、尤度</p>
-<div>\[
-\text{posterior} \propto \text{prior} \times \text{likelihood}
-\]</div>
+<p>確信の度合いをデータによって更新するようなイメージ。</p>
+
 </section>
 <section>
 <h2 id="逐次学習">逐次学習</h2>
-<p>データを追加するごとに事後分布が更新される。
-</section>
-<section>
-<h2 id="ベータ分布を例に">ベータ分布を例に</h2>
-<p>コイントス3回続けて表が出たからといって $p = 1$ なわけがない、
-という事前情報をうまく取り入れて過学習を避けたい。</p>
+<p>コイントス4回のうち表1回、に基づく<strong>事前分布</strong>: $\text{Beta}(p \mid 1, 3)$</p>
+<p>さらに16回投げたら表が7回、の<strong>尤度</strong>: $\text{Binomial}(7 \mid 16,~p)$</p>
+<p><strong>事後分布</strong>を計算してみると、事前分布と同じ形になる:</p>
 <div>\[\begin{split}
-\text{Binomial}(m \mid n,~p) = \binom n m p^m (1 - p)^{(n - m)}
+\text{Beta}(p \mid 8, 12) \propto
+  \text{Beta}(p \mid 1, 3) \times \text{Binomial}(7 \mid 16,~p)
 \end{split}\]</div>
-<div>\[\begin{split}
-\text{Beta}(\mu \mid a, b) =
-   \frac{\Gamma(a + b)}{\Gamma(a) \Gamma(b)} \mu^{a-1} (1 - \mu)^{b-1}
-\end{split}\]</div>
-<p>sequential approach 逐次学習</p>
+<p>これを事前分布としてまた新しいデータで更新できる。</p>
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
 
 </section>
 <section>
@@ -163,88 +194,247 @@ p(\mathcal M _i \mid \mathcal D)
 </tr>
 </tbody>
 </table>
+<p>共役事前分布を使うことが常に正しいとも限らない。<br>
+計算コストがかかっても<strong>無情報事前分布</strong>を使う風潮。</p>
 
 </section>
 <section>
-<h2 id="解析に解くのは難しい">解析に解くのは難しい</h2>
-<p>コイン投げモデルのベータ分布は美しい例だけど現実はもっと複雑。</p>
-<p>→現実的な計算方法としてのMCMC</p>
-<p>事後分布的なものから乱数サンプルを集めて事後分布の代わりにする</p>
-<p>このとき、共役事前分布を使うことが正しいとも限らない。<br>
-計算コストがかかっても<strong>無情報事前分布</strong>を使うのが安全。</p>
+<h2 id="事後分布を用いた推定">事後分布を用いた推定</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<dl>
+<dt>区間推定</dt>
+<dd>幅のある推定値を提示</dd>
+<dd>e.g., 95%ベイズ確信区間<br>(credible interval)</dd>
+<dt>点推定</dt>
+<dd>値を1点だけ提示</dd>
+<dd>e.g., MAP推定
+</div>
+<div class="column" style="flex-shrink: 1.0;">
+</dd>
+</dl>
+<p><img src="figure/integrate-1.png" alt="plot of chunk integrate"></p>
+  </div>
+</div>
+<p>コイン投げモデルのベータ分布は美しい例。<br>
+→ 解析的(数学的)に解ける。</p>
+<p>実践的なモデル・事後分布はもっと複雑。<br>
+→ コンピュータに頼って数値計算: MCMC</p>
 
 </section>
 <section>
-<h2 id="モンテカルロ法">モンテカルロ法</h2>
-<p>円の面積</p>
+<h2 id="mcmc-umuarcov-ucuhain-umuonte-ucuarlo">MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo</h2>
+<a href="https://en.wikipedia.org/wiki/Andrey_Markov">
+<img src="figure/AAMarkov.jpg" height="180" align="right"></a>
+<dl>
+<dt>マルコフ連鎖</dt>
+<dd>次の時点の挙動が現在の値だけで決定されるような確率過程。</dd>
+<dd>$\ldots \to X_{t - 2} \to X_{t - 1} \to X_{t} \to X_{t + 1}$</dd>
+<dd>$\text{Prob}(X_{t+1} \mid X_{t}, X_{t-1}, X_{t-2}, \ldots) = \text{Prob}(X_{t+1} \mid X_{t})$</dd>
+<dd>e.g., すごろく</dd>
+<dt>モンテカルロ法</dt>
+<dd>乱数を用いた計算方法の総称。</dd>
+<dd><a href="https://en.wikipedia.org/wiki/Monte_Carlo_Casino">
+<img src="figure/Real_Monte_Carlo_Casino.jpg" height="200"></a>
+<a href="https://en.wikipedia.org/wiki/Stanislaw_Ulam">
+<img src="figure/Stanislaw_Ulam.jpg" height="200"></a>
+<a href="https://en.wikipedia.org/wiki/John_von_Neumann">
+<img src="figure/John_von_Neumann.jpg" height="200"></a>
+<a href="https://en.wikipedia.org/wiki/Nicholas_Metropolis">
+<img src="figure/Nicholas_Metropolis.png" height="200"></a>
+</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="モンテカルロ法は乱数を用いた計算方法">モンテカルロ法は乱数を用いた計算方法</h2>
+<p>e.g., 半径1の円の面積</p>
+<p>面積4の正方形に400個の一様乱数を打ち込んだら318個乗った:<br>
+$4 \times \frac {318} {400} = 3.18$</p>
 <p><img src="figure/circle-1.png" alt="plot of chunk circle"></p>
-<p>$4 \times \frac {318} {400} = 3.18$</p>
-<p>これが高次元になっていくと？</p>
+<p>数学を知っていれば $\pi r ^ 2 \approx 3.14$</p>
 
 </section>
 <section>
-<h2 id="高次元になるほど当たらなくなる">高次元になるほど当たらなくなる</h2>
-<p>N次元球の体積 / N次元の立方体</p>
+<h2 id="変な分布もモンテカルロ法で扱えそう">変な分布もモンテカルロ法で扱えそう</h2>
+<p>e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。</p>
+<p><img src="figure/mcpdf-1.png" alt="plot of chunk mcpdf"></p>
+<p>でも、ハズレの値もけっこう引いてしまう。</p>
+
+</section>
+<section>
+<h2 id="次元の呪い-高次元になるほど当たりにくくなる">次元の呪い: 高次元になるほど当たりにくくなる</h2>
+<p>(N次元球の体積 / N次元の立方体) はゼロに近づいていく。</p>
+<img src="figure/circle-1.png" width="210" align="right">
 <ul>
-<li>2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4$</li>
-<li>3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6$</li>
+<li>2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$</li>
+<li>3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$</li>
 <li>N次元: $\frac {\frac {\pi ^ {N/2}} {\Gamma (N/2 + 1)} r ^ N} {(2r) ^ N} = \frac {\pi ^ {N/2}} {2^N \Gamma (N/2 + 1)} \to 0$</li>
 </ul>
+<p>パラメータが増えると計算量(≈乱数の無駄撃ち)が急増。</p>
+<hr>
+<p>密度の高い「当たり」付近を効率よく探索したい。<br>
+「当たり」は「当たり」の近くにありがちだろう。<br>
+→ マルコフ連鎖が使えそう</p>
 
 </section>
 <section>
-<h2 id="マルコフ連鎖">マルコフ連鎖</h2>
-<p>記憶を失う
+<h2 id="metropolis--hastings法-mh法">Metropolis&ndash;Hastings法 (MH法)</h2>
+<ol start="0">
+<li>パラメータ $\theta$ の初期値を選ぶ</li>
+<li>$\theta$ をちょっと増減させて $\theta_\text{new}$ を作る</li>
+<li>それぞれ尤度を計算し、比較。
+<ul>
+<li>$L(\theta_\text{new}) \ge L(\theta)$ なら $\theta_\text{new}$ を即採択</li>
+<li>$L(\theta_\text{new}) &lt; L(\theta)$ でも
+確率 $r = \frac {L(\theta_\text{new})} {L(\theta)}$ で  $\theta_\text{new}$ を採択</li>
+</ul>
+</li>
+<li>$\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。</li>
+</ol>
+<p><img src="figure/metropolis-1.png" alt="plot of chunk metropolis">
 </section>
 <section>
-<h2 id="パラメータを更新する方法いろいろ">パラメータを更新する方法いろいろ</h2>
+<h2 id="採択されたパラメータ値の軌跡">採択されたパラメータ値の軌跡</h2>
+<p>尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
+ </p>
+<p><img src="figure/metropolis-trajectory-head-1.png" alt="plot of chunk metropolis-trajectory-head"></p>
+
+</section>
+<section>
+<h2 id="採択されたパラメータ値の軌跡">採択されたパラメータ値の軌跡</h2>
+<p>尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
+通ったパラメータ値を集めるといい感じの分布が得られる。</p>
+<p><img src="figure/metropolis-trajectory-1.png" alt="plot of chunk metropolis-trajectory"></p>
+
+</section>
+<section>
+<h2 id="尤度に比例する事後分布からサンプルしたのと等価">尤度に比例する事後分布からサンプルしたのと等価</h2>
+<p>全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
+が、パラメータ1つの1次元ではご利益はわかりにくい。</p>
+<p><img src="figure/propto-lik-1.png" alt="plot of chunk propto-lik"></p>
+<p>パラメータが複数ある場合は？</p>
+
+</section>
+<section>
+<h2 id="gibbs-sampling">Gibbs Sampling</h2>
+<p>「ほかを固定してひとつ更新」を繰り返す。</p>
+<p>e.g., 二次元正規分布。(-2, 2) からスタート。</p>
+<p><img src="figure/gibbs-1.png" alt="plot of chunk gibbs"></p>
+<p>TODO: アニメーション、周辺分布</p>
+
+</section>
+<section>
+<h2 id="中間まとめ">中間まとめ</h2>
 <ul>
-<li>Metropolis</li>
-<li>Gibbs</li>
-<li>Hamiltonian</li>
+<li>ベイズ推定では不確実性も表現できる。</li>
+<li>コンピュータに頼った計算方法としてのモンテカルロ法。</li>
+<li>多次元でも効率よくサンプルするためのMCMC。</li>
+</ul>
+<hr>
+<p>ここから、実行するにあたっての注意点を見ていく。
+</section>
+<section>
+<h2 id="何回やっても似たような結果になってほしい">何回やっても似たような結果になってほしい</h2>
+<p>乱数や初期値によって偶々、じゃないことを確認したい。</p>
+<p>e.g., <code>chains = 3, iter = 600</code> 。ほぼ同じところをうろうろ:</p>
+<p><img src="figure/chains-1.png" alt="plot of chunk chains"></p>
+<p>収束(convergence)の判定については後ほど。</p>
+
+</section>
+<section>
+<h2 id="初期値の影響が消えるまでウォーミングアップ">初期値の影響が消えるまでウォーミングアップ</h2>
+<p>定常分布の山に到達してからが本番。</p>
+<p>e.g., <code>iter = 600, warmup = 200</code> で灰色の部分を捨てる:</p>
+<p><img src="figure/warmup-1.png" alt="plot of chunk warmup"></p>
+<p>どれくらい長く捨てるべきかは場合による。</p>
+
+</section>
+<section>
+<h2 id="適度に間引いて自己相関を軽減したい">適度に間引いて自己相関を軽減したい</h2>
+<p>直前の値と似すぎていたら独立サンプルとして扱えないので。</p>
+<p>e.g., <code>thin = 5</code> で5回に1回だけサンプルする:</p>
+<p><img src="figure/thin-1.png" alt="plot of chunk thin"></p>
+<p>間引かなくても大丈夫な場合も、間引いても解決しない場合もある。</p>
+
+</section>
+<section>
+<h2 id="収束判定">収束判定</h2>
+<ul>
+<li>複数chains・複数初期値で実行し、軌跡や分布を可視化</li>
+<li>Gelman-Rubin統計量 $\hat R &lt; 1.05$</li>
+<li>Effective Sample Size (ESS) $N_\text{eff} &gt; 100$ per chain</li>
+</ul>
+<p>TODO: 収束してる例 vs してない例
+</section>
+<section>
+<h2 id="収束自己相関が悪い場合にどう改善するか">収束・自己相関が悪い場合にどう改善するか</h2>
+<ul>
+<li>小手先の対処
+<ul>
+<li>warmupとiterをもっと長くする</li>
+<li>thinを大きくして間引く</li>
+</ul>
+</li>
+<li>ちょっと大掛かり
+<ul>
+<li>モデルを見直す</li>
+<li>プログラムを見直す</li>
+<li>アルゴリズム・ソフトウェアを変える</li>
+</ul>
+</li>
 </ul>
 
 </section>
 <section>
-<h2 id="山をうろうろした軌跡事後分布">山をうろうろした軌跡→事後分布</h2>
-<p>尤度に比例した確率分布</p>
-<p>MAP推定</p>
-
-</section>
-<section>
-<h2 id="trace-plot-mcmc結果の可視化">trace plot: MCMC結果の可視化</h2>
+<h2 id="mcmcの方法いろいろ">MCMCの方法いろいろ</h2>
+<p>採択率を高め、早く収束するように改良されてきている。</p>
 <ul>
-<li>chain</li>
-<li>warm up / burn in</li>
-<li>収束</li>
+<li>Metropolis&ndash;Hastings法
+<ul>
+<li>Gibbs Sampling</li>
+<li>Hamiltonian Monte Carlo (HMC)
+<ul>
+<li>No-U-Turn Sampler (NUTS)</li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 </section>
 <section>
 <h2 id="mcmcソフトウェア">MCMCソフトウェア</h2>
 <ul>
-<li>WinBUGS
+<li><a href="https://www.mrc-bsu.cam.ac.uk/software/bugs/">BUGS</a>
 <ul>
-<li>Windowsでしか動かない</li>
+<li>クローズドソースで、ほぼWindows専用。</li>
 </ul>
 </li>
-<li>JAGS
+<li><a href="https://mcmc-jags.sourceforge.io/">JAGS</a>
 <ul>
-<li>開発停滞、マニュアルや用例が不足</li>
+<li>オープンソースで、さまざまなOS・言語から利用可能。</li>
+<li>マニュアルや用例が不足。</li>
 </ul>
 </li>
-<li><strong>Stan</strong>
+<li><a href="https://mc-stan.org/"><strong>Stan</strong></a> 👈
 <ul>
-<li>開発も利用も活発</li>
-<li>マニュアルや用例も充実、エラーも読みやすい。</li>
-<li>NUTSやADVIなどのアルゴリズムで早く収束</li>
+<li>オープンソースで、さまざまなOS・言語から利用可能。</li>
+<li>開発も利用も活発。マニュアルや用例も充実。</li>
+<li>HMC/NUTSにより早く収束。</li>
 </ul>
 </li>
+<li><a href="https://docs.pymc.io/">PyMC3</a></li>
+<li><a href="https://num.pyro.ai/">NumPyro</a></li>
+<li><a href="https://www.tensorflow.org/probability/">TensorFlow Probability</a></li>
 </ul>
 
 </section>
 <section>
 <h2 id="stan">Stan</h2>
+<a href="https://mc-stan.org/">
+<img src="/slides/figure/stan/logo_name.png" width="120" align="right">
+</a>
 <ul>
 <li>C++で書かれている</li>
 <li>Stan言語でモデルを書く</li>
@@ -253,13 +443,32 @@ p(\mathcal M _i \mid \mathcal D)
 
 </section>
 <section>
+<h2 id="おおまかな流れ-in-r">おおまかな流れ in R</h2>
+<p>TODO: in Python</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">mydata</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;mydata.tsv.gz&#34;</span><span class="p">)</span>
+
+<span class="c1"># Stan言語で書いたモデルをコンパイル</span>
+<span class="n">model1</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&#34;model1.stan&#34;</span><span class="p">)</span>
+
+<span class="c1"># MCMCサンプリング</span>
+<span class="n">fit1</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+
+<span class="c1"># 結果を眺める</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
+<span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div>
+</section>
+<section>
 <h2 id="stan言語でモデルを書く">Stan言語でモデルを書く</h2>
-<pre><code class="language-stan" data-lang="stan">data {
-  int length;
-  real x[length];
+<p>いくつかのブロックに分ける。</p>
+<pre><code class="language-stan" data-lang="stan">data {         // passed from R/Python
+  int&lt;lower=0&gt; N;
+  real x[N];
 }
 
-parameters {
+parameters {   // sampled via MCMC
   real mu;
   real&lt;lower=0&gt; sigma;
 }
@@ -270,79 +479,159 @@ model {
 </code></pre>
 </section>
 <section>
-<h2 id="stan言語の7種のブロック順番厳守">Stan言語の7種のブロック、順番厳守</h2>
-<dl>
-<dt><code>functions {...}</code></dt>
-<dd>関数を定義できる。</dd>
-<dt><code>data {...}</code></dt>
-<dd>Rから受け取る定数の宣言。</dd>
-<dt><code>transformed data {...}</code></dt>
-<dd>定数の宣言と代入。
-決め打ちのハイパーパラメータとか。
-決定論的な変換のみ可能。</dd>
-<dt><code>parameters {...}</code></dt>
-<dd>サンプリングされる変数の宣言。</dd>
-<dt><code>transformed parameters {...}</code></dt>
-<dd>変数の宣言と代入。
-モデルで使いやすい形にパラメータを変形しておくとか？</dd>
-<dt><code>model {...}</code></dt>
-<dd>唯一の必須ブロック。
-サンプルされないローカル変数を宣言してもよいが、制約をかけることはできない。</dd>
-<dt><code>generated quantities {...}</code></dt>
-<dd>サンプリング後の値を使って好きなことをするとこ？
-<code>normal_rng()</code>などによる乱数生成が許される唯一のブロック。
-ここを使わずR/Pythonで結果を受け取ってからどうにかするほうが簡単。</dd>
-</dl>
+<h2 id="stan言語の7種のブロック">Stan言語の7種のブロック</h2>
+<p>順番厳守。使うのはだいたい太字のやつだけ。</p>
+<ol>
+<li><code>functions {...}</code></li>
+<li><strong><code>data {...}</code></strong></li>
+<li><code>transformed data {...}</code></li>
+<li><strong><code>parameters {...}</code></strong></li>
+<li><code>transformed parameters {...}</code></li>
+<li><strong><code>model {...}</code></strong></li>
+<li><code>generated quantities {...}</code></li>
+</ol>
 
 </section>
 <section>
-<h2 id="functions-"><code>functions {...}</code></h2>
-<p>関数定義
+<h2 id="変数の型">変数の型</h2>
+<p>整数と実数は区別される。<br>
+配列的なものが複数あってややこしい。</p>
+<pre><code class="language-stan" data-lang="stan"># scalar
+int N;
+real x;
+
+# linear algebra
+vector[N] v;
+row_vector[N] rv;
+matrix[M, N] m;
+
+# array
+real a[N];
+</code></pre><p>TODO: rstan 2.27 が出たら <code>array</code> syntax 更新</p>
+
 </section>
 <section>
 <h2 id="data-"><code>data {...}</code></h2>
-<p>Rから受け取る定数の宣言。
-</section>
-<section>
-<h2 id="transformed-data-"><code>transformed data {...}</code></h2>
-<p>定数の宣言と代入。
-決め打ちのハイパーパラメータとか。
-決定論的な変換のみ可能。
+<p>R/Pythonから受け取る定数の宣言。</p>
+<p>配列の大きさは動的に変えられない。<br>
+上限・下限を設定可能。<br></p>
+<pre><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=0&gt; N;
+  real x[N];
+}
+</code></pre>
 </section>
 <section>
 <h2 id="parameters-"><code>parameters {...}</code></h2>
 <p>サンプリングされる変数の宣言。</p>
-<p>値の範囲を指定する。</p>
-
-</section>
-<section>
-<h2 id="transformed-parameters-"><code>transformed parameters {...}</code></h2>
-<p>変数の宣言と代入。
-モデルで使いやすい形にパラメータを変形しておくとか？
+<pre><code class="language-stan" data-lang="stan">parameters {
+  real mu;
+  real&lt;lower=0&gt; sigma;
+}
+</code></pre>
 </section>
 <section>
 <h2 id="model-"><code>model {...}</code></h2>
-<p>唯一の必須ブロック。</p>
+<p>確率変数と事前分布・パラメータの関係を記述。</p>
+<pre><code class="language-stan" data-lang="stan">model {
+  x ~ normal(mu, sigma);
+}
+</code></pre><p>このようにチルダを使うのは“sampling statement”。<br>
+代わりに <code>target += normal_lpdf(x | mu, sigma);</code>
+のように対数確率の加算を明示的に書いてもいい。</p>
 <p>サンプルされないローカル変数を宣言してもよいが、制約をかけることはできない。</p>
 
 </section>
 <section>
-<h2 id="generated-quantities-"><code>generated quantities {...}</code></h2>
-<p>サンプリング後の値を使って好きなことをするとこ？
-<code>normal_rng()</code>などによる乱数生成が許される唯一のブロック。
-ここを使わずR/Pythonで結果を受け取ってからどうにかするほうが簡単。
+<h2 id="関数">関数</h2>
+<p><a href="https://mc-stan.org/docs/functions-reference/">定義済みの関数</a>がたくさんある。</p>
+<p><code>functions</code> ブロックで<a href="https://mc-stan.org/docs/reference-manual/functions-chapter.html">新しい関数を定義する</a>ことも可能:</p>
+<pre><code class="language-stan" data-lang="stan">real radius(real x, real y) {
+  return sqrt(x ^ 2 + x ^ 2);
+}
+</code></pre>
 </section>
 <section>
-<h2 id="階層じゃないベイズモデルを作ってみる">階層じゃないベイズモデルを作ってみる</h2>
-<p>種子の色と数。二項分布、ベータ分布。
-</section>
-<section>
-<h2 id="普通の線形単回帰をわざわざstanでやってみる">普通の線形単回帰をわざわざStanでやってみる</h2>
+<h2 id="other-blocks">Other blocks</h2>
+<p><code>transformed data {...}</code></p>
+<ul>
+<li><code>data</code> ブロックで読み込む変数の決定論的変換</li>
+<li>決め打ちのハイパーパラメータを宣言するとか</li>
+</ul>
+<p><code>transformed parameters {...}</code></p>
+<ul>
+<li><code>model</code> で使いやすい形にパラメータを変形しておくとか</li>
+</ul>
+<p><code>generated quantities {...}</code></p>
+<ul>
+<li>サンプリング後の値を使って好きなことをする。
+ここを使わずR/Pythonで結果を受け取ってからどうにかするほうが簡単。</li>
+</ul>
 
 </section>
 <section>
-<h2 id="過分散を階層ベイズモデルで扱う">過分散を階層ベイズモデルで扱う</h2>
-<p>個体差→過分散
+<h2 id="説明変数なしのベイズ推定をやってみる">説明変数なしのベイズ推定をやってみる</h2>
+
+</section>
+<section>
+<h2 id="線形単回帰をわざわざstanでやってみる">線形単回帰をわざわざStanでやってみる</h2>
+
+</section>
+<section>
+<h2 id="非線形回帰">非線形回帰</h2>
+<p>非対称なひと山。応答変数も説明変数も正の値。</p>
+<div>\[\begin{split}
+y = ae ^ {-bx} - ce ^ {-dx}
+\end{split}\]</div>
+<p><img src="figure/non-linear-1.png" alt="plot of chunk non-linear"></p>
+
+</section>
+<section>
+<h2 id="練習問題">練習問題</h2>
+
+</section>
+<section>
+<h2 id="階層ベイズモデル">階層ベイズモデル</h2>
+<p>GLMでは説明できない現象</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="figure/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="二項分布なはずなのにおかしい">二項分布なはずなのに、おかしい</h2>
+<p>生存種子</p>
+<p>個体差が過分散を起こしてるっぽい</p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>個体差をそのままモデルに組み込むと<strong>過剰適合</strong><br>
+(パラメータ数 ≥ サンプルサイズ)</p>
+<p>個体差を「平均0、標準偏差$s$の正規分布」としてモデル化</p>
+<p>パラメータ1つの追加で済む</p>
+
+</section>
+<section>
+<h2 id="モデルの全体像">モデルの全体像</h2>
+<p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
+<p>超パラメータ、超事前分布</p>
+
+</section>
+<section>
+<h2 id="階層ベイズをstanで書くと">階層ベイズをStanで書くと</h2>
+
+</section>
+<section>
+<h2 id="うまくフィットできた">うまくフィットできた</h2>
+<p>事後分布からのMCMCサンプル
+</section>
+<section>
+<h2 id="個体差だけでなくグループ差も考慮">個体差だけでなく、グループ差も考慮</h2>
+
 </section>
 <section>
 <h2 id="階層ベイズモデルのほかの応用先">階層ベイズモデルのほかの応用先</h2>
@@ -351,6 +640,85 @@ model {
 <li>空間構造のあるモデル (e.g., CARモデル)</li>
 <li>欠損値の補完</li>
 </ul>
+<p>TODO: それぞれ理論・実践を紹介する？
+</section>
+<section>
+<h2 id="事前分布の選別">事前分布の選別</h2>
+<ol>
+<li>
+<p>とりあえず<strong>無情報事前分布</strong> $[-\infty, \infty]$。Stanのデフォルト。</p>
+</li>
+<li>
+<p>収束が悪かったら<strong>弱情報事前分布</strong>を試す。<br>
+事後分布を更新していったとき<strong>事前分布っぽさが残らない</strong>のが良い。</p>
+<ul>
+<li>取りうる値を逃すような狭すぎる分布はダメ。</li>
+<li>狭すぎるよりはマシだが、広すぎても良くない。</li>
+<li>一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。</li>
+</ul>
+<p>おすすめ: <strong>Student&rsquo;s t分布</strong>、正規分布、指数分布など。</p>
+</li>
+</ol>
+<p><cite><a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></cite></p>
+
+</section>
+<section>
+<h2 id="stanおすすめ弱情報事前分布-students-t分布">Stanおすすめ弱情報事前分布: Student&rsquo;s t分布</h2>
+<p>Student&rsquo;s $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$</p>
+<ul>
+<li>自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。</li>
+<li>スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。</li>
+</ul>
+<p><img src="figure/student_t-1.png" alt="plot of chunk student_t"></p>
+<p>正の値しか取らない場合は <code>&lt;lower=0&gt;</code> として右半分だけ使うとか。</p>
+
+</section>
+<section>
+<h2 id="区間推定-ベイズ確信区間-credible-interval">区間推定: ベイズ確信区間 (credible interval)</h2>
+<p>e.g., 95%ベイズ確信区間 (credible interval): 真の値が95%の確率で含まれる区間。</p>
+<p>等裾事後信用区間 (equal-tailed interval): 両端から2.5%ずつ削る</p>
+<p>TODO: 図</p>
+<p>最高密度区間 (highest density interval): 分布密度に閾値を設ける</p>
+<p>TODO: 図</p>
+
+</section>
+<section>
+<h2 id="点推定">点推定</h2>
+<ul>
+<li>事後中央値 (Posteriori <u>Med</u>ian: MED)</li>
+<li>事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori: EAP)</li>
+<li>事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori: MAP)</li>
+</ul>
+<p>TODO: 図
+</section>
+<section>
+<h2 id="ベイズ推定まとめ">ベイズ推定まとめ</h2>
+
+</section>
+<section>
+<h2 id="階層ベイズの練習問題">階層ベイズの練習問題</h2>
+
+</section>
+<section>
+<h2 id="全体まとめ">全体まとめ</h2>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/2Q0f6JQ">科学とモデル&mdash;シミュレーションの哲学 入門</a> Michael Weisberg 2017<br>
+(原著: <a href="https://amzn.to/3bdvhuI">Simulation and Similarity</a> 2013)</li>
+</ul>
+<a href="." class="readmore">
+目次に戻る
+</a>
 
 </section>
 </div>
