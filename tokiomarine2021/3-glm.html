@@ -452,19 +452,19 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
 <p>各個体の生存率$p_i$をそのままパラメータにすると<strong>過剰適合</strong>。<br>
 「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
-i.e., 4個生き残ったこの個体は生存率0.5だね。次の個体は&hellip;&hellip;</p>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから&hellip;&hellip;</p>
 <p><img src="figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm"></p>
 <p>個体の生存能力をもっと少ないパラメータで表現できないか？</p>
 
 </section>
 <section>
 <h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
-<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定:</p>
+<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 <p><img src="figure/sigmoid-1.png" alt="plot of chunk sigmoid"></p>
-<p>さらに能力値は全個体共通の正規分布に従う<br>
-$z_i \sim \text{Normal}(\hat z, \sigma)$ <br>
-と仮定すればパラメータ2つで済む。</p>
-<p>平均 $\hat z$ は $\hat p$ から求まるとして、ばらつき $\sigma$ どうする？</p>
+<p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
+<p>前者は標本平均 $\hat p$ から求まるとして、後者どうする？</p>
 
 </section>
 <section>
@@ -597,7 +597,7 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 </ul>
 </li>
 </ul>
-<p>→ ここでGLMMの練習はせず、階層ベイズモデルに進みます。</p>
+<p>→ ここでGLMMの練習はせず、階層ベイズモデルに進む。</p>
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="figure/kubo-p2.png" width="60%">
@@ -630,11 +630,11 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 <h2 id="参考文献">参考文献</h2>
 <ul>
 <li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 <li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
-<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
-<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
 </ul>
 <a href="4-bayesian.html" rel="next" class="readmore">
 4. 階層ベイズモデル

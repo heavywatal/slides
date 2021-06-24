@@ -94,7 +94,7 @@ if (!doNotTrack) {
 <p><img src="figure/lm-bad-1.png" alt="plot of chunk lm-bad"></p>
 <ul>
 <li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
-<li><strong>縦軸のばらつき</strong>が横軸に応じて変化？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
 </ul>
 
 </section>
@@ -103,7 +103,7 @@ if (!doNotTrack) {
 <p><img src="figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
 <ul>
 <li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
-<li><strong>縦軸のばらつき</strong>が横軸に応じて変化？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
 <li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
 </ul>
 
@@ -294,55 +294,75 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 </section>
 <section>
-<h2 id="二項分布">二項分布</h2>
-<p>確率pで当たるクジをn回引いてX回当たる確率</p>
-<p>\[
-\text{Prob}(X = k) = \binom n k p^k (1 - p)^{n - k}
-\]</p>
+<h2 id="二項分布-textbinomialnp">二項分布 $~\text{Binomial}(n,~p)$</h2>
+<p>確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。</p>
 <p><img src="figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
+<p>\[
+\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\]</p>
 <p>🔰 1%の当たりを狙って100連ガチャを回した場合を可視化してみよう</p>
 <p>🔰 二項分布になりそうな例を考えてみよう</p>
 
 </section>
 <section>
-<h2 id="ポアソン分布">ポアソン分布</h2>
-<p>平均$\lambda$で単位時間(空間)あたりに発生する事象の回数</p>
+<h2 id="ポアソン分布-textpoissonlambda">ポアソン分布 $~\text{Poisson}(\lambda)$</h2>
+<p>平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。</p>
 <p>e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数</p>
 <p><img src="figure/dpoisson-1.png" alt="plot of chunk dpoisson"></p>
-<p>🔰 ポアソン分布になりそうな例を考えてみよう</p>
-<p>二項分布の極限。めったに起きないことを何回も試行。</p>
+<p>\[
+\text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\]</p>
+<p>二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
+めったに起きないことを何回も試行するような感じ。</p>
 
 </section>
 <section>
-<h2 id="指数分布">指数分布</h2>
-<p>ポアソン過程の事象の発生間隔 (平均$1 / \lambda$)</p>
+<h2 id="指数分布-textexplambda">指数分布 $~\text{Exp}(\lambda)$</h2>
+<p>ポアソン過程の事象の発生間隔。平均は $1 / \lambda$ 。</p>
 <p>e.g., メッセージの受信間隔、国道沿いに落ちてる手袋の間隔</p>
 <p><img src="figure/dexp-1.png" alt="plot of chunk dexp"></p>
-<p>🔰 指数分布になりそうな例を考えてみよう</p>
+<p>\[
+\text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
+\]</p>
+<p>🔰 ポアソン分布・指数分布になりそうな例を考えてみよう</p>
 
 </section>
 <section>
-<h2 id="ガンマ分布">ガンマ分布</h2>
+<h2 id="ガンマ分布-textgammaklambda">ガンマ分布 $~\text{Gamma}(k,~\lambda)$</h2>
 <p>ポアソン過程の事象k回発生までの待ち時間</p>
 <p>e.g., メッセージを2つ受信するまでの待ち時間</p>
 <p><img src="figure/dgamma-1.png" alt="plot of chunk dgamma"></p>
-<p>🔰 ガンマ分布になりそうな例を考えてみよう</p>
+<p>\[
+\text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\]</p>
+<p>shapeパラメータ $k = 1$ のとき指数分布と一致。</p>
 
 </section>
 <section>
-<h2 id="正規分布">正規分布</h2>
-<p>標本平均を何度もサンプルしたもの(中心極限定理)</p>
-<p>e.g., 一様分布 $X \in [0, 100)$ から取った標本40個の平均値</p>
+<h2 id="正規分布-mathcalnmusigma">正規分布 $~\mathcal{N}(\mu,~\sigma)$</h2>
+<p>平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
+e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):</p>
+<p><img src="figure/gaussian-1.png" alt="plot of chunk gaussian"></p>
+<p>\[
+\text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\]</p>
+
+</section>
+<section>
+<h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
+<p>標本平均の反復(<strong>中心極限定理</strong>);
+e.g., 一様分布 [0, 100) から40サンプル</p>
 <p><img src="figure/central-limit-1.png" alt="plot of chunk central-limit"></p>
-<p>これ以外にも、正規分布はいろんなところに現れる</p>
-
-</section>
-<section>
-<h2 id="正規分布に近づくもの">正規分布に近づくもの</h2>
 <p>大きい$n$の二項分布</p>
 <p><img src="figure/binom-normal-1.png" alt="plot of chunk binom-normal"></p>
+
+</section>
+<section>
+<h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
 <p>大きい$\lambda$のポアソン分布</p>
 <p><img src="figure/poisson-normal-1.png" alt="plot of chunk poisson-normal"></p>
+<p>ゼロから離れてほどほどな$k$のガンマ分布</p>
+<p><img src="figure/gamma-normal-1.png" alt="plot of chunk gamma-normal"></p>
 
 </section>
 <section>
@@ -363,7 +383,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <dd>ポアソン過程でk回起こるまでの待ち時間</dd>
 <dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
 <dt>正規分布</dt>
-<dd>確率変数の和、平均値</dd>
+<dd>確率変数の和、平均値。使い勝手が良く、よく登場する。</dd>
 </dl>
 
 </section>
@@ -508,11 +528,11 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 <h2 id="参考文献">参考文献</h2>
 <ul>
 <li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 <li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
-<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
-<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
 </ul>
 <a href="3-glm.html" rel="next" class="readmore">
 3. 一般化線形モデル (GLM)

@@ -119,32 +119,64 @@ p = 0.6 とかである可能性もまあある。
 <section>
 <h2 id="確率おさらい">確率おさらい</h2>
 <dl>
-<dt>同時分布/結合確率: <span style="font-weight: normal;"> $A$かつ$B$の確率</span></dt>
-<dd>$\text{Prob}(A, B) = \text{Prob}(A \cap B) = \text{Prob}(A) \text{Prob}(B)$</dd>
-<dt>周辺確率: <span style="font-weight: normal;"> $B$によらず$A$になる確率</span></dt>
-<dd>$\text{Prob}(A) = \sum_B \text{Prob}(A, B)$</dd>
-<dt>条件付き確率: <span style="font-weight: normal;"> $B$のとき$A$になる確率</span></dt>
-<dd>$\text{Prob}(A \mid B) = \frac {\text{Prob}(A, B)} {\text{Prob}(B)}$</dd>
-<dt>乗法定理</dt>
-<dd>$\text{Prob}(A,B) = \text{Prob}(A \mid B) \text{Prob}(B) = \text{Prob}(B \mid A) \text{Prob}(A)$</dd>
+<dt>同時分布/結合確率: <span style="font-weight: normal;"> <span style="color: #E69F00;">A</span>かつ<span style="color: #0072B2;">B</span>の確率</span></dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \cap \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#0072B2}{B})$</dd>
+<dt>周辺確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>によらず<span style="color: #E69F00;">A</span>になる確率</span></dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A}) = \sum_{\textcolor{#0072B2}{B}} \text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})$</dd>
+<dt>条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>のとき<span style="color: #E69F00;">A</span>になる確率</span></dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$</dd>
 </dl>
-<p>これらを組み合わせると<strong>ベイズの定理</strong>が導かれる。</p>
-<p>TODO: ベン図、具体例に置き換えて
-TODO: A原因、B結果、として事前確率・事後確率　</p>
+<p><img src="figure/venn-1.png" alt="plot of chunk venn">
+</section>
+<section>
+<h2 id="条件付き確率がよくわかる具体例">条件付き確率がよくわかる具体例</h2>
+<dl>
+<dt><span style="color: #0072B2;">B Brewery</span>のビールが<span style="color: #E69F00;">Awesome</span>な確率</dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{\text{Awesome}} \mid \textcolor{#0072B2}{\text{B Brewery}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}})}$</dd>
+<dd>かなり高い確率。良い醸造所。</dd>
+<dt><span style="color: #E69F00;">Awesome</span>なビールが<span style="color: #0072B2;">B Brewery</span>のものである確率</dt>
+<dd>$\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$</dd>
+<dd>かなり低い確率。Awesomeなビールはほかにもたっくさんある。</dd>
+</dl>
+<img src="figure/venn-1.png" alt="plot of chunk venn">
 
 </section>
 <section>
 <h2 id="ベイズの定理">ベイズの定理</h2>
-<p>乗法定理から出発して移項:</p>
-<div>\[\begin{split}
-\text{Prob}(A \mid B) \text{Prob}(B) &= \text{Prob}(B \mid A) \text{Prob}(A) \\
-\text{Prob}(A \mid B) &= \frac {\text{Prob}(B \mid A) \text{Prob}(A)} {\text{Prob}(B)}
-\end{split}\]</div>
-<p>モデル $\mathcal M$ とデータ $\mathcal D$ に置き換え、分母の正規化項を外すと:</p>
-<div>\[\begin{split}
+<dl>
+<dt>乗法定理</dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) \text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#E69F00}{A})$</dd>
+</dl>
+<p>移項するだけで<strong>ベイズの定理</strong>:</p>
+<div>\[
+\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) =
+  \frac {\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) \text{Prob}(\textcolor{#0072B2}{B})}
+        {\text{Prob}(\textcolor{#E69F00}{A})}
+\]</div>
+<p>分母は、右辺の積分を1にするための正規化項。一旦無視:</p>
+<div>\[
+\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) \propto
+  \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) \text{Prob}(\textcolor{#0072B2}{B})
+\]</div>
+<ul>
+<li>$\text{Prob}(\textcolor{#0072B2}{B})$:
+飲む前、手元のビールが<span style="color: #0072B2;">B Brewery</span>のである確率 (<strong>事前確率</strong>)</li>
+<li>$\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$:
+飲んでみたら<span style="color: #E69F00;">Awesome</span>だった。
+これが<span style="color: #0072B2;">B Brewery</span>のである確率 (<strong>事後確率</strong>)
+は事前確率よりも高まる。なぜなら</li>
+<li>$\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})$:
+<span style="color: #0072B2;">B Brewery</span>のビールが
+<span style="color: #E69F00;">Awesome</span>な確率 (<strong>尤度</strong>) は高いから。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="ベイズの定理を統計モデリングの文脈で">ベイズの定理を統計モデリングの文脈で</h2>
+<p>\[\begin{split}
 \text{Prob}(\mathcal M \mid \mathcal D) \propto
   \text{Prob}(\mathcal D \mid \mathcal M) \text{Prob}(\mathcal M)
-\end{split}\]</div>
+\end{split}\]</p>
 <p>モデルの<strong>事後分布</strong> $\text{Prob}(\mathcal M \mid \mathcal D)$ は次の積に比例する:</p>
 <ul>
 <li>$\text{Prob}(\mathcal D \mid \mathcal M)$:
@@ -711,11 +743,11 @@ y = ae ^ {-bx} - ce ^ {-dx}
 <h2 id="参考文献">参考文献</h2>
 <ul>
 <li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 <li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
-<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
-<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
 </ul>
 <a href="." class="readmore">
 目次に戻る
