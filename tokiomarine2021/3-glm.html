@@ -83,7 +83,7 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="前章で見た統計モデル">前章で見た統計モデル</h2>
-<p>確率変数$X$はパラメータ$\theta$の確率分布$f$に&quot;従う&quot;: 
+<p>確率変数$X$はパラメータ$\theta$の確率分布$f$に“従う”: 
 $X \sim f(\theta) $</p>
 <p>e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分布に従う:</p>
 <div>\[\begin{split}
@@ -131,24 +131,26 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 \end{split}\]</p>
 <p>気温も湿度も高いほどビールが売れる、とか</p>
 <p><img src="figure/multiple-regression-1.png" alt="plot of chunk multiple-regression"></p>
-<p>今度は<strong>確率分布</strong>と<strong>連結関数</strong>を変えてみよう。</p>
+<p>今度は<strong>確率分布</strong>と<strong>リンク関数</strong>を変えてみよう。</p>
 
 </section>
 <section>
 <h2 id="ロジスティック回帰">ロジスティック回帰</h2>
 <ul>
 <li>確率分布: <strong>二項分布</strong></li>
-<li>連結関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
-<p>街角の10人のうち何人半袖か。<br>
-その日の気温によって割合が変化。</p>
+<p>客10人中$y_i$人がビールを注文。<br>
+その日$i$の気温$x_i$によって割合が変化。</p>
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
+<p>ロジスティック関数↑</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 <p><img src="figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
@@ -160,7 +162,7 @@ y_i &\sim \text{Binomial}(n,~p_i) \\
 <h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
 <ul>
 <li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
-<li>連結関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
@@ -169,8 +171,10 @@ y_i &\sim \text{Binomial}(n,~p_i) \\
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
   &= \text{Binomial}(1,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
+<p>ロジスティック関数↑</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 <p><img src="figure/wind-1.png" alt="plot of chunk wind"></p>
@@ -182,7 +186,7 @@ y_i &\sim \text{Bernoulli}(p_i) \\
 <h2 id="一般線形モデル-化無し-はglmの一種">一般線形モデル (“化”無し) はGLMの一種</h2>
 <ul>
 <li>確率分布: <strong>正規分布</strong></li>
-<li>連結関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
+<li>リンク関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
 </ul>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
@@ -201,8 +205,10 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 </section>
 <section>
 <h2 id="分散分析-uanualysis-uouf-uvauriance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
-<p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等連結</strong>のGLM、と解釈可能。<br>
+<p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等リンク</strong>のGLM、と解釈可能。<br>
 <span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 <table>
 <thead>
 <tr>
@@ -237,28 +243,33 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
 \end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="figure/glm-anova-1.png" alt="plot of chunk glm-anova"></p>
+  </div>
+</div>
 <p>くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。</p>
-<p>GLMなら確率分布・連結関数を変えてもっと柔軟にモデリングできる。</p>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
 
 </section>
 <section>
 <h2 id="共分散分析-uanualysis-of-ucovauriance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
 <p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
-正規分布・等分散・恒等連結などが仮定される。</p>
+正規分布・等分散・恒等リンクなどが仮定される。</p>
 <p><img src="figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
-<p>GLMなら確率分布・連結関数を変えてもっと柔軟にモデリングできる。</p>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
 
 </section>
 <section>
 <h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
-<p>確率分布・連結関数を変えて柔軟にモデリングできる。<br>
+<p>確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
 特定の組み合わせには名前がある。</p>
 <table>
 <thead>
 <tr>
 <th>名前</th>
 <th>確率分布</th>
-<th>連結関数</th>
+<th>リンク関数</th>
 <th>説明変数</th>
 </tr>
 </thead>
@@ -295,7 +306,27 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 </tr>
 </tbody>
 </table>
-<p>ほかにもいろいろある。</p>
+<p>確率分布については<a href="2-stats-model.html">前章を参照</a>。<br>
+リンク関数をもう少しだけ掘り下げたい。</p>
+
+</section>
+<section>
+<h2 id="リンク関数">リンク関数</h2>
+<p>統計モデリングにおいて「まっすぐ以外も表現できる」意味</p>
+<dl>
+<dt>$\text{identity}(\mu_i)$</dt>
+<dd>$\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$</dd>
+<dd>説明変数の効果が<strong>足し算</strong>的に働く。</dd>
+<dt>$\log(\lambda_i)$</dt>
+<dd>$\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$</dd>
+<dd>説明変数の効果が<strong>掛け算</strong>的に働く。<br>
+e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる</dd>
+<dt>$\text{logit}(p_i)$</dt>
+<dd>$p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)</dd>
+<dd>説明変数の効果が<strong>頭打ち</strong>になる。<br>
+e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
+</dl>
+<p>ほかに <code>probit</code>, <code>inverse</code>, <code>sqrt</code>, etc.</p>
 
 </section>
 <section>
@@ -308,7 +339,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <li>n回中k回のように<strong>割合的なカウント</strong>なら二項分布</li>
 </ul>
 </li>
-<li>データを可視化してみて、それっぽい形のやつを選ぶ
+<li>データを可視化してみて、それっぽい形・性質のものを選ぶ
 <ul>
 <li><strong>左右対称のひと山</strong>ならとりあえず正規分布</li>
 <li><strong>負の値を取らない</strong>ならガンマ分布</li>
@@ -418,7 +449,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <h2 id="glmまとめ">GLMまとめ</h2>
 <ul>
 <li>何はともあれ散布図を描く</li>
-<li>確率分布・連結関数・説明変数を考える</li>
+<li>確率分布・リンク関数・説明変数を考える</li>
 <li>パラメータを最尤推定する</li>
 <li>情報量基準を使って良さげなモデルを選ぶ</li>
 </ul>
@@ -442,9 +473,9 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </section>
 <section>
 <h2 id="n個のうちy個生存二項分布に従わない">n個のうちy個生存。二項分布に従&hellip;&hellip;わない！</h2>
-<p>植物100個体から8個ずつ種子を調べたら半分強の生存だった。<br>
-ランダムならひと山の二項分布になるはずだけど、<br>
-極端な値(全く生き残らない、全部生き残る)が多いぞ。個体差？</p>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
 <p><img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion"></p>
 
 </section>
@@ -612,7 +643,7 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 <li>何はともあれ作図して俯瞰</li>
 <li>GLMは統計モデリングの考え方の根幹
 <ul>
-<li>確率分布・連結関数・説明変数</li>
+<li>確率分布・リンク関数・説明変数</li>
 <li>尤度・最尤法によるパラメータ推定</li>
 <li>情報量基準によるモデル選択</li>
 </ul>

@@ -145,44 +145,51 @@ p = 0.6 とかである可能性もまあある。
 <h2 id="ベイズの定理">ベイズの定理</h2>
 <dl>
 <dt>乗法定理</dt>
-<dd>$\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) \text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#E69F00}{A})$</dd>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$</dd>
 </dl>
-<p>移項するだけで<strong>ベイズの定理</strong>:</p>
-<div>\[
-\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) =
-  \frac {\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) \text{Prob}(\textcolor{#0072B2}{B})}
-        {\text{Prob}(\textcolor{#E69F00}{A})}
-\]</div>
-<p>分母は、右辺の積分を1にするための正規化項。一旦無視:</p>
-<div>\[
-\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) \propto
-  \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) \text{Prob}(\textcolor{#0072B2}{B})
-\]</div>
-<ul>
-<li>$\text{Prob}(\textcolor{#0072B2}{B})$:
-飲む前、手元のビールが<span style="color: #0072B2;">B Brewery</span>のである確率 (<strong>事前確率</strong>)</li>
-<li>$\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$:
-飲んでみたら<span style="color: #E69F00;">Awesome</span>だった。
-これが<span style="color: #0072B2;">B Brewery</span>のである確率 (<strong>事後確率</strong>)
-は事前確率よりも高まる。なぜなら</li>
-<li>$\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})$:
-<span style="color: #0072B2;">B Brewery</span>のビールが
-<span style="color: #E69F00;">Awesome</span>な確率 (<strong>尤度</strong>) は高いから。</li>
-</ul>
+<p>移項するだけで<strong>ベイズの定理</strong>:
+<img src="bayes.drawio.svg" style="padding-left: 1rem;"></p>
+<p>宴会場にビール🍺が運ばれてきた。これはどこのブルワリーの？</p>
+<dl>
+<dt>事前確率: $\text{Prob}(\textcolor{#0072B2}{B})$</dt>
+<dd>飲む前、手元のビールが<span style="color: #0072B2;">B Brewery</span>のである確率。</dd>
+<dd>↓ 飲んでみて更新。</dd>
+<dt>事後確率: $\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$</dt>
+<dd>飲んでみて<span style="color: #E69F00;">Awesome</span>だったビールが
+<span style="color: #0072B2;">B Brewery</span>のである確率。</dd>
+</dl>
 
 </section>
 <section>
-<h2 id="ベイズの定理を統計モデリングの文脈で">ベイズの定理を統計モデリングの文脈で</h2>
-<p>\[\begin{split}
-\text{Prob}(\mathcal M \mid \mathcal D) \propto
-  \text{Prob}(\mathcal D \mid \mathcal M) \text{Prob}(\mathcal M)
-\end{split}\]</p>
+<h2 id="ベイズの定理-in-感染症検査">ベイズの定理 in 感染症検査</h2>
+<ul>
+<li>有病率 $\text{Prob}(M)$ : 2% (この地域の感染者の割合)</li>
+<li>感度 $\text{Prob}(P \mid M)$ : 80% (感染してる人に陽性判定が出る)</li>
+<li>特異度 $\text{Prob}(N \mid \overline{M})$: 99% (感染してない人に陰性判定が出る)</li>
+</ul>
+<p>$\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者である確率)は？</p>
+<div>\[\begin{split}
+\text{Prob}(M \mid P)
+  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)} {\text{Prob}(P)} \\
+  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)}
+           {\text{Prob}(P \mid M)~\text{Prob}(M) + (1 - \text{Prob}(N \mid \overline{M}))~\text{Prob}(\overline{M})} \\
+  &= \frac {0.8 \times 0.02} {0.8 \times 0.02 + 0.01 \times 0.98} \approx 0.62
+\end{split}\]</div>
+<p>🔰 同様に真陰性率、偽陽性率、偽陰性率を計算してみよう<br>
+🔰 計算結果が検査精度だけでなく有病率によっても変わることを確認しよう</p>
+
+</section>
+<section>
+<h2 id="ベイズの定理-in-統計モデリング">ベイズの定理 in 統計モデリング</h2>
+<p>
+<img src="bayesian.drawio.svg">
+</p>
 <p>モデルの<strong>事後分布</strong> $\text{Prob}(\mathcal M \mid \mathcal D)$ は次の積に比例する:</p>
 <ul>
-<li>$\text{Prob}(\mathcal D \mid \mathcal M)$:
-モデル$\mathcal M$の下での観察データ$\mathcal D$の出やすさ (<strong>尤度</strong>)</li>
-<li>$\text{Prob}(\mathcal M)$:
-データ$\mathcal D$を得る前の思い込み (<strong>事前分布</strong>)</li>
+<li><strong>尤度</strong> $\text{Prob}(\mathcal D \mid \mathcal M)$:
+モデル$\mathcal M$の下で観察データ$\mathcal D$を得る確率</li>
+<li><strong>事前分布</strong> $\text{Prob}(\mathcal M)$:
+データ$\mathcal D$を得る前の思い込み</li>
 </ul>
 <p>確信の度合いをデータによって更新するようなイメージ。</p>
 
