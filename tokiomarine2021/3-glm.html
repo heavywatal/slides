@@ -256,7 +256,47 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <h2 id="共分散分析-uanualysis-of-ucovauriance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
 <p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
 正規分布・等分散・恒等リンクなどが仮定される。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">→</th>
+<th style="text-align:center">$x_1$ ☀️ 晴れ</th>
+<th style="text-align:center">$x_2$ ☔️ 雨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☁️ くもり</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
 <p><img src="figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
+  </div>
+</div>
 <p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
 
 </section>
@@ -385,51 +425,76 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="説明変数を加えても尤度があまり改善されない場合">説明変数を加えても尤度があまり改善されない場合</h2>
-<p>種の数 $y$ は体サイズ $x$ で回帰すると良さそう。<br>
-観察時の天気 $x2$ (色) も考慮すると尤度は上がるけど&hellip;&hellip;?</p>
+<h2 id="無駄な説明変数を加えても尤度は上がる">無駄な説明変数を加えても尤度は上がる</h2>
+<p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+観察時に着てた服の色 $x2$ を追加すると尤度が上がる&hellip;&hellip;?</p>
 <p><img src="figure/many-models-1.png" alt="plot of chunk many-models"></p>
 
 </section>
 <section>
 <h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
 <p>\[\begin{split}
-\text{AIC} &= D + 2k \\
-           &= -2 \log L^* + 2k
+\text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
 \end{split}\]</p>
 <ul>
-<li>$D$: 逸脱度 deviance</li>
-<li>$k$: パラメータ数</li>
-<li>AICが小さいほど良いモデル。
+<li>AICが小さいほど予測精度の良いモデル。
 <ul>
-<li>尤度は上げたい(逸脱度は下げたい)。</li>
+<li>尤度は上げたい。</li>
 <li>パラメータ数 $k$ が増えるとペナルティ。</li>
 </ul>
 </li>
+<li>どのデータに対する当てはまりを目指すかという観点
+<ul>
+<li>「手元のデータ」に対する対数尤度は $\log L^*$<br></li>
+<li>「真のメカニズムから出てくる未来のデータ」に対する<br>
+平均対数尤度の推定量は $(\log L^* - k)$<br>
+(Kullback&ndash;Leibler情報量を使って導出するらしい)</li>
 </ul>
-<p>未知のデータへの予測誤差が小さくなるような補正。</p>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="さっきのやつのaicを見てみる">さっきのやつのAICを見てみる</h2>
+<p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+観察時に着てた服の色 $x2$ を追加したモデルはAICが増加。</p>
+<p><img src="figure/many-models-aic-1.png" alt="plot of chunk many-models-aic"></p>
 
 </section>
 <section>
 <h2 id="ほかの情報量基準">ほかの情報量基準</h2>
 <ul>
-<li>BIC</li>
-<li>WAIC</li>
-<li>WBIC</li>
+<li>$\text{BIC} = -2 \log L^* + k \log n$
+<ul>
+<li>パラメータ数 $k$ でペナルティを付けるのはAICと同じ。</li>
+<li>データの観測数 $n$ に依存する点でAICと異なる。<br>
+感覚としては「AICはデータサイズによるペナルティが無い」</li>
+<li>(周辺尤度の最大化という観点で導出するらしい)</li>
+</ul>
+</li>
+<li><a href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html">WAIC</a>,
+<a href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html">WBIC</a>
+<ul>
+<li>AIC, BICを一般化し、広く使えるようにしたもの。</li>
+<li>理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
+そうじゃない場合(現実的には常に)こちらが優位。</li>
+<li>WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。</li>
+</ul>
+</li>
 </ul>
 
 </section>
 <section>
 <h2 id="モデル選択の心構え">モデル選択の心構え</h2>
-<p>「正しい」ものを選べるわけではない。</p>
+<p>「正しい」ものを選べるわけではない。<br>
+予測・理解に useful なものを何らかの基準で選ぶだけ。</p>
 <blockquote>
 <p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
 </blockquote>
-<p>予測・理解に useful なものを何らかの基準で選ぶだけ。</p>
-
-</section>
-<section>
-<h2 id="よさげなモデルが選べたとして結果をどう見るか">よさげなモデルが選べたとして、結果をどう見るか</h2>
+<figure>
+<img src="math-model.drawio.svg" width="600"><br>
+<figcaption><cite>「データ解析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
 
 </section>
 <section>
@@ -438,12 +503,45 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <li>多重共線性(マルチコ)</li>
 <li>値を変換する。e.g., log</li>
 <li>割り算した値を使わない。</li>
+<li>交互作用を入れると解釈が難しくなる。</li>
 </ul>
 
 </section>
 <section>
 <h2 id="交互作用">交互作用</h2>
-<p>解釈が案外難しいのでむやみに使わない。
+<p>ある説明変数の効果が、別の説明変数によって異なる。<br>
+e.g., ビール売上の温度依存性が天気によって異なる。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">$x_1$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="figure/interaction-1.png" alt="plot of chunk interaction"></p>
+  </div>
+</div>
+<p>解釈が一気に難しくなるのでむやみに使わない。</p>
+
 </section>
 <section>
 <h2 id="glmまとめ">GLMまとめ</h2>
