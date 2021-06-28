@@ -86,8 +86,8 @@ if (!doNotTrack) {
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
 <dl>
-<dt>最尤法(頻度主義)</dt>
-<dd>尤もらしいパラメータを点推定。</dd>
+<dt>最尤推定</dt>
+<dd>推定結果は最も尤もらしい1点。</dd>
 <dd>データが少ないとき過剰適合気味。</dd>
 <dd>表が出る確率 p = 0.25 のコインだろう。<br>
 (信じ難いけどデータはこう言っている)</dd>
@@ -110,7 +110,7 @@ p = 0.6 とかである可能性もまあある。
 </section>
 <section>
 <h2 id="コイントスの回数が増えていったら">コイントスの回数が増えていったら</h2>
-<p><strong>最尤法(頻度主義)</strong>: 推定値が真の値に近づいていく</p>
+<p><strong>最尤推定</strong>: 推定値が真の値に近づいていく</p>
 <p><img src="figure/coin-frequentist-1.png" alt="plot of chunk coin-frequentist"></p>
 <p><strong>ベイズ推定</strong>: 確率分布がどんどん尖り、確信が強まる</p>
 <p><img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian"></p>
@@ -123,7 +123,7 @@ p = 0.6 とかである可能性もまあある。
 <dd>$\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \cap \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#0072B2}{B})$</dd>
 <dt>周辺確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>によらず<span style="color: #E69F00;">A</span>になる確率</span></dt>
 <dd>$\text{Prob}(\textcolor{#E69F00}{A}) = \sum_{\textcolor{#0072B2}{B}} \text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})$</dd>
-<dt>条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>のとき<span style="color: #E69F00;">A</span>になる確率</span></dt>
+<dt>条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率</span></dt>
 <dd>$\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$</dd>
 </dl>
 <p><img src="figure/venn-1.png" alt="plot of chunk venn">
@@ -147,6 +147,8 @@ p = 0.6 とかである可能性もまあある。
 <dt>乗法定理</dt>
 <dd>$\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$</dd>
 </dl>
+<a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
+<img src="figure/Thomas_Bayes.gif" height="150" align="right"></a>
 <p>移項するだけで<strong>ベイズの定理</strong>:
 <img src="bayes.drawio.svg" style="padding-left: 1rem;"></p>
 <p>宴会場にビールが運ばれてきた。これはどこのブルワリーの？</p>
@@ -163,8 +165,8 @@ p = 0.6 とかである可能性もまあある。
 <section>
 <h2 id="ベイズの定理-in-感染症検査">ベイズの定理 in 感染症検査</h2>
 <ul>
-<li>有病率 $\text{Prob}(M)$ : 2% (この地域の感染者の割合)</li>
-<li>感度 $\text{Prob}(P \mid M)$ : 80% (感染してる人に陽性判定が出る)</li>
+<li>有病率 $\text{Prob}(M)$ : 0.3% (この地域の感染者の割合; 事前確率)</li>
+<li>感度 $\text{Prob}(P \mid M)$ : 90% (感染してる人に陽性判定が出る)</li>
 <li>特異度 $\text{Prob}(N \mid \overline{M})$: 99% (感染してない人に陰性判定が出る)</li>
 </ul>
 <p>$\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者である確率)は？</p>
@@ -173,10 +175,11 @@ p = 0.6 とかである可能性もまあある。
   &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)} {\text{Prob}(P)} \\
   &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)}
            {\text{Prob}(P \mid M)~\text{Prob}(M) + (1 - \text{Prob}(N \mid \overline{M}))~\text{Prob}(\overline{M})} \\
-  &= \frac {0.8 \times 0.02} {0.8 \times 0.02 + 0.01 \times 0.98} \approx 0.62
+  &= \frac {0.9 \times 0.003} {0.9 \times 0.003 + 0.01 \times 0.997} \approx 0.21
 \end{split}\]</div>
-<p>🔰 同様に真陰性率、偽陽性率、偽陰性率を計算してみよう<br>
-🔰 計算結果が検査精度だけでなく有病率によっても変わることを確認しよう</p>
+<p>感染者を隔離するスクリーニング目的では使いものにならない性能。</p>
+<p>🔰 同様に $\text{Prob}(\overline{M} \mid N)$ 真陰性率を計算してみよう<br>
+🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう</p>
 
 </section>
 <section>
@@ -184,34 +187,99 @@ p = 0.6 とかである可能性もまあある。
 <p>
 <img src="bayesian.drawio.svg">
 </p>
+<p>モデル$M$に対する確信度合いをデータ$D$に基づいて更新する。<br>
+モデル$M$を仮説$H$やパラメータ$\theta$に置き換えてもいい。</p>
 <p><strong>周辺尤度</strong>は「確率分布の積分は1」を満たすための正規化定数とみなせる。<br>
 比例関係だけ抜き出してこう書くことが多い:</p>
 <div>\[\begin{split}
-\text{Prob}(\mathcal M \mid \mathcal D) \propto \text{Prob}(\mathcal D \mid \mathcal M)~\text{Prob}(\mathcal M)
+\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \\
+\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \\
+\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta)
 \end{split}\]</div>
-<p>モデルの<strong>事後分布</strong> $\text{Prob}(\mathcal M \mid \mathcal D)$ は次の積に比例する:</p>
-<ul>
-<li><strong>尤度</strong> $\text{Prob}(\mathcal D \mid \mathcal M)$:
-モデル$\mathcal M$の下で観察データ$\mathcal D$を得る確率</li>
-<li><strong>事前分布</strong> $\text{Prob}(\mathcal M)$:
-データ$\mathcal D$を得る前の思い込み</li>
-</ul>
-<p>解析前から持ってるモデル$\mathcal M$のに対すを、
-データ$\mathcal D$を得て尤度計算して更新、
-データ
-確信の度合いをデータによって更新するようなイメージ。</p>
 
 </section>
 <section>
-<h2 id="逐次学習">逐次学習</h2>
-<p>コイントス4回のうち表1回、に基づく<strong>事前分布</strong>: $\text{Beta}(p \mid 1, 3)$</p>
-<p>さらに16回投げたら表が7回、の<strong>尤度</strong>: $\text{Binomial}(7 \mid 16,~p)$</p>
-<p><strong>事後分布</strong>を計算してみると、事前分布と同じ形になる:</p>
+<h2 id="表が出る確率のベイズ推定-1-事前分布">表が出る確率のベイズ推定: 1. 事前分布</h2>
+<p>コイントスを繰り返して、表が出る確率pをベイズ推定したい。</p>
+<p>事前分布には<strong>ベータ分布</strong>を採用(理由は後で分かる):</p>
 <div>\[\begin{split}
-\text{Beta}(p \mid 8, 12) \propto
-  \text{Beta}(p \mid 1, 3) \times \text{Binomial}(7 \mid 16,~p)
+\text{Beta}(p \mid a, b) =
+   \frac{\Gamma(a + b)}{\Gamma(a) \Gamma(b)} p^{a-1} (1 - p)^{b-1}
 \end{split}\]</div>
-<p>これを事前分布としてまた新しいデータで更新できる。</p>
+<p>分布の形は<strong>超パラメータ</strong> $a,~b$ によって決まる。<br>
+ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
+投げる前なのでとりあえず真っ平ら $\text{Beta}(p \mid a = 1, b = 1)$:</p>
+<p><img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta"></p>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-2-尤度関数">表が出る確率のベイズ推定: 2. 尤度関数</h2>
+<p>4回投げて表が1回だった、というデータで<strong>尤度</strong>を計算(<strong>二項分布</strong>):</p>
+<div>\[\begin{split}
+\text{Binom}(1 \mid 4,~p) = \binom {1} {4} p^{1} (1 - p)^{3}
+\end{split}\]</div>
+<p>これに事前分布を掛けて正規化したら事後分布になるはず。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<p><img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom"></p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  ⨉
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p>
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
+</p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-3-事後分布">表が出る確率のベイズ推定: 3. 事後分布</h2>
+<p>なんと、事後分布もベータ分布になる。</p>
+<div>\[\begin{split}
+\text{Posterior}
+  &\propto \text{Binom}(1 \mid 4,~p) \times \text{Beta}(p \mid a = 1, b = 1)\\
+  &= \binom {1} {4} p^{1} (1 - p)^{3} \times
+     \frac{\Gamma(1 + 1)}{\Gamma(1) \Gamma(1)} p^{1-1} (1 - p)^{1-1} \\
+  &= C p^{2-1} (1 - p)^{4-1} \\
+  &= \text{Beta}(p \mid a = 2, b = 4)
+\end{split}\]</div>
+<p>超パラメータ$a$が表、$b$が裏の回数分だけ増加。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta"></p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  $\propto$
+  </div>
+  <div class="column" style="flex-shrink: 1.0">
+<p>
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom">
+</p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  ⨉
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p>
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
+</p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-4-逐次学習">表が出る確率のベイズ推定: 4. 逐次学習</h2>
+<p>さっきの事後分布を事前分布として、さらにデータを集める。</p>
+<p>コイントス4回のうち表1回、に基づく<strong>事前分布</strong>: $\text{Beta}(p \mid 2,~4)$</p>
+<p>さらに16回投げたら表が7回、の<strong>尤度</strong>: $\text{Binomial}(7 \mid 16,~p)$</p>
+<p><strong>事後分布</strong>はまた事前分布と同じ形になる:</p>
+<div>\[\begin{split}
+\text{Beta}(p \mid 9, 13) \propto
+  \text{Binomial}(7 \mid 16,~p) \times \text{Beta}(p \mid 2, 4)
+\end{split}\]</div>
+<p>データを加えるたびに更新していける:</p>
 <img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
 
 </section>
@@ -652,18 +720,11 @@ y = ae ^ {-bx} - ce ^ {-dx}
 
 </section>
 <section>
-<h2 id="二項分布なはずなのにおかしい">二項分布なはずなのに、おかしい</h2>
-<p>生存種子</p>
-<p>個体差が過分散を起こしてるっぽい</p>
-
-</section>
-<section>
-<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
-<p>個体差をそのままモデルに組み込むと<strong>過剰適合</strong><br>
-(パラメータ数 ≥ サンプルサイズ)</p>
-<p>個体差を「平均0、標準偏差$s$の正規分布」としてモデル化</p>
-<p>パラメータ1つの追加で済む</p>
-
+<h2 id="glmmで登場した個体差モデルをベイズで">GLMMで登場した個体差モデルをベイズで</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
 </section>
 <section>
 <h2 id="モデルの全体像">モデルの全体像</h2>
