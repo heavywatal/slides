@@ -323,12 +323,13 @@ p = 0.6 とかである可能性もまあある。
 <dl>
 <dt>区間推定</dt>
 <dd>幅のある推定値を提示</dd>
-<dd>e.g., 95%ベイズ確信区間<br>(credible interval)</dd>
+<dd>e.g., 95%ベイズ確信区間<br>
+(等裾事後信用区間, 最高密度区間)</dd>
 <dt>点推定</dt>
 <dd>値を1点だけ提示</dd>
-<dd>e.g., MAP推定
+<dd>e.g., MAP, MED, EAP
 </div>
-<div class="column" style="flex-shrink: 1.0;">
+<div class="column" style="flex-shrink: 1.3;">
 </dd>
 </dl>
 <p><img src="figure/integrate-1.png" alt="plot of chunk integrate"></p>
@@ -554,51 +555,77 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <img src="/slides/figure/stan/logo_name.png" width="120" align="right">
 </a>
 <ul>
-<li>C++で書かれている</li>
 <li>Stan言語でモデルを書く</li>
-<li>PythonやRなどから呼び出して使うのが便利</li>
+<li>C++を介して機械語に翻訳(コンパイル)するので高速</li>
+<li>RやPythonなどから呼び出して使うのが便利</li>
 </ul>
-
+<p>大部分はRで説明し、部分的にPythonでの練習を挟みます。<br></p>
+<p>聞きながら手元で<a href="tokiomarine2021-stan.ipynb">tokiomarine2021-stan.ipynb</a>を実行してもいいです。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># install.packages(&#34;rstan&#34;)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">rstan</span><span class="p">)</span>
+<span class="nf">rstan_options</span><span class="p">(</span><span class="n">auto_write</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</code></pre></div>
 </section>
 <section>
-<h2 id="おおまかな流れ-in-r">おおまかな流れ in R</h2>
-<p>TODO: in Python</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">mydata</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;mydata.tsv.gz&#34;</span><span class="p">)</span>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># データ準備</span>
+<span class="n">mydata</span>
 
 <span class="c1"># Stan言語で書いたモデルをコンパイル</span>
-<span class="n">model1</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&#34;model1.stan&#34;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&#34;model1.stan&#34;</span><span class="p">)</span>
 
 <span class="c1"># MCMCサンプリング</span>
-<span class="n">fit1</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model1</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
 
 <span class="c1"># 結果を眺める</span>
-<span class="nf">summary</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 </code></pre></div>
 </section>
 <section>
-<h2 id="stan言語でモデルを書く">Stan言語でモデルを書く</h2>
-<p>いくつかのブロックに分ける。</p>
-<pre><code class="language-stan" data-lang="stan">data {         // passed from R/Python
+<h2 id="説明変数なしのベイズ推定-データ準備">説明変数なしのベイズ推定: データ準備</h2>
+<p>表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">true_p</span> <span class="o">=</span> <span class="m">0.7</span>
+<span class="n">N</span> <span class="o">=</span> <span class="m">40L</span>
+<span class="n">data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div><pre><code>$N
+[1] 40
+
+$x
+ [1] 1 1 0 1 1 1 1 1 1 1 1 0 1 0 0 0 0 0 0 0 1 1 0 1 1 1 1 1 0 0 1 1 0 1 0 0 1 1 0 1
+</code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
+<p>文字列として保持するか、別ファイルに書いておく:</p>
+<pre><code>data {
   int&lt;lower=0&gt; N;
-  real x[N];
+  int x[N];
 }
 
-parameters {   // sampled via MCMC
-  real mu;
-  real&lt;lower=0&gt; sigma;
+parameters {
+  real&lt;lower=0,upper=1&gt; p;
 }
 
 model {
-  x ~ normal(mu, sigma);
+  x ~ binomial(1, p);
 }
-</code></pre>
+</code></pre><ul>
+<li>いくつかのブロックに分けて記述する:<br>
+R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code>, 本体の <code>model</code>.</li>
+<li>整数型 <code>int</code>, 実数型 <code>real</code>, それらの配列がある。</li>
+<li>下限 <code>lower</code>, 上限 <code>upper</code> を設定できる。</li>
+</ul>
+
 </section>
 <section>
 <h2 id="stan言語の7種のブロック">Stan言語の7種のブロック</h2>
-<p>順番厳守。使うのはだいたい太字のやつだけ。</p>
+<p>順番厳守。よく使うのは<strong>太字のやつ</strong>。</p>
 <ol>
 <li><code>functions {...}</code></li>
 <li><strong><code>data {...}</code></strong></li>
@@ -608,109 +635,192 @@ model {
 <li><strong><code>model {...}</code></strong></li>
 <li><code>generated quantities {...}</code></li>
 </ol>
+<p><a href="https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html">https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html</a></p>
 
 </section>
 <section>
-<h2 id="変数の型">変数の型</h2>
-<p>整数と実数は区別される。<br>
-配列的なものが複数あってややこしい。</p>
-<pre><code class="language-stan" data-lang="stan"># scalar
-int N;
-real x;
-
-# linear algebra
-vector[N] v;
-row_vector[N] rv;
-matrix[M, N] m;
-
-# array
-real a[N];
-</code></pre><p>TODO: rstan 2.27 が出たら <code>array</code> syntax 更新</p>
+<h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;binom.stan&#34;</span><span class="p">)</span>
+</code></pre></div><p>これに結構時間がかかるので、変更が無ければ再利用するため先ほど
+<code>rstan_options(auto_write = TRUE)</code> しておいた。</p>
+<hr>
+<p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
 
 </section>
 <section>
-<h2 id="data-"><code>data {...}</code></h2>
-<p>R/Pythonから受け取る定数の宣言。</p>
-<p>配列の大きさは動的に変えられない。<br>
-上限・下限を設定可能。<br></p>
-<pre><code class="language-stan" data-lang="stan">data {
-  int&lt;lower=0&gt; N;
-  real x[N];
-}
+<h2 id="説明変数なしのベイズ推定-結果を眺める">説明変数なしのベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><pre><code>Inference for Stan model: binom.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+       mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
+p      0.59    0.00 0.07   0.44   0.54   0.59   0.64   0.73  1553    1
+lp__ -28.84    0.02 0.72 -30.94 -28.98 -28.57 -28.40 -28.35  1004    1
+
+Samples were drawn using NUTS(diag_e) at Wed Jun 30 06:42:03 2021.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
+<p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;p&#34;</span><span class="p">))</span>
+</code></pre></div><p><img src="figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
+<p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+<p>次はもう少しだけ複雑な例を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-データ準備">線形回帰のベイズ推定: データ準備</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/figure/rstats/lter_penguins.png" width="45%">
+<img src="/slides/figure/rstats/culmen_depth.png" width="45%">
+</a>
+<p><img src="figure/stan-penguins-glm-1.png" alt="plot of chunk stan-penguins-glm">
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-データ準備">線形回帰のベイズ推定: データ準備</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/figure/rstats/lter_penguins.png" width="45%">
+<img src="/slides/figure/rstats/culmen_depth.png" width="45%">
+</a>
+<p><code>Stan does not support NA</code> と怒られるので欠損値を取り除いておく:</p>
+<pre><code>List of 3
+ $ body_mass_g      : int [1:342] 3750 3800 3250 3450 3650 3625 4675 3475 4250 3300 ...
+ $ flipper_length_mm: int [1:342] 181 186 195 193 190 181 195 193 190 186 ...
+ $ N                : int 342
 </code></pre>
 </section>
 <section>
-<h2 id="parameters-"><code>parameters {...}</code></h2>
-<p>サンプリングされる変数の宣言。</p>
-<pre><code class="language-stan" data-lang="stan">parameters {
-  real mu;
+<h2 id="線形回帰のベイズ推定-stan言語でモデル定義">線形回帰のベイズ推定: Stan言語でモデル定義</h2>
+<p>切片、傾き、ばらつきを推定する:</p>
+<pre><code>data {
+  int&lt;lower=0&gt; N;
+  vector&lt;lower=0&gt;[N] body_mass_g;
+  vector&lt;lower=0&gt;[N] flipper_length_mm;
+}
+
+parameters {
+  real intercept;
+  real slope;
   real&lt;lower=0&gt; sigma;
 }
-</code></pre>
-</section>
-<section>
-<h2 id="model-"><code>model {...}</code></h2>
-<p>確率変数と事前分布・パラメータの関係を記述。</p>
-<pre><code class="language-stan" data-lang="stan">model {
-  x ~ normal(mu, sigma);
-}
-</code></pre><p>このようにチルダを使うのは“sampling statement”。<br>
-代わりに <code>target += normal_lpdf(x | mu, sigma);</code>
-のように対数確率の加算を明示的に書いてもいい。</p>
-<p>サンプルされないローカル変数を宣言してもよいが、制約をかけることはできない。</p>
 
-</section>
-<section>
-<h2 id="関数">関数</h2>
-<p><a href="https://mc-stan.org/docs/functions-reference/">定義済みの関数</a>がたくさんある。</p>
-<p><code>functions</code> ブロックで<a href="https://mc-stan.org/docs/reference-manual/functions-chapter.html">新しい関数を定義する</a>ことも可能:</p>
-<pre><code class="language-stan" data-lang="stan">real radius(real x, real y) {
-  return sqrt(x ^ 2 + x ^ 2);
+model {
+  flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
 }
 </code></pre>
 </section>
 <section>
-<h2 id="other-blocks">Other blocks</h2>
-<p><code>transformed data {...}</code></p>
+<h2 id="線形回帰のベイズ推定-mcmcサンプル">線形回帰のベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;penguins.stan&#34;</span><span class="p">)</span>
+</code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-結果を眺める">線形回帰のベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><pre><code>Inference for Stan model: penguins.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+             mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+intercept  136.76    0.06 2.03  132.81  135.36  136.73  138.20  140.86  1148    1
+slope        0.02    0.00 0.00    0.01    0.01    0.02    0.02    0.02  1145    1
+sigma        6.95    0.01 0.26    6.46    6.77    6.94    7.13    7.50  1347    1
+lp__      -830.86    0.03 1.24 -834.07 -831.46 -830.53 -829.92 -829.42  1270    1
+
+Samples were drawn using NUTS(diag_e) at Wed Jun 30 06:42:08 2021.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-trace-plot-確認">線形回帰のベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-penguins-traceplot-1.png" alt="plot of chunk stan-penguins-traceplot"></p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-自己相関の確認">線形回帰のベイズ推定: 自己相関の確認</h2>
+<p>どれもまあまあすぐ消えるので問題なし:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;intercept&#34;</span><span class="p">,</span> <span class="s">&#34;slope&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">))</span>
+</code></pre></div><p><img src="figure/stan-penguins-ac-1.png" alt="plot of chunk stan-penguins-ac"></p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-推定結果確認">線形回帰のベイズ推定: 推定結果確認</h2>
+<p>正規分布っぽいきれいな形:</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-penguins-hist-1.png" alt="plot of chunk stan-penguins-hist"></p>
+<p>これらの値を使って点推定・区間推定も可能。</p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-推定結果で回帰">線形回帰のベイズ推定: 推定結果で回帰</h2>
+<p>無事に最尤推定と似たような線が引けた。</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">coef</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">get_posterior_mean</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="n">[</span><span class="p">,</span> <span class="s">&#34;mean-all chains&#34;</span><span class="n">]</span>
+<span class="n">p_penweight</span> <span class="o">+</span>
+  <span class="nf">geom_abline</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;intercept&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;slope&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-penguins-regression-1.png" alt="plot of chunk stan-penguins-regression"></p>
+
+</section>
+<section>
+<h2 id="ベイズ推定を使った回帰に便利なパッケージ">ベイズ推定を使った回帰に便利なパッケージ</h2>
+<p><a href="https://mc-stan.org/rstanarm/">rstanarm</a> + <a href="https://mjskay.github.io/tidybayes">tidybayes</a></p>
 <ul>
-<li><code>data</code> ブロックで読み込む変数の決定論的変換</li>
-<li>決め打ちのハイパーパラメータを宣言するとか</li>
+<li>Stan言語のモデルを自分で書かずに済む。</li>
+<li>モデルの主要部品がコンパイル済みなので試行錯誤も機敏に。</li>
+<li>区間推定の可視化までお世話してくれる。</li>
 </ul>
-<p><code>transformed parameters {...}</code></p>
-<ul>
-<li><code>model</code> で使いやすい形にパラメータを変形しておくとか</li>
-</ul>
-<p><code>generated quantities {...}</code></p>
-<ul>
-<li>サンプリング後の値を使って好きなことをする。
-ここを使わずR/Pythonで結果を受け取ってからどうにかするほうが簡単。</li>
-</ul>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">rstanarm</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidybayes</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">rstanarm</span><span class="o">::</span><span class="nf">stan_glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">%&gt;%</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="n">tidybayes</span><span class="o">::</span><span class="nf">add_fitted_draws</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">p_penweight</span> <span class="o">+</span>
+  <span class="n">ggdist</span><span class="o">::</span><span class="nf">stat_lineribbon</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">.value</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">pred</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_fill_brewer</span><span class="p">(</span><span class="n">palette</span> <span class="o">=</span> <span class="s">&#34;Greys&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/rstanarm-penguins-1.png" alt="plot of chunk rstanarm-penguins"></p>
 
 </section>
 <section>
-<h2 id="説明変数なしのベイズ推定をやってみる">説明変数なしのベイズ推定をやってみる</h2>
-
-</section>
-<section>
-<h2 id="線形単回帰をわざわざstanでやってみる">線形単回帰をわざわざStanでやってみる</h2>
-
-</section>
-<section>
-<h2 id="非線形回帰">非線形回帰</h2>
-<p>非対称なひと山。応答変数も説明変数も正の値。</p>
-<div>\[\begin{split}
-y = ae ^ {-bx} - ce ^ {-dx}
-\end{split}\]</div>
-<p><img src="figure/non-linear-1.png" alt="plot of chunk non-linear"></p>
-
-</section>
-<section>
-<h2 id="練習問題">練習問題</h2>
-
-</section>
-<section>
-<h2 id="階層ベイズモデル">階層ベイズモデル</h2>
-<p>GLMでは説明できない現象</p>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="figure/kubo-p2.png" width="100%">
@@ -720,38 +830,166 @@ y = ae ^ {-bx} - ce ^ {-dx}
 
 </section>
 <section>
-<h2 id="glmmで登場した個体差モデルをベイズで">GLMMで登場した個体差モデルをベイズで</h2>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
 <p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
 親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？</p>
 <img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
 </section>
 <section>
-<h2 id="モデルの全体像">モデルの全体像</h2>
+<h2 id="階層ベイズモデルのイメージ図">階層ベイズモデルのイメージ図</h2>
 <p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
-<p>超パラメータ、超事前分布</p>
+<figure>
+<img src="hbm.drawio.svg">
+</figure>
 
 </section>
 <section>
-<h2 id="階層ベイズをstanで書くと">階層ベイズをStanで書くと</h2>
+<h2 id="さっきの図をstan言語で記述すると">さっきの図をStan言語で記述すると</h2>
+<p>お絵描きモデルとStanモデルを見比べてみよう。</p>
+<pre><code>data {
+  int&lt;lower=0&gt; N;
+  int y[N];
+}
+
+parameters {
+  real a;           // mean ability
+  vector[N] r;      // individual difference
+  real&lt;lower=0&gt; s;  // sd of r
+}
+
+model {
+  y ~ binomial(8, inv_logit(a + r));
+  a ~ normal(0, 10);
+  r ~ normal(0, s);
+  s ~ exponential(0.01);
+}
+</code></pre><p><code>inv_logit(a + r)</code> が p に相当。<br>
+<code>10</code> とか <code>0.01</code> とか、なんかエイヤっと決めてるやつが超パラメータ。</p>
 
 </section>
 <section>
-<h2 id="うまくフィットできた">うまくフィットできた</h2>
-<p>事後分布からのMCMCサンプル
-</section>
-<section>
-<h2 id="個体差だけでなくグループ差も考慮">個体差だけでなく、グループ差も考慮</h2>
+<h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
+<pre><code>Inference for Stan model: glmm.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
 
+          mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+a         0.86    0.01 0.30    0.30    0.64    0.84    1.06    1.48   898 1.00
+r[1]      2.90    0.02 1.59    0.30    1.71    2.78    3.90    6.33  5411 1.00
+r[2]      0.36    0.01 0.86   -1.24   -0.23    0.32    0.92    2.14  3885 1.00
+r[3]     -2.70    0.02 1.05   -5.07   -3.32   -2.62   -1.95   -0.89  3692 1.00
+r[4]      2.94    0.03 1.69    0.25    1.73    2.72    3.90    6.78  3850 1.00
+r[5]      2.89    0.02 1.62    0.27    1.73    2.71    3.89    6.63  4573 1.00
+r[6]     -0.79    0.01 0.78   -2.34   -1.30   -0.79   -0.28    0.76  3858 1.00
+r[7]      1.23    0.02 1.08   -0.60    0.45    1.13    1.92    3.50  4890 1.00
+r[8]      2.89    0.02 1.63    0.29    1.74    2.69    3.82    6.62  5097 1.00
+r[9]     -1.91    0.01 0.87   -3.74   -2.45   -1.87   -1.31   -0.28  3938 1.00
+r[10]     0.37    0.01 0.88   -1.22   -0.24    0.33    0.91    2.28  3628 1.00
+r[11]     2.90    0.02 1.66    0.23    1.74    2.68    3.84    6.80  4586 1.00
+r[12]     2.91    0.02 1.63    0.30    1.74    2.71    3.87    6.64  4391 1.00
+r[13]    -0.78    0.01 0.77   -2.27   -1.29   -0.79   -0.27    0.73  3538 1.00
+r[14]    -2.67    0.02 1.00   -4.84   -3.26   -2.59   -1.98   -0.88  3457 1.00
+r[15]     0.36    0.01 0.86   -1.23   -0.24    0.31    0.90    2.15  4603 1.00
+r[16]     0.37    0.01 0.88   -1.27   -0.23    0.34    0.91    2.25  4363 1.00
+r[17]     2.85    0.02 1.59    0.25    1.71    2.66    3.76    6.55  5179 1.00
+r[18]     2.88    0.02 1.64    0.25    1.74    2.68    3.84    6.59  5064 1.00
+r[19]    -0.79    0.01 0.78   -2.42   -1.30   -0.77   -0.25    0.70  3913 1.00
+r[20]     2.91    0.03 1.62    0.30    1.75    2.71    3.84    6.61  3731 1.00
+r[21]    -4.02    0.02 1.44   -7.43   -4.83   -3.85   -3.01   -1.67  3580 1.00
+r[22]     2.87    0.02 1.60    0.33    1.70    2.68    3.79    6.57  4686 1.00
+r[23]    -0.79    0.01 0.79   -2.32   -1.31   -0.79   -0.27    0.75  3802 1.00
+r[24]    -1.89    0.01 0.85   -3.65   -2.42   -1.86   -1.33   -0.27  3853 1.00
+r[25]     2.90    0.03 1.63    0.30    1.74    2.69    3.78    6.73  4009 1.00
+r[26]     2.89    0.02 1.62    0.28    1.75    2.69    3.82    6.65  4552 1.00
+r[27]     1.22    0.02 1.06   -0.61    0.47    1.10    1.87    3.64  4322 1.00
+r[28]     2.94    0.02 1.65    0.33    1.74    2.75    3.93    6.66  4581 1.00
+r[29]     2.85    0.02 1.56    0.36    1.73    2.66    3.78    6.45  4060 1.00
+r[30]     2.88    0.02 1.58    0.28    1.74    2.72    3.83    6.39  5011 1.00
+r[31]    -2.69    0.02 1.02   -4.91   -3.31   -2.61   -1.99   -0.92  3339 1.00
+r[32]    -2.69    0.02 1.02   -4.88   -3.33   -2.61   -1.97   -0.92  3528 1.00
+r[33]    -2.67    0.02 1.00   -4.89   -3.28   -2.59   -1.96   -0.92  4089 1.00
+r[34]    -4.01    0.02 1.47   -7.52   -4.85   -3.84   -2.97   -1.64  3655 1.00
+r[35]     2.89    0.02 1.65    0.27    1.71    2.69    3.84    6.73  4427 1.00
+r[36]    -2.68    0.02 1.02   -4.97   -3.31   -2.61   -1.97   -0.86  3805 1.00
+r[37]     2.93    0.03 1.66    0.28    1.75    2.72    3.90    6.71  3973 1.00
+r[38]     1.23    0.02 1.11   -0.72    0.44    1.13    1.93    3.70  4756 1.00
+r[39]    -2.69    0.02 1.06   -5.09   -3.31   -2.61   -1.97   -0.82  4267 1.00
+r[40]     2.90    0.02 1.65    0.32    1.70    2.68    3.88    6.66  4604 1.00
+r[41]    -2.66    0.02 1.01   -4.85   -3.27   -2.57   -1.97   -0.90  3962 1.00
+r[42]    -1.91    0.01 0.87   -3.77   -2.44   -1.86   -1.32   -0.36  3682 1.00
+r[43]     1.23    0.02 1.08   -0.62    0.46    1.14    1.90    3.55  4386 1.00
+r[44]    -2.69    0.02 1.02   -4.83   -3.35   -2.64   -1.98   -0.87  4023 1.00
+r[45]     1.20    0.02 1.05   -0.61    0.48    1.11    1.82    3.51  4340 1.00
+r[46]    -0.26    0.01 0.79   -1.71   -0.79   -0.28    0.25    1.39  4137 1.00
+r[47]     2.87    0.02 1.56    0.33    1.74    2.70    3.81    6.42  4944 1.00
+r[48]     1.24    0.02 1.12   -0.70    0.46    1.16    1.94    3.61  4849 1.00
+r[49]    -1.32    0.01 0.76   -2.78   -1.85   -1.31   -0.80    0.11  4486 1.00
+r[50]    -2.65    0.02 1.01   -4.92   -3.26   -2.58   -1.94   -0.88  4106 1.00
+r[51]     1.25    0.02 1.12   -0.68    0.47    1.17    1.92    3.71  4377 1.00
+r[52]     1.21    0.02 1.08   -0.65    0.47    1.14    1.87    3.58  4476 1.00
+r[53]    -1.32    0.01 0.79   -2.92   -1.86   -1.28   -0.79    0.22  3408 1.00
+r[54]     2.90    0.03 1.64    0.29    1.73    2.70    3.87    6.71  4110 1.00
+r[55]    -1.90    0.01 0.81   -3.57   -2.42   -1.87   -1.33   -0.41  3552 1.00
+r[56]    -1.89    0.01 0.86   -3.65   -2.46   -1.84   -1.31   -0.34  3757 1.00
+r[57]    -1.90    0.01 0.88   -3.70   -2.45   -1.87   -1.30   -0.27  4061 1.00
+r[58]     0.38    0.01 0.89   -1.26   -0.23    0.34    0.95    2.24  4259 1.00
+r[59]     0.34    0.01 0.86   -1.26   -0.25    0.30    0.86    2.15  4103 1.00
+r[60]     1.24    0.02 1.13   -0.64    0.45    1.14    1.91    3.80  4464 1.00
+r[61]    -2.69    0.02 1.03   -4.94   -3.32   -2.62   -1.96   -0.87  4304 1.00
+r[62]    -2.69    0.02 1.02   -4.93   -3.33   -2.60   -1.98   -0.90  4030 1.00
+r[63]     0.36    0.01 0.87   -1.24   -0.26    0.33    0.92    2.17  4725 1.00
+r[64]    -4.06    0.02 1.47   -7.39   -4.91   -3.90   -3.01   -1.67  3760 1.00
+r[65]    -1.33    0.01 0.78   -2.93   -1.84   -1.30   -0.79    0.10  3490 1.00
+r[66]     0.36    0.01 0.89   -1.29   -0.22    0.32    0.89    2.23  4914 1.00
+r[67]    -2.66    0.02 1.01   -4.88   -3.26   -2.57   -1.96   -0.88  4038 1.00
+r[68]     2.88    0.02 1.67    0.26    1.66    2.67    3.88    6.72  5192 1.00
+r[69]    -1.33    0.01 0.80   -2.92   -1.86   -1.32   -0.79    0.22  3500 1.00
+r[70]     2.88    0.02 1.61    0.28    1.74    2.68    3.79    6.56  5122 1.00
+r[71]    -1.89    0.01 0.88   -3.78   -2.47   -1.85   -1.29   -0.33  3509 1.00
+r[72]     2.91    0.02 1.68    0.27    1.70    2.71    3.89    6.84  4573 1.00
+r[73]     0.35    0.01 0.84   -1.20   -0.22    0.32    0.90    2.08  3632 1.00
+r[74]     1.23    0.02 1.10   -0.67    0.45    1.14    1.87    3.61  4713 1.00
+r[75]    -4.03    0.02 1.45   -7.33   -4.86   -3.88   -2.99   -1.62  3597 1.00
+r[76]     0.38    0.01 0.89   -1.26   -0.24    0.34    0.92    2.24  4141 1.00
+r[77]     1.24    0.02 1.09   -0.66    0.49    1.15    1.89    3.63  4545 1.00
+r[78]     2.89    0.02 1.62    0.29    1.72    2.69    3.80    6.71  4698 1.00
+r[79]    -0.25    0.01 0.83   -1.85   -0.80   -0.28    0.30    1.38  5011 1.00
+r[80]     2.91    0.03 1.69    0.16    1.73    2.68    3.87    6.74  3976 1.00
+r[81]    -4.05    0.02 1.52   -7.66   -4.91   -3.85   -3.01   -1.66  3945 1.00
+r[82]     2.89    0.02 1.70    0.13    1.66    2.72    3.88    6.78  4806 1.00
+r[83]    -0.25    0.01 0.80   -1.76   -0.78   -0.27    0.26    1.35  4087 1.00
+r[84]    -1.89    0.01 0.86   -3.66   -2.45   -1.85   -1.30   -0.33  3913 1.00
+r[85]    -4.04    0.02 1.46   -7.39   -4.89   -3.85   -2.97   -1.68  3830 1.00
+r[86]    -0.26    0.01 0.81   -1.80   -0.79   -0.27    0.26    1.37  3619 1.00
+r[87]     0.36    0.01 0.90   -1.29   -0.25    0.33    0.92    2.30  4539 1.00
+r[88]    -0.78    0.01 0.79   -2.33   -1.30   -0.79   -0.28    0.82  3348 1.00
+r[89]    -4.06    0.02 1.49   -7.46   -4.90   -3.89   -3.00   -1.73  4088 1.00
+r[90]     2.90    0.02 1.65    0.23    1.71    2.70    3.88    6.67  4429 1.00
+r[91]    -1.91    0.01 0.85   -3.68   -2.47   -1.85   -1.32   -0.37  3889 1.00
+r[92]    -0.78    0.01 0.77   -2.27   -1.30   -0.78   -0.27    0.74  3860 1.00
+r[93]     0.37    0.01 0.87   -1.21   -0.23    0.34    0.91    2.22  4555 1.00
+r[94]     0.38    0.01 0.88   -1.24   -0.22    0.35    0.95    2.19  3775 1.00
+r[95]     2.92    0.02 1.64    0.26    1.75    2.75    3.86    6.65  4594 1.00
+r[96]    -4.03    0.02 1.45   -7.41   -4.84   -3.87   -3.01   -1.68  3969 1.00
+r[97]    -0.79    0.01 0.77   -2.31   -1.30   -0.80   -0.26    0.71  4096 1.00
+r[98]     2.88    0.03 1.64    0.24    1.73    2.68    3.79    6.73  4056 1.00
+r[99]    -1.31    0.01 0.79   -2.99   -1.82   -1.30   -0.76    0.18  4153 1.00
+r[100]   -2.67    0.02 1.02   -4.91   -3.27   -2.59   -1.98   -0.82  3414 1.00
+s         2.64    0.01 0.32    2.08    2.41    2.63    2.85    3.31  1448 1.00
+lp__   -453.40    0.32 9.13 -472.40 -459.46 -453.11 -446.97 -436.72   797 1.01
+
+Samples were drawn using NUTS(diag_e) at Wed Jun 30 06:42:17 2021.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
 </section>
 <section>
-<h2 id="階層ベイズモデルのほかの応用先">階層ベイズモデルのほかの応用先</h2>
-<ul>
-<li>時系列モデル (状態空間モデル)</li>
-<li>空間構造のあるモデル (e.g., CARモデル)</li>
-<li>欠損値の補完</li>
-</ul>
-<p>TODO: それぞれ理論・実践を紹介する？
+<h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
+<p>データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。</p>
+<p><img src="figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
+
 </section>
 <section>
 <h2 id="事前分布の選別">事前分布の選別</h2>
@@ -786,29 +1024,63 @@ y = ae ^ {-bx} - ce ^ {-dx}
 
 </section>
 <section>
-<h2 id="区間推定-ベイズ確信区間-credible-interval">区間推定: ベイズ確信区間 (credible interval)</h2>
-<p>e.g., 95%ベイズ確信区間 (credible interval): 真の値が95%の確率で含まれる区間。</p>
-<p>等裾事後信用区間 (equal-tailed interval): 両端から2.5%ずつ削る</p>
-<p>TODO: 図</p>
-<p>最高密度区間 (highest density interval): 分布密度に閾値を設ける</p>
-<p>TODO: 図</p>
+<h2 id="非線形回帰の例-データ">非線形回帰の例: データ</h2>
+<p>刺激強度xに対する応答強度yを20個体調査。<br>
+非対称なひと山。応答変数も説明変数も正の値。</p>
+<div>\[\begin{split}
+y = ae ^ {-bx} - ce ^ {-dx}
+\end{split}\]</div>
+<p><img src="figure/non-linear-1.png" alt="plot of chunk non-linear"></p>
 
 </section>
 <section>
-<h2 id="点推定">点推定</h2>
+<h2 id="非線形回帰の例-stanコード">非線形回帰の例: Stanコード</h2>
+<pre><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=1&gt; N;
+  vector[N] x;
+  vector[N] y;
+  int id[N];
+  int&lt;lower=1&gt; Ninds;
+}
+
+parameters {
+  real a;
+  real d;
+  real&lt;upper=a&gt; c;
+  real&lt;upper=d&gt; b;
+  real shape;
+  vector[Ninds] intercept;
+}
+
+model {
+  vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
+  y ~ gamma(shape, shape ./ mu);
+  a ~ exponential(1);
+  b ~ exponential(1);
+  c ~ exponential(1);
+  d ~ exponential(1);
+  shape ~ exponential(0.001);
+  intercept ~ normal(0, 0.005);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="練習問題">練習問題</h2>
+<p>🔰 <code>penguins</code> データでStanを動かしてみよう。</p>
+<p><a href="https://mc-stan.org/docs/functions-reference/">定義済みの関数</a></p>
+
+</section>
+<section>
+<h2 id="階層ベイズモデルのほかの応用先">階層ベイズモデルのほかの応用先</h2>
 <ul>
-<li>事後中央値 (Posteriori <u>Med</u>ian: MED)</li>
-<li>事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori: EAP)</li>
-<li>事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori: MAP)</li>
+<li>時系列モデル (状態空間モデル)</li>
+<li>空間構造のあるモデル (e.g., CARモデル)</li>
+<li>欠損値の補完</li>
 </ul>
-<p>TODO: 図
+
 </section>
 <section>
 <h2 id="ベイズ推定まとめ">ベイズ推定まとめ</h2>
-
-</section>
-<section>
-<h2 id="階層ベイズの練習問題">階層ベイズの練習問題</h2>
 
 </section>
 <section>
