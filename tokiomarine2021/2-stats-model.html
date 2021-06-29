@@ -390,24 +390,41 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 
 </section>
 <section>
-<h2 id="確率分布に従わないことが多い">確率分布に「従わない」ことが多い</h2>
-<p>現実には、確率分布をあてはめただけではうまく説明できない。</p>
-<p>それはなぜ？と考えていくのがまさに統計モデリングの仕事。</p>
-<p>e.g., ポアソン分布になるはずなのに、分散が大きすぎるぞ。<br>
-e.g., 指数分布になるはずなのに、ひと山型で分散が小さいぞ。</p>
-<p>「何も無ければこうなるはず」を理解してこそできる思考。</p>
+<h2 id="現実には確率分布に従わないことが多い">現実には、確率分布に「従わない」ことが多い</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion" width=400>
+<p>「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
+<strong>「普通はこれに従うはず」を理解してこそ</strong>できる思考。</p>
 
 </section>
 <section>
-<h2 id="pythonで乱数生成可視化">Pythonで乱数生成・可視化</h2>
-<p><a href="https://numpy.org/doc/stable/reference/random/generator.html">https://numpy.org/doc/stable/reference/random/generator.html</a></p>
-<p><a href="https://seaborn.pydata.org/tutorial/distributions.html">https://seaborn.pydata.org/tutorial/distributions.html</a></p>
-<p>コイントス、サイコロ、ポアソン。</p>
-<p>「分布に従う」を感覚的に理解するまで。</p>
+<h2 id="pythonで乱数生成可視化してみて感覚を掴もう">Pythonで乱数生成・可視化してみて感覚を掴もう</h2>
+<p>🔰 <a href="https://numpy.org/doc/stable/reference/random/generator.html">numpy公式ドキュメント</a>を参考に、とにかくたくさん試そう。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
 
+<span class="c1">## Random Number Generator</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="c1"># x = rng.binomial(3, 0.5, 100)</span>
+<span class="c1"># x = rng.poisson(10, 100)</span>
+<span class="c1"># x = rng.normal(50, 10, 100)</span>
+
+<span class="c1">## Visualize</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="c1"># sns.histplot(x)   # for continuous values</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    <span class="c1"># for discrete values</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
 </section>
 <section>
-<h2 id="何分布パラメータどうする">何分布？　パラメータどうする？</h2>
+<h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
 <p>ある植物を50個体調べて、それぞれの種子数Xを数えた。</p>
 <p><img src="figure/poisson-seed-1.png" alt="plot of chunk poisson-seed"></p>
 <p>カウントデータだからポアソン分布っぽい。<br>
@@ -415,7 +432,7 @@ e.g., 指数分布になるはずなのに、ひと山型で分散が小さい�
 
 </section>
 <section>
-<h2 id="何分布パラメータどうする">何分布？　パラメータどうする？</h2>
+<h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
 <p>ある植物を50個体調べて、それぞれの種子数Xを数えた。</p>
 <p><img src="figure/poisson-seed-lambda-1.png" alt="plot of chunk poisson-seed-lambda"></p>
 <p>カウントデータだからポアソン分布っぽい。<br>
@@ -469,8 +486,8 @@ L(\lambda \mid D)
 </section>
 <section>
 <h2 id="最尤推定-umuaximum-uluikelihood-ueustimation">最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation</h2>
-<p><strong>対数尤度</strong> (log likelihood) のほうが扱いやすい。<br>
-一階微分が0になる $\lambda$ を求めると&hellip;<strong>標本平均</strong>と一致</p>
+<p>扱いやすい <strong>対数尤度</strong> (log likelihood) にしてから計算する。<br>
+一階微分が0になる $\lambda$ を求めると&hellip;<strong>標本平均</strong>と一致。</p>
 <div>\[\begin{split}
 \log L(\lambda \mid D)
   &= \sum _i ^n \left[ X_i \log (\lambda) - \lambda - \log (X_i !) \right] \\
