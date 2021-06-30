@@ -499,11 +499,19 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="現実的な注意">現実的な注意</h2>
+<h2 id="現実的な注意点悩みどころ">現実的な注意点・悩みどころ</h2>
 <ul>
-<li>多重共線性(マルチコ)</li>
-<li>値を変換する。e.g., log</li>
-<li>割り算した値を使わない。</li>
+<li>多重共線性(multicollinearity):
+<ul>
+<li>説明変数同士が強い相関関係にある</li>
+</ul>
+</li>
+<li>変数変換:
+<ul>
+<li>気安くやるべきじゃないけど、対数変換などしばしば有用</li>
+<li>割り算した値は危険</li>
+</ul>
+</li>
 <li>交互作用を入れると解釈が難しくなる。</li>
 </ul>
 
@@ -545,17 +553,18 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 
 </section>
 <section>
-<h2 id="glmまとめ">GLMまとめ</h2>
+<h2 id="glm座学まとめ">GLM座学まとめ</h2>
 <ul>
 <li>何はともあれ散布図を描く</li>
-<li>確率分布・リンク関数・説明変数を考える</li>
+<li>適切な確率分布・リンク関数・説明変数を考える</li>
 <li>パラメータを最尤推定する</li>
-<li>情報量基準を使って良さげなモデルを選ぶ</li>
+<li>尤度は「手元のデータへのあてはまり」</li>
+<li>モデルを比較するときは情報量基準を参考にする</li>
 </ul>
 
 </section>
 <section>
-<h2 id="pythonでglm">PythonでGLM</h2>
+<h2 id="pythonでglmをやるパッケージ">PythonでGLMをやるパッケージ</h2>
 <dl>
 <dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
 <dd>統計モデリング寄り。今回はこちらを紹介。</dd>
@@ -738,7 +747,18 @@ body_mass_g:species[T.Gentoo]        0.0024      0.001      1.746      0.081    
 
 </section>
 <section>
-<h2 id="正規分布恒等リンクじゃないglmの練習">正規分布・恒等リンクじゃないGLMの練習</h2>
+<h2 id="手元のデータ公共データなどでglmしてみよう">手元のデータ、公共データなどでGLMしてみよう</h2>
+<p>正規分布・恒等リンクじゃないものだとなお良し。</p>
+<p>Pythonパッケージに付属のものを探すのもあり。<br>
+e.g., <a href="https://vincentarelbundock.github.io/Rdatasets/articles/data.html"><code>sm.datasets.get_rdataset(item, package)</code></a></p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">get_dataset_names</span><span class="p">()</span>
+<span class="n">titanic</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;titanic&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="kn">as</span> <span class="nn">sm</span>
+<span class="n">iris</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+<span class="n">diamonds</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;diamonds&#39;</span><span class="p">,</span> <span class="s1">&#39;ggplot2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</code></pre></div><p>Slackで報告していただけると嬉しいです。</p>
 
 </section>
 <section>
@@ -894,7 +914,7 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 </li>
 <li>GLMの拡張として理解はできても、実際に書くのは難しめ
 <ul>
-<li>階層ベイズモデルの一種としてのほうが書きやすい</li>
+<li>階層ベイズモデルの一種として見るほうが便利</li>
 </ul>
 </li>
 </ul>
@@ -908,14 +928,14 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 
 </section>
 <section>
-<h2 id="一般化線形モデルまとめ">一般化線形モデルまとめ</h2>
+<h2 id="一般化線形混合モデルまとめ">一般化線形(混合)モデルまとめ</h2>
 <ul>
 <li>何はともあれ作図して俯瞰</li>
 <li>GLMは統計モデリングの考え方の根幹
 <ul>
 <li>確率分布・リンク関数・説明変数</li>
 <li>尤度・最尤法によるパラメータ推定</li>
-<li>情報量基準によるモデル選択</li>
+<li>情報量基準などによるモデル選択</li>
 </ul>
 </li>
 <li>GLMMは現実のデータ解析に向けた強化
@@ -933,9 +953,9 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 <li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
 <li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
 <li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
-<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 <li><a href="https://amzn.to/3uCxTKo">データ解析のための数理モデル入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
 <a href="4-bayesian.html" rel="next" class="readmore">
 4. 階層ベイズモデル
