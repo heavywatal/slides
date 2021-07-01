@@ -3,11 +3,11 @@
 <head prefix="og: http://ogp.me/ns#">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<title>2. 統計モデルの基本 — 統計モデリング概論 DSHC 2021</title>
+<title>2. 統計モデルの基本: 確率分布、尤度 — 統計モデリング概論 DSHC 2021</title>
 <link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
 <link rel="stylesheet" href="/slides/css/theme-reveal.css">
 <meta name="author" content="Watal M. Iwasaki">
-<meta property="og:title" content="2. 統計モデルの基本 — 統計モデリング概論 DSHC 2021">
+<meta property="og:title" content="2. 統計モデルの基本: 確率分布、尤度 — 統計モデリング概論 DSHC 2021">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2021/2-stats-model.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
@@ -71,9 +71,9 @@ if (!doNotTrack) {
 </div>
 <ol>
 <li><a href="1-introduction.html">導入</a>
-<li class="current-deck"><a href="2-stats-model.html">統計モデルの基本</a>
-<li><a href="3-glm.html">一般化線形モデル</a>
-<li><a href="4-bayesian.html">階層ベイズモデル</a>
+<li class="current-deck"><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定、階層ベイズモデル</a>
 </ol>
 <div class="footnote">
 2021-06-30 東京海上 Data Science Hill Climb
@@ -272,12 +272,12 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <dl>
 <dt>離散一様分布</dt>
 <dd>コインの表裏、サイコロの出目1–6</dd>
+<dt>幾何分布</dt>
+<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
 <dt>二項分布</dt>
 <dd>成功率p、試行回数nのうちの成功回数</dd>
 <dt>ポアソン分布</dt>
 <dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
-<dt>幾何分布</dt>
-<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
 <dt>ガンマ分布</dt>
 <dd>ポアソン過程でk回起こるまでの待ち時間</dd>
 <dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
@@ -292,6 +292,18 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>e.g., コインの表裏、サイコロの出目1–6</p>
 <p><img src="figure/dunif-1.png" alt="plot of chunk dunif"></p>
 <p>🔰 一様分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="幾何分布-textgeomp">幾何分布 $~\text{Geom}(p)$</h2>
+<p>成功率pの試行が初めて成功するまでの失敗回数</p>
+<p>e.g., コイントスで表が出るまでに何回裏が出るか</p>
+<p><img src="figure/geometric-1.png" alt="plot of chunk geometric"></p>
+<p>\[
+\text{Prob}(X = k \mid p) = p (1 - p)^k
+\]</p>
+<p>「初めて成功するまでの試行回数」とする定義もある。</p>
+<p>🔰 幾何分布になりそうな例を考えてみよう</p>
 
 </section>
 <section>
@@ -324,6 +336,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>\[
 \text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
 \]</p>
+<p>幾何分布の連続値版。</p>
 <p>🔰 ポアソン分布・指数分布になりそうな例を考えてみよう</p>
 
 </section>
@@ -335,7 +348,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>\[
 \text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \]</p>
-<p>指数分布を右に膨らませた感じ。<br>
+<p>指数分布をkのぶん右に膨らませた感じ。<br>
 shapeパラメータ $k = 1$ のとき指数分布と一致。</p>
 
 </section>
@@ -362,7 +375,7 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
 <p>大きい$\lambda$のポアソン分布</p>
 <p><img src="figure/poisson-normal-1.png" alt="plot of chunk poisson-normal"></p>
-<p>ゼロから離れてほどほどな$k$のガンマ分布</p>
+<p>平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布</p>
 <p><img src="figure/gamma-normal-1.png" alt="plot of chunk gamma-normal"></p>
 
 </section>
@@ -374,12 +387,12 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <dl>
 <dt>離散一様分布</dt>
 <dd>コインの表裏、サイコロの出目1–6</dd>
+<dt>幾何分布</dt>
+<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
 <dt>二項分布</dt>
 <dd>成功率p、試行回数nのうちの成功回数</dd>
 <dt>ポアソン分布</dt>
 <dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
-<dt>幾何分布</dt>
-<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
 <dt>ガンマ分布</dt>
 <dd>ポアソン過程でk回起こるまでの待ち時間</dd>
 <dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
@@ -399,7 +412,26 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 
 </section>
 <section>
-<h2 id="pythonで乱数生成可視化してみて感覚を掴もう">Pythonで乱数生成・可視化してみて感覚を掴もう</h2>
+<h2 id="疑似乱数生成器-pseudo-random-number-generator">疑似乱数生成器 Pseudo Random Number Generator</h2>
+<p>コンピューター上でランダム<strong>っぽい</strong>数値を出力する装置。<br>
+実際には<strong>決定論的</strong>に計算されているので、<br>
+シード(出発点)と呼び出し回数が同じなら出る数も同じになる。</p>
+<div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>  <span class="c1"># initialize</span>
+<span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="c1"># array([1, 4, 4, 3])</span>
+<span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="c1"># array([3, 5, 1, 4])</span>
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>  <span class="c1"># re-initialize</span>
+<span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="c1"># array([1, 4, 4, 3, 3, 5, 1, 4])</span>
+</code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
+ただし「このシードじゃないと良い結果が出ない」はダメ。</p>
+<p>さまざまな「分布に従う」乱数を生成することもできる。</p>
+
+</section>
+<section>
+<h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
 <p>🔰 <a href="https://numpy.org/doc/stable/reference/random/generator.html">numpy公式ドキュメント</a>を参考に、とにかくたくさん試そう。</p>
 <p>🔰 e.g., 1%の当たりを狙って100連ガチャを回した場合とか</p>
 <div class="highlight"><pre class="chroma"><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
@@ -557,7 +589,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
 <a href="3-glm.html" rel="next" class="readmore">
-3. 一般化線形モデル (GLM)
+3. 一般化線形モデル、混合モデル
 </a>
 
 </section>

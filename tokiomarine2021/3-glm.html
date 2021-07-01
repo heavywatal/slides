@@ -3,11 +3,11 @@
 <head prefix="og: http://ogp.me/ns#">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<title>3. 一般化線形モデル — 統計モデリング概論 DSHC 2021</title>
+<title>3. 一般化線形モデル、混合モデル — 統計モデリング概論 DSHC 2021</title>
 <link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
 <link rel="stylesheet" href="/slides/css/theme-reveal.css">
 <meta name="author" content="Watal M. Iwasaki">
-<meta property="og:title" content="3. 一般化線形モデル — 統計モデリング概論 DSHC 2021">
+<meta property="og:title" content="3. 一般化線形モデル、混合モデル — 統計モデリング概論 DSHC 2021">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2021/3-glm.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
@@ -71,9 +71,9 @@ if (!doNotTrack) {
 </div>
 <ol>
 <li><a href="1-introduction.html">導入</a>
-<li><a href="2-stats-model.html">統計モデルの基本</a>
-<li class="current-deck"><a href="3-glm.html">一般化線形モデル</a>
-<li><a href="4-bayesian.html">階層ベイズモデル</a>
+<li><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li class="current-deck"><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定、階層ベイズモデル</a>
 </ol>
 <div class="footnote">
 2021-06-30 東京海上 Data Science Hill Climb
@@ -199,8 +199,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 <p><img src="figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
   </div>
 </div>
-<p>最小二乗法の直線あてはめと同じ。
-分散分析もこの枠組で考えられる。</p>
+<p>最小二乗法の直線あてはめと結果的に同じになる。</p>
 <p><small style="color: #999999;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small></p>
 
 </section>
@@ -521,7 +520,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <p>ある説明変数の効果が、別の説明変数によって異なる。<br>
 e.g., ビール売上の温度依存性が天気によって異なる。</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
 <table>
 <thead>
 <tr>
@@ -544,6 +543,8 @@ e.g., ビール売上の温度依存性が天気によって異なる。</p>
 y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
 \end{split}\]</p>
+<p>雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 <p><img src="figure/interaction-1.png" alt="plot of chunk interaction"></p>
@@ -958,7 +959,7 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
 <a href="4-bayesian.html" rel="next" class="readmore">
-4. 階層ベイズモデル
+4. ベイズ推定、階層ベイズモデル
 </a>
 
 </section>
