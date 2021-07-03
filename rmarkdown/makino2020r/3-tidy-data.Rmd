@@ -1,0 +1,1732 @@
++++
+url = "makino2020r/3-tidy-data.html"
+title = "Tidying and transforming data with R — Hands-on R Lecture for Makino Lab"
+linktitle = "Tidying and transforming data with R"
+date = 2020-06-03T13:30:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [Hands-on Introduction to R 2020](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+
+<ol start="0">
+<li><a href="0-why-r.html">Why do we use R?</a>
+<li><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li class="current-deck"><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+<li><a href="4-statistics.html">Statistical analysis with R</a>
+</ol>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br>
+2020-06-03
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+library(readr)
+library(forcats)
+library(lubridate)
+knitr::opts_chunk$set(cache = FALSE)
+anscombe = tibble::as_tibble(anscombe)
+```
+
+---
+## パッケージをアップデートしてください
+
+```r
+update.packages()
+```
+
+Rを再起動していつものパッケージ読み込み
+```r
+library(tidyverse)
+```
+```
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
+✔ ggplot2 3.3.1     ✔ purrr   0.3.4
+✔ tibble  3.0.1     ✔ dplyr   1.0.0
+✔ tidyr   1.1.0     ✔ stringr 1.4.0
+✔ readr   1.3.1     ✔ forcats 0.5.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+```
+
+最近でた **dplyr ≥1.0.0** と **tidyr ≥1.1.0** を使う。
+
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備
+1. データの取得、読み込み
+1. 探索的データ解析
+    - **前処理、加工** (地味。意外と重い。今回の主題)
+    - 可視化、仮説生成 (派手！楽しい！[前回の主題](2-ggplot.html))
+    - 統計解析、仮説検証 (みんな勉強したがる)
+1. 報告、発表
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 可視化だいじ。わかった。
+
+情報の整理 → **正しい解析・新しい発見・仮説生成**
+
+<figure>
+<a href="https://r4ds.had.co.nz/explore-intro.html">
+<img src="/slides/image/r4ds/data-science-explore.png">
+<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+</a>
+</figure>
+
+でも**データ分析に費やす労力の8割は前処理**らしいよ。。。
+
+
+---
+## 機械処理しやすい形 vs 人が読み書きしやすい形
+
+作図や解析に使えるデータ形式はほぼ決まってる
+: `ggplot(data, ...)`, `glm(..., data, ...)`, ...
+
+出発点となるデータはさまざま
+: 実験ノート、フィールドノート、データベース、...
+
+> Happy families are all alike;<br>
+> every unhappy family is unhappy in its own way<br>
+> --- Leo Tolstoy "Anna Karenina"
+
+> tidy datasets are all alike,<br>
+> but every messy dataset is messy in its own way<br>
+> --- Hadley Wickham, creator of tidyverse
+
+
+---
+## 整然データ tidy data
+
+- **縦1列**は1つの**変数**
+- **横1行**は1つの**観測**
+- **1セル**は1つの**値**
+
+<cite style="display: block; text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</cite>
+
+```{r tidy_example}
+print(diamonds)
+```
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
+    <div style="position: absolute; top: 440px;">
+    <strong>縦1列は1つの変数</strong><br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    <strong>横1行は1つの観測</strong><br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    <strong>1セルは1つの値</strong><br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+
+---
+## 整然データのご利益の一例
+
+x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
+
+```{r aes-map, fig.height=6, fig.width=9}
+ggplot(diamonds) + aes(x = carat, y = price) +
+  geom_point(mapping = aes(color = color, size = clarity)) +
+  facet_wrap(~ cut)
+```
+
+
+---
+## 目標: 生データを下ごしらえして食べやすい形に
+
+```{r messy_example}
+VADeaths
+```
+
+↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+
+```{r tidy_vadeaths, echo=FALSE}
+VADeaths %>%
+  as.data.frame() %>%
+  rownames_to_column("age") %>%
+  pivot_longer(-age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
+  separate(age, c("lbound", "ubound"), convert = TRUE)
+```
+
+
+---
+## 前処理は大きく2つに分けられる
+
+- **データ構造を対象とする処理** 👈
+    - 使いたい部分だけ抽出
+    - グループごとに特徴を要約
+    - 大きい順に並べ替え
+    - 異なるテーブルの結合
+    - 変形: 縦長 ↔ 横広
+- データ内容を対象とする処理
+    - 数値を変換する (e.g., 対数、座標系)
+    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
+    - 外れ値・欠損値に対処
+    - 文字列から数値や日時を抜き出す
+
+<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></cite>
+
+---
+## tidyverseに便利な道具が揃ってる
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+```{r tidyverse, eval=FALSE}
+install.packages("tidyverse")
+library(tidyverse)
+# core packages are loaded
+```
+
+- 統一的な使い勝手
+- シンプルな関数を繋げて使うデザイン
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+data.frame処理に使うのは主に [dplyr](/rstats/dplyr.html) と [tidyr](/rstats/tidyr.html)
+
+
+---
+## このハンズオンR入門の目標
+
+### ✅ <strike>再現可能な解析を楽にやりたい</strike>
+
+### ⬜ あれもこれもRでできそう！
+
+### ⬜ やりたくなったらこうやって調べればいいんだな
+
+<br>
+That's all.
+この3点さえ押さえれば、個々の方法は覚えなくても大丈夫。<br>
+
+(今日は結構盛り沢山なので念のため再掲)
+
+
+---
+## dplyr --- data.frameの高速処理担当
+
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/dplyr.png" width="120" align="right">
+</a>
+
+シンプルな関数がたくさん。繋げて使う (piping)
+
+抽出
+: 列: `select()`,
+: 行: `filter()`, `distinct()`, `slice()`
+
+要約・集計
+: `group_by()`, `summarize()`, `count()`
+
+ソート
+: `arrange()`
+
+結合
+: 行方向: `bind_rows()`
+: 列方向: `left_join()`, `inner_join()`, `full_join()`
+
+列の追加・変更
+: `mutate()`, `rename()`
+
+
+---
+## dplyrを使ってみる準備
+
+パッケージを読み込んで、データを見てみる
+```r
+# install.packages("tidyverse")
+library(tidyverse)
+print(diamonds)
+View(diamonds)  # RStudio
+```
+
+```{r dplyr-diamonds, echo=FALSE}
+print(diamonds)
+```
+
+
+---
+## dplyr 使用例
+
+小さな関数を繋げて使う流れ作業:
+```{r dplyr}
+result = diamonds %>%              # 生データから出発して
+  select(carat, cut, price) %>%    # 列を抽出して
+  filter(carat > 1) %>%            # 行を抽出して
+  group_by(cut) %>%                # グループ化して
+  summarize(mean(price)) %>%       # 平均を計算
+  print()                          # 表示してみる
+```
+
+この見慣れぬ記号 `%>%` は何？
+
+---
+## Pipe operator (パイプ演算子) `%>%`
+
+パイプの左側の変数を、右側の関数の第一引数にねじ込む:
+```r
+diamonds %>% filter(carat > 1)
+filter(diamonds, carat > 1)     # これと同じ
+
+# 前処理の流れ作業に便利:
+diamonds %>% select(carat, price) %>% filter(carat > 1) %>% ...
+#   data %>%  do_A()  %>%  do_B()  %>%  do_C()  %>% ...
+```
+
+[問] パイプを使わない形に書き換えよう:
+```{r letters}
+seq_len(6) %>% sum()
+letters %>% toupper() %>% head(3)
+```
+
+[解答例]
+```r
+sum(seq_len(6))
+head(toupper(letters), 3)
+```
+
+---
+## パイプ演算子 `%>%` を使わない方法
+
+😐 一時変数をイチイチ作る:
+```{r pipe-tmp-var}
+tmp1 = select(diamonds, carat, cut, price)   # 列を抽出して
+tmp2 = filter(tmp1, carat > 1)               # 行を抽出して
+tmp3 = group_by(tmp2, cut)                   # グループ化して
+result = summarize(tmp3, mean(price))        # 平均を計算
+```
+
+😐 同じ名前を使い回す:
+```{r pipe-recursive-assign}
+result = select(diamonds, carat, cut, price) # 列を抽出して
+result = filter(result, carat > 1)           # 行を抽出して
+result = group_by(result, cut)               # グループ化して
+result = summarize(result, mean(price))      # 平均を計算
+```
+
+どちらも悪くない。
+何度も変数名を入力するのがやや冗長。
+
+
+---
+## パイプ演算子 `%>%` を使わない方法
+
+😫 一時変数を使わずに:
+```{r pipe-nest}
+result = summarize(                    # 平均を計算
+    group_by(                            # グループ化して
+      filter(                              # 行を抽出して
+        select(diamonds, carat, cut, price), # 列を抽出して
+        carat > 1),                        # 行を抽出して
+      cut),                              # グループ化して
+    mean(price))                       # 平均を計算
+```
+
+🤪 改行さえせずに:
+```{r pipe-oneliner}
+result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
+```
+
+論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
+さっきのほうがぜんぜんマシ。
+
+---
+## パイプ演算子 `%>%` を使おう
+
+😁 慣れれば、論理の流れを追いやすい:
+```{r eg-pipe}
+result = diamonds %>%
+  select(carat, cut, price) %>%    # 列を抽出して
+  filter(carat > 1) %>%            # 行を抽出して
+  group_by(cut) %>%                # グループ化して
+  summarize(mean(price)) %>%       # 平均を計算
+  print()                          # 表示してみる
+```
+
+慣れるまではちょっと大変かも。
+無理して使わなくても大丈夫。
+
+
+---
+## 列の抽出: `select()`
+
+**列の番号**で指定:
+```{r select-number}
+result = diamonds %>%
+  select(1, 2, 7) %>%
+  print()
+```
+
+別解: `diamonds[, c(1, 2, 7)]`
+
+
+---
+## 列の抽出: `select()`
+
+**列の名前**で指定:
+```{r select-name}
+result = diamonds %>%
+  select(carat, cut, price) %>%
+  print()
+```
+
+別解: `diamonds %>% select(c("carat", "cut", "price"))`<br>
+別解: `diamonds[, c("carat", "cut", "price")]`
+
+
+---
+## 列の抽出: `select()`
+
+**捨てる列**をマイナス指定:
+```{r select-negative}
+result = diamonds %>%
+  select(-carat, -cut, -price) %>%
+  print()
+```
+
+---
+## 列の抽出: `select()`
+
+名前の**部分一致**で指定:
+```{r select-matches}
+result = diamonds %>%
+  select(starts_with("c")) %>%
+  print()
+```
+
+See `?dplyr_tidy_select` or [tidyselect helpers](https://tidyselect.r-lib.org/reference/select_helpers.html) for more details.
+
+
+---
+## 列の抽出: `select()`
+
+**列の型**で指定:
+```{r select-where}
+result = diamonds %>%
+  select(where(is.numeric)) %>%
+  print()
+```
+
+See `?dplyr_tidy_select` or [`tidyselect::where`](https://tidyselect.r-lib.org/reference/where.html) for more details.
+
+
+---
+## 行の抽出: `filter()`
+
+等号 `==` で**完全一致する行**のみ残す:
+```{r filter-exact}
+result = diamonds %>%
+  filter(cut == "Ideal") %>%
+  print()
+```
+
+別解: `diamonds[diamonds[["cut"]] == "Ideal", ]`
+
+
+---
+## 行の抽出: `filter()`
+
+不等号で**一致しない行**のみ残す:
+```{r filter-unequal}
+result = diamonds %>%
+  filter(cut != "Ideal") %>%
+  print()
+```
+
+不等号: `!=`, `<`, `<=`, `>`, `>=`
+
+---
+## 行の抽出: `filter()`
+
+複数の値のうち**どれかに一致する行**のみ残す:
+```{r filter-in}
+result = diamonds %>%
+  filter(cut %in% c("Ideal", "Good")) %>%
+  print()
+```
+
+---
+## 行の抽出: `filter()`
+
+2つの条件を**両方満たす行**のみ残す (AND):
+```{r filter-and}
+result = diamonds %>%
+  filter(carat > 2 & price < 14000) %>%
+  print()
+```
+
+---
+## 行の抽出: `filter()`
+
+2つの条件の**いずれかを満たす行**のみ残す (OR):
+```{r filter-or}
+result = diamonds %>%
+  filter(carat > 2 | price < 14000) %>%
+  print()
+```
+
+---
+## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
+
+指定した列の値が**大きい順**に抽出:
+```{r slice_max}
+result = diamonds %>%
+  slice_max(price, n = 5L) %>%
+  print()
+```
+
+**割合を指定**するなら `n` の代わりに `prop = 0.05`
+
+
+---
+## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
+
+指定した列の値が**大きい順**に**各グループから**抽出:
+```{r group_slice_max}
+result = diamonds %>%
+  group_by(cut) %>%
+  slice_max(price, n = 2L) %>%
+  print()
+```
+
+**割合を指定**するなら `n` の代わりに `prop = 0.05`
+
+
+---
+## 先頭/末尾の行の抽出: `slice_head()`, `slice_tail()`
+
+**各グループの先頭**を抽出:
+```{r group_slice_head}
+result = diamonds %>%
+  group_by(cut) %>%
+  slice_head(n = 3L) %>%
+  print()
+```
+
+**割合を指定**するなら `n` の代わりに `prop = 0.05`
+
+
+---
+## ランダムに行の抽出: `slice_sample()`
+
+**行数を指定**してランダムサンプル:
+```{r slice_sample}
+result = diamonds %>%
+  group_by(cut) %>%
+  slice_sample(n = 3L, replace = FALSE) %>%
+  print()
+```
+
+**割合を指定**するなら `prop =` を使う。
+
+
+---
+## X番目の行の抽出: `slice()`
+
+**各グループのX番目の行**を抽出:
+```{r group_slice}
+result = diamonds %>%
+  group_by(cut) %>%
+  slice(c(1, 2, 9)) %>%
+  print()
+```
+
+
+---
+## 重複行の除去: `distinct()`
+
+指定した列に関してユニークな行のみ残す:
+```{r distinct}
+result = diamonds %>%
+  distinct(cut, color) %>%
+  print()
+```
+
+`.keep_all = TRUE`
+オプションを付けると指定しなかった列も残せる。
+
+---
+## 要約・集計: `summarize()`
+
+列の**合計、平均、最大**などを求める:
+```{r summarize}
+result = diamonds %>%
+  summarize(sum(carat), mean(carat), max(price)) %>%
+  print()
+```
+
+vectorを受け取って1つの値を返す集約関数:<br>
+`min()`, `max()`, `mean()`, `median()`, `var()`, `sd()`, etc.
+
+
+---
+## 要約・集計: `summarize()`
+
+列の値を**グループごとに**集計する:
+```{r group_summarize}
+result = diamonds %>%
+  group_by(cut) %>%
+  summarize(avg_carat = mean(carat),
+            max_price = max(price)) %>%
+  print()
+```
+
+
+---
+## 要約・集計: `summarize()` 発展編
+
+複数の列の複数の値を柔軟に集計する:
+```{r group_summarize_across}
+result = diamonds %>%
+  group_by(cut) %>%
+  summarize(across(where(is.numeric), range)) %>%
+  print()
+```
+
+`across()` も `where()` も複数行出力も dplyr 1.0.0 新機能
+
+
+---
+## 要約・集計: `count()`
+
+指定した列の組み合わせ出現数を数える:
+```{r count}
+result = diamonds %>%
+  count(cut, color) %>%
+  print()
+```
+
+`diamonds %>% group_by(cut, color) %>% tally()` と同じ。
+
+
+---
+## 行のソート: `arrange()`
+
+指定した列の値が**小さい順に上から**並べる:
+```{r arrange}
+result = diamonds %>%
+  arrange(color, desc(carat)) %>%  # 色の昇順。色が同じなら大きさ降順
+  print()
+```
+
+逆にするには `desc()` を使う。
+
+
+---
+## 列の並び替え: `relocate()`
+
+指定した列を左端に移動:
+```{r relocate}
+result = diamonds %>%
+  relocate(carat, price, clarity) %>%
+  print()
+```
+
+`.before`, `.after` オプションで微調整も可能。
+
+
+---
+## 行の結合: `bind_rows()`
+
+例。先頭と末尾を6行ずつ取ってひとつの表に結合する:
+```{r bind_rows}
+bind_rows(head(diamonds), tail(diamonds))
+```
+
+
+---
+## 共通する列で結合: `full_join()`
+
+他方に無い部分を `NA` で補完して**左右とも全行**保持:
+```{r full_join}
+full_join(band_members, band_instruments, by = "name")
+```
+```
+band_members          band_instruments
+   name    band          name  plays
+  <chr>   <chr>         <chr>  <chr>
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+```
+
+---
+## 共通する列で結合: `left_join()`
+
+右側に無い部分を `NA` で補完して**左側だけ全行**保持:
+```{r left_join}
+left_join(band_members, band_instruments, by = "name")
+```
+```
+band_members          band_instruments
+   name    band          name  plays
+  <chr>   <chr>         <chr>  <chr>
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+```
+
+その逆は `right_join()`
+
+---
+## 共通する列で結合: `inner_join()`
+
+左右ともに**共通する値のある行だけ**保持:
+```{r inner_join}
+inner_join(band_members, band_instruments, by = "name")
+```
+```
+band_members          band_instruments
+   name    band          name  plays
+  <chr>   <chr>         <chr>  <chr>
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+```
+
+---
+## joinまとめ
+
+<figure>
+<a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
+<img src="/slides/image/r4ds/join.png" height="550">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+</a>
+</figure>
+
+
+---
+## join例題: `nycflights13` データセット
+
+関連するdata.frameをいろいろな方法で結合してみよう。
+
+```r
+install.packages("nycflights13")
+library(nycflights13)
+data(package = "nycflights13")
+# airlines, airports, flights, planes, weather
+```
+
+<figure>
+<a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
+<img src="/slides/image/r4ds/relational-nycflights.png" height="320">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+</a>
+</figure>
+
+
+---
+## 新しい列の追加: `mutate()`
+
+既存の列名を指定すると上書き:
+```{r mutate}
+result = diamonds %>%
+  mutate(ratio = price / carat,
+         price = price * 108.36) %>%
+  print()
+```
+
+
+---
+## tidyr --- data.frameの変形・整形担当
+
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tidyr.png" width="120" align="right">
+</a>
+
+横広から縦長に
+: `pivot_longer()`, <strike><code>gather()</code></strike>
+
+縦長から横広に
+: `pivot_wider()`, <strike><code>spread()</code></strike>
+
+列を分離、結合
+: `separate()`, `unite()`
+
+入れ子構造をつくる、解消する
+: `nest()`, `unnest()`
+
+*etc.*
+
+
+---
+## `pivot_longer()` 横広から縦長に
+
+複数列にまたがる値を1列にする。<br>
+そのラベルも合わせて移動。
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#gathering">
+<img src="/slides/image/r4ds/tidy-gather.png" width="800">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#gathering</figcaption>
+</a>
+</figure>
+
+---
+## `pivot_longer()` 横広から縦長に
+
+複数列にまたがる値を1列にする(ここでは`value`)。<br>
+そのラベルも合わせて移動(ここでは`item`)。
+
+```{r pivot_longer}
+iris_long = iris %>% head(2L) %>%    # 最初の2行だけ
+  rowid_to_column("id") %>%          # ID列を追加
+  print() %>%                        # 途中経過を表示
+  pivot_longer(2:5, names_to = "item", values_to = "value") %>%
+  print()                            # 2–5列目の値を移動
+```
+
+
+---
+## `pivot_wider()` 縦長から横広に
+
+1列に収まっていた値を複数列の行列に変換。<br>
+そのラベルを列の名前にする。
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#spreading">
+<img src="/slides/image/r4ds/tidy-spread.png" height="480">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#spreading</figcaption>
+</a>
+</figure>
+
+---
+## `pivot_wider()` 縦長から横広に
+
+1列に収まっていた値を複数列の行列に変換(`value`)。<br>
+そのラベルを列の名前にする(`item`)。
+
+```{r spread}
+iris_long %>% print() %>%                    # さっき縦長にしたやつ
+  pivot_wider(names_from = item, values_from = value)  # 横広に戻す
+```
+
+---
+## `separate()` 列を分離
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#separate">
+<img src="/slides/image/r4ds/tidy-separate.png" width="800">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
+</a>
+</figure>
+
+---
+## `separate()` 列を分離
+
+```{r separate}
+iris_long %>% print() %>%
+  separate(item, c("part", "measure")) # 列を分離
+```
+
+---
+## `unite()` 列を融合
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#unite">
+<img src="/slides/image/r4ds/tidy-unite.png" width="800">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
+</a>
+</figure>
+
+---
+## `nest()` 入れ子にする
+
+グループ毎にdata.frameを区切ってlist型の列に入れる。
+
+<figure>
+<a href="https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/">
+<img src="/slides/image/rstats/nest-pack-chop.png" height="500">
+<br>
+<figcaption class="url">https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</figcaption>
+</a>
+</figure>
+
+---
+## `nest()` 入れ子にする
+
+グループ毎にdata.frameを区切ってlist型の列に入れる。
+
+```{r nest}
+iris_nested = as_tibble(iris) %>%
+  nest(data = -Species) %>% print()
+iris_nested$data[[1L]]
+```
+
+---
+## 例題1: `VADeaths` を縦長にしたい
+
+```{r vadeaths_df, results="hold"}
+as.data.frame(VADeaths)                  # data.frameに変換
+                                         # 行名を列に
+                                         # 縦長に変形したい
+```
+
+---
+## 例題1: `VADeaths` を縦長にしたい
+
+```{r vadeaths_rownames, results="hold"}
+as.data.frame(VADeaths) %>%              # data.frameに変換
+  rownames_to_column("age")              # 行名を列に
+                                         # 縦長に変形したい
+```
+
+---
+## 例題1: `VADeaths` を縦長にしたい
+
+```{r vadeaths_longer, results="hold"}
+as.data.frame(VADeaths) %>%              # data.frameに変換
+  rownames_to_column("age") %>%          # 行名を列に
+  pivot_longer(-age, values_to = "death")     # age以外を移動して縦長化
+                                         # 新しいname列を分割
+```
+
+---
+## 例題1: `VADeaths` を縦長にしたい
+
+```{r vadeaths_region_sex, results="hold"}
+as.data.frame(VADeaths) %>%              # data.frameに変換
+  rownames_to_column("age") %>%          # 行名を列に
+  pivot_longer(-age, values_to = "death") %>% # age以外を移動して縦長化
+  separate(name, c("region", "sex"))     # 新しいname列を分割
+```
+
+---
+## 例題1: `VADeaths` を縦長にしたい
+
+```{r vadeaths_age, results="hold"}
+va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
+  rownames_to_column("age") %>%          # 行名を列に
+  pivot_longer(-age, values_to = "death") %>% # age以外を移動して縦長化
+  separate(name, c("region", "sex")) %>% # 新しいname列を分割
+  separate(age, c("lbound", "ubound"), "-", convert = TRUE) %>%
+  print()                                # 下限と上限を分離
+```
+
+---
+## 例題1: `VADeaths` 別解
+
+```{r vadeaths_pivot, results="hold"}
+va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
+  rownames_to_column("age") %>%          # 行名を列に
+  pivot_longer(                          # 縦長に変形したい
+    -age,                                # age以外の列に入ってる値を移動
+    names_to = c("region", "sex"),       # 元の列名を2つに分離
+    names_sep = " ",                     # スペースで切る
+    values_to = "death") %>%             # 値の行き先の列名
+  separate(age, c("lbound", "ubound"), "-", convert = TRUE) %>%
+  print()                                # 下限と上限を分離
+```
+
+---
+## 例題1: `VADeaths` 作図例
+
+```{r vadeaths_plot, fig.height = 5, fig.width = 10}
+ggplot(va_deaths) +
+  aes(lbound, death) +
+  geom_point(aes(color = sex, shape = region), size = 5) +
+  theme_classic(base_size = 16)
+```
+
+---
+## 例題2: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe, results="hold"}
+anscombe %>%
+  rowid_to_column("id")              # IDをつけておく
+                                     # x y で始まる列の値を移して縦長に
+```
+
+ggplot does not accept this format. Let's transformt it.
+
+
+---
+## 例題2: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_longer, results="hold"}
+anscombe %>%
+  rowid_to_column("id") %>%          # IDをつけておく
+  pivot_longer(matches("^x|y"))      # x y で始まる列の値を移して縦長に
+
+                                     # name列を分割
+```
+
+---
+## 例題2: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_separate, results="hold"}
+anscombe %>%
+  rowid_to_column("id") %>%          # IDをつけておく
+  pivot_longer(matches("^x|y")) %>%  # x y で始まる列の値を移して縦長に
+  separate(name, c("axis", "group"), 1L, convert = TRUE)
+                                     # name列を分割
+```
+
+---
+## 例題2: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_wider, results="hold"}
+tidy_anscombe = anscombe %>%
+  rowid_to_column("id") %>%          # IDをつけておく
+  pivot_longer(matches("^x|y")) %>%  # x y で始まる列の値を移して縦長に
+  separate(name, c("axis", "group"), 1L, convert = TRUE) %>%
+                                     # name列を分割
+  pivot_wider(names_from = axis, values_from = value) %>%
+                                     # axis列内の x y を列にして横広化
+  arrange(group) %>%                 # グループごとに並べる
+  print()                            # ggplotしたい形！
+```
+
+---
+## 例題2: `anscombe` 別解
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_pivot}
+tidy_anscombe = anscombe %>%
+  pivot_longer(                       # 縦長に変形したい
+    everything(),                     # すべての列について
+    names_to = c(".value", "group"),  # 新しい列名
+    names_sep = 1L,                   # 切る位置
+    names_transform = list(group = as.integer)) %>% # 型変換
+  arrange(group) %>%                  # グループごとに並べる
+  print()                             # ggplotしたい形！
+```
+
+
+---
+## 例題2: `anscombe` 作図例
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r plot_anscombe, fig.height=3, fig.width=10, out.width="98%"}
+ggplot(tidy_anscombe) + aes(x, y) +
+  geom_point(size = 3) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, fullrange = TRUE) +
+  facet_wrap(~ group, nrow = 1L)
+```
+
+---
+## 例題2: `anscombe` 要約
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r summarize_anscombe}
+tidy_anscombe %>%
+  group_by(group) %>%   # group列でグループ化して
+  summarize(            # x, y列を使ってsummarize
+    mean_x = mean(x),
+    mean_y = mean(y),
+    sd_x = sd(x),
+    sd_y = sd(y),
+    cor_xy = cor(x, y)
+  )
+```
+
+
+
+<!-- ###################################################################### -->
+
+
+
+---
+## 前処理は大きく2つに分けられる
+
+- データ構造を対象とする処理
+    - 使いたい部分だけ抽出 --- `select()`, `filter()`
+    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
+    - 大きい順に並べ替え --- `arrange()`
+    - 異なるテーブルの結合 --- `*_join()`
+    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
+- **データ内容を対象とする処理** 👈
+    - 数値を変換する (e.g., 対数、座標系)
+    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
+    - 外れ値・欠損値に対処
+    - 文字列から数値や日時を抜き出す
+
+<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></cite>
+
+---
+## 変数/オブジェクトの型 (先週のおさらい)
+
+- **`vector`: 基本型。一次元の配列。** (👈今回の主役)
+    - `logical`: 論理値 (`TRUE` or `FALSE`)
+    - `numeric`: 数値 (整数 `42L` or 実数 `3.1416`)
+    - `character`: 文字列 (`"a string"`)
+    - `factor`: 因子 (文字列っぽいけど微妙に違う)
+- `array`: 多次元配列。`vector`同様、全要素が同じ型。
+    - `matrix`: 行列 = 二次元の配列。
+- `list`: 異なる型でも詰め込める太っ腹ベクトル。
+- `data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
+  `tibble` とか `tbl_df` と呼ばれる亜種もあるけどほぼ同じ。
+
+
+---
+## vector: 一次元の配列 (先週のおさらい)
+
+1個の値でもベクトル扱い。<br>
+ベクトルの各要素に一気に計算を適用できる。
+
+```{r vector}
+x = c(1, 2, 9)  # 長さ3の数値ベクトル
+x + x           # 同じ長さ同士の計算
+y = 10          # 長さ1の数値ベクトル
+x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+sqrt(x)         # square root
+```
+
+
+---
+## data.frameは列vectorの集まり
+
+内容を変更する方法はいくつかある。<br>
+`diamonds[["price"]]` をドルから円に変換する例:
+
+```{r dfcolumn}
+dia = diamonds    # 別名コピー
+
+# dollar演算子で指定
+dia$price = 109.58 * dia$price
+
+# 名前を文字列で指定
+dia[["price"]] = 109.58 * dia[["price"]]
+
+# dplyr::mutate with pipe
+dia = diamonds %>%
+  mutate(price = 109.58 * price)
+```
+
+1発ならどれでもいい。流れ作業には `mutate()` が便利。
+
+
+---
+## 数値: numeric型
+
+普通は倍精度浮動小数点型 `double` として扱われる:
+
+```{r numeric}
+answer = 42
+typeof(answer)
+```
+
+明示的に変換したり末尾にLを付けることで整数扱いもできる:
+
+```{r integer}
+typeof(as.integer(answer))
+whoami = 24601L
+typeof(whoami)
+```
+
+---
+## 様々な数学関数
+
+ベクトルを受け取り、それぞれの要素に適用
+
+```{r math}
+x = c(1, 2, 3)
+sqrt(x)
+log(x)
+log10(x)
+exp(x)
+```
+
+<div style="text-align: right;">
+<a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
+https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
+</a></div>
+
+---
+## 正規化 (z-score normalization)
+
+平均=0、標準偏差=1、になるように:
+
+```{r z-score}
+result = diamonds %>%
+  mutate(depth = scale(depth)) %>%
+  print()
+```
+
+`depth = (depth - mean(depth)) / sd(depth)` と同じ。
+
+
+---
+## 正規化 (min-max normalization)
+
+最小=0、最大=1、になるように:
+
+```{r min-max}
+result = diamonds %>%
+  mutate(depth = (depth - min(depth)) / (max(depth) - min(depth))) %>%
+  print()
+```
+
+外れ値の影響を大きく受けることに注意。
+
+
+---
+## 外れ値の除去
+
+平均値から標準偏差の3倍以上離れているものを取り除く例:
+
+```{r outlier}
+result = diamonds %>%
+  filter(abs(depth - mean(depth)) / sd(depth) < 3) %>%
+  print()
+```
+
+唯一の方法ではないし、そもそもやるべきかどうかも要検討
+
+
+---
+## 欠損値の除去 `tidyr::drop_na()`
+
+(指定した列に) `NA` が含まれてる行を削除する。
+
+```{r drop_na}
+df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>% drop_na()
+```
+
+問: `starwars` データセットで試してみよう
+
+```{r starwars-drop, echo=FALSE}
+starwars
+```
+
+---
+## 欠損値の補完 `tidyr::replace_na()`
+
+欠損値 `NA` を任意の値で置き換える。
+
+```{r replace_na}
+df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>% replace_na(list(x = 0, y = "unknown"))
+```
+
+問: `starwars` データセットで試してみよう
+
+
+---
+## 欠損値の補完 `dplyr::coalesce()`
+
+先に指定した列が `NA` なら次の列の値を採用:
+
+```{r coalesce}
+y = c(1, 2, NA, NA, 5)
+z = c(NA, NA, 3, 4, 5)
+coalesce(y, z)
+```
+
+型が異なると怒られる:
+```{r coalesce-type}
+df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>%
+  mutate(z = coalesce(x, y))
+```
+
+問: `starwars` データセットで試してみよう
+
+
+---
+## 欠損値とみなす `dplyr::na_if()`
+
+特定の値を `NA` に置き換える:
+
+```{r na_if}
+df %>%
+  mutate(x = na_if(x, 1), y = na_if(y, "a"))
+```
+
+問: `starwars` データセットで試してみよう
+
+
+
+---
+## 文字列
+
+ダブルクォートで囲む。シングルクォートも使える。
+
+```{r string}
+x = "This is a string"
+y = 'If I want to include a "quote" inside a string, I use single quotes'
+```
+
+閉じそびれると変な状態になるので、落ち着いて <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>
+
+```
+> "This is a string without a closing quote
++
++
++ HELP I'M STUCK
+```
+
+<div style="text-align: right;">
+<a class="url" href=https://r4ds.had.co.nz/strings.html>
+https://r4ds.had.co.nz/strings.html
+</a></div>
+
+---
+## R備え付けの文字列機能は使いにくい
+
+-   何をやる関数なのか名前から分かりにくい<br>
+    `grep`, `grepl`, `regexpr`, `gregexpr`, `regexec`<br>
+    `sub`, `gsub`, `substr`, `substring`
+-   第一引数は対象文字列？検索パターン？関数ごとに違う。
+-   `NA` に対する挙動が微妙
+
+
+---
+## stringr --- 文字列処理パッケージ
+
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
+</a>
+
+-   tidyverseの一部
+-   何をやる関数なのか名前から分かりやすい
+-   対象文字列が一貫して第一引数で、パターンが二番目
+-   引数オブジェクトの各要素の名前や位置を保持する
+    -   長さゼロの入力からは長さゼロの出力
+    -   入力に `NA` が含まれる場合は対応する出力も `NA`
+-   [ICU正規表現](http://userguide.icu-project.org/strings/regexp) の仕様が明確
+-   [チートシート](https://github.com/rstudio/cheatsheets/raw/master/strings.pdf)
+
+
+---
+## 文字列基本操作
+
+```{r str_length}
+fruit4 = head(fruit, 4L) %>% print()
+str_length(fruit4)            # 長さ
+str_sub(fruit4, 2, 4)         # 部分列
+str_c(1:4, " ", fruit4, "!")  # 結合
+```
+
+
+---
+## パターンマッチング、正規表現
+
+単純な一致だけじゃなく、いろんな条件でマッチングできる:
+
+```{r pattern}
+# aで始まる
+str_subset(fruit, "^a")
+
+# rで終わる
+str_subset(fruit, "r$")
+
+# 英数字3-4文字
+str_subset(fruit, "^\\w{3,4}$")
+```
+
+
+---
+## 正規表現: よく使う特殊文字
+
+| メタ文字 | 意味 | &emsp;&emsp;&emsp; | 演算子 | 意味 |
+| ---- | ---- | --- | ---- | ---- |
+| `\d` | 数字   | | `?`  | 0回か1回 |
+| `\s` | 空白   | | `*`  | 0回以上繰り返し |
+| `\w` | 英数字 | | `+`  | 1回以上繰り返し |
+| `.`  | 何でも | | `{n,m}` | n回以上m回以下 |
+| `^`  | 行頭   | | `XXX(?=YYY)`  | YYYに先立つXXX |
+| `$`  | 行末   | | `(?<=YYY)XXX`  | YYYに続くXXX |
+
+R文字列ではバックスラッシュを重ねる必要がある, e.g., `"\\d"`.<br>
+`\D`, `\S`, `W` のように大文字にすると反転。
+
+<div style="text-align: right;"><a class="url" href="http://userguide.icu-project.org/strings/regexp">
+http://userguide.icu-project.org/strings/regexp
+</a></div>
+
+問: `str_subset(fruit, "PATTERN")` をいろいろ試してみよう
+
+
+---
+## 検出 `str_detect()`
+
+マッチするかどうか `TRUE`/`FALSE` を返す。
+```{r str_detect}
+fruit4 = head(fruit, 4L)
+str_detect(fruit4, "^a")
+```
+
+問: `starwars` の `name` 列で `filter()` してみよう
+
+```{r starwars-detect, echo=FALSE}
+starwars
+```
+
+---
+## 抽出 `str_extract()`
+
+マッチした部分文字列を取り出す。しなかった要素には `NA`。
+```{r str_extract}
+fruit4 = head(fruit, 4L)
+str_extract(fruit4, "^a..")
+```
+
+問: `diamonds` の `clarity` 列から数字を取り除いてみよう
+
+```{r diamonds-extract, echo=FALSE}
+diamonds
+```
+
+
+---
+## 置換 `str_replace()`
+
+カッコ `()` で囲んだマッチングは後で参照できる:
+```{r str_replace}
+fruit4 = head(fruit, 4L)
+str_replace(fruit4, "..$", "!!")
+str_replace(fruit4, "(..)$", "!!\\1")
+```
+
+問: `starwars` の `name` 列の数字を全部ゼロにしてみよう
+
+```{r starwars-replace, echo=FALSE}
+starwars
+```
+
+
+---
+## 形式を変える・整える
+
+```{r upperlower}
+fruit4 = head(fruit, 4L)
+str_to_upper(fruit4)              # 大文字に
+str_pad(fruit4, 8, "left", "_")   # 幅を埋める
+```
+
+[`stringi`](http://www.gagolewski.com/software/stringi/) パッケージはさらに多機能
+```{r stringi}
+stringi::stri_trans_nfkc("ｶﾀｶﾅ")  # 半角カナを全角に
+```
+
+---
+## 文字列から別の型に
+
+<a href="https://readr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
+</a>
+
+これはstringrではなくreadrの担当:
+
+```{r parse-character}
+parse_number(c("p = 0.02 *", "N_A = 6e23"))
+parse_double(c("0.02", "6e23"))   # 異物には警告
+parse_logical(c("1", "true", "0", "false"))
+parse_date("2020-06-03")
+```
+
+---
+## 因子型 `factor`
+
+カテゴリカル変数を扱うための型。文字列っぽいけど中身は数。
+
+```{r iris}
+iris = tibble::as_tibble(iris) %>% print()
+levels(iris[["Species"]])
+```
+
+<div style="text-align: right;"><a class="url" href="https://r4ds.had.co.nz/factors.html">
+https://r4ds.had.co.nz/factors.html
+</a></div>
+
+
+---
+## 因子型 `factor`: 文字列との違い1
+
+取りうる値 (levels) が既知。
+
+typoがあると `NA` 扱い。
+
+```{r factor}
+month_levels = c(
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+)
+x2 = c("Dec", "Apr", "Jam", "Mar")
+factor(x2, levels = month_levels)
+```
+
+---
+## 因子型 `factor`: 文字列との違い2
+
+順序がある。
+
+文字列をソートすると当然アルファベット順になるけど、<br>
+因子型にはそうじゃない順序を持たせられる:
+
+```{r sort}
+x1 = c("Dec", "Apr", "Jan", "Mar")
+sort(x1)
+y1 = factor(x1, levels = month_levels)
+as.integer(y1)
+```
+
+
+---
+## 因子型 `factor`: 順序の情報は作図で生きる
+
+文字列ならアルファベット順、因子型なら任意指定可能。<br>
+頻度順にする例:
+
+```{r fct_infreq, fig.height = 4}
+diamonds %>%
+  mutate(color = fct_infreq(color)) %>%
+  ggplot() + aes(x = color) +
+  geom_bar() + coord_flip()
+```
+
+---
+## tidyverse の因子型担当は forcats
+
+<a href="https://forcats.tidyverse.org/">
+<img src="/slides/image/hex-stickers/forcats.png" width="120" align="right">
+</a>
+
+- `fct_reorder()`: 別の変数に応じて順序を並べ替え
+- `fct_infreq()`: 頻度に応じて順序を並べ替え
+- `fct_relevel()`: すべて手動で再設定
+- `fct_lump()`: 少なすぎるカテゴリを"その他"としてまとめる
+
+
+---
+## ダミー変数に変換
+
+イチゼロの値を持たせて横広に変形するのと等価。
+
+```{r dummy}
+iris %>%
+  rowid_to_column() %>% select(-starts_with("Sepal")) %>%
+  mutate(value = 1L) %>%
+  pivot_wider(names_from = Species, values_from = value, values_fill = c(value = 0L))
+```
+
+問: これの逆向きをやってみよう
+
+
+---
+## 日時型: POSIXct, POSIXlt
+
+- POSIXct: エポックからの経過秒数。比較や差分などを取りやすい。
+- POSIXlt: list(年, 月, 日, 時, 分, 秒)。単位ごとに抜き出しやすい。
+
+```{r datetime}
+now = "2020-06-03 13:00:00"
+ct = as.POSIXct(now)
+unclass(ct)
+lt = as.POSIXlt(now)
+unclass(lt) %>% as_tibble()
+```
+
+素のRでも扱えるけど lubridate パッケージを使うともっと楽に。
+
+---
+## lubridate --- 日時型処理パッケージ
+
+<a href="https://lubridate.tidyverse.org/">
+<img src="/slides/image/hex-stickers/lubridate.png" width="120" align="right">
+</a>
+
+日時型への変換:
+```{r lubridate-parse}
+ymd(c("20200603", "2020-06-03", "20/6/3"))
+```
+
+日時型から単位ごとに値を取得:
+```{r lubridate-get}
+today = ymd(20200603)
+month(today)
+wday(today, label = TRUE)
+```
+
+[チートシート](https://github.com/rstudio/cheatsheets/raw/master/lubridate.pdf)
+
+---
+## 終盤のまとめ
+
+- vectorには型がある: 文字列、数値、因子、日時、etc.
+- 文字列を扱うには [stringr](https://stringr.tidyverse.org/)
+    - 正規表現は強力・汎用的
+- 因子を扱うには [forcats](https://forcats.tidyverse.org/)
+    - 知っておくと作図で有利
+- 日時を扱うには [lubridate](https://lubridate.tidyverse.org/)
+
+各パッケージのチートシート.pdfを手元に持っておくと便利。
+
+---
+## Reference
+
+R for Data Science --- Hadley Wickham and Garrett Grolemund
+: <https://r4ds.had.co.nz/>,
+  [Paperback](https://amzn.to/2tbRmVc),
+  [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+
+- [本橋智光「前処理大全」](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)
+- [松村ら「RユーザのためのRStudio[実践]入門」(宇宙本)](https://amzn.to/3eBprm5)
+
+整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
+: [Speaker Deck](https://speakerdeck.com/fnshr/zheng-ran-detatutenani),
+  [Colorless Green Ideas](https://id.fnshr.info/2017/01/09/tidy-data-intro/)
+
+Official documents:
+: [tidyverse](https://www.tidyverse.org/),
+  [dplyr](https://dplyr.tidyverse.org/),
+  [tidyr](https://tidyr.tidyverse.org/),
+  [purrr](https://purrr.tidyverse.org/),
+  [tibble](https://tibble.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/),
+  [stringr](https://stringr.tidyverse.org/),
+  [forcats](https://forcats.tidyverse.org/),
+  [lubridate](https://lubridate.tidyverse.org/)
+
+Older versions
+: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
+   岩嵜航 2018
+: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2019/)」
+   岩嵜航 2019 東京医科歯科大
+
+<a href="4-statistics.html" rel="next" class="readmore">
+4. Statistical analysis with R
+</a>

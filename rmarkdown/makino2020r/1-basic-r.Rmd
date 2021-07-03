@@ -1,0 +1,601 @@
++++
+url = "makino2020r/1-basic-r.html"
+title = "R basics — Hands-on R Lecture for Makino Lab"
+linktitle = "R basics"
+date = 2020-05-27T13:15:00+09:00
+type = "reveal"
+draft = false
++++
+
+# [Hands-on Introduction to R 2020](.)
+
+<link rel="stylesheet" href="style.css">
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+
+<ol start="0">
+<li><a href="0-why-r.html">Why do we use R?</a>
+<li class="current-deck"><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+<li><a href="4-statistics.html">Statistical analysis with R</a>
+</ol>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br>
+2020-05-27
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+iris = tibble::as_tibble(iris)
+```
+
+---
+## R basics: Index
+
+🖥 Setup R environment
+
+👽 Conversation with R
+
+📁 Create a "project" and "script"
+
+➕ Basic operations and types
+
+📦 Package
+
+❓ Errors and questions
+
+
+---
+## 環境依存の不具合 🤮
+
+- <strong>"<i class="fab fa-windows"></i> Windows + 🇯🇵日本語ユーザー名"
+  だと不具合が生じがち。</strong><br>
+  英語名ユーザーを作りなおして引っ越したほうがいい。
+
+- OS全体の言語設定も英語にするのがオススメ。
+
+- <span style="color: #999999;">
+  できれば <i class="fab fa-apple"></i> Macを使うのが無難。<br>
+  <i class="fab fa-linux"></i> Linuxが使えるならなお良い。
+  </span>
+
+
+---
+## Keyboard shortcuts
+
+Action | <i class="fab fa-apple"></i> Mac | <i class="fab fa-windows"></i> Windows
+------ | ------- | ----
+Switch apps | <kbd>command</kbd><kbd>tab</kbd> | <kbd>alt</kbd><kbd>tab</kbd>
+Quit apps | <kbd>command</kbd><kbd>q</kbd>     | <kbd>alt</kbd><kbd>F4</kbd>
+Spotlight | <kbd>command</kbd><kbd>space</kbd>
+Cut, Copy, Paste | <kbd>command</kbd><kbd>x</kbd>, -<kbd>c</kbd>, -<kbd>v</kbd> | <kbd>ctrl</kbd><kbd>x</kbd>, -<kbd>c</kbd>, -<kbd>v</kbd>
+Select all | <kbd>command</kbd><kbd>a</kbd>    | <kbd>ctrl</kbd><kbd>a</kbd>
+Undo | <kbd>command</kbd><kbd>z</kbd>    | <kbd>ctrl</kbd><kbd>z</kbd>
+Find | <kbd>command</kbd><kbd>f</kbd>    | <kbd>ctrl</kbd><kbd>f</kbd>
+Save | <kbd>command</kbd><kbd>s</kbd>    | <kbd>ctrl</kbd><kbd>s</kbd>
+
+See https://support.apple.com/HT201236
+
+---
+## Setup Mac environment
+
+- Set OS language to **English** (System Preferences → Language & Region)
+- Install **Command Line Tools** via **Terminal.app**:
+
+    ```sh
+    xcode-select --install
+    ```
+
+    Full Xcode is not necessary, but you can have it if you like.
+
+- Install [Homebrew](/mac/homebrew.html) (software manager):
+
+    ```sh
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+    ```
+
+- Try installing some softwares:
+
+    ```sh
+    brew install wget
+    wget https://cran.r-project.org/Rlogo.svg
+    ls
+    ```
+
+---
+## Setup R environment
+
+```sh
+brew cask install r rstudio
+```
+
+[R](https://cran.r-project.org/)
+: Core software to interpret and execute commands.
+: Standard packages and functions are included.
+
+[RStudio Desktop](https://www.rstudio.com/)
+: Integrated environment to help users interact with R.
+: Not necessary, but many people like it.
+
+<img src="/slides/image/rstudio/rstudio-300x260.png">
+
+
+---
+## Launch RStudio and play with Console
+
+**Workspace (Environment)** = a set of temporary objects
+
+<img src="/slides/image/rstudio/console.png" class="screenshot" width="100%">
+
+```{r rstudio-demo, include=FALSE, eval=FALSE}
+1 + 2
+x = 2980
+y = 1.08 * x
+y
+z = "I love beer!"
+?sum
+hist(iris$Petal.Length)
+```
+
+
+---
+## Configure RStudio NOT to save/load workspace
+
+<i class="fab fa-fw fa-lg fa-apple"></i> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
+<i class="fab fa-fw fa-lg fa-windows"></i> Tools → Global options
+
+**Uncheck** "Restore ...", Choose **Never** for "Save workspace ...".
+
+<figure style="margin: 0;">
+<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<img src="/slides/image/rstudio/preferences-workspace.png" width="75%"
+     style="object-fit: cover; object-position: top; height: 450px;">
+<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+
+
+---
+## Create "Project"
+
+File → New Project... → New Directory → New Project →<br>
+→ Directory name: `r-training-2020`<br>
+→ as subdirectory of: `~/project`
+
+<img src="/slides/image/rstudio/create-new-project.png" class="screenshot" width="90%">
+
+---
+## Write R script, and send it to Console
+
+File → New File → R script
+
+<img src="/slides/image/rstudio/newfile.png" width="100%">
+
+---
+## Write R script, and send it to Console
+
+File → New File → R script
+
+<img src="/slides/image/rstudio/script-console.png" width="100%">
+
+---
+## Write R script, and send it to Console
+
+Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
+Execute them with <kbd>ctrl</kbd><kbd>return</kbd>
+
+<img src="/slides/image/rstudio/101.png" width="100%">
+
+---
+## Save R script in the project: <kbd>command</kbd><kbd>s</kbd>
+
+Separate data, scripts, and results, e.g.,
+
+```
+r-training-2020/           # プロジェクトの最上階
+├── data/                  # 元データを置くところ
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+├── r-training-2020.Rproj  # これダブルクリックでRStudioを起動
+├── hello.R
+├── output/                # 結果の出力先
+│   ├── iris-petal.png
+│   └── iris-summary.tsv
+├── transform.R            # データ整理・変形のスクリプト
+└── visualize.R            # 作図のスクリプト
+```
+
+プロジェクト最上階を作業ディレクトリとし、<br>
+ファイル読み書きの基準にする。(後で詳しく)
+
+ほんの一例です。好きな構造に決めてください。
+
+---
+## Rと接する上での心構え
+
+エラー文を恐れない
+: 熟練プログラマでも頻繁にエラーを起こす。
+: エラーはRからのメッセージ。意図を読み取って修正しよう。
+
+困ったらウェブ検索
+: あなたの問題は全世界のRユーザーが既に通った道。
+: 日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。
+
+<figure style="float: right; margin: 0;">
+<img src="/slides/image/rstats/error.png" height="300">
+</figure>
+
+(コードの)コピペ推奨
+: 打ち間違いによるエラーを防げるし、早い。
+: ネット上で見つけたコードもまずはコピペしてから自分用に改変。
+: (ただし、ライセンスには注意...)
+
+---
+## Create objects/variables (変数)
+
+```{r objects}
+x = 42       # Create x
+x            # What's in x?
+y = "24601"  # Create y
+y            # What's in y?
+```
+
+Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。
+
+この `x` と `y` を足そうとするとエラーになる。なぜ？
+
+```{r error}
+x + y        # Error! Why?
+```
+
+---
+## Object types (型)
+
+```{r isas}
+class(x)
+is.numeric(x)
+is.character(x)
+as.character(x)
+```
+
+Try applying the same functions to `y`.
+
+---
+## Object types (型)
+
+- `vector`: 基本型。一次元の配列。
+    - `logical`: 論理値 (`TRUE` or `FALSE`)
+    - `numeric`: 数値 (整数 `42L` or 実数 `3.1416`)
+    - `character`: 文字列 (`"a string"`)
+    - `factor`: 因子 (文字列っぽいけど微妙に違う)
+- `array`: 多次元配列。`vector`同様、全要素が同じ型。
+    - `matrix`: 行列 = 二次元の配列。
+- `list`: 異なる型でも詰め込める太っ腹ベクトル。
+- **`data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
+  **`tibble`** とか **`tbl_df`** と呼ばれる亜種もあるけどほぼ同じ。
+
+---
+## Function (関数)
+
+変数を受け取って、何か仕事して、返す命令セット
+
+```{r function}
+x = seq(1, 3)  # 1と3を渡すとvectorが返ってくる
+x
+sum(x)         # vectorを渡すと足し算が返ってくる
+square = function(something) {  # 自分の関数を定義
+  something ** 2
+}
+square(x)                       # 使ってみる
+```
+
+---
+## `vector`: 1-dimensional array
+
+1個の値でもベクトル扱い。<br>
+同じ長さ(または長さ1)の相手との計算が得意。
+
+```{r vector}
+x = c(1, 2, 9)  # 長さ3の数値ベクトル
+x + x           # 同じ長さ同士の計算
+y = 10          # 長さ1の数値ベクトル
+x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+sqrt(x)         # square root
+# We don't have to write for-loop like this
+z = c(0, 0, 0)
+for (i in seq(1, 3)) {
+  z[i] = sqrt(x[i])
+}
+```
+
+---
+## `matrix`: 2-dimensional array (行列)
+
+1本の `vector` を折り曲げて長方形にしたもの。<br>
+中身は全て同じ型。機械学習とか画像処理とかで使う。
+
+```{r matrix}
+v = seq(1, 8)              # c(1, 2, 3, 4, 5, 6, 7, 8)
+x = matrix(v, nrow = 2)    # 2行に畳む。列ごとに詰める
+x
+y = matrix(v, nrow = 2, byrow = TRUE)  # 行ごとに詰める
+y
+```
+
+Let's try `x + y`, `dim(x)`, `nrow(x)`, `ncol(x)`.
+
+
+---
+## 行 (row), 列 (column) の憶え方
+
+<div class="column-container">
+  <div class="column">
+    <figure>
+    <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
+    <img src="/slides/image/free/front-row.jpg" height="480">
+    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    </a>
+    </figure>
+  </div>
+  <div class="column">
+    <figure>
+    <a href="https://en.wikipedia.org/wiki/Rhodes">
+    <img src="/slides/image/free/apollon-columns.jpg" height="480">
+    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    </a>
+    </figure>
+  </div>
+</div>
+
+
+---
+## `data.frame`: rectangle table (IMPORTANT!)
+
+同じ長さの列 `vector` を複数束ねた長方形の表。<br>
+e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
+
+```{r data.frame}
+print(iris)
+```
+
+`iris` はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。
+
+---
+## data.frameを眺める
+
+概要を掴む:
+```r
+head(iris, 6)   # 先頭だけ見てみる
+nrow(iris)      # 行数: Number of ROWs
+ncol(iris)      # 列数: Number of COLumns
+names(iris)     # 列名
+summary(iris)   # 要約
+View(iris)      # RStudioで閲覧
+```
+```{r str}
+str(iris)       # 構造が分かる形で表示
+```
+
+ほかのデータもいろいろ見てみよう, e.g., `mtcars`, `quakes`, `data()`
+
+---
+## data.frameを眺める
+
+部分的なdata.frameを取得する:
+```r
+iris[2, ]                  # 2行目
+iris[2:5, ]                # 2行目から5行目まで
+iris[, 3:4]                # 3-4列目
+iris[2:5, 3:4]             # 2-5行目, 3-4列目
+```
+
+vectorとして取得する:
+```r
+iris[[3]]                  # 3列目
+iris$Petal.Length          # Petal.Length列
+iris[["Petal.Length"]]     # Petal.Length列
+iris[["Petal.Length"]][2]  # Petal.Length列の2番目
+```
+
+結果がdata.frameになるかvectorになるか微妙:
+```r
+iris[, 3]                  # 3列目
+iris[, "Petal.Length"]     # Petal.Length列
+iris[2, 3]                 # 2行目3列目
+iris[2, "Petal.Length"]    # 2行目Petal.Length列
+```
+
+---
+## data.frameの新規作成
+
+同じ長さの **列(column) vector** を結合して作る:
+```{r data.frame.new}
+x = c(1, 2, 3)
+y = c("A", "B", "C")
+mydata = data.frame(x, y)
+print(mydata)
+```
+
+---
+## data.frameの読み書き
+
+- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+    ```r
+    install.packages("readr") # R標準の read.table() とかは難しいので
+    library(readr)            # パッケージのやつを使うよ
+    write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = read_tsv("data/iris.tsv")  # 読み込み
+    ```
+
+- 現在の作業ディレクトリとその中身を確認しておこう:
+
+    ```r
+    getwd()               # Get Working Directory
+    list.files(".")       # List files in "."
+    list.files("data")    # List files in "./data"
+    ```
+
+R組み込みデータや自作データを読み書きしてみよう
+
+---
+## R package
+
+便利な関数やデータセットなどをひとまとめにしたもの。
+
+Standard Packages
+: Rの標準機能。何もしなくても使用可能
+
+Contributed Packages
+: 有志により開発され、
+  [CRAN](https://cran.rstudio.com/web/packages/index.html)
+  にまとめて公開されている。
+: 要インストール。使う前に読み込むおまじないが必要。
+
+```{r package, eval=FALSE}
+install.packages("readr")  # 一度やればOK
+library(readr)             # 読み込みはRを起動するたびに必要
+update.packages()          # たまには更新しよう
+```
+
+素のRも覚えきってないのにいきなりパッケージ？
+: 大丈夫。誰も覚えきってない。
+: パッケージを使わないR作業 = 火もナイフも使わない料理
+
+---
+## tidyverse
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+```r
+install.packages("tidyverse")
+library(tidyverse)
+# 関連パッケージが一挙に読み込まれる
+```
+
+- 統一的な使い勝手
+- 暗黙の処理をなるべくしない安全設計
+- シンプルな関数を繋げて使うデザイン
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+---
+## tidyverse
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+```r
+install.packages("tidyverse")
+library(tidyverse)
+# 関連パッケージが一挙に読み込まれる
+```
+
+- `Conflicts ❌` とか表示されて不安だけど<br>
+  これは大丈夫なやつ:
+
+```
+── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
+✔ ggplot2 3.3.0     ✔ purrr   0.3.4
+✔ tibble  3.0.1     ✔ dplyr   0.8.5
+✔ tidyr   1.1.0     ✔ stringr 1.4.0
+✔ readr   1.3.1     ✔ forcats 0.5.0
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+```
+
+---
+## Many other useful packages
+
+<a href="https://readxl.tidyverse.org/">
+<img src="/slides/image/hex-stickers/readxl.png" width="120" align="right">
+</a>
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
+</a>
+
+- [readxl](https://readxl.tidyverse.org/): エクセル形式の読み込み
+- [stringr](https://stringr.tidyverse.org/): 文字列の処理
+- [Bioconductor](https://www.bioconductor.org/): バイオインフォマティクス関連
+- [igraph](https://igraph.org/r/): グラフ(ネットワーク)関連
+- [rgl](https://cran.r-project.org/package=rgl): 3Dの作図
+- [R Markdown](https://rmarkdown.rstudio.com/):
+  Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
+  この発表スライドもそうやって作った。<br>
+  レポート作成や共同研究者への報告にも便利！
+
+---
+## How to solve problems
+
+- RStudio内にヘルプを表示: `?sum`, `help.start()`
+- 変数の構造を確かめる: `str(iris)`, `attributes(iris)`
+- エラー文をちゃんと読む: `No such file or directory`
+- エラー文やパッケージ名をコピペしてウェブ検索<br>
+  → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
+  や個人サイトに解決策
+- Slack <i class="fab fa-slack"></i>
+  [r-wakalang](https://github.com/tokyor/r-wakalang)
+  で質問を投稿する。<br>
+  (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)
+- 状況再現できる小さな例
+  [(reprex)](https://reprex.tidyverse.org/)
+  を添えると回答を得やすい。<br>
+  (これを準備してるうちに問題が切り分けられて自己解決したり)
+- パッケージの公式ドキュメントをちゃんと読む
+
+---
+## R basics: Summary
+
+✅ Write **R script**, and send it to **Console**.
+
+✅ Object types: numeric **vector**, **data.frame**, etc.
+
+✅ Use **packages**.
+
+✅ **Relax.** You know how to solve problems.
+
+
+---
+## Reference
+
+R for Data Science --- Hadley Wickham and Garrett Grolemund
+: https://r4ds.had.co.nz/
+: [Book](https://amzn.to/2tbRmVc)
+: [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+
+Older versions
+: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
+   岩嵜航 2018
+: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2019/)」
+   岩嵜航 2019 東京医科歯科大
+
+<a href="2-ggplot.html" rel="next" class="readmore">
+2. Visualization with R
+</a>

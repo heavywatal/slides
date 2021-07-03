@@ -1,0 +1,306 @@
++++
+url = "nagoya2018/1-basic-r.html"
+title = "nagoya2018-1: Rの基本"
+linktitle = "Rの基本"
+date = 2018-05-18T15:10:00+09:00
+type = "reveal"
+draft = false
++++
+
+# Rにやらせて<ruby>楽<rt>ラク</rt></ruby>しよう <span class="subtitle">— データの可視化と下ごしらえ</span>
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+総研大 先導科学研究科<br>
+(SOKENDAI, The Graduate University for Advanced Studies)
+</div>
+
+<style>
+.reveal .current-deck {font-weight: bold;}
+.reveal .subtitle {font-size: 90%;}
+</style>
+<ol start="0">
+<li><a href="0-why-r.html">どうしてRを使うの？</a>
+<li class="current-deck"><a href="1-basic-r.html">Rの基本</a>
+<li><a href="2-ggplot.html">R + ggplot2 — きれいなグラフを簡単に合理的に</a>
+<li><a href="3-tidy-data.html">R + tidyverse — 使える形にデータを整える</a>
+</ol>
+
+<div class="footnote">
+2018-05-18
+名古屋大学 アドバンス生命理学特論 IGER Seminar
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+iris = as_tibble(iris)
+```
+
+---
+## 目次: Rの基本 ~15分
+
+- Rのインストール
+- Rとの対話
+- プロジェクトの作成
+- 表形式ファイルの読み書き
+- パッケージの利用
+- 疑問やエラーが生じたら
+
+---
+## R環境のインストール
+
+R本体
+: コマンドを解釈して実行するコア部分
+: よく使われる関数なども標準パッケージとして同梱
+: https://cran.rstudio.com/ からダウンロードしてインストール
+
+RStudio Desktop
+: Rをより快適に使うための総合開発環境(IDE)
+: 必須ではないけど、結構みんな使ってるらしい
+: https://www.rstudio.com/ からダウンロードしてインストール
+
+<img src="/slides/image/rstudio/rstudio-300x260.png">
+
+```{r rstudio-demo, include=FALSE, eval=FALSE}
+1 + 2
+x = 2980
+y = 1.08 * x
+y
+z = "I love beer!"
+?sum
+hist(iris$Petal.Length)
+```
+
+---
+## とりあえず起動してコンソールにコマンドを打つ
+
+`x = 2980` のようにして作った変数はワークスペースに溜まっていく。
+
+<img src="/slides/image/rstudio/console.png" class="screenshot" width="100%">
+
+---
+## RStudioの設定: 毎回まっさらな環境で始めよう
+
+ワークスペース `.RData` は保存しない、読み込まないのが安全。
+
+<figure>
+<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<img src="/slides/image/rstudio/rstudio-workspace.png" width="75%"
+     style="object-fit: cover; object-position: top; height: 480px;">
+<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+
+---
+## "プロジェクト"を作成する
+
+New Project > New Directory > `~/project/nagoya2018`
+
+<img src="/slides/image/rstudio/create-new-project.png" class="screenshot" width="90%">
+
+---
+## ファイルをプロジェクト内に配置する
+
+**データ、スクリプト、結果を分離する。** <br>
+(Excelで作業するとゴチャマゼになりがち)<br>
+例えばこんな感じのディレクトリ(=フォルダ)構造を目指す:
+
+```
+nagoya2018/               # プロジェクトの最上階
+├── data/                 # 元データを置くところ
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+├── nagoya2018.Rproj      # これダブルクリックでRStudioを起動
+├── hello.R
+├── output/               # 結果の出力先
+│   ├── iris-petal.png
+│   └── iris-summary.tsv
+├── transform.R           # データ整理・変形のスクリプト
+└── visualize.R           # 作図のスクリプト
+```
+
+プロジェクト最上階を作業ディレクトリとし、<br>
+ファイル読み書きの基準にする。(後で詳しく)
+
+---
+## Rスクリプトに書いてから、実行する
+
+途中まで書いて <kbd>tab</kbd> を押すと、続きを提案・補完してくれる。<br>
+実行したい部分を選択して <kbd>ctrl-return</kbd> 。
+
+<img src="/slides/image/rstudio/run-selection.png" class="screenshot" width="100%">
+
+---
+## データの型
+
+- `NULL`: 空っぽ
+- vector: 基本型。一次元の配列。
+    - logical: 論理値 (`TRUE` or `FALSE`)
+    - numeric: 数値 (整数 `42L` と 実数 `3.1416`)
+    - character: 文字列 (`"a string"`)
+    - factor: 因子 (文字列っぽいけど微妙に違う)
+    - ↑それぞれに欠損値 `NA` も定義されてる
+- matrix: 二次元の行列。vector同様、全要素が同じ型。
+- list: 異なる型でも詰め込める太っ腹ベクトル。
+- **data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
+  **tibble** とか **tbl_df** と呼ばれる亜種もあるけどほぼ同じ。
+
+---
+## vector: 1次元の配列。基本。
+
+1個の値でもベクトル扱い。<br>
+同じ長さ(または長さ1)の相手との計算が得意。
+
+```{r vector}
+x = c(2, 8, 6)  # 長さ3の数値ベクトル
+x + x           # 同じ長さ同士の計算
+y = 42          # 長さ1の数値ベクトル
+x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+# こういうfor文は書かずに済む
+z = c(0, 0, 0)
+for (i in seq_len(3)) {
+  z[i] = x[i] + y
+}
+```
+
+---
+## data.frame: 長方形のテーブル。重要。
+
+`iris` はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。
+
+```{r data.frame}
+print(iris)
+```
+
+長さ150の数値ベクトル4本と因子ベクトル1本。
+
+---
+## data.frameの読み書き
+
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+```{r readr_show, eval=FALSE}
+install.packages("readr") # R標準の read.table() とかは難しいので
+library(readr)            # パッケージのやつを使うよ
+readr::write_tsv(iris, "data/iris.tsv")
+readr::read_tsv("data/iris.tsv")
+```
+
+```{r readr_internal, echo=FALSE}
+print(iris %>% dplyr::mutate(Species = as.character(Species)), topn = 3L)
+```
+
+readxlパッケージを使うとExcelファイルも読み込める。
+
+---
+## パッケージ
+
+便利な関数やデータセットなどをひとまとめにしたもの。
+
+Standard Packages
+: Rの標準機能。何もしなくても使用可能
+
+Contributed Packages
+: 有志により開発され、
+  [CRAN](https://cran.rstudio.com/web/packages/index.html)
+  にまとめて公開されている。
+: 要インストール。使う前に読み込むおまじないが必要。
+
+```{r package, eval=FALSE}
+install.packages("readr")  # 一度やればOK
+library(readr)             # 読み込みはRを起動するたびに必要
+update.packages()          # たまには更新しよう
+```
+
+素のRも覚えきってないのにいきなりパッケージ？
+: 大丈夫。誰も覚えきってない。
+: パッケージを使わないR作業 = 火もナイフも使わない料理
+
+---
+## tidyverse
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+```{r tidyverse, eval=FALSE}
+install.packages("tidyverse")
+library(tidyverse)
+# 関連パッケージが一挙に読み込まれる
+```
+
+- 統一的な使い勝手
+- 暗黙の処理をなるべくしない安全設計
+- シンプルな関数を繋げて使うデザイン
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+---
+## ほかにもたくさん
+
+<a href="https://readxl.tidyverse.org/">
+<img src="/slides/image/hex-stickers/readxl.png" width="120" align="right">
+</a>
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
+</a>
+
+- [readxl](https://readxl.tidyverse.org/): エクセル形式の読み込み
+- [stringr](https://stringr.tidyverse.org/): 文字列の処理
+- [Bioconductor](https://www.bioconductor.org/): バイオインフォマティクス関連
+- [igraph](https://igraph.org/r/): グラフ(ネットワーク)関連
+- [rgl](https://cran.r-project.org/package=rgl): 3Dの作図
+- [R Markdown](https://rmarkdown.rstudio.com/):
+  Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
+  この発表スライドもそうやって作った。<br>
+  レポート作成や共同研究者への報告にも便利！
+
+たくさんありすぎて選べない？<br>
+まずは人気のパッケージを https://awesome-r.com/ で探してみるとか。
+
+---
+## 疑問やエラーの解決方法
+
+- RStudio内にヘルプを表示: `?sum`, `help.start()`
+- 変数の構造を確かめる: `str(iris)`, `attributes(iris)`
+- エラー文をちゃんと読む: `No such file or directory`
+- パッケージの公式ドキュメントをちゃんと読む
+- パッケージ名やエラー文をコピペしてウェブ検索<br>
+  → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
+  や個人サイトに解決策
+- 身近な経験者に訊く
+- Slackの
+  [r-wakalang](https://github.com/tokyor/r-wakalang)
+  で質問を投稿する。<br>
+  内容によってチャンネルを選ぶ: `#r_beginners`, `#statistics`
+- 質問するときは、状況を再現できる小さな例
+  [(reprex)](https://reprex.tidyverse.org/)
+  を添えて
+
+---
+## このパートのまとめ: Rの基本
+
+- R本体とRStudioのインストール。
+- コンソールでRと対話できるけど、スクリプトに書いてから実行しよう。
+- プロジェクトの構造を決めて、ファイルの読み書きをスムーズに。
+- 数値や文字列という基本型があり、data.frameという構造が特に重要。
+- パッケージを使うことで効率よく作業できる。
+- 疑問の答えは、Rの中にも、インターネットにもある。
+
+<a href="2-ggplot.html" rel="next" class="readmore">
+2. R + ggplot2 — きれいなグラフを簡単に合理的に
+</a>

@@ -1,0 +1,165 @@
++++
+url = "tmd2020/6-practice.html"
+title = "6. 実践 — Rによるデータ前処理実習 2020"
+linktitle = "実践: 現実の問題に対処してみる"
+date = 2020-10-17T14:40:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [Rによるデータ前処理実習2020](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<ol>
+<li><a href="1-introduction.html">入門1: 前処理とは。Rを使うメリット。Rの基本。</a>
+<li><a href="2-visualization.html">入門2: データ可視化の重要性と方法。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
+<li class="current-deck"><a href="6-practice.html">実践: 現実の問題に対処してみる。</a>
+</ol>
+
+<div class="footnote">
+2020-10-17 東京医科歯科大学 M&Dタワー 情報検索室1
+<a href="https://heavywatal.github.io/slides/tmd2020/">https://heavywatal.github.io/slides/tmd2020/</a>
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stringr)
+library(readr)
+library(forcats)
+library(lubridate)
+knitr::opts_chunk$set(cache = FALSE)
+anscombe = tibble::as_tibble(anscombe)
+```
+
+---
+## 最終回: 実践してみよう
+
+1. コンピュータ環境の整備
+1. データの取得、読み込み
+1. 探索的データ解析
+    - **前処理、加工** (地味。意外と重い) 👈本実習の主題
+    - 可視化、仮説生成 (派手！だいじ！)
+    - 統計解析、仮説検証 (みんな勉強したがる)
+1. 報告、発表
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 好きなデータをいじくり倒してみよう
+
+- 自分がこれから解析したいデータ (もし手元にあれば)
+- Rやパッケージに付属のデータ (のうちtidyじゃないもの)
+    - `VADeath`, `anscombe`, `economics`
+- 何か適当なパブリックデータ
+    - [data.go.jp](https://www.data.go.jp/data/dataset?res_format=CSV): データカタログサイト
+    - [IT DASHBOARD](https://www.itdashboard.go.jp/Statistics/opendata): 内閣官房
+    - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
+    - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
+    - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+    - [目黒区オープンデータ](https://www.city.meguro.tokyo.jp/gyosei/hirakareta/opendata/opendata.html):
+      「地域・年齢別人口」とかいい感じ
+- 「こうしたい」「うまくいかない」「もっといじるとしたら」
+  など気軽に質問してください
+
+---
+## 実演: 目黒区オープンデータ
+
+「地域・年齢別人口」CSVをダウンロードして、読み込む
+
+```{r meguro_read}
+# infile = http://www.city.meguro.tokyo.jp/opendata/131105_population_20170401.csv
+infile = "131105_population_20170401.csv"
+raw_df = readr::read_csv(infile)
+print(raw_df)
+```
+
+---
+## 実演: 目黒区オープンデータ
+
+ggplotしたくなる形に変形
+
+```{r meguro_tidy}
+tidy_df = raw_df %>%
+  select("地域名", matches("の.+性$")) %>%
+  rename(place = 地域名) %>%
+  mutate(place = str_replace(place, "\\S丁目", "")) %>%
+  group_by(place) %>%
+  summarize(across(everything(), sum)) %>%
+  ungroup() %>%
+  pivot_longer(-place, names_to = "category") %>%
+  separate(category, c("age", "sex"), sep = "の") %>%
+  filter(str_detect(age, "\\d")) %>%
+  mutate(age = parse_number(age)) %>%
+  print()
+```
+
+---
+## 実演: 目黒区オープンデータ
+
+作図してみる
+
+```{r meguro_plot, fig.height = 4.5, fig.width = 10}
+tidy_df %>%
+  ggplot(aes(age, value)) +
+  geom_col(aes(fill = sex)) +
+  facet_wrap(~ place, nrow = 3L) +
+  theme_bw(base_family = "HiraginoSans-W3")
+```
+
+
+---
+## Reference
+
+R for Data Science --- Hadley Wickham and Garrett Grolemund
+: <https://r4ds.had.co.nz/>,
+  [Paperback](https://amzn.to/2tbRmVc),
+  [日本語版書籍](https://amzn.to/2yyFRKt)
+
+[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
+[RユーザのためのRStudio[実践]入門 (宇宙本) --- 松村ら](https://amzn.to/3eBprm5)
+
+Official documents:
+: [tidyverse](https://www.tidyverse.org/),
+  [ggplot2](https://ggplot2.tidyverse.org/),
+  [dplyr](https://dplyr.tidyverse.org/),
+  [tidyr](https://tidyr.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/),
+  [tibble](https://tibble.tidyverse.org/),
+  [stringr](https://stringr.tidyverse.org/),
+
+Older versions
+: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
+   岩嵜航 2018
+: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2019/)」
+   岩嵜航 2019 東京医科歯科大
+
+<a href="./" class="readmore">
+目次に戻る
+</a>

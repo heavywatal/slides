@@ -1,0 +1,622 @@
++++
+url = "tmd2019/3-content.html"
+title = "3. データ内容の処理 — Rによるデータ前処理実習 2019"
+linktitle = "データ内容の処理: 数値、文字列、日時など"
+date = 2019-12-28T13:00:00+09:00
+type = "reveal"
+draft = false
++++
+
+# [Rによるデータ前処理実習](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<ol>
+<li><a href="1-introduction.html">入門: 前処理とは。Rを使うメリット。Rの基本</a>
+<li><a href="2-structure.html">データ構造の処理: 抽出、集約、結合、変形など</a>
+<li class="current-deck"><a href="3-content.html">データ内容の処理: 数値、文字列、日時など</a>
+<li><a href="4-practice.html">実践: 現実の問題に対処してみる</a>
+</ol>
+
+<div class="footnote">
+2019-12-28 東京医科歯科大学 M&Dタワー 情報検索室1
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(stringr)
+library(forcats)
+library(lubridate)
+iris = tibble::as_tibble(iris)
+```
+
+---
+## R作業を再開する
+
+- 前回作った `***.Rproj` をダブルクリックしてRStudio起動。<br>
+  もしくはプロジェクトを新規作成。
+- Rスクリプトを新規作成、名前を付けて保存。
+- `getwd()`: 現在地を確認。
+- `library()`: 使いたいパッケージを読み込む。
+
+```r
+getwd()
+# install.packages("tidyverse")
+library(tidyverse)
+```
+
+---
+## 前処理は大きく2つに分けられる
+
+- データ構造を対象とする処理 (<a href="2-structure.html">前回の主題</a>)
+    - 使いたい部分だけ抽出 --- `select()`, `filter()`
+    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
+    - 大きい順に並べ替え --- `arrange()`
+    - 異なるテーブルの結合 --- `*_join()`
+    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
+- **データ内容を対象とする処理** (👈今回の主題)
+    - 数値を変換する (e.g., 対数、座標系)
+    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
+    - 欠損値 `NA` に対処
+    - 文字列から数値や日時を抜き出す
+
+
+---
+## 変数/オブジェクトの型 (先週のおさらい)
+
+- `NULL`: 空っぽ
+- **vector: 基本型。一次元の配列。** (👈今回の主役)
+    - logical: 論理値 (`TRUE` or `FALSE`)
+    - numeric: 数値 (整数 `42L` or 実数 `3.1416`)
+    - character: 文字列 (`"a string"`)
+    - factor: 因子 (文字列っぽいけど微妙に違う)
+    - ↑それぞれに欠損値 `NA` も定義されてる
+- matrix: 二次元の行列。vector同様、全要素が同じ型。
+- list: 異なる型でも詰め込める太っ腹ベクトル。
+- data.frame: 同じ長さのベクトルを並べた長方形のテーブル。重要。<br>
+  **tibble** とか **tbl_df** と呼ばれる亜種もあるけどほぼ同じ。
+
+---
+## vector: 一次元の配列 (先週のおさらい)
+
+1個の値でもベクトル扱い。<br>
+ベクトルの各要素に一気に計算を適用できる。
+
+```{r vector}
+x = c(1, 2, 9)  # 長さ3の数値ベクトル
+x + x           # 同じ長さ同士の計算
+y = 10          # 長さ1の数値ベクトル
+x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+sqrt(x)         # square root
+```
+
+---
+## data.frameは列vectorの集まり
+
+<a href="https://tibble.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
+</a>
+
+内容を変更する方法はいくつかある。<br>
+`diamonds[["price"]]` をドルから円に変換する例:
+
+```{r mutate}
+dia = diamonds    # 別名コピー
+
+# dollar演算子で指定
+dia$price = 109.58 * dia$price
+
+# 名前を文字列で指定
+dia[["price"]] = 109.58 * dia[["price"]]
+
+# dplyr::mutate with pipe
+dia = diamonds %>%
+  mutate(price = 109.58 * price)
+```
+
+1発ならどれでもいい。流れ作業には `mutate()` が便利。
+
+
+---
+## 数値: numeric型
+
+普通は倍精度浮動小数点型 `double` として扱われる:
+
+```{r numeric}
+answer = 42
+typeof(answer)
+```
+
+明示的に変換したり末尾にLを付けることで整数扱いもできる:
+
+```{r integer}
+typeof(as.integer(answer))
+whoami = 24601L
+typeof(whoami)
+```
+
+---
+## 様々な数学関数
+
+ベクトルを受け取り、それぞれの要素に適用
+
+```{r math}
+x = c(1, 2, 3)
+sqrt(x)
+log(x)
+log10(x)
+exp(x)
+```
+
+<div style="text-align: right;">
+<a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
+https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
+</a></div>
+
+---
+## 正規化 (z-score normalization)
+
+平均=0、標準偏差=1、になるように:
+
+```{r z-score}
+result = diamonds %>%
+  mutate(depth = scale(depth)) %>%
+  print()
+```
+
+`depth = (depth - mean(depth)) / sd(depth)` と同じ。
+
+
+---
+## 正規化 (min-max normalization)
+
+最小=0、最大=1、になるように:
+
+```{r min-max}
+result = diamonds %>%
+  mutate(depth = (depth - min(depth)) / (max(depth) - min(depth))) %>%
+  print()
+```
+
+外れ値の影響を大きく受けることに注意。
+
+
+---
+## 外れ値の除去
+
+平均値から標準偏差の3倍以上離れているものを取り除く例:
+
+```{r outlier}
+result = diamonds %>%
+  filter(abs(depth - mean(depth)) / sd(depth) < 3) %>%
+  print()
+```
+
+唯一の方法ではないし、そもそもやるべきかどうかも要検討
+
+
+---
+## 欠損値の除去 `tidyr::drop_na()`
+
+(指定した列に) `NA` が含まれてる行を削除する。
+
+```{r drop_na}
+df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>% drop_na()
+```
+
+問: `starwars` データセットで試してみよう
+
+```{r starwars-drop, echo=FALSE}
+starwars
+```
+
+---
+## 欠損値の補完 `tidyr::replace_na()`
+
+欠損値 `NA` を任意の値で置き換える。
+
+```{r replace_na}
+df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>% replace_na(list(x = 0, y = "unknown"))
+```
+
+問: `starwars` データセットで試してみよう
+
+
+---
+## 欠損値の補完 `dplyr::coalesce()`
+
+先に指定した列が `NA` なら次の列の値を採用:
+
+```{r coalesce}
+y = c(1, 2, NA, NA, 5)
+z = c(NA, NA, 3, 4, 5)
+coalesce(y, z)
+```
+
+型が異なると怒られる:
+```{r coalesce-type}
+df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df %>%
+  mutate(z = coalesce(x, y))
+```
+
+問: `starwars` データセットで試してみよう
+
+
+---
+## 欠損値とみなす `dplyr::na_if()`
+
+特定の値を `NA` に置き換える:
+
+```{r na_if}
+df %>%
+  mutate(x = na_if(x, 1), y = na_if(y, "a"))
+```
+
+問: `starwars` データセットで試してみよう
+
+
+
+---
+## 文字列
+
+ダブルクォートで囲む。シングルクォートも使える。
+
+```{r string}
+x = "This is a string"
+y = 'If I want to include a "quote" inside a string, I use single quotes'
+```
+
+閉じそびれると変な状態になるので、落ち着いて <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>
+
+```
+> "This is a string without a closing quote
++
++
++ HELP I'M STUCK
+```
+
+<div style="text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/strings.html">
+https://r4ds.had.co.nz/strings.html
+</a></div>
+
+---
+## R備え付けの文字列機能は使いにくい
+
+-   何をやる関数なのか名前から分かりにくい<br>
+    `grep`, `grepl`, `regexpr`, `gregexpr`, `regexec`<br>
+    `sub`, `gsub`, `substr`, `substring`
+-   第一引数は対象文字列？検索パターン？関数ごとに違う。
+-   `NA` に対する挙動が微妙
+
+
+---
+## stringr --- 文字列処理パッケージ
+
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
+</a>
+
+-   tidyverseの一部
+-   何をやる関数なのか名前から分かりやすい
+-   対象文字列が一貫して第一引数で、パターンが二番目
+-   引数オブジェクトの各要素の名前や位置を保持する
+    -   長さゼロの入力からは長さゼロの出力
+    -   入力に `NA` が含まれる場合は対応する出力も `NA`
+-   [ICU正規表現](http://userguide.icu-project.org/strings/regexp) の仕様が明確
+-   [チートシート](https://github.com/rstudio/cheatsheets/raw/master/strings.pdf)
+
+
+---
+## 文字列基本操作
+
+```{r str_length}
+fruit4 = head(fruit, 4L) %>% print()
+str_length(fruit4)            # 長さ
+str_sub(fruit4, 2, 4)         # 部分列
+str_c(1:4, " ", fruit4, "!")  # 結合
+```
+
+
+---
+## パターンマッチング、正規表現
+
+単純な一致だけじゃなく、いろんな条件でマッチングできる:
+
+```{r pattern}
+# aで始まる
+str_subset(fruit, "^a")
+
+# rで終わる
+str_subset(fruit, "r$")
+
+# 英数字3-4文字
+str_subset(fruit, "^\\w{3,4}$")
+```
+
+
+---
+## 正規表現: よく使う特殊文字
+
+| メタ文字 | 意味 | &emsp;&emsp;&emsp; | 演算子 | 意味 |
+| ---- | ---- | --- | ---- | ---- |
+| `\d` | 数字   | | `?`  | 0回か1回 |
+| `\s` | 空白   | | `*`  | 0回以上繰り返し |
+| `\w` | 英数字 | | `+`  | 1回以上繰り返し |
+| `.`  | 何でも | | `{n,m}` | n回以上m回以下 |
+| `^`  | 行頭   | | `XXX(?=YYY)`  | YYYに先立つXXX |
+| `$`  | 行末   | | `(?<=YYY)XXX`  | YYYに続くXXX |
+
+R文字列ではバックスラッシュを重ねる必要がある, e.g., `"\\d"`.<br>
+`\D`, `\S`, `W` のように大文字にすると反転。
+
+<div style="text-align: right;"><a class="url" href="http://userguide.icu-project.org/strings/regexp">
+http://userguide.icu-project.org/strings/regexp
+</a></div>
+
+問: `str_subset(fruit, "PATTERN")` をいろいろ試してみよう
+
+
+---
+## 検出 `str_detect()`
+
+マッチするかどうか `TRUE`/`FALSE` を返す。
+```{r str_detect}
+fruit4 = head(fruit, 4L)
+str_detect(fruit4, "^a")
+```
+
+問: `starwars` の `name` 列で `filter()` してみよう
+
+```{r starwars-detect, echo=FALSE}
+starwars
+```
+
+---
+## 抽出 `str_extract()`
+
+マッチした部分文字列を取り出す。しなかった要素には `NA`。
+```{r str_extract}
+fruit4 = head(fruit, 4L)
+str_extract(fruit4, "^a..")
+```
+
+問: `diamonds` の `clarity` 列から数字を取り除いてみよう
+
+```{r diamonds-extract, echo=FALSE}
+diamonds
+```
+
+
+---
+## 置換 `str_replace()`
+
+カッコ `()` で囲んだマッチングは後で参照できる:
+```{r str_replace}
+fruit4 = head(fruit, 4L)
+str_replace(fruit4, "..$", "!!")
+str_replace(fruit4, "(..)$", "!!\\1")
+```
+
+問: `starwars` の `name` 列の数字を全部ゼロにしてみよう
+
+```{r starwars-replace, echo=FALSE}
+starwars
+```
+
+
+---
+## 形式を変える・整える
+
+```{r upperlower}
+fruit4 = head(fruit, 4L)
+str_to_upper(fruit4)              # 大文字に
+str_pad(fruit4, 8, "left", "_")   # 幅を埋める
+```
+
+[`stringi`](http://www.gagolewski.com/software/stringi/) パッケージはさらに多機能
+```{r stringi}
+stringi::stri_trans_nfkc("ｶﾀｶﾅ")  # 半角カナを全角に
+```
+
+---
+## 文字列から別の型に
+
+<a href="https://readr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
+</a>
+
+これはstringrではなくreadrの担当:
+
+```{r parse-character}
+parse_number(c("p = 0.02 *", "N_A = 6e23"))
+parse_double(c("0.02", "6e23"))   # 異物には警告
+parse_logical(c("1", "true", "0", "false"))
+parse_date("2019-12-27")
+```
+
+---
+## 因子型 `factor`
+
+カテゴリカル変数を扱うための型。文字列っぽいけど中身は数。
+
+```{r iris}
+iris = tibble::as_tibble(iris) %>% print()
+levels(iris[["Species"]])
+```
+
+<a class="url" href="https://r4ds.had.co.nz/factors.html">
+https://r4ds.had.co.nz/factors.html
+</a>
+
+
+---
+## 因子型 `factor`: 文字列との違い1
+
+取りうる値 (levels) が既知。
+
+typoがあると `NA` 扱い。
+
+```{r factor}
+month_levels = c(
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+)
+x2 = c("Dec", "Apr", "Jam", "Mar")
+factor(x2, levels = month_levels)
+```
+
+---
+## 因子型 `factor`: 文字列との違い2
+
+順序がある。
+
+文字列をソートすると当然アルファベット順になるけど、<br>
+因子型にはそうじゃない順序を持たせられる:
+
+```{r sort}
+x1 = c("Dec", "Apr", "Jan", "Mar")
+sort(x1)
+y1 = factor(x1, levels = month_levels)
+as.integer(y1)
+```
+
+
+---
+## 因子型 `factor`: 順序の情報は作図で生きる
+
+文字列ならアルファベット順、因子型なら任意指定可能。<br>
+頻度順にする例:
+
+```{r fct_infreq, fig.height = 4}
+diamonds %>%
+  mutate(color = fct_infreq(color)) %>%
+  ggplot(aes(x = color)) +
+  geom_bar() + coord_flip()
+```
+
+---
+## tidyverse の因子型担当は forcats
+
+<a href="https://forcats.tidyverse.org/">
+<img src="/slides/image/hex-stickers/forcats.png" width="120" align="right">
+</a>
+
+- `fct_reorder()`: 別の変数に応じて順序を並べ替え
+- `fct_infreq()`: 頻度に応じて順序を並べ替え
+- `fct_relevel()`: すべて手動で再設定
+- `fct_lump()`: 少なすぎるカテゴリを"その他"としてまとめる
+
+
+---
+## ダミー変数に変換
+
+イチゼロの値を持たせて横広に変形するのと等価。
+
+```{r dummy}
+iris %>%
+  rowid_to_column() %>% select(-starts_with("Sepal")) %>%
+  mutate(value = 1L) %>%
+  pivot_wider(names_from = Species, values_from = value, values_fill = c(value = 0L))
+```
+
+問: これの逆向きをやってみよう
+
+
+---
+## 日時型: POSIXct, POSIXlt
+
+- POSIXct: エポックからの経過秒数。比較や差分などを取りやすい。
+- POSIXlt: list(年, 月, 日, 時, 分, 秒)。単位ごとに抜き出しやすい。
+
+```{r datetime}
+now = "2019-12-27 13:00:00"
+ct = as.POSIXct(now)
+unclass(ct)
+lt = as.POSIXlt(now)
+unclass(lt) %>% as_tibble()
+```
+
+素のRでも扱えるけど lubridate パッケージを使うともっと楽に。
+
+---
+## lubridate --- 日時型処理パッケージ
+
+<a href="https://lubridate.tidyverse.org/">
+<img src="/slides/image/hex-stickers/lubridate.png" width="120" align="right">
+</a>
+
+日時型への変換:
+```{r lubridate-parse}
+today = ymd(20191227)
+ymd(c("20191227", "2019-12-27", "19/12/27"))
+```
+
+日時型から単位ごとに値を取得:
+```{r lubridate-get}
+month(today)
+wday(today, label = TRUE)
+```
+
+[チートシート](https://github.com/rstudio/cheatsheets/raw/master/lubridate.pdf)
+
+---
+## 本日前半のまとめ
+
+- vectorには型がある: 文字列、数値、因子、日時、etc.
+- 大概の操作はvector全体に一括適用
+- 文字列を扱うには [stringr](https://stringr.tidyverse.org/)
+    - 正規表現は強力・汎用的
+- 因子を扱うには [forcats](https://forcats.tidyverse.org/)
+    - 知っておくと作図で有利
+- 日時を扱うには [lubridate](https://lubridate.tidyverse.org/)
+
+各パッケージのチートシート.pdfを手元に持っておくと便利。
+
+---
+## Reference
+
+R for Data Science --- Hadley Wickham & Garrett Grolemund
+: [Website](https://r4ds.had.co.nz/), [Book](https://amzn.to/2tbRmVc)
+: [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+
+[RユーザのためのRStudio[実践]入門](https://amzn.to/2Q8GlhE) --- 松村優哉ほか<br>
+[前処理大全](https://amzn.to/2PFe4jF) --- 本橋智光
+
+過去の講義資料
+: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
+   岩嵜航 2018
+: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+: 「[Hands-on R Lecture for Makino Lab](https://heavywatal.github.io/slides/makino2019r/)」
+   岩嵜航 2019 東北大学
+
+Official documents:
+: [tidyverse](https://www.tidyverse.org/),
+  [dplyr](https://dplyr.tidyverse.org/),
+  [tidyr](https://tidyr.tidyverse.org/),
+  [tibble](https://tibble.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/),
+  [stringr](https://stringr.tidyverse.org/),
+  [forcats](https://forcats.tidyverse.org/)
+  [lubridate](https://lubridate.tidyverse.org/)
+
+<a href="4-practice.html" rel="next" class="readmore">
+4. 実践: 現実の問題に対処してみる
+</a>

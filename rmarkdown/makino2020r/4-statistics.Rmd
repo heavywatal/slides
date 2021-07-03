@@ -1,0 +1,527 @@
++++
+url = "makino2020r/4-statistics.html"
+title = "Statistical analysis with R — Hands-on R Lecture for Makino Lab"
+linktitle = "Statistical analysis with R"
+date = 2020-06-03T23:59:59+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [Hands-on Introduction to R 2020](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+
+<ol start="0">
+<li><a href="0-why-r.html">Why do we use R?</a>
+<li><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+<li class="current-deck"><a href="4-statistics.html">Statistical analysis with R</a>
+</ol>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br>
+2020-06-03
+</div>
+
+```{r setup-local, include=FALSE}
+library(broom)
+library(ggplot2)
+theme_set(wtl::theme_wtl(base_size = 20))
+knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(fig.height = 5, fig.width = 6)
+set.seed(24601)
+```
+
+---
+## Today's topic
+
+- <strike>Theoretical background of statistical analysis</strike>
+- How to perform statistical analysis with R
+
+<br><br>
+Launch RStudio, and load `tidyverse`.
+
+```r
+library(tidyverse)
+```
+
+---
+## Relationship between `cty` (燃費) & `displ` (排気量)?
+
+```{r plot-displ-cty}
+ggplot(mpg) + aes(displ, cty) + geom_point()
+```
+
+---
+## Basic form
+
+```r
+# Get the result as an object
+formula = Y ~ X
+model_object = model_function(formula, data = MYDATA)
+
+# View its summary
+summary(model_object)
+
+# Get the estimated coefficients
+coef(model_object)
+```
+
+where
+
+- `DATA`: data.frame, e.g., `iris`, `diamonds`, **`mpg`**
+- `Y`: response variable (a column in `DATA`), e.g., **`cty`**
+- `X`: explanatory variable (a column in `DATA`), e.g., **`displ`**
+
+
+---
+## Genaral Linear Model (一般線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm}
+fit = lm(cty ~ displ, data = mpg)
+summary(fit)
+```
+
+---
+## Genaral Linear Model (一般線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm-abline}
+a = coef(fit)[[1]]
+b = coef(fit)[[2]]
+ggplot(mpg) + aes(displ, cty) + geom_point() +
+  geom_abline(intercept = a, slope = b, color = "blue", size = 0.8)
+```
+
+---
+## Genaral Linear Model (一般線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm-predict}
+Y = predict(fit)
+ggplot(mpg) + aes(displ, cty) + geom_point() +
+  geom_line(aes(y = Y), color = "blue", size = 0.8)
+```
+
+---
+## Genaral Linear Model (一般線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm-smooth}
+ggplot(mpg) + aes(displ, cty) + geom_point() +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE)
+```
+
+---
+## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+
+<div>\[\begin{aligned}
+\text{link}(Y) &= c_0 + c_1 x_1 + c_2 x_2 + \ldots + \epsilon \\
+\epsilon &\sim \text{error}(\ldots)
+\end{aligned}\]</div>
+
+- `formula`: linear predictor (線形予測子), e.g., `cty ~ displ`
+- `family`: error structure (誤差構造), e.g., `gaussian`, `poisson`, `Gamma`
+- `link`: link function (リンク関数), e.g., `"identity"`, `"log"`, `"inverse"`
+
+LM is a special case of GLM:<br>
+`glm(..., family = gaussian("identity"))`
+
+
+---
+## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+
+$\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344 + \epsilon$
+
+```{r glm-gamma-log}
+fit = glm(cty ~ displ, data = mpg, family = Gamma(link = "log"))
+summary(fit)
+```
+
+---
+## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+
+$\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344 + \epsilon$
+
+```{r glm-gamma-log-plot}
+ggplot(mpg) + aes(displ, cty) + geom_point() +
+  geom_line(aes(y = exp(predict(fit))), color = "blue", size = 0.8)
+```
+
+---
+## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+
+$(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027 + \epsilon$
+
+```{r glm-gamma-inverse}
+fit = glm(cty ~ displ, data = mpg, family = Gamma(link = "inverse"))
+summary(fit)
+```
+
+---
+## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+
+$(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027 + \epsilon$
+
+```{r glm-gamma-inverse-plot}
+ggplot(mpg) + aes(displ, cty) + geom_point() +
+  geom_line(aes(y = 1 / predict(fit)), color = "blue", size = 0.8)
+```
+
+---
+## Non-linear Least-Square (非線形最小二乗法)
+
+$\text{cty} = {28.7} / {\text{displ}} + 7.33$
+
+```{r nls}
+fit = nls(cty ~ k / displ + b, data = mpg, start = list(k = 1, b = 0))
+summary(fit)
+```
+
+---
+## Non-linear Least-Square (非線形最小二乗法)
+
+$\text{cty} = {28.7} / {\text{displ}} + 7.33$
+
+```{r nls-plot}
+ggplot(mpg) + aes(displ, cty) + geom_point() +
+  geom_line(aes(y = predict(fit)), color = "blue", size = 0.8)
+```
+
+---
+## Model comparison
+
+There are many statistics, e.g., AIC, BIC, WAIC, etc.
+
+```{r model-comparison, results="hold"}
+fit1 = lm(cty ~ displ, data = mpg) #family = gaussian("identity")
+fit2 = glm(cty ~ displ, data = mpg, family = Gamma(link = "log"))
+fit3 = glm(cty ~ displ, data = mpg, family = Gamma(link = "inverse"))
+fit4 = nls(cty ~ k / displ + b, data = mpg, start = list(k = 1, b = 0))
+AIC(fit1, fit2, fit3, fit4)
+```
+
+---
+## Model comparison
+
+```{r stepaic, results="hold", message = FALSE}
+library(MASS)
+full_model = glm(cty ~ displ + cyl + drv + class, data = mpg, family = Gamma(link = "inverse"))
+stepAIC(full_model)
+```
+
+---
+## `tidymodels` meta-package
+
+For modeling and statistical analysis that share the underlying design philosophy, grammar, and data structures of the tidyverse.
+
+```r
+install.packages("tidymodels")
+library(tidymodels)
+```
+
+- [`broom`](https://broom.tidyverse.org/)
+- [`dplyr`](https://dplyr.tidyverse.org)
+- [`ggplot2`](https://ggplot2.tidyverse.org)
+- [`infer`](https://infer.netlify.com/)
+- [`purrr`](https://purrr.tidyverse.org)
+- [`recipes`](https://tidymodels.github.io/recipes/)
+- [`rsample`](https://tidymodels.github.io/rsample/)
+- [`tibble`](https://tibble.tidyverse.org)
+- [`yardstick`](https://tidymodels.github.io/yardstick/)
+
+
+---
+## `broom` package
+
+Transfroms the messy output of R stats functions to tidy data.frames.
+
+[Available methods](https://broom.tidyverse.org/articles/available-methods.html)
+
+
+---
+## Extract results from `fit`
+
+```{r nottidy}
+fit = lm(Sepal.Width ~ Petal.Length + Petal.Width, data = iris)
+summary(fit)
+```
+
+---
+## Extract results from `fit`
+
+```{r tidy}
+fit = lm(Sepal.Width ~ Petal.Length + Petal.Width, data = iris)
+tidy(fit)
+```
+
+---
+## Tests 仮説検定
+
+```r
+chisq.test()
+fisher.test()
+kruskal.test()
+ks.test()
+t.test()
+var.test()
+wilcox.test()
+# etc.
+```
+
+See [`stats` package](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/00Index.html) for more details.
+
+
+---
+## Probability distributions 確率分布
+
+```{r probdist}
+# 確率密度関数 (PDF)
+dnorm(c(0, 1.96))
+# 累積分布関数 (CDF)
+pnorm(c(0, 1.96))
+# 累積分布関数の逆関数
+qnorm(c(0.5, 0.975))
+# 乱数生成
+rnorm(4)
+```
+
+---
+## 計算機の限界に注意
+
+`1 - pnorm(...)`や`log(pnorm(...))`のほうが直感的に分かりやすいので、
+`lower.tail = FALSE`や`log.p = TRUE`は不要なようにも思われるが、
+これらの引数で内部処理させたほうが浮動小数点型の限界付近での計算が正確。
+
+```r
+# complementary
+1 - pnorm(10, 0, 1)                  # 0
+pnorm(10, 0, 1, lower.tail = FALSE)  # 7.619853e-24
+
+# log
+log(pnorm(10, 0, 1))                 # 0
+pnorm(10, 0, 1, log.p = TRUE)        # -7.619853e-24
+```
+
+---
+## Discrete 離散
+
+```r
+_binom(size, prob)
+_geom(prob)
+_hyper(m, n, k)
+_nbinom(size, prob, mu)
+_pois(lambda)
+_signrank(n)
+_wilcox(m, n)
+```
+
+---
+## Continuous 連続
+
+```r
+_beta(shape1, shape2)
+_cauchy(location = 0, scale = 1)
+_chisq(df)
+_exp(rate = 1)
+_f(df1, df2)
+_gamma(shape, rate = 1, scale = 1 / rate)
+_lnorm(meanlog = 0, sdlog = 1)
+_logis(location = 0, scale = 1)
+_norm(mean = 0, sd = 1)
+_t(df)
+_unif(min = 0, max = 1)
+_weibull(shape, scale = 1)
+```
+
+
+---
+## Reference
+
+[`stats` package](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/00Index.html)
+
+[`tidymodels`](https://github.com/tidymodels/tidymodels)
+
+[`broom`](https://broom.tidyverse.org/)
+
+[`caret` package](http://caret.r-forge.r-project.org/)
+for machine learning
+
+[`stan` package](https://mc-stan.org/rstan/)
+for Bayesian modeling and inference.
+
+<a href="./" class="readmore">
+目次に戻る
+</a>
+
+
+---
+## 牧野研輪読会 補遺
+
+["RとStanではじめる ベイズ統計モデリングによるデータ分析入門"](https://amzn.to/2TpZFJv)
+第2部 第1--3章
+
+
+
+---
+## `ts`: time series (時系列型)
+
+<span style="float: right">2.1.13</span>
+
+`vector` with labels and print format.
+
+```{r ts}
+timeser = ts(LETTERS, start = c(2020, 5), freq = 12)
+timeser
+is(timeser)
+is.character(timeser)
+```
+
+
+---
+## Random Number Generator (乱数生成器)
+
+<span style="float: right">2.1.15</span>
+
+`r` + 分布の名前 + `(length, parameters, ...)`
+
+```{r rnorm}
+set.seed(24601)  # 乱数シードをセット
+# 平均50、標準偏差10の正規分布から5個生成
+rnorm(5L, mean = 50, sd = 10)
+# もう1回実行すると違う結果
+rnorm(5L, mean = 50, sd = 10)
+```
+
+疑似乱数
+: 内部状態に依存して**決定論的に**生成される数列。
+: **乱数シード**は、内部状態を指定する「復活の呪文🏰」
+
+---
+## Random Number Generator (乱数生成器)
+
+<span style="float: right">2.1.15</span>
+
+内部状態が同じなら、生成される乱数も同じ。
+
+```{r setseed}
+set.seed(24601)  # 内部状態をリセット
+rnorm(5L, 0, 1)  # 生成するときに内部状態が変化するけど
+set.seed(24601)  # 内部状態をリセット
+rnorm(5L, 0, 1)  # 同じ結果
+```
+
+シミュレーションや解析に再現性を求める場合は設定必須。<br>
+(どんなシードでも同じ結論になる、が理想ではあるけど)
+
+「ほしい結果が出るような乱数シードを探す」
+とかやっちゃ**ダメ絶対‼️**
+
+---
+## For-loop
+
+<span style="float: right">2.1.16</span>
+
+Rではほぼ使わないけど、この教科書では使いたいらしい。
+
+```{r forloop}
+for (i in seq(1, 3)) {
+  print(i)
+}
+```
+
+---
+## Histogram
+
+<span style="float: right">2.2.2</span>
+
+連続値をいくつかのbinに区切って数えたもの
+
+```{r histogram, fig.width=9}
+ggplot(diamonds) + aes(x = price) +
+  geom_histogram(bins = 40L)
+```
+
+---
+## Kernel Density Estimation (カーネル密度推定)
+
+<span style="float: right">2.2.3</span>
+
+ヒストグラムを正規分布で滑らかにしたもの
+
+```{r kde, fig.width=9}
+ggplot(diamonds) + aes(x = price) +
+  geom_rug(size = 0.1, alpha = 0.05) +
+  geom_density(size = 2) +
+  geom_density(adjust = 1 / 4, color = "red") +
+  geom_density(adjust = 4, color = "blue")
+```
+
+---
+## Summary Statistics (要約統計量)
+
+<span style="float: right">2.2.4, 5</span>
+
+```{r summary-stats}
+# 平均値: 普通の算術平均。tailに引っ張られる。
+mean(diamonds[["price"]])
+# 中央値: 順位で真ん中にある値。
+median(diamonds[["price"]])
+# 四分位点: 上位・下位25%にある値。
+quantile(diamonds[["price"]], probs = c(0.25, 0.75))
+```
+
+---
+## Correlation (相関)
+
+<span style="float: right">2.2.6</span>
+
+```{r covariance}
+# Covariance (共分散) > 0 なら、
+# carat が大きくなるほど price も大きくなる
+cov(diamonds[["carat"]], diamonds[["price"]])
+```
+
+↑この値だけ見てもその度合いは想像しにくいので、<br>
+値が [-1, 1] になるように正規化したものが相関係数↓
+
+```{r correlation}
+cor(diamonds[["carat"]], diamonds[["price"]])
+```
+
+結構強い相関だな。
+
+---
+## Autocorrelation (自己相関)
+
+<span style="float: right">2.2.7</span>
+
+時系列データにおいて、n時点前の値との相関を取ったもの。<br>
+1次の自己相関 = 1時点前との相関
+
+```{r acf}
+ac = acf(Nile, lag.max = 10, plot = FALSE) %>% broom::tidy()
+ggplot(ac) + aes(lag, acf) + geom_col() + scale_x_continuous(n.breaks = 10L)
+```

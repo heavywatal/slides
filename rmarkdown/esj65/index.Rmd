@@ -1,0 +1,801 @@
++++
+title = "ESJ65-W07 それもRにやらせよう — 整然データの下ごしらえ"
+date = 2018-03-14T10:00:00+09:00
+type = "reveal"
+draft = false
++++
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(comment = NA)
+library(tidyverse)
+set.seed(24601)
+options(
+  datatable.print.class = TRUE,
+  datatable.print.colnames = "top",
+  pillar.subtle = FALSE,
+  pillar.neg = FALSE,
+  readr.num_columns = 0L
+)
+wtl::adjust_print_options(8L)
+print.tbl_df = data.table:::print.data.table
+```
+
+# それもRにやらせよう --- 整然データの下ごしらえ
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+総研大<br>
+(SOKENDAI, The Graduate University for Advanced Studies)
+</div>
+
+<div class="footnote">
+2018-03-14
+<a href="http://www.esj.ne.jp/meeting/65/">
+生態学会65＠札幌
+</a><br>
+<a href="http://hosho.ees.hokudai.ac.jp/~kubo/ce/EcoSj2018.html">
+[W07] データ解析で出会う統計的問題: R の新しい作図・作表
+</a>
+</div>
+
+---
+## 下ごしらえを自動化してハッピーに
+
+> Happy families are all alike;<br>
+> every unhappy family is unhappy in its own way<br>
+> --- Leo Tolstoy "Anna Karenina"
+
+> tidy datasets are all alike,<br>
+> but every messy dataset is messy in its own way<br>
+> --- Hadley Wickham
+
+出発点となるデータはさまざま
+: 実験ノート、フィールドノート、
+: データベース、シミュレーション。。。
+
+解析や作図に使えるデータ形式はほぼ決まってる
+: `glm(..., data, ...)`,
+  `ggplot(data, ...)`, ...
+
+
+---
+## 整然データ tidy data
+
+- 1行は1つの観測
+- 1列は1つの変数
+- 1セルは1つの値
+- (ggplotしたくなる形)
+
+```{r tidy_example}
+mtcars
+```
+
+参考:<br>
+<https://r4ds.had.co.nz/tidy-data.html><br>
+<https://speakerdeck.com/fnshr/zheng-ran-detatutenani><br>
+
+---
+## 雑然データ messy data
+
+- 1つの観測が縦横バラバラに散らばっている
+- 1つの変数が複数列にまたがっている
+- 1つのセルに複数の意味や値が含まれている
+- セルの結合？もってのほか！
+- (データを採るときに楽な形。これは仕方ない)
+
+```{r messy_example}
+VADeaths
+```
+
+↓下ごしらえ
+
+```{r tidy_vadeaths, echo=FALSE}
+as.data.frame(VADeaths) %>%
+  tibble::rownames_to_column("class") %>%
+  tidyr::gather(people, death_rate, -class) %>%
+  tidyr::separate(people, c("region", "sex"), " ") %>%
+  tidyr::separate(class, c("lbound", "ubound"), "-", convert = TRUE)
+```
+
+
+---
+## ゑくせる手作業 ＝ シーシュポスの岩
+
+<img src="image/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right">
+
+- 膨大な単純作業がそもそもツラい
+- 人間だもの、ミスは防ぎきれない
+- なるべく防ぐためのチェックもツラい
+- ミスを発見 → 初めからやり直し
+- 新たなデータ・研究 → 初めからやり直し
+- どんなに経験を積んでも良くならない
+
+<br>
+規則性のある退屈な仕事は人間よりも機械のほうが得意。<br>
+一度書いたプログラムは、データが変わっても使える財産。<br>
+
+**Reproducible Research, 再現性のためにも R にやらせよう**
+
+
+---
+## 今回の目標
+
+### いまのRってこんなことができるんだな
+
+### やりたくなったらこのへんを調べればいいんだな
+
+<br>
+この2点さえ押さえれば、具体的なやり方は覚えなくても大丈夫
+
+
+---
+## tidyverse
+
+<a href="https://www.tidyverse.org/">
+<img src="image/tidyverse-screenshot.png" width="320" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+- 統一的な使い勝手
+- 暗黙の処理をなるべくしない
+- 意味のわかるエラーメッセージ
+- **シンプルな関数を繋げて使うデザイン**
+
+```{r tidyverse, eval=FALSE}
+install.packages("tidyverse")
+library(tidyverse)
+# 関連ライブラリが一挙に読み込まれる
+```
+
+Q. 素のRも覚えきってないのにいきなりパッケージ？<br>
+A. 大丈夫。誰も覚えきってない。
+
+
+---
+## よく見かけるサンプルデータ `iris`
+
+Rに最初から入ってるdata.frame。<br>
+3種のアヤメ150個体に関する4個の計測値。
+
+うっかり実行すると、
+
+```{r iris-noeval, eval=FALSE}
+iris
+```
+
+---
+## よく見かけるサンプルデータ `iris`
+
+Rに最初から入ってるdata.frame。<br>
+3種のアヤメ150個体に関する4個の計測値。
+
+うっかり実行すると、ながーい！
+
+```{r iris}
+iris
+```
+
+---
+## tibble --- data.frameの改良版
+
+<a href="https://tibble.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
+</a>
+
+- **巨大データをうっかり表示しても画面を埋め尽くさない**
+- 列の名前や型を勝手に変更しない
+- 一応説明したけど、この先は区別せずdata.frameと呼ぶ
+
+```{r tibble}
+as_tibble(iris)
+```
+
+---
+## tibble --- data.frameの改良版
+
+<a href="https://tibble.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
+</a>
+
+- 巨大データをうっかり表示しても画面を埋め尽くさない
+- **列の名前や型を勝手に変更しない**
+- 一応説明したけど、この先は区別せずdata.frameと呼ぶ
+
+```{r stringsAsFactors}
+df = data.frame("x-1" = c("b", "e", "e", "r"))
+df[["x.1"]]   # 名前が違う！中身も勝手にfactor型に！
+tbl = tibble("x-1" = c("b", "e", "e", "r"))
+tbl[["x-1"]]  # 当然character型のまま
+```
+
+---
+## readr --- data.frameの読み書き担当
+
+<a href="https://readr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
+</a>
+
+- 生data.frameではなく安全なtibbleとして読んでくれる
+- 列の名前や型を勝手に変更しない
+- オプションをごちゃごちゃ付けなくてもいい感じに動く<br>
+  (R標準の `read.table()` とかは意外と難しい)
+
+```{r readr, message=FALSE}
+readr::write_tsv(iris, "iris.tsv")
+readr::read_tsv("iris.tsv")
+```
+
+```{r rm_tsv, include=FALSE}
+fs::file_delete("iris.tsv")
+```
+
+---
+## dplyr --- data.frameの高速処理担当
+
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/dplyr.png" width="120" align="right">
+</a>
+
+ひとつの関数はひとつの仕事。<br>
+繋げて使いやすいシンプルな関数がたくさん。
+
+抽出
+: `filter()`, `select()`, `distinct()`, `sample_n()`
+
+変更・追加
+: `mutate()`, `rename()`
+
+要約・集計
+: `group_by()`, `summarise()`, `count()`
+
+ソート
+: `arrange()`
+
+結合
+: `left_join()`, `inner_join()`, `full_join()`
+
+*etc.*
+
+---
+## dplyr --- data.frameの高速処理担当
+
+いつもdata.frameが第一引数。
+```{r dplyr-eg}
+dplyr::filter(iris, Sepal.Length < 4.6)   # 条件にあう行を抽出
+dplyr::sample_n(iris, 3L)                 # ランダムに3行抽出
+```
+
+---
+## dplyr --- data.frameの高速処理担当
+
+小さな関数を繋げて使う。
+```{r dplyr}
+result = iris %>%
+  dplyr::arrange(Petal.Width) %>%          # 小さい順に並べ替え
+  dplyr::filter(Species != "setosa") %>%   # 行を除外
+  dplyr::select(-matches("^Petal")) %>%    # 列を除外
+  dplyr::group_by(Species) %>%             # グループごとに
+  dplyr::summarise_all(mean) %>%           # 平均を計算
+  dplyr::mutate(area = Sepal.Length * Sepal.Width / 2) %>%
+                                           # 新しい列を作る
+  print()                                  # 表示してみる
+```
+
+見慣れないこの記号 `%>%` は何？
+
+---
+## パイプ演算子 `%>%`
+
+パイプの左側の変数を、右側の関数の第一引数にねじ込む:
+```{r pipe}
+1 %>% sum(2, 3)
+sum(1, 2, 3)
+```
+
+下ごしらえの流れ作業に便利:
+```{r assembly-line}
+# data %>%  process-A  %>%  process-B  %>%  process-C
+1      %>%  sum(2, 3)  %>%  factorial()
+```
+
+---
+## パイプ演算子 `%>%` を使わない
+
+一時変数を使う方法:
+```{r pipe-tmp-var}
+tmp1 = dplyr::filter(iris, Species != "setosa") # 行を除外
+tmp2 = dplyr::select(tmp1, -matches("^Petal"))  # 列を除外
+tmp3 = dplyr::group_by(tmp2, Species)           # グループごとに
+result = dplyr::summarise_all(tmp3, mean)       # 平均を計算
+```
+
+もしくは全部同じ名前で:
+```{r pipe-recursive-assign}
+result = dplyr::filter(iris, Species != "setosa")  # 行を除外
+result = dplyr::select(result, -matches("^Petal")) # 列を除外
+result = dplyr::group_by(result, Species)          # グループごとに
+result = dplyr::summarise_all(result, mean)        # 平均を計算
+```
+
+どちらも悪くない。
+何度も変数名を入力するのがやや冗長。
+
+
+---
+## パイプ演算子 `%>%` を使わない
+
+一時変数を使わない力技:
+```{r pipe-nest}
+result = dplyr::summarise_all(            # 平均を計算
+  dplyr::group_by(                          # グループごとに
+    dplyr::select(                            # 列を除外
+      dplyr::filter(iris, Species != "setosa"), # 行を除外
+      -matches("^Petal")),                    # 列を除外
+    Species),                               # グループごとに
+  mean)                                   # 平均を計算
+```
+
+改行さえしない超人技:
+```{r pipe-oneliner}
+result = dplyr::summarise_all(dplyr::group_by(dplyr::select(dplyr::filter(iris, Species != "setosa"), -matches("^Petal")), Species), mean)
+```
+
+論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
+さっきのほうがぜんぜんマシ。
+
+---
+## パイプ演算子 `%>%` を使う
+
+慣れれば、論理の流れを追いやすい:
+```{r eg-pipe}
+library(tidyverse)
+result = iris %>%
+  dplyr::filter(Species != "setosa") %>%   # 行を除外
+  dplyr::select(-matches("^Petal")) %>%    # 列を除外
+  dplyr::group_by(Species) %>%             # グループごとに
+  dplyr::summarise_all(mean) %>%           # 平均を計算
+  print()                                  # 表示してみる
+```
+
+慣れるまではちょっと大変かも。無理して使わなくても大丈夫。
+
+
+---
+## tidyr --- data.frameの変形・整形担当
+
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tidyr.png" width="120" align="right">
+</a>
+
+横長から縦長に
+: `gather()`
+
+縦長から横長に
+: `spread()`
+
+入れ子構造をつくる、解消する
+: `nest()`, `unnest()`
+
+1列を複数の列に分離
+: `separate()`
+
+*etc.*
+
+
+---
+## `tidyr::gather()` 横長から縦長に
+
+複数列にまたがる値を1列にする(ここでは`value`)。<br>
+そのラベルも合わせて移動(ここでは`name`)。
+
+```{r gather}
+long_iris = iris %>% head(2L) %>%              # 最初の2行だけ
+  rownames_to_column("id") %>%                 # ID列を追加
+  print() %>%                                  # 途中経過を表示
+  tidyr::gather(name, value, -id, -Species) %>%   # 縦長に変形
+  print()
+```
+
+---
+## `tidyr::spread()` 縦長から横長に
+
+1列に収まっていた値(`value`)を複数列の行列に変換。<br>
+そのラベル(`name`)を列の名前にする。
+
+```{r spread}
+long_iris %>% print() %>%      # gatherしたやつ
+  tidyr::spread(name, value)   # 横長に戻す
+```
+
+---
+## `tidyr::separate()` 列を分離
+
+```{r separate}
+long_iris %>% print() %>%                     # gatherしたやつ
+  tidyr::separate(name, c("part", "measure")) # 列を分離
+```
+
+---
+## `tidyr::nest()` 入れ子にする
+
+グループ毎にdata.frameを区切ってlist型の列に入れる。
+
+```{r nest}
+nested_iris = as_tibble(iris) %>%
+  tidyr::nest(-Species) %>% print()
+nested_iris$data[[1L]]
+```
+
+入れ子にされたlistの列どうする？
+`purrr::map()`の出番！
+
+---
+## purrr
+
+<a href="https://purrr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/purrr.png" width="120" align="right">
+</a>
+
+listやループの処理担当。
+
+- `map()`, `walk()`
+- `map_int()`, `map_dbl()`, `map_chr()`
+- `map_dfr()`
+- `pmap()`, `map2()`
+- `flatten()`
+- *etc.*
+
+標準Rの `lapply()`, `sapply()`, `vapply()`, `unlist()` などの代わりに
+
+
+---
+## 例題: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe, results="hold"}
+anscombe %>%
+  tibble::rownames_to_column("id")       # あとで必要なID列
+  # xやyの値が何列にも広がってる。これを1列に(縦長に)したい
+```
+
+---
+## 例題: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_gather, results="hold"}
+anscombe %>%
+  tibble::rownames_to_column("id") %>%   # あとで必要なID列
+  tidyr::gather(key, value, -id)         # 縦長に変形
+  # key列の x1 とかを x, 1 の2列に分離したい
+```
+
+---
+## 例題: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_separate, results="hold"}
+anscombe %>%
+  tibble::rownames_to_column("id") %>%   # あとで必要なID列
+  tidyr::gather(key, value, -id) %>%     # 縦長に変形
+  tidyr::separate(key, c("axis", "group"), 1L)      # 列を分離
+  # xとyのペアが1行になってほしい
+  # xとyが新たな列名になるように横長にしたい
+```
+
+---
+## 例題: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r anscombe_spread}
+anscombe %>%
+  tibble::rownames_to_column("id") %>%   # あとで必要なID列
+  tidyr::gather(key, value, -id) %>%     # 縦長に変形
+  tidyr::separate(key, c("axis", "group"), 1L) %>%  # 列を分離
+  tidyr::spread(axis, value)             # axis列をx列とy列に
+```
+
+---
+## 例題: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r tidy_anscombe}
+tidy_anscombe = anscombe %>%
+  tibble::rownames_to_column("id") %>%   # あとで必要なID列
+  tidyr::gather(key, value, -id) %>%     # 縦長に変形
+  tidyr::separate(key, c("axis", "group"), 1L) %>%  # 列を分離
+  tidyr::spread(axis, value) %>%         # axis列をx列とy列に
+  dplyr::select(-id) %>%                 # 使い終わったID列を消す
+  dplyr::arrange(group) %>%              # グループごとに並べる
+  print()                                # ggplotしたい形！
+```
+
+---
+## 例題: `anscombe`
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r plot_anscombe, fig.height=3, fig.width=10, out.width="98%"}
+ggplot(tidy_anscombe, aes(x, y)) +
+  geom_point(size = 3) +
+  stat_smooth(method = lm, se = FALSE, fullrange = TRUE) +
+  facet_wrap(~ group, nrow = 1L)
+```
+
+---
+## 例題: `anscombe`
+
+dplyrのグループ化を使って要約
+
+```{r summarize_anscombe}
+tidy_anscombe %>%
+  dplyr::group_by(group) %>%   # group列でグループ化して
+  dplyr::summarise(            # x, y列を使ってsummarize
+    mean_x = mean(x),
+    mean_y = mean(y),
+    sd_x = sd(x),
+    sd_y = sd(y),
+    cor_xy = cor(x, y)
+  )
+```
+
+---
+## 例題: `anscombe`
+
+tidyrのネストを使って要約 (中級者向け)
+
+```{r nest_anscombe}
+tidy_anscombe %>%
+  tidyr::nest(-group) %>%    # group列でネストして
+  dplyr::mutate(data = purrr::map(data, function(data_i) {
+    data_i %>%               # 入れ子の内側の各データをいじって
+      summarise_all(funs(mean, sd)) %>%
+      dplyr::mutate(cor_xy = cor(data_i$x, data_i$y))
+  })) %>%
+  tidyr::unnest()            # 入れ子を解消
+```
+
+---
+## 例題: [先ほどの伊東さん](https://figshare.com/articles/ggplot2___/5982007)のデータ準備部分
+
+`m_data` をベースに、2つをまとめた `g_data` を作りたい
+
+```{r ito_read_dummy, eval=FALSE}
+prefix = "https://raw.githubusercontent.com/ito4303/esj65/master/"
+m_data = paste0(prefix, "Measurement_data.csv") %>% read_csv()
+s_data = paste0(prefix, "Stem_data.csv") %>% read_csv()
+m_data %>% head(3L)
+s_data %>% head(3L)
+```
+```{r ito_read, echo=FALSE, message=FALSE}
+prefix = "./"
+m_data = paste0(prefix, "Measurement_data.csv") %>% read_csv()
+s_data = paste0(prefix, "Stem_data.csv") %>% read_csv()
+m_data %>% head(3L)
+s_data %>% head(3L)
+```
+
+
+---
+## 例題: [先ほどの伊東さん](https://figshare.com/articles/ggplot2___/5982007)のデータ準備部分
+
+`m_data` をベースに、2つをまとめた `g_data` を作りたい
+
+```{r ito_join, message=FALSE}
+g_data = m_data %>%
+  dplyr::inner_join(s_data, by = "Stem") %>%  # 共通する列で結合
+  print()                                     # 使う行を絞りたい
+```
+
+
+---
+## 例題: [先ほどの伊東さん](https://figshare.com/articles/ggplot2___/5982007)のデータ準備部分
+
+`m_data` をベースに、2つをまとめた `g_data` を作りたい
+
+```{r ito_filter, message=FALSE}
+g_data = m_data %>%
+  dplyr::inner_join(s_data, by = "Stem") %>%  # 共通する列で結合
+  dplyr::filter(                              # 使う行を絞りたい
+    Year %in% c(1993, 2014),
+    X1 < 50,
+    Species %in% c("Quercus glauca", "Symplocos prunifolia"),
+    !is.na(DBH)
+  ) %>%                                       # 使う列を絞りたい
+  print()
+```
+
+
+---
+## 例題: [先ほどの伊東さん](https://figshare.com/articles/ggplot2___/5982007)のデータ準備部分
+
+`m_data` をベースに、2つをまとめた `g_data` を作りたい
+
+```{r ito_transmute, message=FALSE}
+g_data = m_data %>%
+  dplyr::inner_join(s_data, by = "Stem") %>%  # 共通する列で結合
+  dplyr::filter(                              # 使う行を絞りたい
+    Year %in% c(1993, 2014),
+    X1 < 50,
+    Species %in% c("Quercus glauca", "Symplocos prunifolia"),
+    !is.na(DBH)
+  ) %>%                                       # 使う列を絞りたい
+  dplyr::select(X1, Y1, Year, Species, DBH) %>%
+  dplyr::rename(X = X1, Y = Y1) %>%           # 列名を変更
+  print()
+```
+
+---
+## 例題: `VADeaths`
+
+```{r vadeaths_df, results="hold"}
+as.data.frame(VADeaths)                     # data.frameに変換
+                                            # 行名を列に
+                                            # 縦長に変形
+                                                  # 地域と性別を分離
+                                            # 下限と上限を分離
+```
+
+---
+## 例題: `VADeaths`
+
+```{r vadeaths_rownames, results="hold"}
+as.data.frame(VADeaths) %>%                 # data.frameに変換
+  tibble::rownames_to_column("class")       # 行名を列に
+                                            # 縦長に変形
+                                                  # 地域と性別を分離
+                                            # 下限と上限を分離
+```
+
+---
+## 例題: `VADeaths`
+
+```{r vadeaths_gather, results="hold"}
+as.data.frame(VADeaths) %>%                 # data.frameに変換
+  tibble::rownames_to_column("class") %>%   # 行名を列に
+  tidyr::gather(people, death, -class)      # 縦長に変形
+                                                  # 地域と性別を分離
+                                            # 下限と上限を分離
+```
+
+---
+## 例題: `VADeaths`
+
+```{r vadeaths_region_sex, results="hold"}
+as.data.frame(VADeaths) %>%                 # data.frameに変換
+  tibble::rownames_to_column("class") %>%   # 行名を列に
+  tidyr::gather(people, death, -class) %>%  # 縦長に変形
+  tidyr::separate(people, c("region", "sex"))     # 地域と性別を分離
+                                            # 下限と上限を分離
+```
+
+---
+## 例題: `VADeaths`
+
+```{r vadeaths_class, results="hold"}
+as.data.frame(VADeaths) %>%                 # data.frameに変換
+  tibble::rownames_to_column("class") %>%   # 行名を列に
+  tidyr::gather(people, death, -class) %>%  # 縦長に変形
+  tidyr::separate(people, c("region", "sex")) %>% # 地域と性別を分離
+  tidyr::separate(class, c("lbound", "ubound"), "-", convert=TRUE)
+                                            # 下限と上限を分離
+```
+
+
+---
+## 例題: 数値+単位になっちゃってる列を処理
+
+```{r unit}
+women2 = women %>% sample_n(2L) %>% tibble::as_tibble() %>% dplyr::mutate(height = paste0(height, "in"), weight = paste(weight, "lbs")) %>% print()
+
+# 単位を捨てる (スペースの有無によらず可能)
+women2 %>% dplyr::mutate(weight = readr::parse_number(weight))
+
+# 単位を新しい列に分ける
+women2 %>%
+  tidyr::separate(height, c("height", "uh"), -2L, convert = TRUE) %>%
+  tidyr::separate(weight, c("weight", "uw"), " ", convert = TRUE)
+```
+
+
+---
+## (質問を受けて補足) 文字列処理
+
+さらに複雑な文字列の抽出・置換をしたい場合は
+[stringrパッケージ](https://stringr.tidyverse.org/)
+で正規表現を使う:
+```{r stringr}
+c("Who am I? 24601!", "p = 0.02 *") %>%
+  str_extract("[\\d\\.]+") %>%  # 連続する数字または小数点を抽出
+  as.numeric()                  # 数値に変換
+```
+
+全角英数字を半角に変換
+```{r nfkc}
+c("ｔｐ５３", "ＫＲＡＳ") %>%
+  stringi::stri_trans_nfkc()
+```
+
+---
+## (質問を受けて補足) 名前の衝突
+
+`filter(...)` でも動くのにわざわざ頭に `dplyr::` 付ける？
+
+- 今回の発表では、どのパッケージ由来かをなるべく明示したかった
+- ほかのパッケージや自分の作業によって、<br>
+  **同じ名前の関数で上書きされちゃっても大丈夫なように:**
+
+```{r namespace}
+filter = function(x, y) return(NULL)     # うっかり同名の関数を作る
+filter(iris, Petal.Length < 1.2)         # 新しいほうが使われちゃう
+dplyr::filter(iris, Petal.Length < 1.2)  # 明示したので大丈夫
+```
+
+---
+## (質問を受けて補足) 布教
+
+<img src="image/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right">
+
+頑なにエクセルを使い込む熟練のシーシュポスたちにどうやってRの利用を広めていくか？
+
+- 彼らが苦労してる作業を魔法のように一瞬で解決して見せる。
+- その魔法を使うのは意外と難しくない、と思わせる。
+- というのを地道に続けていくしかない・・・？
+
+
+---
+## 参考
+
+R for Data Science --- Hadley Wickham and Garrett Grolemund
+: https://r4ds.had.co.nz/
+: [英語版書籍](https://amzn.to/2tbRmVc)
+: [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+
+各パッケージの公式ドキュメント
+: [tidyverse](https://www.tidyverse.org/),
+  [dplyr](https://dplyr.tidyverse.org/),
+  [tidyr](https://tidyr.tidyverse.org/),
+  [purrr](https://purrr.tidyverse.org/),
+  [tibble](https://tibble.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/),
+  [readxl](https://readxl.tidyverse.org/),
+  [stringr](https://stringr.tidyverse.org/)
+
+整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
+: https://speakerdeck.com/fnshr/zheng-ran-detatutenani
+: http://id.fnshr.info/2017/01/09/tidy-data-intro/
+
+https://en.wikipedia.org/wiki/Sisyphus
+
+---
+## 疑問やエラーの解決方法
+
+- 公式ドキュメントを読む
+- エラー文をちゃんと読む
+- パッケージ名やエラー文をコピペしてウェブ検索<br>
+  → StackOverflowや個人サイトに先例
+- 身近な経験者に訊く
+- Slackのr-wakalangに質問を投稿する<br>
+  https://github.com/tokyor/r-wakalang <br>
+  内容によってチャンネルを選ぶ:<br>
+  `#r_beginners`, `#statistics`, `#ggplot2`, etc.
+- 質問するときは、状況を再現できる小さな例
+  [(reprex)](https://reprex.tidyverse.org/)
+  を添えて
+
+---
+## まとめ
+
+- 解析や作図の前に、使いやすい形にデータを整えよう。
+- マウスでぽちぽちセルの切り貼りをするのはやめて、<br>
+  そういうことはRにやらせよう。
+- いまRを使うなら、tidyverseの機能を使うと捗る。
+- 調べ方がわかれば、具体的な方法を全部覚えなくても大丈夫。

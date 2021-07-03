@@ -1,0 +1,371 @@
++++
+url = "makino2019r/4-statistics.html"
+title = "Statistical analysis with R — Hands-on R Lecture for Makino Lab"
+linktitle = "Statistical analysis with R"
+date = 2019-10-23T14:00:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [Hands-on R Lecture for Makino Lab](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+
+<ol start="0">
+<li><a href="0-why-r.html">Why do we use R?</a>
+<li><a href="1-basic-r.html">R basics</a>
+<li><a href="2-ggplot.html">Visualization with R</a>
+<li><a href="3-tidy-data.html">Tidying and transforming data with R</a>
+<li class="current-deck"><a href="4-statistics.html">Statistical analysis with R</a>
+<li><a href="5-git.html">File management with Git+GitHub</a>
+</ol>
+
+<div class="footnote">
+資料作成協力: 石川由希 (名古屋大学 理学研究科 脳回路構造学 講師)<br>
+2019-10-23 生物棟大会議室
+</div>
+
+```{r setup-local, include=FALSE}
+library(broom)
+library(ggplot2)
+theme_set(wtl::theme_wtl(base_size = 20))
+knitr::opts_chunk$set(fig.height = 5, fig.width = 6)
+set.seed(24601)
+```
+
+---
+## Today's topic
+
+- <strike>Theoretical background of statistical analysis</strike>
+- How to perform statistical analysis with R
+
+<br><br>
+Launch RStudio, and load `tidyverse`.
+
+```r
+library(tidyverse)
+```
+
+---
+## Relationship between `cty` (燃費) & `displ` (排気量)?
+
+```{r plot-displ-cty}
+ggplot(mpg, aes(displ, cty)) + geom_point()
+```
+
+---
+## Basic form
+
+```r
+# Get the result as an object
+formula = Y ~ X
+model_object = model_function(formula, data = MYDATA)
+
+# View its summary
+summary(model_object)
+
+# Get the estimated coefficients
+coef(model_object)
+```
+
+where
+
+- `DATA`: data.frame, e.g., `iris`, `diamonds`, **`mpg`**
+- `Y`: response variable (a column in `DATA`), e.g., **`cty`**
+- `X`: explanatory variable (a column in `DATA`), e.g., **`displ`**
+
+
+---
+## Linear Model (線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm}
+fit = lm(cty ~ displ, data = mpg)
+summary(fit)
+```
+
+---
+## Linear Model (線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm-abline}
+a = coef(fit)[[1]]
+b = coef(fit)[[2]]
+ggplot(mpg, aes(displ, cty)) + geom_point() +
+  geom_abline(intercept = a, slope = b, color = "blue", size = 0.8)
+```
+
+---
+## Linear Model (線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm-predict}
+Y = predict(fit)
+ggplot(mpg, aes(displ, cty)) + geom_point() +
+  geom_line(aes(y = Y), color = "blue", size = 0.8)
+```
+
+---
+## Linear Model (線形モデル)
+
+Estimates the coefficients (係数) and intercept (切片).<br>
+
+$\text{cty} = - 2.63 \times \text{displ} + 25.99$
+
+```{r lm-smooth}
+ggplot(mpg, aes(displ, cty)) + geom_point() +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE)
+```
+
+---
+## Genaralized Linear Model (一般化線形モデル)
+
+<div>\[\begin{aligned}
+\text{link}(Y) &= c_0 + c_1 x_1 + c_2 x_2 + \ldots + \epsilon \\
+\epsilon &\sim \text{error}(\ldots)
+\end{aligned}\]</div>
+
+- `formula`: linear predictor (線形予測子), e.g., `cty ~ displ`
+- `family`: error structure (誤差構造), e.g., `gaussian`, `poisson`, `Gamma`
+- `link`: link function (リンク関数), e.g., `"identity"`, `"log"`, `"inverse"`
+
+LM is a special case of GLM: `glm(..., family = gaussian("identity"))`
+
+
+---
+## Genaralized Linear Model (一般化線形モデル)
+
+$\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344$
+
+```{r glm-gamma-log}
+fit = glm(cty ~ displ, data = mpg, family = Gamma(link = "log"))
+summary(fit)
+```
+
+---
+## Genaralized Linear Model (一般化線形モデル)
+
+$\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344$
+
+```{r glm-gamma-log-plot}
+ggplot(mpg, aes(displ, cty)) + geom_point() +
+  geom_line(aes(y = exp(predict(fit))), color = "blue", size = 0.8)
+```
+
+---
+## Genaralized Linear Model (一般化線形モデル)
+
+$(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027$
+
+```{r glm-gamma-inverse}
+fit = glm(cty ~ displ, data = mpg, family = Gamma(link = "inverse"))
+summary(fit)
+```
+
+---
+## Genaralized Linear Model (一般化線形モデル)
+
+$(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027$
+
+```{r glm-gamma-inverse-plot}
+ggplot(mpg, aes(displ, cty)) + geom_point() +
+  geom_line(aes(y = 1 / predict(fit)), color = "blue", size = 0.8)
+```
+
+---
+## Non-linear Least-Square (非線形最小二乗法)
+
+$\text{cty} = {28.7} / {\text{displ}} + 7.33$
+
+```{r nls}
+fit = nls(cty ~ k / displ + b, data = mpg, start = list(k = 1, b = 0))
+summary(fit)
+```
+
+---
+## Non-linear Least-Square (非線形最小二乗法)
+
+$\text{cty} = {28.7} / {\text{displ}} + 7.33$
+
+```{r nls-plot}
+ggplot(mpg, aes(displ, cty)) + geom_point() +
+  geom_line(aes(y = predict(fit)), color = "blue", size = 0.8)
+```
+
+---
+## Model comparison
+
+There are many statistics, e.g., AIC, BIC, etc.
+
+```{r model-comparison, results="hold"}
+fit1 = lm(cty ~ displ, data = mpg) #family = gaussian("identity")
+fit2 = glm(cty ~ displ, data = mpg, family = Gamma(link = "log"))
+fit3 = glm(cty ~ displ, data = mpg, family = Gamma(link = "inverse"))
+fit4 = nls(cty ~ k / displ + b, data = mpg, start = list(k = 1, b = 0))
+AIC(fit1, fit2, fit3, fit4)
+```
+
+---
+## Model comparison
+
+```{r stepaic, results="hold"}
+library(MASS)
+full_model = glm(cty ~ displ + cyl + drv + class, data = mpg, family = Gamma(link = "inverse"))
+stepAIC(full_model)
+```
+
+---
+## `tidymodels` meta-package
+
+For modeling and statistical analysis that share the underlying design philosophy, grammar, and data structures of the tidyverse.
+
+```r
+install.packages("tidymodels")
+library(tidymodels)
+```
+
+- [`broom`](https://broom.tidyverse.org/)
+- [`dplyr`](https://dplyr.tidyverse.org)
+- [`ggplot2`](https://ggplot2.tidyverse.org)
+- [`infer`](https://infer.netlify.com/)
+- [`purrr`](https://purrr.tidyverse.org)
+- [`recipes`](https://tidymodels.github.io/recipes/)
+- [`rsample`](https://tidymodels.github.io/rsample/)
+- [`tibble`](https://tibble.tidyverse.org)
+- [`yardstick`](https://tidymodels.github.io/yardstick/)
+
+
+---
+## `broom` package
+
+Transfroms the messy output of R stats functions to tidy data.frames.
+
+[Available methods](https://broom.tidyverse.org/articles/available-methods.html)
+
+
+---
+## Extract results from `fit`
+
+```{r nottidy}
+fit = lm(Sepal.Width ~ Petal.Length + Petal.Width, data = iris)
+summary(fit)
+```
+
+---
+## Extract results from `fit`
+
+```{r tidy}
+fit = lm(Sepal.Width ~ Petal.Length + Petal.Width, data = iris)
+tidy(fit)
+```
+
+---
+## Tests 仮説検定
+
+```r
+chisq.test()
+fisher.test()
+kruskal.test()
+ks.test()
+t.test()
+var.test()
+wilcox.test()
+# etc.
+```
+
+See [`stats` package](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/00Index.html) for more details.
+
+
+---
+## Probability distributions 確率分布
+
+```{r probdist}
+# 確率密度関数 (PDF)
+dnorm(c(0, 1.96))
+# 累積分布関数 (CDF)
+pnorm(c(0, 1.96))
+# 累積分布関数の逆関数
+qnorm(c(0.5, 0.975))
+# 乱数生成
+rnorm(4)
+```
+
+---
+## 計算機の限界に注意
+
+`1 - pnorm(...)`や`log(pnorm(...))`のほうが直感的に分かりやすいので、
+`lower.tail = FALSE`や`log.p = TRUE`は不要なようにも思われるが、
+これらの引数で内部処理させたほうが浮動小数点型の限界付近での計算が正確。
+
+```r
+# complementary
+1 - pnorm(10, 0, 1)                  # 0
+pnorm(10, 0, 1, lower.tail = FALSE)  # 7.619853e-24
+
+# log
+log(pnorm(10, 0, 1))                 # 0
+pnorm(10, 0, 1, log.p = TRUE)        # -7.619853e-24
+```
+
+---
+## Discrete 離散
+
+```r
+_binom(size, prob)
+_geom(prob)
+_hyper(m, n, k)
+_nbinom(size, prob, mu)
+_pois(lambda)
+_signrank(n)
+_wilcox(m, n)
+```
+
+---
+## Continuous 連続
+
+```r
+_beta(shape1, shape2)
+_cauchy(location = 0, scale = 1)
+_chisq(df)
+_exp(rate = 1)
+_f(df1, df2)
+_gamma(shape, rate = 1, scale = 1 / rate)
+_lnorm(meanlog = 0, sdlog = 1)
+_logis(location = 0, scale = 1)
+_norm(mean = 0, sd = 1)
+_t(df)
+_unif(min = 0, max = 1)
+_weibull(shape, scale = 1)
+```
+
+---
+## Reference
+
+[`stats` package](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/00Index.html)
+
+[`tidymodels`](https://github.com/tidymodels/tidymodels)
+
+[`broom`](https://broom.tidyverse.org/)
+
+[`caret` package](http://caret.r-forge.r-project.org/)
+for machine learning
+
+[`stan` package](https://mc-stan.org/rstan/)
+for Bayesian modeling and inference.
