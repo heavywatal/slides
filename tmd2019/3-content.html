@@ -153,7 +153,7 @@ if (!doNotTrack) {
 <section>
 <h2 id="dataframeは列vectorの集まり">data.frameは列vectorの集まり</h2>
 <a href="https://tibble.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/tibble.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
 </a>
 <p>内容を変更する方法はいくつかある。<br>
 <code>diamonds[[&quot;price&quot;]]</code> をドルから円に変換する例:</p>
@@ -208,8 +208,8 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">depth</span> <span class="o">=</span> <span class="nf">scale</span><span class="p">(</span><span class="n">depth</span><span class="p">))</span> <span class="o">%&gt;%</span>
   <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre><code>      carat       cut color clarity            table price     x     y     z
-      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt;   &lt;matrix&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+</code></pre></div><pre><code>      carat       cut color clarity  depth[,1] table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
     1  0.23     Ideal     E     SI2 -0.1740899    55   326  3.95  3.98  2.43
     2  0.21   Premium     E     SI1 -1.3607259    61   326  3.89  3.84  2.31
     3  0.23      Good     E     VS1 -3.3849872    65   327  4.05  4.07  2.31
@@ -308,9 +308,9 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">df</span> <span class="o">=</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="kc">NA</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;a&#34;</span><span class="p">,</span> <span class="kc">NA</span><span class="p">,</span> <span class="s">&#34;b&#34;</span><span class="p">))</span>
 <span class="n">df</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">z</span> <span class="o">=</span> <span class="nf">coalesce</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-</code></pre></div><pre><code>Error: Problem with `mutate()` input `z`.
+</code></pre></div><pre><code>Error: Problem with `mutate()` column `z`.
+ℹ `z = coalesce(x, y)`.
 ✖ Can't combine `..1` &lt;double&gt; and `..2` &lt;character&gt;.
-ℹ Input `z` is `coalesce(x, y)`.
 </code></pre><p>問: <code>starwars</code> データセットで試してみよう</p>
 
 </section>
@@ -356,7 +356,7 @@ https://r4ds.had.co.nz/strings.html
 <section>
 <h2 id="stringr-----文字列処理パッケージ">stringr &mdash; 文字列処理パッケージ</h2>
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/stringr.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
 </a>
 <ul>
 <li>tidyverseの一部</li>
@@ -541,7 +541,7 @@ http://userguide.icu-project.org/strings/regexp
 <section>
 <h2 id="文字列から別の型に">文字列から別の型に</h2>
 <a href="https://readr.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/readr.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
 </a>
 <p>これはstringrではなくreadrの担当:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">parse_number</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&#34;p = 0.02 *&#34;</span><span class="p">,</span> <span class="s">&#34;N_A = 6e23&#34;</span><span class="p">))</span>
@@ -617,7 +617,7 @@ Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 <section>
 <h2 id="tidyverse-の因子型担当は-forcats">tidyverse の因子型担当は forcats</h2>
 <a href="https://forcats.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/forcats.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/forcats.png" width="120" align="right">
 </a>
 <ul>
 <li><code>fct_reorder()</code>: 別の変数に応じて順序を並べ替え</li>
@@ -671,7 +671,7 @@ attr(,&quot;tzone&quot;)
 <section>
 <h2 id="lubridate-----日時型処理パッケージ">lubridate &mdash; 日時型処理パッケージ</h2>
 <a href="https://lubridate.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/lubridate.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/lubridate.png" width="120" align="right">
 </a>
 <p>日時型への変換:</p>
 <div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">today</span> <span class="o">=</span> <span class="nf">ymd</span><span class="p">(</span><span class="m">20191227</span><span class="p">)</span>
