@@ -12,7 +12,14 @@ https://heavywatal.github.io/slides/
     converts Markdown files (`content/**.md`) to HTML files (`public/**.html`).
 3.  [reveal.js](https://revealjs.com/)
     helps rendering HTML as presentation slides.
-    It is included in [a Hugo theme](https://github.com/heavywatal/hugo-theme-reveal).
+    [KaTeX](https://katex.org/)
+    renders math equations (`$ ... $` and `\[ ... \]`) embedded in HTML.
+    They are included in [a Hugo theme](https://github.com/heavywatal/hugo-theme-reveal).
+
+But I would rather recommend using other user-friendly frameworks such as
+[`xaringan`](https://slides.yihui.org/xaringan/),
+[`rstudio/revealjs`](https://bookdown.org/yihui/rmarkdown/revealjs.html),
+and [others supported in `rmarkdown` package](https://bookdown.org/yihui/rmarkdown/presentations.html).
 
 
 ## R packages used in `*.Rmd`
