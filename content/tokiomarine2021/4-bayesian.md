@@ -733,7 +733,7 @@ post-warmup draws per chain=1000, total post-warmup draws=4000.
 p      0.55    0.00 0.08   0.39   0.50   0.55   0.60   0.69  1651    1
 lp__ -29.45    0.02 0.76 -31.61 -29.61 -29.16 -28.97 -28.92  1262    1
 
-Samples were drawn using NUTS(diag_e) at Sat Jul  3 17:20:32 2021.
+Samples were drawn using NUTS(diag_e) at Tue Jul  6 17:58:10 2021.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).
@@ -881,7 +881,7 @@ slope        0.02    0.00 0.00    0.01    0.01    0.02    0.02    0.02  1526    
 sigma        6.94    0.01 0.27    6.41    6.76    6.94    7.13    7.47  1198    1
 lp__      -830.83    0.04 1.24 -834.08 -831.39 -830.51 -829.93 -829.43  1120    1
 
-Samples were drawn using NUTS(diag_e) at Sat Jul  3 17:20:35 2021.
+Samples were drawn using NUTS(diag_e) at Tue Jul  6 17:58:14 2021.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).
@@ -1158,7 +1158,7 @@ r[100]   -4.61    0.04 1.89   -8.96   -5.67   -4.35   -3.26   -1.60  2757    1
 s         3.46    0.01 0.44    2.71    3.15    3.43    3.74    4.45   945    1
 lp__   -433.99    0.35 9.69 -454.15 -440.31 -433.69 -427.41 -416.15   783    1
 
-Samples were drawn using NUTS(diag_e) at Sat Jul  3 17:20:47 2021.
+Samples were drawn using NUTS(diag_e) at Tue Jul  6 17:58:26 2021.
 For each parameter, n_eff is a crude measure of effective sample size,
 and Rhat is the potential scale reduction factor on split chains (at 
 convergence, Rhat=1).
@@ -1308,7 +1308,7 @@ model {
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
 - [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
 - [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
-- [データ解析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
 

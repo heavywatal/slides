@@ -430,7 +430,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 <figure>
 <img src="math-model.drawio.svg" width="600"><br>
-<figcaption><cite>「データ解析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
 
@@ -909,7 +909,7 @@ e.g.,<br>
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
 - [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
 - [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
-- [データ解析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
 
