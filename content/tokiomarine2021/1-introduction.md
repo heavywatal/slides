@@ -269,6 +269,8 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 - 統計モデル縛り・実行環境縛りなどの案件もある。
 - 分析方針を決める立場の上級職になるつもりなら統計モデルも必要。
 
+協力: [`@kato_kohaku`](https://twitter.com/kato_kohaku)さん、[`@teuder`](https://twitter.com/teuder)さん
+
 
 ---
 ## 理想的じゃなくてもしばしば有用な回帰
