@@ -2,14 +2,16 @@
 title = "Rにやらせて楽しよう — データの可視化と下ごしらえ 2021"
 date = 2021-09-13T09:30:00+09:00
 draft = false
+unlisted = false
 +++
 
 ## 概要
 
 -   講師: 岩嵜航 (東北大学生命科学研究科)
 -   責任教員: 中川真一 (北海道大学薬学研究院)
--   日程: 2021年9月中旬
--   場所: 北海道大学 / zoom.us?
+-   科目: 北海道大学 生命科学院 特別講義
+-   日程: 2021年9月13, 14, 15日
+-   場所: 北海道大学 / zoom.us
 -   授業の目標:<br>
     データの解析と作図はどんな研究にも不可欠です。
     特に、回帰分析や仮説検定といった統計処理をする前に、データをいろいろな角度から可視化して全体の構造を見渡すことが重要です。
@@ -52,10 +54,10 @@ draft = false
     たぶん変更できない？ので新しいユーザーを作って引っ越すのがいいと思います。
 1.  OSのソフトウェア・アップデートをすべて適用して再起動。
 1.  <https://cran.r-project.org/>
-    から最新版のR本体(≥4.0.0)をダウンロードしてインストール。
+    から最新版のR本体(≥4.1.0)をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
 1.  <https://rstudio.com/products/rstudio/download/#download>
-    から最新版のRStudio(≥1.3.1073)をダウンロードしてインストール。
+    から最新版のRStudio(≥1.4.1717)をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
 1.  Windowsの場合はRtoolsも必要かも。次のページに従って設定:<br>
     <https://cran.r-project.org/bin/windows/Rtools/>
@@ -70,9 +72,9 @@ draft = false
     > library(tidyverse)
     ── Attaching packages ───────────────────────────── tidyverse 1.3.1 ──
     ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-    ✓ tibble  3.1.2     ✓ dplyr   1.0.7
+    ✓ tibble  3.1.4     ✓ dplyr   1.0.7
     ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-    ✓ readr   1.4.0     ✓ forcats 0.5.1
+    ✓ readr   2.0.1     ✓ forcats 0.5.1
     ── Conflicts ──────────────────────────────── tidyverse_conflicts() ──
     x dplyr::filter() masks stats::filter()
     x dplyr::lag()    masks stats::lag()
@@ -81,4 +83,4 @@ draft = false
 
 ## 講義資料
 
-[2020年の講義資料](https://heavywatal.github.io/slides/tmd2020/)を元に準備中。
+全6回。リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。
