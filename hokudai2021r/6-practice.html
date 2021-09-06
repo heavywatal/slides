@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>6. 実践 — Rにやらせて楽しよう 2021 北大</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="6. 実践 — Rにやらせて楽しよう 2021 北大">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/hokudai2021r/6-practice.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.83.1" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="rにやらせて楽しよう--データの可視化と下ごしらえ"><a href=".">Rにやらせて楽しよう — データの可視化と下ごしらえ</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">入門1: データ解析の全体像。Rを使うメリット。Rの基本。</a>
+<li><a href="2-visualization.html">入門2: データ可視化の重要性と方法。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
+<li class="current-deck"><a href="6-practice.html">実践: 現実の問題に対処してみる。</a>
+</ol>
+<div class="footnote">
+2021-09-13 北海道大学 生命科学院 特別講義
+<a href="https://heavywatal.github.io/slides/hokudai2021r/">https://heavywatal.github.io/slides/hokudai2021r/</a>
+</div>
+
+</section>
+<section>
+<h2 id="最終回-実践してみよう">最終回: 実践してみよう</h2>
+<ol>
+<li>コンピュータ環境の整備</li>
+<li>データの取得、読み込み</li>
+<li>探索的データ解析
+<ul>
+<li><strong>前処理、加工</strong> (地味。意外と重い) 👈本実習の主題</li>
+<li>可視化、仮説生成 (派手！だいじ！)</li>
+<li>統計解析、仮説検証 (みんな勉強したがる)</li>
+</ul>
+</li>
+<li>報告、発表</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="好きなデータをいじくり倒してみよう">好きなデータをいじくり倒してみよう</h2>
+<ul>
+<li>自分がこれから解析したいデータ (もし手元にあれば)</li>
+<li>Rやパッケージに付属のデータ (のうちtidyじゃないもの)
+<ul>
+<li><code>VADeath</code>, <code>anscombe</code>, <code>economics</code></li>
+</ul>
+</li>
+<li>何か適当なパブリックデータ
+<ul>
+<li><a href="https://www.data.go.jp/data/dataset?res_format=CSV">data.go.jp</a>: データカタログサイト</li>
+<li><a href="https://www.itdashboard.go.jp/Statistics/opendata">IT DASHBOARD</a>: 内閣官房</li>
+<li><a href="https://www.e-stat.go.jp/">e-Stat</a>: 政府統計の総合窓口</li>
+<li><a href="https://www.data.gov/">DATA.GOV</a>: U.S. Government’s open data</li>
+<li><a href="https://www.data.jma.go.jp/gmd/risk/obsdl/index.php">気象庁</a></li>
+<li><a href="https://www.city.meguro.tokyo.jp/gyosei/hirakareta/opendata/opendata.html">目黒区オープンデータ</a>:
+「地域・年齢別人口」とかいい感じ</li>
+</ul>
+</li>
+<li>「こうしたい」「うまくいかない」「もっといじるとしたら」
+など気軽に質問してください</li>
+</ul>
+
+</section>
+<section>
+<h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
+<p>「地域・年齢別人口」CSVをダウンロードして、読み込む</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># infile = http://www.city.meguro.tokyo.jp/opendata/131105_population_20170401.csv</span>
+<span class="n">infile</span> <span class="o">=</span> <span class="s">&#34;131105_population_20170401.csv&#34;</span>
+<span class="n">raw_df</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+</code></pre></div><pre><code>Rows: 88 Columns: 49
+</code></pre><pre><code>── Column specification ─────────────────────────────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr   (3): 都道府県名, 市区町村名, 地域名
+dbl  (44): 都道府県コード又は市区町村コード, 地域コード, 総人口, 男性, 女性, 0-4歳の男性, 0-4歳の女性, 5-9歳の男性, 5-9歳の女性, 10-14歳の男性, 10-14歳の女性, 15-19歳の男性, 15-19歳の女性, 20-24歳の男性, 20-24歳の女性, 25-29歳の男性, 25-29歳の女性, 30-34歳の男性, 30-34歳の女性, 35-39歳の男性, 35-39歳の女性, 40-44歳の男性, 40-44歳の女性, 45-49歳の男性, 45-49歳の女性, 50-54歳の男性, 50-54歳の女性, 55-59歳の男性, 55-59歳の女性, 60-64歳の男性, 60-64歳の女性, 65-69歳の男性, 65-69歳の女性, 70-74歳の男性, 70-74歳の女性, 75-79歳の男性, 75-79歳の女性, 80-84歳の男性, 80-84歳の女性, 85歳の男性以上, 85歳の女性以上, 不詳者の男性, 不詳者の女性, 世帯数
+lgl   (1): 備考
+date  (1): 調査年月日
+</code></pre><pre><code>
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+</code></pre><div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">raw_df</span><span class="p">)</span>
+</code></pre></div><pre><code>   都道府県コード又は市区町村コード 地域コード 都道府県名 市区町村名 調査年月日       地域名 総人口  男性  女性 0-4歳の男性 0-4歳の女性 5-9歳の男性 5-9歳の女性 10-14歳の男性 10-14歳の女性 15-19歳の男性 15-19歳の女性 20-24歳の男性 20-24歳の女性 25-29歳の男性 25-29歳の女性 30-34歳の男性 30-34歳の女性 35-39歳の男性 35-39歳の女性 40-44歳の男性 40-44歳の女性 45-49歳の男性 45-49歳の女性 50-54歳の男性 50-54歳の女性 55-59歳の男性 55-59歳の女性 60-64歳の男性 60-64歳の女性 65-69歳の男性 65-69歳の女性 70-74歳の男性 70-74歳の女性 75-79歳の男性 75-79歳の女性 80-84歳の男性 80-84歳の女性 85歳の男性以上 85歳の女性以上 不詳者の男性 不詳者の女性 世帯数  備考
+                              &lt;dbl&gt;      &lt;dbl&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;date&gt;        &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt; &lt;lgl&gt;
+ 1                           131105        111     東京都     目黒区 2017-04-01   駒場一丁目   3995  2027  1968          65          63          85          68            52            51            70            63           156           109           231           160           215           169           202           157           170           175           165           149           114           123            78           105            80            99           126           122            66           107            63            74            48            67             41            107            0            0   2421    NA
+ 2                           131105        112     東京都     目黒区 2017-04-01   駒場二丁目    557   267   290           6           8           7           7            13            10             9             9            16            17            31            19            21            20            21            16            26            19            17            25            18            20            16            16            11            12            15            25            15            16             8            11            10            19              7             21            0            0    337    NA
+ 3                           131105        113     東京都     目黒区 2017-04-01   駒場三丁目    779   403   376          15          11          14          12            16            10            18            11            26            15            28            18            28            15            34            26            35            34            28            43            34            27            21            26            24            24            24            29            20            25            13            18            13            15             12             17            0            0    415    NA
+ 4                           131105        114     東京都     目黒区 2017-04-01   駒場四丁目   1537   736   801          23          35          35          28            31            29            47            35           101            89            70            62            49            47            52            65            43            68            54            68            55            64            34            41            32            34            35            46            26            31            23            19            16            19             10             21            0            0    876    NA
+--                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+85                           131105        364     東京都     目黒区 2017-04-01   八雲四丁目   2104   969  1135          56          47          52          47            38            35            34            40            57            54            50            74            56            76            80           104            99           109            73            92            81            83            48            66            43            57            68            67            54            47            24            37            35            42             21             58            0            0    965    NA
+86                           131105        365     東京都     目黒区 2017-04-01   八雲五丁目   2818  1354  1464          82          53          83          75            65            64            65            61            85            55            90            87            92           103           112           133           117           146           115           128           103           110            84            99            63            73            76            59            37            64            32            47            34            46             19             61            0            0   1316    NA
+87                           131105        371     東京都     目黒区 2017-04-01 東が丘一丁目   4439  2049  2390         104          90         100          83           108            93            94           124           108           120           131           155           165           186           169           186           190           193           164           195           144           193           130           137           104           109           115           136            81            87            53            81            44            79             45            143            0            0   2193    NA
+88                           131105        372     東京都     目黒区 2017-04-01 東が丘二丁目   2974  1292  1682          66          63          63          41            47            51            57            37            65           191           138           235           134           174           113           131            93           126            99           126           101           104            77            83            54            56            46            79            44            48            43            39            22            41             30             57            0            0   1667    NA
+</code></pre>
+</section>
+<section>
+<h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
+<p>ggplotしたくなる形に変形</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">=</span> <span class="n">raw_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="s">&#34;地域名&#34;</span><span class="p">,</span> <span class="nf">matches</span><span class="p">(</span><span class="s">&#34;の.+性$&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">rename</span><span class="p">(</span><span class="n">place</span> <span class="o">=</span> 地域名<span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">place</span> <span class="o">=</span> <span class="nf">str_replace</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s">&#34;\\S丁目&#34;</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">group_by</span><span class="p">(</span><span class="n">place</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">summarize</span><span class="p">(</span><span class="nf">across</span><span class="p">(</span><span class="nf">everything</span><span class="p">(),</span> <span class="n">sum</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">ungroup</span><span class="p">()</span> <span class="o">%&gt;%</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">place</span><span class="p">,</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;category&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">separate</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;の&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">filter</span><span class="p">(</span><span class="nf">str_detect</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="s">&#34;\\d&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="nf">parse_number</span><span class="p">(</span><span class="n">age</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">print</span><span class="p">()</span>
+</code></pre></div><pre><code>    place   age   sex value
+    &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
+  1  三田     0  男性   105
+  2  三田     0  女性   102
+  3  三田     5  男性    80
+  4  三田     5  女性    69
+ --                        
+915  鷹番    75  男性   143
+916  鷹番    75  女性   204
+917  鷹番    80  男性   107
+918  鷹番    80  女性   179
+</code></pre>
+</section>
+<section>
+<h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
+<p>作図してみる</p>
+<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">%&gt;%</span>
+  <span class="nf">ggplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">geom_col</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="n">sex</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">place</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">3L</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_family</span> <span class="o">=</span> <span class="s">&#34;HiraginoSans-W3&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/meguro_plot-1.png" alt="plot of chunk meguro_plot"></p>
+
+</section>
+<section>
+<h2 id="reference">Reference</h2>
+<dl>
+<dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
+<dd><a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a>,
+<a href="https://amzn.to/2tbRmVc">Paperback</a>,
+<a href="https://amzn.to/2yyFRKt">日本語版書籍</a></dd>
+</dl>
+<p><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&amp;linkCode=ll1&amp;tag=heavywatal-22&amp;linkId=8a3fd4e9a0c944b1b41242bbab8d147b">前処理大全 &mdash; 本橋智光</a><br>
+<a href="https://amzn.to/3eBprm5">RユーザのためのRStudio[実践]入門 (宇宙本) &mdash; 松村ら</a></p>
+<dl>
+<dt>Official documents:</dt>
+<dd><a href="https://www.tidyverse.org/">tidyverse</a>,
+<a href="https://ggplot2.tidyverse.org/">ggplot2</a>,
+<a href="https://dplyr.tidyverse.org/">dplyr</a>,
+<a href="https://tidyr.tidyverse.org/">tidyr</a>,
+<a href="https://readr.tidyverse.org/">readr</a>,
+<a href="https://tibble.tidyverse.org/">tibble</a>,
+<a href="https://stringr.tidyverse.org/">stringr</a>,</dd>
+<dt>Older versions</dt>
+<dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
+岩嵜航 2018</dd>
+<dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
+<dd>「<a href="https://heavywatal.github.io/slides/tmd2019/">Rによるデータ前処理実習</a>」
+岩嵜航 2019 東京医科歯科大</dd>
+</dl>
+<a href="./" class="readmore">
+目次に戻る
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
