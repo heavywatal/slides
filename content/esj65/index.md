@@ -155,7 +155,7 @@ VADeaths
 ---
 ## ゑくせる手作業 ＝ シーシュポスの岩
 
-<img src="figure/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right">
 
 - 膨大な単純作業がそもそもツラい
 - 人間だもの、ミスは防ぎきれない
@@ -186,7 +186,7 @@ VADeaths
 ## tidyverse
 
 <a href="https://www.tidyverse.org/">
-<img src="figure/tidyverse-screenshot.png" width="320" align="right">
+<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群
@@ -391,7 +391,7 @@ iris
 ## tibble --- data.frameの改良版
 
 <a href="https://tibble.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/tibble.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
 </a>
 
 - **巨大データをうっかり表示しても画面を埋め尽くさない**
@@ -422,7 +422,7 @@ as_tibble(iris)
 ## tibble --- data.frameの改良版
 
 <a href="https://tibble.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/tibble.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
 </a>
 
 - 巨大データをうっかり表示しても画面を埋め尽くさない
@@ -453,7 +453,7 @@ tbl[["x-1"]]  # 当然character型のまま
 ## readr --- data.frameの読み書き担当
 
 <a href="https://readr.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/readr.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
 </a>
 
 - 生data.frameではなく安全なtibbleとして読んでくれる
@@ -488,7 +488,7 @@ readr::read_tsv("iris.tsv")
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/dplyr.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/dplyr.png" width="120" align="right">
 </a>
 
 ひとつの関数はひとつの仕事。<br>
@@ -676,7 +676,7 @@ result = iris %>%
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/tidyr.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/tidyr.png" width="120" align="right">
 </a>
 
 横長から縦長に
@@ -832,7 +832,7 @@ nested_iris$data[[1L]]
 ## purrr
 
 <a href="https://purrr.tidyverse.org/">
-<img src="/slides/figure/hex-stickers/purrr.png" width="120" align="right">
+<img src="/slides/image/hex-stickers/purrr.png" width="120" align="right">
 </a>
 
 listやループの処理担当。
@@ -1686,7 +1686,7 @@ dplyr::filter(iris, Petal.Length < 1.2)  # 明示したので大丈夫
 ---
 ## (質問を受けて補足) 布教
 
-<img src="figure/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="280" align="right">
 
 頑なにエクセルを使い込む熟練のシーシュポスたちにどうやってRの利用を広めていくか？
 

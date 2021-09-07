@@ -37,7 +37,7 @@ draft = false
 
 <figure style="position: absolute; top: 32px; right: 40px;">
 <a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
-<img src="/slides/figure/free/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
+<img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
 <figcaption class="url">
 https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figcaption>
@@ -68,7 +68,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 それらを決める要因は何か。膨大な観察データに基づく超大作卒論。
 
 <figure>
-<img src="/slides/figure/messy/thesis.png" width="800">
+<img src="/slides/image/messy/thesis.png" width="800">
 </figure>
 
 ---
@@ -78,8 +78,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
 <figure style="position: relative; margin: 20px 0;">
-<img src="/slides/figure/messy/dir-0826.png" class="screenshot" height="500">
-<img src="/slides/figure/messy/file-0826-zebra.png" class="screenshot" height="450"
+<img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
+<img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
      style="position: absolute; left: 270px; top: 50px;">
 </figure>
 
@@ -89,9 +89,9 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ちゃんと合ってるのかな... ファイルもタブもたくさん...
 
 <figure style="position: relative;">
-<img src="/slides/figure/messy/dir-z.png" class="screenshot" height="550"
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
      style="position: absolute; z-index: 100;">
-<img src="/slides/figure/messy/file-z-book1.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
      style="position: absolute; left: 250px; top: 50px;">
 </figure>
 
@@ -101,13 +101,13 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ちゃんと合ってるのかな... ファイルもタブもたくさん...
 
 <figure style="position: relative;">
-<img src="/slides/figure/messy/dir-z.png" class="screenshot" height="550"
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
      style="position: absolute; z-index: 100;">
-<img src="/slides/figure/messy/file-z-book1.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
      style="position: absolute; left: 250px; top: 50px;">
-<img src="/slides/figure/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
      style="position: absolute; left: 30px; top: 20px; z-index: 200;">
-<img src="/slides/figure/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
      style="position: absolute; left: 260px; top: 40px; z-index: 300;">
 </figure>
 
@@ -117,19 +117,19 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 泣きながら何十枚も...。無料期間が終わって今は使えない...。
 
 <figure style="position: relative; margin: 20px 0;">
-<img src="/slides/figure/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
-<img src="/slides/figure/messy/photoshop.jpg" width="530"
+<img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
+<img src="/slides/image/messy/photoshop.jpg" width="530"
      style="position: absolute; left: 200px; top: -10px;">
 </figure>
-<img src="/slides/figure/messy/zebra_AM.jpg" width="300">
-<img src="/slides/figure/messy/zebra_PM.jpg" width="300">
+<img src="/slides/image/messy/zebra_AM.jpg" width="300">
+<img src="/slides/image/messy/zebra_PM.jpg" width="300">
 
 ---
 ## 目作業・手作業 ＝ シーシュポスの岩
 
 <figure style="float: right;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
-<img src="/slides/figure/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="320">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="320">
 <figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
 </a>
 </figure>
@@ -150,8 +150,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 先の例に負けず生データはどっさり。でも頑張るのは機械。
 
 <figure>
-<img src="/slides/figure/tek/finder.png" height="420">
-<img src="/slides/figure/tek/fig5.png" height="420">
+<img src="/slides/image/tek/finder.png" height="420">
+<img src="/slides/image/tek/fig5.png" height="420">
 <figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
 </figure>
 
@@ -159,18 +159,18 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ## こんな感じの図もRでラクラク描けるよ
 
 <figure>
-<img src="/slides/figure/tumopp/paper/Fig1.png" height="200">
-<img src="/slides/figure/tumopp/neighborhood.png" height="200">
-<img src="/slides/figure/tumopp/param-p.png" height="200">
-<img src="/slides/figure/tumopp/paper/Fig3.png" height="200">
-<img src="/slides/figure/tumopp/param-k.png" height="200">
-<img src="/slides/figure/tumopp/driver.gif" height="200"><br>
-<img src="/slides/figure/tumopp/Cmoore_Lconst.gif" height="100">
-<img src="/slides/figure/tumopp/Cmoore_Llinear.gif" height="100">
-<img src="/slides/figure/tumopp/Cmoore_Lstep.gif" height="100">
-<img src="/slides/figure/tumopp/Chex_Lconst.gif" height="100">
-<img src="/slides/figure/tumopp/Chex_Llinear.gif" height="100">
-<img src="/slides/figure/tumopp/Chex_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/image/tumopp/neighborhood.png" height="200">
+<img src="/slides/image/tumopp/param-p.png" height="200">
+<img src="/slides/image/tumopp/paper/Fig3.png" height="200">
+<img src="/slides/image/tumopp/param-k.png" height="200">
+<img src="/slides/image/tumopp/driver.gif" height="200"><br>
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
 <figcaption class="url">Iwasaki and Innan (2017)</figcaption>
 </figure>
 
@@ -187,7 +187,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/figure/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -199,7 +199,7 @@ for statistical computing and graphics
 
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
-<img src="/slides/figure/rstats/Rlogo.svg" height="200">
+<img src="/slides/image/rstats/Rlogo.svg" height="200">
 <figcaption class="url">https://cran.r-project.org/</figcaption>
 </a>
 </figure>
