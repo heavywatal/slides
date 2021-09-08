@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.88.1" />
 <link rel="stylesheet" href="/lib/katex/katex.min.css">
 <script defer src="/lib/katex/katex.min.js"></script>
 <script defer src="/lib/katex/contrib/auto-render.min.js"></script>
@@ -114,7 +114,7 @@ Likes
 <section>
 <h2 id="tumopp-----tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
 <p>Available via <a href="https://brew.sh/">Homebrew</a>/<a href="http://linuxbrew.sh/">Linuxbrew</a>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-sh" data-lang="sh">brew install heavywatal/tap/tumopp
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh">brew install heavywatal/tap/tumopp
 tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR
 </code></pre></div><p>Dependencies:</p>
 <ul>
@@ -131,7 +131,7 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR
 <section>
 <h2 id="tumopp-----tumor-growth-simulator-in-c">tumopp &mdash; tumor growth simulator in C++</h2>
 <p>Library structure:</p>
-<pre><code>CMAKE_INSTALL_PREFIX/
+<pre tabindex="0"><code>CMAKE_INSTALL_PREFIX/
 ├── bin/
 │   └── tumopp
 ├── include/
@@ -142,7 +142,7 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR
 └── lib/
     └── libtumopp.dylib    # libtumopp.so on Linux
 </code></pre><p>Output structure:</p>
-<pre><code>OUTPUT_DIR/
+<pre tabindex="0"><code>OUTPUT_DIR/
 ├── drivers.tsv.gz
 ├── population.tsv.gz
 ├── program_options.conf
@@ -160,9 +160,9 @@ tumopp -N10000 -D3 -Chex -k100 -d0.1 -m0.5 -o OUTPUT_DIR
 </ol>
 <p>Not too bad.<br>
 But it will be more convenient if I can run tumopp in R:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">tumopp</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">tumopp</span><span class="p">)</span>
 <span class="n">results</span> <span class="o">=</span> <span class="nf">tumopp</span><span class="p">(</span><span class="n">some_parameter_sets</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre><code>     max  coord dimensions shape delta0  rho0 population  drivers
+</code></pre></div><pre tabindex="0"><code>     max  coord dimensions shape delta0  rho0 population  drivers
    &lt;int&gt; &lt;char&gt;      &lt;int&gt; &lt;int&gt;  &lt;num&gt; &lt;num&gt;     &lt;list&gt;   &lt;list&gt;
 1: 10000    hex          3   100    0.1   0.5   &lt;tbl_df&gt; &lt;tbl_df&gt;
 </code></pre>
@@ -171,7 +171,7 @@ But it will be more convenient if I can run tumopp in R:</p>
 <h2 id="seamless-r-and-c-integration-with-rcpphttpwwwrcpporg">Seamless R and C++ integration with <a href="http://www.rcpp.org/">Rcpp</a></h2>
 <p>It is typically used to eliminate bottlenecks in R code.<br>
 Many online examples show the ways to define a short function:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">Rcpp</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">Rcpp</span><span class="p">)</span>
 
 <span class="n">Rcpp</span><span class="o">::</span><span class="nf">cppFunction</span><span class="p">(</span><span class="s">&#39;
 </span><span class="s">int fibonacci(int x) {
@@ -181,7 +181,7 @@ Many online examples show the ways to define a short function:</p>
 </span><span class="s">&#39;</span><span class="p">)</span>
 
 <span class="nf">fibonacci</span><span class="p">(</span><span class="m">8L</span><span class="p">)</span>
-</code></pre></div><pre><code>[1] 21
+</code></pre></div><pre tabindex="0"><code>[1] 21
 </code></pre><p>But I already have C++ functions in my library.<br>
 How can I use them in R?</p>
 
@@ -190,7 +190,7 @@ How can I use them in R?</p>
 <h2 id="create-an-rrcpp-package-from-scratch">Create an R+Rcpp package from scratch</h2>
 <p>Package components
 <cite>(See <a href="http://r-pkgs.had.co.nz/">http://r-pkgs.had.co.nz/</a> for details)</cite>:</p>
-<pre><code>DESCRIPTION  # Package metadata
+<pre tabindex="0"><code>DESCRIPTION  # Package metadata
 LICENSE
 NAMESPACE    # List of objects to import/export
 R/           # R code (*.R)
@@ -199,7 +199,7 @@ src/         # C++ source code (*.cpp)
 vignettes/   # Long-form guide
 </code></pre><p>Use <a href="https://devtools.r-lib.org/">devtools</a> and/or
 <a href="http://usethis.r-lib.org/">usethis</a> to setup a skeleton:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">usethis</span><span class="o">::</span><span class="nf">create_package</span><span class="p">(</span><span class="s">&#34;tumopp&#34;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">usethis</span><span class="o">::</span><span class="nf">create_package</span><span class="p">(</span><span class="s">&#34;tumopp&#34;</span><span class="p">)</span>
 <span class="n">usethis</span><span class="o">::</span><span class="nf">use_mit_license</span><span class="p">()</span>
 <span class="n">usethis</span><span class="o">::</span><span class="nf">use_roxygen_md</span><span class="p">()</span>
 <span class="n">usethis</span><span class="o">::</span><span class="nf">use_package_doc</span><span class="p">()</span>
@@ -210,7 +210,7 @@ vignettes/   # Long-form guide
 </section>
 <section>
 <h2 id="package-wide-settings-in-rtumopp-packager">Package-wide settings in <code>R/tumopp-package.R</code></h2>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; @useDynLib tumopp, .registration = TRUE</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; @useDynLib tumopp, .registration = TRUE</span>
 <span class="c1">#&#39; @importFrom Rcpp sourceCpp</span>
 <span class="c1">#&#39; @importFrom magrittr %&gt;%</span>
 <span class="c1">#&#39; @aliases NULL tumopp-package</span>
@@ -233,7 +233,7 @@ but not used in the major packages these days&hellip;?<br>
 <section>
 <h2 id="define-rcpp-function-to-use-external-libraries">Define Rcpp function to use external libraries</h2>
 <p>Create <code>src/run.cpp</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// [[Rcpp::plugins(cpp14)]]
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="c1">// [[Rcpp::plugins(cpp14)]]
 </span><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&lt;Rcpp.h&gt;</span><span class="cp">
 </span><span class="cp">#include</span> <span class="cpf">&lt;tumopp/simulation.hpp&gt;</span><span class="cp">
 </span><span class="cp"></span>
@@ -256,15 +256,15 @@ but not used in the major packages these days&hellip;?<br>
 <section>
 <h2 id="configure-compile-options">Configure compile options</h2>
 <p>Error: R does not know where my C++ library is located:</p>
-<pre><code>run.cpp:3:10: fatal error: 'tumopp/simulation.hpp' file not found
+<pre tabindex="0"><code>run.cpp:3:10: fatal error: 'tumopp/simulation.hpp' file not found
 #include &lt;tumopp/simulation.hpp&gt;
          ^~~~~~~~~~~~~~~~~~~~~~~
 </code></pre><p>Write compile options to <code>src/Makevars</code> directly:</p>
-<div class="highlight"><pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX14
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX14
 <span class="nv">PKG_CPPFLAGS</span><span class="o">=</span>-DSTRICT_R_HEADERS -I/usr/local/include
 <span class="nv">PKG_LIBS</span><span class="o">=</span>-L/usr/local/lib -Wl,-rpath,/usr/local/lib -ltumopp
 </code></pre></div><p>Or use <code>configure</code>/<code>CMake</code> script to generate it from <code>src/Makevars.in</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX14
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-makefile" data-lang="makefile"><span class="nv">CXX_STD</span><span class="o">=</span>CXX14
 <span class="nv">PKG_CPPFLAGS</span><span class="o">=</span>-DSTRICT_R_HEADERS @CPPFLAGS@
 <span class="nv">PKG_LIBS</span><span class="o">=</span>@LDFLAGS@ @LDLIBS@
 </code></pre></div><cite>
@@ -274,7 +274,7 @@ https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-clean
 <section>
 <h2 id="transform-c-strings-to-dataframe">Transform C++ strings to data.frame</h2>
 <p>Create <code>R/tumopp</code>:</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; `tumopp()` returns full results with config columns in a data.frame</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1">#&#39; `tumopp()` returns full results with config columns in a data.frame</span>
 <span class="c1">#&#39; @param args command line arguments as a string vector</span>
 <span class="c1">#&#39; @export</span>
 <span class="n">tumopp</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">args</span> <span class="o">=</span> <span class="nf">character</span><span class="p">(</span><span class="m">0L</span><span class="p">))</span> <span class="p">{</span>
@@ -285,7 +285,7 @@ https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-clean
     <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">population</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">population</span><span class="p">))</span> <span class="o">%&gt;%</span>
     <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">drivers</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">drivers</span><span class="p">))</span>
 <span class="p">}</span>
-</code></pre></div><pre><code>     max  coord dimensions shape delta0  rho0 population  drivers
+</code></pre></div><pre tabindex="0"><code>     max  coord dimensions shape delta0  rho0 population  drivers
    &lt;int&gt; &lt;char&gt;      &lt;int&gt; &lt;int&gt;  &lt;num&gt; &lt;num&gt;     &lt;list&gt;   &lt;list&gt;
 1: 10000    hex          3   100    0.1   0.5   &lt;tbl_df&gt; &lt;tbl_df&gt;
 </code></pre><p>There must be some more efficient ways&hellip;

@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.83.1" />
+<meta name="generator" content="Hugo 0.88.1" />
 <link rel="stylesheet" href="/lib/katex/katex.min.css">
 <script defer src="/lib/katex/katex.min.js"></script>
 <script defer src="/lib/katex/contrib/auto-render.min.js"></script>
@@ -133,11 +133,11 @@ if (!doNotTrack) {
 <section>
 <h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
 <p>「地域・年齢別人口」CSVをダウンロードして、読み込む</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># infile = http://www.city.meguro.tokyo.jp/opendata/131105_population_20170401.csv</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1"># infile = http://www.city.meguro.tokyo.jp/opendata/131105_population_20170401.csv</span>
 <span class="n">infile</span> <span class="o">=</span> <span class="s">&#34;131105_population_20170401.csv&#34;</span>
 <span class="n">raw_df</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
 <span class="nf">print</span><span class="p">(</span><span class="n">raw_df</span><span class="p">)</span>
-</code></pre></div><pre><code>   都道府県コード又は市区町村コード 地域コード 都道府県名 市区町村名 調査年月日       地域名 総人口  男性  女性 0-4歳の男性 0-4歳の女性 5-9歳の男性 5-9歳の女性 10-14歳の男性 10-14歳の女性 15-19歳の男性 15-19歳の女性 20-24歳の男性 20-24歳の女性 25-29歳の男性 25-29歳の女性 30-34歳の男性 30-34歳の女性 35-39歳の男性 35-39歳の女性 40-44歳の男性 40-44歳の女性 45-49歳の男性 45-49歳の女性 50-54歳の男性 50-54歳の女性 55-59歳の男性 55-59歳の女性 60-64歳の男性 60-64歳の女性 65-69歳の男性 65-69歳の女性 70-74歳の男性 70-74歳の女性 75-79歳の男性 75-79歳の女性 80-84歳の男性 80-84歳の女性 85歳の男性以上 85歳の女性以上 不詳者の男性 不詳者の女性 世帯数  備考
+</code></pre></div><pre tabindex="0"><code>   都道府県コード又は市区町村コード 地域コード 都道府県名 市区町村名 調査年月日       地域名 総人口  男性  女性 0-4歳の男性 0-4歳の女性 5-9歳の男性 5-9歳の女性 10-14歳の男性 10-14歳の女性 15-19歳の男性 15-19歳の女性 20-24歳の男性 20-24歳の女性 25-29歳の男性 25-29歳の女性 30-34歳の男性 30-34歳の女性 35-39歳の男性 35-39歳の女性 40-44歳の男性 40-44歳の女性 45-49歳の男性 45-49歳の女性 50-54歳の男性 50-54歳の女性 55-59歳の男性 55-59歳の女性 60-64歳の男性 60-64歳の女性 65-69歳の男性 65-69歳の女性 70-74歳の男性 70-74歳の女性 75-79歳の男性 75-79歳の女性 80-84歳の男性 80-84歳の女性 85歳の男性以上 85歳の女性以上 不詳者の男性 不詳者の女性 世帯数  備考
                               &lt;dbl&gt;      &lt;dbl&gt;      &lt;chr&gt;      &lt;chr&gt;     &lt;date&gt;        &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;          &lt;dbl&gt;          &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;  &lt;dbl&gt; &lt;lgl&gt;
  1                           131105        111     東京都     目黒区 2017-04-01   駒場一丁目   3995  2027  1968          65          63          85          68            52            51            70            63           156           109           231           160           215           169           202           157           170           175           165           149           114           123            78           105            80            99           126           122            66           107            63            74            48            67             41            107            0            0   2421    NA
  2                           131105        112     東京都     目黒区 2017-04-01   駒場二丁目    557   267   290           6           8           7           7            13            10             9             9            16            17            31            19            21            20            21            16            26            19            17            25            18            20            16            16            11            12            15            25            15            16             8            11            10            19              7             21            0            0    337    NA
@@ -153,7 +153,7 @@ if (!doNotTrack) {
 <section>
 <h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
 <p>ggplotしたくなる形に変形</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">=</span> <span class="n">raw_df</span> <span class="o">%&gt;%</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">=</span> <span class="n">raw_df</span> <span class="o">%&gt;%</span>
   <span class="nf">select</span><span class="p">(</span><span class="s">&#34;地域名&#34;</span><span class="p">,</span> <span class="nf">matches</span><span class="p">(</span><span class="s">&#34;の.+性$&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
   <span class="nf">rename</span><span class="p">(</span><span class="n">place</span> <span class="o">=</span> 地域名<span class="p">)</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">place</span> <span class="o">=</span> <span class="nf">str_replace</span><span class="p">(</span><span class="n">place</span><span class="p">,</span> <span class="s">&#34;\\S丁目&#34;</span><span class="p">,</span> <span class="s">&#34;&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
@@ -165,7 +165,7 @@ if (!doNotTrack) {
   <span class="nf">filter</span><span class="p">(</span><span class="nf">str_detect</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="s">&#34;\\d&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="nf">parse_number</span><span class="p">(</span><span class="n">age</span><span class="p">))</span> <span class="o">%&gt;%</span>
   <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre><code>    place   age   sex value
+</code></pre></div><pre tabindex="0"><code>    place   age   sex value
     &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt; &lt;dbl&gt;
   1  三田     0  男性   105
   2  三田     0  女性   102
@@ -181,7 +181,7 @@ if (!doNotTrack) {
 <section>
 <h2 id="実演-目黒区オープンデータ">実演: 目黒区オープンデータ</h2>
 <p>作図してみる</p>
-<div class="highlight"><pre class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">%&gt;%</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_df</span> <span class="o">%&gt;%</span>
   <span class="nf">ggplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span> <span class="o">+</span>
   <span class="nf">geom_col</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="n">sex</span><span class="p">))</span> <span class="o">+</span>
   <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">place</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">3L</span><span class="p">)</span> <span class="o">+</span>
