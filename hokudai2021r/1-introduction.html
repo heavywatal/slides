@@ -75,13 +75,208 @@ if (!doNotTrack) {
 <li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
 <li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
 <li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
-<li><a href="6-practice.html">実践: 現実の問題に対処してみる。</a>
+<li><a href="6-stats-model.html">統計モデリング基礎: 確率分布、尤度、一般化線形モデル</a>
 </ol>
 <div class="footnote">
 2021-09-13 北海道大学 生命科学院 特別講義
 <a href="https://heavywatal.github.io/slides/hokudai2021r/">https://heavywatal.github.io/slides/hokudai2021r/</a>
 </div>
 
+</section>
+<section>
+<h2 id="研究の基本プロセス">研究の基本プロセス</h2>
+<ol>
+<li>課題を見つける／仮説を立てる</li>
+<li>実験🧫・観察🔬・インターネット🏄‍♀️でデータを集める</li>
+<li><strong>データを整理する</strong></li>
+<li><strong>データを解析して仮説を検証する</strong></li>
+<li>結果を報告する</li>
+</ol>
+<br>
+<ul>
+<li>実験や観察は研究の半分くらい！</li>
+<li>残り半分はデータの整理＆解析！</li>
+</ul>
+
+</section>
+<section>
+<h2 id="科学の営み--巨人の肩に立つ">科学の営み = 巨人の肩に立つ</h2>
+<figure style="position: absolute; top: 32px; right: 40px;">
+<a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
+<img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
+<figcaption class="url">
+https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
+</figcaption>
+</a>
+</figure>
+<p>先人たちの積み重ねに基づいて、新しい発見をする</p>
+<dl>
+<dt>記録を残すことは何より重要</dt>
+<dd>実験や野外観察では些細なことも漏らさず記録。</dd>
+<dd>生データは何重にもバックアップ。</dd>
+<dd>みんな結構できてる(はず)。</dd>
+<dt>データ整理・解析・作図も不可欠、だけど&hellip;</dt>
+<dd>再現不能の職人技で切り抜けちゃう人も多い。</dd>
+<dd>コピペ、メニュー選択、配色と配置を微調整&hellip;</dd>
+<dt>疑義が生じたら&hellip;？ 別の人がその研究を発展させたいとき&hellip;？</dt>
+<dd>💩「ありまぁす！」</dd>
+<dd>✅「誰でも確実に再現できるプロトコルがこちらです」</dd>
+</dl>
+<p><strong>Reproducible Research (再現可能な研究)</strong> が巨人を大きくする。</p>
+
+</section>
+<section>
+<h2 id="再現不可能な職人的研究の例">再現不可能な職人的研究の例</h2>
+<p>動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
+それらを決める要因は何か。膨大な観察データに基づく超大作卒論。</p>
+<figure>
+<img src="/slides/image/messy/thesis.png" width="800">
+</figure>
+</section>
+<section>
+<h2 id="生データ-ここはまだそんなに悪くない">生データ: ここはまだそんなに悪くない</h2>
+<p>週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。</p>
+<figure style="position: relative; margin: 20px 0;">
+<img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
+<img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
+     style="position: absolute; left: 270px; top: 50px;">
+</figure>
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+<figure style="position: relative;">
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+</figure>
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+<figure style="position: relative;">
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
+     style="position: absolute; left: 30px; top: 20px; z-index: 200;">
+<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+     style="position: absolute; left: 260px; top: 40px; z-index: 300;">
+</figure>
+</section>
+<section>
+<h2 id="目と手で数え濃淡を計算し画像ソフトで塗る">目と手で数え、濃淡を計算し、画像ソフトで塗る</h2>
+<p>泣きながら何十枚も&hellip;。無料期間が終わって今は使えない&hellip;。</p>
+<figure style="position: relative; margin: 20px 0;">
+<img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
+<img src="/slides/image/messy/photoshop.jpg" width="530"
+     style="position: absolute; left: 200px; top: -10px;">
+</figure>
+<img src="/slides/image/messy/zebra_AM.jpg" width="300">
+<img src="/slides/image/messy/zebra_PM.jpg" width="300">
+</section>
+<section>
+<h2 id="目作業手作業--シーシュポスの岩">目作業・手作業 ＝ シーシュポスの岩</h2>
+<figure style="float: right; margin: 0.7rem 0 0;">
+<a href="https://en.wikipedia.org/wiki/Sisyphus">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="290">
+<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
+</a>
+</figure>
+<ul>
+<li><strong>膨大な単純作業</strong>がそもそもツラい</li>
+<li>人間だもの、<strong>ミスは防ぎきれない</strong></li>
+<li>ミスを減らすためのチェックもツラい</li>
+<li>ミスを発見 → <strong>初めからやり直し</strong></li>
+<li>新データ追加 → <strong>初めからやり直し</strong></li>
+<li>熟練してもツラいまま</li>
+<li>そのときの自分しかできない、記録に残らない<br>
+→ <strong>検証のしようがない</strong></li>
+<li>卒論なら努力賞でいいかもしれないけど、科学の手続きとしては問題。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="プログラミングで大量のファイルを捌く">プログラミングで大量のファイルを捌く</h2>
+<p>先の例に負けず生データはどっさり。でも頑張るのは機械。</p>
+<figure>
+<img src="/slides/image/tek/finder.png" height="420">
+<img src="/slides/image/tek/fig5.png" height="420">
+<figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="こんな感じの図もrでラクラク描けるよ">こんな感じの図もRでラクラク描けるよ</h2>
+<figure>
+<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/image/tumopp/neighborhood.png" height="200">
+<img src="/slides/image/tumopp/param-p.png" height="200">
+<img src="/slides/image/tumopp/paper/Fig3.png" height="200">
+<img src="/slides/image/tumopp/param-k.png" height="200">
+<img src="/slides/image/tumopp/driver.gif" height="200"><br>
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
+<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="rにやらせて楽しよう">Rにやらせて楽しよう</h2>
+<ul>
+<li>規則性のある退屈な仕事は人間よりも機械のほうが得意。</li>
+<li>一度書いたプログラムは、データが変わっても<strong>使いまわせる</strong>。</li>
+<li><strong>自分以外の人でも再現・検証</strong>できる</li>
+<li><strong>きれいな図を簡単に</strong>描ける</li>
+<li>部分的に改変しながらいろんな解析を試せる。<br>
+→ <strong>仮説検証</strong> だけでなく、 <strong>仮説生成(探索的データ解析)</strong> もやりやすい</li>
+<li>やれば上達する。どんどん楽になる！</li>
+</ul>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="rとは">Rとは</h2>
+<p>統計解析と作図の機能が充実したプログラミング言語・環境</p>
+<figure style="float: right;">
+<a href="https://cran.r-project.org/">
+<img src="/slides/image/rstats/Rlogo.svg" height="200">
+<figcaption class="url">https://cran.r-project.org/</figcaption>
+</a>
+</figure>
+<dl>
+<dt>クロスプラットフォーム</dt>
+<dd>Linux, Mac, Windows で動く</dd>
+<dt>オープンソース</dt>
+<dd>永久に無償で、すべての機能を使える。</dd>
+<dd>集合知によって常に進化している。</dd>
+<dt>コミュニティ</dt>
+<dd>相談できる人や参考になるウェブサイトがたくさん見つかる。</dd>
+</dl>
+<p>他のプログラミング言語でもいいよ:<br>
+<a href="https://www.python.org/">Python</a>とか<a href="https://julialang.org/">Julia</a>とか。</p>
+
+</section>
+<section>
+<h2 id="この集中講義の目標">この集中講義の目標</h2>
+<h3 id="-strike再現可能な解析を楽にやりたいstrike">✅ <strike>再現可能な解析を楽にやりたい</strike></h3>
+<h3 id="-あれもこれもrでできそう">⬜ あれもこれもRでできそう！</h3>
+<h3 id="-やりたくなったらこうやって調べればいいんだな">⬜ やりたくなったらこうやって調べればいいんだな</h3>
+<br>
+That's all.
+この3点さえ押さえれば、個々の方法は覚えなくても大丈夫。
+<p>このスライドもオンラインで読める:
+<br>
+<a href="https://heavywatal.github.io/slides/">https://heavywatal.github.io/slides/</a>
 </section>
 <section>
 <h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
@@ -297,162 +492,9 @@ but every messy dataset is messy in its own way<br>
 </section>
 <section>
 <h2 id="本日1時限目の話題">本日1時限目の話題</h2>
-<h3 id="-strikeデータ解析全体の流れ可視化だいじstrike">✅ <strike>データ解析全体の流れ。可視化だいじ</strike></h3>
-<h3 id="-strike作図解析の前にデータの前処理が必要strike">✅ <strike>作図・解析の前にデータの前処理が必要</strike></h3>
-<h3 id="-なぜrを使うのか">⬜ なぜRを使うのか？</h3>
-<ul>
-<li>退屈な作業は機械にやらせてラクしよう</li>
-<li>無料で誰でも使える</li>
-</ul>
-<h3 id="-rの基礎">⬜ Rの基礎</h3>
-
-</section>
-<section>
-<h2 id="rを使わなかった場合の悲劇の例">Rを使わなかった場合の悲劇の例</h2>
-<p>動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
-それらを決める要因は何か。膨大な観察データに基づく超大作卒論。</p>
-<figure>
-<img src="/slides/image/messy/thesis.png" width="800">
-</figure>
-</section>
-<section>
-<h2 id="生データ-ここはまだそんなに悪くない">生データ: ここはまだそんなに悪くない</h2>
-<p>週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
-タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。</p>
-<figure style="position: relative; margin: 20px 0;">
-<img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
-<img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
-     style="position: absolute; left: 270px; top: 50px;">
-</figure>
-</section>
-<section>
-<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
-<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
-<figure style="position: relative;">
-<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
-     style="position: absolute; z-index: 100;">
-<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
-     style="position: absolute; left: 250px; top: 50px;">
-</figure>
-</section>
-<section>
-<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
-<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
-<figure style="position: relative;">
-<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
-     style="position: absolute; z-index: 100;">
-<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
-     style="position: absolute; left: 250px; top: 50px;">
-<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
-     style="position: absolute; left: 30px; top: 20px; z-index: 200;">
-<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
-     style="position: absolute; left: 260px; top: 40px; z-index: 300;">
-</figure>
-</section>
-<section>
-<h2 id="目と手で数え濃淡を計算し画像ソフトで塗る">目と手で数え、濃淡を計算し、画像ソフトで塗る</h2>
-<p>泣きながら何十枚も&hellip;。無料期間が終わって今は使えない&hellip;。</p>
-<figure style="position: relative; margin: 20px 0;">
-<img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
-<img src="/slides/image/messy/photoshop.jpg" width="530"
-     style="position: absolute; left: 200px; top: -10px;">
-</figure>
-<img src="/slides/image/messy/zebra_AM.jpg" width="300">
-<img src="/slides/image/messy/zebra_PM.jpg" width="300">
-</section>
-<section>
-<h2 id="目作業手作業--シーシュポスの岩">目作業・手作業 ＝ シーシュポスの岩</h2>
-<figure style="float: right; margin: 0.7rem 0 0;">
-<a href="https://en.wikipedia.org/wiki/Sisyphus">
-<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="290">
-<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
-</a>
-</figure>
-<ul>
-<li><strong>膨大な単純作業</strong>がそもそもツラい</li>
-<li>人間だもの、<strong>ミスは防ぎきれない</strong></li>
-<li>ミスを減らすためのチェックもツラい</li>
-<li>ミスを発見 → <strong>初めからやり直し</strong></li>
-<li>新データ追加 → <strong>初めからやり直し</strong></li>
-<li>熟練してもツラいまま</li>
-<li>そのときの自分しかできない、記録に残らない<br>
-→ <strong>検証のしようがない</strong></li>
-<li>卒論なら努力賞でいいかもしれないけど、科学の手続きとしては問題。</li>
-</ul>
-
-</section>
-<section>
-<h2 id="プログラミングで大量のファイルを捌く">プログラミングで大量のファイルを捌く</h2>
-<p>先の例に負けず生データはどっさり。でも頑張るのは機械。</p>
-<figure>
-<img src="/slides/image/tek/finder.png" height="420">
-<img src="/slides/image/tek/fig5.png" height="420">
-<figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
-</figure>
-</section>
-<section>
-<h2 id="こんな感じの図もrでラクラク描けるよ">こんな感じの図もRでラクラク描けるよ</h2>
-<figure>
-<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
-<img src="/slides/image/tumopp/neighborhood.png" height="200">
-<img src="/slides/image/tumopp/param-p.png" height="200">
-<img src="/slides/image/tumopp/paper/Fig3.png" height="200">
-<img src="/slides/image/tumopp/param-k.png" height="200">
-<img src="/slides/image/tumopp/driver.gif" height="200"><br>
-<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
-<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
-<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
-<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
-<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
-<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
-</figure>
-</section>
-<section>
-<h2 id="rにやらせて楽しよう">Rにやらせて楽しよう</h2>
-<ul>
-<li>規則性のある退屈な仕事は人間よりも機械のほうが得意。</li>
-<li>一度書いたプログラムは、データが変わっても<strong>使いまわせる</strong>。</li>
-<li><strong>自分以外の人でも再現・検証</strong>できる</li>
-<li><strong>きれいな図を簡単に</strong>描ける</li>
-<li>部分的に改変しながらいろんな解析を試せる。<br>
-→ <strong>仮説検証</strong> だけでなく、 <strong>仮説生成(探索的データ解析)</strong> もやりやすい</li>
-<li>やれば上達する。どんどん楽になる！</li>
-</ul>
-<figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
-</a>
-</figure>
-</section>
-<section>
-<h2 id="rとは">Rとは</h2>
-<p>統計解析と作図の機能が充実したプログラミング言語・環境</p>
-<figure style="float: right;">
-<a href="https://cran.r-project.org/">
-<img src="/slides/image/rstats/Rlogo.svg" height="200">
-<figcaption class="url">https://cran.r-project.org/</figcaption>
-</a>
-</figure>
-<dl>
-<dt>クロスプラットフォーム</dt>
-<dd>Linux, Mac, Windows で動く</dd>
-<dt>オープンソース</dt>
-<dd>永久に無償で、すべての機能を使える。</dd>
-<dd>集合知によって常に進化している。</dd>
-<dt>コミュニティ</dt>
-<dd>相談できる人や参考になるウェブサイトがたくさん見つかる。</dd>
-</dl>
-<p>他のプログラミング言語でもいいよ:<br>
-<a href="https://www.python.org/">Python</a>とか<a href="https://julialang.org/">Julia</a>とか。</p>
-
-</section>
-<section>
-<h2 id="本日1時限目の話題">本日1時限目の話題</h2>
-<h3 id="-strikeデータ解析全体の流れ可視化だいじstrike">✅ <strike>データ解析全体の流れ。可視化だいじ</strike></h3>
-<h3 id="-strike作図解析の前にデータの前処理が必要strike">✅ <strike>作図・解析の前にデータの前処理が必要</strike></h3>
 <h3 id="-strikeなぜrを使うのかstrike">✅ <strike>なぜRを使うのか？</strike></h3>
+<h3 id="-strikeデータ解析全体の流れ可視化だいじstrike">✅ <strike>データ解析全体の流れ。可視化だいじ</strike></h3>
+<h3 id="-strike作図解析の前にデータの前処理が必要strike">✅ <strike>作図・解析の前にデータの前処理が必要</strike></h3>
 <h3 id="-rの基礎">⬜ Rの基礎</h3>
 <ul>
 <li>R環境のセットアップ</li>
@@ -980,8 +1022,10 @@ Rコマンドと結果を埋め込んだPDFやHTMLを作る。<br>
 <dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
 岩嵜航 2018</dd>
 <dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
-<dd>「<a href="https://heavywatal.github.io/slides/tmd2019/">Rによるデータ前処理実習</a>」
-岩嵜航 2019 東京医科歯科大</dd>
+<dd>「<a href="https://heavywatal.github.io/slides/tmd2020/">Rによるデータ前処理実習</a>」
+岩嵜航 2020 東京医科歯科大</dd>
+<dd>「<a href="https://comicalcommet.github.io/r-training-2021/">Rを用いたデータ解析の基礎と応用</a>」
+石川由希 2021 名古屋大学</dd>
 </dl>
 <a href="2-visualization.html" rel="next" class="readmore">
 2. 入門2: データ可視化の重要性と方法。
