@@ -109,7 +109,7 @@ plot論文.R
 You found a bug. How can you find its origin, and fix all the copies?
 
 <figure>
-<img src="figure/messy/yuki-zawa.png" width="480"
+<img src="/slides/image/messy/yuki-zawa.png" width="480"
      style="object-fit: cover; object-position: top; height: 500px;">
 </figure>
 
@@ -122,11 +122,11 @@ You found a bug. How can you find its origin, and fix all the copies?
 
 <figure>
 <a href="https://github.com/heavywatal/tumopp">
-<img src="figure/messy/github-repository.png" height="500" class="screenshot">
+<img src="/slides/image/messy/github-repository.png" height="500" class="screenshot">
 </a>
 &nbsp;
 <a href="https://github.com/heavywatal/tumopp/commits/master">
-<img src="figure/messy/github-history.png" height="500" class="screenshot">
+<img src="/slides/image/messy/github-history.png" height="500" class="screenshot">
 </a>
 </figure>
 

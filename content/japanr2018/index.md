@@ -95,8 +95,7 @@ twitter-widget {
 ## But lacking "how to use external libraries" 😢
 
 <a href="https://teuder.github.io/rcpp4everyone_ja/350_package.html">
-<img src="figure/rcpp4everyone35.png" width="100%" style="margin: -1.5rem -1.5rem -2.4rem;">
-<!-- <img src="figure/rcpp4everyone35.png" width="100%" style="transform: translate(-10px, -40px);"> -->
+<img src="image/rcpp4everyone35.png" width="100%" style="margin: -1.5rem -1.5rem -2.4rem;">
 </a>
 
 Necessity is the mother of invention. Let's do it 💪

@@ -684,10 +684,10 @@ ggsave("dia4.png", p1 + theme_bw(base_size = 22), width = 4, height = 4)
 ```
 
 <figure>
-<img src="image/dia1.png" width="24%">
-<img src="image/dia2.png" width="24%">
-<img src="image/dia3.png" width="24%">
-<img src="image/dia4.png" width="24%">
+<img src="../sendair2/image/dia1.png" width="24%">
+<img src="../sendair2/image/dia2.png" width="24%">
+<img src="../sendair2/image/dia3.png" width="24%">
+<img src="../sendair2/image/dia4.png" width="24%">
 </figure>
 
 ---
@@ -697,14 +697,14 @@ ggsave("dia4.png", p1 + theme_bw(base_size = 22), width = 4, height = 4)
 [公式サイト](https://ggplot2.tidyverse.org/reference/index.html)を見に行こう。
 
 <figure>
-<img src="image/ggplot2-reference-geoms.png" width="80%">
+<img src="/slides/image/rstats/ggplot2-reference-geoms.png" width="80%">
 </figure>
 
 ---
 
 <figure style="margin: 0;">
 <a href="https://ggplot2.tidyverse.org/">
-<img src="image/data-visualization-2.1-4789.jpg" width="100%">
+<img src="/slides/image/rstats/data-visualization-2.1-4789.jpg" width="100%">
 <figcaption class="url">https://ggplot2.tidyverse.org/</figcaption>
 </a>
 </figure>

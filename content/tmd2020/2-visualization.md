@@ -799,10 +799,10 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 ```
 
 <figure>
-<img src="image/dia1.png" width="24%">
-<img src="image/dia2.png" width="24%">
-<img src="image/dia3.png" width="24%">
-<img src="image/dia4.png" width="24%">
+<img src="../sendair2/image/dia1.png" width="24%">
+<img src="../sendair2/image/dia2.png" width="24%">
+<img src="../sendair2/image/dia3.png" width="24%">
+<img src="../sendair2/image/dia4.png" width="24%">
 </figure>
 
 ---
