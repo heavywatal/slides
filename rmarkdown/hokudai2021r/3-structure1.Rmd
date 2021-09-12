@@ -259,7 +259,7 @@ VADeaths %>%
     - 何かの順に並べ替え
     - 異なるテーブルの結合
     - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 来週</span>
+- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
     - 数値を変換する (e.g., 対数、座標系)
     - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
     - 外れ値・欠損値に対処
@@ -284,11 +284,11 @@ VADeaths %>%
 library(tidyverse)  # パッケージ読み込み
 ```
 ```
-── Attaching packages ──────────────────────── tidyverse 1.3.0 ──
-✔ ggplot2 3.3.2     ✔ purrr   0.3.4
-✔ tibble  3.0.3     ✔ dplyr   1.0.2
-✔ tidyr   1.1.2     ✔ stringr 1.4.0
-✔ readr   1.3.1     ✔ forcats 0.5.0
+── Attaching packages ──────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.4     ✔ dplyr   1.0.7
+✔ tidyr   1.1.3     ✔ stringr 1.4.0
+✔ readr   2.0.1     ✔ forcats 0.5.1
 ── Conflicts ─────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
@@ -297,7 +297,7 @@ library(tidyverse)  # パッケージ読み込み
 **dplyr ≥1.0.0** と **tidyr ≥1.1.0** を使いたいので古かったら更新:
 ```r
 update.packages(ask = "no", type = "binary")
-# いちいち確認せずにビルド済み安定版を入れるオプション
+# いちいち確認せずにコンパイル済み安定版を入れるオプション
 ```
 
 ---
@@ -342,6 +342,8 @@ View(diamonds)  # RStudio
 print(diamonds)
 ```
 
+🔰 `starwars` データも眺めてみよう
+
 
 ---
 ## dplyr 使用例
@@ -371,7 +373,7 @@ diamonds %>% select(carat, price) %>% filter(carat > 1) %>% ...
 #   data %>%  do_A()  %>%  do_B()  %>%  do_C()  %>% ...
 ```
 
-[問] パイプを使わない形に書き換えよう:
+🔰 パイプを使わない形に書き換えよう:
 ```{r letters}
 seq(1, 6) %>% sum()
 letters %>% toupper() %>% head(3)
@@ -455,9 +457,9 @@ result = diamonds %>%
   print()
 ```
 
-別解: `diamonds[, c(1, 2, 7)]`
+別解: `%>% select(c(1, 2, 7))`, `diamonds[, c(1, 2, 7)]`
 
-🔰 `starwars` の 1, 10, 11 列目を抽出してみよう
+🔰 `starwars` の 1, 10, 11 列目を3通りの方法で抽出してみよう
 
 ---
 ## 列の抽出: `select()`
@@ -477,10 +479,10 @@ result = diamonds %>%
 ---
 ## 列の抽出: `select()`
 
-**捨てる列**をマイナス・反転指定:
+**捨てる列**を反転指定:
 ```{r select-negative}
 result = diamonds %>%
-  select(-carat, -cut, -price) %>%
+  select(!c(carat, cut, price)) %>%
   print()
 ```
 
@@ -796,7 +798,7 @@ result = diamonds %>%
     - **何かの順に並べ替え** 👈 第3回 ここまで紹介
     - 異なるテーブルの結合
     - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理  <span style="color: #888888;">— 第5回 来週</span>
+- データ内容を対象とする処理  <span style="color: #888888;">— 第5回 明日</span>
     - 数値を変換する (e.g., 対数、座標系)
     - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
     - 外れ値・欠損値に対処
@@ -812,7 +814,7 @@ result = diamonds %>%
 
 <figure>
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/rstats/dplyr-website.png" width="90%">
+<img src="/slides/image/rstats/dplyr-website.png" width="80%">
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
@@ -832,14 +834,6 @@ R for Data Science --- Hadley Wickham and Garrett Grolemund
 整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
 : [Speaker Deck](https://speakerdeck.com/fnshr/zheng-ran-detatutenani),
   [Colorless Green Ideas](https://id.fnshr.info/2017/01/09/tidy-data-intro/)
-
-Official documents:
-: [tidyverse](https://www.tidyverse.org/),
-  [dplyr](https://dplyr.tidyverse.org/),
-  [tidyr](https://tidyr.tidyverse.org/),
-  [purrr](https://purrr.tidyverse.org/),
-  [tibble](https://tibble.tidyverse.org/),
-  [readr](https://readr.tidyverse.org/)
 
 Older versions
 : 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」

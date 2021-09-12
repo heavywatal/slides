@@ -56,7 +56,7 @@ anscombe = tibble::as_tibble(anscombe)
     - 何かの順に並べ替え
     - **異なるテーブルの結合** 👈 第4回ここから
     - **変形: 縦長 ↔ 横広**
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 来週</span>
+- データ内容を対象とする処理 <span style="color: #888888;">— 第5回</span>
     - 数値を変換する (e.g., 対数、座標系)
     - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
     - 外れ値・欠損値に対処
@@ -96,12 +96,32 @@ anscombe = tibble::as_tibble(anscombe)
 ---
 ## 行の結合: `bind_rows()`
 
-例。先頭と末尾を6行ずつ取ってひとつの表に結合する:
+例。先頭と末尾を6行ずつ取って縦並びで結合する:
 ```{r bind_rows}
 bind_rows(head(diamonds), tail(diamonds))
 ```
 
 🔰 `mpg` で同様に3行ずつ取って結合してみよう
+
+
+---
+## 列の結合: `bind_cols()`
+
+例。3行2列の表を横並びで結合する:
+```{r bind_cols}
+bind_cols(band_members, band_instruments2)
+```
+```
+band_members          band_instruments2
+   name    band         artist  plays
+  <chr>   <chr>          <chr>  <chr>
+1  Mick  Stones       1   John guitar
+2  John Beatles       2   Paul   bass
+3  Paul Beatles       3  Keith guitar
+```
+
+**中身が合ってなくても**行数が合ってれば成功してしまう。<br>
+共通する列を**糊しろ**にして結合したい場合は `*_join()` 関数 →
 
 
 ---
@@ -219,10 +239,10 @@ data(package = "nycflights13")
 </a>
 
 横広から縦長に
-: `pivot_longer()`, <strike><code>gather()</code></strike>
+: `pivot_longer()`, <del><code>gather()</code></del>
 
 縦長から横広に
-: `pivot_wider()`, <strike><code>spread()</code></strike>
+: `pivot_wider()`, <del><code>spread()</code></del>
 
 列を分離、結合
 : `separate()`, `unite()`
@@ -232,6 +252,9 @@ data(package = "nycflights13")
 
 *etc.*
 
+- こういう変形なしでそのまま使えるデータは激レア
+- エクセルでポチポチやらず、tidyrで手続きを記述しよう
+- ちょっとハードルは高いけど、使えるようになると**強い**💪
 
 ---
 ## `pivot_longer()` 横広から縦長に
@@ -241,11 +264,19 @@ data(package = "nycflights13")
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#longer">
-<img src="/slides/image/r4ds/tidy-gather.png" width="800">
+<img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="600">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#longer</figcaption>
 </a>
 </figure>
+
+```r
+table4a
+pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
+```
+
+🔰 変形前と変形後を手元のRで確認してみよう。詳細は別の例で→
+
 
 ---
 ## `pivot_longer()` 横広から縦長に: `relig_income` の例
@@ -322,12 +353,20 @@ relig_long = relig_income[1:2, 1:4] %>% print() %>%
 ---
 ## `pivot_longer()` 横広から縦長に: 練習問題
 
-🔰 `world_bank_pop` の人口データを縦長にしてみよう
+🔰 `economics` データを縦長にして作図しよう
 
-```{r world_bank_pop}
-print(world_bank_pop)
+```{r economics, echo = FALSE}
+wtl::printdf(economics, n = 4L)
 ```
 
+```{r economics-longer, echo = FALSE, fig.height = 5, fig.width = 7}
+economics %>%
+  pivot_longer(!date) %>%
+  ggplot() +
+  aes(date, value) +
+  geom_line() +
+  facet_grid(rows = vars(name), scales = "free_y")
+```
 
 ---
 ## `pivot_wider()` 縦長から横広に
@@ -337,7 +376,7 @@ print(world_bank_pop)
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#wider">
-<img src="/slides/image/r4ds/tidy-spread.png" height="480">
+<img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="600">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
 </a>
@@ -384,20 +423,64 @@ fish_encounters %>%
 `values_fill = 0` とすれば `NA` じゃなく `0` で埋められる。
 
 ---
-## `pivot_wider()` 縦長から横広に: 練習問題
-
-🔰 `population` で1年のデータが1行になるように変形しよう<br>
-🔰 `population` で1国のデータが1行になるように変形しよう
+## `pivot_wider()` 縦長から横広に: 練習問題1
 
 ```{r population}
 print(population)
 ```
 
-🔰 `us_rent_income` で `income` と `rent` の推定値がそれぞれ列となるように変形しよう
+🔰 1年のデータが1行になるように変形しよう↓
+```{r wider-goal1, echo = FALSE}
+population %>% pivot_wider(names_from = "year", values_from = "population")
+```
+
+---
+## `pivot_wider()` 縦長から横広に: 練習問題2
+
+```{r population2}
+print(population)
+```
+
+🔰 1国のデータが1行になるように変形しよう↓
+```{r wider-goal2, echo = FALSE}
+population %>% pivot_wider(names_from = "country", values_from = "population")
+```
+
+
+---
+## `pivot_wider()` 縦長から横広に: 練習問題3
 
 ```{r us_rent_income}
 print(us_rent_income)
 ```
+
+🔰 `income` と `rent` の推定値がそれぞれ列となるように変形しよう
+```{r wider-goal3, echo = FALSE}
+us_rent_income %>%
+  dplyr::select(!moe) %>%
+  pivot_wider(names_from = "variable", values_from = "estimate")
+```
+
+
+---
+## `pivot_*()` 総合問題
+
+🔰 `world_bank_pop` の人口データを使いやすい形にしよう
+
+```{r world_bank_pop}
+wtl::printdf(world_bank_pop, n = 4L)
+```
+```{r world_bank_pop-pivot, echo = FALSE}
+world_bank_pop %>%
+  pivot_longer(!1:2, names_to = "year") %>%
+  dplyr::filter(country %in% c("DEU", "FIN", "JPN")) %>%
+  ggplot() +
+  aes(year, value) +
+  geom_line(aes(group = country, color = country)) +
+  facet_grid(rows = vars(indicator), scale = "free_y")
+  pivot_wider(names_from = "indicator", values_from = "value")
+```
+
 
 ---
 ## `separate()` 列を分離
@@ -466,7 +549,7 @@ table5 %>%
 ```
 
 結合直後は文字列になっているので数値なら忘れずに変換。<br>
-こうしたデータ内容を対象とする処理については、来週くわしく。
+こうしたデータ内容を対象とする処理については、次回くわしく。
 
 ---
 ## `separate()` / `unite()` 練習問題
@@ -734,7 +817,7 @@ tidy_anscombe %>%
     - 何かの順に並べ替え --- `arrange()`
     - 異なるテーブルの結合 --- `*_join()`
     - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
-- データ内容を対象とする処理 — 第5回 来週
+- データ内容を対象とする処理 — 第5回
     - 数値を変換する (e.g., 対数、座標系)
     - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
     - 外れ値・欠損値に対処
@@ -754,6 +837,13 @@ tidy_anscombe %>%
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
+
+
+---
+## 課題
+
+🔰 Rやパッケージに付属のデータで整形→作図しよう
+: e.g., `iris`, `diamonds`, `starwars`, `mpg`, `economics`, `txhousing`.
 
 
 ---

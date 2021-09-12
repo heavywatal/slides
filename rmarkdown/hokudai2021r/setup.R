@@ -10,8 +10,6 @@ options(
   dplyr.summarise.inform = FALSE,
   readr.num_columns = 0L,
   ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis",
-  ggplot2.discrete.colour = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1]),
-  ggplot2.discrete.fill = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1])
+  ggplot2.continuous.fill = "viridis"
 )
 registerS3method("print", "tbl_df", wtl::printdf)
