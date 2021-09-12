@@ -300,7 +300,7 @@ but every messy dataset is messy in its own way<br>
 <li>変形: 縦長 ↔ 横広</li>
 </ul>
 </li>
-<li>データ内容を対象とする処理 <span style="color: #888888;">— 第5回 来週</span>
+<li>データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
 <ul>
 <li>数値を変換する (e.g., 対数、座標系)</li>
 <li>変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数</li>
@@ -324,17 +324,17 @@ but every messy dataset is messy in its own way<br>
 </ul>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1"># install.packages(&#34;tidyverse&#34;)</span>
 <span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># パッケージ読み込み</span>
-</code></pre></div><pre tabindex="0"><code>── Attaching packages ──────────────────────── tidyverse 1.3.0 ──
-✔ ggplot2 3.3.2     ✔ purrr   0.3.4
-✔ tibble  3.0.3     ✔ dplyr   1.0.2
-✔ tidyr   1.1.2     ✔ stringr 1.4.0
-✔ readr   1.3.1     ✔ forcats 0.5.0
+</code></pre></div><pre tabindex="0"><code>── Attaching packages ──────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.4     ✔ dplyr   1.0.7
+✔ tidyr   1.1.3     ✔ stringr 1.4.0
+✔ readr   2.0.1     ✔ forcats 0.5.1
 ── Conflicts ─────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 </code></pre><p><strong>dplyr ≥1.0.0</strong> と <strong>tidyr ≥1.1.0</strong> を使いたいので古かったら更新:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">update.packages</span><span class="p">(</span><span class="n">ask</span> <span class="o">=</span> <span class="s">&#34;no&#34;</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;binary&#34;</span><span class="p">)</span>
-<span class="c1"># いちいち確認せずにビルド済み安定版を入れるオプション</span>
+<span class="c1"># いちいち確認せずにコンパイル済み安定版を入れるオプション</span>
 </code></pre></div>
 </section>
 <section>
@@ -377,7 +377,8 @@ but every messy dataset is messy in its own way<br>
 53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
 53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
 53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
-</code></pre>
+</code></pre><p>🔰 <code>starwars</code> データも眺めてみよう</p>
+
 </section>
 <section>
 <h2 id="dplyr-使用例">dplyr 使用例</h2>
@@ -407,7 +408,7 @@ but every messy dataset is messy in its own way<br>
 <span class="c1"># 前処理の流れ作業に便利:</span>
 <span class="n">diamonds</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="kc">...</span>
 <span class="c1">#   data %&gt;%  do_A()  %&gt;%  do_B()  %&gt;%  do_C()  %&gt;% ...</span>
-</code></pre></div><p>[問] パイプを使わない形に書き換えよう:</p>
+</code></pre></div><p>🔰 パイプを使わない形に書き換えよう:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">sum</span><span class="p">()</span>
 </code></pre></div><pre tabindex="0"><code>[1] 21
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="kc">letters</span> <span class="o">%&gt;%</span> <span class="nf">toupper</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="nf">head</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>
@@ -486,8 +487,8 @@ but every messy dataset is messy in its own way<br>
 53938  0.70 Very Good  2757
 53939  0.86   Premium  2757
 53940  0.75     Ideal  2757
-</code></pre><p>別解: <code>diamonds[, c(1, 2, 7)]</code></p>
-<p>🔰 <code>starwars</code> の 1, 10, 11 列目を抽出してみよう</p>
+</code></pre><p>別解: <code>%&gt;% select(c(1, 2, 7))</code>, <code>diamonds[, c(1, 2, 7)]</code></p>
+<p>🔰 <code>starwars</code> の 1, 10, 11 列目を3通りの方法で抽出してみよう</p>
 
 </section>
 <section>
@@ -513,9 +514,9 @@ but every messy dataset is messy in its own way<br>
 </section>
 <section>
 <h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
-<p><strong>捨てる列</strong>をマイナス・反転指定:</p>
+<p><strong>捨てる列</strong>を反転指定:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
-  <span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">carat</span><span class="p">,</span> <span class="o">-</span><span class="n">cut</span><span class="p">,</span> <span class="o">-</span><span class="n">price</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="o">!</span><span class="nf">c</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">))</span> <span class="o">%&gt;%</span>
   <span class="nf">print</span><span class="p">()</span>
 </code></pre></div><pre tabindex="0"><code>      color clarity depth table     x     y     z
       &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
@@ -972,7 +973,7 @@ but every messy dataset is messy in its own way<br>
 <li>変形: 縦長 ↔ 横広</li>
 </ul>
 </li>
-<li>データ内容を対象とする処理  <span style="color: #888888;">— 第5回 来週</span>
+<li>データ内容を対象とする処理  <span style="color: #888888;">— 第5回 明日</span>
 <ul>
 <li>数値を変換する (e.g., 対数、座標系)</li>
 <li>変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数</li>
@@ -989,7 +990,7 @@ but every messy dataset is messy in its own way<br>
 <h2 id="憶えなくていい公式サイトなどを見ながら作業">憶えなくていい。公式サイトなどを見ながら作業</h2>
 <figure>
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/rstats/dplyr-website.png" width="90%">
+<img src="/slides/image/rstats/dplyr-website.png" width="80%">
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
@@ -1009,13 +1010,6 @@ but every messy dataset is messy in its own way<br>
 <dt>整然データとは何か &mdash; <a href="https://twitter.com/f_nisihara">@f_nisihara</a></dt>
 <dd><a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">Speaker Deck</a>,
 <a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">Colorless Green Ideas</a></dd>
-<dt>Official documents:</dt>
-<dd><a href="https://www.tidyverse.org/">tidyverse</a>,
-<a href="https://dplyr.tidyverse.org/">dplyr</a>,
-<a href="https://tidyr.tidyverse.org/">tidyr</a>,
-<a href="https://purrr.tidyverse.org/">purrr</a>,
-<a href="https://tibble.tidyverse.org/">tibble</a>,
-<a href="https://readr.tidyverse.org/">readr</a></dd>
 <dt>Older versions</dt>
 <dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
 岩嵜航 2018</dd>
