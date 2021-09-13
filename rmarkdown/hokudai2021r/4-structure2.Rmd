@@ -58,7 +58,7 @@ anscombe = tibble::as_tibble(anscombe)
     - **変形: 縦長 ↔ 横広**
 - データ内容を対象とする処理 <span style="color: #888888;">— 第5回</span>
     - 数値を変換する (e.g., 対数、座標系)
-    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
+    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ 指示変数
     - 外れ値・欠損値に対処
     - 文字列から数値や日時を抜き出す
 
@@ -275,7 +275,7 @@ table4a
 pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
 ```
 
-🔰 変形前と変形後を手元のRで確認してみよう。詳細は別の例で→
+🔰 変形前と変形後を手元のRで確認してみよう。
 
 
 ---
@@ -314,6 +314,8 @@ print(relig_long)
 180 Unaffiliated Don't know/refused   597
 ```
 
+🔰 次ページの答えを見ず自力でやってみよう
+
 </div>
 <div class="column">
 
@@ -351,24 +353,6 @@ relig_long = relig_income[1:2, 1:4] %>% print() %>%
 
 
 ---
-## `pivot_longer()` 横広から縦長に: 練習問題
-
-🔰 `economics` データを縦長にして作図しよう
-
-```{r economics, echo = FALSE}
-wtl::printdf(economics, n = 4L)
-```
-
-```{r economics-longer, echo = FALSE, fig.height = 5, fig.width = 7}
-economics %>%
-  pivot_longer(!date) %>%
-  ggplot() +
-  aes(date, value) +
-  geom_line() +
-  facet_grid(rows = vars(name), scales = "free_y")
-```
-
----
 ## `pivot_wider()` 縦長から横広に
 
 1列に収まっていた値を複数列の行列に変換。<br>
@@ -376,11 +360,17 @@ economics %>%
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#wider">
-<img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="600">
+<img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="560">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
 </a>
 </figure>
+
+```r
+pivot_wider(table2, names_from = type, values_from = count)
+```
+
+🔰 変形前と変形後を手元のRで確認してみよう。
 
 ---
 ## `pivot_wider()` 縦長から横広に: `fish_encounters`
@@ -408,6 +398,8 @@ fish_encounters %>%
 
 </div>
 </div>
+
+🔰 次ページの答えを見ず自力でやってみよう
 
 ---
 ## `pivot_wider()` 縦長から横広に: `fish_encounters`
@@ -459,26 +451,6 @@ print(us_rent_income)
 us_rent_income %>%
   dplyr::select(!moe) %>%
   pivot_wider(names_from = "variable", values_from = "estimate")
-```
-
-
----
-## `pivot_*()` 総合問題
-
-🔰 `world_bank_pop` の人口データを使いやすい形にしよう
-
-```{r world_bank_pop}
-wtl::printdf(world_bank_pop, n = 4L)
-```
-```{r world_bank_pop-pivot, echo = FALSE}
-world_bank_pop %>%
-  pivot_longer(!1:2, names_to = "year") %>%
-  dplyr::filter(country %in% c("DEU", "FIN", "JPN")) %>%
-  ggplot() +
-  aes(year, value) +
-  geom_line(aes(group = country, color = country)) +
-  facet_grid(rows = vars(indicator), scale = "free_y")
-  pivot_wider(names_from = "indicator", values_from = "value")
 ```
 
 
@@ -597,6 +569,89 @@ mpg_nested = mpg %>% nest(data = -drv) %>% print()
 mpg_nested$data[[1]]
 ```
 
+
+---
+## 前処理は大きく2つに分けられる
+
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/dplyr.png" width="120">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tidyr.png" width="120">
+</a>
+</div>
+
+- **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
+    - 使いたい部分だけ抽出 --- `select()`, `filter()`
+    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
+    - 何かの順に並べ替え --- `arrange()`
+    - 異なるテーブルの結合 --- `*_join()`
+    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
+- データ内容を対象とする処理 — 第5回
+    - 数値を変換する (e.g., 対数、座標系)
+    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ 指示変数
+    - 外れ値・欠損値に対処
+    - 文字列から数値や日時を抜き出す
+
+<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></cite>
+
+
+---
+## 憶えなくていい。公式サイトなどを見ながら作業
+
+<figure>
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/rstats/dplyr-website.png" width="90%">
+<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+</a>
+</figure>
+
+
+
+---
+## 🔰 課題: `economics` を変形して作図しよう
+
+```r
+print(economics)
+```
+```{r economics, echo = FALSE}
+wtl::printdf(economics, n = 4L)
+```
+
+```{r economics-longer, echo = FALSE, fig.height = 4.5, fig.width = 8}
+economics %>%
+  pivot_longer(!date) %>%
+  ggplot() +
+  aes(date, value) +
+  geom_line() +
+  facet_grid(rows = vars(name), scales = "free_y")
+```
+
+---
+## 🔰 課題: `world_bank_pop` を変形して作図しよう
+
+```r
+printdf(world_bank_pop)
+```
+```{r world_bank_pop, echo = FALSE}
+wtl::printdf(world_bank_pop, n = 4L)
+```
+```{r world_bank_pop-pivot, fig.height = 4, fig.width = 11.5, echo = FALSE}
+wbp_tidy = world_bank_pop %>%
+  pivot_longer(!1:2, names_to = "year") %>%
+  dplyr::filter(country %in% c("DEU", "FIN", "JPN")) %>%
+  separate(indicator, c(NA, "region", "name"))
+
+ggplot(wbp_tidy) +
+  aes(year, value) +
+  geom_line(aes(group = country, color = country)) +
+  facet_grid(vars(name), vars(region), scale = "free_y") +
+  scale_x_discrete(breaks = seq(2000, 2020, 5))
+```
+
 ---
 ## 少し前に出てきたこれ、そろそろできるのでは
 
@@ -627,52 +682,14 @@ VADeaths %>%
 ```
 
 ---
-## 例題: `VADeaths` を縦長にしてggplotしてみよう
+## 🔰 課題: `VADeaths` を縦長にしてggplotしてみよう
 
 ```{r vadeaths_rownames, results="hold"}
 as.data.frame(VADeaths) %>%              # data.frameに変換
   rownames_to_column("age")              # 行名を列に
 ```
 
-<img src="figure/vadeaths_plot-1.png" alt="plot of chunk vadeaths_plot">
-
-
----
-## 例題: `VADeaths` を縦長にしたい
-
-```{r vadeaths_longer, results="hold"}
-as.data.frame(VADeaths) %>%              # data.frameに変換
-  rownames_to_column("age") %>%          # 行名を列に
-  pivot_longer(-age, values_to = "death")     # age以外を移動して縦長化
-                                         # 新しいname列を分割
-```
-
----
-## 例題: `VADeaths` を縦長にしたい
-
-```{r vadeaths_region_sex, results="hold"}
-as.data.frame(VADeaths) %>%              # data.frameに変換
-  rownames_to_column("age") %>%          # 行名を列に
-  pivot_longer(-age, values_to = "death") %>% # age以外を移動して縦長化
-  separate(name, c("region", "sex"))     # 新しいname列を分割
-```
-
----
-## 例題: `VADeaths` を縦長にしたい
-
-```{r vadeaths_age, results="hold"}
-va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
-  rownames_to_column("age") %>%          # 行名を列に
-  pivot_longer(-age, values_to = "death") %>% # age以外を移動して縦長化
-  separate(name, c("region", "sex")) %>% # 新しいname列を分割
-  separate(age, c("lbound", "ubound"), "-", convert = TRUE) %>%
-  print()                                # 下限と上限を分離
-```
-
----
-## 例題: `VADeaths` 別解
-
-```{r vadeaths_pivot, results="hold"}
+```{r vadeaths_plot, fig.height = 4, fig.width = 5, echo = FALSE}
 va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
   rownames_to_column("age") %>%          # 行名を列に
   pivot_longer(                          # 縦長に変形したい
@@ -680,14 +697,8 @@ va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
     names_to = c("region", "sex"),       # 元の列名を2つに分離
     names_sep = " ",                     # スペースで切る
     values_to = "death") %>%             # 値の行き先の列名
-  separate(age, c("lbound", "ubound"), "-", convert = TRUE) %>%
-  print()                                # 下限と上限を分離
-```
+  separate(age, c("lbound", "ubound"), "-", convert = TRUE)
 
----
-## 例題: `VADeaths` 作図例
-
-```{r vadeaths_plot, fig.height = 4, fig.width = 5}
 ggplot(va_deaths) +
   aes(lbound, death) +
   geom_point(aes(color = sex, shape = region), size = 5) +
@@ -695,68 +706,13 @@ ggplot(va_deaths) +
 ```
 
 ---
-## 例題: `anscombe`
-
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
+## 🔰 課題: `anscombe` を縦長にしてggplotしてみよう
 
 ```{r anscombe, results="hold"}
-anscombe %>%
-  rowid_to_column("id")              # IDをつけておく
-                                     # x y で始まる列の値を移して縦長に
+anscombe %>% rowid_to_column("id")   # IDをつけておく
 ```
 
-🔰 うまく変形してggplotと要約統計量の計算をしてみよう
-
-
----
-## 例題: `anscombe`
-
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
-
-```{r anscombe_longer, results="hold"}
-anscombe %>%
-  rowid_to_column("id") %>%          # IDをつけておく
-  pivot_longer(matches("^x|y"))      # x y で始まる列の値を移して縦長に
-
-                                     # name列を分割
-```
-
----
-## 例題: `anscombe`
-
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
-
-```{r anscombe_separate, results="hold"}
-anscombe %>%
-  rowid_to_column("id") %>%          # IDをつけておく
-  pivot_longer(matches("^x|y")) %>%  # x y で始まる列の値を移して縦長に
-  separate(name, c("axis", "group"), 1L, convert = TRUE)
-                                     # name列を分割
-```
-
----
-## 例題: `anscombe`
-
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
-
-```{r anscombe_wider, results="hold"}
-tidy_anscombe = anscombe %>%
-  rowid_to_column("id") %>%          # IDをつけておく
-  pivot_longer(matches("^x|y")) %>%  # x y で始まる列の値を移して縦長に
-  separate(name, c("axis", "group"), 1L, convert = TRUE) %>%
-                                     # name列を分割
-  pivot_wider(names_from = axis, values_from = value) %>%
-                                     # axis列内の x y を列にして横広化
-  arrange(group) %>%                 # グループごとに並べる
-  print()                            # ggplotしたい形！
-```
-
----
-## 例題: `anscombe` 別解
-
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
-
-```{r anscombe_pivot}
+```{r anscombe_pivot, include = FALSE}
 tidy_anscombe = anscombe %>%
   pivot_longer(                       # 縦長に変形したい
     everything(),                     # すべての列について
@@ -767,13 +723,7 @@ tidy_anscombe = anscombe %>%
   print()                             # ggplotしたい形！
 ```
 
-
----
-## 例題: `anscombe` 作図例
-
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
-
-```{r plot_anscombe, fig.height=3, fig.width=10, out.width="98%"}
+```{r plot_anscombe, fig.height=3, fig.width=10, out.width="98%", echo = FALSE}
 ggplot(tidy_anscombe) + aes(x, y) +
   geom_point(size = 3) +
   stat_smooth(method = lm, formula = y ~ x, se = FALSE, fullrange = TRUE) +
@@ -782,11 +732,11 @@ ggplot(tidy_anscombe) + aes(x, y) +
 ```
 
 ---
-## 例題: `anscombe` 要約
+## 🔰 課題: `anscombe` の要約統計量を計算しよう
 
 4組のx-yは、平均・分散・相関係数がほぼ同じ？
 
-```{r summarize_anscombe}
+```{r summarize_anscombe, echo = FALSE}
 tidy_anscombe %>%
   group_by(group) %>%   # group列でグループ化して
   summarize(            # x, y列を使ってsummarize
@@ -797,53 +747,6 @@ tidy_anscombe %>%
     cor_xy = cor(x, y)
   )
 ```
-
-
----
-## 前処理は大きく2つに分けられる
-
-<div style="float: right;">
-<a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/dplyr.png" width="120">
-</a><br>
-<a href="https://tidyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/tidyr.png" width="120">
-</a>
-</div>
-
-- **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
-    - 使いたい部分だけ抽出 --- `select()`, `filter()`
-    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
-    - 何かの順に並べ替え --- `arrange()`
-    - 異なるテーブルの結合 --- `*_join()`
-    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
-- データ内容を対象とする処理 — 第5回
-    - 数値を変換する (e.g., 対数、座標系)
-    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ ダミー変数
-    - 外れ値・欠損値に対処
-    - 文字列から数値や日時を抜き出す
-
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
-本橋智光「前処理大全」
-</a></cite>
-
-
----
-## 憶えなくていい。公式サイトなどを見ながら作業
-
-<figure>
-<a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/rstats/dplyr-website.png" width="90%">
-<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
-</a>
-</figure>
-
-
----
-## 課題
-
-🔰 Rやパッケージに付属のデータで整形→作図しよう
-: e.g., `iris`, `diamonds`, `starwars`, `mpg`, `economics`, `txhousing`.
 
 
 ---
@@ -860,14 +763,6 @@ R for Data Science --- Hadley Wickham and Garrett Grolemund
 整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
 : [Speaker Deck](https://speakerdeck.com/fnshr/zheng-ran-detatutenani),
   [Colorless Green Ideas](https://id.fnshr.info/2017/01/09/tidy-data-intro/)
-
-Official documents:
-: [tidyverse](https://www.tidyverse.org/),
-  [dplyr](https://dplyr.tidyverse.org/),
-  [tidyr](https://tidyr.tidyverse.org/),
-  [purrr](https://purrr.tidyverse.org/),
-  [tibble](https://tibble.tidyverse.org/),
-  [readr](https://readr.tidyverse.org/),
 
 Older versions
 : 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
