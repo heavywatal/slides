@@ -183,7 +183,7 @@ if (!doNotTrack) {
 1  Mick  Stones       1  John guitar
 2  John Beatles       2  Paul   bass
 3  Paul Beatles       3 Keith guitar
-</code></pre><p>🔰 パイプ演算子 <code>%&gt;%</code> を使って同じ処理をしてみよう</p>
+</code></pre><p>🔰 結合前と結合後の表を手元でも確認しよう</p>
 
 </section>
 <section>
@@ -202,7 +202,7 @@ if (!doNotTrack) {
 1  Mick  Stones       1   John guitar
 2  John Beatles       2   Paul   bass
 3  Paul Beatles       3  Keith guitar
-</code></pre><p>🔰 パイプ演算子 <code>%&gt;%</code> を使って同じ処理をしてみよう</p>
+</code></pre><p>🔰 結合前と結合後の表を手元でも確認しよう</p>
 
 </section>
 <section>
@@ -221,7 +221,7 @@ if (!doNotTrack) {
 2  John Beatles       2  Paul   bass
 3  Paul Beatles       3 Keith guitar
 </code></pre><p>その逆は <code>right_join()</code></p>
-<p>🔰 パイプ演算子 <code>%&gt;%</code> を使って同じ処理をしてみよう</p>
+<p>🔰 結合前と結合後の表を手元でも確認しよう</p>
 
 </section>
 <section>
@@ -238,11 +238,13 @@ if (!doNotTrack) {
 1  Mick  Stones       1  John guitar
 2  John Beatles       2  Paul   bass
 3  Paul Beatles       3 Keith guitar
-</code></pre><p>🔰 パイプ演算子 <code>%&gt;%</code> を使って同じ処理をしてみよう</p>
+</code></pre><p>🔰 結合前と結合後の表を手元でも確認しよう</p>
 
 </section>
 <section>
 <h2 id="joinまとめ">joinまとめ</h2>
+<div class="column-container">
+<div class="column" style="flex-shrink: 1.4;">
 <figure>
 <a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
 <img src="/slides/image/r4ds/join.png" height="550">
@@ -250,7 +252,15 @@ if (!doNotTrack) {
 <figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
 </a>
 </figure>
-
+</div>
+<div class="column">
+<p>生命科学における <code>left_join()</code> の例</p>
+<p>左: <strong>興味のある遺伝子</strong>の発現データ<br>
+右: <strong>全遺伝子</strong>のアノテーション情報</p>
+<p>  ↓ <code>left_join</code>(by = &ldquo;遺伝子名&rdquo;)</p>
+<p><strong>興味のある遺伝子</strong>の発現+アノテーション</p>
+</div>
+</div>
 </section>
 <section>
 <h2 id="join例題-nycflights13-データセット">join例題: <code>nycflights13</code> データセット</h2>
@@ -532,14 +542,11 @@ if (!doNotTrack) {
 <h2 id="separate-列を分離"><code>separate()</code> 列を分離</h2>
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
-<img src="/slides/image/r4ds/tidy-separate.png" width="800">
+<img src="/slides/image/r4ds/tidy-separate.png" width="700">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
 </a>
 </figure>
-</section>
-<section>
-<h2 id="separate-列を分離-table3"><code>separate()</code> 列を分離: <code>table3</code></h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#separate">R for Data Science</a>
 に登場するお試しデータ。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
@@ -554,7 +561,7 @@ if (!doNotTrack) {
 </code></pre>
 </section>
 <section>
-<h2 id="separate-列を分離-table3"><code>separate()</code> 列を分離: <code>table3</code></h2>
+<h2 id="separate-列を分離"><code>separate()</code> 列を分離</h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#separate">R for Data Science</a>
 に登場するお試しデータ。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table3</span> <span class="o">%&gt;%</span> <span class="nf">separate</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">into</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;cases&#34;</span><span class="p">,</span> <span class="s">&#34;population&#34;</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;/&#34;</span><span class="p">)</span>
@@ -567,6 +574,7 @@ if (!doNotTrack) {
 5       China  1999 212258 1272915272
 6       China  2000 213766 1280428583
 </code></pre><p><code>sep</code> は指定しなくてもデフォルトで記号や空白を認識してくれる。</p>
+<p>🔰 変形前と変形後を手元のRで確認してみよう。</p>
 
 </section>
 <section>
@@ -578,9 +586,6 @@ if (!doNotTrack) {
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
 </a>
 </figure>
-</section>
-<section>
-<h2 id="unite-列を融合-table5"><code>unite()</code> 列を融合: <code>table5</code></h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#unite">R for Data Science</a>
 に登場するお試しデータ。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table5</span><span class="p">)</span>
@@ -595,13 +600,13 @@ if (!doNotTrack) {
 </code></pre>
 </section>
 <section>
-<h2 id="unite-列を融合-table5"><code>unite()</code> 列を融合: <code>table5</code></h2>
+<h2 id="unite-列を融合"><code>unite()</code> 列を融合</h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#unite">R for Data Science</a>
 に登場するお試しデータ。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table5</span> <span class="o">%&gt;%</span>
-  <span class="nf">unite</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">century</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">mutate</span><span class="p">(</span><span class="n">year</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
-</code></pre></div><pre tabindex="0"><code>      country  year              rate
+  <span class="nf">unite</span><span class="p">(</span><span class="n">YEAR</span><span class="p">,</span> <span class="n">century</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">YEAR</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="n">YEAR</span><span class="p">))</span>
+</code></pre></div><pre tabindex="0"><code>      country  YEAR              rate
         &lt;chr&gt; &lt;int&gt;             &lt;chr&gt;
 1 Afghanistan  1999      745/19987071
 2 Afghanistan  2000     2666/20595360
@@ -611,10 +616,11 @@ if (!doNotTrack) {
 6       China  2000 213766/1280428583
 </code></pre><p>結合直後は文字列になっているので数値なら忘れずに変換。<br>
 こうしたデータ内容を対象とする処理については、次回くわしく。</p>
+<p>🔰 変形前と変形後を手元のRで確認してみよう。</p>
 
 </section>
 <section>
-<h2 id="separate--unite-練習問題"><code>separate()</code> / <code>unite()</code> 練習問題</h2>
+<h2 id="separate--unite-練習問題1"><code>separate()</code> / <code>unite()</code> 練習問題1</h2>
 <p>🔰 <code>table3</code> の <code>rate</code> を分割したあと、また元に戻してみよう。</p>
 <p>🔰 <code>table3</code> の <code>year</code> を分割して <code>table5</code> を作ってみよう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
@@ -626,7 +632,12 @@ if (!doNotTrack) {
 4      Brazil  2000   80488/174504898
 5       China  1999 212258/1272915272
 6       China  2000 213766/1280428583
-</code></pre><p>🔰 <code>world_bank_pop</code> の <code>indicator</code> を3列に分割してみよう。</p>
+</code></pre>
+</section>
+<section>
+<h2 id="separate--unite-練習問題2"><code>separate()</code> / <code>unite()</code> 練習問題2</h2>
+<p>🔰 <code>world_bank_pop</code> の <code>indicator</code> を3列に分割してみよう。<br>
+(<code>sep = &quot;.&quot;</code> を指定せず省略する。理由は文字列処理の回で説明)</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
 </code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005          2006          2007          2008          2009          2010         2011         2012         2013         2014         2015         2016         2017
        &lt;chr&gt;       &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
