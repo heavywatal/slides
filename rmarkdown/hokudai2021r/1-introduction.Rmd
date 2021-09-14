@@ -299,18 +299,45 @@ print(ggplot2::diamonds)
 ---
 ## 要約統計量(平均とか分散とか)を見てみる
 
-生のままよりは把握しやすいかも
+各列の**平均**とか**標準偏差**とか:
 
-```{r summary-diamonds}
-summary(ggplot2::diamonds)
+```{r summary-diamonds, echo = FALSE}
+diamonds %>%
+  dplyr::summarize(across(where(is.numeric), list(mean = mean, sd = sd, max = max))) %>%
+  dplyr::mutate(across(where(is.numeric), round, digits = 2)) %>%
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_")
 ```
+
+大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
+```{r cor-diamonds, eval = FALSE, include = FALSE}
+cor(diamonds$carat, diamonds$price)
+# [1] 0.9215913
+```
+
+**生のままよりは把握しやすい**かも。
+
+しかし要注意...
+
+
+---
+## 平均値ばかり見て可視化を怠ると構造を見逃す
+
+<figure style="position: relative;">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<img src="/slides/image/rstats/datasaurus.png" width="800">
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
 
 ---
 ## 作図してみると全体像・構造が見やすい
 
 情報の整理 → **正しい解析・新しい発見・仮説生成**
 
-```{r simplify-diamonds, echo = FALSE, fig.height = 7, fig.width = 8, cache = TRUE}
+```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7, cache = TRUE}
 diamonds %>%
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
   ggplot(aes(carat, price, color = clarity)) +
@@ -319,14 +346,12 @@ diamonds %>%
     guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
   ) +
   labs(title = "Diamonds") +
-  theme_gray(base_size = 22) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "#bbbbbb"),
-    legend.key = element_rect(fill = "#bbbbbb"),
-    axis.ticks = element_blank()
-  )
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank())
 ```
+
+`carat` が大きいほど `price` も高いらしい。<br>
+その度合いは `clarity` によって異なるらしい。
 
 ---
 ## 作図してみると全体像・構造が見やすい

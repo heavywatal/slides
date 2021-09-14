@@ -63,7 +63,7 @@ knitr::opts_chunk$set(cache = TRUE)
     - 数値を変換する (e.g., 対数、座標系)
     - 変換: 連続変数 ↔ カテゴリカル変数 ↔ 指示変数
     - 外れ値・欠損値に対処
-    - 文字列から数値や日時を抜き出す
+    - 文字列処理: パターンマッチ、日時
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
@@ -85,10 +85,10 @@ library(tidyverse)  # パッケージ読み込み
 ```
 ```
 ── Attaching packages ──────────────────────── tidyverse 1.3.0 ──
-✔ ggplot2 3.3.2     ✔ purrr   0.3.4
-✔ tibble  3.0.3     ✔ dplyr   1.0.2
-✔ tidyr   1.1.2     ✔ stringr 1.4.0
-✔ readr   1.3.1     ✔ forcats 0.5.0
+✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.4     ✔ dplyr   1.0.7
+✔ tidyr   1.1.3     ✔ stringr 1.4.0
+✔ readr   2.0.1     ✔ forcats 0.5.1
 ── Conflicts ─────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
@@ -134,15 +134,15 @@ sqrt(x)         # square root
 ## data.frameは列vectorの集まり
 
 内容を変更する方法はいくつかある。<br>
-`diamonds[["price"]]` をドルから円に変換する例:
+`diamonds` の `price` 列をドルから円に変換する例:
 
 ```{r dfcolumn}
 dia = diamonds    # 別名コピー
 
-# dollar演算子で指定
+# dollar演算子 $ で指定
 dia$price = 105.59 * dia$price
 
-# 名前を文字列で指定
+# 名前を [[文字列]] で指定
 dia[["price"]] = 105.59 * dia[["price"]]
 
 # dplyr::mutate with pipe
@@ -378,9 +378,9 @@ https://r4ds.had.co.nz/strings.html
 ---
 ## stringr --- 文字列処理パッケージ
 
-<figure>
+<figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/rstats/stringr-cheatsheet1.png" width="90%">
+<img src="/slides/image/cheatsheet/strings.png" width="90%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
 </a>
 </figure>
@@ -441,7 +441,7 @@ http://userguide.icu-project.org/strings/regexp
 ---
 ## 正規表現: チートシート
 
-<figure>
+<figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/rstats/stringr-cheatsheet2.png" width="90%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
@@ -545,22 +545,22 @@ parse_date("2020-06-03")
 `2e-02` は $2 \times 10^{-2}$ 、 `6e+23` は $6 \times 10 ^ {23}$ のプログラミング的表現
 
 ---
-## 因子型 `factor` (`ordered`)
+## 因子型 `factor`
 
 カテゴリカル変数を扱うための型。文字列っぽいけど実体は整数。
 
 ```{r factor}
-month_levels = c(
+month_levels = c(                       # 取りうる値
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 )
-s1 = c("Dec", "Apr", "Jan", "Mar")      # ただの文字列vector
-f1 = factor(s1, levels = month_levels)  # 因子型に変換
-print(f1)
-as.integer(f1)                          # 整数型に変換可能
+x1 = c("Dec", "Apr", "Jan", "Mar")      # ただの文字列vector
+y1 = factor(x1, levels = month_levels)  # 因子型に変換
+print(y1)
+as.integer(y1)                          # 整数型に変換可能
 ```
 
-🔰 `diamonds` や `iris` に含まれる因子型を確認しよう
+🔰 `iris` に含まれる因子型を確認しよう
 
 <div style="text-align: right;"><a class="url" href="https://r4ds.had.co.nz/factors.html">
 https://r4ds.had.co.nz/factors.html
@@ -574,8 +574,8 @@ https://r4ds.had.co.nz/factors.html
 typoなどによりlevels外になると `NA` 扱い。
 
 ```{r factor-levels}
-s2 = c("Dec", "Apr", "Jam", "Mar")
-factor(s2, levels = month_levels)
+x2 = c("Dec", "Apr", "Jam", "Mar")
+factor(x2, levels = month_levels)
 ```
 
 元の文字列vectorに全てのlevelsが含まれてるなら簡単に変換可能:
@@ -589,19 +589,11 @@ as.factor(starwars[["gender"]])
 アルファベット順じゃない順序がある:
 
 ```{r factor-sort}
-s1 = c("Dec", "Apr", "Jan", "Mar")
-sort(s1)     # 文字列としてソートするとアルファベット順
-f1 = factor(s1, levels = month_levels)
-sort(f1)     # 因子としてソートするとlevels順
+x1 = c("Dec", "Apr", "Jan", "Mar")
+sort(x1)     # 文字列としてソートするとアルファベット順
+y1 = factor(x1, levels = month_levels)
+sort(y1)     # 因子としてソートするとlevels順
 ```
-
-明示的な順序付き因子のことを特に `ordered` 型と呼ぶ:
-
-```{r factor-ordered}
-f2 = factor(s1, levels = month_levels, ordered = TRUE)
-f2
-```
-
 
 ---
 ## 因子型 `factor`: 順序の情報は作図で生きる
@@ -615,6 +607,22 @@ diamonds %>%
   ggplot() + aes(x = color) +
   geom_bar() + coord_flip()
 ```
+
+---
+## 順序つき因子型 `ordered`
+
+大小の比較ができる。
+
+```{r ordered}
+x1 = c("Dec", "Apr", "Jan", "Mar")
+y3 = factor(x1, levels = month_levels, ordered = TRUE)
+class(y3)
+print(y3)
+y3 < "Sep"
+```
+
+🔰 `diamonds` に含まれるordered型を確認しよう。<br>
+🔰 `cut` がPremium以上の行だけ抜き出す、とか。
 
 ---
 ## tidyverse の因子型担当は forcats
@@ -711,14 +719,15 @@ wday(today, label = TRUE)
 ---
 ## データ内容を対象とする処理 | まとめ
 
-- vectorには型がある: 文字列、数値、因子、日時、etc.
+- 正規化・欠損値処理は目的に応じて検討
+- vectorには**型**がある: 文字列、数値、因子、日時、etc.
 - 文字列を扱うには [stringr](https://stringr.tidyverse.org/)
-    - 正規表現は一度習得すれば超強力
+    - **正規表現**は一度習得すれば超強力
 - 因子を扱うには [forcats](https://forcats.tidyverse.org/)
-    - 知っておくと作図で有利
+    - 知っておくと作図で有利。苦手なら全部文字列にする。
 - 日時を扱うには [lubridate](https://lubridate.tidyverse.org/)
 
-各パッケージのチートシート.pdfを手元に持っておくと便利。
+各パッケージの[チートシート.pdf](https://www.rstudio.com/resources/cheatsheets/)を手元に持っておくと便利。
 
 ---
 ## Reference

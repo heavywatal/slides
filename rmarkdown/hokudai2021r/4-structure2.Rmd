@@ -140,7 +140,7 @@ band_members          band_instruments
 3  Paul Beatles       3 Keith guitar
 ```
 
-🔰 パイプ演算子 `%>%` を使って同じ処理をしてみよう
+🔰 結合前と結合後の表を手元でも確認しよう
 
 ---
 ## 共通する列で結合: `full_join()`
@@ -158,7 +158,7 @@ band_members          band_instruments2
 3  Paul Beatles       3  Keith guitar
 ```
 
-🔰 パイプ演算子 `%>%` を使って同じ処理をしてみよう
+🔰 結合前と結合後の表を手元でも確認しよう
 
 ---
 ## 共通する列で結合: `left_join()`
@@ -178,7 +178,7 @@ band_members          band_instruments
 
 その逆は `right_join()`
 
-🔰 パイプ演算子 `%>%` を使って同じ処理をしてみよう
+🔰 結合前と結合後の表を手元でも確認しよう
 
 ---
 ## 共通する列で結合: `inner_join()`
@@ -196,10 +196,13 @@ band_members          band_instruments
 3  Paul Beatles       3 Keith guitar
 ```
 
-🔰 パイプ演算子 `%>%` を使って同じ処理をしてみよう
+🔰 結合前と結合後の表を手元でも確認しよう
 
 ---
 ## joinまとめ
+
+<div class="column-container">
+<div class="column" style="flex-shrink: 1.4;">
 
 <figure>
 <a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
@@ -209,6 +212,20 @@ band_members          band_instruments
 </a>
 </figure>
 
+</div>
+<div class="column">
+
+生命科学における `left_join()` の例
+
+左: **興味のある遺伝子**の発現データ<br>
+右: **全遺伝子**のアノテーション情報
+
+&nbsp; ↓ `left_join`(by = "遺伝子名")
+
+**興味のある遺伝子**の発現+アノテーション
+
+</div>
+</div>
 
 ---
 ## join例題: `nycflights13` データセット
@@ -421,7 +438,7 @@ fish_encounters %>%
 print(population)
 ```
 
-🔰 1年のデータが1行になるように変形しよう↓
+🔰 1国のデータが1行になるように変形しよう↓
 ```{r wider-goal1, echo = FALSE}
 population %>% pivot_wider(names_from = "year", values_from = "population")
 ```
@@ -433,7 +450,7 @@ population %>% pivot_wider(names_from = "year", values_from = "population")
 print(population)
 ```
 
-🔰 1国のデータが1行になるように変形しよう↓
+🔰 1年のデータが1行になるように変形しよう↓
 ```{r wider-goal2, echo = FALSE}
 population %>% pivot_wider(names_from = "country", values_from = "population")
 ```
@@ -459,14 +476,11 @@ us_rent_income %>%
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
-<img src="/slides/image/r4ds/tidy-separate.png" width="800">
+<img src="/slides/image/r4ds/tidy-separate.png" width="700">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
 </a>
 </figure>
-
----
-## `separate()` 列を分離: `table3`
 
 [R for Data Science](https://r4ds.had.co.nz/tidy-data.html#separate)
 に登場するお試しデータ。
@@ -476,7 +490,7 @@ print(table3)
 ```
 
 ---
-## `separate()` 列を分離: `table3`
+## `separate()` 列を分離
 
 [R for Data Science](https://r4ds.had.co.nz/tidy-data.html#separate)
 に登場するお試しデータ。
@@ -486,6 +500,8 @@ table3 %>% separate(rate, into = c("cases", "population"), sep = "/")
 ```
 
 `sep` は指定しなくてもデフォルトで記号や空白を認識してくれる。
+
+🔰 変形前と変形後を手元のRで確認してみよう。
 
 ---
 ## `unite()` 列を融合
@@ -498,9 +514,6 @@ table3 %>% separate(rate, into = c("cases", "population"), sep = "/")
 </a>
 </figure>
 
----
-## `unite()` 列を融合: `table5`
-
 [R for Data Science](https://r4ds.had.co.nz/tidy-data.html#unite)
 に登場するお試しデータ。
 
@@ -509,22 +522,24 @@ print(table5)
 ```
 
 ---
-## `unite()` 列を融合: `table5`
+## `unite()` 列を融合
 
 [R for Data Science](https://r4ds.had.co.nz/tidy-data.html#unite)
 に登場するお試しデータ。
 
 ```{r unite}
 table5 %>%
-  unite(year, century, year, sep = "") %>%
-  mutate(year = as.integer(year))
+  unite(YEAR, century, year, sep = "") %>%
+  mutate(YEAR = as.integer(YEAR))
 ```
 
 結合直後は文字列になっているので数値なら忘れずに変換。<br>
 こうしたデータ内容を対象とする処理については、次回くわしく。
 
+🔰 変形前と変形後を手元のRで確認してみよう。
+
 ---
-## `separate()` / `unite()` 練習問題
+## `separate()` / `unite()` 練習問題1
 
 🔰 `table3` の `rate` を分割したあと、また元に戻してみよう。
 
@@ -534,7 +549,11 @@ table5 %>%
 print(table3)
 ```
 
-🔰 `world_bank_pop` の `indicator` を3列に分割してみよう。
+---
+## `separate()` / `unite()` 練習問題2
+
+🔰 `world_bank_pop` の `indicator` を3列に分割してみよう。<br>
+   (`sep = "."` を指定せず省略する。理由は文字列処理の回で説明)
 
 ```{r world_bank_pop-practice}
 print(world_bank_pop)
