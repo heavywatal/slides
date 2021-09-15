@@ -57,10 +57,10 @@ anscombe = tibble::as_tibble(anscombe)
     - **異なるテーブルの結合** 👈 第4回ここから
     - **変形: 縦長 ↔ 横広**
 - データ内容を対象とする処理 <span style="color: #888888;">— 第5回</span>
-    - 数値を変換する (e.g., 対数、座標系)
-    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ 指示変数
-    - 外れ値・欠損値に対処
-    - 文字列から数値や日時を抜き出す
+    - 数値の変換: 対数、正規化
+    - 外れ値・欠損値への対処
+    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
+    - 文字列処理: 正規表現によるパターンマッチ
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
@@ -584,7 +584,7 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 グループ毎にdata.frameを区切ってlist型の列に入れる。
 
 ```{r nest}
-mpg_nested = mpg %>% nest(data = -drv) %>% print()
+mpg_nested = mpg %>% nest(data = !drv) %>% print()
 mpg_nested$data[[1]]
 ```
 
@@ -608,10 +608,10 @@ mpg_nested$data[[1]]
     - 異なるテーブルの結合 --- `*_join()`
     - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
 - データ内容を対象とする処理 — 第5回
-    - 数値を変換する (e.g., 対数、座標系)
-    - 変換: 連続変数 ↔ カテゴリカル変数 ↔ 指示変数
-    - 外れ値・欠損値に対処
-    - 文字列から数値や日時を抜き出す
+    - 数値の変換: 対数、正規化
+    - 外れ値・欠損値への対処
+    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
+    - 文字列処理: 正規表現によるパターンマッチ
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
@@ -684,7 +684,7 @@ print(VADeaths)
 VADeaths %>%
   as.data.frame() %>%
   rownames_to_column("age") %>%
-  pivot_longer(-age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
+  pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
   separate(age, c("lbound", "ubound"), convert = TRUE)
 ```
 
@@ -712,7 +712,7 @@ as.data.frame(VADeaths) %>%              # data.frameに変換
 va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
   rownames_to_column("age") %>%          # 行名を列に
   pivot_longer(                          # 縦長に変形したい
-    -age,                                # age以外の列に入ってる値を移動
+    !age,                                # age以外の列に入ってる値を移動
     names_to = c("region", "sex"),       # 元の列名を2つに分離
     names_sep = " ",                     # スペースで切る
     values_to = "death") %>%             # 値の行き先の列名

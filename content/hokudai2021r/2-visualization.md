@@ -34,17 +34,9 @@ draft = false
 <a href="https://heavywatal.github.io/slides/hokudai2021r/">https://heavywatal.github.io/slides/hokudai2021r/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
-```
 
-```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
-knitr::opts_chunk$set(cache = TRUE)
-iris = tibble::as_tibble(iris)
-```
+
+
 
 ---
 ## データ解析のおおまかな流れ
@@ -70,8 +62,23 @@ iris = tibble::as_tibble(iris)
 
 生データは情報が多すぎて関係性も何も見えない
 
-```{r diamonds}
+
+```r
 print(diamonds)
+```
+
+```
+      carat       cut color clarity depth table price     x     y     z
+      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
 ```
 
 ダイヤモンド53,940個について10項目の値を持つ `data.frame`
@@ -81,18 +88,17 @@ print(diamonds)
 
 各列の**平均**とか**標準偏差**とか:
 
-```{r summary-diamonds, echo = FALSE}
-diamonds %>%
-  dplyr::summarize(across(where(is.numeric), list(mean = mean, sd = sd, max = max))) %>%
-  dplyr::mutate(across(where(is.numeric), round, digits = 2)) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_")
+
+```
+   stat carat depth table    price     x     y     z
+  <chr> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>
+1  mean  0.80 61.75 57.46  3932.80  5.73  5.73  3.54
+2    sd  0.47  1.43  2.23  3989.44  1.12  1.14  0.71
+3   max  5.01 79.00 95.00 18823.00 10.74 58.90 31.80
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
-```{r cor-diamonds, eval = FALSE, include = FALSE}
-cor(diamonds$carat, diamonds$price)
-# [1] 0.9215913
-```
+
 
 **生のままよりは把握しやすい**かも。
 
@@ -161,57 +167,7 @@ cor(diamonds$carat, diamonds$price)
 平均値の差？ ばらつきの様子？ 軸はゼロから始まる？<br>
 **目的に合わせて見せ方を吟味**しよう。
 
-```{r iris-compare, echo=FALSE, fig.height=7, fig.width=10, message=FALSE, cache = TRUE}
-tidy_iris = iris %>%
-  tibble::rownames_to_column("id") %>%
-  tidyr::pivot_longer(!c(id, Species)) %>%
-  tidyr::separate(name, c("part", "measure"))
-
-mean_sd = function(x, mult = 1.96) {
-  x = stats::na.omit(x)
-  div = mult * stats::sd(x)
-  mu = mean(x)
-  data.frame(y = mu, ymin = mu - div, ymax = mu + div)
-}
-
-theme_iris = theme_linedraw(base_size=15) + theme(
-    strip.placement = "outside", strip.background = element_blank(),
-    axis.title = element_blank(), axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(), legend.position = "top"
-  )
-
-p_iris = ggplot(tidy_iris) +
-  aes(Species, value, fill = Species) +
-  scale_fill_brewer(palette = "Set1", guide = "none") +
-  scale_y_continuous(breaks = seq(0, 8, 2)) +
-  facet_grid(vars(measure), vars(part), switch = "both", scale = "free_x", space = "free_x") +
-  theme_iris
-
-p_bar = p_iris +
-  stat_summary(geom = "bar", fun = mean, alpha = 0.9) +
-  stat_summary(geom = "errorbar", fun.data = mean_sd, width = 0.2) +
-  coord_flip()
-
-p_box = p_iris + geom_boxplot() + coord_flip()
-
-p_dot = p_iris +
-  geom_dotplot(binwidth = 0.1, binaxis = "y", stackdir = "center", stackratio = 0.8, alpha = 0.9, colour = "#666666") +
-  coord_flip()
-
-p_ridges = ggplot(tidy_iris) +
-  aes(value, Species, fill = Species) +
-  ggridges::geom_density_ridges(aes(value, Species),
-    jittered_points = TRUE,
-    position = ggridges::position_points_jitter(width = 0.05, height = 0),
-    point_shape = "|", point_size = 3, alpha = 0.7
-  ) +
-  scale_fill_brewer(palette = "Set1", guide = "none") +
-  scale_x_continuous(breaks = seq(0, 8, 2)) +
-  facet_grid(vars(measure), vars(part), switch = "both", scale = "free_x", space = "free_x") +
-  theme_iris
-
-cowplot::plot_grid(p_bar, p_box, p_dot, p_ridges, ncol=2L)
-```
+![plot of chunk iris-compare](figure/iris-compare-1.png)
 
 ---
 ## こんな感じの図もRでラクラク描けるよ
@@ -252,8 +208,23 @@ cowplot::plot_grid(p_bar, p_box, p_dot, p_ridges, ncol=2L)
 `iris` はアヤメ属3種150個体に関する測定データ。<br>
 Rに最初から入ってて、例としてよく使われる。
 
-```{r data.frame}
+
+```r
 print(iris)
+```
+
+```
+    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+           <dbl>       <dbl>        <dbl>       <dbl>     <fct>
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
 ```
 
 長さ150の数値ベクトル4本と因子ベクトル1本。
@@ -263,36 +234,48 @@ print(iris)
 
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
-```{r plot, fig.height=5, fig.width=5}
+
+```r
 plot(iris$Sepal.Length, iris$Sepal.Width)
 ```
 
+![plot of chunk plot](figure/plot-1.png)
+
 ---
 ## R標準のグラフィックス
 
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
-```{r hist, fig.height=5, fig.width=5}
+
+```r
 hist(iris$Petal.Length)
 ```
 
+![plot of chunk hist](figure/hist-1.png)
+
 ---
 ## R標準のグラフィックス
 
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
-```{r plot-density, fig.height=5, fig.width=5}
+
+```r
 plot(density(iris$Petal.Length))
 ```
 
+![plot of chunk plot-density](figure/plot-density-1.png)
+
 ---
 ## R標準のグラフィックス
 
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
-```{r boxplot, fig.height=5, fig.width=5}
+
+```r
 boxplot(Petal.Width ~ Species, data = iris)
 ```
+
+![plot of chunk boxplot](figure/boxplot-1.png)
 
 きれいなグラフを簡単に描けるパッケージを使いたい。
 
@@ -320,32 +303,122 @@ boxplot(Petal.Width ~ Species, data = iris)
 
 R標準のやつとは根本的に違うシステムで作図する。
 
-```{r grviz, echo=FALSE, results="asis"}
-g = DiagrammeR::grViz("
-digraph boxes_and_circles {
-  graph [fontsize = 18]
-  node [shape = box, fontname = Helvetica]
-
-  'Traditional R plot\nboxplot(), hist(), ...';
-  lattice; ggplot2;
-  graphics; grid;
-  grDevices;
-  pdf; png; svg;
-
-  'Traditional R plot\nboxplot(), hist(), ...' -> graphics
-  graphics -> grDevices
-  lattice -> grid
-  ggplot2 -> grid
-  grid -> grDevices
-  grDevices -> pdf
-  grDevices -> png
-  grDevices -> svg
-}")
-DiagrammeRsvg::export_svg(g) %>%
-  stringr::str_replace(stringr::regex(".+(?=<svg)", dotall = TRUE), "") %>%
-  {paste0("<div class=\"goldmark-p-workaround\">\n", ., "</div>")} %>%
-  cat()
-```
+<div class="goldmark-p-workaround">
+<svg width="288pt" height="266pt"
+ viewBox="0.00 0.00 288.35 265.60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 261.6)">
+<title>boxes_and_circles</title>
+<polygon fill="#ffffff" stroke="transparent" points="-4,4 -4,-261.6 284.3471,-261.6 284.3471,4 -4,4"/>
+<!-- Traditional R plot
+boxplot(), hist(), ... -->
+<g id="node1" class="node">
+<title>Traditional R plot
+boxplot(), hist(), ...</title>
+<polygon fill="none" stroke="#000000" points="128.6762,-257.4019 .1078,-257.4019 .1078,-216.1981 128.6762,-216.1981 128.6762,-257.4019"/>
+<text text-anchor="middle" x="64.392" y="-241" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">Traditional R plot</text>
+<text text-anchor="middle" x="64.392" y="-224.2" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">boxplot(), hist(), ...</text>
+</g>
+<!-- graphics -->
+<g id="node4" class="node">
+<title>graphics</title>
+<polygon fill="none" stroke="#000000" points="113.7897,-180 44.9943,-180 44.9943,-144 113.7897,-144 113.7897,-180"/>
+<text text-anchor="middle" x="79.392" y="-157.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">graphics</text>
+</g>
+<!-- Traditional R plot
+boxplot(), hist(), ...&#45;&gt;graphics -->
+<g id="edge1" class="edge">
+<title>Traditional R plot
+boxplot(), hist(), ...&#45;&gt;graphics</title>
+<path fill="none" stroke="#000000" d="M68.5703,-215.964C70.1727,-207.9736 72.0285,-198.7191 73.746,-190.1547"/>
+<polygon fill="#000000" stroke="#000000" points="77.2114,-190.6746 75.746,-180.1816 70.348,-189.2982 77.2114,-190.6746"/>
+</g>
+<!-- lattice -->
+<g id="node2" class="node">
+<title>lattice</title>
+<polygon fill="none" stroke="#000000" points="200.392,-254.8 146.392,-254.8 146.392,-218.8 200.392,-218.8 200.392,-254.8"/>
+<text text-anchor="middle" x="173.392" y="-232.6" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">lattice</text>
+</g>
+<!-- grid -->
+<g id="node5" class="node">
+<title>grid</title>
+<polygon fill="none" stroke="#000000" points="200.392,-180 146.392,-180 146.392,-144 200.392,-144 200.392,-180"/>
+<text text-anchor="middle" x="173.392" y="-157.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">grid</text>
+</g>
+<!-- lattice&#45;&gt;grid -->
+<g id="edge3" class="edge">
+<title>lattice&#45;&gt;grid</title>
+<path fill="none" stroke="#000000" d="M173.392,-218.693C173.392,-210.2112 173.392,-199.9062 173.392,-190.4204"/>
+<polygon fill="#000000" stroke="#000000" points="176.8921,-190.1995 173.392,-180.1995 169.8921,-190.1995 176.8921,-190.1995"/>
+</g>
+<!-- ggplot2 -->
+<g id="node3" class="node">
+<title>ggplot2</title>
+<polygon fill="none" stroke="#000000" points="280.3023,-254.8 218.4817,-254.8 218.4817,-218.8 280.3023,-218.8 280.3023,-254.8"/>
+<text text-anchor="middle" x="249.392" y="-232.6" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">ggplot2</text>
+</g>
+<!-- ggplot2&#45;&gt;grid -->
+<g id="edge4" class="edge">
+<title>ggplot2&#45;&gt;grid</title>
+<path fill="none" stroke="#000000" d="M230.9945,-218.693C221.4499,-209.2991 209.6333,-197.669 199.1915,-187.3922"/>
+<polygon fill="#000000" stroke="#000000" points="201.4657,-184.7196 191.8835,-180.1995 196.5555,-189.7086 201.4657,-184.7196"/>
+</g>
+<!-- grDevices -->
+<g id="node6" class="node">
+<title>grDevices</title>
+<polygon fill="none" stroke="#000000" points="157.6139,-108 79.1701,-108 79.1701,-72 157.6139,-72 157.6139,-108"/>
+<text text-anchor="middle" x="118.392" y="-85.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">grDevices</text>
+</g>
+<!-- graphics&#45;&gt;grDevices -->
+<g id="edge2" class="edge">
+<title>graphics&#45;&gt;grDevices</title>
+<path fill="none" stroke="#000000" d="M89.2333,-143.8314C93.5877,-135.7925 98.8018,-126.1666 103.6089,-117.2918"/>
+<polygon fill="#000000" stroke="#000000" points="106.7328,-118.8732 108.4181,-108.4133 100.5777,-115.5392 106.7328,-118.8732"/>
+</g>
+<!-- grid&#45;&gt;grDevices -->
+<g id="edge5" class="edge">
+<title>grid&#45;&gt;grDevices</title>
+<path fill="none" stroke="#000000" d="M159.5132,-143.8314C153.1784,-135.5386 145.5536,-125.557 138.5994,-116.4533"/>
+<polygon fill="#000000" stroke="#000000" points="141.3095,-114.2353 132.4577,-108.4133 135.7468,-118.4847 141.3095,-114.2353"/>
+</g>
+<!-- pdf -->
+<g id="node7" class="node">
+<title>pdf</title>
+<polygon fill="none" stroke="#000000" points="73.392,-36 19.392,-36 19.392,0 73.392,0 73.392,-36"/>
+<text text-anchor="middle" x="46.392" y="-13.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">pdf</text>
+</g>
+<!-- grDevices&#45;&gt;pdf -->
+<g id="edge6" class="edge">
+<title>grDevices&#45;&gt;pdf</title>
+<path fill="none" stroke="#000000" d="M100.2234,-71.8314C91.6768,-63.2848 81.3363,-52.9443 72.0118,-43.6198"/>
+<polygon fill="#000000" stroke="#000000" points="74.3512,-41.0095 64.8053,-36.4133 69.4015,-45.9592 74.3512,-41.0095"/>
+</g>
+<!-- png -->
+<g id="node8" class="node">
+<title>png</title>
+<polygon fill="none" stroke="#000000" points="145.392,-36 91.392,-36 91.392,0 145.392,0 145.392,-36"/>
+<text text-anchor="middle" x="118.392" y="-13.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">png</text>
+</g>
+<!-- grDevices&#45;&gt;png -->
+<g id="edge7" class="edge">
+<title>grDevices&#45;&gt;png</title>
+<path fill="none" stroke="#000000" d="M118.392,-71.8314C118.392,-64.131 118.392,-54.9743 118.392,-46.4166"/>
+<polygon fill="#000000" stroke="#000000" points="121.8921,-46.4132 118.392,-36.4133 114.8921,-46.4133 121.8921,-46.4132"/>
+</g>
+<!-- svg -->
+<g id="node9" class="node">
+<title>svg</title>
+<polygon fill="none" stroke="#000000" points="217.392,-36 163.392,-36 163.392,0 217.392,0 217.392,-36"/>
+<text text-anchor="middle" x="190.392" y="-13.8" font-family="Helvetica,sans-Serif" font-size="14.00" fill="#000000">svg</text>
+</g>
+<!-- grDevices&#45;&gt;svg -->
+<g id="edge8" class="edge">
+<title>grDevices&#45;&gt;svg</title>
+<path fill="none" stroke="#000000" d="M136.5606,-71.8314C145.1072,-63.2848 155.4477,-52.9443 164.7722,-43.6198"/>
+<polygon fill="#000000" stroke="#000000" points="167.3825,-45.9592 171.9787,-36.4133 162.4328,-41.0095 167.3825,-45.9592"/>
+</g>
+</g>
+</svg>
+</div>
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -355,7 +428,8 @@ DiagrammeRsvg::export_svg(g) %>%
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus1, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -365,10 +439,13 @@ ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus1](figure/ggplot-plus1-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus2, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -378,10 +455,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus2](figure/ggplot-plus2-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus3, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point()                      # 散布図を描く
@@ -391,10 +471,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus3](figure/ggplot-plus3-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus4, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -404,10 +487,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus4](figure/ggplot-plus4-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus5, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -417,10 +503,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus5](figure/ggplot-plus5-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus6, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -430,10 +519,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus6](figure/ggplot-plus6-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus7, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -443,10 +535,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus7](figure/ggplot-plus7-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus8, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -456,17 +551,22 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus8](figure/ggplot-plus8-1.png)
+
 
 ---
 ## 途中経過オブジェクトを取っておける
 
-```{r ggplot-object, fig.show="hold", fig.height=5, fig.width=6}
+
+```r
 p1 = ggplot(data = diamonds)
 p2 = p1 + aes(x = carat, y = price)
 p3 = p2 + geom_point()
 p4 = p3 + facet_wrap(vars(clarity))
 print(p3)
 ```
+
+![plot of chunk ggplot-object](figure/ggplot-object-1.png)
 
 普段はあんまりやらなけど、今日は `p2` とか使う
 
@@ -475,17 +575,20 @@ print(p3)
 
 自動車のスペックに関するデータ `mpg` を使って。
 
-```{r mpg, echo = FALSE}
-wtl::printdf(mpg, n = 4)
+
+```
+    manufacturer  model displ  year   cyl      trans   drv   cty   hwy    fl   class
+           <chr>  <chr> <dbl> <int> <int>      <chr> <chr> <int> <int> <chr>   <chr>
+  1         audi     a4   1.8  1999     4   auto(l5)     f    18    29     p compact
+  2         audi     a4   1.8  1999     4 manual(m5)     f    21    29     p compact
+ --                                                                                 
+233   volkswagen passat   2.8  1999     6 manual(m5)     f    18    26     p midsize
+234   volkswagen passat   3.6  2008     6   auto(s6)     f    17    26     p midsize
 ```
 
 🔰 排気量 `displ` と市街地燃費 `cty` の関係を散布図で。
 
-```{r ggplot-mpg, echo = FALSE, fig.height = 3, fig.width = 3}
-ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point()
-```
+![plot of chunk ggplot-mpg](figure/ggplot-mpg-1.png)
 
 ---
 ## よくあるエラー
@@ -517,8 +620,23 @@ ggplot(diamonds)    # OK!
 - 1セルは1つの値
 - この列をX軸、この列をY軸、この列で色わけ、と指定できる！
 
-```{r diamonds-again}
+
+```r
 print(diamonds)
+```
+
+```
+      carat       cut color clarity depth table price     x     y     z
+      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
 ```
 
 <cite>
@@ -532,45 +650,47 @@ print(diamonds)
 
 `aes()` の中で列名を指定する。
 
-```{r aes-map, fig.height = 6, fig.width = 8}
+
+```r
 p1 + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity))
 ```
+
+![plot of chunk aes-map](figure/aes-map-1.png)
 
 ---
 ## データによらず一律でaestheticsを変える
 
 `aes()` の外で値を指定する。
 
-```{r aes-nomap, fig.height=6, fig.width=7}
+
+```r
 p1 + aes(x = carat, y = price) +
   geom_point(color = "darkorange", size = 6, alpha = 0.4)
 ```
+
+![plot of chunk aes-nomap](figure/aes-nomap-1.png)
 
 ---
 ## 色の変え方の練習
 
 自動車のスペックに関するデータ `mpg` を使って。
 
-```{r mpg2, echo = FALSE}
-wtl::printdf(mpg, n = 4)
+
+```
+    manufacturer  model displ  year   cyl      trans   drv   cty   hwy    fl   class
+           <chr>  <chr> <dbl> <int> <int>      <chr> <chr> <int> <int> <chr>   <chr>
+  1         audi     a4   1.8  1999     4   auto(l5)     f    18    29     p compact
+  2         audi     a4   1.8  1999     4 manual(m5)     f    21    29     p compact
+ --                                                                                 
+233   volkswagen passat   2.8  1999     6 manual(m5)     f    18    26     p midsize
+234   volkswagen passat   3.6  2008     6   auto(s6)     f    17    26     p midsize
 ```
 
 🔰 排気量 `displ` と市街地燃費 `cty` の関係を青い散布図で描こう<br>
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によって色を塗り分けしてみよう
 
-```{r ggplot-mpg-color, echo = FALSE, fig.height = 3, fig.width = 10}
-pL = ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(color = "blue")
-pC = ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv))
-pR = ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = cyl))
-cowplot::plot_grid(pL, pC, pR, nrow = 1L)
-```
+![plot of chunk ggplot-mpg-color](figure/ggplot-mpg-color-1.png)
 
 ---
 ## [aesthetics一覧](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html)
@@ -593,10 +713,13 @@ cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ## 点と線と文字は `color`, 面は `fill`
 
 
-```{r fill, fig.height=6, fig.width=7}
+
+```r
 p1 + aes(x = clarity, y = price) +
   geom_boxplot(color = "darkgreen", fill = "gold", alpha = 0.6)
 ```
+
+![plot of chunk fill](figure/fill-1.png)
 
 ---
 ## 色パレットの変更 `scale_color_*()`
@@ -606,11 +729,14 @@ e.g., [ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5
 [viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html)
 (色覚多様性・グレースケール対策にも有効)
 
-```{r plasma, fig.show="hold", fig.height=5, fig.width=7}
+
+```r
 p2 + geom_point(mapping = aes(color = color)) +
   scale_color_viridis_d(option = "plasma") + theme_dark()
 # scale_color_brewer(palette = "Spectral")
 ```
+
+![plot of chunk plasma](figure/plasma-1.png)
 
 ---
 ## 値に応じてパネル切り分け (1変数facet)
@@ -618,9 +744,12 @@ p2 + geom_point(mapping = aes(color = color)) +
 ggplotの真骨頂！
 これをR標準機能でやるのは結構たいへん。
 
-```{r facet-wrap, fig.height=5.5, fig.width=8}
+
+```r
 p3 + facet_wrap(vars(clarity), ncol = 4L)
 ```
+
+![plot of chunk facet-wrap](figure/facet-wrap-1.png)
 
 ---
 ## 値に応じてパネル切り分け (≥2変数facet)
@@ -628,53 +757,44 @@ p3 + facet_wrap(vars(clarity), ncol = 4L)
 ggplotの真骨頂！
 これをR標準機能でやるのは結構たいへん。
 
-```{r facet-grid, fig.height=6.5, fig.width=9}
+
+```r
 p3 + facet_grid(vars(clarity), vars(cut))
 ```
+
+![plot of chunk facet-grid](figure/facet-grid-1.png)
 
 ---
 ## 多変量データの俯瞰、5次元くらいまで有効
 
-```{r facet-diamonds, echo = FALSE, fig.height = 7.8, fig.width = 12}
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(aes(color = color), alpha = 0.5) +
-  facet_grid(vars(clarity), vars(forcats::fct_rev(cut)), labeller = labeller(color = label_both)) +
-  scale_color_viridis_d(
-    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
-  ) +
-  labs(title = "Diamonds") +
-  theme_gray(base_size = 18) +
-  theme(
-    panel.grid = element_blank(),
-    panel.background = element_rect(fill = "#bbbbbb"),
-    legend.key = element_rect(fill = "#bbbbbb"),
-    axis.text = element_blank(), axis.ticks = element_blank()
-  )
-```
+![plot of chunk facet-diamonds](figure/facet-diamonds-1.png)
 
 ---
 ## 値に応じたfacetの練習
 
 自動車のスペックに関するデータ `mpg` を使って。
 
-```{r mpg3, echo = FALSE}
-wtl::printdf(mpg, n = 4)
+
+```
+    manufacturer  model displ  year   cyl      trans   drv   cty   hwy    fl   class
+           <chr>  <chr> <dbl> <int> <int>      <chr> <chr> <int> <int> <chr>   <chr>
+  1         audi     a4   1.8  1999     4   auto(l5)     f    18    29     p compact
+  2         audi     a4   1.8  1999     4 manual(m5)     f    21    29     p compact
+ --                                                                                 
+233   volkswagen passat   2.8  1999     6 manual(m5)     f    18    26     p midsize
+234   volkswagen passat   3.6  2008     6   auto(s6)     f    17    26     p midsize
 ```
 
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によってfacetしてみよう
 
-```{r ggplot-mpg-facet, echo = FALSE, fig.height = 3, fig.width = 10}
-ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = cyl)) +
-  facet_wrap(vars(drv))
-```
+![plot of chunk ggplot-mpg-facet](figure/ggplot-mpg-facet-1.png)
 
 
 ---
 ## 値を変えず座標軸を変える [`scale_*`](https://ggplot2.tidyverse.org/reference/#section-scales), [`coord_*`](https://ggplot2.tidyverse.org/reference/#section-coordinate-systems)
 
-```{r scale-axis, fig.height=4.8, fig.width=8}
+
+```r
 p2 + geom_point(alpha = 0.25) +
   scale_x_log10() +
   scale_y_log10(breaks = c(1, 2, 5, 10) * 1000) +
@@ -682,13 +802,16 @@ p2 + geom_point(alpha = 0.25) +
   labs(title = "Diamonds", x = "Size (carat)", y = "Price (USD)")
 ```
 
+![plot of chunk scale-axis](figure/scale-axis-1.png)
+
 ---
 ## データと関係ない部分の見た目を調整 `theme`
 
 [既存の `theme_*()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
 をベースに、[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html)関数で微調整。
 
-```{r theme, fig.height=4, fig.width=8}
+
+```r
 p3 + theme_bw() + theme(
   panel.background = element_rect(fill = "white"), # 箱
   panel.grid       = element_line(color = "blue"), # 線
@@ -696,6 +819,8 @@ p3 + theme_bw() + theme(
   axis.text        = element_blank()               # 消す
 )
 ```
+
+![plot of chunk theme](figure/theme-1.png)
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -711,10 +836,13 @@ p3 + theme_bw() + theme(
 [patchwork](https://patchwork.data-imaginist.com/))
 の助けを借りて
 
-```{r cowplot, fig.height=5.5, fig.width=6}
+
+```r
 pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
 cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol=1L)
 ```
+
+![plot of chunk cowplot](figure/cowplot-1.png)
 
 ---
 ## ファイル名もサイズも再現可能な作図
@@ -763,7 +891,8 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 
 うん。でもすべての点について後から確認できるし、使い回せる！
 
-```{r long, eval=FALSE}
+
+```r
 ggplot(diamonds) +
   geom_boxplot(aes(y = carat, x = cut, color = cut)) +
   theme_classic(base_size = 15) +
@@ -823,30 +952,7 @@ ggplot2は3Dが苦手
 下図になるべく似るように調整して `ggsave()` してください。<br>
 次回、数人グループに分かれてコードと図を見せ合います。
 
-```{r ggplot-homework, fig.height = 3.8, fig.width = 12, echo = FALSE}
-p_iris = ggplot(iris) +
-  aes(Sepal.Length, Sepal.Width) +
-  geom_point(aes(color = Species), shape = 16, size = 2, alpha = 0.6) +
-  stat_smooth(aes(color = Species), method = lm, formula = y ~ x, se = FALSE, size = 1, alpha = 0.6) +
-  scale_color_brewer(palette = "Set1") +
-  theme_gray(base_size = 14) +
-  theme(legend.position = "top", axis.ticks = element_blank())
-
-p_diamonds = ggplot(diamonds) +
-  aes(price) +
-  geom_histogram(bins = 20, fill = "darkorange") +
-  labs(title = "Distribution of diamonds price") +
-  theme_bw(base_size = 14) +
-  theme(panel.grid.minor = element_blank())
-
-p_mpg = ggplot(mpg) +
-  aes(drv, cty) +
-  geom_boxplot(aes(fill = drv)) +
-  geom_jitter(height = 0, width = 0.2, alpha = 0.5, shape = 16) +
-  theme_classic(base_size = 16)
-
-cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
-```
+![plot of chunk ggplot-homework](figure/ggplot-homework-1.png)
 
 ---
 ## 🔰 自由課題

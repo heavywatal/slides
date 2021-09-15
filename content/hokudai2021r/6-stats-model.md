@@ -34,16 +34,9 @@ draft = false
 <a href="https://heavywatal.github.io/slides/hokudai2021r/">https://heavywatal.github.io/slides/hokudai2021r/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
-```
 
-```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
-knitr::opts_chunk$set(cache = TRUE)
-```
+
+
 
 
 ---
@@ -63,8 +56,23 @@ knitr::opts_chunk$set(cache = TRUE)
 
 往々にして複雑過ぎ、情報多すぎ、そのままでは手に負えない
 
-```{r diamonds}
+
+```r
 print(ggplot2::diamonds)
+```
+
+```
+      carat       cut color clarity depth table price     x     y     z
+      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
 ```
 
 ダイヤモンド53,940個について10項目の値を持つデータセット
@@ -74,18 +82,17 @@ print(ggplot2::diamonds)
 
 各列の**平均**とか**標準偏差**とか:
 
-```{r summary-diamonds, echo = FALSE}
-diamonds %>%
-  dplyr::summarize(across(where(is.numeric), list(mean = mean, sd = sd, max = max))) %>%
-  dplyr::mutate(across(where(is.numeric), round, digits = 2)) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_")
+
+```
+   stat carat depth table    price     x     y     z
+  <chr> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>
+1  mean  0.80 61.75 57.46  3932.80  5.73  5.73  3.54
+2    sd  0.47  1.43  2.23  3989.44  1.12  1.14  0.71
+3   max  5.01 79.00 95.00 18823.00 10.74 58.90 31.80
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
-```{r cor-diamonds, eval = FALSE, include = FALSE}
-cor(diamonds$carat, diamonds$price)
-# [1] 0.9215913
-```
+
 
 **生のままよりは把握しやすい**かも。
 
@@ -186,16 +193,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 データ生成をうまく真似できそうな仮定の数式表現。<br>
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
-```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
-  ggplot(aes(carat, price)) +
-  geom_point(alpha = 0.3, size = 3) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  coord_cartesian(ylim = c(0, 20000)) +
-  labs(title = "Diamonds") +
-  theme_classic(base_size = 22)
-```
+![plot of chunk lm-diamonds](figure/lm-diamonds-1.png)
 
 新しく採れたダイヤモンドの価格予想とかにも使える。
 
@@ -290,18 +288,7 @@ diamonds %>%
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 &nbsp;
 
-```{r weight-height, echo = FALSE, fig.height = 5, fig.width = 5}
-n = 50
-df_weight = tibble::tibble(
-  height = rnorm(n, 1.70, 0.05),
-  bmi = rnorm(n, 22, 1),
-  weight = bmi * (height ** 2)
-)
-p_weight = ggplot(df_weight) + aes(height, weight) +
-  geom_point(alpha = 0.5) +
-  theme_bw(base_size = 20) + theme(panel.grid = element_blank())
-p_weight
-```
+![plot of chunk weight-height](figure/weight-height-1.png)
 
 
 ---
@@ -310,12 +297,7 @@ p_weight
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 じゃあ切片と傾き、どう決める？
 
-```{r weight-lines, echo = FALSE, fig.height = 5, fig.width = 5}
-df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) %>%
-  dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
-p_weight +
-  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
-```
+![plot of chunk weight-lines](figure/weight-lines-1.png)
 
 
 ---
@@ -323,36 +305,7 @@ p_weight +
 
 回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。
 
-```{r weight-residual, echo = FALSE, fig.height = 5, fig.width = 10}
-predict_weight = function(parameters, data) {
-  parameters[1] + parameters[2] * data$height
-}
-
-rss_weight = function(parameters, data) {
-  pred = predict_weight(parameters, data)
-  sqdev = (data[["weight"]] - pred) ** 2
-  sum(sqdev)
-}
-# rss_weight(c(40, -5), df_weight)
-
-param1 = c(10, 30)
-lm_weight = lm(weight ~ height, data = df_weight)
-rss1 = rss_weight(param1, df_weight)
-rss2 = rss_weight(lm_weight$coefficients, df_weight)
-stopifnot(abs(sum(lm_weight$residuals ** 2) - rss2) < 1e-6)
-
-p1 = p_weight %+%
-  (df_weight %>% dplyr::mutate(pred = predict_weight(param1, .))) +
-  geom_line(aes(y = pred)) +
-  geom_linerange(aes(ymin = weight, ymax = pred), colour = "#3366ff") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = sprintf("RSS = %.1f", rss1))
-p2 = p_weight %+%
-  (df_weight %>% modelr::add_predictions(lm_weight)) +
-  geom_line(aes(y = pred)) +
-  geom_linerange(aes(ymin = weight, ymax = pred), colour = "#3366ff") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = sprintf("RSS = %.1f", rss2))
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
+![plot of chunk weight-residual](figure/weight-residual-1.png)
 
 
 ---
@@ -360,36 +313,14 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 
 ランダムに試してみて、上位のものを採用
 
-```{r weight-goodlines, echo = FALSE, fig.height = 5, fig.width = 10}
-n = 200
-df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) %>%
-  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
-p_ab = ggplot(df_ab_random) + aes(intercept, slope) +
-  geom_point(data = function(x) {filter(x, rank(rss) < 6)}, shape = 1, size = 4) +
-  geom_point(aes(color = log10(rss))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
-
-p2 = p_weight +
-  geom_abline(data = df_ab_random %>% dplyr::slice_min(rss, n = 5), aes(slope = slope, intercept = intercept), color = "#3366ff", alpha = 0.5)
-cowplot::plot_grid(p_ab, p2, nrow = 1L)
-```
+![plot of chunk weight-goodlines](figure/weight-goodlines-1.png)
 
 ---
 ## 残差平方和(RSS)が最小となるパラメータを探せ
 
 **グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す
 
-```{r weight-grid, echo = FALSE, fig.height = 5, fig.width = 10}
-df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) %>%
-  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
-
-p1 = p_ab %+% df_ab_grid
-
-p2 = p_weight +
-  geom_abline(data = df_ab_grid %>% dplyr::slice_min(rss, n = 5), aes(slope = slope, intercept = intercept), color = "#3366ff", alpha = 0.5)
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
+![plot of chunk weight-grid](figure/weight-grid-1.png)
 
 こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
 
@@ -397,42 +328,24 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ---
 ## これくらいなら一瞬で計算してもらえる
 
-```{r lm}
+
+```r
 par_init = c(intercept = 0, slope = 0)
 result = optim(par_init, fn = rss_weight, data = df_weight)
 result$par
 ```
 
-```{r weight-lm, echo = FALSE, fig.height = 5, fig.width = 5}
-label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
-p_weight +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label)
 ```
+intercept     slope 
+-66.63000  77.04308 
+```
+
+![plot of chunk weight-lm](figure/weight-lm-1.png)
 
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r lm-bad, echo = FALSE, fig.height = 5, fig.width = 5}
-n = 300L
-a = 3
-b = -3
-df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
-
-x_breaks = c(0.5, 1.0, 1.5)
-coeff = lm(y ~ x, data = df_pois)$coefficients
-df_lm = tidyr::crossing(x = x_breaks, y = seq(-5, 20, 0.1)) %>%
- dplyr::mutate(density = dnorm(y, coeff[1] + coeff[2] * x, 1.4)) %>%
- dplyr::filter(density > 1e-4)
-
-p_pois = ggplot(df_pois) + aes(x, y) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), linetype = 0, alpha = 0) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
-```
+![plot of chunk lm-bad](figure/lm-bad-1.png)
 
 - 観察データは常に**正の値**なのに予測が負に突入してない？
 - **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
@@ -441,24 +354,7 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r glm-better, echo = FALSE, fig.height = 5, fig.width = 10}
-p_lm = p_pois +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), fill = "#3366ffaa", linetype = 0)
-# p_lm
-
-df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) %>%
- dplyr::mutate(density = dpois(y, exp(a * x + b))) %>%
- dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
-
-p_poisson = p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 0.5, group = x), fill = "#3366ffaa", linetype = 0)
-# p_poisson
-
-cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
-```
+![plot of chunk glm-better](figure/glm-better-1.png)
 
 - 観察データは常に**正の値**なのに予測が負に突入してない？
 - **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
@@ -493,22 +389,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 手元のデータを数えて作るのが**経験分布**<br>
 e.g., サイコロを12回投げた結果、学生1000人の身長
 
-```{r distribution, echo = FALSE, fig.height = 4, fig.width = 8}
-p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) %>%
-  ggplot() + aes(face) +
-  geom_bar(aes(y = after_stat(prop))) +
-  scale_x_continuous(breaks = seq_len(6L)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
-        axis.ticks = element_blank())
-
-p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) %>%
-  ggplot() + aes(height) +
-  geom_histogram(aes(y = after_stat(density)), binwidth = 1, boundary = 0) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), axis.ticks = element_blank())
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
+![plot of chunk distribution](figure/distribution-1.png)
 
 一方、少数のパラメータと数式で作るのが**理論分布**。<br>
 (こちらを単に「確率分布」と呼ぶことが多い印象）
@@ -525,15 +406,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
 
-```{r dbinom, echo = FALSE, fig.height = 3, fig.width = 3}
-size = 3L; p = 0.5
-tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) %>%
-  ggplot() + aes(X, Prob) +
-  geom_col() +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk dbinom](figure/dbinom-1.png)
 
   </div>
   <div class="column" style="padding-top: 10px;">
@@ -555,22 +428,7 @@ k &\in \{0, 1, 2, \ldots, n\}
 試行2: 裏 裏 裏 → $X = 0$<br>
 試行3: **表** 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$
 
-```{r rbinom, echo = FALSE, fig.height = 3, fig.width = 11}
-size = 3L; p = 0.5
-X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
-df_rbinom = purrr::map_dfr(c(1, 2, 3, 10, 100), ~{
-  tibble::tibble(X = head(X, .x)) %>% dplyr::count(X) %>%
-    dplyr::mutate(Freq = n / .x, Repl = .x)
-}) %>%
-  dplyr::bind_rows(tibble(X = seq(0, 3), Freq = dbinom(X, size, p), Repl = Inf))
-df_rbinom %>%
-  ggplot() + aes(X, Freq) +
-  geom_col() +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  facet_wrap(vars(Repl), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk rbinom](figure/rbinom-1.png)
 
 <div style="text-align: right;">
 試行回数を増やすほど<b>二項分布</b>の形に近づく。<br>
@@ -656,17 +514,7 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 e.g., コインの表裏、サイコロの出目1–6
 
-```{r dunif, echo = FALSE, fig.height = 4, fig.width = 6}
-df_coin = tibble::tibble(X = c("head", "tail"), Prob = c(0.5, 0.5), group = "Coin")
-df_dice = tibble::tibble(X = as.character(seq_len(6L)), Prob = rep(1 / 6, 6), group = "Dice")
-dplyr::bind_rows(df_coin, df_dice) %>%
-  ggplot() + aes(X, Prob) +
-  geom_col() +
-  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
-  facet_grid(cols = vars(group), scale = "free_x", space = "free_x") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk dunif](figure/dunif-1.png)
 
 🔰 一様分布になりそうな例を考えてみよう
 
@@ -678,20 +526,7 @@ dplyr::bind_rows(df_coin, df_dice) %>%
 
 e.g., コイントスで表が出るまでに何回裏が出るか
 
-```{r geometric, echo = FALSE, fig.height = 4, fig.width = 11}
-df = purrr::map_dfr(c(0.2, 0.5, 0.9), function(p) {
-  tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
-}) %>%
-  dplyr::filter(Prob > 0.001)
-x_br = c(seq.int(0, 10), seq.int(15, 100, 5))
-ggplot(df) + aes(X, Prob) +
-  scale_x_continuous(breaks = x_br) +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  geom_col() +
-  facet_grid(cols = vars(p), scales = "free_x", space = "free_x", labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk geometric](figure/geometric-1.png)
 
 \\[
 \text{Prob}(X = k \mid p) = p (1 - p)^k
@@ -706,20 +541,7 @@ ggplot(df) + aes(X, Prob) +
 
 確率$p$で当たるクジを$n$回引いたうち当たった回数X。平均は$np$。
 
-```{r dbinom-n, echo = FALSE, fig.height = 4, fig.width = 11}
-p = 0.25
-df = purrr::map_dfr(2 ** seq.int(0, 4), function(n) {
-  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
-})
-ggplot(df) + aes(X, Prob) +
-  scale_x_continuous(breaks = df[["X"]]) +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  geom_col() +
-  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
-  labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk dbinom-n](figure/dbinom-n-1.png)
 
 \\[
 \text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
@@ -735,32 +557,7 @@ ggplot(df) + aes(X, Prob) +
 
 e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数
 
-```{r dpoisson, echo = FALSE, fig.height = 4, fig.width = 11}
-lambda = c(1, 5, 10)
-
-p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) %>%
-  dplyr::mutate(time = purrr::map(lambda, ~runif(.x * 3, 0, 3))) %>%
-  tidyr::unnest(time) %>%
-  ggplot() + aes(time, y) +
-  annotate("segment", x = -0.1, xend = 3.1, y = 1:3, yend = 1:3, size = 2, arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed"), linejoin = "mitre") +
-  geom_point(aes(color = lambda, fill = lambda), size = 8, shape = 124, key_glyph = draw_key_rect) +
-  scale_color_continuous(guide = NULL) +
-  scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
-  scale_y_continuous(limits = c(0.5, 3.5), breaks = NULL) +
-  labs(y = NULL, x = "time (space)") +
-  theme_bw(base_size = 18) +
-  theme(axis.text.y = element_blank(), axis.ticks = element_blank(), panel.border = element_blank(),
-        panel.grid.minor = element_blank(), legend.position = "top")
-
-p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) %>%
-  dplyr::mutate(Prob = dpois(X, lambda)) %>%
-  ggplot() + aes(X, Prob) +
-  geom_col(aes(fill = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank(), legend.position = "none")
-cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
-```
+![plot of chunk dpoisson](figure/dpoisson-1.png)
 
 \\[
 \text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
@@ -777,16 +574,7 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 
 e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔
 
-```{r dexp, echo = FALSE, fig.height = 4, fig.width = 11}
-p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) %>%
-  dplyr::mutate(Prob = dexp(x, rate = lambda)) %>%
-  ggplot() + aes(x, Prob) +
-  geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank(), legend.position = "none")
-cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
-```
+![plot of chunk dexp](figure/dexp-1.png)
 
 \\[
 \text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
@@ -804,16 +592,7 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 
 e.g., メッセージを2つ受信するまでの待ち時間
 
-```{r dgamma, echo = FALSE, fig.height = 4, fig.width = 11}
-p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) %>%
-  dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) %>%
-  ggplot() + aes(x, Prob) +
-  geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank(), legend.position = "none")
-cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
-```
+![plot of chunk dgamma](figure/dgamma-1.png)
 
 \\[
 \text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
@@ -829,17 +608,7 @@ shapeパラメータ $k = 1$ のとき指数分布と一致。
 平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
 e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):
 
-```{r gaussian, echo = FALSE, fig.height = 5, fig.width = 11}
-ci = qnorm(c(0.005, 0.025, 0.975, 0.995), 50, 10)
-tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) %>%
-  ggplot() + aes(x, Prob) +
-  geom_area(alpha = 0.4) +
-  geom_area(data = function(.x) {dplyr::filter(.x, dplyr::between(x, ci[2], ci[3]))}, alpha = 0.4) +
-  geom_area(data = function(.x) {dplyr::filter(.x, dplyr::between(x, ci[1], ci[4]))}, alpha = 0.4) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank(), legend.position = "none")
-```
+![plot of chunk gaussian](figure/gaussian-1.png)
 
 \\[
 \text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
@@ -851,65 +620,22 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) %>%
 標本平均の反復(**中心極限定理**);
 e.g., 一様分布 [0, 100) から40サンプル
 
-```{r central-limit, echo = FALSE, fig.height = 3, fig.width = 11}
-n = 40L
-X = replicate(10000L, mean(runif(n, 0, 100)))
-purrr::map_dfr(c(10, 100, 1000, 10000), ~{tibble::tibble(X = head(X, .x), Repl = .x)}) %>%
-  ggplot() + aes(X) +
-  geom_histogram(bins = 25) +
-  facet_wrap(vars(Repl), nrow = 1L, scale = "free_y", labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
-        axis.ticks = element_blank())
-```
+![plot of chunk central-limit](figure/central-limit-1.png)
 
 大きい$n$の二項分布
 
-```{r binom-normal, echo = FALSE, fig.height = 3, fig.width = 11}
-purrr::map_dfr(c(1, 4, 16, 64, 256), ~{
-  tibble::tibble(X = seq(0, .x), Prob = dbinom(X, .x, 0.25), n = .x) %>%
-  dplyr::filter(Prob > 1e-5)
-}) %>%
-  ggplot() + aes(X, Prob) +
-  geom_col(width = 1) +
-  facet_wrap(vars(n), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
-        axis.ticks = element_blank())
-```
+![plot of chunk binom-normal](figure/binom-normal-1.png)
 
 ---
 ## 正規分布に近づくものがいろいろある
 
 大きい$\lambda$のポアソン分布
 
-```{r poisson-normal, echo = FALSE, fig.height = 2.5, fig.width = 11}
-purrr::map_dfr(c(1, 4, 16, 64, 256), ~{
-  tibble::tibble(X = seq(0, 4 * .x), Prob = dpois(X, .x), lambda = .x) %>%
-  dplyr::filter(Prob > 1e-5)
-}) %>%
-  ggplot() + aes(X, Prob) +
-  geom_col(width = 1) +
-  facet_wrap(vars(lambda), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
-        axis.ticks = element_blank())
-```
+![plot of chunk poisson-normal](figure/poisson-normal-1.png)
 
 平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布
 
-```{r gamma-normal, echo = FALSE, fig.height = 4, fig.width = 11}
-.guide = guide_legend(reverse = TRUE, label.position = "left", label.hjust = 1)
-tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10 ** seq.int(0, 3)) %>%
-  dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) %>%
-  ggplot() + aes(x, Prob) +
-  geom_area(aes(fill = k, group = k), position = "identity", alpha = 0.5) +
-  scale_fill_viridis_c(trans = "log10", guide = .guide) +
-  coord_cartesian(xlim = c(0, 20)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank())
-```
+![plot of chunk gamma-normal](figure/gamma-normal-1.png)
 
 
 ---
@@ -1002,14 +728,7 @@ p1 + geom_bar()       # for discrete values
 
 ある植物を50個体調べて、それぞれの種子数Xを数えた。
 
-```{r poisson-seed, echo = FALSE, fig.height = 4, fig.width = 4}
-df_rpois = tibble::tibble(X = rpois(50L, 3))
-ggplot(df_rpois) + aes(X) +
-  geom_bar() +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
-        axis.ticks = element_blank())
-```
+![plot of chunk poisson-seed](figure/poisson-seed-1.png)
 
 カウントデータだからポアソン分布っぽい。<br>
 ポアソン分布のパラメータ $\lambda$ はどう決める？
@@ -1020,19 +739,7 @@ ggplot(df_rpois) + aes(X) +
 
 ある植物を50個体調べて、それぞれの種子数Xを数えた。
 
-```{r poisson-seed-lambda, echo = FALSE, fig.height = 4, fig.width = 11}
-df_dpois = purrr::map_dfr(c(1, 3, 5), ~{
-  tibble(lambda = .x, X = seq(0, 11), Prob = dpois(X, lambda))
-})
-p_pois = ggplot(df_rpois) + aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
-  facet_wrap(vars(lambda), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-p_pois
-```
+![plot of chunk poisson-seed-lambda](figure/poisson-seed-lambda-1.png)
 
 カウントデータだからポアソン分布っぽい。<br>
 ポアソン分布のパラメータ $\lambda$ はどう決める？<br>
@@ -1092,15 +799,7 @@ L(\lambda \mid D)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 
-```{r poisson-seed-likelihood, echo = FALSE, fig.height = 4, fig.width = 11}
-df_likelihood = df_rpois %>%
-  dplyr::left_join(df_dpois, by = "X") %>%
-  dplyr::group_by(lambda) %>%
-  dplyr::summarize(L = prod(Prob)) %>%
-  dplyr::mutate(logL = log(L), label = sprintf("L(%.0f|D) = %.1e", lambda, L))
-p_pois +
-  geom_text(data = df_likelihood, aes(label = label), x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 6, color = "#3366ff")
-```
+![plot of chunk poisson-seed-likelihood](figure/poisson-seed-likelihood-1.png)
 
 この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。
 
@@ -1119,35 +818,7 @@ p_pois +
 \end{split}\]</div>
 
 
-```{r poisson-mle, echo = FALSE, fig.height = 3, fig.width = 10}
-count_rpois = df_rpois %>% dplyr::count(X)
-calc_likelihood_rpois = function(lambda) {
-  prod(dpois(count_rpois[["X"]], lambda) ** count_rpois[["n"]])
-}
-X_mle = mean(df_rpois[["X"]])
-L_mle = calc_likelihood_rpois(X_mle)
-p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_likelihood_rpois)) %>%
-  dplyr::mutate(logL = log(L)) %>%
-  ggplot() + aes(lambda, logL) +
-  geom_line() +
-  geom_vline(xintercept = X_mle, color = "#3366ff") +
-  annotate("point", x = X_mle, y = log(L_mle), size = 3, color = "#3366ff") +
-  annotate("text", x = Inf, y = Inf, hjust = 1.1, vjust = 1.2, size = 5, color = "#3366ff", label = sprintf("lambda = %.2f", X_mle)) +
-  labs(y = "log L") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank())
-
-df_dpois = tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
-p_pois = ggplot(df_rpois) + aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-
-cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
-```
+![plot of chunk poisson-mle](figure/poisson-mle-1.png)
 
 ---
 ## 最尤推定を使っても“真のλ”は得られない
@@ -1155,38 +826,7 @@ cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
 今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
 「50個体サンプル→最尤推定」を1,000回繰り返してみると:
 
-```{r poisson-mle-repl, echo = FALSE, fig.height = 5, fig.width = 11}
-nrep = 1000L
-df_repl = tibble::tibble(X = rpois(50L * nrep, 3), repl = rep(seq_len(nrep), each = 50L))
-df_sum = df_repl %>%
-  dplyr::group_by(repl) %>%
-  dplyr::summarize(lambda = mean(X))
-df_minmax = dplyr::bind_rows(dplyr::slice_max(df_sum, lambda), dplyr::slice_min(df_sum, lambda))
-
-p_repl = df_sum %>%
-  ggplot() + aes(lambda) +
-  geom_histogram(bins = 25, center = 3) +
-  annotate("point", x = df_minmax$lambda, y = 0, color = "#3366ff", size = 8, alpha = 0.5) +
-  labs(x = "estimated_lambda") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank())
-
-df_dpois = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) %>%
-  dplyr::mutate(Prob = dpois(X, lambda))
-p_minmax = df_repl %>%
-  dplyr::filter(repl %in% df_minmax$repl) %>%
-  dplyr::left_join(df_minmax, by = "repl") %>%
-  ggplot() + aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
-  facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-
-cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
-```
+![plot of chunk poisson-mle-repl](figure/poisson-mle-repl-1.png)
 
 サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
 (標本データへのあてはまりはかなり良く見えるのに！)
@@ -1197,21 +837,7 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 
 “$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:
 
-```{r poisson-mle-nsam, echo = FALSE, fig.height = 4, fig.width = 11}
-nrep = 1000L
-purrr::map_dfr(c(5, 50, 500, 5000), ~{
-  tibble::tibble(X = rpois(.x * nrep, 3), repl = rep(seq_len(nrep), each = .x)) %>%
-    dplyr::group_by(repl) %>%
-    dplyr::summarize(estimated_lambda = mean(X)) %>%
-    dplyr::mutate(n = .x)
-}) %>%
-  ggplot() + aes(estimated_lambda) +
-  geom_histogram(bins = 25, center = 3) +
-  facet_wrap(vars(n), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        axis.ticks = element_blank())
-```
+![plot of chunk poisson-mle-nsam](figure/poisson-mle-nsam-1.png)
 
 Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
 A. 推定したい統計量とか、許容できる誤差とかによる。
@@ -1265,17 +891,7 @@ e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分�
 X \sim \text{Poisson}(\lambda)
 \end{split}\]</div>
 
-```{r only-dist, echo = FALSE, fig.height = 4, fig.width = 4}
-df_rpois = tibble::tibble(X = rpois(50L, 3))
-df_dpois = tibble(X = seq(0, 11), Prob = dpois(X, mean(df_rpois$X)))
-p_pois = ggplot(df_rpois) + aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.3) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
-  theme_bw(base_size = 18)
-p_pois +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk only-dist](figure/only-dist-1.png)
 
 これを一般化線形モデル(GLM)として見ることもできる。
 
@@ -1290,13 +906,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 \lambda_i &= \beta_0
 \end{split}\]</div>
 
-```{r glm-without-x, echo = FALSE, fig.height = 4, fig.width = 4}
-p_pois +
-  labs(x = "y") +
-  coord_flip() +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.y = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk glm-without-x](figure/glm-without-x-1.png)
 
 種子数をY軸にして、式を2つに分けただけ...?<br>
 **説明変数**を含むモデルを見ればご利益が分かるかも。
@@ -1317,28 +927,7 @@ p_pois +
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r glm-poisson, echo = FALSE, fig.height = 5, fig.width = 5}
-n = 300L
-a = 3
-b = -3
-df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
-
-x_breaks = c(0.5, 1.0, 1.5)
-df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) %>%
- dplyr::mutate(density = dpois(y, exp(a * x + b))) %>%
- dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
-
-p_pois = ggplot(df_pois) + aes(x, y) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-
-p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 0.5, group = x), fill = "#3366ffaa", linetype = 0)
-```
+![plot of chunk glm-poisson](figure/glm-poisson-1.png)
 
   </div>
 </div>
@@ -1356,37 +945,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 気温も湿度も高いほどビールが売れる、とか
 
-```{r multiple-regression, echo = FALSE, fig.height = 5, fig.width = 10}
-n = 200L
-true_coef = c(3, 0.05, 0.006)
-df_beer = tibble::tibble(
-  temperature = runif(n, 8, 32),
-  humidity = runif(n, 20, 80),
-  beer_sales = rpois(n, exp(true_coef[1] + true_coef[2] * temperature + true_coef[3] * humidity))
-)
-glm_multi = glm(beer_sales ~ temperature + humidity, df_beer, family = poisson)
-
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) %>%
-  modelr::add_predictions(glm_multi) %>%
-  dplyr::mutate(y_pred = exp(pred))
-
-p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
-  geom_line(data = df_pred, aes(y = y_pred, group = humidity), alpha = 0.7) +
-  geom_point(alpha = 0.5) +
-  scale_color_viridis_c(option = "cividis", direction = -1) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
-  geom_line(data = df_pred, aes(y = y_pred, group = temperature), alpha = 0.7) +
-  geom_point(alpha = 0.5) +
-  scale_color_viridis_c(option = "turbo") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
+![plot of chunk multiple-regression](figure/multiple-regression-1.png)
 
 今度は**確率分布**と**リンク関数**を変えてみよう。
 
@@ -1416,39 +975,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r glm-logistic, echo = FALSE, fig.height = 5, fig.width = 5}
-nrep = 200L
-n = 10L
-df_rlogistic = tibble::tibble(
-  x = runif(nrep, -10, 35),
-  logit_p = -3 + 0.3 * x,
-  p = wtl::logistic(logit_p),
-  y = rbinom(nrep, n, p),
-  response = matrix(c(y, n - y), ncol = 2)
-)
-glm_logistic = glm(response ~ x, df_rlogistic, family = binomial)
-df_pred = df_rlogistic %>%
-  modelr::add_predictions(glm_logistic) %>%
-  dplyr::mutate(y_pred = n * wtl::logistic(pred))
-
-coef = glm_logistic$coefficients
-
-x_breaks = c(-10, 0, 10, 20, 30)
-df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) %>%
-  dplyr::mutate(p = wtl::logistic(coef[1] + coef[2] * x), density = dbinom(y, n, p)) %>%
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
-
-ggplot(df_pred) + aes(x, y) +
-  geom_point(alpha = 0.5, shape = 16) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 6, group = x), fill = "#3366ffaa", linetype = 0) +
-  geom_line(aes(y = y_pred), size = 2, color = "#3366ff") +
-  scale_x_continuous(breaks = x_breaks) +
-  scale_y_continuous(breaks = seq.int(0, 10)) +
-  labs(x = "temperature", y = "beer_sales") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-```
+![plot of chunk glm-logistic](figure/glm-logistic-1.png)
 
   </div>
 </div>
@@ -1484,31 +1011,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r wind, echo = FALSE, fig.height = 4, fig.width = 5}
-n = 200
-df_wind = tibble::tibble(
-  max_wind = runif(n, 0, 40),
-  bucket_sales = rbinom(n, 1L, wtl::sigmoid(max_wind - 20, 0.2)) + 0L)
-glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = "binomial")
-
-coef = glm_bernoulli$coefficients
-x_breaks = c(0, 10, 20, 30, 40)
-df_ridges = tidyr::crossing(x = x_breaks, y = c(0, 1)) %>%
-  dplyr::mutate(p = wtl::logistic(coef[1] + coef[2] * x), density = dbinom(y, 1, p)) %>%
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density, width = 0.2)
-
-df_wind %>%
-  modelr::add_predictions(glm_bernoulli) %>%
-  dplyr::mutate(y_pred = wtl::logistic(pred)) %>%
-  ggplot() + aes(max_wind, bucket_sales) +
-  geom_point(alpha = 0.3, shape = 124, size = 6) +
-  ggridges::geom_vridgeline(data = df_bars, aes(x, y, width = density * 6, group = x), fill = "#3366ffaa", linetype = 0) +
-  geom_line(aes(y = y_pred), color = "#3366ff") +
-  scale_y_continuous(breaks = c(0, 1)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-```
+![plot of chunk wind](figure/wind-1.png)
 
   </div>
 </div>
@@ -1531,29 +1034,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r glm-weight, echo = FALSE, fig.height = 4, fig.width = 4}
-n = 100
-df_weight = tibble::tibble(
-  height = rnorm(n, 1.70, 0.06),
-  bmi = rnorm(n, 22, 0.8),
-  weight = bmi * (height ** 2)
-) %>%
-  dplyr::filter(dplyr::between(height, 1.6, 1.8))
-
-coef = lm(weight ~ height, df_weight)$coefficients
-
-x_breaks = c(1.65, 1.7, 1.75)
-df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) %>%
-  dplyr::mutate(density = dnorm(weight, coef[1] + coef[2] * height, 1.8)) %>%
-  dplyr::filter(density > 1e-4)
-
-ggplot(df_weight) + aes(height, weight) +
-  geom_point(alpha = 0.5, shape = 16) +
-  ggridges::geom_vridgeline(data = df_ridges, aes(width = density * 0.08, group = height), fill = "#3366ffaa", linetype = 0) +
-  stat_smooth(method = lm, formula = y ~ x, se = FALSE) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) + theme(panel.grid.minor = element_blank())
-```
+![plot of chunk glm-weight](figure/glm-weight-1.png)
 
   </div>
 </div>
@@ -1585,64 +1066,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r glm-anova, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
-n = 200L
-coef = c(70, 3, 20, -20)
-weather_levels = c("sunny", "cloudy", "rainy")
-df_beer = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) %>%
-  dplyr::mutate(name = weather, value = 1L) %>%
-  tidyr::pivot_wider(values_fill = 0L) %>%
-  dplyr::select(!cloudy) %>%
-  dplyr::mutate(beer_sales = rnorm(n, coef[1] + coef[2] * temperature + coef[3] * sunny + coef[4] * rainy, 10))
-
-lm_anova = lm(beer_sales ~ weather, df_beer)
-df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels), beer_sales = seq(50, 200, 1)) %>%
-  modelr::add_predictions(lm_anova) %>%
-  dplyr::mutate(density = dnorm(beer_sales, pred, 10)) %>%
-  dplyr::filter(density > 1e-4)
-
-tidy_anova = broom::tidy(lm_anova)
-
-avgs = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_anova) %>%
-  tibble::deframe()
-
-dfl = tibble::tribble(
-  ~x, ~xend, ~y, ~yend,
-  -Inf, Inf, avgs["cloudy"], avgs["cloudy"],
-  1.5, 2.5, avgs["sunny"], avgs["sunny"],
-  2.5, 3.5, avgs["rainy"], avgs["rainy"]
-)
-
-dfa = tibble::tribble(
-  ~x, ~xend, ~y, ~yend,
-  1.75, 1.75, avgs["cloudy"], avgs["sunny"],
-  2.75, 2.75, avgs["cloudy"], avgs["rainy"]
-)
-
-dfs = tibble::tribble(
-  ~x, ~y, ~label,
-  0.6, avgs["cloudy"] + (avgs["sunny"] - avgs["cloudy"]) * 0.3, "beta[0]",
-  1.55, (avgs["cloudy"] + avgs["sunny"]) / 2, "beta[1]",
-  2.55, (avgs["cloudy"] + avgs["rainy"]) / 2, "beta[2]"
-)
-
-.arr = grid::arrow(length = grid::unit(0.1, "inches"))
-df_beer %>%
-  ggplot() + aes(weather, beer_sales, color = weather) +
-  ggridges::geom_vridgeline(data = df_ridges, aes(width = density * 6, group = weather), fill = "#3366ffaa", linetype = 0) +
-  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#3366ffaa") +
-  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#3366ffaa") +
-  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 6, color = "#3366ffaa") +
-  geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
-  scale_x_discrete(limits = c("cloudy", "sunny", "rainy")) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
-```
+![plot of chunk glm-anova](figure/glm-anova-1.png)
 
   </div>
 </div>
@@ -1677,20 +1101,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
   <div class="column" style="flex-shrink: 1.3;">
 
 
-```{r glm-ancova, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
-lm_ancova = lm(beer_sales ~ temperature + weather, df_beer)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_ancova) %>%
-  dplyr::mutate(y_pred = pred)
-
-ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, size = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-```
+![plot of chunk glm-ancova](figure/glm-ancova-1.png)
 
   </div>
 </div>
@@ -1779,53 +1190,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
 この場合は直線回帰よりもポアソン回帰が良さそう:
 
-```{r compare-loglik, echo = FALSE, fig.height = 5, fig.width = 9}
-n = 300L
-a = 3
-b = -3
-df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
-
-models = setNames(, c("gaussian", "poisson")) %>% purrr::map(~{
-  glm(y ~ x, family = .x, data = df_pois)
-})
-
-x_breaks = c(0.5, 1.0, 1.5)
-df_lm = tidyr::crossing(x = x_breaks, y = seq(-5, 20, 0.1)) %>%
-  modelr::add_predictions(models[["gaussian"]]) %>%
-  dplyr::mutate(density = dnorm(y, pred, 1.4)) %>%
-  dplyr::filter(density > 1e-4)
-
-p_pois = ggplot(df_pois) + aes(x, y) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), linetype = 0, alpha = 0) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-
-label = sprintf("logLik = %.1f", broom::glance(models[["gaussian"]])$logLik)
-p_lm = p_pois +
-  labs(title = "gaussian, identity link") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 6) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), fill = "#3366ffaa", linetype = 0)
-# p_lm
-
-df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) %>%
-  modelr::add_predictions(models[["poisson"]]) %>%
-  dplyr::mutate(density = dpois(y, exp(pred))) %>%
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
-
-label = sprintf("logLik = %.1f", broom::glance(models[["poisson"]])$logLik)
-p_poisson = p_pois +
-  labs(title = "poisson, log link") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 6) +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 0.5, group = x), fill = "#3366ffaa", linetype = 0)
-# p_poisson
-
-cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
-```
+![plot of chunk compare-loglik](figure/compare-loglik-1.png)
 
 この調子で、より尤度の高いモデルを探していけばいいだろうか？
 
@@ -1836,42 +1201,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 : パラメータを増やせば**現データへの**適合度・尤度を高くできるが、<br>
   予測・理解の役には立たなくなる。
 
-```{r saturated-model, echo = FALSE, fig.height = 4, fig.width = 11}
-n = 16L
-true_coef = c(0.1, 0.2)
-df_plant = tibble::tibble(
-  x = runif(n, 7, 12.5),
-  lambda = exp(true_coef[1] + true_coef[2] * x),
-  y = rpois(n, lambda)
-) %>% tibble::rownames_to_column("id")
-
-models = df_plant %>% modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
-  null = ~ 1,
-  x = ~ x,
-  saturated = ~ id
-))
-labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
-
-p_plant = df_plant %>%
-  modelr::add_predictions(models$null) %>%
-  ggplot() + aes(x, y) +
-  geom_line(aes(y = exp(pred)), color = "#3366ff", size = 2, alpha = 0.7) +
-  geom_point(shape = 16, alpha = 0.6) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
-
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
-p_x = p_plant %+% modelr::add_predictions(df_plant, models$x) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated) +
-  labs(title = "saturated model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["saturated"]], color = "#3366ff", size = 6)
-
-cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
-```
+![plot of chunk saturated-model](figure/saturated-model-1.png)
 
 **帰無モデル**: 説明変数なし。切片のみ。<br>
 **飽和モデル**: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
@@ -1883,51 +1213,7 @@ cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
 観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
 
-```{r many-models, echo = FALSE, fig.height = 7, fig.width = 7}
-set.seed(24601)
-n = 120L
-true_coef = c(1, 0.12, 0)
-df_plant = tibble::tibble(
-  x = runif(n, 7, 12.5),
-  x2 = sample(c(FALSE, TRUE), n, replace = TRUE),
-  lambda = exp(true_coef[1] + true_coef[2] * x + true_coef[3] * x2),
-  y = rpois(n, lambda)
-) %>% tibble::rownames_to_column("id")
-
-models = df_plant %>% modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
-  null = ~ 1,
-  x = ~ x,
-  x2 = ~ x2,
-  both = ~ x + x2,
-  saturated = ~ id
-))
-labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
-
-p_plant = df_plant %>%
-  modelr::add_predictions(models$null) %>%
-  ggplot() + aes(x, y) +
-  geom_line(aes(y = exp(pred)), size = 1.5, alpha = 0.6) +
-  geom_point(shape = 16, alpha = 0.6) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
-
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
-p_x = p_plant %+% (df_plant %>% modelr::add_predictions(models$x)) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_x2 = p_plant %+% (df_plant %>% modelr::add_predictions(models$x2)) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 6)
-p_both = p_plant %+% (df_plant %>% modelr::add_predictions(models$both)) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 6)
-
-cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
-```
+![plot of chunk many-models](figure/many-models-1.png)
 
 
 
@@ -1958,24 +1244,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
 観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
 
-```{r many-models-aic, echo = FALSE, fig.height = 7, fig.width = 7}
-labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(models))
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
-p_x = p_plant %+% (df_plant %>% modelr::add_predictions(models$x)) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_x2 = p_plant %+% (df_plant %>% modelr::add_predictions(models$x2)) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 6)
-p_both = p_plant %+% (df_plant %>% modelr::add_predictions(models$both)) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 6)
-cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
-```
+![plot of chunk many-models-aic](figure/many-models-aic-1.png)
 
 ---
 ## ほかの情報量基準
@@ -2043,32 +1312,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r interaction, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
-n = 200L
-coef = c(70, 3, 100, -2)
-weather_levels = c("sunny", "rainy")
-df_beer = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) %>%
-  dplyr::mutate(name = weather, value = 1L) %>%
-  tidyr::pivot_wider(values_fill = 0L) %>%
-  dplyr::mutate(mu = coef[1] * sunny + coef[2] * temperature + coef[3] * rainy + coef[4] * temperature * rainy) %>%
-  dplyr::mutate(beer_sales = rnorm(n, mu, 10))
-
-lm_int = lm(beer_sales ~ temperature * weather, df_beer)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_int) %>%
-  dplyr::mutate(y_pred = pred)
-
-ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, size = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-```
+![plot of chunk interaction](figure/interaction-1.png)
 
   </div>
 </div>
@@ -2111,13 +1355,19 @@ penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{r penguins, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
-if (!require(palmerpenguins, quietly = TRUE)) {
-  install.packages("palmerpenguins")
-  library(palmerpenguins)
-}
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
-print(penguins)
+
+```
+      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex  year
+        <fct>     <fct>          <dbl>         <dbl>             <int>       <int>  <fct> <int>
+  1    Adelie Torgersen           39.1          18.7               181        3750   male  2007
+  2    Adelie Torgersen           39.5          17.4               186        3800 female  2007
+  3    Adelie Torgersen           40.3          18.0               195        3250 female  2007
+  4    Adelie Torgersen             NA            NA                NA          NA     NA  2007
+ --                                                                                            
+341 Chinstrap     Dream           43.5          18.1               202        3400 female  2009
+342 Chinstrap     Dream           49.6          18.2               193        3775   male  2009
+343 Chinstrap     Dream           50.8          19.0               210        4100   male  2009
+344 Chinstrap     Dream           50.2          18.7               198        3775 female  2009
 ```
 
 ---
@@ -2125,7 +1375,8 @@ print(penguins)
 
 どうやら、重いペンギンほど翼長も長い。
 
-```{r penguins-weight, fig.height = 5, fig.width = 5, warning = FALSE}
+
+```r
 p_penweight = ggplot(penguins) +
   aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +
@@ -2134,14 +1385,33 @@ p_penweight = ggplot(penguins) +
 p_penweight
 ```
 
+![plot of chunk penguins-weight](figure/penguins-weight-1.png)
+
 
 ---
 ## 単回帰の練習: 2. モデル作成、フィッティング
 
-```{r penguins-fit1}
+
+```r
 fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
 broom::tidy(fit1)
+```
+
+```
+         term     estimate   std.error statistic       p.value
+        <chr>        <dbl>       <dbl>     <dbl>         <dbl>
+1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
+2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
+```
+
+```r
 broom::glance(fit1)
+```
+
+```
+  null.deviance df.null    logLik      AIC     BIC deviance df.residual  nobs
+          <dbl>   <int>     <dbl>    <dbl>   <dbl>    <dbl>       <int> <int>
+1      67426.54     341 -1145.518 2297.035 2308.54  16250.3         340   342
 ```
 
 ---
@@ -2149,23 +1419,29 @@ broom::glance(fit1)
 
 $y = 136.7 + 0.0153 x$
 
-```{r penguins-weight-glm, fig.height = 5, fig.width = 5, warning = FALSE}
+
+```r
 added1 = modelr::add_predictions(penguins, fit1)
 p1 = p_penweight +
   geom_line(aes(y = pred), data = added1, size = 1, color = "#3366ff")
 p1
 ```
 
+![plot of chunk penguins-weight-glm](figure/penguins-weight-glm-1.png)
+
 ---
 ## 重回帰の練習: 1. まず作図
 
 重いペンギンほど翼長も長い。翼長は種によっても違うかも。
 
-```{r penguins-weight-sp, fig.height = 5, fig.width = 7, warning = FALSE}
+
+```r
 p_penweight_color = p_penweight + aes(color = species) +
   scale_color_manual(values = penguins_colors)
 p_penweight_color
 ```
+
+![plot of chunk penguins-weight-sp](figure/penguins-weight-sp-1.png)
 
 
 ---
@@ -2174,21 +1450,43 @@ p_penweight_color
 Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のときより小さい。
 
-```{r penguins-fit2}
+
+```r
 fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
 broom::tidy(fit2)
+```
+
+```
+              term     estimate    std.error statistic       p.value
+             <chr>        <dbl>        <dbl>     <dbl>         <dbl>
+1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
+2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
+4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+```
+
+```r
 broom::glance(fit2)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
+          <dbl>   <int>     <dbl>    <dbl>    <dbl>    <dbl>       <int> <int>
+1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
 ```
 
 ---
 ## 重回帰の練習: 3. フィッティング結果を作図
 
-```{r penguins-weight-sp-glm, fig.height = 5, fig.width = 7, warning = FALSE}
+
+```r
 added2 = modelr::add_predictions(penguins, fit2)
 p2 = p_penweight_color +
   geom_line(aes(y = pred), data = added2, size = 1)
 p2
 ```
+
+![plot of chunk penguins-weight-sp-glm](figure/penguins-weight-sp-glm-1.png)
 
 **傾き**も種によって違うかも。**交互作用**を入れてみたい。
 
@@ -2199,21 +1497,43 @@ p2
 Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
-```{r penguins-fit3}
+
+```r
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
 broom::tidy(fit2)
+```
+
+```
+              term     estimate    std.error statistic       p.value
+             <chr>        <dbl>        <dbl>     <dbl>         <dbl>
+1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
+2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
+4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+```
+
+```r
 broom::glance(fit2)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
+          <dbl>   <int>     <dbl>    <dbl>    <dbl>    <dbl>       <int> <int>
+1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
 ```
 
 ---
 ## 交互作用の練習: フィッティング結果を作図
 
-```{r penguins-interaction, fig.height = 5, fig.width = 7, warning = FALSE}
+
+```r
 added3 = modelr::add_predictions(penguins, fit3)
 p3 = p_penweight_color +
   geom_line(aes(y = pred), data = added3, size = 1)
 p3
 ```
+
+![plot of chunk penguins-interaction](figure/penguins-interaction-1.png)
 
 ---
 ## ここまでの3つのモデルでどれがいいか？
@@ -2223,12 +1543,7 @@ AICで選ぶなら交互作用入り重回帰のが良さそう。
 ```r
 AIC(fit1, fit2, fit3)$AIC
 ```
-```{r penguins-aic, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
-labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
-cowplot::plot_grid(p1 + labs(title = labels[1]),
-                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
-                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
-```
+![plot of chunk penguins-aic](figure/penguins-aic-1.png)
 
 
 ---
@@ -2236,28 +1551,7 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
-```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
-p_bill = penguins %>%
-  ggplot() + aes(bill_length_mm, bill_depth_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
-  scale_color_manual(values = penguins_colors) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins)
-p1 = p_bill +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
-p2 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit2), size = 1)
-p3 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit3), size = 1)
-labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
-cowplot::plot_grid(p1 + labs(title = labels[1]),
-                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
-                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
-```
+![plot of chunk penguins-bill](figure/penguins-bill-1.png)
 
 🔰余裕があったら性別や年なども説明変数に入れてみよう。
 
@@ -2266,10 +1560,17 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 ## 確率分布とリンク関数を明示的に指定したい
 
 何も指定しない場合は正規分布・恒等リンクだった:
-```{r glm-default-family}
+
+```r
 formula = flipper_length_mm ~ body_mass_g
 fit1 = glm(formula, data = penguins)
 fit1$family
+```
+
+```
+
+Family: gaussian 
+Link function: identity 
 ```
 
 こう書いたのと同じ:
@@ -2287,35 +1588,7 @@ glm(formula, data = penguins, family = gaussian(link = identity))
 親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
-```{r overdispersion, echo = FALSE, fig.height = 5, fig.width = 6, warning = FALSE}
-ninds = 100L
-mu_ind = 0.5
-sd_ind = 3
-df_od = tibble::tibble(
-  z = rnorm(ninds, mu_ind, sd_ind),
-  p = wtl::sigmoid(z),
-  y = rbinom(ninds, 8L, p))
-sum_y = sum(df_od$y)
-p_hat = sum_y / 800
-tidy_od = df_od %>%
-  dplyr::count(y, name = "observed") %>%
-  dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
-  tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
-  dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
-# label = expression(hat(p) == paste(sprintf("%d/800 = %.2f", sum_y, p_hat)))
-label = bquote(hat(p) == .(paste(sprintf("%d/800 = %.2f", sum_y, p_hat))))
-tidy_od %>%
-  ggplot() + aes(y, count) +
-  geom_col(aes(fill = key, width = width, alpha = alpha), position = "identity") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 6) +
-  scale_alpha_identity() +
-  scale_fill_manual(values = c(observed = "#333333", expected = "#3366ff")) +
-  coord_cartesian(xlim = c(0, 8)) +
-  labs(x = "# survived seeds") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-```
+![plot of chunk overdispersion](figure/overdispersion-1.png)
 
 もっと柔軟にモデリングしたい
 
