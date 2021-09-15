@@ -97,10 +97,10 @@ if (!doNotTrack) {
 </li>
 <li><strong>データ内容を対象とする処理</strong> 👈 第5回 本日の話題
 <ul>
-<li>数値を変換する (e.g., 対数、座標系)</li>
-<li>変換: 連続変数 ↔ カテゴリカル変数 ↔ 指示変数</li>
-<li>外れ値・欠損値に対処</li>
-<li>文字列処理: パターンマッチ、日時</li>
+<li>数値の変換: 対数、正規化</li>
+<li>外れ値・欠損値への対処</li>
+<li>型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時</li>
+<li>文字列処理: 正規表現によるパターンマッチ</li>
 </ul>
 </li>
 </ul>
@@ -626,6 +626,15 @@ http://userguide.icu-project.org/strings/regexp
 86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA   &lt;NA&gt;      &lt;NA&gt;      &lt;NA&gt;    &lt;NA&gt; &lt;chr [1]&gt; &lt;chr [0]&gt; &lt;chr [0]&gt;
 87  Padmé Amidala    165    45      brown       light     brown       46.0 female  feminine     Naboo   Human &lt;chr [3]&gt; &lt;chr [0]&gt; &lt;chr [3]&gt;
 </code></pre>
+</section>
+<section>
+<h2 id="dplyr-tidyr-の列選択などでも活躍">dplyr, tidyr の列選択などでも活躍</h2>
+<p><code>matches()</code> があれば <code>starts_with()</code>/<code>ends_with()</code> は不要:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">diamonds</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^c&#34;</span><span class="p">))</span>   <span class="c1"># starts_with(&#34;c&#34;)</span>
+<span class="n">starwars</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;s$&#34;</span><span class="p">))</span>   <span class="c1"># ends_with(&#34;s&#34;)</span>
+<span class="n">world_bank_pop</span> <span class="o">%&gt;%</span> <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^\\d+$&#34;</span><span class="p">),</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;year&#34;</span><span class="p">)</span>
+</code></pre></div><p>See <a href="https://tidyselect.r-lib.org/reference/select_helpers.html">&ldquo;tidyselect helpers&rdquo;</a> for more details.</p>
+
 </section>
 <section>
 <h2 id="形式を変える整える">形式を変える・整える</h2>
