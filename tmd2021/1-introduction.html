@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>1. 入門1: 前処理とは。Rを使うメリット。Rの基本 — Rによるデータ前処理実習 2021</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="1. 入門1: 前処理とは。Rを使うメリット。Rの基本 — Rによるデータ前処理実習 2021">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tmd2021/1-introduction.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.88.1" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="rによるデータ前処理実習2020"><a href=".">Rによるデータ前処理実習2020</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li class="current-deck"><a href="1-introduction.html">入門1: 前処理とは。Rを使うメリット。Rの基本。</a>
+<li><a href="2-visualization.html">入門2: データ可視化の重要性と方法。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
+<li><a href="6-practice.html">実践: 現実の問題に対処してみる。</a>
+</ol>
+<div class="footnote">
+2021-10-02 東京医科歯科大学 M&Dタワー 情報検索室1
+<a href="https://heavywatal.github.io/slides/tmd2021/">https://heavywatal.github.io/slides/tmd2021/</a>
+</div>
+
+</section>
+<section>
+<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<ol>
+<li>コンピュータ環境の整備</li>
+<li>データの取得、読み込み</li>
+<li>探索的データ解析
+<ul>
+<li><strong>前処理、加工</strong> (地味。意外と重い) 👈本実習の主題</li>
+<li>可視化、仮説生成 (派手！楽しい！)</li>
+<li>統計解析、仮説検証 (みんな勉強したがる)</li>
+</ul>
+</li>
+<li>報告、発表</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="そもそもなぜ解析-生の数字見ればよくない">そもそもなぜ解析？ 生の数字見ればよくない？</h2>
+<p>生データは情報が多すぎて関係性も何も見えない</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre><p>ダイヤモンド53,940個について10項目の値を持つデータセット</p>
+
+</section>
+<section>
+<h2 id="要約統計量平均とか分散とかを見てみる">要約統計量(平均とか分散とか)を見てみる</h2>
+<p>各列の<strong>平均</strong>とか<strong>標準偏差</strong>とか:</p>
+<pre tabindex="0"><code>   stat carat depth table    price     x     y     z
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1  mean  0.80 61.75 57.46  3932.80  5.73  5.73  3.54
+2    sd  0.47  1.43  2.23  3989.44  1.12  1.14  0.71
+3   max  5.01 79.00 95.00 18823.00 10.74 58.90 31.80
+</code></pre><p>大きさ <code>carat</code> と価格 <code>price</code> の<strong>相関係数</strong>は 0.92 (かなり高い)。</p>
+<p><strong>生のままよりは把握しやすい</strong>かも。</p>
+<p>しかし要注意&hellip;</p>
+
+</section>
+<section>
+<h2 id="平均値ばかり見て可視化を怠ると構造を見逃す">平均値ばかり見て可視化を怠ると構造を見逃す</h2>
+<figure style="position: relative;">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<img src="/slides/image/rstats/datasaurus.png" width="800">
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+</section>
+<section>
+<h2 id="作図してみると全体像構造が見やすい">作図してみると全体像・構造が見やすい</h2>
+<p>情報の整理 → <strong>正しい解析・新しい発見・仮説生成</strong></p>
+<p><img src="figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds"></p>
+<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
+その度合いは <code>clarity</code> によって異なるらしい。</p>
+
+</section>
+<section>
+<h2 id="作図してみると全体像構造が見やすい">作図してみると全体像・構造が見やすい</h2>
+<p>情報の整理 → <strong>正しい解析・新しい発見・仮説生成</strong></p>
+<figure>
+<a href="https://r4ds.had.co.nz/explore-intro.html">
+<img src="/slides/image/r4ds/data-science-explore.png">
+<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+</a>
+</figure>
+<br>
+可視化だいじ。わかった。<br>
+でも「データ分析に費やす労力の8割は前処理」だって？
+
+</section>
+<section>
+<h2 id="機械処理しやすい形-vs-人が読み書きしやすい形">機械処理しやすい形 vs 人が読み書きしやすい形</h2>
+<dl>
+<dt>作図や解析に使えるデータ形式はほぼ決まってる</dt>
+<dd><code>ggplot(data, ...)</code>, <code>glm(..., data, ...)</code>, &hellip;</dd>
+<dt>出発点となるデータはさまざま</dt>
+<dd>実験ノート、フィールドノート、データベース、&hellip;</dd>
+</dl>
+<blockquote>
+<p>Happy families are all alike;<br>
+every unhappy family is unhappy in its own way<br>
+&mdash; Leo Tolstoy &ldquo;Anna Karenina&rdquo;</p>
+</blockquote>
+<blockquote>
+<p>tidy datasets are all alike,<br>
+but every messy dataset is messy in its own way<br>
+&mdash; Hadley Wickham</p>
+</blockquote>
+
+</section>
+<section>
+<h2 id="整然データ-tidy-data">整然データ tidy data</h2>
+<ul>
+<li><strong>縦1列</strong>は1つの<strong>変数</strong></li>
+<li><strong>横1行</strong>は1つの<strong>観測</strong></li>
+<li><strong>1セル</strong>は1つの<strong>値</strong></li>
+</ul>
+<cite style="display: block; text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</cite>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
+    <div style="position: absolute; top: 440px;">
+    <strong>縦1列は1つの変数</strong><br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    <strong>横1行は1つの観測</strong><br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    <strong>1セルは1つの値</strong><br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+</section>
+<section>
+<h2 id="整然データのご利益の例-ggplot2-本日2時限目の話題">整然データのご利益の例: ggplot2 (本日2時限目の話題)</h2>
+<p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">cut</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/tidy-data-benefit-1.png" alt="plot of chunk tidy-data-benefit"></p>
+
+</section>
+<section>
+<h2 id="本日1時限目の話題">本日1時限目の話題</h2>
+<h3 id="-delデータ解析全体の流れ可視化だいじdel-small-stylefont-weight-normal詳細は本日後半small">✅ <del>データ解析全体の流れ。可視化だいじ</del> <small style="font-weight: normal;">(詳細は本日後半)</small></h3>
+<h3 id="-del作図解析の前にデータの前処理が必要del-small-stylefont-weight-normal詳細は明日small">✅ <del>作図・解析の前にデータの前処理が必要</del> <small style="font-weight: normal;">(詳細は明日)</small></h3>
+<h3 id="-なぜrを使うのか">⬜ なぜRを使うのか？</h3>
+<ul>
+<li>退屈な作業は機械にやらせてラクしよう</li>
+<li>無料で誰でも使える</li>
+</ul>
+<h3 id="-rの基礎">⬜ Rの基礎</h3>
+
+</section>
+<section>
+<h2 id="rを使わなかった場合の悲劇の例">Rを使わなかった場合の悲劇の例</h2>
+<p>動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
+それらを決める要因は何か。膨大な観察データに基づく超大作卒論。</p>
+<figure>
+<img src="/slides/image/messy/thesis.png" width="800">
+</figure>
+</section>
+<section>
+<h2 id="生データ-ここはまだそんなに悪くない">生データ: ここはまだそんなに悪くない</h2>
+<p>週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。</p>
+<figure style="position: relative; margin: 20px 0;">
+<img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
+<img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
+     style="position: absolute; left: 270px; top: 50px;">
+</figure>
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+<figure style="position: relative;">
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+</figure>
+</section>
+<section>
+<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+<figure style="position: relative;">
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
+     style="position: absolute; left: 30px; top: 20px; z-index: 200;">
+<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+     style="position: absolute; left: 260px; top: 40px; z-index: 300;">
+</figure>
+</section>
+<section>
+<h2 id="目と手で数え濃淡を計算し画像ソフトで塗る">目と手で数え、濃淡を計算し、画像ソフトで塗る</h2>
+<p>泣きながら何十枚も&hellip;。無料期間が終わって今は使えない&hellip;。</p>
+<figure style="position: relative; margin: 20px 0;">
+<img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
+<img src="/slides/image/messy/photoshop.jpg" width="530"
+     style="position: absolute; left: 200px; top: -10px;">
+</figure>
+<img src="/slides/image/messy/zebra_AM.jpg" width="300">
+<img src="/slides/image/messy/zebra_PM.jpg" width="300">
+</section>
+<section>
+<h2 id="目作業手作業--シーシュポスの岩">目作業・手作業 ＝ シーシュポスの岩</h2>
+<figure style="float: right; margin: 0.7rem 0 0;">
+<a href="https://en.wikipedia.org/wiki/Sisyphus">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="290">
+<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
+</a>
+</figure>
+<ul>
+<li><strong>膨大な単純作業</strong>がそもそもツラい</li>
+<li>人間だもの、<strong>ミスは防ぎきれない</strong></li>
+<li>ミスを減らすためのチェックもツラい</li>
+<li>ミスを発見 → <strong>初めからやり直し</strong></li>
+<li>新データ追加 → <strong>初めからやり直し</strong></li>
+<li>熟練してもツラいまま</li>
+<li>そのときの自分しかできない、記録に残らない<br>
+→ <strong>検証のしようがない</strong></li>
+<li>卒論なら努力賞でいいかもしれないけど、科学の手続きとしては問題。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="プログラミングで大量のファイルを捌く">プログラミングで大量のファイルを捌く</h2>
+<p>先の例に負けず生データはどっさり。でも頑張るのは機械。</p>
+<figure>
+<img src="/slides/image/tek/finder.png" height="420">
+<img src="/slides/image/tek/fig5.png" height="420">
+<figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="こんな感じの図もrでラクラク描けるよ">こんな感じの図もRでラクラク描けるよ</h2>
+<figure>
+<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/image/tumopp/neighborhood.png" height="200">
+<img src="/slides/image/tumopp/param-p.png" height="200">
+<img src="/slides/image/tumopp/paper/Fig3.png" height="200">
+<img src="/slides/image/tumopp/param-k.png" height="200">
+<img src="/slides/image/tumopp/driver.gif" height="200"><br>
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
+<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="rにやらせて楽しよう">Rにやらせて楽しよう</h2>
+<ul>
+<li>規則性のある退屈な仕事は人間よりも機械のほうが得意。</li>
+<li>一度書いたプログラムは、データが変わっても<strong>使いまわせる</strong>。</li>
+<li><strong>自分以外の人でも再現・検証</strong>できる</li>
+<li><strong>きれいな図を簡単に</strong>描ける</li>
+<li>部分的に改変しながらいろんな解析を試せる。<br>
+→ <strong>仮説検証</strong> だけでなく、 <strong>仮説生成(探索的データ解析)</strong> もやりやすい</li>
+<li>やれば上達する。どんどん楽になる！</li>
+</ul>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="rとは">Rとは</h2>
+<p>統計解析と作図の機能が充実したプログラミング言語・環境</p>
+<figure style="float: right;">
+<a href="https://cran.r-project.org/">
+<img src="/slides/image/rstats/Rlogo.svg" height="200">
+<figcaption class="url">https://cran.r-project.org/</figcaption>
+</a>
+</figure>
+<dl>
+<dt>クロスプラットフォーム</dt>
+<dd>Linux, Mac, Windows で動く</dd>
+<dt>オープンソース</dt>
+<dd>永久に無償で、すべての機能を使える。</dd>
+<dd>集合知によって常に進化している。</dd>
+<dt>コミュニティ</dt>
+<dd>相談できる人や参考になるウェブサイトがたくさん見つかる。</dd>
+</dl>
+<p>他のプログラミング言語でもいいよ:
+<a href="https://www.python.org/">Python</a>とか<a href="https://julialang.org/">Julia</a>とか。</p>
+
+</section>
+<section>
+<h2 id="本日1時限目の話題">本日1時限目の話題</h2>
+<h3 id="-delデータ解析全体の流れ可視化だいじdel-small-stylefont-weight-normal詳細は本日後半small">✅ <del>データ解析全体の流れ。可視化だいじ</del> <small style="font-weight: normal;">(詳細は本日後半)</small></h3>
+<h3 id="-del作図解析の前にデータの前処理が必要del-small-stylefont-weight-normal詳細は明日small">✅ <del>作図・解析の前にデータの前処理が必要</del> <small style="font-weight: normal;">(詳細は明日)</small></h3>
+<h3 id="-delなぜrを使うのかdel">✅ <del>なぜRを使うのか？</del></h3>
+<h3 id="-rの基礎">⬜ Rの基礎</h3>
+<ul>
+<li>R環境のセットアップ</li>
+<li>Rとの対話</li>
+<li>「プロジェクト」と「スクリプト」を作る</li>
+<li>基本的な型と演算</li>
+<li>Rパッケージ</li>
+</ul>
+
+</section>
+<section>
+<h2 id="keyboard-shortcuts">Keyboard shortcuts</h2>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th><i class="fab fa-apple"></i> Mac</th>
+<th><i class="fab fa-windows"></i> Windows</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Switch apps</td>
+<td><kbd>command</kbd><kbd>tab</kbd></td>
+<td><kbd>alt</kbd><kbd>tab</kbd></td>
+</tr>
+<tr>
+<td>Quit apps</td>
+<td><kbd>command</kbd><kbd>q</kbd></td>
+<td><kbd>alt</kbd><kbd>F4</kbd></td>
+</tr>
+<tr>
+<td>Spotlight</td>
+<td><kbd>command</kbd><kbd>space</kbd></td>
+<td></td>
+</tr>
+<tr>
+<td>Cut, Copy, Paste</td>
+<td><kbd>command</kbd><kbd>x</kbd>, -<kbd>c</kbd>, -<kbd>v</kbd></td>
+<td><kbd>ctrl</kbd><kbd>x</kbd>, -<kbd>c</kbd>, -<kbd>v</kbd></td>
+</tr>
+<tr>
+<td>Select all</td>
+<td><kbd>command</kbd><kbd>a</kbd></td>
+<td><kbd>ctrl</kbd><kbd>a</kbd></td>
+</tr>
+<tr>
+<td>Undo</td>
+<td><kbd>command</kbd><kbd>z</kbd></td>
+<td><kbd>ctrl</kbd><kbd>z</kbd></td>
+</tr>
+<tr>
+<td>Find</td>
+<td><kbd>command</kbd><kbd>f</kbd></td>
+<td><kbd>ctrl</kbd><kbd>f</kbd></td>
+</tr>
+<tr>
+<td>Save</td>
+<td><kbd>command</kbd><kbd>s</kbd></td>
+<td><kbd>ctrl</kbd><kbd>s</kbd></td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="https://support.apple.com/HT201236">https://support.apple.com/HT201236</a>
+</section>
+<section>
+<h2 id="r環境のセットアップ">R環境のセットアップ</h2>
+<dl>
+<dt><a href="https://cran.rstudio.com/">R本体</a></dt>
+<dd>コマンドを解釈して実行するコア部分。</dd>
+<dd>よく使われる関数なども標準パッケージとして同梱。</dd>
+<dt><a href="https://www.rstudio.com/">RStudio Desktop</a></dt>
+<dd>Rをより快適に使うための総合開発環境 (IDE)</dd>
+<dd>必須じゃないけど便利なので結構みんな使ってる。</dd>
+</dl>
+<img src="/slides/image/rstudio/rstudio-300x260.png">
+
+</section>
+<section>
+<h2 id="rstudioを起動してconsoleで対話しよう">RStudioを起動してConsoleで対話しよう</h2>
+<p><strong>Workspace (Environment)</strong> = 一時オブジェクトの集まり</p>
+<img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
+</section>
+<section>
+<h2 id="毎回まっさらなワークスペースで始める設定">毎回まっさらなワークスペースで始める設定</h2>
+<p><i class="fab fa-fw fa-lg fa-apple"></i> RStudio → Preferences   <kbd>command</kbd><kbd>,</kbd><br>
+<i class="fab fa-fw fa-lg fa-windows"></i> Tools → Global options</p>
+<p>&ldquo;Restore &hellip;&rdquo; の<strong>チェックを外し</strong>て、 &ldquo;Save &hellip;&rdquo; の<strong>Never</strong>を選択</p>
+<figure style="margin: 0;">
+<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<img src="/slides/image/rstudio/preferences-workspace.png"
+     style="object-fit: cover; object-position: top; height: 420px;">
+<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="project-を新規作成する">&ldquo;Project&rdquo; を新規作成する</h2>
+<p>File → New Project&hellip; → New Directory → New Project →<br>
+→ Directory name: <code>r-training-2021</code><br>
+→ as subdirectory of: <code>~/project</code> (無ければ作る)</p>
+<p><img src="/slides/image/rstudio/create-new-project.png" class="screenshot" width="90%"
+style="object-fit: cover; object-position: top; height: 450px;"></p>
+<p>📁 ディレクトリ ＝ フォルダ</p>
+
+</section>
+<section>
+<h2 id="rスクリプトに書いてから実行">Rスクリプトに書いてから実行</h2>
+<p>File → New File → R script</p>
+<img src="/slides/image/rstudio/newfile.png" width="100%">
+</section>
+<section>
+<h2 id="rスクリプトに書いてから実行">Rスクリプトに書いてから実行</h2>
+<p>File → New File → R script</p>
+<img src="/slides/image/rstudio/script-console.png" width="100%">
+</section>
+<section>
+<h2 id="rスクリプトに書いてから実行">Rスクリプトに書いてから実行</h2>
+<p>Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
+Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
+<img src="/slides/image/rstudio/101.png" width="100%">
+</section>
+<section>
+<h2 id="rスクリプトを保存する">Rスクリプトを保存する</h2>
+<ul>
+<li>手順
+<ul>
+<li>File → Save <kbd>command</kbd><kbd>s</kbd></li>
+<li>ファイル名: <code>hello.R</code></li>
+<li>場所: さっき作ったプロジェクト内 (デフォルトでそうなるはず)</li>
+</ul>
+</li>
+<li><strong>スクリプトを書いたら消さずに保存すること！</strong>
+<ul>
+<li>書いたスクリプトは財産</li>
+<li>保存しておけばまた使い回せる</li>
+</ul>
+</li>
+</ul>
+<p>🔰 いろんな四則演算を試して <code>hello.R</code> に保存してみよう。<br>
+e.g., <code>1 + 2 + 3</code>, <code>3 * 7 * 2</code>, <code>4 / 2</code>, <code>4 / 3</code>, etc.
+</section>
+<section>
+<h2 id="プロジェクトにファイルが溜まっていく">プロジェクト📁にファイルが溜まっていく</h2>
+<p>スクリプト、データ、結果を分けて整理する例:</p>
+<pre tabindex="0"><code>r-training-2021/           # プロジェクトの最上階
+├── r-training-2021.Rproj  # これダブルクリックでRStudioを起動
+├── hello.R
+├── transform.R            # データ整理・変形のスクリプト
+├── visualize.R            # 作図のスクリプト
+├── data/                  # 元データを置くところ
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+└── output/                # 結果の出力先
+    ├── iris-petal.png
+    └── iris-summary.tsv
+</code></pre><p>プロジェクト最上階を作業ディレクトリとし、<br>
+ファイル読み書きの基準にする。(後で詳しく)</p>
+<p>ほんの一例です。好きな構造に決めてください。</p>
+
+</section>
+<section>
+<h2 id="rと接する上での心構え">Rと接する上での心構え</h2>
+<figure>
+<img src="/slides/image/free/akusyu_uchuujin.png" height="200">
+</figure>
+<dl>
+<dt>エラー文を恐れない</dt>
+<dd>熟練プログラマでも頻繁にエラーを起こす。</dd>
+<dd>エラーはRからのメッセージ。<strong>意図を読み取って修正</strong>しよう。</dd>
+<dd>プログラミングの経験値 ≈ エラー解決の経験値</dd>
+<dt>困ったらウェブ検索</dt>
+<dd>あなたの問題は全世界のRユーザーが既に通った道。</dd>
+<dd>日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="この実習の取り組み方">この実習の取り組み方</h2>
+<p>とにかく手を動かして体感しよう！</p>
+<ol>
+<li>
+<p>こういう枠が出てきたら、自分のRスクリプトに<strong>コピペして保存</strong>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+</code></pre></div></li>
+<li>
+<p><strong>実行してコンソールを確認</strong>。思ったとおりの出力？<br>
+<code>Error</code> や <code>Warning</code> があったらよく読んで対処する。<br>
+(無視していい <code>Warning</code> もたまーにあるけど)</p>
+</li>
+<li>
+<p>🔰 マークの練習問題があれば解いてみる。<br>
+そこまでのコードの<strong>コピペ＋改変</strong>でできるはず。</p>
+</li>
+</ol>
+<p>疑問・困りごとがある場合は<strong>気軽にChat欄に</strong>書き込んでください。<br>
+私の代わりに解答するのも大歓迎です助かります。</p>
+
+</section>
+<section>
+<h2 id="変数オブジェクトを作ってみよう">変数/オブジェクトを作ってみよう</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="m">2</span>        <span class="c1"># Create x</span>
+<span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
+</code></pre></div><pre tabindex="0"><code>[1] 2
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="m">5</span>        <span class="c1"># Create y</span>
+<span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
+</code></pre></div><pre tabindex="0"><code>[1] 5
+</code></pre><p>Rでは代入演算子として矢印 <code>&lt;-</code> も使えるけど私は <code>=</code> 推奨。<br>
+<code>#</code> 記号より右はRに無視される。コメントを書くのに便利。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+</code></pre></div><pre tabindex="0"><code>[1] 7
+</code></pre><p>🔰 <code>x</code> と <code>y</code> の引き算、掛け算、割り算をやってみよう</p>
+
+</section>
+<section>
+<h2 id="基本的な演算">基本的な演算</h2>
+<p><code>+</code> とか <code>*</code> のような演算子(operator)を変数の間に置く。<br></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="m">10</span> <span class="o">+</span> <span class="m">3</span>    <span class="c1"># addition</span>
+<span class="m">10</span> <span class="o">-</span> <span class="m">3</span>    <span class="c1"># subtraction</span>
+<span class="m">10</span> <span class="o">*</span> <span class="m">3</span>    <span class="c1"># multiplication</span>
+<span class="m">10</span> <span class="o">/</span> <span class="m">3</span>    <span class="c1"># division</span>
+<span class="m">10</span> <span class="o">%/%</span> <span class="m">3</span>  <span class="c1"># integer division</span>
+<span class="m">10</span> <span class="o">%%</span> <span class="m">3</span>   <span class="c1"># modulus 剰余</span>
+<span class="m">10</span> <span class="o">**</span> <span class="m">3</span>   <span class="c1"># exponent 10^3</span>
+</code></pre></div><p>🔰 コピペして結果を確認してみよう。</p>
+
+</section>
+<section>
+<h2 id="関数-function">関数 (function)</h2>
+<p>変数を受け取って、何か仕事して、返す命令セット</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>  <span class="c1"># 1と3を渡すとvectorが返ってくる</span>
+<span class="n">x</span>
+</code></pre></div><pre tabindex="0"><code>[1] 1 2 3
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># vectorを渡すと足し算が返ってくる</span>
+</code></pre></div><pre tabindex="0"><code>[1] 6
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">square</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">something</span><span class="p">)</span> <span class="p">{</span>  <span class="c1"># 自分の関数を定義</span>
+  <span class="n">something</span> <span class="o">**</span> <span class="m">2</span>
+<span class="p">}</span>
+<span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># 使ってみる</span>
+</code></pre></div><pre tabindex="0"><code>[1] 1 4 9
+</code></pre><p>🔰 自分の関数を何か作ってみよう。
+e.g., 2倍にする関数 <code>twice</code></p>
+
+</section>
+<section>
+<h2 id="変数オブジェクトを作ってみよう-part-2">変数/オブジェクトを作ってみよう Part 2</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
+<span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
+</code></pre></div><pre tabindex="0"><code>[1] 42
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
+<span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;24601&quot;
+</code></pre><p>この <code>x</code> と <code>y</code> を足そうとするとエラーになる。なぜ？</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error! Why?</span>
+</code></pre></div><pre tabindex="0"><code>Error in x + y: non-numeric argument to binary operator
+</code></pre>
+</section>
+<section>
+<h2 id="変数オブジェクトの型">変数/オブジェクトの型</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;numeric&quot;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>[1] TRUE
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>[1] FALSE
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;42&quot;
+</code></pre><p>🔰 さっき作った <code>y</code> にも同じ関数を適用してみよう。</p>
+
+</section>
+<section>
+<h2 id="変数オブジェクトの型">変数/オブジェクトの型</h2>
+<ul>
+<li><code>vector</code>: 基本型。一次元の配列。
+<ul>
+<li><code>logical</code>: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
+<li><code>numeric</code>: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
+<li><code>character</code>: 文字列 (<code>&quot;a string&quot;</code>)</li>
+<li><code>factor</code>: 因子 (文字列っぽいけど微妙に違う)</li>
+</ul>
+</li>
+<li><code>array</code>: 多次元配列。<code>vector</code>同様、全要素が同じ型。
+<ul>
+<li><code>matrix</code>: 行列 = 二次元の配列。</li>
+</ul>
+</li>
+<li><code>list</code>: 異なる型でも詰め込める太っ腹ベクトル。</li>
+<li><strong><code>data.frame</code>: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong> <br>
+<strong><code>tibble</code></strong> とか <strong><code>tbl_df</code></strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="vector-一次元の配列">vector: 一次元の配列</h2>
+<p>1個の値でもベクトル扱い。<br>
+同じ長さ(または長さ1)の相手との計算が得意。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
+<span class="n">x</span> <span class="o">+</span> <span class="n">x</span>           <span class="c1"># 同じ長さ同士の計算</span>
+</code></pre></div><pre tabindex="0"><code>[1]  2  4 18
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
+<span class="n">x</span> <span class="o">+</span> <span class="n">y</span>           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span>
+</code></pre></div><pre tabindex="0"><code>[1] 11 12 19
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">&lt;</span> <span class="m">5</span>           <span class="c1"># 5より小さいか</span>
+</code></pre></div><pre tabindex="0"><code>[1]  TRUE  TRUE FALSE
+</code></pre><p>🔰 この <code>x, y</code> を使っていろいろな演算を試してみよう</p>
+
+</section>
+<section>
+<h2 id="vectorから部分的に抜き出す">vectorから部分的に抜き出す</h2>
+<p><code>[]</code> を使う。番号は1から始まる。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="kc">letters</span>
+</code></pre></div><pre tabindex="0"><code> [1] &quot;a&quot; &quot;b&quot; &quot;c&quot; &quot;d&quot; &quot;e&quot; &quot;f&quot; &quot;g&quot; &quot;h&quot; &quot;i&quot; &quot;j&quot; &quot;k&quot; &quot;l&quot; &quot;m&quot; &quot;n&quot; &quot;o&quot; &quot;p&quot; &quot;q&quot; &quot;r&quot; &quot;s&quot; &quot;t&quot; &quot;u&quot; &quot;v&quot; &quot;w&quot; &quot;x&quot; &quot;y&quot; &quot;z&quot;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="kc">letters</span><span class="n">[3]</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;c&quot;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="kc">letters</span><span class="nf">[seq</span><span class="p">(</span><span class="m">4</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span><span class="n">]</span>       <span class="c1"># 4 5 6</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;d&quot; &quot;e&quot; &quot;f&quot;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="kc">letters</span><span class="nf">[seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">26</span><span class="p">)</span> <span class="o">&lt;</span> <span class="m">4</span><span class="n">]</span>  <span class="c1"># TRUE TRUE TRUE FALSE FALSE ...</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
+</code></pre>
+</section>
+<section>
+<h2 id="vectorを渡した結果は関数によって異なる">vectorを渡した結果は関数によって異なる</h2>
+<p>各要素に適用するもの:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>     <span class="c1"># square root</span>
+<span class="n">y</span>
+</code></pre></div><pre tabindex="0"><code>[1] 1.000000 1.414214 3.000000
+</code></pre><p>全要素を集約した値を返すもの:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">z</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">z</span>
+</code></pre></div><pre tabindex="0"><code>[1] 12
+</code></pre><p>🔰 <code>log()</code>, <code>exp()</code>, <code>length()</code>, <code>max()</code>, <code>mean()</code>
+にvectorを渡してみよう。</p>
+
+</section>
+<section>
+<h2 id="matrix-二次元の配列-行列">matrix: 二次元の配列 (行列)</h2>
+<p>1本のvectorを折り曲げて長方形にしたもの。<br>
+中身は全て同じ型。機械学習とか画像処理とかで使う。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">v</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">)</span>              <span class="c1"># c(1, 2, 3, 4, 5, 6, 7, 8)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>    <span class="c1"># 2行に畳む。列ごとに詰める</span>
+<span class="n">x</span>
+</code></pre></div><pre tabindex="0"><code>     [,1] [,2] [,3] [,4]
+[1,]    1    3    5    7
+[2,]    2    4    6    8
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">byrow</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>  <span class="c1"># 行ごとに詰める</span>
+<span class="n">y</span>
+</code></pre></div><pre tabindex="0"><code>     [,1] [,2] [,3] [,4]
+[1,]    1    2    3    4
+[2,]    5    6    7    8
+</code></pre><p>🔰 結果を確認してみよう: <code>x + y</code>, <code>dim(x)</code>, <code>nrow(x)</code>, <code>ncol(x)</code>.</p>
+
+</section>
+<section>
+<h2 id="行-row-列-column-の憶え方">行 (row), 列 (column) の憶え方</h2>
+<div class="column-container">
+  <div class="column">
+    <figure>
+    <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
+    <img src="/slides/image/free/front-row.jpg" height="480">
+    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    </a>
+    </figure>
+  </div>
+  <div class="column">
+    <figure>
+    <a href="https://en.wikipedia.org/wiki/Rhodes">
+    <img src="/slides/image/free/apollon-columns.jpg" height="480">
+    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    </a>
+    </figure>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="dataframe-長方形のテーブル-重要">data.frame: 長方形のテーブル (重要!)</h2>
+<p>同じ長さの列vectorを複数束ねた長方形の表。<br>
+e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+           &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;fct&gt;
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
+</code></pre><p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。</p>
+
+</section>
+<section>
+<h2 id="dataframeを眺める">data.frameを眺める</h2>
+<p>概要を掴む:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>   <span class="c1"># 先頭だけ見てみる。末尾は tail()</span>
+<span class="nf">nrow</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 行数: Number of ROWs</span>
+<span class="nf">ncol</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 列数: Number of COLumns</span>
+<span class="nf">names</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>     <span class="c1"># 列名</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>   <span class="c1"># 要約</span>
+<span class="nf">View</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># RStudioで閲覧</span>
+</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">str</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>       <span class="c1"># 構造が分かる形で表示</span>
+</code></pre></div><pre tabindex="0"><code>tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
+ $ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num [1:150] 1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+ $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+</code></pre><p>🔰 ほかのデータもいろいろ見てみよう。
+e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html"><code>data()</code></a></p>
+
+</section>
+<section>
+<h2 id="dataframeを眺める">data.frameを眺める</h2>
+<p>部分的なdata.frameを取得する:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
+<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
+<span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
+<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
+</code></pre></div><p>vectorとして取得する:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[[3]]</span>                  <span class="c1"># 3列目</span>
+<span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># Petal.Length列</span>
+<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># Petal.Length列</span>
+<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># Petal.Length列の2番目</span>
+</code></pre></div><p>結果がdata.frameになるかvectorになるか微妙:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
+<span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
+<span class="n">iris[2</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                 <span class="c1"># 2行目3列目</span>
+<span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
+</code></pre></div>
+</section>
+<section>
+<h2 id="dataframeの新規作成">data.frameの新規作成</h2>
+<p>同じ長さの <strong>列(column) vector</strong> を結合して作る:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
+<span class="n">mydata</span> <span class="o">=</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>  x y
+1 1 A
+2 2 B
+3 3 C
+</code></pre><p>🔰 次のようなdata.frameを作って <code>theDF</code> と名付けよう:</p>
+<pre tabindex="0"><code> i s
+24 x
+25 y
+26 z
+</code></pre><p>ヒント: <code>c()</code> 無しでクリアすることも可能。</p>
+
+</section>
+<section>
+<h2 id="dataframeの読み書き">data.frameの読み書き</h2>
+<ul>
+<li>
+<p>readxlパッケージを使えば <code>.xlsx</code> ファイルも読める、けど</p>
+</li>
+<li>
+<p>カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。</p>
+</li>
+<li>
+<p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
+<span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
+<span class="n">iris2</span> <span class="o">=</span> <span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
+</code></pre></div></li>
+<li>
+<p>現在の作業ディレクトリとその中身を確認しておこう:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get Working Directory</span>
+<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
+<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
+</code></pre></div></li>
+</ul>
+<p>🔰 R組み込みデータや自作データを読み書きしてみよう</p>
+
+</section>
+<section>
+<h2 id="r-package">R package</h2>
+<p>便利な関数やデータセットなどをひとまとめにしたもの。</p>
+<dl>
+<dt>Standard Packages</dt>
+<dd>Rの標準機能。何もしなくても使用可能</dd>
+<dt>Contributed Packages</dt>
+<dd>有志により開発され、
+<a href="https://cran.rstudio.com/web/packages/index.html">CRAN</a>
+にまとめて公開されている。</dd>
+<dd>要インストール。使う前に読み込むおまじないが必要。</dd>
+</dl>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
+<span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
+</code></pre></div><dl>
+<dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
+<dd>大丈夫。誰も覚えきってない。</dd>
+<dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="tidyverse">tidyverse</h2>
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="c1"># 関連パッケージが一挙に読み込まれる</span>
+</code></pre></div><ul>
+<li>統一的な使い勝手</li>
+<li>暗黙の処理をなるべくしない安全設計</li>
+<li>シンプルな関数を繋げて使うデザイン</li>
+</ul>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyverse">tidyverse</h2>
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="c1"># 関連パッケージが一挙に読み込まれる</span>
+</code></pre></div><ul>
+<li><code>Conflicts ❌</code> とか表示されて不安だけど<br>
+これは大丈夫なやつ:</li>
+</ul>
+<pre tabindex="0"><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+✔ tibble  3.1.4     ✔ dplyr   1.0.7
+✔ tidyr   1.1.3     ✔ stringr 1.4.0
+✔ readr   2.0.1     ✔ forcats 0.5.1
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+</code></pre><p>次回からはこれらを使って解説</p>
+
+</section>
+<section>
+<h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
+<ul>
+<li>エラーのほとんどは凡ミス由来。よく確認しよう。
+<ul>
+<li>エラー文をちゃんと読む: <code>No such file or directory</code></li>
+<li><a href="https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
+をチェックする</li>
+<li>変数の中身を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
+</ul>
+</li>
+<li>エラー文やパッケージ名をコピペしてウェブ検索<br>
+→ <a href="https://stackoverflow.com/questions/tagged/r">StackOverflow</a>
+や個人サイトに解決策</li>
+<li>Slack <i class="fab fa-slack"></i>
+<a href="https://github.com/tokyor/r-wakalang">r-wakalang</a>
+で質問を投稿する。<br>
+(質問に飢えた優しいワニが多数生息 👀   👀   👀   👀)</li>
+<li>状況再現できる小さな例
+<a href="https://reprex.tidyverse.org/">(reprex)</a>
+を添えると回答を得やすい。<br>
+(これを準備してるうちに問題が切り分けられて自己解決したり)</li>
+<li>パッケージの公式ドキュメントをちゃんと読む</li>
+<li>R(Studio)内のヘルプを読む: <code>?sum</code>, <code>help.start()</code></li>
+</ul>
+
+</section>
+<section>
+<h2 id="本日1時限目の話題">本日1時限目の話題</h2>
+<h3 id="-なぜrを使うのか">✅ なぜRを使うのか？</h3>
+<h3 id="-データ解析全体の流れ可視化だいじ-small-stylefont-weight-normal詳細は本日後半small">✅ データ解析全体の流れ。可視化だいじ <small style="font-weight: normal;">(詳細は本日後半)</small></h3>
+<h3 id="-作図解析の前にデータの前処理が必要-small-stylefont-weight-normal詳細は明日small">✅ 作図・解析の前にデータの前処理が必要 <small style="font-weight: normal;">(詳細は明日)</small></h3>
+<h3 id="-rの基礎">✅ Rの基礎</h3>
+<ul>
+<li>まず<strong>Rスクリプト</strong>に書いてから、<strong>コンソール</strong>で実行</li>
+<li>変数には型がある: 数値、文字列、<strong>データフレーム</strong>など</li>
+<li>便利な<strong>パッケージ</strong>を使おう</li>
+<li>調べ方さえわかれば、全部覚えなくても大丈夫。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="reference">Reference</h2>
+<dl>
+<dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
+<dd><a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a></dd>
+<dd><a href="https://amzn.to/2tbRmVc">Book</a></dd>
+<dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
+<dt>Older versions</dt>
+<dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
+岩嵜航 2018</dd>
+<dd>「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学</dd>
+<dd>「<a href="https://heavywatal.github.io/slides/tmd2020/">Rによるデータ前処理実習</a>」
+岩嵜航 2020 東京医科歯科大</dd>
+<dd>「<a href="https://comicalcommet.github.io/r-training-2021/">Rを用いたデータ解析の基礎と応用</a>」
+石川由希 2021 名古屋大学</dd>
+</dl>
+<a href="2-visualization.html" rel="next" class="readmore">
+2. 入門2: データ可視化の重要性と方法。
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
