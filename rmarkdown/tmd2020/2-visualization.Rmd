@@ -322,32 +322,7 @@ boxplot(Petal.Width ~ Species, data = iris)
 
 R標準のやつとは根本的に違うシステムで作図する。
 
-```{r grviz, echo=FALSE, results="asis"}
-g = DiagrammeR::grViz("
-digraph boxes_and_circles {
-  graph [fontsize = 18]
-  node [shape = box, fontname = Helvetica]
-
-  'Traditional R plot\nboxplot(), hist(), ...';
-  lattice; ggplot2;
-  graphics; grid;
-  grDevices;
-  pdf; png; svg;
-
-  'Traditional R plot\nboxplot(), hist(), ...' -> graphics
-  graphics -> grDevices
-  lattice -> grid
-  ggplot2 -> grid
-  grid -> grDevices
-  grDevices -> pdf
-  grDevices -> png
-  grDevices -> svg
-}")
-DiagrammeRsvg::export_svg(g) %>%
-  stringr::str_replace(stringr::regex(".+(?=<svg)", dotall = TRUE), "") %>%
-  {paste0("<div class=\"goldmark-p-workaround\">\n", ., "</div>")} %>%
-  cat()
-```
+<img src="/slides/image/rstats/r-graphics.svg">
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
