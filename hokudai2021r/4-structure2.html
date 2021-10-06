@@ -542,28 +542,11 @@ if (!doNotTrack) {
 <h2 id="separate-列を分離"><code>separate()</code> 列を分離</h2>
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
-<img src="/slides/image/r4ds/tidy-separate.png" width="700">
+<img src="/slides/image/cheatsheet/tidyr-separate.png" height="120">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
 </a>
 </figure>
-<p><a href="https://r4ds.had.co.nz/tidy-data.html#separate">R for Data Science</a>
-に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      country  year              rate
-        &lt;chr&gt; &lt;int&gt;             &lt;chr&gt;
-1 Afghanistan  1999      745/19987071
-2 Afghanistan  2000     2666/20595360
-3      Brazil  1999   37737/172006362
-4      Brazil  2000   80488/174504898
-5       China  1999 212258/1272915272
-6       China  2000 213766/1280428583
-</code></pre>
-</section>
-<section>
-<h2 id="separate-列を分離"><code>separate()</code> 列を分離</h2>
-<p><a href="https://r4ds.had.co.nz/tidy-data.html#separate">R for Data Science</a>
-に登場するお試しデータ。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table3</span> <span class="o">%&gt;%</span> <span class="nf">separate</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">into</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;cases&#34;</span><span class="p">,</span> <span class="s">&#34;population&#34;</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;/&#34;</span><span class="p">)</span>
 </code></pre></div><pre tabindex="0"><code>      country  year  cases population
         &lt;chr&gt; &lt;int&gt;  &lt;chr&gt;      &lt;chr&gt;
@@ -581,30 +564,12 @@ if (!doNotTrack) {
 <h2 id="unite-列を融合"><code>unite()</code> 列を融合</h2>
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#unite">
-<img src="/slides/image/r4ds/tidy-unite.png" width="800">
+<img src="/slides/image/cheatsheet/tidyr-unite.png" height="120">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
 </a>
 </figure>
-<p><a href="https://r4ds.had.co.nz/tidy-data.html#unite">R for Data Science</a>
-に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table5</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      country century  year              rate
-        &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;             &lt;chr&gt;
-1 Afghanistan      19    99      745/19987071
-2 Afghanistan      20    00     2666/20595360
-3      Brazil      19    99   37737/172006362
-4      Brazil      20    00   80488/174504898
-5       China      19    99 212258/1272915272
-6       China      20    00 213766/1280428583
-</code></pre>
-</section>
-<section>
-<h2 id="unite-列を融合"><code>unite()</code> 列を融合</h2>
-<p><a href="https://r4ds.had.co.nz/tidy-data.html#unite">R for Data Science</a>
-に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table5</span> <span class="o">%&gt;%</span>
-  <span class="nf">unite</span><span class="p">(</span><span class="n">YEAR</span><span class="p">,</span> <span class="n">century</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table5</span> <span class="o">%&gt;%</span> <span class="nf">unite</span><span class="p">(</span><span class="n">YEAR</span><span class="p">,</span> <span class="n">century</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">YEAR</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="n">YEAR</span><span class="p">))</span>
 </code></pre></div><pre tabindex="0"><code>      country  YEAR              rate
         &lt;chr&gt; &lt;int&gt;             &lt;chr&gt;
@@ -614,8 +579,7 @@ if (!doNotTrack) {
 4      Brazil  2000   80488/174504898
 5       China  1999 212258/1272915272
 6       China  2000 213766/1280428583
-</code></pre><p>結合直後は文字列になっているので数値なら忘れずに変換。<br>
-こうしたデータ内容を対象とする処理については、次回くわしく。</p>
+</code></pre><p><strong>結合直後は文字列</strong>になっているので数値なら忘れずに変換。</p>
 <p>🔰 変形前と変形後を手元のRで確認してみよう。</p>
 
 </section>
@@ -728,7 +692,7 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <h2 id="憶えなくていい公式サイトなどを見ながら作業">憶えなくていい。公式サイトなどを見ながら作業</h2>
 <figure>
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/rstats/dplyr-website.png" width="90%">
+<img src="/slides/image/rstats/dplyr-website.png" width="80%">
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
@@ -851,7 +815,7 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <a href="https://amzn.to/2yyFRKt">日本語版書籍</a></dd>
 </dl>
 <p><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&amp;linkCode=ll1&amp;tag=heavywatal-22&amp;linkId=8a3fd4e9a0c944b1b41242bbab8d147b">前処理大全 &mdash; 本橋智光</a><br>
-<a href="https://amzn.to/3eBprm5">RユーザのためのRStudio[実践]入門 (宇宙本) &mdash; 松村ら</a></p>
+<a href="https://amzn.to/2Yy5LND">RユーザのためのRStudio[実践]入門 (宇宙船本) &mdash; 松村ら</a></p>
 <dl>
 <dt>整然データとは何か &mdash; <a href="https://twitter.com/f_nisihara">@f_nisihara</a></dt>
 <dd><a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">Speaker Deck</a>,
