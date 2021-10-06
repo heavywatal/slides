@@ -15,6 +15,8 @@ https://heavywatal.github.io/slides/
     [KaTeX](https://katex.org/)
     renders math equations (`$ ... $` and `\[ ... \]`) embedded in HTML.
     They are included in [a Hugo theme](https://github.com/heavywatal/hugo-theme-reveal).
+4.  The output and libraries are published via
+    [`gh-pages` branch of this repository](https://github.com/heavywatal/slides/tree/gh-pages).
 
 But I would rather recommend using other user-friendly frameworks such as
 [`xaringan`](https://slides.yihui.org/xaringan/),
@@ -49,8 +51,8 @@ remotes::install_github("heavywatal/rwtl")
 1.  Run decktape:
 
     ```sh
-    npm run decktape http://heavywatal.github.io/slides/tmd2021/1-introduction.html 1-introduction.pdf
+    npm run decktape https://heavywatal.github.io/slides/tmd2021/1-introduction.html 1-introduction.pdf
     # or manually
-    npx decktape -s 960x720 --chrome-arg=--disable-web-security reveal http://heavywatal.github.io/slides/hokudai2021r/1-introduction.html 1-introduction.pdf
+    npx decktape -s 960x720 --chrome-arg=--disable-web-security reveal https://heavywatal.github.io/slides/hokudai2021r/1-introduction.html 1-introduction.pdf
     npx decktape -s 800x600 --chrome-arg=--disable-web-security generic https://comicalcommet.github.io/r-training-2021/R_training_2021_1.html R_training_2021_1.pdf
     ```
