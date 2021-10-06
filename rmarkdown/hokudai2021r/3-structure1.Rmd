@@ -51,17 +51,17 @@ anscombe = tibble::as_tibble(anscombe)
 ---
 ## この集中講義の目標
 
-### ✅ <del>再現可能な解析を楽にやりたい気持ちになる</del>
+### ✅ 再現可能な解析を楽にやりたい気持ちになる
 
-### ⬜ データ解析の基本を身につける
+### ✅ データ解析の全体像をつかむ
 
 - 全体のおおまかな流れがわかる
 - 解析しやすいデータの形を知る
 
-### ✅ <del>必要な方法を調べ、実践する力をつける</del>
+### ⬜ 必要な方法を調べ、実践する力をつける
 
-- Rでできそうなことを把握する
 - 困ったときの対処法・相談先を知る
+- Rでできそうなことを把握する
 
 <br>
 これさえ押さえれば、個々の方法は覚えなくても大丈夫！
@@ -118,21 +118,6 @@ anscombe = tibble::as_tibble(anscombe)
 > but every messy dataset is messy in its own way<br>
 > --- Hadley Wickham, creator of tidyverse
 
-
----
-## 整然データ tidy data
-
-- **縦1列**は1つの**変数**
-- **横1行**は1つの**観測**
-- **1セル**は1つの**値**
-
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
-</cite>
-
-```{r tidy_example}
-print(ggplot2::diamonds)
-```
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -224,7 +209,22 @@ print(ggplot2::diamonds)
 
 
 ---
-## 整然データのご利益の例: ggplot2 (前回の話題)
+## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+
+- **縦1列**は1つの**変数**
+- **横1行**は1つの**観測**
+- **1セル**は1つの**値**
+
+<cite style="display: block; text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</cite>
+
+```{r tidy_example}
+print(ggplot2::diamonds)
+```
+
+---
+## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
 
 x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
 
@@ -362,7 +362,8 @@ result = diamonds %>%              # 生データから出発して
   print()                          # 表示してみる
 ```
 
-この見慣れぬ記号 `%>%` は何？
+この見慣れぬ記号 `%>%` は何？<br>
+(`select()` など個々の関数は後で触れるとして)
 
 ---
 ## Pipe operator (パイプ演算子) `%>%`
@@ -373,11 +374,11 @@ diamonds %>% filter(carat > 1)
 filter(diamonds, carat > 1)     # これと同じ
 
 # 前処理の流れ作業に便利:
-diamonds %>% select(carat, price) %>% filter(carat > 1) %>% ...
-#   data %>%  do_A()  %>%  do_B()  %>%  do_C()  %>% ...
+diamonds %>% filter(carat > 1) %>% select(carat, price) %>% ...
+potatos %>% cut() %>% fry() %>% season() %>% eat()
 ```
 
-🔰 パイプを使わない形に書き換えよう:
+🔰 パイプを使わない形に書き換え、出力を確認しよう:
 ```{r letters}
 seq(1, 6) %>% sum()
 letters %>% toupper() %>% head(3)
@@ -539,14 +540,12 @@ result = diamonds %>%
 ---
 ## 行の抽出: `filter()`
 
-不等号で**一致しない行**のみ残す:
+不等号 `!=`, `<`, `<=`, `>`, `>=` を満たす行のみ残す:
 ```{r filter-unequal}
 result = diamonds %>%
   filter(cut != "Ideal") %>%
   print()
 ```
-
-不等号: `!=`, `<`, `<=`, `>`, `>=`
 
 🔰 `starwars` の**身長が150以下のキャラクタ**を抽出してみよう
 
@@ -590,7 +589,7 @@ result = diamonds %>%
 ---
 ## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
 
-指定した列の値が**大きい順**に抽出:
+指定した列の値が**大きい順**に `n` 行または割合 `prop` で抽出:
 ```{r slice_max}
 result = diamonds %>%
   slice_max(price, n = 5L) %>%
@@ -613,14 +612,12 @@ result = diamonds %>%
   print()
 ```
 
-**割合を指定**するなら `n` の代わりに `prop = 0.05`
-
 🔰 `starwars` の**ジェンダーごとに身長が低い3名ずつ**抽出してみよう
 
 ---
 ## 先頭/末尾の行の抽出: `slice_head()`, `slice_tail()`
 
-**各グループの先頭**を抽出:
+**各グループの先頭**を `n` 行または割合 `prop` で抽出:
 ```{r group_slice_head}
 result = diamonds %>%
   group_by(cut) %>%
@@ -628,23 +625,19 @@ result = diamonds %>%
   print()
 ```
 
-**割合を指定**するなら `n` の代わりに `prop = 0.05`
-
 🔰 `starwars` の**ジェンダーごとに先頭3名ずつ**抽出してみよう
 
 
 ---
 ## ランダムに行の抽出: `slice_sample()`
 
-**行数を指定**してランダムサンプル:
+**ランダムに** `n` 行または割合 `prop` でサンプル:
 ```{r slice_sample}
 result = diamonds %>%
   group_by(cut) %>%
   slice_sample(n = 3L, replace = FALSE) %>%
   print()
 ```
-
-**割合を指定**するなら `prop =` を使う。
 
 🔰 `starwars` から**ジェンダーごとにランダムに3名**抽出してみよう
 
@@ -702,8 +695,6 @@ result = diamonds %>%
   print()
 ```
 
-`across()` も `where()` も複数行出力も dplyr 1.0.0 新機能
-
 🔰 `mpg` の**各数値列の最大値を駆動方式ごとに**計算しよう
 
 ---
@@ -715,8 +706,6 @@ result = diamonds %>%
   count(cut, color) %>%
   print()
 ```
-
-`diamonds %>% group_by(cut, color) %>% tally()` と同じ。
 
 🔰 `starwars` の**性とジェンダーの組み合わせ**を数えてみよう
 
@@ -740,14 +729,12 @@ result = diamonds %>%
 ---
 ## 行の並べ替え: `arrange()`
 
-指定した列の値が**小さい順に上から**並べる:
+指定した列の**昇順(または降順 `desc()`)で**行を並べ替える:
 ```{r arrange}
 result = diamonds %>%
   arrange(color, desc(carat)) %>%  # 色の昇順。色が同じなら大きさ降順
   print()
 ```
-
-逆にするには `desc()` を使う。
 
 🔰 `starwars` の**種族と身長で並べ替え**てみよう
 
@@ -804,7 +791,7 @@ result = diamonds %>%
     - **何かの順に並べ替え** 👈 第3回 ここまで紹介
     - 異なるテーブルの結合
     - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理  <span style="color: #888888;">— 第5回 明日</span>
+- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
     - 数値の変換: 対数、正規化
     - 外れ値・欠損値への対処
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
@@ -835,7 +822,7 @@ R for Data Science --- Hadley Wickham and Garrett Grolemund
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
-[RユーザのためのRStudio[実践]入門 (宇宙本) --- 松村ら](https://amzn.to/3eBprm5)
+[RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
 
 整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
 : [Speaker Deck](https://speakerdeck.com/fnshr/zheng-ran-detatutenani),

@@ -1164,7 +1164,7 @@ R for Data Science --- Hadley Wickham and Garrett Grolemund
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
-[RユーザのためのRStudio[実践]入門 (宇宙本) --- 松村ら](https://amzn.to/3eBprm5)
+[RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
 
 Official documents:
 : [tidyverse](https://www.tidyverse.org/),

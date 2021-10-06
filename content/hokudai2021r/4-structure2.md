@@ -662,36 +662,11 @@ print(us_rent_income)
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
-<img src="/slides/image/r4ds/tidy-separate.png" width="700">
+<img src="/slides/image/cheatsheet/tidyr-separate.png" height="120">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
 </a>
 </figure>
-
-[R for Data Science](https://r4ds.had.co.nz/tidy-data.html#separate)
-に登場するお試しデータ。
-
-
-```r
-print(table3)
-```
-
-```
-      country  year              rate
-        <chr> <int>             <chr>
-1 Afghanistan  1999      745/19987071
-2 Afghanistan  2000     2666/20595360
-3      Brazil  1999   37737/172006362
-4      Brazil  2000   80488/174504898
-5       China  1999 212258/1272915272
-6       China  2000 213766/1280428583
-```
-
----
-## `separate()` 列を分離
-
-[R for Data Science](https://r4ds.had.co.nz/tidy-data.html#separate)
-に登場するお試しデータ。
 
 
 ```r
@@ -718,41 +693,15 @@ table3 %>% separate(rate, into = c("cases", "population"), sep = "/")
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#unite">
-<img src="/slides/image/r4ds/tidy-unite.png" width="800">
+<img src="/slides/image/cheatsheet/tidyr-unite.png" height="120">
 <br>
 <figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
 </a>
 </figure>
 
-[R for Data Science](https://r4ds.had.co.nz/tidy-data.html#unite)
-に登場するお試しデータ。
-
 
 ```r
-print(table5)
-```
-
-```
-      country century  year              rate
-        <chr>   <chr> <chr>             <chr>
-1 Afghanistan      19    99      745/19987071
-2 Afghanistan      20    00     2666/20595360
-3      Brazil      19    99   37737/172006362
-4      Brazil      20    00   80488/174504898
-5       China      19    99 212258/1272915272
-6       China      20    00 213766/1280428583
-```
-
----
-## `unite()` 列を融合
-
-[R for Data Science](https://r4ds.had.co.nz/tidy-data.html#unite)
-に登場するお試しデータ。
-
-
-```r
-table5 %>%
-  unite(YEAR, century, year, sep = "") %>%
+table5 %>% unite(YEAR, century, year, sep = "") %>%
   mutate(YEAR = as.integer(YEAR))
 ```
 
@@ -767,8 +716,7 @@ table5 %>%
 6       China  2000 213766/1280428583
 ```
 
-結合直後は文字列になっているので数値なら忘れずに変換。<br>
-こうしたデータ内容を対象とする処理については、次回くわしく。
+**結合直後は文字列**になっているので数値なら忘れずに変換。
 
 🔰 変形前と変形後を手元のRで確認してみよう。
 
@@ -910,7 +858,7 @@ mpg_nested$data[[1]]
 
 <figure>
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/rstats/dplyr-website.png" width="90%">
+<img src="/slides/image/rstats/dplyr-website.png" width="80%">
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
@@ -1095,7 +1043,7 @@ R for Data Science --- Hadley Wickham and Garrett Grolemund
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
-[RユーザのためのRStudio[実践]入門 (宇宙本) --- 松村ら](https://amzn.to/3eBprm5)
+[RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
 
 整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
 : [Speaker Deck](https://speakerdeck.com/fnshr/zheng-ran-detatutenani),
