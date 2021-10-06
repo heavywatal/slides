@@ -9,7 +9,7 @@ draft = false
 
 <link rel="stylesheet" href="style.css">
 
-# [Rによるデータ前処理実習2020](.)
+# [Rによるデータ前処理実習2021](.)
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
