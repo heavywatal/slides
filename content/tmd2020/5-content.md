@@ -458,9 +458,9 @@ df %>% mutate(z = coalesce(x, y))
 ```
 
 ```
-Error: Problem with `mutate()` input `z`.
+Error: Problem with `mutate()` column `z`.
+ℹ `z = coalesce(x, y)`.
 ✖ Can't combine `..1` <double> and `..2` <character>.
-ℹ Input `z` is `coalesce(x, y)`.
 ```
 
 🔰 `starwars` で**髪色の欠損値を肌色で補おう**
@@ -561,9 +561,9 @@ https://r4ds.had.co.nz/strings.html
 ---
 ## stringr --- 文字列処理パッケージ
 
-<figure>
+<figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/rstats/stringr-cheatsheet1.png" width="90%">
+<img src="/slides/image/cheatsheet/strings.png" width="90%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
 </a>
 </figure>
@@ -667,9 +667,9 @@ http://userguide.icu-project.org/strings/regexp
 ---
 ## 正規表現: チートシート
 
-<figure>
+<figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/rstats/stringr-cheatsheet2.png" width="90%">
+<img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
 </a>
 </figure>
