@@ -84,7 +84,50 @@ if (!doNotTrack) {
 
 </section>
 <section>
+<h2 id="前回までのまとめ">前回までのまとめ</h2>
+<h3 id="-rの基礎">✅ Rの基礎</h3>
+<ul>
+<li>調べ方さえわかれば、全部覚えなくても大丈夫</li>
+<li>エラーは日常茶飯事。落ち着いて読み取ろう</li>
+<li>まず<strong>Rスクリプト</strong>に書いてから、<strong>コンソール</strong>で実行</li>
+<li>便利な<strong>パッケージ</strong>を使おう</li>
+</ul>
+<h3 id="-データ解析全体の流れ可視化だいじ">✅ データ解析全体の流れ。可視化だいじ</h3>
+<h3 id="-一貫性のある文法で合理的に描けるggplot2">✅ 一貫性のある文法で合理的に描けるggplot2</h3>
+<h3 id="-使える整然データにするための前処理がたいへん">✅ 使える整然データにするための前処理がたいへん</h3>
+
+</section>
+<section>
+<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<ol>
+<li>コンピュータ環境の整備</li>
+<li>データの取得、読み込み</li>
+<li>探索的データ解析
+<ul>
+<li><strong>前処理、加工</strong> (地味。意外と重い) 👈 本実習の主題</li>
+<li>可視化、仮説生成 (派手！だいじ！)</li>
+<li>統計解析、仮説検証 (みんな勉強したがる)</li>
+</ul>
+</li>
+<li>報告、発表</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
 <h2 id="前処理は大きく2つに分けられる">前処理は大きく2つに分けられる</h2>
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/dplyr.png" width="120">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tidyr.png" width="120">
+</a>
+</div>
 <ul>
 <li>データ構造を対象とする処理 &mdash; 第3, 4回
 <ul>
@@ -129,7 +172,7 @@ if (!doNotTrack) {
 ✖ dplyr::lag()    masks stats::lag()
 </code></pre><p>たまには更新しよう:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">update.packages</span><span class="p">(</span><span class="n">ask</span> <span class="o">=</span> <span class="s">&#34;no&#34;</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;binary&#34;</span><span class="p">)</span>
-<span class="c1"># いちいち確認せずにビルド済み安定版を入れるオプション</span>
+<span class="c1"># いちいち確認せずにビルド済み安定版を入れるオプション。無くても。</span>
 </code></pre></div>
 </section>
 <section>
@@ -169,24 +212,6 @@ if (!doNotTrack) {
 </code></pre>
 </section>
 <section>
-<h2 id="dataframeは列vectorの集まり">data.frameは列vectorの集まり</h2>
-<p>内容を変更する方法はいくつかある。<br>
-<code>diamonds</code> の <code>price</code> 列をドルから円に変換する例:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">dia</span> <span class="o">=</span> <span class="n">diamonds</span>    <span class="c1"># 別名コピー</span>
-
-<span class="c1"># dollar演算子 $ で指定</span>
-<span class="n">dia</span><span class="o">$</span><span class="n">price</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">dia</span><span class="o">$</span><span class="n">price</span>
-
-<span class="c1"># 名前を [[文字列]] で指定</span>
-<span class="n">dia[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">dia[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span>
-
-<span class="c1"># dplyr::mutate with pipe</span>
-<span class="n">dia</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
-  <span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">price</span><span class="p">)</span>
-</code></pre></div><p>1発ならどれでもいい。流れ作業には <code>mutate()</code> が便利。</p>
-
-</section>
-<section>
 <h2 id="数値-numeric型">数値: numeric型</h2>
 <p>普通は倍精度浮動小数点型 <code>double</code> として扱われる:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">answer</span> <span class="o">=</span> <span class="m">42</span>
@@ -217,30 +242,27 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 </a></div>
 </section>
 <section>
-<h2 id="正規化-z-score-normalization">正規化 (z-score normalization)</h2>
-<p>平均=0、標準偏差=1、になるように:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
-  <span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="nf">as.vector</span><span class="p">(</span><span class="nf">scale</span><span class="p">(</span><span class="n">price</span><span class="p">)))</span> <span class="o">%&gt;%</span>
-  <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table      price     x     y     z
-      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-    1  0.23     Ideal     E     SI2  61.5    55 -0.9040868  3.95  3.98  2.43
-    2  0.21   Premium     E     SI1  59.8    61 -0.9040868  3.89  3.84  2.31
-    3  0.23      Good     E     VS1  56.9    65 -0.9038361  4.05  4.07  2.31
-    4  0.29   Premium     I     VS2  62.4    58 -0.9020815  4.20  4.23  2.63
-   --                                                                       
-53937  0.72      Good     D     SI1  63.1    55 -0.2947280  5.69  5.75  3.61
-53938  0.70 Very Good     D     SI1  62.8    60 -0.2947280  5.66  5.68  3.56
-53939  0.86   Premium     H     SI2  61.0    58 -0.2947280  6.15  6.12  3.74
-53940  0.75     Ideal     D     SI2  62.2    55 -0.2947280  5.83  5.87  3.64
-</code></pre><p><code>price = (price - mean(price)) / sd(price)</code> と同じ。</p>
-<p><code>scale()</code> はmatrixを返すため <code>as.vector()</code> が必要。</p>
+<h2 id="dataframeは列vectorの集まり">data.frameは列vectorの集まり</h2>
+<p>内容を変更する方法はいくつかある。<br>
+<code>diamonds</code> の <code>price</code> 列をドルから円に変換する例:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">dia</span> <span class="o">=</span> <span class="n">diamonds</span>    <span class="c1"># 別名コピー</span>
+
+<span class="c1"># dollar演算子 $ で指定</span>
+<span class="n">dia</span><span class="o">$</span><span class="n">price</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">dia</span><span class="o">$</span><span class="n">price</span>
+
+<span class="c1"># 名前を [[文字列]] で指定</span>
+<span class="n">dia[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">dia[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span>
+
+<span class="c1"># dplyr::mutate with pipe</span>
+<span class="n">dia</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">price</span><span class="p">)</span>
+</code></pre></div><p>1発ならどれでもいい。流れ作業には <code>mutate()</code> が便利。</p>
 
 </section>
 <section>
 <h2 id="正規化-min-max-normalization">正規化 (min-max normalization)</h2>
 <p>最小=0、最大=1、になるように:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">normalized_minmax</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="p">(</span><span class="n">price</span> <span class="o">-</span> <span class="nf">min</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="nf">max</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="o">-</span> <span class="nf">min</span><span class="p">(</span><span class="n">price</span><span class="p">)))</span> <span class="o">%&gt;%</span>
   <span class="nf">print</span><span class="p">()</span>
 </code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table        price     x     y     z
@@ -258,8 +280,36 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 
 </section>
 <section>
+<h2 id="正規化-z-score-normalization">正規化 (z-score normalization)</h2>
+<p>平均=0、標準偏差=1、になるように:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">normalized_z</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="p">(</span><span class="n">price</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">/</span> <span class="nf">sd</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">print</span><span class="p">()</span>
+</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table      price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55 -0.9040868  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61 -0.9040868  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65 -0.9038361  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58 -0.9020815  4.20  4.23  2.63
+   --                                                                       
+53937  0.72      Good     D     SI1  63.1    55 -0.2947280  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60 -0.2947280  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58 -0.2947280  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55 -0.2947280  5.83  5.87  3.64
+</code></pre><p><code>price = as.vector(scale(price))</code> でも可能。<br>
+<code>scale()</code> はmatrixを返すため <code>as.vector()</code> が必要。</p>
+
+</section>
+<section>
+<h2 id="正規化の結果を確認">正規化の結果を確認</h2>
+<p>分布の形は変わらず、範囲が変わる。</p>
+<p>z-scoreは正規分布前提。これだけ非対称だと使いにくい。</p>
+<p><img src="figure/normalize-plot-1.png" alt="plot of chunk normalize-plot"></p>
+
+</section>
+<section>
 <h2 id="外れ値の除去">外れ値の除去</h2>
-<p>平均値から標準偏差の3倍以上離れているものを取り除く例:</p>
+<p>平均値から標準偏差の3倍以上離れているもの($\lvert z \rvert \ge 3$)を取り除く例:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
   <span class="nf">filter</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">price</span> <span class="o">-</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">/</span> <span class="nf">sd</span><span class="p">(</span><span class="n">price</span><span class="p">)</span> <span class="o">&lt;</span> <span class="m">3</span><span class="p">)</span> <span class="o">%&gt;%</span>
   <span class="nf">print</span><span class="p">()</span>
@@ -434,7 +484,7 @@ substr(x, start, stop)
 <li>入力に <code>NA</code> が含まれる場合は対応する出力も <code>NA</code></li>
 </ul>
 </li>
-<li><a href="http://userguide.icu-project.org/strings/regexp">ICU正規表現</a>の仕様が明確</li>
+<li><a href="https://unicode-org.github.io/icu/userguide/strings/regexp.html">ICU正規表現</a>の仕様が明確</li>
 <li><a href="https://stringr.tidyverse.org/">公式ドキュメント</a>を見れば全容が掴める</li>
 </ul>
 
@@ -492,28 +542,28 @@ substr(x, start, stop)
 <tbody>
 <tr>
 <td><code>\d</code></td>
-<td>数字</td>
+<td>数字 (逆は <code>\D</code>)</td>
 <td></td>
 <td><code>?</code></td>
 <td>0回か1回</td>
 </tr>
 <tr>
 <td><code>\s</code></td>
-<td>空白</td>
+<td>空白 (逆は <code>\S</code>)</td>
 <td></td>
 <td><code>*</code></td>
 <td>0回以上繰り返し</td>
 </tr>
 <tr>
 <td><code>\w</code></td>
-<td>英数字</td>
+<td>英数字 (逆は <code>\W</code>)</td>
 <td></td>
 <td><code>+</code></td>
 <td>1回以上繰り返し</td>
 </tr>
 <tr>
 <td><code>.</code></td>
-<td>何でも</td>
+<td><strong>何でも1文字</strong></td>
 <td></td>
 <td><code>{n,m}</code></td>
 <td>n回以上m回以下</td>
@@ -534,23 +584,23 @@ substr(x, start, stop)
 </tr>
 </tbody>
 </table>
-<p><code>&quot;普通の文字列&quot;</code>ではバックスラッシュを重ねる必要がある: <code>&quot;^\\d&quot;</code>.<br>
-<code>r&quot;(raw文字列)&quot;</code>を使う場合はひとつでいい: <code>r&quot;(\d$)&quot;</code>.<br>
-大文字にすると反転: <code>\D</code>, <code>\S</code>, <code>\W</code>.</p>
-<div style="text-align: right;"><a class="url" href="http://userguide.icu-project.org/strings/regexp">
-http://userguide.icu-project.org/strings/regexp
+<div style="text-align: right;"><a class="url" href="https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters">
+https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters
 </a></div>
-
+<p>Rの<code>&quot;普通の文字列&quot;</code>ではバックスラッシュを重ねる必要がある: <code>&quot;^\\d&quot;</code>.</p>
+<aside style="font-size: 0.9rem; color: #888888;">
+<p>改行 <code>\n</code> とかタブ <code>\t</code> のような<a href="https://duckduckgo.com/?q=escape+sequence">エスケープシーケンス</a>と区別するため。<br>
+<code>r&quot;(raw文字列)&quot;</code>を使う場合はひとつでいい: <code>r&quot;(^\d)&quot;</code>.</p>
+</aside>
 </section>
 <section>
 <h2 id="正規表現-チートシート">正規表現: チートシート</h2>
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/rstats/stringr-cheatsheet2.png" width="90%">
+<img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
 </a>
 </figure>
-
 </section>
 <section>
 <h2 id="正規表現-練習問題">正規表現: 練習問題</h2>
@@ -591,7 +641,7 @@ http://userguide.icu-project.org/strings/regexp
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fruit4</span> <span class="o">=</span> <span class="nf">head</span><span class="p">(</span><span class="n">fruit</span><span class="p">,</span> <span class="m">4L</span><span class="p">)</span>
 <span class="nf">str_extract</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="s">&#34;^a..&#34;</span><span class="p">)</span>
 </code></pre></div><pre tabindex="0"><code>[1] &quot;app&quot; &quot;apr&quot; &quot;avo&quot; NA   
-</code></pre><p>🔰 <code>diamonds</code> の <code>clarity</code> 列から数字を取り除いてみよう</p>
+</code></pre><p>🔰 <code>diamonds</code> の <code>clarity</code> 列を数字なしにしてみよう</p>
 <pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
       &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
     1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
@@ -611,8 +661,8 @@ http://userguide.icu-project.org/strings/regexp
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fruit4</span> <span class="o">=</span> <span class="nf">head</span><span class="p">(</span><span class="n">fruit</span><span class="p">,</span> <span class="m">4L</span><span class="p">)</span>
 <span class="nf">str_replace</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="s">&#34;..$&#34;</span><span class="p">,</span> <span class="s">&#34;!!&#34;</span><span class="p">)</span>
 </code></pre></div><pre tabindex="0"><code>[1] &quot;app!!&quot;   &quot;apric!!&quot; &quot;avoca!!&quot; &quot;bana!!&quot; 
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">str_replace</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="s">&#34;(..)$&#34;</span><span class="p">,</span> <span class="s">&#34;!!\\1&#34;</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] &quot;app!!le&quot;   &quot;apric!!ot&quot; &quot;avoca!!do&quot; &quot;bana!!na&quot; 
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">str_replace</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="s">&#34;(..)$&#34;</span><span class="p">,</span> <span class="s">&#34;_\\1_&#34;</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>[1] &quot;app_le_&quot;   &quot;apric_ot_&quot; &quot;avoca_do_&quot; &quot;bana_na_&quot; 
 </code></pre><p>🔰 <code>starwars</code> の <code>name</code> 列の数字を全部ゼロにしてみよう</p>
 <pre tabindex="0"><code>             name height  mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
             &lt;chr&gt;  &lt;int&gt; &lt;dbl&gt;      &lt;chr&gt;       &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt;  &lt;chr&gt;     &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;    &lt;list&gt;    &lt;list&gt;    &lt;list&gt;
@@ -632,7 +682,8 @@ http://userguide.icu-project.org/strings/regexp
 <p><code>matches()</code> があれば <code>starts_with()</code>/<code>ends_with()</code> は不要:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">diamonds</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^c&#34;</span><span class="p">))</span>   <span class="c1"># starts_with(&#34;c&#34;)</span>
 <span class="n">starwars</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;s$&#34;</span><span class="p">))</span>   <span class="c1"># ends_with(&#34;s&#34;)</span>
-<span class="n">world_bank_pop</span> <span class="o">%&gt;%</span> <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^\\d+$&#34;</span><span class="p">),</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;year&#34;</span><span class="p">)</span>
+<span class="n">world_bank_pop</span> <span class="o">%&gt;%</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^\\d+$&#34;</span><span class="p">),</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;year&#34;</span><span class="p">)</span>
 </code></pre></div><p>See <a href="https://tidyselect.r-lib.org/reference/select_helpers.html">&ldquo;tidyselect helpers&rdquo;</a> for more details.</p>
 
 </section>
@@ -641,7 +692,7 @@ http://userguide.icu-project.org/strings/regexp
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fruit4</span> <span class="o">=</span> <span class="nf">head</span><span class="p">(</span><span class="n">fruit</span><span class="p">,</span> <span class="m">4L</span><span class="p">)</span>
 <span class="nf">str_to_upper</span><span class="p">(</span><span class="n">fruit4</span><span class="p">)</span>              <span class="c1"># 大文字に</span>
 </code></pre></div><pre tabindex="0"><code>[1] &quot;APPLE&quot;   &quot;APRICOT&quot; &quot;AVOCADO&quot; &quot;BANANA&quot; 
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">str_pad</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="s">&#34;left&#34;</span><span class="p">,</span> <span class="s">&#34;_&#34;</span><span class="p">)</span>   <span class="c1"># 幅を埋める</span>
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">str_pad</span><span class="p">(</span><span class="n">fruit4</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="s">&#34;left&#34;</span><span class="p">,</span> <span class="s">&#34;_&#34;</span><span class="p">)</span>   <span class="c1"># 幅を埋めて指定幅に</span>
 </code></pre></div><pre tabindex="0"><code>[1] &quot;___apple&quot; &quot;_apricot&quot; &quot;_avocado&quot; &quot;__banana&quot;
 </code></pre><p><a href="http://www.gagolewski.com/software/stringi/"><code>stringi</code></a> パッケージはさらに多機能</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">stringi</span><span class="o">::</span><span class="nf">stri_trans_nfkc</span><span class="p">(</span><span class="s">&#34;ｶﾀｶﾅ&#34;</span><span class="p">)</span>  <span class="c1"># 半角カナを全角に</span>
@@ -663,12 +714,13 @@ http://userguide.icu-project.org/strings/regexp
 </code></pre></div><pre tabindex="0"><code>[1]  TRUE  TRUE FALSE FALSE
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">parse_date</span><span class="p">(</span><span class="s">&#34;2020-06-03&#34;</span><span class="p">)</span>
 </code></pre></div><pre tabindex="0"><code>[1] &quot;2020-06-03&quot;
-</code></pre><p><code>2e-02</code> は $2 \times 10^{-2}$ 、 <code>6e+23</code> は $6 \times 10 ^ {23}$ のプログラミング的表現</p>
+</code></pre><p><code>6e+23</code> は $6 \times 10 ^ {23}$ のプログラミング的表現。
+$6e^{23}$ ではない。</p>
 
 </section>
 <section>
 <h2 id="因子型-factor">因子型 <code>factor</code></h2>
-<p>カテゴリカル変数を扱うための型。文字列っぽいけど実体は整数。</p>
+<p><strong>カテゴリカル変数</strong>(質的変数)を扱うための型。文字列っぽいけど<strong>実体は整数</strong>。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">month_levels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span>                       <span class="c1"># 取りうる値</span>
   <span class="s">&#34;Jan&#34;</span><span class="p">,</span> <span class="s">&#34;Feb&#34;</span><span class="p">,</span> <span class="s">&#34;Mar&#34;</span><span class="p">,</span> <span class="s">&#34;Apr&#34;</span><span class="p">,</span> <span class="s">&#34;May&#34;</span><span class="p">,</span> <span class="s">&#34;Jun&#34;</span><span class="p">,</span>
   <span class="s">&#34;Jul&#34;</span><span class="p">,</span> <span class="s">&#34;Aug&#34;</span><span class="p">,</span> <span class="s">&#34;Sep&#34;</span><span class="p">,</span> <span class="s">&#34;Oct&#34;</span><span class="p">,</span> <span class="s">&#34;Nov&#34;</span><span class="p">,</span> <span class="s">&#34;Dec&#34;</span>
@@ -680,7 +732,7 @@ http://userguide.icu-project.org/strings/regexp
 Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.integer</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>                          <span class="c1"># 整数型に変換可能</span>
 </code></pre></div><pre tabindex="0"><code>[1] 12  4  1  3
-</code></pre><p>🔰 <code>iris</code> に含まれる因子型を確認しよう</p>
+</code></pre><p>🔰 <code>iris</code> に含まれる因子型を確認しよう: <code>str(iris)</code></p>
 <div style="text-align: right;"><a class="url" href="https://r4ds.had.co.nz/factors.html">
 https://r4ds.had.co.nz/factors.html
 </a></div>
@@ -713,13 +765,10 @@ Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 </section>
 <section>
 <h2 id="因子型-factor-順序の情報は作図で生きる">因子型 <code>factor</code>: 順序の情報は作図で生きる</h2>
-<p>文字列だと勝手にアルファベット順。因子型なら任意指定可能。<br>
-頻度順にする例:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">diamonds</span> <span class="o">%&gt;%</span>
-  <span class="nf">mutate</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="nf">fct_infreq</span><span class="p">(</span><span class="n">color</span><span class="p">))</span> <span class="o">%&gt;%</span>
-  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">color</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_bar</span><span class="p">()</span> <span class="o">+</span> <span class="nf">coord_flip</span><span class="p">()</span>
-</code></pre></div><p><img src="figure/fct_infreq-1.png" alt="plot of chunk fct_infreq"></p>
+<p>文字列だと勝手にアルファベット順。因子型なら任意指定可能:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">mpg_fct</span> <span class="o">=</span> <span class="n">mpg</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">drv</span> <span class="o">=</span> <span class="nf">factor</span><span class="p">(</span><span class="n">drv</span><span class="p">,</span> <span class="n">levels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;f&#34;</span><span class="p">,</span> <span class="s">&#34;r&#34;</span><span class="p">,</span> <span class="s">&#34;4&#34;</span><span class="p">)))</span>
+</code></pre></div><p><img src="figure/factor-plot-1.png" alt="plot of chunk factor-plot"></p>
 
 </section>
 <section>
@@ -734,7 +783,7 @@ Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 Levels: Jan &lt; Feb &lt; Mar &lt; Apr &lt; May &lt; Jun &lt; Jul &lt; Aug &lt; Sep &lt; Oct &lt; Nov &lt; Dec
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y3</span> <span class="o">&lt;</span> <span class="s">&#34;Sep&#34;</span>
 </code></pre></div><pre tabindex="0"><code>[1] FALSE  TRUE  TRUE  TRUE
-</code></pre><p>🔰 <code>diamonds</code> に含まれるordered型を確認しよう。<br>
+</code></pre><p>🔰 <code>diamonds</code> に含まれるordered型を確認しよう: <code>str(diamonds)</code><br>
 🔰 <code>cut</code> がPremium以上の行だけ抜き出す、とか。</p>
 
 </section>
@@ -744,18 +793,26 @@ Levels: Jan &lt; Feb &lt; Mar &lt; Apr &lt; May &lt; Jun &lt; Jul &lt; Aug &lt; 
 <img src="/slides/image/hex-stickers/forcats.png" width="120" align="right">
 </a>
 <ul>
+<li><code>fct_relevel()</code>: 手動で順序設定</li>
 <li><code>fct_reorder()</code>: 別の変数に応じて順序を並べ替え</li>
 <li><code>fct_infreq()</code>: 頻度に応じて順序を並べ替え</li>
-<li><code>fct_relevel()</code>: すべて手動で再設定</li>
 <li><code>fct_lump()</code>: 少なすぎるカテゴリを&quot;その他&quot;としてまとめる</li>
 </ul>
-<hr>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">diamonds_fct</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="nf">fct_infreq</span><span class="p">(</span><span class="n">color</span><span class="p">))</span>
+<span class="n">mpg_fct</span> <span class="o">=</span> <span class="n">mpg</span> <span class="o">%&gt;%</span>
+  <span class="nf">mutate</span><span class="p">(</span><span class="n">fl</span> <span class="o">=</span> <span class="nf">fct_lump</span><span class="p">(</span><span class="n">fl</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="m">2</span><span class="p">))</span>
+</code></pre></div><p><img src="figure/fct_infreq-1.png" alt="plot of chunk fct_infreq"></p>
+
+</section>
+<section>
+<h2 id="factorで順序を変えて作図する練習">factorで順序を変えて作図する練習</h2>
 <p>🔰 <code>mpg</code> で次のような図を描いてみよう</p>
 <p><img src="figure/plot-factor-1.png" alt="plot of chunk plot-factor"></p>
 
 </section>
 <section>
-<h2 id="指示変数に変換">指示変数に変換</h2>
+<h2 id="指示変数ダミー変数に変換">指示変数(ダミー変数)に変換</h2>
 <p>イチゼロの値を持たせて横広に変形するのと等価。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris</span> <span class="o">%&gt;%</span> <span class="nf">rowid_to_column</span><span class="p">()</span> <span class="o">%&gt;%</span>
   <span class="nf">mutate</span><span class="p">(</span><span class="n">value</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span> <span class="o">%&gt;%</span>
@@ -779,19 +836,19 @@ Levels: Jan &lt; Feb &lt; Mar &lt; Apr &lt; May &lt; Jun &lt; Jul &lt; Aug &lt; 
 <h2 id="日時型-posixct-posixlt">日時型: POSIXct, POSIXlt</h2>
 <ul>
 <li>POSIXct: エポックからの経過秒数。比較や差分などを取りやすい。</li>
-<li>POSIXlt: list(年, 月, 日, 時, 分, 秒)。単位ごとに抜き出しやすい。</li>
+<li>POSIXlt: list(秒, 分, 時, 日, 月, 年, &hellip;)。単位ごとに抜き出しやすい。</li>
 </ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">now</span> <span class="o">=</span> <span class="s">&#34;2020-10-17 14:00:00&#34;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">now</span> <span class="o">=</span> <span class="s">&#34;2021-09-15 11:00:00&#34;</span>
 <span class="n">ct</span> <span class="o">=</span> <span class="nf">as.POSIXct</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
 <span class="nf">unclass</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] 1602910800
+</code></pre></div><pre tabindex="0"><code>[1] 1631671200
 attr(,&quot;tzone&quot;)
 [1] &quot;&quot;
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">lt</span> <span class="o">=</span> <span class="nf">as.POSIXlt</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
 <span class="nf">unclass</span><span class="p">(</span><span class="n">lt</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">as_tibble</span><span class="p">()</span>
 </code></pre></div><pre tabindex="0"><code>    sec   min  hour  mday   mon  year  wday  yday isdst  zone gmtoff
   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  &lt;int&gt;
-1     0     0    14    17     9   120     6   290     0   JST     NA
+1     0     0    11    15     8   121     3   257     0   JST     NA
 </code></pre><p>素のRでも扱えるけど lubridate パッケージを使うともっと楽に。</p>
 
 </section>
@@ -815,6 +872,17 @@ Levels: Sun &lt; Mon &lt; Tue &lt; Wed &lt; Thu &lt; Fri &lt; Sat
 </section>
 <section>
 <h2 id="データ内容を対象とする処理--まとめ">データ内容を対象とする処理 | まとめ</h2>
+<div style="float: right;">
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/stringr.png" width="120">
+</a><br>
+<a href="https://forcats.tidyverse.org/">
+<img src="/slides/image/hex-stickers/forcats.png" width="120">
+</a><br>
+<a href="https://lubridate.tidyverse.org/">
+<img src="/slides/image/hex-stickers/lubridate.png" width="120">
+</a><br>
+</div>
 <ul>
 <li>正規化・欠損値処理は目的に応じて検討</li>
 <li>vectorには<strong>型</strong>がある: 文字列、数値、因子、日時、etc.</li>
@@ -825,12 +893,70 @@ Levels: Sun &lt; Mon &lt; Tue &lt; Wed &lt; Thu &lt; Fri &lt; Sat
 </li>
 <li>因子を扱うには <a href="https://forcats.tidyverse.org/">forcats</a>
 <ul>
-<li>知っておくと作図で有利。苦手なら全部文字列にする。</li>
+<li>知っておくとたまに便利。苦手なら全部文字列にしてもいい。</li>
 </ul>
 </li>
 <li>日時を扱うには <a href="https://lubridate.tidyverse.org/">lubridate</a></li>
 </ul>
 <p>各パッケージの<a href="https://www.rstudio.com/resources/cheatsheets/">チートシート.pdf</a>を手元に持っておくと便利。
+</section>
+<section>
+<h2 id="前処理に必要な道具はだいたい揃った">前処理に必要な道具はだいたい揃った</h2>
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/dplyr.png" width="120">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/tidyr.png" width="120">
+</a><br>
+<a href="https://stringr.tidyverse.org/">
+<img src="/slides/image/hex-stickers/stringr.png" width="120">
+</a>
+</div>
+<ul>
+<li>データ構造を対象とする処理 — 第3, 4回
+<ul>
+<li>使いたい部分だけ抽出 &mdash; <code>select()</code>, <code>filter()</code></li>
+<li>グループごとに特徴を要約 &mdash; <code>group_by()</code>, <code>summarize()</code></li>
+<li>何かの順に並べ替え &mdash; <code>arrange()</code></li>
+<li>異なるテーブルの結合 &mdash; <code>*_join()</code></li>
+<li>変形: 縦長 ↔ 横広 &mdash; <code>pivot_longer()</code>, <code>pivot_wider()</code></li>
+</ul>
+</li>
+<li><strong>データ内容を対象とする処理</strong> — 👈 第5回 本日の話題
+<ul>
+<li>数値の変換: 対数、正規化</li>
+<li>外れ値・欠損値への対処</li>
+<li>型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時</li>
+<li>文字列処理: 正規表現によるパターンマッチ</li>
+</ul>
+</li>
+</ul>
+<p><cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></cite>
+</section>
+<section>
+<h2 id="統計解析の一歩手前までなら行ける">統計解析の一歩手前までなら行ける</h2>
+<ol>
+<li>コンピュータ環境の整備</li>
+<li>データの取得、読み込み</li>
+<li>探索的データ解析
+<ul>
+<li><strong>前処理、加工</strong> (地味。意外と重い) 👈 本実習の主題</li>
+<li>可視化、仮説生成 (派手！だいじ！)</li>
+<li>統計解析、仮説検証 (みんな勉強したがる)</li>
+</ul>
+</li>
+<li>報告、発表</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
 </section>
 <section>
 <h2 id="reference">Reference</h2>
@@ -846,7 +972,7 @@ Levels: Sun &lt; Mon &lt; Tue &lt; Wed &lt; Thu &lt; Fri &lt; Sat
 <dt>Official documents:</dt>
 <dd><a href="https://www.tidyverse.org/">tidyverse</a>,
 <a href="https://dplyr.tidyverse.org/">dplyr</a>,
-<a href="https://tibble.tidyverse.org/">tibble</a>,
+<a href="https://tidyr.tidyverse.org/">tidyr</a>,
 <a href="https://stringr.tidyverse.org/">stringr</a>,
 <a href="https://forcats.tidyverse.org/">forcats</a>,
 <a href="https://lubridate.tidyverse.org/">lubridate</a></dd>
