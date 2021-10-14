@@ -234,7 +234,7 @@ x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡
 ```r
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
-  facet_wrap(~ cut)
+  facet_wrap(vars(cut))
 ```
 
 <img src="figure/tidy-data-benefit-1.png" alt="plot of chunk tidy-data-benefit">

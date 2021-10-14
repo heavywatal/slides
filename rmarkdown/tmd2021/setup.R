@@ -10,6 +10,8 @@ options(
   width = 9999L,
   dplyr.summarise.inform = FALSE,
   readr.num_columns = 0L,
+  readr.show_progress = FALSE,
+  readr.show_col_types = FALSE,
   ggplot2.continuous.colour = "viridis",
   ggplot2.continuous.fill = "viridis"
 )

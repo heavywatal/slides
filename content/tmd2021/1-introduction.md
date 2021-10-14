@@ -292,7 +292,7 @@ x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡
 ```r
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
-  facet_wrap(~ cut)
+  facet_wrap(vars(cut))
 ```
 
 ![plot of chunk tidy-data-benefit](figure/tidy-data-benefit-1.png)
@@ -999,7 +999,6 @@ y
 同じ長さの列vectorを複数束ねた長方形の表。<br>
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
-
 ```r
 print(iris)
 ```
@@ -1039,11 +1038,11 @@ str(iris)       # 構造が分かる形で表示
 ```
 
 ```
-tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
- $ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
- $ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
- $ Petal.Length: num [1:150] 1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
- $ Petal.Width : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+'data.frame':	150 obs. of  5 variables:
+ $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num  3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num  0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
  $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
 ```
 

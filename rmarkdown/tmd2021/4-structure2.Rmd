@@ -42,9 +42,7 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-library(purrr)
 knitr::opts_chunk$set(cache = FALSE)
-anscombe = tibble::as_tibble(anscombe)
 ```
 
 ---
@@ -673,7 +671,7 @@ VADeaths %>%
 ```
 
 ---
-## 🔰 課題: `VADeaths` を縦長にしてggplotしてみよう
+## 🔰 課題: `VADeaths` を変形して作図しよう
 
 ```{r vadeaths_rownames, results="hold"}
 as.data.frame(VADeaths) %>%              # data.frameに変換
@@ -697,8 +695,11 @@ ggplot(va_deaths) +
 ```
 
 ---
-## 🔰 課題: `anscombe` を縦長にしてggplotしてみよう
+## 🔰 課題: `anscombe` を変形して作図しよう
 
+```{r anscombe_tbl, include = FALSE}
+anscombe = tibble::as_tibble(anscombe) # for printing with wtl::printdf()
+```
 ```{r anscombe, results="hold"}
 anscombe %>% rowid_to_column("id")   # IDをつけておく
 ```
@@ -718,7 +719,7 @@ tidy_anscombe = anscombe %>%
 ggplot(tidy_anscombe) + aes(x, y) +
   geom_point(size = 3) +
   stat_smooth(method = lm, formula = y ~ x, se = FALSE, fullrange = TRUE) +
-  facet_wrap(~ group, nrow = 1L) +
+  facet_wrap(vars(group), nrow = 1L) +
   theme_bw(base_size = 16)
 ```
 

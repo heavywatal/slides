@@ -973,7 +973,7 @@ VADeaths %>%
 ```
 
 ---
-## 🔰 課題: `VADeaths` を縦長にしてggplotしてみよう
+## 🔰 課題: `VADeaths` を変形して作図しよう
 
 
 ```r
@@ -993,7 +993,8 @@ as.data.frame(VADeaths) %>%              # data.frameに変換
 ![plot of chunk vadeaths_plot](figure/vadeaths_plot-1.png)
 
 ---
-## 🔰 課題: `anscombe` を縦長にしてggplotしてみよう
+## 🔰 課題: `anscombe` を変形して作図しよう
+
 
 
 ```r

@@ -42,7 +42,6 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-iris = tibble::as_tibble(iris)
 ```
 
 
@@ -280,7 +279,7 @@ x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡
 ```{r tidy-data-benefit, fig.height = 6, fig.width = 9, cache = TRUE}
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
-  facet_wrap(~ cut)
+  facet_wrap(vars(cut))
 ```
 
 ---
@@ -843,8 +842,11 @@ y
 同じ長さの列vectorを複数束ねた長方形の表。<br>
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
-```{r data.frame}
+```r
 print(iris)
+```
+```{r data.frame, echo = FALSE}
+wtl::printdf(iris)
 ```
 
 `iris` はアヤメ属3種150個体に関する測定データ。<br>
