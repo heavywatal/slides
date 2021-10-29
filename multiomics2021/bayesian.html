@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>ベイズ推定、階層ベイズモデル — マルチNGSオミクス解析研究会 #10</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="ベイズ推定、階層ベイズモデル — マルチNGSオミクス解析研究会 #10">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/multiomics2021/bayesian.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.88.1" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-41178626-2', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="確率分布を理解する統計モデリング入門"><a href=".">確率分布を理解する統計モデリング入門</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="distribution.html">統計モデリング基礎: 確率分布、尤度</a>
+<li><a href="glm.html">一般化線形モデル、混合モデル</a>
+<li class="current-deck"><a href="bayesian.html">ベイズ統計、階層ベイズモデル</a>
+</ol>
+<div class="footnote">
+2021-12-14 東京大学 中戸研 <a href="https://amedprime-nakatolab.github.io/Seminar/10.html">マルチNGSオミクス解析研究会 #10</a><br>
+<a href="https://heavywatal.github.io/slides/multiomics2021/">https://heavywatal.github.io/slides/multiomics2021/</a>
+</div>
+
+</section>
+<section>
+<h2 id="全体の構成">全体の構成</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに回帰分析の概要を紹介。</p>
+<ol>
+<li>イントロ <a href="distribution.html">(#7 9/30)</a></li>
+<li>統計モデルの基本
+<ul>
+<li>確率変数・<strong>確率分布</strong> 👈 主役</li>
+<li>尤度・最尤推定</li>
+</ul>
+</li>
+<li>一般化線形モデル、混合モデル <a href="glm.html">(#10 12/14 前半)</a></li>
+<li>ベイズ統計、階層ベイズモデル <a href="bayesian.html">(#10 12/14 後半)</a></li>
+</ol>
+<p>回帰のキモは<strong>線ではなく分布</strong>。</p>
+<hr>
+<cite>
+<p><a href="https://heavywatal.github.io/slides/tokiomarine2021/">Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)</a>
+の演習無し抜粋バージョン (~2時間 x 2回)。</p>
+</cite>
+
+</section>
+<section>
+<h2 id="コイントス4回たまたま表が1回だったら">コイントス4回、たまたま表が1回だったら</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<dl>
+<dt>最尤推定</dt>
+<dd>推定結果は最も尤もらしい1点。</dd>
+<dd>データが少ないとき過剰適合気味。</dd>
+<dd>表が出る確率 p = 0.25 のコインだろう。<br>
+(信じ難いけどデータはこう言っている)</dd>
+</dl>
+<br>
+<dl>
+<dt>ベイズ推定</dt>
+<dd>推定結果は確率分布そのもの。</dd>
+<dd>データが少ないなりの不確実さも表現。</dd>
+<dd>p = 0.25 らへんである確率は高いが、<br>
+p = 0.6 とかである可能性もまあある。
+</div>
+<div class="column" style="flex-shrink: 1.4;">
+</dd>
+</dl>
+<p><img src="figure/freq-vs-bayes-1.png" alt="plot of chunk freq-vs-bayes"><img src="figure/freq-vs-bayes-2.png" alt="plot of chunk freq-vs-bayes"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="コイントスの回数が増えていったら">コイントスの回数が増えていったら</h2>
+<p><strong>最尤推定</strong>: 推定値が真の値に近づいていく</p>
+<p><img src="figure/coin-frequentist-1.png" alt="plot of chunk coin-frequentist"></p>
+<p><strong>ベイズ推定</strong>: 確率分布がどんどん尖り、確信が強まる</p>
+<p><img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian"></p>
+
+</section>
+<section>
+<h2 id="確率おさらい">確率おさらい</h2>
+<dl>
+<dt>同時分布/結合確率: <span style="font-weight: normal;"> <span style="color: #E69F00;">A</span>かつ<span style="color: #0072B2;">B</span>の確率</span></dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \cap \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#0072B2}{B})$</dd>
+<dt>周辺確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>によらず<span style="color: #E69F00;">A</span>になる確率</span></dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A}) = \sum_{\textcolor{#0072B2}{B}} \text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})$</dd>
+<dt>条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率。重要。</span></dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$</dd>
+</dl>
+<p><img src="figure/venn-1.png" alt="plot of chunk venn">
+</section>
+<section>
+<h2 id="条件付き確率がよくわかる具体例">条件付き確率がよくわかる具体例</h2>
+<dl>
+<dt><span style="color: #0072B2;">B Brewery</span>のビールが<span style="color: #E69F00;">Awesome</span>な確率</dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{\text{Awesome}} \mid \textcolor{#0072B2}{\text{B Brewery}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}})}$</dd>
+<dd>かなり高い確率。良い醸造所。</dd>
+<dt><span style="color: #E69F00;">Awesome</span>なビールが<span style="color: #0072B2;">B Brewery</span>のものである確率</dt>
+<dd>$\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$</dd>
+<dd>かなり低い確率。Awesomeなビールはほかにもたっくさんある。</dd>
+</dl>
+<img src="figure/venn-1.png" alt="plot of chunk venn">
+
+</section>
+<section>
+<h2 id="ベイズの定理">ベイズの定理</h2>
+<dl>
+<dt>乗法定理</dt>
+<dd>$\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$</dd>
+</dl>
+<a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
+<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="150" align="right"></a>
+<p>移項するだけで<strong>ベイズの定理</strong>:
+<img src="../tokiomarine2021/bayes.drawio.svg" style="padding-left: 1rem;"></p>
+<p>宴会場にビールが運ばれてきた。これはどこのブルワリーの？</p>
+<dl>
+<dt>事前確率: $\text{Prob}(\textcolor{#0072B2}{B})$</dt>
+<dd>飲む前、手元のビールが<span style="color: #0072B2;">B Brewery</span>のである確率。</dd>
+<dd>↓ 🍻 飲んでみて更新</dd>
+<dt>事後確率: $\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$</dt>
+<dd>飲んでみて<span style="color: #E69F00;">Awesome</span>だったビールが
+<span style="color: #0072B2;">B Brewery</span>のである確率。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="ベイズの定理-in-感染症検査">ベイズの定理 in 感染症検査</h2>
+<ul>
+<li>有病率 $\text{Prob}(M)$ : 0.3% (この地域の感染者の割合; 事前確率)</li>
+<li>感度 $\text{Prob}(P \mid M)$ : 90% (感染してる人に陽性判定が出る)</li>
+<li>特異度 $\text{Prob}(N \mid \overline{M})$: 99% (感染してない人に陰性判定が出る)</li>
+</ul>
+<p>$\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者である確率)は？</p>
+<div>\[\begin{split}
+\text{Prob}(M \mid P)
+  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)} {\text{Prob}(P)} \\
+  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)}
+           {\text{Prob}(P \mid M)~\text{Prob}(M) + (1 - \text{Prob}(N \mid \overline{M}))~\text{Prob}(\overline{M})} \\
+  &= \frac {0.9 \times 0.003} {0.9 \times 0.003 + 0.01 \times 0.997} \approx 0.21
+\end{split}\]</div>
+<p>感染者を隔離するスクリーニング目的では使いものにならない性能。</p>
+<p>🔰 同様に $\text{Prob}(\overline{M} \mid N)$ 真陰性率を計算してみよう<br>
+🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう</p>
+
+</section>
+<section>
+<h2 id="ベイズの定理-in-統計モデリング">ベイズの定理 in 統計モデリング</h2>
+<p>
+<img src="../tokiomarine2021/bayesian.drawio.svg">
+</p>
+<p>モデル$M$に対する確信度合いをデータ$D$に基づいて更新する。<br>
+モデル$M$を仮説$H$やパラメータ$\theta$に置き換えてもいい。</p>
+<p><strong>周辺尤度</strong>は「確率分布の積分は1」を満たすための正規化定数とみなせる。<br>
+比例関係だけ抜き出してこう書くことが多い:</p>
+<div>\[\begin{split}
+\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \\
+\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \\
+\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta)
+\end{split}\]</div>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-1-事前分布">表が出る確率のベイズ推定: 1. 事前分布</h2>
+<p>コイントスを繰り返して、表が出る確率pをベイズ推定したい。</p>
+<p>事前分布には<strong>ベータ分布</strong>を採用(理由は後で分かる):</p>
+<div>\[\begin{split}
+\text{Beta}(p \mid a, b) =
+   \frac{\Gamma(a + b)}{\Gamma(a) \Gamma(b)} p^{a-1} (1 - p)^{b-1}
+\end{split}\]</div>
+<p>分布の形は $a,~b$ によって決まる。<br>
+ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
+投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:</p>
+<p><img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta"></p>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-2-尤度関数">表が出る確率のベイズ推定: 2. 尤度関数</h2>
+<p>4回投げて表が1回だった、というデータで<strong>尤度</strong>を計算(<strong>二項分布</strong>):</p>
+<div>\[\begin{split}
+\text{Binom}(1 \mid 4,~p) = \binom {1} {4} p^{1} (1 - p)^{3}
+\end{split}\]</div>
+<p>これに事前分布を掛けて正規化したら事後分布になるはず。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<p><img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom"></p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  ⨉
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p>
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
+</p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-3-事後分布">表が出る確率のベイズ推定: 3. 事後分布</h2>
+<p>なんと、事後分布もベータ分布になる。</p>
+<div>\[\begin{split}
+\text{Posterior}
+  &\propto \text{Binom}(1 \mid 4,~p) \times \text{Beta}(p \mid  1, 1)\\
+  &= \binom {1} {4} p^{1} (1 - p)^{3} \times
+     \frac{\Gamma(1 + 1)}{\Gamma(1) \Gamma(1)} p^{1-1} (1 - p)^{1-1} \\
+  &= C p^{2-1} (1 - p)^{4-1} \\
+  &= \text{Beta}(p \mid 2, 4)
+\end{split}\]</div>
+<p>ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta"></p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  $\propto$
+  </div>
+  <div class="column" style="flex-shrink: 1.0">
+<p>
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom">
+</p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  ⨉
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p>
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
+</p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="表が出る確率のベイズ推定-4-逐次学習">表が出る確率のベイズ推定: 4. 逐次学習</h2>
+<p>さっきの事後分布を事前分布として、さらにデータを集める。</p>
+<p>コイントス4回のうち表1回、に基づく<strong>事前分布</strong>: $\text{Beta}(p \mid 2,~4)$</p>
+<p>さらに16回投げたら表が7回、の<strong>尤度</strong>: $\text{Binomial}(7 \mid 16,~p)$</p>
+<p><strong>事後分布</strong>はまた事前分布と同じ形になる:</p>
+<div>\[\begin{split}
+\text{Beta}(p \mid 9, 13) \propto
+  \text{Binomial}(7 \mid 16,~p) \times \text{Beta}(p \mid 2, 4)
+\end{split}\]</div>
+<p>データを加えるたびに更新していける:</p>
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+
+</section>
+<section>
+<h2 id="共役事前分布">共役事前分布</h2>
+<p>事後分布が事前分布と同じ形なので計算しやすい、という組み合わせ。</p>
+<table>
+<thead>
+<tr>
+<th>尤度関数</th>
+<th>共役事前分布</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>二項分布</td>
+<td>ベータ分布</td>
+</tr>
+<tr>
+<td>ポアソン分布</td>
+<td>ガンマ分布</td>
+</tr>
+<tr>
+<td>正規分布</td>
+<td>ガンマ分布</td>
+</tr>
+<tr>
+<td>正規分布 (分散既知)</td>
+<td>正規分布</td>
+</tr>
+</tbody>
+</table>
+<p>共役事前分布を使うことが常に正しいとも限らない。<br>
+計算コストがかかっても<strong>無情報事前分布</strong>を使う風潮。</p>
+
+</section>
+<section>
+<h2 id="事後分布を用いた推定">事後分布を用いた推定</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<dl>
+<dt>区間推定</dt>
+<dd>幅のある推定値を提示</dd>
+<dd>e.g., 95%ベイズ確信区間<br>
+(等裾事後信用区間, 最高密度区間)</dd>
+<dt>点推定</dt>
+<dd>値を1点だけ提示</dd>
+<dd>e.g., MAP, MED, EAP
+</div>
+<div class="column" style="flex-shrink: 1.3;">
+</dd>
+</dl>
+<p><img src="figure/integrate-1.png" alt="plot of chunk integrate"></p>
+  </div>
+</div>
+<p>コイン投げモデルのベータ分布は美しい例。<br>
+→ 解析的(数学的)に解ける。</p>
+<p>実践的なモデル・事後分布はもっと複雑。<br>
+→ コンピュータに頼って数値計算: MCMC</p>
+
+</section>
+<section>
+<h2 id="mcmc-umuarcov-ucuhain-umuonte-ucuarlo">MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo</h2>
+<a href="https://en.wikipedia.org/wiki/Andrey_Markov">
+<img src="../tokiomarine2021/image/AAMarkov.jpg" height="180" align="right"></a>
+<dl>
+<dt>マルコフ連鎖</dt>
+<dd>次の時点の挙動が現在の値だけで決定されるような確率過程。</dd>
+<dd>$\ldots \to X_{t - 2} \to X_{t - 1} \to X_{t} \to X_{t + 1}$</dd>
+<dd>$\text{Prob}(X_{t+1} \mid X_{t}, X_{t-1}, X_{t-2}, \ldots) = \text{Prob}(X_{t+1} \mid X_{t})$</dd>
+<dd>e.g., すごろく</dd>
+<dt>モンテカルロ法</dt>
+<dd>乱数を用いた計算方法の総称。</dd>
+<dd><a href="https://en.wikipedia.org/wiki/Monte_Carlo_Casino">
+<img src="../tokiomarine2021/image/Real_Monte_Carlo_Casino.jpg" height="200"></a>
+<a href="https://en.wikipedia.org/wiki/Stanislaw_Ulam">
+<img src="../tokiomarine2021/image/Stanislaw_Ulam.jpg" height="200"></a>
+<a href="https://en.wikipedia.org/wiki/John_von_Neumann">
+<img src="../tokiomarine2021/image/John_von_Neumann.jpg" height="200"></a>
+<a href="https://en.wikipedia.org/wiki/Nicholas_Metropolis">
+<img src="../tokiomarine2021/image/Nicholas_Metropolis.png" height="200"></a>
+</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="モンテカルロ法は乱数を用いた計算方法">モンテカルロ法は乱数を用いた計算方法</h2>
+<p>e.g., 半径1の円の面積</p>
+<p>面積4の正方形に400個の一様乱数を打ち込んだら318個乗った:<br>
+$4 \times \frac {318} {400} = 3.18$</p>
+<p><img src="figure/circle-1.png" alt="plot of chunk circle"></p>
+<p>数学を知っていれば $\pi r ^ 2 \approx 3.14$</p>
+
+</section>
+<section>
+<h2 id="変な分布もモンテカルロ法で扱えそう">変な分布もモンテカルロ法で扱えそう</h2>
+<p>e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。</p>
+<p><img src="figure/mcpdf-1.png" alt="plot of chunk mcpdf"></p>
+<p>でも、ハズレの値もけっこう引いてしまう。</p>
+
+</section>
+<section>
+<h2 id="次元の呪い-高次元になるほど当たりにくくなる">次元の呪い: 高次元になるほど当たりにくくなる</h2>
+<p>(N次元球の体積 / N次元の立方体) はゼロに近づいていく。</p>
+<img src="figure/circle-1.png" width="210" align="right">
+<ul>
+<li>2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$</li>
+<li>3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$</li>
+<li>N次元: $\frac {\frac {\pi ^ {N/2}} {\Gamma (N/2 + 1)} r ^ N} {(2r) ^ N} = \frac {\pi ^ {N/2}} {2^N \Gamma (N/2 + 1)} \to 0$</li>
+</ul>
+<p>パラメータが増えると計算量(≈乱数の無駄撃ち)が急増。</p>
+<hr>
+<p>密度の高い「当たり」付近を効率よく探索したい。<br>
+「当たり」は「当たり」の近くにありがちだろう。<br>
+→ マルコフ連鎖が使えそう</p>
+
+</section>
+<section>
+<h2 id="metropolis--hastings法-mh法">Metropolis&ndash;Hastings法 (MH法)</h2>
+<ol start="0">
+<li>パラメータ $\theta$ の初期値を選ぶ</li>
+<li>$\theta$ をちょっと増減させて $\theta_\text{new}$ を作る</li>
+<li>それぞれ尤度を計算し、比較。
+<ul>
+<li>$L(\theta_\text{new}) \ge L(\theta)$ なら $\theta_\text{new}$ を即採択</li>
+<li>$L(\theta_\text{new}) &lt; L(\theta)$ でも
+確率 $r = \frac {L(\theta_\text{new})} {L(\theta)}$ で  $\theta_\text{new}$ を採択</li>
+</ul>
+</li>
+<li>$\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。</li>
+</ol>
+<p><img src="figure/metropolis-1.png" alt="plot of chunk metropolis">
+</section>
+<section>
+<h2 id="採択されたパラメータ値の軌跡">採択されたパラメータ値の軌跡</h2>
+<p>尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
+通ったパラメータ値を集めるといい感じの分布が得られる。</p>
+<p><img src="figure/metropolis-trajectory-.gif" alt="plot of chunk metropolis-trajectory"></p>
+
+</section>
+<section>
+<h2 id="尤度に比例する事後分布からサンプルしたのと等価">尤度に比例する事後分布からサンプルしたのと等価</h2>
+<p>全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
+が、パラメータ1つの1次元ではご利益はわかりにくい。</p>
+<p><img src="figure/propto-lik-1.png" alt="plot of chunk propto-lik"></p>
+<p>パラメータが複数ある場合は？</p>
+
+</section>
+<section>
+<h2 id="gibbs-sampling">Gibbs Sampling</h2>
+<p>パラメータが複数の場合「ほかを固定してひとつ更新」を繰り返す。</p>
+<p>e.g., 二次元正規分布。(-2, 2) からスタート。</p>
+<p><img src="figure/gibbs-.gif" alt="plot of chunk gibbs"></p>
+
+</section>
+<section>
+<h2 id="中間まとめ">中間まとめ</h2>
+<ul>
+<li>ベイズ推定では不確実性も表現できる。</li>
+<li>コンピュータに頼った計算方法としてのモンテカルロ法。</li>
+<li>多次元でも効率よくサンプルするためのMCMC。</li>
+</ul>
+<hr>
+<p>ここから、実行するにあたっての注意点を見ていく。
+</section>
+<section>
+<h2 id="何回やっても似たような結果になってほしい">何回やっても似たような結果になってほしい</h2>
+<p>乱数や初期値によって偶々、じゃないことを確認したい。</p>
+<p>e.g., <code>chains = 3, iter = 600</code> 。ほぼ同じところをうろうろ:</p>
+<p><img src="figure/chains-1.png" alt="plot of chunk chains"></p>
+<p>収束(convergence)の判定については後ほど。</p>
+
+</section>
+<section>
+<h2 id="初期値の影響が消えるまでウォーミングアップ">初期値の影響が消えるまでウォーミングアップ</h2>
+<p>定常分布の山に到達してからが本番。</p>
+<p>e.g., <code>iter = 600, warmup = 200</code> で灰色の部分を捨てる:</p>
+<p><img src="figure/warmup-1.png" alt="plot of chunk warmup"></p>
+<p>どれくらい長く捨てるべきかは場合による。</p>
+
+</section>
+<section>
+<h2 id="適度に間引いて自己相関を軽減したい">適度に間引いて自己相関を軽減したい</h2>
+<p>直前の値と似すぎていたら独立サンプルとして扱えないので。</p>
+<p>e.g., <code>thin = 5</code> で5回に1回だけサンプルする:</p>
+<p><img src="figure/thin-1.png" alt="plot of chunk thin"></p>
+<p>間引かなくても大丈夫な場合も、間引いても解決しない場合もある。</p>
+
+</section>
+<section>
+<h2 id="収束判定">収束判定</h2>
+<ul>
+<li>複数chains・複数初期値で実行し、軌跡や分布を可視化</li>
+<li>Gelman-Rubin統計量 $\hat R &lt; 1.05$</li>
+<li>Effective Sample Size (ESS) $N_\text{eff} &gt; 100$ per chain</li>
+</ul>
+<p><img src="figure/convergence-1.png" alt="plot of chunk convergence"></p>
+<pre tabindex="0"><code>Warning: The largest R-hat is ***, indicating chains have not mixed.
+Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html
+</code></pre>
+</section>
+<section>
+<h2 id="収束自己相関が悪い場合にどう改善するか">収束・自己相関が悪い場合にどう改善するか</h2>
+<ul>
+<li>小手先の対処
+<ul>
+<li>warmupとiterをもっと長くする</li>
+<li>thinを大きくして間引く</li>
+</ul>
+</li>
+<li>ちょっと大掛かり
+<ul>
+<li>モデルを見直す</li>
+<li>プログラムを見直す</li>
+<li>アルゴリズム・ソフトウェアを変える</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="mcmcの方法いろいろ">MCMCの方法いろいろ</h2>
+<p>採択率を高め、早く収束するように改良されてきている。</p>
+<ul>
+<li>Metropolis&ndash;Hastings法
+<ul>
+<li>Gibbs Sampling</li>
+<li>Hamiltonian Monte Carlo (HMC)
+<ul>
+<li>No-U-Turn Sampler (NUTS)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="mcmcソフトウェア">MCMCソフトウェア</h2>
+<ul>
+<li><a href="https://www.mrc-bsu.cam.ac.uk/software/bugs/">BUGS</a>
+<ul>
+<li>クローズドソースで、ほぼWindows専用。</li>
+</ul>
+</li>
+<li><a href="https://mcmc-jags.sourceforge.io/">JAGS</a>
+<ul>
+<li>オープンソースで、さまざまなOS・言語から利用可能。</li>
+<li>マニュアルや用例が不足。</li>
+</ul>
+</li>
+<li><a href="https://mc-stan.org/"><strong>Stan</strong></a> 👈
+<ul>
+<li>オープンソースで、さまざまなOS・言語から利用可能。</li>
+<li>開発も利用も活発。マニュアルや用例も充実。</li>
+<li>HMC/NUTSにより早く収束。</li>
+</ul>
+</li>
+<li><a href="https://docs.pymc.io/">PyMC3</a></li>
+<li><a href="https://num.pyro.ai/">NumPyro</a></li>
+<li><a href="https://www.tensorflow.org/probability/">TensorFlow Probability</a></li>
+</ul>
+
+</section>
+<section>
+<h2 id="stan">Stan</h2>
+<a href="https://mc-stan.org/">
+<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+</a>
+<ul>
+<li>Stan言語でモデルを書く</li>
+<li>C++を介して機械語に翻訳(コンパイル)するので高速</li>
+<li>RやPythonなどから呼び出して使うのが便利</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1"># install.packages(&#34;rstan&#34;)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">rstan</span><span class="p">)</span>
+<span class="nf">rstan_options</span><span class="p">(</span><span class="n">auto_write</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</code></pre></div>
+</section>
+<section>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1"># データ準備</span>
+<span class="n">mydata</span>
+
+<span class="c1"># Stan言語で書いたモデルをコンパイル</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&#34;model.stan&#34;</span><span class="p">)</span>
+
+<span class="c1"># MCMCサンプリング</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+
+<span class="c1"># 結果を眺める</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div>
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-データ準備">説明変数なしのベイズ推定: データ準備</h2>
+<p>表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">true_p</span> <span class="o">=</span> <span class="m">0.7</span>
+<span class="n">N</span> <span class="o">=</span> <span class="m">40L</span>
+<span class="n">mydata</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>$N
+[1] 40
+
+$x
+ [1] 0 0 1 0 1 1 0 1 1 0 1 0 0 1 1 0 0 1 1 1 0 1 0 0 1 1 1 0 1 0 0 0 1 1 1 0 1 1 0 1
+</code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
+<p>文字列として保持するか、別ファイルに書いておく:</p>
+<pre tabindex="0"><code>data {
+  int&lt;lower=0&gt; N;
+  int x[N];
+}
+
+parameters {
+  real&lt;lower=0,upper=1&gt; p;
+}
+
+model {
+  x ~ binomial(1, p);
+}
+</code></pre><ul>
+<li>いくつかのブロックに分けて記述する:<br>
+R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code>, 本体の <code>model</code>.</li>
+<li>整数型 <code>int</code>, 実数型 <code>real</code>, それらの配列がある。</li>
+<li>下限 <code>lower</code>, 上限 <code>upper</code> を設定できる。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="stan言語の7種のブロック">Stan言語の7種のブロック</h2>
+<p>順番厳守。よく使うのは<strong>太字のやつ</strong>。</p>
+<ol>
+<li><code>functions {...}</code></li>
+<li><strong><code>data {...}</code></strong></li>
+<li><code>transformed data {...}</code></li>
+<li><strong><code>parameters {...}</code></strong></li>
+<li><code>transformed parameters {...}</code></li>
+<li><strong><code>model {...}</code></strong></li>
+<li><code>generated quantities {...}</code></li>
+</ol>
+<p><a href="https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html">https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html</a></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;binom.stan&#34;</span><span class="p">)</span>
+</code></pre></div><p>これに結構時間がかかるので、変更が無ければ再利用するため先ほど
+<code>rstan_options(auto_write = TRUE)</code> しておいた。</p>
+<hr>
+<p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-結果を眺める">説明変数なしのベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>Inference for Stan model: binom.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+       mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
+p      0.55    0.00 0.08   0.39   0.50   0.55   0.60   0.69  1651    1
+lp__ -29.45    0.02 0.76 -31.61 -29.61 -29.16 -28.97 -28.92  1262    1
+
+Samples were drawn using NUTS(diag_e) at Fri Oct 29 17:13:51 2021.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
+<p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;p&#34;</span><span class="p">))</span>
+</code></pre></div><p><img src="figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
+<p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+<p>次はもう少しだけ複雑な例を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-データ準備">線形回帰のベイズ推定: データ準備</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<p><img src="figure/stan-penguins-glm-1.png" alt="plot of chunk stan-penguins-glm">
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-データ準備">線形回帰のベイズ推定: データ準備</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<p><code>Stan does not support NA</code> と怒られるので欠損値を取り除いておく:</p>
+<pre tabindex="0"><code>List of 3
+ $ body_mass_g      : int [1:342] 3750 3800 3250 3450 3650 3625 4675 3475 4250 3300 ...
+ $ flipper_length_mm: int [1:342] 181 186 195 193 190 181 195 193 190 186 ...
+ $ N                : int 342
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-stan言語でモデル定義">単回帰のベイズ推定: Stan言語でモデル定義</h2>
+<p>切片、傾き、ばらつきを推定する:</p>
+<pre tabindex="0"><code>data {
+  int&lt;lower=0&gt; N;
+  vector&lt;lower=0&gt;[N] body_mass_g;
+  vector&lt;lower=0&gt;[N] flipper_length_mm;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real&lt;lower=0&gt; sigma;
+}
+
+model {
+  flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-mcmcサンプル">単回帰のベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;penguins.stan&#34;</span><span class="p">)</span>
+</code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+</code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-結果を眺める">単回帰のベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><pre tabindex="0"><code>Inference for Stan model: penguins.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+             mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+intercept  136.76    0.05 1.97  132.89  135.40  136.75  138.04  140.67  1506    1
+slope        0.02    0.00 0.00    0.01    0.01    0.02    0.02    0.02  1526    1
+sigma        6.94    0.01 0.27    6.41    6.76    6.94    7.13    7.47  1198    1
+lp__      -830.83    0.04 1.24 -834.08 -831.39 -830.51 -829.93 -829.43  1120    1
+
+Samples were drawn using NUTS(diag_e) at Fri Oct 29 17:13:56 2021.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-trace-plot-確認">単回帰のベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-penguins-traceplot-1.png" alt="plot of chunk stan-penguins-traceplot"></p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-自己相関の確認">単回帰のベイズ推定: 自己相関の確認</h2>
+<p>どれもまあまあすぐ消えるので問題なし:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;intercept&#34;</span><span class="p">,</span> <span class="s">&#34;slope&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">))</span>
+</code></pre></div><p><img src="figure/stan-penguins-ac-1.png" alt="plot of chunk stan-penguins-ac"></p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-推定結果確認">単回帰のベイズ推定: 推定結果確認</h2>
+<p>正規分布っぽいきれいな形:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-penguins-hist-1.png" alt="plot of chunk stan-penguins-hist"></p>
+<p>これらの値を使って点推定・区間推定も可能。</p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-推定結果で回帰">単回帰のベイズ推定: 推定結果で回帰</h2>
+<p>無事に最尤推定と似たような線が引けた。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">coef</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">get_posterior_mean</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="n">[</span><span class="p">,</span> <span class="s">&#34;mean-all chains&#34;</span><span class="n">]</span>
+<span class="n">p_penweight</span> <span class="o">+</span>
+  <span class="nf">geom_abline</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;intercept&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;slope&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/stan-penguins-regression-1.png" alt="plot of chunk stan-penguins-regression"></p>
+
+</section>
+<section>
+<h2 id="ベイズ推定を使った回帰に便利なパッケージ">ベイズ推定を使った回帰に便利なパッケージ</h2>
+<p><a href="https://mc-stan.org/rstanarm/">rstanarm</a> + <a href="https://mjskay.github.io/tidybayes">tidybayes</a></p>
+<ul>
+<li>Stan言語のモデルを自分で書かずに済む。</li>
+<li>モデルの主要部品がコンパイル済みなので試行錯誤も機敏に。</li>
+<li>区間推定の可視化までお世話してくれる。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">rstanarm</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">tidybayes</span><span class="p">)</span>
+<span class="n">fit</span> <span class="o">=</span> <span class="n">rstanarm</span><span class="o">::</span><span class="nf">stan_glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">%&gt;%</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="n">tidybayes</span><span class="o">::</span><span class="nf">add_fitted_draws</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">p_penweight</span> <span class="o">+</span>
+  <span class="n">ggdist</span><span class="o">::</span><span class="nf">stat_lineribbon</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">.value</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">pred</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_fill_brewer</span><span class="p">(</span><span class="n">palette</span> <span class="o">=</span> <span class="s">&#34;Greys&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/rstanarm-penguins-1.png" alt="plot of chunk rstanarm-penguins"></p>
+
+</section>
+<section>
+<h2 id="rstanarmを使えば重回帰のベイズ推定も簡単">rstanarmを使えば重回帰のベイズ推定も簡単</h2>
+<p>GLMのような書き味で書ける。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstanarm</span><span class="o">::</span><span class="nf">stan_glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">%&gt;%</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="n">tidybayes</span><span class="o">::</span><span class="nf">add_fitted_draws</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">,</span> <span class="n">group</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
+  <span class="n">ggdist</span><span class="o">::</span><span class="nf">stat_lineribbon</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">.value</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">pred</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span> <span class="o">+</span>
+  <span class="nf">scale_fill_brewer</span><span class="p">(</span><span class="n">palette</span> <span class="o">=</span> <span class="s">&#34;Greys&#34;</span><span class="p">)</span>
+</code></pre></div><p><img src="figure/rstanarm-penguins-multi-1.png" alt="plot of chunk rstanarm-penguins-multi"></p>
+
+</section>
+<section>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+</section>
+<section>
+<h2 id="階層ベイズモデルのイメージ図">階層ベイズモデルのイメージ図</h2>
+<p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
+<figure>
+<img src="../tokiomarine2021/hbm.drawio.svg">
+</figure>
+
+</section>
+<section>
+<h2 id="さっきの図をstan言語で記述すると">さっきの図をStan言語で記述すると</h2>
+<p>お絵描きモデルとStanモデルを見比べてみよう。</p>
+<pre tabindex="0"><code>data {
+  int&lt;lower=0&gt; N;
+  int y[N];
+}
+
+parameters {
+  real a;           // mean ability
+  vector[N] r;      // individual difference
+  real&lt;lower=0&gt; s;  // sd of r
+}
+
+model {
+  y ~ binomial(8, inv_logit(a + r));
+  a ~ normal(0, 10);
+  r ~ normal(0, s);
+  s ~ exponential(0.01);
+}
+</code></pre><p><code>inv_logit(a + r)</code> が p に相当。<br>
+<code>10</code> とか <code>0.01</code> とか、エイヤっと決めてるやつが超パラメータ。</p>
+
+</section>
+<section>
+<h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
+<pre tabindex="0"><code>Inference for Stan model: glmm.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+          mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+a         0.64    0.01 0.33    0.02    0.42    0.63    0.85    1.31   715 1.00
+r[1]     -1.14    0.01 0.83   -2.80   -1.67   -1.12   -0.58    0.39  3103 1.00
+r[2]     -4.21    0.03 1.66   -8.07   -5.11   -3.98   -3.03   -1.59  2501 1.00
+r[3]      3.28    0.03 1.75    0.53    2.01    3.05    4.27    7.32  3607 1.00
+r[4]     -1.74    0.02 0.87   -3.55   -2.28   -1.70   -1.15   -0.11  3161 1.00
+r[5]      3.32    0.03 1.79    0.50    2.01    3.09    4.35    7.55  3155 1.00
+r[6]      3.34    0.03 1.81    0.53    2.03    3.11    4.42    7.55  3351 1.00
+r[7]      3.29    0.03 1.79    0.50    2.01    3.05    4.33    7.41  3755 1.00
+r[8]     -1.73    0.02 0.87   -3.54   -2.28   -1.70   -1.12   -0.14  3211 1.00
+r[9]      1.47    0.02 1.14   -0.51    0.70    1.37    2.13    4.00  3450 1.00
+r[10]    -4.23    0.03 1.73   -8.22   -5.21   -4.01   -2.99   -1.51  2901 1.00
+r[11]    -4.22    0.03 1.74   -8.43   -5.18   -3.94   -3.00   -1.50  3181 1.00
+r[12]    -1.75    0.02 0.93   -3.75   -2.33   -1.70   -1.12   -0.05  3312 1.00
+r[13]    -4.20    0.03 1.67   -8.08   -5.14   -3.94   -3.02   -1.61  3401 1.00
+r[14]     1.48    0.02 1.16   -0.51    0.68    1.35    2.20    4.07  3648 1.00
+r[15]    -0.06    0.01 0.81   -1.65   -0.58   -0.07    0.47    1.54  3262 1.00
+r[16]    -1.76    0.02 0.91   -3.66   -2.33   -1.71   -1.15   -0.12  3090 1.00
+r[17]     0.57    0.02 0.89   -1.05   -0.04    0.54    1.12    2.48  3339 1.00
+r[18]    -1.12    0.01 0.78   -2.70   -1.63   -1.12   -0.59    0.40  3214 1.00
+r[19]    -4.15    0.03 1.63   -7.95   -5.06   -3.93   -3.01   -1.62  3150 1.00
+r[20]     0.58    0.01 0.91   -1.06   -0.05    0.55    1.16    2.52  3689 1.00
+r[21]    -2.58    0.02 1.10   -5.08   -3.22   -2.49   -1.83   -0.70  3230 1.00
+r[22]     3.27    0.03 1.74    0.46    2.06    3.03    4.23    7.33  4449 1.00
+r[23]    -0.60    0.01 0.81   -2.22   -1.14   -0.58   -0.05    1.03  3225 1.00
+r[24]     3.33    0.03 1.82    0.49    2.06    3.08    4.39    7.55  4216 1.00
+r[25]     1.46    0.02 1.10   -0.44    0.70    1.38    2.11    3.86  3242 1.00
+r[26]    -2.57    0.02 1.07   -4.88   -3.23   -2.49   -1.82   -0.69  3177 1.00
+r[27]     3.34    0.03 1.76    0.56    2.08    3.13    4.38    7.45  3473 1.00
+r[28]     3.29    0.03 1.79    0.45    1.97    3.05    4.35    7.29  4532 1.00
+r[29]     0.55    0.02 0.88   -1.06   -0.04    0.52    1.12    2.42  3429 1.00
+r[30]     3.30    0.03 1.77    0.44    2.03    3.06    4.36    7.30  3878 1.00
+r[31]     3.32    0.03 1.81    0.39    2.00    3.09    4.43    7.49  4289 1.00
+r[32]    -1.13    0.01 0.82   -2.81   -1.66   -1.11   -0.59    0.43  3146 1.00
+r[33]    -4.20    0.03 1.66   -7.91   -5.09   -3.96   -3.03   -1.62  3309 1.00
+r[34]     1.47    0.02 1.14   -0.52    0.67    1.36    2.17    4.00  3491 1.00
+r[35]    -1.14    0.02 0.82   -2.79   -1.66   -1.11   -0.58    0.41  2846 1.00
+r[36]     3.32    0.03 1.78    0.52    2.04    3.07    4.37    7.37  3656 1.00
+r[37]     3.33    0.03 1.82    0.49    2.04    3.05    4.34    7.63  2878 1.00
+r[38]     3.31    0.03 1.75    0.54    2.06    3.07    4.30    7.33  4249 1.00
+r[39]    -1.74    0.02 0.88   -3.57   -2.29   -1.68   -1.14   -0.13  3177 1.00
+r[40]     3.34    0.03 1.82    0.52    2.06    3.07    4.35    7.55  3303 1.00
+r[41]     1.48    0.02 1.09   -0.42    0.70    1.38    2.14    3.85  3730 1.00
+r[42]     3.30    0.03 1.81    0.43    2.01    3.08    4.35    7.39  4420 1.00
+r[43]     3.30    0.03 1.83    0.40    2.01    3.05    4.32    7.72  4425 1.00
+r[44]     3.31    0.03 1.80    0.47    2.02    3.07    4.32    7.53  4103 1.00
+r[45]    -2.58    0.02 1.06   -4.91   -3.22   -2.48   -1.84   -0.76  3490 1.00
+r[46]    -0.62    0.01 0.78   -2.19   -1.12   -0.63   -0.11    0.97  3135 1.00
+r[47]     3.35    0.03 1.83    0.54    2.03    3.10    4.39    7.54  3843 1.00
+r[48]    -4.17    0.03 1.63   -7.97   -5.08   -3.95   -3.00   -1.64  3222 1.00
+r[49]    -1.75    0.02 0.85   -3.51   -2.30   -1.71   -1.15   -0.22  2868 1.00
+r[50]     3.35    0.03 1.80    0.49    2.02    3.11    4.42    7.47  4154 1.00
+r[51]     3.29    0.03 1.74    0.56    2.05    3.05    4.29    7.33  3633 1.00
+r[52]     1.45    0.02 1.13   -0.48    0.66    1.37    2.11    3.89  3494 1.00
+r[53]    -1.75    0.02 0.87   -3.57   -2.31   -1.70   -1.15   -0.14  2798 1.00
+r[54]    -1.74    0.01 0.85   -3.50   -2.30   -1.70   -1.16   -0.17  3373 1.00
+r[55]     3.28    0.03 1.80    0.42    2.00    3.03    4.33    7.41  4110 1.00
+r[56]     1.48    0.02 1.15   -0.49    0.67    1.37    2.16    4.02  3902 1.00
+r[57]     0.58    0.02 0.92   -1.09   -0.03    0.53    1.16    2.52  3282 1.00
+r[58]    -0.07    0.01 0.79   -1.60   -0.60   -0.07    0.45    1.52  3475 1.00
+r[59]    -4.17    0.03 1.67   -8.09   -5.08   -3.93   -2.98   -1.59  3864 1.00
+r[60]    -0.06    0.01 0.78   -1.55   -0.59   -0.08    0.44    1.54  3064 1.00
+r[61]    -0.60    0.01 0.79   -2.15   -1.12   -0.61   -0.08    0.97  2960 1.00
+r[62]    -1.74    0.02 0.90   -3.68   -2.27   -1.68   -1.13   -0.10  3136 1.00
+r[63]     3.30    0.03 1.79    0.52    1.98    3.09    4.32    7.43  4105 1.00
+r[64]     1.44    0.02 1.08   -0.46    0.69    1.35    2.10    3.77  3982 1.00
+r[65]     3.30    0.03 1.80    0.48    2.03    3.04    4.30    7.52  3822 1.00
+r[66]    -1.14    0.01 0.80   -2.74   -1.65   -1.11   -0.60    0.41  2886 1.00
+r[67]     0.58    0.02 0.91   -1.08   -0.05    0.54    1.16    2.50  3257 1.00
+r[68]     1.44    0.02 1.08   -0.45    0.69    1.36    2.10    3.87  3589 1.00
+r[69]    -4.16    0.03 1.60   -7.74   -5.12   -3.92   -3.01   -1.63  3384 1.00
+r[70]    -2.56    0.02 1.06   -4.86   -3.21   -2.46   -1.84   -0.74  4056 1.00
+r[71]    -4.19    0.03 1.67   -8.02   -5.17   -4.00   -2.98   -1.56  2914 1.00
+r[72]    -4.14    0.03 1.61   -7.83   -5.09   -3.93   -3.02   -1.57  3898 1.00
+r[73]    -0.06    0.01 0.83   -1.60   -0.61   -0.09    0.48    1.64  3389 1.00
+r[74]     0.56    0.02 0.89   -1.03   -0.05    0.53    1.12    2.45  3455 1.00
+r[75]     3.32    0.03 1.77    0.52    2.02    3.12    4.33    7.49  3877 1.00
+r[76]     1.45    0.02 1.06   -0.38    0.71    1.35    2.10    3.80  4350 1.00
+r[77]    -2.59    0.02 1.10   -4.91   -3.26   -2.49   -1.81   -0.68  3702 1.00
+r[78]     3.32    0.03 1.79    0.46    2.08    3.09    4.31    7.51  4059 1.00
+r[79]    -1.15    0.02 0.81   -2.77   -1.68   -1.13   -0.60    0.38  2749 1.00
+r[80]     3.28    0.03 1.77    0.50    2.05    3.04    4.22    7.47  3877 1.00
+r[81]    -2.59    0.02 1.10   -5.05   -3.25   -2.49   -1.82   -0.64  3963 1.00
+r[82]    -0.07    0.01 0.83   -1.66   -0.63   -0.08    0.46    1.62  3331 1.00
+r[83]    -0.06    0.01 0.79   -1.58   -0.59   -0.05    0.45    1.53  3115 1.00
+r[84]     0.57    0.02 0.89   -1.09   -0.03    0.53    1.13    2.35  3043 1.00
+r[85]    -0.06    0.02 0.81   -1.62   -0.60   -0.08    0.49    1.57  2857 1.00
+r[86]     0.56    0.01 0.90   -1.14   -0.03    0.50    1.10    2.51  3650 1.00
+r[87]    -1.13    0.02 0.81   -2.85   -1.65   -1.11   -0.59    0.36  2735 1.00
+r[88]    -2.58    0.02 1.13   -5.18   -3.22   -2.46   -1.80   -0.71  3137 1.00
+r[89]    -4.22    0.03 1.69   -8.10   -5.20   -4.01   -2.99   -1.56  3726 1.00
+r[90]    -2.56    0.02 1.09   -4.92   -3.21   -2.47   -1.80   -0.73  3150 1.00
+r[91]    -1.14    0.01 0.81   -2.76   -1.68   -1.13   -0.59    0.34  2959 1.00
+r[92]     3.29    0.03 1.76    0.54    2.00    3.06    4.36    7.26  4439 1.00
+r[93]    -4.16    0.03 1.69   -8.13   -5.10   -3.95   -2.96   -1.52  3633 1.00
+r[94]     3.34    0.03 1.78    0.51    2.04    3.12    4.40    7.52  4070 1.00
+r[95]    -2.58    0.02 1.08   -4.98   -3.22   -2.45   -1.84   -0.74  3719 1.00
+r[96]    -4.19    0.03 1.64   -7.97   -5.15   -3.98   -3.02   -1.65  3574 1.00
+r[97]    -0.06    0.02 0.83   -1.66   -0.61   -0.07    0.47    1.67  3004 1.00
+r[98]    -1.74    0.02 0.87   -3.57   -2.30   -1.70   -1.16   -0.12  3103 1.00
+r[99]    -0.06    0.01 0.80   -1.60   -0.61   -0.09    0.46    1.62  3153 1.00
+r[100]   -1.14    0.01 0.79   -2.75   -1.65   -1.10   -0.58    0.34  2838 1.00
+s         2.95    0.01 0.38    2.30    2.68    2.92    3.18    3.78  1096 1.01
+lp__   -452.90    0.38 9.69 -473.84 -458.96 -452.20 -446.19 -435.36   639 1.01
+
+Samples were drawn using NUTS(diag_e) at Fri Oct 29 17:14:22 2021.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
+</section>
+<section>
+<h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
+<p>データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。</p>
+<p><img src="figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
+
+</section>
+<section>
+<h2 id="事前分布の選別">事前分布の選別</h2>
+<ol>
+<li>
+<p>とりあえず<strong>無情報事前分布</strong> $[-\infty, \infty]$。Stanのデフォルト。</p>
+</li>
+<li>
+<p>収束が悪かったら<strong>弱情報事前分布</strong>を試す。<br>
+事後分布を更新していったとき<strong>事前分布っぽさが残らない</strong>のが良い。</p>
+<ul>
+<li>取りうる値を逃すような狭すぎる分布はダメ。</li>
+<li>狭すぎるよりはマシだが、広すぎても良くない。</li>
+<li>一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。</li>
+</ul>
+<p>おすすめ: <strong>Student&rsquo;s t分布</strong>、正規分布、指数分布など。</p>
+</li>
+</ol>
+<p><cite><a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></cite></p>
+
+</section>
+<section>
+<h2 id="stanおすすめ弱情報事前分布-students-t分布">Stanおすすめ弱情報事前分布: Student&rsquo;s t分布</h2>
+<p>Student&rsquo;s $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$</p>
+<ul>
+<li>自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。</li>
+<li>スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。</li>
+</ul>
+<p><img src="figure/student_t-1.png" alt="plot of chunk student_t"></p>
+<p>正の値しか取らない場合は <code>&lt;lower=0&gt;</code> として右半分だけ使うとか。</p>
+
+</section>
+<section>
+<h2 id="非線形回帰の例-データ">非線形回帰の例: データ</h2>
+<p>刺激強度xに対する応答強度yを20個体調査。<br>
+非対称なひと山。応答変数も説明変数も正の値。</p>
+<div>\[\begin{split}
+y = ae ^ {-bx} - ce ^ {-dx}
+\end{split}\]</div>
+<p><img src="figure/non-linear-1.png" alt="plot of chunk non-linear"></p>
+
+</section>
+<section>
+<h2 id="非線形回帰の例-stanコード">非線形回帰の例: Stanコード</h2>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=1&gt; N;
+  vector[N] x;
+  vector[N] y;
+  int id[N];
+  int&lt;lower=1&gt; Ninds;
+}
+
+parameters {
+  real a;
+  real d;
+  real&lt;upper=a&gt; c;
+  real&lt;upper=d&gt; b;
+  real shape;
+  vector[Ninds] intercept;
+}
+
+model {
+  vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
+  y ~ gamma(shape, shape ./ mu);
+  a ~ exponential(1);
+  b ~ exponential(1);
+  c ~ exponential(1);
+  d ~ exponential(1);
+  shape ~ exponential(0.001);
+  intercept ~ normal(0, 0.005);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="ベイズ推定まとめ">ベイズ推定まとめ</h2>
+<ul>
+<li>条件付き確率 $\text{Prob}(B \mid A)$ の理解が大事。
+<ul>
+<li>事後分布 $\propto$ 尤度 ⨉ 事前分布</li>
+<li>確信度合いをデータで更新していく。</li>
+</ul>
+</li>
+<li>推定結果は分布そのもの。
+<ul>
+<li>そこから点推定も区間推定も可能。</li>
+</ul>
+</li>
+<li>解析的に解けない問題は計算機に乱数を振らせて解く。
+<ul>
+<li>理論・技術の進歩が目覚ましい。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="回帰分析ふりかえり">回帰分析ふりかえり</h2>
+<p>より柔軟にモデルを記述できるようになった。計算方法も変化。</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="全体まとめ">全体まとめ</h2>
+<ul>
+<li>統計とは、データをうまくまとめ、それに基づいて推論するための手法。</li>
+<li>モデルには<strong>理解志向</strong>と<strong>応用志向</strong>があり、統計モデルは前者寄り。
+<ul>
+<li>どちらも多少は分かった上で使い分けたい。</li>
+<li>どっちにしろ真の正しい何かではない。</li>
+</ul>
+</li>
+<li><strong>確率分布</strong>とその背後にある<strong>確率過程</strong>の理解が重要。
+<ul>
+<li>乱数生成→作図を繰り返してイメージを掴もう。</li>
+<li>MCMCサンプリングも事後分布からの乱数生成。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="." class="readmore">
+目次に戻る
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
