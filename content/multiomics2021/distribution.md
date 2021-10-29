@@ -1,26 +1,11 @@
 +++
-title = "確率分布を理解する統計モデリング入門 — マルチNGSオミクス解析研究会 #7"
-linktitle = "確率分布を理解する統計モデリング入門"
+url = "multiomics2021/distribution.html"
+title = "統計モデリング基礎: 確率分布、尤度 — マルチNGSオミクス解析研究会 #7"
+linktitle = "統計モデリング基礎: 確率分布、尤度"
 date = 2021-09-30T13:00:00+09:00
 type = "reveal"
 draft = false
 +++
-
-<!--
-Rによるデータ可視化・前処理入門
-
-作図は研究報告の最終段階だけでなく、仮説や解析方針を検討する上でも重要な作業である。
-また、観察・実験・データベースなどから得られるデータは多種多様であり、作図や解析の前に整形する必要がある。
-tidyverseはこうしたデータ操作のあらゆる側面をサポートするRパッケージ群である。
-本セミナーでは「描きたい図をちゃちゃっと描ける」ことを目指し、実例を交えながらR+tidyverseの基本を解説する。
-
-確率分布を理解する統計モデリング入門
-
-私たちが研究対象とするようなシステムは複雑すぎて、あるがままに捉えることはできない。
-単純化・理想化して扱いやすいようにモデル化し、限られたデータを通して統計的に解釈するのが科学のやり方である。
-本セミナーでは回帰モデルを軸にして統計モデリングの基礎を解説する。
-特に、現象を確率過程として捉えること、モデルの部品として確率分布を使いこなすことに重点を置く。
--->
 
 # [確率分布を理解する統計モデリング入門](.)
 
@@ -33,8 +18,14 @@ tidyverseはこうしたデータ操作のあらゆる側面をサポートす�
 (Graduate School of Life Sciences, Tohoku University)
 </div>
 
+<ol>
+<li class="current-deck"><a href="distribution.html">統計モデリング基礎: 確率分布、尤度</a>
+<li><a href="glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="bayesian.html">ベイズ統計、階層ベイズモデル</a>
+</ol>
+
 <div class="footnote">
-2021-09-30 東京大学 中戸研 マルチNGSオミクス解析研究会 #7
+2021-09-30 東京大学 中戸研 <a href="https://amedprime-nakatolab.github.io/Seminar/7.html">マルチNGSオミクス解析研究会 #7</a><br>
 <a href="https://heavywatal.github.io/slides/multiomics2021/">https://heavywatal.github.io/slides/multiomics2021/</a>
 </div>
 
@@ -71,7 +62,29 @@ print(ggplot2::diamonds)
     2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
     3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
     4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+    5  0.31      Good     J     SI2  63.3    58   335  4.34  4.35  2.75
+    6  0.24 Very Good     J    VVS2  62.8    57   336  3.94  3.96  2.48
+    7  0.24 Very Good     I    VVS1  62.3    57   336  3.95  3.98  2.47
+    8  0.26 Very Good     H     SI1  61.9    55   337  4.07  4.11  2.53
+    9  0.22      Fair     E     VS2  65.1    61   337  3.87  3.78  2.49
+   10  0.23 Very Good     H     VS1  59.4    61   338  4.00  4.05  2.39
+   11  0.30      Good     J     SI1  64.0    55   339  4.25  4.28  2.73
+   12  0.23     Ideal     J     VS1  62.8    56   340  3.93  3.90  2.46
+   13  0.22   Premium     F     SI1  60.4    61   342  3.88  3.84  2.33
+   14  0.31     Ideal     J     SI2  62.2    54   344  4.35  4.37  2.71
+   15  0.20   Premium     E     SI2  60.2    62   345  3.79  3.75  2.27
    --                                                                  
+53926  0.79     Ideal     I     SI1  61.6    56  2756  5.95  5.97  3.67
+53927  0.71     Ideal     E     SI1  61.9    56  2756  5.71  5.73  3.54
+53928  0.79      Good     F     SI1  58.1    59  2756  6.06  6.13  3.54
+53929  0.79   Premium     E     SI2  61.4    58  2756  6.03  5.96  3.68
+53930  0.71     Ideal     G     VS1  61.4    56  2756  5.76  5.73  3.53
+53931  0.71   Premium     E     SI1  60.5    55  2756  5.79  5.74  3.49
+53932  0.71   Premium     F     SI1  59.8    62  2756  5.74  5.73  3.43
+53933  0.70 Very Good     E     VS2  60.5    59  2757  5.71  5.76  3.47
+53934  0.70 Very Good     E     VS2  61.2    59  2757  5.69  5.72  3.49
+53935  0.72   Premium     D     SI1  62.7    59  2757  5.69  5.73  3.58
+53936  0.72     Ideal     D     SI1  60.8    57  2757  5.75  5.76  3.50
 53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
 53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
 53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
@@ -252,7 +265,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
-<img src="../tokiomarine2021/image/kubo-book.jpg" width="300" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
 </a>
 </figure>
 
@@ -260,12 +273,12 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 「データ解析のための統計モデリング入門」<br>
 をベースに回帰分析の概要を紹介。
 
-1. イントロ
+1. イントロ [(#7 9/30)](distribution.html)
 1. 統計モデルの基本
     - 確率変数・**確率分布** 👈 本日の主役
     - 尤度・最尤推定
-1. 一般化線形モデル、<del>混合モデル</del>
-1. <del>ベイズ統計、階層ベイズモデル</del>
+1. 一般化線形モデル、混合モデル [(#10 12/14 前半)](glm.html)
+1. ベイズ統計、階層ベイズモデル [(#10 12/14 後半)](bayesian.html)
 
 回帰のキモは**線ではなく分布**。
 
@@ -273,7 +286,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <cite>
 
 [Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
-の抜粋バージョン (~1時間)。
+の演習無し抜粋バージョン (~2時間 x 2回)。
 
 </cite>
 
@@ -872,6 +885,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 ---
 ## 統計モデリングの道具 --- まとめ
 
+- 何はともあれ作図して俯瞰
 - **確率変数** $X$
 - **確率分布** $X \sim f(\theta)$
     - **少ないパラメータ** $\theta$ でばらつきの様子を表現
@@ -882,511 +896,6 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
     - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
     - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**
 
-
-
-
-
-
-
-
-
-
----
-## ここまで見てきた統計モデル
-
-確率変数$X$はパラメータ$\theta$の確率分布$f$に“従う”:&nbsp;
-$X \sim f(\theta) $
-
-e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分布に従う:
-
-<div>\[\begin{split}
-X \sim \text{Poisson}(\lambda)
-\end{split}\]</div>
-
-![plot of chunk only-dist](figure/only-dist-1.png)
-
-これを一般化線形モデル(GLM)として見ることもできる。
-
----
-## 一般化線形モデル(GLM)として記述してみる
-
-個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
-平均値$\lambda_i$は**他のデータによらず$\beta_0$で一定**。
-
-<div>\[\begin{split}
-y_i &\sim \text{Poisson}(\lambda_i) \\
-\lambda_i &= \beta_0
-\end{split}\]</div>
-
-![plot of chunk glm-without-x](figure/glm-without-x-1.png)
-
-種子数をY軸にして、式を2つに分けただけ...?<br>
-**説明変数**を含むモデルを見ればご利益が分かるかも。
-
----
-## 説明変数が1つある一般化線形モデル
-
-個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
-平均値の対数$\log(\lambda_i)$は**その個体の大きさ$x_i$に比例**する。
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
-
-<figure>
-<img src="../tokiomarine2021/glm.drawio.svg" width="100%"><br>
-</figure>
-
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-
-![plot of chunk glm-poisson](figure/glm-poisson-1.png)
-
-  </div>
-</div>
-
-この場合は**単回帰**。説明変数が複数あると**重回帰**。
-
-
----
-## 複数の説明変数を同時に扱う重回帰
-
-<p>\[\begin{split}
-y_i &\sim \text{Poisson}(\lambda_i) \\
-\log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
-\end{split}\]</p>
-
-気温も湿度も高いほどビールが売れる、とか
-
-![plot of chunk multiple-regression](figure/multiple-regression-1.png)
-
-今度は**確率分布**と**リンク関数**を変えてみよう。
-
-
----
-## ロジスティック回帰
-
-- 確率分布: **二項分布**
-- リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$
-
-何かの成否に対する何かの因子の影響、とか
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
-
-客10人中$y_i$人がビールを注文。<br>
-その日$i$の気温$x_i$によって割合が変化。
-
-<p>\[\begin{split}
-y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
-p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
-\end{split}\]</p>
-
-ロジスティック関数↑
-
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-
-![plot of chunk glm-logistic](figure/glm-logistic-1.png)
-
-  </div>
-</div>
-
-???
-ロジット = 対数オッズ
-オッズ = 失敗の何倍成功しやすいか
-Xが1増えるとオッズがe^a倍に増える。
-
-
----
-## ロジスティック回帰 (狭義)
-
-- 確率分布: **ベルヌーイ分布** ($n = 1$ の二項分布)
-- リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$
-
-何かの成否に対する何かの因子の影響、とか
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
-
-風が吹けば桶屋が儲かる。
-
-<p>\[\begin{split}
-y_i &\sim \text{Bernoulli}(p_i) \\
-  &= \text{Binomial}(1,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
-p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
-\end{split}\]</p>
-
-ロジスティック関数↑
-
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-
-![plot of chunk wind](figure/wind-1.png)
-
-  </div>
-</div>
-
-
----
-## 一般線形モデル (“化”無し) はGLMの一種
-
-- 確率分布: **正規分布**
-- リンク関数: **恒等関数**(なにもせずそのまま)
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
-
-<p>\[\begin{split}
-y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
-\text{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
-\end{split}\]</p>
-
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-
-![plot of chunk glm-weight](figure/glm-weight-1.png)
-
-  </div>
-</div>
-
-最小二乗法の直線あてはめと結果的に同じになる。
-
-<small style="color: #999999;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small>
-
----
-## 分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM
-
-**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。<br>
-<span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
-
-| 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
-| ---- | :-: | :---: | :---: |
-| ☁️ くもり | | 0 | 0 |
-| ☀️ 晴れ | | 1 | 0 |
-| ☔️ 雨 | | 0 | 1 |
-
-<p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
-\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
-\end{split}\]</p>
-
-  </div>
-  <div class="column" style="flex-shrink: 1.3;">
-
-![plot of chunk glm-anova](figure/glm-anova-1.png)
-
-  </div>
-</div>
-
-くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。
-
-GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。
-
-
----
-## 共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM
-
-**質的変数と量的変数を両方**含むGLM、と解釈可能。<br>
-正規分布・等分散・恒等リンクなどが仮定される。
-
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
-
-| 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
-| ---- | :-: | :---: | :---: |
-| ☁️ くもり | | 0 | 0 |
-| ☀️ 晴れ | | 1 | 0 |
-| ☔️ 雨 | | 0 | 1 |
-
-<p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
-\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
-\end{split}\]</p>
-
-  </div>
-  <div class="column" style="flex-shrink: 1.3;">
-
-
-![plot of chunk glm-ancova](figure/glm-ancova-1.png)
-
-  </div>
-</div>
-
-GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。
-
-
----
-## 一般化線形モデル(GLM)ふりかえり
-
-確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
-特定の組み合わせには名前がある。
-
-| 名前 | 確率分布 | リンク関数 | 説明変数 |
-| ---- | -------- | -------- | -------- |
-|ポアソン回帰|ポアソン分布|log| |
-|ロジスティック回帰|二項分布|logit| |
-|一般線形回帰|正規分布|恒等| |
-|分散分析|正規分布|恒等|質的変数|
-|共分散分析|正規分布|恒等|質的変数+量的変数|
-
-リンク関数をもう少しだけ掘り下げたい。
-
-
----
-## リンク関数
-
-統計モデリングにおいて「まっすぐ以外も表現できる」意味
-
-$\text{identity}(\mu_i)$
-: $\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
-: 説明変数の効果が**足し算**的に働く。
-
-$\log(\lambda_i)$
-: $\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$
-: 説明変数の効果が**掛け算**的に働く。<br>
-  e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる
-
-$\text{logit}(p_i)$
-: $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)
-: 説明変数の効果が**頭打ち**になる。<br>
-  e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
-
-ほかに `probit`, `inverse`, `sqrt`, etc.
-
-
----
-## データはひとつ、モデルはたくさん
-
-どう選ぶ？
-
-1. メカニズム的に納得できるものを選ぶ
-    - ポアソン過程の**カウント**ならポアソン分布、**間隔**ならガンマ分布
-    - n回中k回のように**割合的なカウント**なら二項分布
-1. データを可視化してみて、それっぽい形・性質のものを選ぶ
-    - **左右対称のひと山**ならとりあえず正規分布
-    - **負の値を取らない**ならガンマ分布
-    - 直線的か、指数関数的か、頭打ちか、などなど
-
-客観的な指標もほしい。<br>
-モデルの尤もらしさといえば...
-
-
----
-## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
-
-**あるモデル$M$の下でそのデータ$D$が観察される確率**:<br>
-$\text{Prob}(D \mid M)$
-
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
-$L(M \mid D)$
-
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
-$L(\theta \mid D)$ or $L(\theta)$
-
-**対数尤度** $\log L$ の形にしたほうがいろいろ便利。
-
-<hr>
-
-各モデルで最適なパラメータを探して、比較:<br>
-$\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
-
-
----
-## たしかに尤度はあてはまりの良さを表してそう
-
-この場合は直線回帰よりもポアソン回帰が良さそう:
-
-![plot of chunk compare-loglik](figure/compare-loglik-1.png)
-
-この調子で、より尤度の高いモデルを探していけばいいだろうか？
-
----
-## あてはまりが良ければいいってもんでもない
-
-過剰適合 / 過学習 / overfitting
-: パラメータを増やせば**現データへの**適合度・尤度を高くできるが、<br>
-  予測・理解の役には立たなくなる。
-
-![plot of chunk saturated-model](figure/saturated-model-1.png)
-
-**帰無モデル**: 説明変数なし。切片のみ。<br>
-**飽和モデル**: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
-
-
----
-## 無駄な説明変数を加えても尤度は上がる
-
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
-観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
-
-![plot of chunk many-models](figure/many-models-1.png)
-
-
-
----
-## AIC: 赤池情報量基準
-
-<p>\[\begin{split}
-\text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
-\end{split}\]</p>
-
-- AICが小さいほど予測精度の良いモデル。
-    - 尤度は上げたい。
-    - パラメータ数 $k$ が増えるとペナルティ。
-- どのデータに対する当てはまりを目指すかという観点
-    - 「手元のデータ」に対する対数尤度は $\log L^*$<br>
-    - 「真のメカニズムから出てくる未来のデータ」に対する<br>
-      平均対数尤度の推定量は $(\log L^* - k)$<br>
-      (Kullback--Leibler情報量を使って導出するらしい)
-
-
-???
-https://www.slideshare.net/logics-of-blue/1-6aic
-
-
----
-## 無駄な説明変数の追加でAIC増加
-
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
-観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
-
-![plot of chunk many-models-aic](figure/many-models-aic-1.png)
-
----
-## ほかの情報量基準
-
-- $\text{BIC} = -2 \log L^* + k \log n$
-    - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
-    - データの観測数 $n$ に依存する点でAICと異なる。<br>
-      感覚としては「AICはデータサイズによるペナルティが無い」
-    - (周辺尤度の最大化という観点で導出するらしい)
-- [WAIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
-  [WBIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
-    - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
-      そうじゃない場合(現実的には常に)こちらが優位。
-    - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
-
-
----
-## モデル選択の心構え
-
-「正しい」ものを選べるわけではない。<br>
-予測・理解に useful なものを何らかの基準で選ぶだけ。
-
-> All models are wrong, but some are useful. --- George E. P. Box
-
-<figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
-
----
-## 現実的な注意点・悩みどころ
-
-- 多重共線性(multicollinearity):
-    - 説明変数同士が強い相関関係にある
-- 変数変換:
-    - 気安くやるべきじゃないけど、対数変換などしばしば有用
-    - 割り算した値は危険
-- 交互作用を入れると解釈が難しくなる。
-
-
----
-## 交互作用
-
-ある説明変数の効果が、別の説明変数によって異なる。<br>
-e.g., ビール売上の温度依存性が天気によって異なる。
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
-
-| 天気 | $x_1$ |
-| ---- | :---: |
-| ☀️ 晴れ | 1 |
-| ☔️ 雨 | 0 |
-
-<p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
-\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
-\end{split}\]</p>
-
-雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
-晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
-
-  </div>
-  <div class="column" style="flex-shrink: 1.3;">
-
-![plot of chunk interaction](figure/interaction-1.png)
-
-  </div>
-</div>
-
-
-解釈が一気に難しくなるのでむやみに使わない。
-
----
-## 一般化線形モデル座学まとめ
-
-- 何はともあれ散布図を描く
-- 適切な確率分布・リンク関数・説明変数を考える
-- パラメータを最尤推定する
-- 尤度は「手元のデータへのあてはまり」
-- モデルを比較するときは情報量基準を参考にする
-
-
----
-## n個のうちy個生存。二項分布に従......わない！
-
-植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
-極端な値(全部死亡、全部生存)が多かった。個体差？
-
-![plot of chunk overdispersion](figure/overdispersion-1.png)
-
-もっと柔軟にモデリングしたい
-
----
-## ちょっとずつ線形モデルを発展させていく
-
-**線形モデル LM** (単純な直線あてはめ)
-
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<strong>確率分布</strong>を扱いたい</span>
-
-**一般化線形モデル GLM**
-
-<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
-
-**一般化線形混合モデル GLMM**
-
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
-
-**階層ベイズモデル HBM**
-
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
-
-
-
----
-## 統計モデリング入門まとめ
-
-- 何はともあれ作図して俯瞰
-- GLMは統計モデリングの考え方の根幹
-    - 確率分布・リンク関数・説明変数
-    - 尤度・最尤法によるパラメータ推定
-    - 情報量基準などによるモデル選択
-- より柔軟なモデリングについて今回は省略
-    - 一般化線形混合モデル (GLMM)
-    - 階層ベイズモデル (HBM)
-    - フルバージョンの過去資料:
-      [統計モデリング概論 DSHC 2021](/slides/tokiomarine2021/)
 
 ---
 ## 参考文献
@@ -1399,3 +908,8 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
 - [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
+
+
+<a href="glm.html" rel="next" class="readmore">
+一般化線形モデル、混合モデル
+</a>

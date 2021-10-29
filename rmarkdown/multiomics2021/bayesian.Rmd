@@ -1,0 +1,1542 @@
++++
+url = "multiomics2021/bayesian.html"
+title = "ベイズ推定、階層ベイズモデル — マルチNGSオミクス解析研究会 #10"
+linktitle = "ベイズ推定、階層ベイズモデル"
+date = 2021-12-14T14:00:00+09:00
+type = "reveal"
+draft = false
++++
+
+# [確率分布を理解する統計モデリング入門](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<ol>
+<li><a href="distribution.html">統計モデリング基礎: 確率分布、尤度</a>
+<li><a href="glm.html">一般化線形モデル、混合モデル</a>
+<li class="current-deck"><a href="bayesian.html">ベイズ統計、階層ベイズモデル</a>
+</ol>
+
+<div class="footnote">
+2021-12-14 東京大学 中戸研 <a href="https://amedprime-nakatolab.github.io/Seminar/10.html">マルチNGSオミクス解析研究会 #10</a><br>
+<a href="https://heavywatal.github.io/slides/multiomics2021/">https://heavywatal.github.io/slides/multiomics2021/</a>
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+---
+## 全体の構成
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに回帰分析の概要を紹介。
+
+1. イントロ [(#7 9/30)](distribution.html)
+1. 統計モデルの基本
+    - 確率変数・**確率分布** 👈 主役
+    - 尤度・最尤推定
+1. 一般化線形モデル、混合モデル [(#10 12/14 前半)](glm.html)
+1. ベイズ統計、階層ベイズモデル [(#10 12/14 後半)](bayesian.html)
+
+回帰のキモは**線ではなく分布**。
+
+<hr>
+<cite>
+
+[Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
+の演習無し抜粋バージョン (~2時間 x 2回)。
+
+</cite>
+
+
+---
+## コイントス4回、たまたま表が1回だったら
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+
+最尤推定
+: 推定結果は最も尤もらしい1点。
+: データが少ないとき過剰適合気味。
+: 表が出る確率 p = 0.25 のコインだろう。<br>
+  (信じ難いけどデータはこう言っている)
+
+<br>
+
+ベイズ推定
+: 推定結果は確率分布そのもの。
+: データが少ないなりの不確実さも表現。
+: p = 0.25 らへんである確率は高いが、<br>
+  p = 0.6 とかである可能性もまあある。
+
+  </div>
+  <div class="column" style="flex-shrink: 1.4;">
+
+```{r freq-vs-bayes, echo = FALSE, fig.height = 4, fig.width = 4}
+tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) %>%
+  dplyr::filter(logLik > -1e6) %>%
+  ggplot() + aes(p, logLik) +
+  geom_line() +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#3366ff") +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#3366ff") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+
+tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) %>%
+  ggplot() + aes(p, Density) +
+  geom_area(fill = "#3366ff", alpha = 0.5) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+  </div>
+</div>
+
+
+---
+## コイントスの回数が増えていったら
+
+**最尤推定**: 推定値が真の値に近づいていく
+
+```{r coin-frequentist, echo = FALSE, fig.width = 11, fig.height = 3}
+size = 1L; p = 0.5
+X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
+df_rbinom = purrr::map_dfr(c(4, 20, 100, 500), ~{
+  k = sum(head(X, .x))
+  tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), logLik = dbinom(k, .x, p, log = TRUE))
+}) %>%
+  # dplyr::bind_rows(tibble(p = seq(0, 1, 0.01), logLik = dbinom(sum(head(X, .x)), .x, p, log = TRUE), Repl = Inf))
+  dplyr::filter(logLik > -20) %>%
+  dplyr::mutate(label = factor(label, levels = unique(label)))
+df_rbinom %>%
+  group_by(label) %>%
+  ggplot() + aes(p, logLik) +
+  geom_line() +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#3366ff") +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#3366ff") +
+  facet_wrap(vars(label), nrow = 1L) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+**ベイズ推定**: 確率分布がどんどん尖り、確信が強まる
+
+```{r coin-bayesian, echo = FALSE, fig.width = 11, fig.height = 3}
+purrr::map_dfr(c(4, 20, 100, 500), ~{
+  k = sum(head(X, .x))
+  tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), Density = dbeta(p, k + 1, .x - k + 1))
+}) %>%
+  dplyr::mutate(label = factor(label, levels = unique(label))) %>%
+  ggplot() + aes(p, Density) +
+  geom_area(fill = "#3366ff", alpha = 0.5) +
+  facet_wrap(vars(label), nrow = 1L) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+---
+## 確率おさらい
+
+同時分布/結合確率: <span style="font-weight: normal;"> <span style="color: #E69F00;">A</span>かつ<span style="color: #0072B2;">B</span>の確率</span>
+: $\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \cap \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#0072B2}{B})$
+
+周辺確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>によらず<span style="color: #E69F00;">A</span>になる確率</span>
+: $\text{Prob}(\textcolor{#E69F00}{A}) = \sum_{\textcolor{#0072B2}{B}} \text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})$
+
+条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率。重要。</span>
+: $\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$
+
+```{r venn, echo = FALSE, fig.width = 6, fig.height = 3}
+make_circle = function(radius, center, n = 100L) {
+  tibble::tibble(theta = seq(0, 2 * pi, length.out = n + 1L)[-1]) %>%
+    dplyr::mutate(x = radius * cos(theta) + center[1],
+                  y = radius * sin(theta) + center[2])
+}
+#grDevices::palette.colors(palette = "Okabe-Ito")
+ggplot() + aes(x, y) +
+  geom_polygon(data = make_circle(5, c(0, 0)), fill = "#E69F00", alpha = 0.5) +
+  geom_polygon(data = make_circle(1, c(4.3, 0)), fill = "#0072B2", alpha = 0.5) +
+  coord_fixed(xlim = c(-7, 7)) +
+  theme_bw() +
+  theme(panel.grid = element_blank(),
+        axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+
+---
+## 条件付き確率がよくわかる具体例
+
+<span style="color: #0072B2;">B Brewery</span>のビールが<span style="color: #E69F00;">Awesome</span>な確率
+: $\text{Prob}(\textcolor{#E69F00}{\text{Awesome}} \mid \textcolor{#0072B2}{\text{B Brewery}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}})}$
+: かなり高い確率。良い醸造所。
+
+<span style="color: #E69F00;">Awesome</span>なビールが<span style="color: #0072B2;">B Brewery</span>のものである確率
+: $\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$
+: かなり低い確率。Awesomeなビールはほかにもたっくさんある。
+
+<img src="figure/venn-1.png" alt="plot of chunk venn">
+
+
+---
+## ベイズの定理
+
+乗法定理
+: $\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$
+
+<a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
+<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="150" align="right"></a>
+
+移項するだけで**ベイズの定理**:
+<img src="../tokiomarine2021/bayes.drawio.svg" style="padding-left: 1rem;">
+
+宴会場にビールが運ばれてきた。これはどこのブルワリーの？
+
+事前確率: $\text{Prob}(\textcolor{#0072B2}{B})$
+: 飲む前、手元のビールが<span style="color: #0072B2;">B Brewery</span>のである確率。
+: ↓ 🍻 飲んでみて更新
+
+事後確率: $\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$
+: 飲んでみて<span style="color: #E69F00;">Awesome</span>だったビールが
+  <span style="color: #0072B2;">B Brewery</span>のである確率。
+
+
+---
+## ベイズの定理 in 感染症検査
+
+- 有病率 $\text{Prob}(M)$ : 0.3% (この地域の感染者の割合; 事前確率)
+- 感度 $\text{Prob}(P \mid M)$ : 90% (感染してる人に陽性判定が出る)
+- 特異度 $\text{Prob}(N \mid \overline{M})$: 99% (感染してない人に陰性判定が出る)
+
+$\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者である確率)は？
+
+<div>\[\begin{split}
+\text{Prob}(M \mid P)
+  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)} {\text{Prob}(P)} \\
+  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)}
+           {\text{Prob}(P \mid M)~\text{Prob}(M) + (1 - \text{Prob}(N \mid \overline{M}))~\text{Prob}(\overline{M})} \\
+  &= \frac {0.9 \times 0.003} {0.9 \times 0.003 + 0.01 \times 0.997} \approx 0.21
+\end{split}\]</div>
+
+感染者を隔離するスクリーニング目的では使いものにならない性能。
+
+🔰 同様に $\text{Prob}(\overline{M} \mid N)$ 真陰性率を計算してみよう<br>
+🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう
+
+```{r infection-test, echo = FALSE, eval = FALSE, include = FALSE}
+sensitivity = 0.9
+specificity = 0.99
+prevalence = 0.003
+p_positive = (prevalence * sensitivity + (1 - prevalence) * (1 - specificity))
+p_negative = ((1 - prevalence) * specificity + prevalence * (1 - sensitivity))
+devnull = tibble::tibble(
+  true_positive = prevalence * sensitivity / p_positive,
+  false_positive = (1 - prevalence) * (1 - specificity) / p_positive,
+  true_negative = (1 - prevalence) * specificity / p_negative,
+  false_negative = prevalence * (1 - sensitivity) / p_negative,
+)
+```
+
+
+---
+## ベイズの定理 in 統計モデリング
+
+<p>
+<img src="../tokiomarine2021/bayesian.drawio.svg">
+</p>
+
+モデル$M$に対する確信度合いをデータ$D$に基づいて更新する。<br>
+モデル$M$を仮説$H$やパラメータ$\theta$に置き換えてもいい。
+
+**周辺尤度**は「確率分布の積分は1」を満たすための正規化定数とみなせる。<br>
+比例関係だけ抜き出してこう書くことが多い:
+<div>\[\begin{split}
+\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \\
+\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \\
+\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta)
+\end{split}\]</div>
+
+
+---
+## 表が出る確率のベイズ推定: 1. 事前分布
+
+コイントスを繰り返して、表が出る確率pをベイズ推定したい。
+
+事前分布には**ベータ分布**を採用(理由は後で分かる):
+<div>\[\begin{split}
+\text{Beta}(p \mid a, b) =
+   \frac{\Gamma(a + b)}{\Gamma(a) \Gamma(b)} p^{a-1} (1 - p)^{b-1}
+\end{split}\]</div>
+
+分布の形は $a,~b$ によって決まる。<br>
+ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
+投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:
+
+```{r prior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
+size = 1L; p = 0.5
+X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
+df_beta = purrr::map_dfr(c(0, 1, 2, 3, 4, 20, 100, 500), ~{
+  k = sum(head(X, .x))
+  tibble::tibble(
+    i = .x,
+    label = sprintf("%d / %d", k, .x),
+    p = seq(0, 1, 0.01),
+    Density = dbeta(p, k + 1, .x - k + 1))
+}) %>%
+  dplyr::mutate(label = factor(label, levels = unique(label)))
+
+df_beta %>%
+  dplyr::filter(i == 0) %>%
+  ggplot() + aes(p, Density) +
+  geom_area(fill = "#3366ff", alpha = 0.5) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(title = "Prior") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+---
+## 表が出る確率のベイズ推定: 2. 尤度関数
+
+4回投げて表が1回だった、というデータで**尤度**を計算(**二項分布**):
+<div>\[\begin{split}
+\text{Binom}(1 \mid 4,~p) = \binom {1} {4} p^{1} (1 - p)^{3}
+\end{split}\]</div>
+
+これに事前分布を掛けて正規化したら事後分布になるはず。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+
+```{r likelihood-binom, echo = FALSE, fig.width = 3, fig.height = 3}
+tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) %>%
+  ggplot() + aes(p, L) +
+  geom_line(color = "#3366ff", size = 2) +
+  labs(title = "Likelihood") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  ⨉
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p>
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
+</p>
+  </div>
+</div>
+
+
+---
+## 表が出る確率のベイズ推定: 3. 事後分布
+
+なんと、事後分布もベータ分布になる。
+
+<div>\[\begin{split}
+\text{Posterior}
+  &\propto \text{Binom}(1 \mid 4,~p) \times \text{Beta}(p \mid  1, 1)\\
+  &= \binom {1} {4} p^{1} (1 - p)^{3} \times
+     \frac{\Gamma(1 + 1)}{\Gamma(1) \Gamma(1)} p^{1-1} (1 - p)^{1-1} \\
+  &= C p^{2-1} (1 - p)^{4-1} \\
+  &= \text{Beta}(p \mid 2, 4)
+\end{split}\]</div>
+
+ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+
+```{r posterior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
+df_beta %>%
+  dplyr::filter(i == 4) %>%
+  ggplot() + aes(p, Density) +
+  geom_area(fill = "#3366ff", alpha = 0.5) +
+  coord_cartesian(ylim = c(0, 3)) +
+  labs(title = "Posterior") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  $\propto$
+  </div>
+  <div class="column" style="flex-shrink: 1.0">
+<p>
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom">
+</p>
+  </div>
+  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
+  ⨉
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p>
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
+</p>
+  </div>
+</div>
+
+
+---
+## 表が出る確率のベイズ推定: 4. 逐次学習
+
+さっきの事後分布を事前分布として、さらにデータを集める。
+
+コイントス4回のうち表1回、に基づく**事前分布**: $\text{Beta}(p \mid 2,~4)$
+
+さらに16回投げたら表が7回、の**尤度**: $\text{Binomial}(7 \mid 16,~p)$
+
+**事後分布**はまた事前分布と同じ形になる:
+
+<div>\[\begin{split}
+\text{Beta}(p \mid 9, 13) \propto
+  \text{Binomial}(7 \mid 16,~p) \times \text{Beta}(p \mid 2, 4)
+\end{split}\]</div>
+
+データを加えるたびに更新していける:
+
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+
+
+---
+## 共役事前分布
+
+事後分布が事前分布と同じ形なので計算しやすい、という組み合わせ。
+
+| 尤度関数 | 共役事前分布 |
+| ---------- | ------------ |
+| 二項分布 | ベータ分布 |
+| ポアソン分布 | ガンマ分布 |
+| 正規分布 | ガンマ分布 |
+| 正規分布 (分散既知) | 正規分布 |
+
+共役事前分布を使うことが常に正しいとも限らない。<br>
+計算コストがかかっても**無情報事前分布**を使う風潮。
+
+---
+## 事後分布を用いた推定
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+
+区間推定
+: 幅のある推定値を提示
+: e.g., 95%ベイズ確信区間<br>
+  (等裾事後信用区間, 最高密度区間)
+
+点推定
+: 値を1点だけ提示
+: e.g., MAP, MED, EAP
+
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+
+```{r integrate, echo = FALSE, fig.width = 6, fig.height = 4}
+n_head = 6
+n_total = 10
+bound = qbeta(c(0.025, 0.975), n_head, n_total - n_head)
+.f = function(.x) {dplyr::filter(.x, dplyr::between(p, bound[1], bound[2]))}
+.g = function(.x) {dplyr::slice_max(.x, Density)}
+tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)) %>%
+  ggplot() + aes(p, Density) +
+  geom_hline(yintercept = 0) +
+  geom_line(color = "#3366ff", size = 1) +
+  geom_area(data = .f, fill = "#3366ff", alpha = 0.5) +
+  geom_vline(aes(xintercept = p), data = .g, color = "#3366ff", size = 1) +
+  geom_point(data = .g, color = "#3366ff", size = 5, shape = 16) +
+  scale_x_continuous(breaks = round(bound, 2)) +
+  labs(title = sprintf("%d / %d", n_head, n_total)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank())
+```
+
+  </div>
+</div>
+
+コイン投げモデルのベータ分布は美しい例。<br>
+→ 解析的(数学的)に解ける。
+
+実践的なモデル・事後分布はもっと複雑。<br>
+→ コンピュータに頼って数値計算: MCMC
+
+???
+
+- 95%ベイズ確信区間 (credible interval): 真の値が95%の確率で含まれる区間。
+- 等裾事後信用区間 (equal-tailed interval): 両端から2.5%ずつ削る
+- 最高密度区間 (highest density interval): 分布密度に閾値を設ける
+- 事後中央値 (Posteriori <u>Med</u>ian: MED)
+- 事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori: EAP)
+- 事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori: MAP)
+
+信頼区間 (confidence interval)
+頻度主義の考え方に基づいていて、解釈が難しい。
+「標本抽出を100回繰り返すとそのうちの95回はその区間に母平均が含まれる」
+真の値は1つに定まっていて、不確実性は有限のサンプリングに由来する。
+
+
+---
+## MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo
+
+<a href="https://en.wikipedia.org/wiki/Andrey_Markov">
+<img src="../tokiomarine2021/image/AAMarkov.jpg" height="180" align="right"></a>
+
+マルコフ連鎖
+: 次の時点の挙動が現在の値だけで決定されるような確率過程。
+: $\ldots \to X_{t - 2} \to X_{t - 1} \to X_{t} \to X_{t + 1}$
+: $\text{Prob}(X_{t+1} \mid X_{t}, X_{t-1}, X_{t-2}, \ldots) = \text{Prob}(X_{t+1} \mid X_{t})$
+: e.g., すごろく
+
+モンテカルロ法
+: 乱数を用いた計算方法の総称。
+: <a href="https://en.wikipedia.org/wiki/Monte_Carlo_Casino">
+  <img src="../tokiomarine2021/image/Real_Monte_Carlo_Casino.jpg" height="200"></a>
+  <a href="https://en.wikipedia.org/wiki/Stanislaw_Ulam">
+  <img src="../tokiomarine2021/image/Stanislaw_Ulam.jpg" height="200"></a>
+  <a href="https://en.wikipedia.org/wiki/John_von_Neumann">
+  <img src="../tokiomarine2021/image/John_von_Neumann.jpg" height="200"></a>
+  <a href="https://en.wikipedia.org/wiki/Nicholas_Metropolis">
+  <img src="../tokiomarine2021/image/Nicholas_Metropolis.png" height="200"></a>
+
+???
+スタニスワフ・ウラムがソリテアの成功率を考えてた時に思いついて、
+同僚のジョン・フォン・ノイマンが計算機上での実用まで持ってった。
+モナコ公国のモンテカルロ地区に国営カジノがあって、
+ウラムの叔父がそこで負けて親戚から借金したことにちなんで
+同僚のニコラス・メトロポリスが命名したらしい。
+
+マルコフ連鎖
+: マルコフ過程のうち、離散的な時間を考えるもの。
+
+マルコフ過程
+: マルコフ性を持つ確率過程
+
+マルコフ性
+: 次の時点の挙動が現在の値だけで決定され、過去の値と無関係
+
+
+最適化ではなくサンプリング法
+
+
+---
+## モンテカルロ法は乱数を用いた計算方法
+
+e.g., 半径1の円の面積
+
+面積4の正方形に400個の一様乱数を打ち込んだら318個乗った:<br>
+$4 \times \frac {318} {400} = 3.18$
+
+```{r circle, echo = FALSE, fig.width = 4, fig.height = 4}
+n = 100L
+points = tibble(x = runif(n, -1, 1), y = runif(n, -1, 1))
+theta = seq(0, 2 * pi, length.out = 100)
+ggplot(points) + aes(x, y) +
+  annotate("polygon", x = cos(theta), y = sin(theta), fill = "#888888", alpha = 0.5) +
+  geom_point(shape = 16, alpha = 0.5, size = 2) +
+  geom_point(data = function(.x) dplyr::filter(.x, x ^ 2 + y ^ 2 < 1), color = "#3366ff", shape = 16, size = 2) +
+  coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1), expand = FALSE)  +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+数学を知っていれば $\pi r ^ 2 \approx 3.14$
+
+---
+## 変な分布もモンテカルロ法で扱えそう
+
+e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。
+
+```{r mcpdf, echo = FALSE, fig.width = 11, fig.height = 6}
+n = 800
+df_point = tibble::tibble(p = runif(n, -0.2, 1.2), Density = runif(n, 0, 5)) %>%
+  dplyr::mutate(accepted = Density < (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2)
+p_pdf = tibble::tibble(p = seq(0, 1, 0.01), Density = (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2) %>%
+  ggplot() + aes(p, Density) +
+  geom_hline(yintercept = 0) +
+  geom_area(fill = "#000000", alpha = 0.4) +
+  geom_point(data = df_point %>% filter(!accepted), shape = 16, alpha = 0.5) +
+  geom_point(data = df_point %>% filter(accepted), color = "#3366ff", shape = 16, size = 2, alpha = 1) +
+  labs(x = "X") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank(),
+        axis.text = element_blank())
+
+p_accepted = tibble::tibble(p = runif(n), th = dbeta(p, 4, 6) + dbeta(p, 70, 30)) %>%
+  dplyr::filter(runif(length(p), 0, max(th)) < th) %>%
+  ggplot() + aes(p) +
+  geom_hline(yintercept = 0) +
+  coord_cartesian(xlim = c(-0.2, 1.2)) +
+  geom_histogram(bins = 20, center = 0.5, fill = "#3366ff", alpha = 0.5) +
+  labs(x = "X") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank(),
+        axis.text = element_blank())
+
+cowplot::plot_grid(p_pdf, p_accepted, nrow = 1L)
+```
+
+でも、ハズレの値もけっこう引いてしまう。
+
+
+---
+## 次元の呪い: 高次元になるほど当たりにくくなる
+
+(N次元球の体積 / N次元の立方体) はゼロに近づいていく。
+
+<img src="figure/circle-1.png" width="210" align="right">
+
+- 2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$
+- 3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$
+- N次元: $\frac {\frac {\pi ^ {N/2}} {\Gamma (N/2 + 1)} r ^ N} {(2r) ^ N} = \frac {\pi ^ {N/2}} {2^N \Gamma (N/2 + 1)} \to 0$
+
+パラメータが増えると計算量(≈乱数の無駄撃ち)が急増。
+
+<hr>
+
+密度の高い「当たり」付近を効率よく探索したい。<br>
+「当たり」は「当たり」の近くにありがちだろう。<br>
+→ マルコフ連鎖が使えそう
+
+
+---
+## Metropolis--Hastings法 (MH法)
+
+0.  パラメータ $\theta$ の初期値を選ぶ
+1.  $\theta$ をちょっと増減させて $\theta_\text{new}$ を作る
+2.  それぞれ尤度を計算し、比較。
+    - $L(\theta_\text{new}) \ge L(\theta)$ なら $\theta_\text{new}$ を即採択
+    - $L(\theta_\text{new}) < L(\theta)$ でも
+      確率 $r = \frac {L(\theta_\text{new})} {L(\theta)}$ で  $\theta_\text{new}$ を採択
+3.  $\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。
+
+```{r metropolis, echo = FALSE, fig.width = 11, fig.height = 3.5}
+n_head = 12
+n_total = 20
+dp = 0.02
+df_point = tibble::tibble(p = seq(0.48, 0.64, dp), logLik = dbinom(n_head, n_total, p, log = TRUE))
+offset = 0.005
+df_arrow = df_point %>%
+  dplyr::group_by(p) %>%
+  dplyr::mutate(data = purrr::map_dfr(p, ~{
+    pl = p + offset
+    pr = p + dp - offset
+    ll = dbinom(n_head, n_total, pl, log = TRUE)
+    lr = dbinom(n_head, n_total, pr, log = TRUE)
+    if (ll < lr) {
+      data.frame(pbegin = pl, pend = pr, lbegin = ll, lend = lr)
+    } else {
+      data.frame(pbegin = pr, pend = pl, lbegin = lr, lend = ll)
+    }
+  })) %>%
+  tidyr::unpack(data)
+
+.ar = grid::arrow(angle = 20, length = grid::unit(0.11, "inches"), type = "closed")
+.ar2 = grid::arrow(angle = 20, length = grid::unit(0.09, "inches"), type = "closed", ends = "first")
+.aes = aes(pbegin, lbegin, xend = pend, yend = lend)
+df_point %>%
+  ggplot() + aes(p, logLik) +
+  geom_segment(data = df_arrow, .aes, linejoin = "mitre", size = 1, position = position_nudge(0, +0.008), arrow = .ar) +
+  geom_segment(data = df_arrow, .aes, linejoin = "mitre", size = 1, position = position_nudge(0, -0.008), arrow = .ar2, alpha = 0.33) +
+  geom_point(size = 6, alpha = 0.6, shape = 16) +
+  labs(x = expression(theta)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+```
+
+---
+## 採択されたパラメータ値の軌跡
+
+尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
+通ったパラメータ値を集めるといい感じの分布が得られる。
+
+```{r metropolis-trajectory, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.2, fig.width = 12, fig.height = 6}
+dp = 0.05
+mh_sample = function(n, p0, n_head, n_total, dp) {
+  p = p0
+  lp = dbinom(n_head, n_total, p, log = FALSE)
+  posterior = p
+  for (i in seq.int(2L, n)) {
+    p_new = p + sample(c(-dp, dp), 1)
+    lp_new = suppressWarnings(dbinom(n_head, n_total, p_new, log = FALSE))
+    if (is.nan(lp_new)) next
+    if (lp_new > lp) {
+      p = p_new
+      lp = lp_new
+    } else {
+      if (runif(1L) < (lp_new / lp)) {
+        p = p_new
+        lp = lp_new
+      }
+    }
+    posterior = c(posterior, p)
+  }
+  tibble::tibble(p = posterior) %>% tibble::rowid_to_column("t")
+}
+n = 1000
+df_traj = mh_sample(n, 0.1, n_head, n_total, dp = dp)
+
+p_traj = df_traj %>%
+  ggplot() + aes(t, p) +
+  geom_line() +
+  coord_cartesian(xlim = c(0, n), ylim = c(0, 1)) +
+  labs(title = "traceplot", y = expression(theta), x = "iterations") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+
+p_hist = df_traj %>%
+  ggplot() + aes(p) +
+  geom_bar(width = 0.6 * dp) +
+  coord_flip(xlim = c(0, 1)) +
+  labs(title = "MCMC samples") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        axis.title.y = element_blank(), axis.text.y = element_blank())
+
+ymax = max(ggplot_build(p_hist)$data[[1]]$count)
+
+for (i in seq.int(50, 1000, 50)) {
+  df_traj_head = df_traj %>% head(i)
+  p1 = p_traj %+% df_traj_head
+  p2 = p_hist %+% df_traj_head + ylim(c(0, ymax))
+  p = cowplot::plot_grid(p1, p2, nrow = 1L, rel_widths = c(4, 1))
+  print(p)
+}
+```
+
+
+---
+## 尤度に比例する事後分布からサンプルしたのと等価
+
+全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
+が、パラメータ1つの1次元ではご利益はわかりにくい。
+
+```{r propto-lik, echo = FALSE, fig.width = 11, fig.height = 4}
+p_lik = tibble::tibble(p = seq(0, 1, 0.01), Likelihood = dbinom(n_head, n_total, p, log = FALSE)) %>%
+  ggplot() + aes(p, Likelihood) +
+  geom_hline(yintercept = 0) +
+  geom_line(size = 2) +
+  labs(title = "Likelihood", x = expression(theta)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank())
+
+p_dens = tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)) %>%
+  ggplot() + aes(p, Density) +
+  geom_hline(yintercept = 0) +
+  geom_area(alpha = 0.5) +
+  labs(title = "Posterior", x = expression(theta)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank())
+
+p_hist = df_traj %>% tail(-100) %>%
+  ggplot() + aes(p) +
+  geom_hline(yintercept = 0) +
+  geom_bar(width = 0.6 * dp) +
+  coord_cartesian(xlim = c(0, 1)) +
+  labs(title = "MCMC samples", x = expression(theta), y = "Count") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank())
+
+cowplot::plot_grid(p_lik, p_dens, p_hist, nrow = 1L)
+```
+
+パラメータが複数ある場合は？
+
+???
+これは「コイン10回投げて6回表。表の出る確率pは？」という簡単なモデル。
+
+
+---
+## Gibbs Sampling
+
+パラメータが複数の場合「ほかを固定してひとつ更新」を繰り返す。
+
+e.g., 二次元正規分布。(-2, 2) からスタート。
+
+```{r gibbs, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.1, fig.width = 5, fig.height = 5}
+gibbs_sample = function(n, rho) {
+  x = double(n)
+  y = double(n)
+  x[1] = -2
+  y[1] = 2
+  for (i in seq.int(2, n)) {
+    x[i] = rnorm(1, rho * y[i - 1], sqrt(1 - rho ** 2))
+    y[i] = rnorm(1, rho * x[i], sqrt(1 - rho ** 2))
+  }
+  x = rep(x, each = 2)
+  y = rep(y, each = 2)
+  tibble::tibble(x = x[-1], y = y[-2 * n])
+}
+
+rho = 0.8
+df_gibbs = gibbs_sample(40, rho)
+
+p_tile = tidyr::crossing(x = seq(-3, 3, 0.05), y = x) %>%
+  dplyr::mutate(z = x^2 + y^2 - 2 * rho * x * y,
+                d = (1 / (2 * pi * sqrt(1 - rho ** 2))) * exp(-0.5 * z / (1 - rho ** 2))) %>%
+  ggplot() + aes(x, y) +
+  geom_tile(aes(fill = d)) +
+  scale_fill_gradient(low = "#f8f8f8", high = "black") +
+  coord_fixed(expand = FALSE) +
+  theme_void() + theme(legend.position = "none")
+
+for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
+  df_i = head(df_gibbs, i)
+  p = p_tile +
+    geom_path(data = df_i, color = "#3366ff", alpha = 0.5, size = 1) +
+    geom_point(data = df_i, color = "#3366ff", alpha = 0.5, shape = 16)
+  print(p)
+}
+```
+
+
+---
+## 中間まとめ
+
+- ベイズ推定では不確実性も表現できる。
+- コンピュータに頼った計算方法としてのモンテカルロ法。
+- 多次元でも効率よくサンプルするためのMCMC。
+
+<hr>
+
+ここから、実行するにあたっての注意点を見ていく。
+
+
+---
+## 何回やっても似たような結果になってほしい
+
+乱数や初期値によって偶々、じゃないことを確認したい。
+
+e.g., `chains = 3, iter = 600` 。ほぼ同じところをうろうろ:
+
+```{r chains, echo = FALSE, fig.height = 5, fig.width = 12}
+df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) %>%
+  dplyr::mutate(data = purrr::map(init, ~{mh_sample(600, .x, 18, 30, dp = 0.02)})) %>%
+  tidyr::unnest(data) %>%
+  dplyr::mutate(p = round(p, 2))
+t_warmup = 200
+p_trace = ggplot(df_trace) + aes(t, p, group = init) +
+  geom_path(aes(color = as.factor(init)), size = 1) +
+  scale_color_discrete(guide = NULL) +
+  labs(title = "traceplot", y = expression(theta), x = "iterations") +
+  coord_cartesian(ylim = c(0, 1)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+
+p_hist = df_trace %>%
+  dplyr::mutate(init = as.factor(init)) %>%
+  ggplot() + aes(p) +
+  geom_bar(aes(fill = init), position = position_stack(reverse = TRUE)) +
+  coord_flip(xlim = c(0, 1)) +
+  labs(title = "MCMC samples") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        axis.title.y = element_blank(), axis.text.y = element_blank(),
+        legend.position = "none")
+cowplot::plot_grid(p_trace, p_hist, nrow = 1L, rel_widths = c(4, 1))
+```
+
+収束(convergence)の判定については後ほど。
+
+---
+## 初期値の影響が消えるまでウォーミングアップ
+
+定常分布の山に到達してからが本番。
+
+e.g., `iter = 600, warmup = 200` で灰色の部分を捨てる:
+
+```{r warmup, echo = FALSE, fig.height = 5, fig.width = 12}
+cowplot::plot_grid(
+  p_trace + annotate("ribbon", x = c(0, t_warmup), ymin = Inf, ymax = -Inf, alpha = 0.3),
+  p_hist %+% (df_trace %>% dplyr::mutate(init = as.factor(ifelse(t < t_warmup, NA, init)))),
+  nrow = 1L, rel_widths = c(4, 1))
+```
+
+どれくらい長く捨てるべきかは場合による。
+
+
+---
+## 適度に間引いて自己相関を軽減したい
+
+直前の値と似すぎていたら独立サンプルとして扱えないので。
+
+e.g., `thin = 5` で5回に1回だけサンプルする:
+
+```{r thin, echo = FALSE, fig.height = 5, fig.width = 7, message = FALSE}
+p_trace +
+  coord_cartesian(ylim = c(0, 1), xlim = c(200, 260)) +
+  geom_point(data = function(.x) {dplyr::filter(.x, t %% 5 == 0)}, alpha = 0.6, size = 3, shape = 16)
+```
+
+間引かなくても大丈夫な場合も、間引いても解決しない場合もある。
+
+
+
+---
+## 収束判定
+
+- 複数chains・複数初期値で実行し、軌跡や分布を可視化
+- Gelman-Rubin統計量 $\hat R < 1.05$
+- Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
+
+```{r convergence, echo = FALSE, fig.height = 3, fig.width = 11, message = FALSE, warning = FALSE}
+data = list(x = rep(10L, 10L))
+data$N = length(data$x)
+model_yes = rstan::stan_model("converge-yes.stan")
+model_no = rstan::stan_model("converge-no.stan")
+fit_yes = rstan::sampling(model_yes, data = data)
+fit_no = rstan::sampling(model_no, data = data)
+s = rstan::summary(fit_yes, pars = "lambda")$summary
+template = "Rhat = %.4f, n_eff = %.1f"
+label_yes = sprintf(template, s[, "Rhat"], s[, "n_eff"])
+s = rstan::summary(fit_no, pars = "lambda")$summary
+label_no = sprintf(template, s[, "Rhat"], s[, "n_eff"])
+p1 = rstan::stan_trace(fit_yes, pars = "lambda") + labs(title = label_yes)
+p2 = rstan::stan_trace(fit_no, pars = "lambda") + labs(title = label_no)
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+```
+Warning: The largest R-hat is ***, indicating chains have not mixed.
+Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
+Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
+Running the chains for more iterations may help. See
+http://mc-stan.org/misc/warnings.html
+```
+
+???
+https://ill-identified.hatenablog.com/entry/2020/05/21/001158
+
+
+---
+## 収束・自己相関が悪い場合にどう改善するか
+
+- 小手先の対処
+    - warmupとiterをもっと長くする
+    - thinを大きくして間引く
+- ちょっと大掛かり
+    - モデルを見直す
+    - プログラムを見直す
+    - アルゴリズム・ソフトウェアを変える
+
+---
+##  MCMCの方法いろいろ
+
+採択率を高め、早く収束するように改良されてきている。
+
+- Metropolis--Hastings法
+    - Gibbs Sampling
+    - Hamiltonian Monte Carlo (HMC)
+        - No-U-Turn Sampler (NUTS)
+
+
+---
+## MCMCソフトウェア
+
+- [BUGS](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
+    - クローズドソースで、ほぼWindows専用。
+- [JAGS](https://mcmc-jags.sourceforge.io/)
+    - オープンソースで、さまざまなOS・言語から利用可能。
+    - マニュアルや用例が不足。
+- [**Stan**](https://mc-stan.org/) 👈
+    - オープンソースで、さまざまなOS・言語から利用可能。
+    - 開発も利用も活発。マニュアルや用例も充実。
+    - HMC/NUTSにより早く収束。
+- [PyMC3](https://docs.pymc.io/)
+- [NumPyro](https://num.pyro.ai/)
+- [TensorFlow Probability](https://www.tensorflow.org/probability/)
+
+
+---
+## Stan
+
+<a href="https://mc-stan.org/">
+<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+</a>
+
+- Stan言語でモデルを書く
+- C++を介して機械語に翻訳(コンパイル)するので高速
+- RやPythonなどから呼び出して使うのが便利
+
+```r
+# install.packages("rstan")
+library(rstan)
+rstan_options(auto_write = TRUE)
+```
+
+---
+## おおまかな流れ
+
+```r
+# データ準備
+mydata
+
+# Stan言語で書いたモデルをコンパイル
+model = rstan::stan_model(file = "model.stan")
+
+# MCMCサンプリング
+fit = rstan::sampling(model, data = mydata)
+
+# 結果を眺める
+print(fit)
+rstan::stan_trace(fit)
+rstan::stan_hist(fit)
+rstan::stan_ac(fit)
+```
+
+
+---
+## 説明変数なしのベイズ推定: データ準備
+
+表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。
+
+```{r stan-set-seed, echo = FALSE}
+set.seed(42)
+```
+```{r stan-binom, fig.width = 4, fig.height = 4}
+true_p = 0.7
+N = 40L
+mydata = list(N = N, x = rbinom(N, 1, true_p))
+print(mydata)
+```
+
+Rならlist型、Pythonならdict型にまとめてStanに渡す。
+
+
+---
+## 説明変数なしのベイズ推定: Stan言語でモデル定義
+
+文字列として保持するか、別ファイルに書いておく:
+
+```{r read-binom-stan, code = 'cat(readr::read_file("binom.stan"))', echo = FALSE}
+```
+
+- いくつかのブロックに分けて記述する:<br>
+  R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
+- 整数型 `int`, 実数型 `real`, それらの配列がある。
+- 下限 `lower`, 上限 `upper` を設定できる。
+
+
+---
+## Stan言語の7種のブロック
+
+順番厳守。よく使うのは**太字のやつ**。
+
+1. `functions {...}`
+1. **`data {...}`**
+1. `transformed data {...}`
+1. **`parameters {...}`**
+1. `transformed parameters {...}`
+1. **`model {...}`**
+1. `generated quantities {...}`
+
+<https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html>
+
+
+---
+## 説明変数なしのベイズ推定: MCMCサンプル
+
+予め実行速度の速い機械語に翻訳(コンパイル):
+
+```{r stan-binom-model, fig.width = 4, fig.height = 4}
+model = rstan::stan_model("binom.stan")
+```
+
+これに結構時間がかかるので、変更が無ければ再利用するため先ほど
+`rstan_options(auto_write = TRUE)` しておいた。
+
+<hr>
+
+モデルとデータを使ってMCMCサンプリング:
+
+```{r stan-binom-sample, fig.width = 4, fig.height = 3}
+fit = rstan::sampling(model, data = mydata)
+```
+
+いろいろオプションはあるけどとりあえずデフォルトで:<br>
+`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
+
+問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
+
+---
+## 説明変数なしのベイズ推定: 結果を眺める
+
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。
+
+```{r stan-binom-fit, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
+
+
+---
+## 説明変数なしのベイズ推定: trace plot 確認
+
+どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
+
+```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
+rstan::stan_trace(fit)
+```
+
+---
+## 説明変数なしのベイズ推定: 自己相関の確認
+
+2--3ステップくらいで自己相関がほぼ消えるので問題なし:
+
+```{r stan-binom-ac, fig.width = 4, fig.height = 4}
+rstan::stan_ac(fit, pars = c("p"))
+```
+
+---
+## 説明変数なしのベイズ推定: 推定結果確認
+
+サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:
+
+```{r stan-binom-hist, fig.width = 4, fig.height = 4}
+rstan::stan_hist(fit, bins = 30)
+```
+
+次はもう少しだけ複雑な例を見てみよう。
+
+---
+## 線形回帰のベイズ推定: データ準備
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```{r stan-penguins-glm, echo = FALSE, fig.width = 7, fig.height = 4, warning = FALSE}
+if (!require(palmerpenguins, quietly = TRUE)) {
+  install.packages("palmerpenguins")
+  library(palmerpenguins)
+}
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+
+p_penweight = penguins %>%
+  ggplot() + aes(body_mass_g, flipper_length_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  scale_color_manual(values = penguins_colors) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
+p_penweight +
+  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
+```
+
+
+---
+## 線形回帰のベイズ推定: データ準備
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+`Stan does not support NA` と怒られるので欠損値を取り除いておく:
+
+```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4}
+data = penguins %>%
+  dplyr::select(c("body_mass_g", "flipper_length_mm")) %>%
+  tidyr::drop_na() %>%
+  as.list()
+data$N = length(data$body_mass_g)
+str(data)
+```
+
+---
+## 単回帰のベイズ推定: Stan言語でモデル定義
+
+切片、傾き、ばらつきを推定する:
+
+```{r read-penguins-stan, code = 'cat(readr::read_file("penguins.stan"))', echo = FALSE}
+```
+
+
+---
+## 単回帰のベイズ推定: MCMCサンプル
+
+予め実行速度の速い機械語に翻訳(コンパイル):
+
+```{r stan-penguins-model, fig.width = 4, fig.height = 4}
+model = rstan::stan_model("penguins.stan")
+```
+
+モデルとデータを使ってMCMCサンプリング:
+
+```{r stan-penguins-sample, fig.width = 4, fig.height = 3}
+fit = rstan::sampling(model, data = data)
+```
+
+いろいろオプションはあるけどとりあえずデフォルトで:<br>
+`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
+
+問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
+
+---
+## 単回帰のベイズ推定: 結果を眺める
+
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。
+
+```{r stan-penguins-fit, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+
+---
+## 単回帰のベイズ推定: trace plot 確認
+
+どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
+
+```{r stan-penguins-traceplot, fig.width = 11, fig.height = 4}
+rstan::stan_trace(fit)
+```
+
+---
+## 単回帰のベイズ推定: 自己相関の確認
+
+どれもまあまあすぐ消えるので問題なし:
+
+```{r stan-penguins-ac, fig.width = 11, fig.height = 4}
+rstan::stan_ac(fit, pars = c("intercept", "slope", "sigma"))
+```
+
+---
+## 単回帰のベイズ推定: 推定結果確認
+
+正規分布っぽいきれいな形:
+
+```{r stan-penguins-hist, fig.width = 11, fig.height = 3}
+rstan::stan_hist(fit, bins = 30)
+```
+
+これらの値を使って点推定・区間推定も可能。
+
+
+---
+## 単回帰のベイズ推定: 推定結果で回帰
+
+無事に最尤推定と似たような線が引けた。
+
+```{r stan-penguins-regression, fig.width = 4, fig.height = 4, warning = FALSE}
+coef = rstan::get_posterior_mean(fit)[, "mean-all chains"]
+p_penweight +
+  geom_abline(intercept = coef["intercept"], slope = coef["slope"], size = 1, color = "#3366ff")
+```
+
+---
+## ベイズ推定を使った回帰に便利なパッケージ
+
+[rstanarm](https://mc-stan.org/rstanarm/) + [tidybayes](https://mjskay.github.io/tidybayes)
+
+- Stan言語のモデルを自分で書かずに済む。
+- モデルの主要部品がコンパイル済みなので試行錯誤も機敏に。
+- 区間推定の可視化までお世話してくれる。
+
+```{r rstanarm-penguins, fig.width = 8, fig.height = 4, message = FALSE, warning = FALSE}
+library(rstanarm)
+library(tidybayes)
+fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g, family = gaussian(), data = penguins)
+pred = penguins %>% tidyr::drop_na() %>% tidybayes::add_fitted_draws(fit)
+p_penweight +
+  ggdist::stat_lineribbon(aes(y = .value), data = pred, color = "#3366ff", size = 0.4) +
+  scale_fill_brewer(palette = "Greys")
+```
+
+
+---
+## rstanarmを使えば重回帰のベイズ推定も簡単
+
+GLMのような書き味で書ける。
+
+```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
+fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species, family = gaussian(), data = penguins)
+pred = penguins %>% tidyr::drop_na() %>% tidybayes::add_fitted_draws(fit)
+p_penweight + aes(color = species, group = species) +
+  ggdist::stat_lineribbon(aes(y = .value), data = pred, size = 0.4) +
+  scale_color_manual(values = penguins_colors) +
+  scale_fill_brewer(palette = "Greys")
+```
+
+
+---
+## GLMMで登場した個体差を階層ベイズモデルで
+
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+
+---
+## GLMMで登場した個体差を階層ベイズモデルで
+
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？
+
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+
+
+---
+## 階層ベイズモデルのイメージ図
+
+事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ
+
+<figure>
+<img src="../tokiomarine2021/hbm.drawio.svg">
+</figure>
+
+
+---
+## さっきの図をStan言語で記述すると
+
+お絵描きモデルとStanモデルを見比べてみよう。
+
+```{r read-glmm-stan, code = 'cat(readr::read_file("glmm.stan"))', echo = FALSE}
+```
+
+`inv_logit(a + r)` が p に相当。<br>
+`10` とか `0.01` とか、エイヤっと決めてるやつが超パラメータ。
+
+---
+## 変量効果が入った推定結果
+
+```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, message = FALSE}
+ninds = 100L
+mu_ind = 0.5
+sd_ind = 3
+df_od = tibble::tibble(
+  z = rnorm(ninds, mu_ind, sd_ind),
+  p = wtl::sigmoid(z),
+  y = rbinom(ninds, 8L, p))
+# sum_y = sum(df_od$y)
+# p_hat = sum_y / 800
+# tidy_od = df_od %>%
+#   dplyr::count(y, name = "observed") %>%
+#   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
+#   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
+#   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
+data = list(y = df_od$y, N = ninds)
+model = rstan::stan_model("glmm.stan")
+fit = rstan::sampling(model, data = data)
+```
+
+```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+---
+## 抜粋して作図。悪くない。
+
+データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。
+
+```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7}
+.pars = c("a", "s", "r[1]", "r[2]")
+p_trace = rstan::stan_trace(fit, pars = .pars, nrow = 1L) + coord_flip()
+p_hist = rstan::stan_hist(fit, pars = .pars, nrow = 1L, bins = 30)
+cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
+```
+
+
+---
+## 事前分布の選別
+
+1.  とりあえず**無情報事前分布** $[-\infty, \infty]$。Stanのデフォルト。
+
+1.  収束が悪かったら**弱情報事前分布**を試す。<br>
+    事後分布を更新していったとき**事前分布っぽさが残らない**のが良い。
+
+    - 取りうる値を逃すような狭すぎる分布はダメ。
+    - 狭すぎるよりはマシだが、広すぎても良くない。
+    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+      事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。
+
+    おすすめ: **Student's t分布**、正規分布、指数分布など。
+
+<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
+
+
+---
+## Stanおすすめ弱情報事前分布: Student's t分布
+
+Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
+
+- 自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。
+- スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
+
+```{r student_t, echo = FALSE, fig.height = 5, fig.width = 10}
+tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
+  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) %>%
+  ggplot() + aes(x, Density, group = df) +
+  geom_line(aes(color = nu), size = 1, alpha = 0.7) +
+  scale_color_viridis_d(end = 0.88, direction = 1, guide = guide_legend(reverse = TRUE)) +
+  scale_x_continuous(breaks = c(-1, 0, 1), labels = c(expression(-sigma), 0, expression(sigma))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank())
+```
+
+正の値しか取らない場合は `<lower=0>` として右半分だけ使うとか。
+
+
+---
+## 非線形回帰の例: データ
+
+刺激強度xに対する応答強度yを20個体調査。<br>
+非対称なひと山。応答変数も説明変数も正の値。
+
+<div>\[\begin{split}
+y = ae ^ {-bx} - ce ^ {-dx}
+\end{split}\]</div>
+
+```{r non-linear, echo = FALSE, fig.width = 10, fig.height = 5}
+expo = function(x, y0, lambda) y0 * exp(- lambda * x)
+
+genfunc = function(params) {
+  function(x) {
+    expo(x, params["a"], params["b"]) - expo(x, params["c"], params["d"])
+  }
+}
+
+params = c(a = 0.08, b = 0.01, c = 0.05, d = 0.05)
+func = genfunc(params)
+n_inds = 20L
+sd_inds = 0.005
+shape = 60
+min_ipi = 5
+intercept = sort(rnorm(n_inds, 0, sd_inds))
+df = tidyr::crossing(id = seq_len(n_inds), x = seq(min_ipi, 105, 10)) %>%
+  dplyr::mutate(y = rgamma(length(x), shape = shape, scale = (func(x) + intercept[id]) / shape))
+
+p_base = ggplot(df) + aes(x, y) +
+  geom_point(aes(color = id), alpha = 0.7, shape = 16, size = 3) +
+  geom_line(aes(color = id, group = id), alpha = 0.2) +
+  xlim(0, NA) + ylim(0, NA) +
+  geom_function(fun = func) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+p_base
+```
+
+---
+## 非線形回帰の例: Stanコード
+
+```stan
+data {
+  int<lower=1> N;
+  vector[N] x;
+  vector[N] y;
+  int id[N];
+  int<lower=1> Ninds;
+}
+
+parameters {
+  real a;
+  real d;
+  real<upper=a> c;
+  real<upper=d> b;
+  real shape;
+  vector[Ninds] intercept;
+}
+
+model {
+  vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
+  y ~ gamma(shape, shape ./ mu);
+  a ~ exponential(1);
+  b ~ exponential(1);
+  c ~ exponential(1);
+  d ~ exponential(1);
+  shape ~ exponential(0.001);
+  intercept ~ normal(0, 0.005);
+}
+```
+
+
+---
+## ベイズ推定まとめ
+
+- 条件付き確率 $\text{Prob}(B \mid A)$ の理解が大事。
+    - 事後分布 $\propto$ 尤度 ⨉ 事前分布
+    - 確信度合いをデータで更新していく。
+- 推定結果は分布そのもの。
+    - そこから点推定も区間推定も可能。
+- 解析的に解けない問題は計算機に乱数を振らせて解く。
+    - 理論・技術の進歩が目覚ましい。
+
+
+---
+## 回帰分析ふりかえり
+
+より柔軟にモデルを記述できるようになった。計算方法も変化。
+
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 全体まとめ
+
+- 統計とは、データをうまくまとめ、それに基づいて推論するための手法。
+- モデルには**理解志向**と**応用志向**があり、統計モデルは前者寄り。
+    - どちらも多少は分かった上で使い分けたい。
+    - どっちにしろ真の正しい何かではない。
+- **確率分布**とその背後にある**確率過程**の理解が重要。
+    - 乱数生成→作図を繰り返してイメージを掴もう。
+    - MCMCサンプリングも事後分布からの乱数生成。
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+
+<a href="." class="readmore">
+目次に戻る
+</a>
