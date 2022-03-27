@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.89.4" />
+<meta name="generator" content="Hugo 0.96.0" />
 <link rel="stylesheet" href="/lib/katex/katex.min.css">
 <script defer src="/lib/katex/katex.min.js"></script>
 <script defer src="/lib/katex/contrib/auto-render.min.js"></script>
@@ -103,8 +103,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="そもそもなぜ解析-生の数字見ればよくない">そもそもなぜ解析？ 生の数字見ればよくない？</h2>
 <p>生データは情報が多すぎて関係性も何も見えない</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
       &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
     1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
     2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
@@ -121,16 +121,16 @@ if (!doNotTrack) {
 <section>
 <h2 id="要約統計量平均とか分散とかを見てみる">要約統計量(平均とか分散とか)を見てみる</h2>
 <p>まあ何となく分かった気になる</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize_if</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">is.numeric</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      carat   depth    table  price        x        y        z
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize_if</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">is.numeric</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat   depth    table  price        x        y        z
       &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
 1 0.7979397 61.7494 57.45718 3932.8 5.731157 5.734526 3.538734
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize_if</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">is.numeric</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      carat    depth    table   price        x        y         z
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize_if</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">is.numeric</span><span class="p">,</span> <span class="n">sd</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat    depth    table   price        x        y         z
       &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
 1 0.4740112 1.432621 2.234491 3989.44 1.121761 1.142135 0.7056988
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">summary</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>     carat               cut        color        clarity          depth           table           price             x                y                z         
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">summary</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     carat               cut        color        clarity          depth           table           price             x                y                z         
  Min.   :0.2000   Fair     : 1610   D: 6775   SI1    :13065   Min.   :43.00   Min.   :43.00   Min.   :  326   Min.   : 0.000   Min.   : 0.000   Min.   : 0.000  
  1st Qu.:0.4000   Good     : 4906   E: 9797   VS2    :12258   1st Qu.:61.00   1st Qu.:56.00   1st Qu.:  950   1st Qu.: 4.710   1st Qu.: 4.720   1st Qu.: 2.910  
  Median :0.7000   Very Good:12082   F: 9542   SI2    : 9194   Median :61.80   Median :57.00   Median : 2401   Median : 5.700   Median : 5.710   Median : 3.530  
@@ -201,8 +201,8 @@ but every messy dataset is messy in its own way<br>
 <cite style="display: block; text-align: right;">
 <a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
 </cite>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
       &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
     1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
     2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
@@ -303,16 +303,16 @@ but every messy dataset is messy in its own way<br>
 <section>
 <h2 id="整然データのご利益">整然データのご利益</h2>
 <p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
-  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">cut</span><span class="p">)</span>
-</code></pre></div><p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">cut</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
 
 </section>
 <section>
 <h2 id="本日2時限目の話題-データ変形整形">本日2時限目の話題: データ変形・整形</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">VADeaths</span>
-</code></pre></div><pre tabindex="0"><code>      Rural Male Rural Female Urban Male Urban Female
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">VADeaths</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      Rural Male Rural Female Urban Male Urban Female
 50-54       11.7          8.7       15.4          8.4
 55-59       18.1         11.7       24.3         13.6
 60-64       26.9         20.3       37.0         19.3
@@ -595,26 +595,26 @@ but every messy dataset is messy in its own way<br>
 </section>
 <section>
 <h2 id="変数オブジェクトを作ってみよう">変数/オブジェクトを作ってみよう</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
-<span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
-</code></pre></div><pre tabindex="0"><code>[1] 42
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
-<span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
-</code></pre></div><pre tabindex="0"><code>[1] &quot;24601&quot;
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error!</span>
-</code></pre></div><pre tabindex="0"><code>Error in x + y: non-numeric argument to binary operator
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 42
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;24601&#34;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error!</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Error in x + y: non-numeric argument to binary operator
 </code></pre>
 </section>
 <section>
 <h2 id="変数オブジェクトの型">変数/オブジェクトの型</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] &quot;numeric&quot;
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] TRUE
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">is.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] FALSE
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] &quot;42&quot;
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;numeric&#34;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">is.numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] TRUE
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">is.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] FALSE
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;42&#34;
 </code></pre><p>さっき作った <code>y</code> にも同じ関数を適用してみよう。</p>
 
 </section>
@@ -642,27 +642,27 @@ but every messy dataset is messy in its own way<br>
 <h2 id="vector-一次元の配列">vector: 一次元の配列</h2>
 <p>1個の値でもベクトル扱い。<br>
 同じ長さ(または長さ1)の相手との計算が得意。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
-<span class="n">x</span> <span class="o">+</span> <span class="n">x</span>           <span class="c1"># 同じ長さ同士の計算</span>
-</code></pre></div><pre tabindex="0"><code>[1]  2  4 18
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">y</span> <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
-<span class="n">x</span> <span class="o">+</span> <span class="n">y</span>           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span>
-</code></pre></div><pre tabindex="0"><code>[1] 11 12 19
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># square root</span>
-</code></pre></div><pre tabindex="0"><code>[1] 1.000000 1.414214 3.000000
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1"># We don&#39;t have to write for-loop like this</span>
-<span class="n">z</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
-<span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
-  <span class="n">z[i]</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x[i]</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">x</span>           <span class="c1"># 同じ長さ同士の計算</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1]  2  4 18
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 11 12 19
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># square root</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 1.000000 1.414214 3.000000
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># We don&#39;t have to write for-loop like this</span>
+</span></span><span class="line"><span class="cl"><span class="n">z</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="nf">seq_len</span><span class="p">(</span><span class="m">3</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">z[i]</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x[i]</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="dataframe-長方形のテーブル-重要">data.frame: 長方形のテーブル (重要!)</h2>
 <p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
 Rに最初から入ってて、例としてよく使われる。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
            &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;fct&gt;
   1          5.1         3.5          1.4         0.2    setosa
   2          4.9         3.0          1.4         0.2    setosa
@@ -679,40 +679,40 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <section>
 <h2 id="dataframeを眺める">data.frameを眺める</h2>
 <p>概要を掴む:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>   <span class="c1"># 先頭だけ見てみる</span>
-<span class="nf">nrow</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 行数: Number of ROWs</span>
-<span class="nf">ncol</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 列数: Number of COLumns</span>
-<span class="nf">names</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>     <span class="c1"># 列名</span>
-<span class="nf">summary</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>   <span class="c1"># 要約</span>
-<span class="nf">View</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># RStudioで閲覧</span>
-</code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">str</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>       <span class="c1"># 構造が分かる形で表示</span>
-</code></pre></div><pre tabindex="0"><code>tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>   <span class="c1"># 先頭だけ見てみる</span>
+</span></span><span class="line"><span class="cl"><span class="nf">nrow</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 行数: Number of ROWs</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ncol</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 列数: Number of COLumns</span>
+</span></span><span class="line"><span class="cl"><span class="nf">names</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>     <span class="c1"># 列名</span>
+</span></span><span class="line"><span class="cl"><span class="nf">summary</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>   <span class="c1"># 要約</span>
+</span></span><span class="line"><span class="cl"><span class="nf">View</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># RStudioで閲覧</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">str</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>       <span class="c1"># 構造が分かる形で表示</span>
+</span></span></code></pre></div><pre tabindex="0"><code>tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
  $ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
  $ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
  $ Petal.Length: num [1:150] 1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
  $ Petal.Width : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
- $ Species     : Factor w/ 3 levels &quot;setosa&quot;,&quot;versicolor&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+ $ Species     : Factor w/ 3 levels &#34;setosa&#34;,&#34;versicolor&#34;,..: 1 1 1 1 1 1 1 1 1 1 ...
 </code></pre><p>ほかのデータもいろいろ見てみよう, e.g., <code>mtcars</code>, <code>quakes</code>, <code>data()</code></p>
 
 </section>
 <section>
 <h2 id="dataframeを眺める">data.frameを眺める</h2>
 <p>部分的なdata.frameを取得する:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
-<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
-<span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
-<span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
-</code></pre></div><p>vectorとして取得する:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[[3]]</span>                  <span class="c1"># 3列目</span>
-<span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># Petal.Length列</span>
-<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># Petal.Length列</span>
-<span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># Petal.Length列の2番目</span>
-</code></pre></div><p>結果がdata.frameになるかvectorになるか微妙:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
-<span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
-<span class="n">iris[2</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                 <span class="c1"># 2行目3列目</span>
-<span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
+</span></span></code></pre></div><p>vectorとして取得する:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[[3]]</span>                  <span class="c1"># 3列目</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># Petal.Length列</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># Petal.Length列</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># Petal.Length列の2番目</span>
+</span></span></code></pre></div><p>結果がdata.frameになるかvectorになるか微妙:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                 <span class="c1"># 2行目3列目</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="行-row-列-column-の憶え方">行 (row), 列 (column) の憶え方</h2>
@@ -738,11 +738,11 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <section>
 <h2 id="dataframeの新規作成">data.frameの新規作成</h2>
 <p>同じ長さの <strong>列(column) vector</strong> を結合して作る:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
-<span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
-<span class="n">mydata</span> <span class="o">=</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>  x y
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">mydata</span> <span class="o">=</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  x y
 1 1 A
 2 2 B
 3 3 C
@@ -759,17 +759,17 @@ Rに最初から入ってて、例としてよく使われる。</p>
 </li>
 <li>
 <p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
-<span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
-<span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
-</code></pre></div></li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span> <span class="c1"># R標準の read.table() とかは難しいので</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>            <span class="c1"># パッケージのやつを使うよ</span>
+</span></span><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
+</span></span></code></pre></div></li>
 <li>
 <p>現在の作業ディレクトリとその中身を確認しておこう:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get Working Directory</span>
-<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
-<span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
-</code></pre></div></li>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get Working Directory</span>
+</span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
+</span></span></code></pre></div></li>
 </ul>
 <p>R組み込みデータや自作データを読み書きしてみよう</p>
 
@@ -786,10 +786,10 @@ Rに最初から入ってて、例としてよく使われる。</p>
 にまとめて公開されている。</dd>
 <dd>要インストール。使う前に読み込むおまじないが必要。</dd>
 </dl>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
-<span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
-</code></pre></div><dl>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
+</span></span><span class="line"><span class="cl"><span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
+</span></span></code></pre></div><dl>
 <dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
 <dd>大丈夫。誰も覚えきってない。</dd>
 <dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
@@ -802,10 +802,10 @@ Rに最初から入ってて、例としてよく使われる。</p>
 <img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
 </a>
 <p>Rでデータを上手に扱うためのパッケージ群</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
-<span class="c1"># 関連パッケージが一挙に読み込まれる</span>
-</code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 関連パッケージが一挙に読み込まれる</span>
+</span></span></code></pre></div><ul>
 <li>統一的な使い勝手</li>
 <li>暗黙の処理をなるべくしない安全設計</li>
 <li>シンプルな関数を繋げて使うデザイン</li>

@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.89.4" />
+<meta name="generator" content="Hugo 0.96.0" />
 <link rel="stylesheet" href="/lib/katex/katex.min.css">
 <script defer src="/lib/katex/katex.min.js"></script>
 <script defer src="/lib/katex/contrib/auto-render.min.js"></script>
@@ -97,8 +97,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="データ解析って必要-生データ見ればいいべ">データ解析って必要？ 生データ見ればいいべ？</h2>
 <p>往々にして複雑過ぎ、情報多すぎ、そのままでは手に負えない</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
       &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
     1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
     2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
@@ -359,10 +359,10 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 </section>
 <section>
 <h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
-<span class="n">result</span><span class="o">$</span><span class="n">par</span>
-</code></pre></div><pre tabindex="0"><code>intercept     slope 
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">$</span><span class="n">par</span>
+</span></span></code></pre></div><pre tabindex="0"><code>intercept     slope 
 -66.63000  77.04308 
 </code></pre><p><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
 
@@ -624,15 +624,15 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <p>コンピューター上でランダム<strong>っぽい</strong>数値を出力する装置。<br>
 実際には<strong>決定論的</strong>に計算されているので、<br>
 シード(出発点)と呼び出し回数が同じなら出る数も同じになる。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
-<span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
-<span class="c1"># 0.9148060 0.9370754 0.2861395</span>
-<span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
-<span class="c1"># 0.8304476 0.6417455 0.5190959</span>
-<span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
-<span class="nf">runif</span><span class="p">(</span><span class="m">6L</span><span class="p">)</span>
-<span class="c1"># 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959</span>
-</code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0.9148060 0.9370754 0.2861395</span>
+</span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0.8304476 0.6417455 0.5190959</span>
+</span></span><span class="line"><span class="cl"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">6L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959</span>
+</span></span></code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
 ただし「このシードじゃないと良い結果が出ない」はダメ。</p>
 <p>さまざまな「分布に従う」乱数を生成することもできる。</p>
 
@@ -641,19 +641,19 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
 <p>🔰 <code>?rbinom</code> などヘルプを参照しつつたくさん試そう。</p>
 <p>🔰 e.g., 1%の当たりを狙って100連ガチャを回した場合とか</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">n</span> <span class="o">=</span> <span class="m">100</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">sample.int</span><span class="p">(</span><span class="m">6</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">min</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rgeom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rpois</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lambda</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-<span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">()</span> <span class="c1"># for continuous values</span>
-<span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">()</span>       <span class="c1"># for discrete values</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">100</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">sample.int</span><span class="p">(</span><span class="m">6</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">min</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rgeom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rpois</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lambda</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">()</span> <span class="c1"># for continuous values</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">()</span>       <span class="c1"># for discrete values</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
@@ -1270,11 +1270,11 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="c1"># install.packages(&#34;palmerpenguins&#34;)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
-<span class="n">penguins_colors</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">Adelie</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">Chinstrap</span> <span class="o">=</span> <span class="s">&#34;purple&#34;</span><span class="p">,</span> <span class="n">Gentoo</span> <span class="o">=</span> <span class="s">&#34;cyan4&#34;</span><span class="p">)</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;palmerpenguins&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">penguins_colors</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">Adelie</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">Chinstrap</span> <span class="o">=</span> <span class="s">&#34;purple&#34;</span><span class="p">,</span> <span class="n">Gentoo</span> <span class="o">=</span> <span class="s">&#34;cyan4&#34;</span><span class="p">)</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="penguinsデータセット">penguinsデータセット</h2>
@@ -1299,25 +1299,25 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <section>
 <h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
 <p>どうやら、重いペンギンほど翼長も長い。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">,</span> <span class="n">flipper_length_mm</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_point</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.66</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">theme</span><span class="p">(</span><span class="n">panel.grid.minor</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">())</span>
-<span class="n">p_penweight</span>
-</code></pre></div><p><img src="figure/penguins-weight-1.png" alt="plot of chunk penguins-weight"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">,</span> <span class="n">flipper_length_mm</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.66</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme</span><span class="p">(</span><span class="n">panel.grid.minor</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_penweight</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-1.png" alt="plot of chunk penguins-weight"></p>
 
 </section>
 <section>
 <h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
-<span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>         term     estimate   std.error statistic       p.value
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>         term     estimate   std.error statistic       p.value
         &lt;chr&gt;        &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
 1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
 2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC     BIC deviance df.residual  nobs
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC     BIC deviance df.residual  nobs
           &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
 1      67426.54     341 -1145.518 2297.035 2308.54  16250.3         340   342
 </code></pre>
@@ -1325,47 +1325,47 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <section>
 <h2 id="単回帰の練習-3-フィッティング結果を作図">単回帰の練習: 3. フィッティング結果を作図</h2>
 <p>$y = 136.7 + 0.0153 x$</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">added1</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit1</span><span class="p">)</span>
-<span class="n">p1</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span>
-  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
-<span class="n">p1</span>
-</code></pre></div><p><img src="figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added1</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added1</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm"></p>
 
 </section>
 <section>
 <h2 id="重回帰の練習-1-まず作図">重回帰の練習: 1. まず作図</h2>
 <p>重いペンギンほど翼長も長い。翼長は種によっても違うかも。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">p_penweight_color</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span>
-<span class="n">p_penweight_color</span>
-</code></pre></div><p><img src="figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight_color</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_penweight_color</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp"></p>
 
 </section>
 <section>
 <h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
 <p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のときより小さい。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
-<span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
              &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
 1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
 2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
 3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
 4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
           &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
 1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
 </code></pre>
 </section>
 <section>
 <h2 id="重回帰の練習-3-フィッティング結果を作図">重回帰の練習: 3. フィッティング結果を作図</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">added2</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit2</span><span class="p">)</span>
-<span class="n">p2</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
-  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added2</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
-<span class="n">p2</span>
-</code></pre></div><p><img src="figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added2</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added2</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p2</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm"></p>
 <p><strong>傾き</strong>も種によって違うかも。<strong>交互作用</strong>を入れてみたい。</p>
 
 </section>
@@ -1373,34 +1373,34 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
 <p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
-<span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
              &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
 1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
 2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
 3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
 4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
           &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
 1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
 </code></pre>
 </section>
 <section>
 <h2 id="交互作用の練習-フィッティング結果を作図">交互作用の練習: フィッティング結果を作図</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">added3</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit3</span><span class="p">)</span>
-<span class="n">p3</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
-  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added3</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
-<span class="n">p3</span>
-</code></pre></div><p><img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added3</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit3</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added3</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p3</span>
+</span></span></code></pre></div><p><img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction"></p>
 
 </section>
 <section>
 <h2 id="ここまでの3つのモデルでどれがいいか">ここまでの3つのモデルでどれがいいか？</h2>
 <p>AICで選ぶなら交互作用入り重回帰のが良さそう。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">AIC</span><span class="p">(</span><span class="n">fit1</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">fit3</span><span class="p">)</span><span class="o">$</span><span class="n">AIC</span>
-</code></pre></div><p><img src="figure/penguins-aic-1.png" alt="plot of chunk penguins-aic"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">AIC</span><span class="p">(</span><span class="n">fit1</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">fit3</span><span class="p">)</span><span class="o">$</span><span class="n">AIC</span>
+</span></span></code></pre></div><p><img src="figure/penguins-aic-1.png" alt="plot of chunk penguins-aic"></p>
 
 </section>
 <section>
@@ -1413,15 +1413,15 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <section>
 <h2 id="確率分布とリンク関数を明示的に指定したい">確率分布とリンク関数を明示的に指定したい</h2>
 <p>何も指定しない場合は正規分布・恒等リンクだった:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">formula</span> <span class="o">=</span> <span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span>
-<span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
-<span class="n">fit1</span><span class="o">$</span><span class="n">family</span>
-</code></pre></div><pre tabindex="0"><code>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit1</span><span class="o">$</span><span class="n">family</span>
+</span></span></code></pre></div><pre tabindex="0"><code>
 Family: gaussian 
 Link function: identity 
 </code></pre><p>こう書いたのと同じ:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">identity</span><span class="p">))</span>
-</code></pre></div><p>利用可能な確率分布リンク関数は <code>?family</code> などを参照。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">identity</span><span class="p">))</span>
+</span></span></code></pre></div><p>利用可能な確率分布リンク関数は <code>?family</code> などを参照。</p>
 
 </section>
 <section>

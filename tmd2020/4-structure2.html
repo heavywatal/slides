@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.89.4" />
+<meta name="generator" content="Hugo 0.96.0" />
 <link rel="stylesheet" href="/lib/katex/katex.min.css">
 <script defer src="/lib/katex/katex.min.js"></script>
 <script defer src="/lib/katex/contrib/auto-render.min.js"></script>
@@ -132,8 +132,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="行の結合-bind_rows">行の結合: <code>bind_rows()</code></h2>
 <p>例。先頭と末尾を6行ずつ取ってひとつの表に結合する:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">bind_rows</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">diamonds</span><span class="p">),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">diamonds</span><span class="p">))</span>
-</code></pre></div><pre tabindex="0"><code>   carat       cut color clarity depth table price     x     y     z
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">bind_rows</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="n">diamonds</span><span class="p">),</span> <span class="nf">tail</span><span class="p">(</span><span class="n">diamonds</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   carat       cut color clarity depth table price     x     y     z
    &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
  1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
  2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
@@ -150,8 +150,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="共通する列で結合-full_join">共通する列で結合: <code>full_join()</code></h2>
 <p>他方に無い部分を <code>NA</code> で補完して<strong>左右とも全行</strong>保持:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">full_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>   name    band  plays
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">full_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   name    band  plays
   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
 1  Mick  Stones   &lt;NA&gt;
 2  John Beatles guitar
@@ -169,8 +169,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="共通する列で結合-full_join">共通する列で結合: <code>full_join()</code></h2>
 <p>結合に使う列の名前が違ってても大丈夫:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">full_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments2</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#34;artist&#34;</span><span class="p">))</span>
-</code></pre></div><pre tabindex="0"><code>   name    band  plays
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">full_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments2</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&#34;artist&#34;</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   name    band  plays
   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
 1  Mick  Stones   &lt;NA&gt;
 2  John Beatles guitar
@@ -188,8 +188,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="共通する列で結合-left_join">共通する列で結合: <code>left_join()</code></h2>
 <p>右側に無い部分を <code>NA</code> で補完して<strong>左側だけ全行</strong>保持:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">left_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>   name    band  plays
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">left_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   name    band  plays
   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
 1  Mick  Stones   &lt;NA&gt;
 2  John Beatles guitar
@@ -207,8 +207,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="共通する列で結合-inner_join">共通する列で結合: <code>inner_join()</code></h2>
 <p>左右ともに<strong>共通する値のある行だけ</strong>保持:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">inner_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>   name    band  plays
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">inner_join</span><span class="p">(</span><span class="n">band_members</span><span class="p">,</span> <span class="n">band_instruments</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="s">&#34;name&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   name    band  plays
   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;
 1  John Beatles guitar
 2  Paul Beatles   bass
@@ -235,11 +235,11 @@ if (!doNotTrack) {
 <section>
 <h2 id="join例題-nycflights13-データセット">join例題: <code>nycflights13</code> データセット</h2>
 <p>🔰 関連するdata.frameをいろいろな方法で結合してみよう。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="n">nycflights13</span><span class="p">)</span>
-<span class="nf">data</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
-<span class="c1"># airlines, airports, flights, planes, weather</span>
-</code></pre></div><figure>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">nycflights13</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">data</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># airlines, airports, flights, planes, weather</span>
+</span></span></code></pre></div><figure>
 <a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
 <img src="/slides/image/r4ds/relational-nycflights.png" height="320">
 <br>
@@ -281,8 +281,8 @@ if (!doNotTrack) {
 <h2 id="pivot_longer-横広から縦長に-relig_income-の例"><code>pivot_longer()</code> 横広から縦長に: <code>relig_income</code> の例</h2>
 <p>宗教と収入の関係を調査したデータ。<br>
 世帯数のカウントが複数列にまたがっている。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">relig_income</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>                religion &lt;$10k $10-20k $20-30k $30-40k $40-50k $50-75k $75-100k $100-150k &gt;150k Don't know/refused
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">relig_income</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                religion &lt;$10k $10-20k $20-30k $30-40k $40-50k $50-75k $75-100k $100-150k &gt;150k Don&#39;t know/refused
                    &lt;chr&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;              &lt;dbl&gt;
  1              Agnostic    27      34      60      81      76     137      122       109    84                 96
  2               Atheist    12      27      37      52      35      70       73        59    74                 76
@@ -301,8 +301,8 @@ if (!doNotTrack) {
 こうなってたらggplotできるのに。</p>
 <div class="column-container">
 <div class="column">
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">relig_long</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>        religion             income count
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">relig_long</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>        religion             income count
            &lt;chr&gt;              &lt;chr&gt; &lt;dbl&gt;
   1     Agnostic              &lt;$10k    27
   2     Agnostic            $10-20k    34
@@ -312,7 +312,7 @@ if (!doNotTrack) {
 177 Unaffiliated           $75-100k   407
 178 Unaffiliated          $100-150k   321
 179 Unaffiliated              &gt;150k   258
-180 Unaffiliated Don't know/refused   597
+180 Unaffiliated Don&#39;t know/refused   597
 </code></pre></div>
 <div class="column">
 <p><img src="figure/relig_income-plot-1.png" alt="plot of chunk relig_income-plot"></p>
@@ -323,10 +323,10 @@ if (!doNotTrack) {
 <h2 id="pivot_longer-横広から縦長に-relig_income-の例"><code>pivot_longer()</code> 横広から縦長に: <code>relig_income</code> の例</h2>
 <p>複数列にまたがっている世帯数カウントを <code>count</code> 1列に移動。<br>
 列名になってた収入帯を <code>income</code> 列に移動。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">relig_long</span> <span class="o">=</span> <span class="n">relig_income[1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="n">]</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span> <span class="o">%&gt;%</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">!</span><span class="n">religion</span><span class="p">,</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;income&#34;</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;count&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre tabindex="0"><code>  religion &lt;$10k $10-20k $20-30k
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">relig_long</span> <span class="o">=</span> <span class="n">relig_income[1</span><span class="o">:</span><span class="m">2</span><span class="p">,</span> <span class="m">1</span><span class="o">:</span><span class="m">4</span><span class="n">]</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">!</span><span class="n">religion</span><span class="p">,</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;income&#34;</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;count&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  religion &lt;$10k $10-20k $20-30k
      &lt;chr&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
 1 Agnostic    27      34      60
 2  Atheist    12      27      37
@@ -344,8 +344,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="pivot_longer-横広から縦長に-練習問題"><code>pivot_longer()</code> 横広から縦長に: 練習問題</h2>
 <p>🔰 <code>world_bank_pop</code> の人口データを縦長にしてみよう</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005          2006          2007          2008          2009          2010         2011         2012         2013         2014         2015         2016         2017
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005          2006          2007          2008          2009          2010         2011         2012         2013         2014         2015         2016         2017
        &lt;chr&gt;       &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
    1     ABW SP.URB.TOTL 4.244400e+04 4.304800e+04 4.367000e+04 4.424600e+04 4.466900e+04 4.488900e+04  4.488100e+04  4.468600e+04  4.437500e+04  4.405200e+04  4.377800e+04 4.382200e+04 4.406400e+04 4.436000e+04 4.467400e+04 4.497900e+04 4.527500e+04 4.557200e+04
    2     ABW SP.URB.GROW 1.182632e+00 1.413021e+00 1.434560e+00 1.310360e+00 9.514777e-01 4.913027e-01 -1.782333e-02 -4.354289e-01 -6.984006e-01 -7.305493e-01 -6.239346e-01 1.004566e-01 5.507148e-01 6.695040e-01 7.053514e-01 6.804037e-01 6.559290e-01 6.538489e-01
@@ -376,8 +376,8 @@ if (!doNotTrack) {
 既にggplotしやすそうな形だけど、あえて1魚1行の横広にしたい。</p>
 <div class="column-container">
 <div class="column">
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">fish_encounters</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>     fish station  seen
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fish_encounters</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     fish station  seen
     &lt;fct&gt;   &lt;fct&gt; &lt;int&gt;
   1  4842 Release     1
   2  4842   I80_1     1
@@ -390,8 +390,8 @@ if (!doNotTrack) {
 114  4865  Lisbon     1
 </code></pre></div>
 <div class="column">
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">fish_wide</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>    fish Release I80_1 Lisbon  Rstr Base_TD   BCE   BCW  BCE2  BCW2   MAE   MAW
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fish_wide</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    fish Release I80_1 Lisbon  Rstr Base_TD   BCE   BCW  BCE2  BCW2   MAE   MAW
    &lt;fct&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
  1  4842       1     1      1     1       1     1     1     1     1     1     1
  2  4843       1     1      1     1       1     1     1     1     1     1     1
@@ -409,9 +409,9 @@ if (!doNotTrack) {
 <h2 id="pivot_wider-縦長から横広に-fish_encounters"><code>pivot_wider()</code> 縦長から横広に: <code>fish_encounters</code></h2>
 <p>観測地点 <code>station</code> を列名に移動。<br>
 観察されたかどうか <code>seen</code> を各列に移動。存在しなければ <code>NA</code></p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">fish_encounters</span> <span class="o">%&gt;%</span>
-  <span class="nf">pivot_wider</span><span class="p">(</span><span class="n">names_from</span> <span class="o">=</span> <span class="n">station</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">seen</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>    fish Release I80_1 Lisbon  Rstr Base_TD   BCE   BCW  BCE2  BCW2   MAE   MAW
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fish_encounters</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_wider</span><span class="p">(</span><span class="n">names_from</span> <span class="o">=</span> <span class="n">station</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">seen</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    fish Release I80_1 Lisbon  Rstr Base_TD   BCE   BCW  BCE2  BCW2   MAE   MAW
    &lt;fct&gt;   &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;
  1  4842       1     1      1     1       1     1     1     1     1     1     1
  2  4843       1     1      1     1       1     1     1     1     1     1     1
@@ -429,8 +429,8 @@ if (!doNotTrack) {
 <h2 id="pivot_wider-縦長から横広に-練習問題"><code>pivot_wider()</code> 縦長から横広に: 練習問題</h2>
 <p>🔰 <code>population</code> で1年のデータが1行になるように変形しよう<br>
 🔰 <code>population</code> で1国のデータが1行になるように変形しよう</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>         country  year population
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">population</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>         country  year population
            &lt;chr&gt; &lt;int&gt;      &lt;int&gt;
    1 Afghanistan  1995   17586073
    2 Afghanistan  1996   18415307
@@ -442,8 +442,8 @@ if (!doNotTrack) {
 4059    Zimbabwe  2012   13724317
 4060    Zimbabwe  2013   14149648
 </code></pre><p>🔰 <code>us_rent_income</code> で <code>income</code> と <code>rent</code> の推定値がそれぞれ列となるように変形しよう</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">us_rent_income</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>    GEOID        NAME variable estimate   moe
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">us_rent_income</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    GEOID        NAME variable estimate   moe
     &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;    &lt;dbl&gt; &lt;dbl&gt;
   1    01     Alabama   income    24476   136
   2    01     Alabama     rent      747     3
@@ -470,8 +470,8 @@ if (!doNotTrack) {
 <h2 id="separate-列を分離-table3"><code>separate()</code> 列を分離: <code>table3</code></h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#separate">R for Data Science</a>
 に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      country  year              rate
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      country  year              rate
         &lt;chr&gt; &lt;int&gt;             &lt;chr&gt;
 1 Afghanistan  1999      745/19987071
 2 Afghanistan  2000     2666/20595360
@@ -485,8 +485,8 @@ if (!doNotTrack) {
 <h2 id="separate-列を分離-table3"><code>separate()</code> 列を分離: <code>table3</code></h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#separate">R for Data Science</a>
 に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table3</span> <span class="o">%&gt;%</span> <span class="nf">separate</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">into</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;cases&#34;</span><span class="p">,</span> <span class="s">&#34;population&#34;</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;/&#34;</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      country  year  cases population
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">table3</span> <span class="o">%&gt;%</span> <span class="nf">separate</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">into</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;cases&#34;</span><span class="p">,</span> <span class="s">&#34;population&#34;</span><span class="p">),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;/&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      country  year  cases population
         &lt;chr&gt; &lt;int&gt;  &lt;chr&gt;      &lt;chr&gt;
 1 Afghanistan  1999    745   19987071
 2 Afghanistan  2000   2666   20595360
@@ -511,8 +511,8 @@ if (!doNotTrack) {
 <h2 id="unite-列を融合-table5"><code>unite()</code> 列を融合: <code>table5</code></h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#unite">R for Data Science</a>
 に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table5</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      country century  year              rate
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">table5</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      country century  year              rate
         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;             &lt;chr&gt;
 1 Afghanistan      19    99      745/19987071
 2 Afghanistan      20    00     2666/20595360
@@ -526,10 +526,10 @@ if (!doNotTrack) {
 <h2 id="unite-列を融合-table5"><code>unite()</code> 列を融合: <code>table5</code></h2>
 <p><a href="https://r4ds.had.co.nz/tidy-data.html#unite">R for Data Science</a>
 に登場するお試しデータ。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">table5</span> <span class="o">%&gt;%</span>
-  <span class="nf">unite</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">century</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">mutate</span><span class="p">(</span><span class="n">year</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
-</code></pre></div><pre tabindex="0"><code>      country  year              rate
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">table5</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">unite</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">century</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s">&#34;&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">mutate</span><span class="p">(</span><span class="n">year</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">(</span><span class="n">year</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      country  year              rate
         &lt;chr&gt; &lt;int&gt;             &lt;chr&gt;
 1 Afghanistan  1999      745/19987071
 2 Afghanistan  2000     2666/20595360
@@ -545,8 +545,8 @@ if (!doNotTrack) {
 <h2 id="separate--unite-練習問題"><code>separate()</code> / <code>unite()</code> 練習問題</h2>
 <p>🔰 <code>table3</code> の <code>rate</code> を分割したあと、また元に戻してみよう。</p>
 <p>🔰 <code>table3</code> の <code>year</code> を分割して <code>table5</code> を作ってみよう。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      country  year              rate
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      country  year              rate
         &lt;chr&gt; &lt;int&gt;             &lt;chr&gt;
 1 Afghanistan  1999      745/19987071
 2 Afghanistan  2000     2666/20595360
@@ -555,8 +555,8 @@ if (!doNotTrack) {
 5       China  1999 212258/1272915272
 6       China  2000 213766/1280428583
 </code></pre><p>🔰 <code>world_bank_pop</code> の <code>indicator</code> を3列に分割してみよう。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005          2006          2007          2008          2009          2010         2011         2012         2013         2014         2015         2016         2017
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005          2006          2007          2008          2009          2010         2011         2012         2013         2014         2015         2016         2017
        &lt;chr&gt;       &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;
    1     ABW SP.URB.TOTL 4.244400e+04 4.304800e+04 4.367000e+04 4.424600e+04 4.466900e+04 4.488900e+04  4.488100e+04  4.468600e+04  4.437500e+04  4.405200e+04  4.377800e+04 4.382200e+04 4.406400e+04 4.436000e+04 4.467400e+04 4.497900e+04 4.527500e+04 4.557200e+04
    2     ABW SP.URB.GROW 1.182632e+00 1.413021e+00 1.434560e+00 1.310360e+00 9.514777e-01 4.913027e-01 -1.782333e-02 -4.354289e-01 -6.984006e-01 -7.305493e-01 -6.239346e-01 1.004566e-01 5.507148e-01 6.695040e-01 7.053514e-01 6.804037e-01 6.559290e-01 6.538489e-01
@@ -588,14 +588,14 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <section>
 <h2 id="nest-入れ子にする"><code>nest()</code> 入れ子にする</h2>
 <p>グループ毎にdata.frameを区切ってlist型の列に入れる。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">mpg_nested</span> <span class="o">=</span> <span class="n">mpg</span> <span class="o">%&gt;%</span> <span class="nf">nest</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="n">drv</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre tabindex="0"><code>    drv                data
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mpg_nested</span> <span class="o">=</span> <span class="n">mpg</span> <span class="o">%&gt;%</span> <span class="nf">nest</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="o">-</span><span class="n">drv</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    drv                data
   &lt;chr&gt;              &lt;list&gt;
 1     f &lt;tbl_df [106 x 10]&gt;
 2     4 &lt;tbl_df [103 x 10]&gt;
 3     r  &lt;tbl_df [25 x 10]&gt;
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">mpg_nested</span><span class="o">$</span><span class="n">data[[1]]</span>
-</code></pre></div><pre tabindex="0"><code>    manufacturer  model displ  year   cyl      trans   cty   hwy    fl   class
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mpg_nested</span><span class="o">$</span><span class="n">data[[1]]</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    manufacturer  model displ  year   cyl      trans   cty   hwy    fl   class
            &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt;      &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;
   1         audi     a4   1.8  1999     4   auto(l5)    18    29     p compact
   2         audi     a4   1.8  1999     4 manual(m5)    21    29     p compact
@@ -610,8 +610,8 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="少し前に出てきたこれそろそろできるのでは">少し前に出てきたこれ、そろそろできるのでは</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      Rural Male Rural Female Urban Male Urban Female
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      Rural Male Rural Female Urban Male Urban Female
 50-54       11.7          8.7       15.4          8.4
 55-59       18.1         11.7       24.3         13.6
 60-64       26.9         20.3       37.0         19.3
@@ -633,15 +633,15 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="ちょっと補足">ちょっと補足</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">class</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] &quot;matrix&quot; &quot;array&quot; 
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">rownames</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>[1] &quot;50-54&quot; &quot;55-59&quot; &quot;60-64&quot; &quot;65-69&quot; &quot;70-74&quot;
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">VADeaths</span> <span class="o">%&gt;%</span>
-  <span class="nf">as.data.frame</span><span class="p">()</span> <span class="o">%&gt;%</span>            <span class="c1"># dplyr/tidyrで扱うのはdata.frame</span>
-  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 行名は扱いにくいので普通の列に</span>
-  <span class="nf">print</span><span class="p">()</span>
-</code></pre></div><pre tabindex="0"><code>    age Rural Male Rural Female Urban Male Urban Female
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">class</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;matrix&#34; &#34;array&#34; 
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">rownames</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;50-54&#34; &#34;55-59&#34; &#34;60-64&#34; &#34;65-69&#34; &#34;70-74&#34;
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">VADeaths</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">as.data.frame</span><span class="p">()</span> <span class="o">%&gt;%</span>            <span class="c1"># dplyr/tidyrで扱うのはdata.frame</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># 行名は扱いにくいので普通の列に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    age Rural Male Rural Female Urban Male Urban Female
 1 50-54       11.7          8.7       15.4          8.4
 2 55-59       18.1         11.7       24.3         13.6
 3 60-64       26.9         20.3       37.0         19.3
@@ -651,9 +651,9 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="例題-vadeaths-を縦長にしてggplotしてみよう">例題: <code>VADeaths</code> を縦長にしてggplotしてみよう</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
-  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span>              <span class="c1"># 行名を列に</span>
-</code></pre></div><pre tabindex="0"><code>    age Rural Male Rural Female Urban Male Urban Female
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span>              <span class="c1"># 行名を列に</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    age Rural Male Rural Female Urban Male Urban Female
 1 50-54       11.7          8.7       15.4          8.4
 2 55-59       18.1         11.7       24.3         13.6
 3 60-64       26.9         20.3       37.0         19.3
@@ -664,11 +664,11 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="例題-vadeaths-を縦長にしたい">例題: <code>VADeaths</code> を縦長にしたい</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
-  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span>     <span class="c1"># age以外を移動して縦長化</span>
-                                         <span class="c1"># 新しいname列を分割</span>
-</code></pre></div><pre tabindex="0"><code>     age         name death
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span>     <span class="c1"># age以外を移動して縦長化</span>
+</span></span><span class="line"><span class="cl">                                         <span class="c1"># 新しいname列を分割</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     age         name death
    &lt;chr&gt;        &lt;chr&gt; &lt;dbl&gt;
  1 50-54   Rural Male  11.7
  2 50-54 Rural Female   8.7
@@ -683,11 +683,11 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="例題-vadeaths-を縦長にしたい">例題: <code>VADeaths</code> を縦長にしたい</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
-  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># age以外を移動して縦長化</span>
-  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span>     <span class="c1"># 新しいname列を分割</span>
-</code></pre></div><pre tabindex="0"><code>     age region    sex death
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>              <span class="c1"># data.frameに変換</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># age以外を移動して縦長化</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span>     <span class="c1"># 新しいname列を分割</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     age region    sex death
    &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
  1 50-54  Rural   Male  11.7
  2 50-54  Rural Female   8.7
@@ -702,13 +702,13 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="例題-vadeaths-を縦長にしたい">例題: <code>VADeaths</code> を縦長にしたい</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">va_deaths</span> <span class="o">=</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
-  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># age以外を移動して縦長化</span>
-  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 新しいname列を分割</span>
-  <span class="nf">separate</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span>
-</code></pre></div><pre tabindex="0"><code>   lbound ubound region    sex death
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">va_deaths</span> <span class="o">=</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="o">-</span><span class="n">age</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="c1"># age以外を移動して縦長化</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 新しいname列を分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">separate</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   lbound ubound region    sex death
     &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
  1     50     54  Rural   Male  11.7
  2     50     54  Rural Female   8.7
@@ -723,16 +723,16 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="例題-vadeaths-別解">例題: <code>VADeaths</code> 別解</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">va_deaths</span> <span class="o">=</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
-  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span>                          <span class="c1"># 縦長に変形したい</span>
-    <span class="o">-</span><span class="n">age</span><span class="p">,</span>                                <span class="c1"># age以外の列に入ってる値を移動</span>
-    <span class="n">names_to</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span>       <span class="c1"># 元の列名を2つに分離</span>
-    <span class="n">names_sep</span> <span class="o">=</span> <span class="s">&#34; &#34;</span><span class="p">,</span>                     <span class="c1"># スペースで切る</span>
-    <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>             <span class="c1"># 値の行き先の列名</span>
-  <span class="nf">separate</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
-  <span class="nf">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span>
-</code></pre></div><pre tabindex="0"><code>   lbound ubound region    sex death
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">va_deaths</span> <span class="o">=</span> <span class="nf">as.data.frame</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span> <span class="o">%&gt;%</span>  <span class="c1"># data.frameに変換</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># 行名を列に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span>                          <span class="c1"># 縦長に変形したい</span>
+</span></span><span class="line"><span class="cl">    <span class="o">-</span><span class="n">age</span><span class="p">,</span>                                <span class="c1"># age以外の列に入ってる値を移動</span>
+</span></span><span class="line"><span class="cl">    <span class="n">names_to</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;region&#34;</span><span class="p">,</span> <span class="s">&#34;sex&#34;</span><span class="p">),</span>       <span class="c1"># 元の列名を2つに分離</span>
+</span></span><span class="line"><span class="cl">    <span class="n">names_sep</span> <span class="o">=</span> <span class="s">&#34; &#34;</span><span class="p">,</span>                     <span class="c1"># スペースで切る</span>
+</span></span><span class="line"><span class="cl">    <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;death&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>             <span class="c1"># 値の行き先の列名</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">separate</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;lbound&#34;</span><span class="p">,</span> <span class="s">&#34;ubound&#34;</span><span class="p">),</span> <span class="s">&#34;-&#34;</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                                <span class="c1"># 下限と上限を分離</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   lbound ubound region    sex death
     &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
  1     50     54  Rural   Male  11.7
  2     50     54  Rural Female   8.7
@@ -747,20 +747,20 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 </section>
 <section>
 <h2 id="例題-vadeaths-作図例">例題: <code>VADeaths</code> 作図例</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">va_deaths</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">aes</span><span class="p">(</span><span class="n">lbound</span><span class="p">,</span> <span class="n">death</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">sex</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">region</span><span class="p">),</span> <span class="n">size</span> <span class="o">=</span> <span class="m">5</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">18</span><span class="p">)</span>
-</code></pre></div><p><img src="figure/vadeaths_plot-1.png" alt="plot of chunk vadeaths_plot"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">va_deaths</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">lbound</span><span class="p">,</span> <span class="n">death</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">sex</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="n">region</span><span class="p">),</span> <span class="n">size</span> <span class="o">=</span> <span class="m">5</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">18</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/vadeaths_plot-1.png" alt="plot of chunk vadeaths_plot"></p>
 
 </section>
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">anscombe</span> <span class="o">%&gt;%</span>
-  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span>              <span class="c1"># IDをつけておく</span>
-                                     <span class="c1"># x y で始まる列の値を移して縦長に</span>
-</code></pre></div><pre tabindex="0"><code>      id    x1    x2    x3    x4    y1    y2    y3    y4
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">anscombe</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span>              <span class="c1"># IDをつけておく</span>
+</span></span><span class="line"><span class="cl">                                     <span class="c1"># x y で始まる列の値を移して縦長に</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      id    x1    x2    x3    x4    y1    y2    y3    y4
    &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
  1     1    10    10    10     8  8.04  9.14  7.46  6.58
  2     2     8     8     8     8  6.95  8.14  6.77  5.76
@@ -777,12 +777,12 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">anscombe</span> <span class="o">%&gt;%</span>
-  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span>      <span class="c1"># x y で始まる列の値を移して縦長に</span>
-
-                                     <span class="c1"># name列を分割</span>
-</code></pre></div><pre tabindex="0"><code>      id  name value
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">anscombe</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span>      <span class="c1"># x y で始まる列の値を移して縦長に</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                                     <span class="c1"># name列を分割</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      id  name value
    &lt;int&gt; &lt;chr&gt; &lt;dbl&gt;
  1     1    x1 10.00
  2     1    x2 10.00
@@ -798,12 +798,12 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">anscombe</span> <span class="o">%&gt;%</span>
-  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># x y で始まる列の値を移して縦長に</span>
-  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-                                     <span class="c1"># name列を分割</span>
-</code></pre></div><pre tabindex="0"><code>      id  axis group value
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">anscombe</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># x y で始まる列の値を移して縦長に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                                     <span class="c1"># name列を分割</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      id  axis group value
    &lt;int&gt; &lt;chr&gt; &lt;int&gt; &lt;dbl&gt;
  1     1     x     1 10.00
  2     1     x     2 10.00
@@ -819,16 +819,16 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <section>
 <h2 id="例題-anscombe">例題: <code>anscombe</code></h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_anscombe</span> <span class="o">=</span> <span class="n">anscombe</span> <span class="o">%&gt;%</span>
-  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># x y で始まる列の値を移して縦長に</span>
-  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
-                                     <span class="c1"># name列を分割</span>
-  <span class="nf">pivot_wider</span><span class="p">(</span><span class="n">names_from</span> <span class="o">=</span> <span class="n">axis</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">value</span><span class="p">)</span> <span class="o">%&gt;%</span>
-                                     <span class="c1"># axis列内の x y を列にして横広化</span>
-  <span class="nf">arrange</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># グループごとに並べる</span>
-  <span class="nf">print</span><span class="p">()</span>                            <span class="c1"># ggplotしたい形！</span>
-</code></pre></div><pre tabindex="0"><code>      id group     x     y
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tidy_anscombe</span> <span class="o">=</span> <span class="n">anscombe</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">rowid_to_column</span><span class="p">(</span><span class="s">&#34;id&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>          <span class="c1"># IDをつけておく</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^x|y&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>  <span class="c1"># x y で始まる列の値を移して縦長に</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">separate</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;axis&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span> <span class="m">1L</span><span class="p">,</span> <span class="n">convert</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">                                     <span class="c1"># name列を分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_wider</span><span class="p">(</span><span class="n">names_from</span> <span class="o">=</span> <span class="n">axis</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">value</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">                                     <span class="c1"># axis列内の x y を列にして横広化</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">arrange</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>                 <span class="c1"># グループごとに並べる</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                            <span class="c1"># ggplotしたい形！</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      id group     x     y
    &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
  1     1     1    10  8.04
  2     2     1     8  6.95
@@ -844,15 +844,15 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <section>
 <h2 id="例題-anscombe-別解">例題: <code>anscombe</code> 別解</h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_anscombe</span> <span class="o">=</span> <span class="n">anscombe</span> <span class="o">%&gt;%</span>
-  <span class="nf">pivot_longer</span><span class="p">(</span>                       <span class="c1"># 縦長に変形したい</span>
-    <span class="nf">everything</span><span class="p">(),</span>                     <span class="c1"># すべての列について</span>
-    <span class="n">names_to</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;.value&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span>  <span class="c1"># 新しい列名</span>
-    <span class="n">names_sep</span> <span class="o">=</span> <span class="m">1L</span><span class="p">,</span>                   <span class="c1"># 切る位置</span>
-    <span class="n">names_transform</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">group</span> <span class="o">=</span> <span class="n">as.integer</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 型変換</span>
-  <span class="nf">arrange</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># グループごとに並べる</span>
-  <span class="nf">print</span><span class="p">()</span>                             <span class="c1"># ggplotしたい形！</span>
-</code></pre></div><pre tabindex="0"><code>   group     x     y
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tidy_anscombe</span> <span class="o">=</span> <span class="n">anscombe</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span>                       <span class="c1"># 縦長に変形したい</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">everything</span><span class="p">(),</span>                     <span class="c1"># すべての列について</span>
+</span></span><span class="line"><span class="cl">    <span class="n">names_to</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;.value&#34;</span><span class="p">,</span> <span class="s">&#34;group&#34;</span><span class="p">),</span>  <span class="c1"># 新しい列名</span>
+</span></span><span class="line"><span class="cl">    <span class="n">names_sep</span> <span class="o">=</span> <span class="m">1L</span><span class="p">,</span>                   <span class="c1"># 切る位置</span>
+</span></span><span class="line"><span class="cl">    <span class="n">names_transform</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">group</span> <span class="o">=</span> <span class="n">as.integer</span><span class="p">))</span> <span class="o">%&gt;%</span> <span class="c1"># 型変換</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">arrange</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>                  <span class="c1"># グループごとに並べる</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                             <span class="c1"># ggplotしたい形！</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   group     x     y
    &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt;
  1     1    10  8.04
  2     1     8  6.95
@@ -868,26 +868,26 @@ purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹
 <section>
 <h2 id="例題-anscombe-作図例">例題: <code>anscombe</code> 作図例</h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">ggplot</span><span class="p">(</span><span class="n">tidy_anscombe</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">geom_point</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">fullrange</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">group</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span> <span class="o">+</span>
-  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">16</span><span class="p">)</span>
-</code></pre></div><img src="figure/plot_anscombe-1.png" title="plot of chunk plot_anscombe" alt="plot of chunk plot_anscombe" width="98%" />
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">tidy_anscombe</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">,</span> <span class="n">se</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">,</span> <span class="n">fullrange</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="o">~</span> <span class="n">group</span><span class="p">,</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">16</span><span class="p">)</span>
+</span></span></code></pre></div><img src="figure/plot_anscombe-1.png" title="plot of chunk plot_anscombe" alt="plot of chunk plot_anscombe" width="98%" />
 </section>
 <section>
 <h2 id="例題-anscombe-要約">例題: <code>anscombe</code> 要約</h2>
 <p>4組のx-yは、平均・分散・相関係数がほぼ同じ？</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">tidy_anscombe</span> <span class="o">%&gt;%</span>
-  <span class="nf">group_by</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># group列でグループ化して</span>
-  <span class="nf">summarize</span><span class="p">(</span>            <span class="c1"># x, y列を使ってsummarize</span>
-    <span class="n">mean_x</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-    <span class="n">mean_y</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
-    <span class="n">sd_x</span> <span class="o">=</span> <span class="nf">sd</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-    <span class="n">sd_y</span> <span class="o">=</span> <span class="nf">sd</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
-    <span class="n">cor_xy</span> <span class="o">=</span> <span class="nf">cor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-  <span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>  group mean_x   mean_y     sd_x     sd_y    cor_xy
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tidy_anscombe</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">group_by</span><span class="p">(</span><span class="n">group</span><span class="p">)</span> <span class="o">%&gt;%</span>   <span class="c1"># group列でグループ化して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">summarize</span><span class="p">(</span>            <span class="c1"># x, y列を使ってsummarize</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mean_x</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">mean_y</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sd_x</span> <span class="o">=</span> <span class="nf">sd</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sd_y</span> <span class="o">=</span> <span class="nf">sd</span><span class="p">(</span><span class="n">y</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">cor_xy</span> <span class="o">=</span> <span class="nf">cor</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  group mean_x   mean_y     sd_x     sd_y    cor_xy
   &lt;int&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
 1     1      9 7.500909 3.316625 2.031568 0.8164205
 2     2      9 7.500909 3.316625 2.031657 0.8162365

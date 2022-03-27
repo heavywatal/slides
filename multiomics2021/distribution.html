@@ -16,7 +16,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@heavywatal">
 <meta name="twitter:creator" content="@heavywatal">
-<meta name="generator" content="Hugo 0.89.4" />
+<meta name="generator" content="Hugo 0.96.0" />
 <link rel="stylesheet" href="/lib/katex/katex.min.css">
 <script defer src="/lib/katex/katex.min.js"></script>
 <script defer src="/lib/katex/contrib/auto-render.min.js"></script>
@@ -93,8 +93,8 @@ if (!doNotTrack) {
 <section>
 <h2 id="データ解析って必要-生データ見ればいいべ">データ解析って必要？ 生データ見ればいいべ？</h2>
 <p>往々にして複雑過ぎ、情報多すぎ、そのままでは手に負えない</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
-</code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
       &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
     1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
     2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
@@ -383,10 +383,10 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 </section>
 <section>
 <h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
-<span class="n">result</span><span class="o">$</span><span class="n">par</span>
-</code></pre></div><pre tabindex="0"><code>intercept     slope 
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">$</span><span class="n">par</span>
+</span></span></code></pre></div><pre tabindex="0"><code>intercept     slope 
 -50.54532  67.18659 
 </code></pre><p><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
 
@@ -648,15 +648,15 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <p>コンピューター上でランダム<strong>っぽい</strong>数値を出力する装置。<br>
 実際には<strong>決定論的</strong>に計算されているので、<br>
 シード(出発点)と呼び出し回数が同じなら出る数も同じになる。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
-<span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
-<span class="c1"># 0.9148060 0.9370754 0.2861395</span>
-<span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
-<span class="c1"># 0.8304476 0.6417455 0.5190959</span>
-<span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
-<span class="nf">runif</span><span class="p">(</span><span class="m">6L</span><span class="p">)</span>
-<span class="c1"># 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959</span>
-</code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0.9148060 0.9370754 0.2861395</span>
+</span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0.8304476 0.6417455 0.5190959</span>
+</span></span><span class="line"><span class="cl"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">6L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959</span>
+</span></span></code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
 ただし「このシードじゃないと良い結果が出ない」はダメ。</p>
 <p>さまざまな「分布に従う」乱数を生成することもできる。</p>
 
@@ -665,19 +665,19 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
 <p>🔰 <code>?rbinom</code> などヘルプを参照しつつたくさん試そう。</p>
 <p>🔰 e.g., 1%の当たりを狙って100連ガチャを回した場合とか</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="n">n</span> <span class="o">=</span> <span class="m">100</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">sample.int</span><span class="p">(</span><span class="m">6</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">min</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rgeom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rpois</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lambda</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
-<span class="n">x</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-
-<span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-<span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">()</span> <span class="c1"># for continuous values</span>
-<span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">()</span>       <span class="c1"># for discrete values</span>
-</code></pre></div>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">100</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">sample.int</span><span class="p">(</span><span class="m">6</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">min</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rgeom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">3</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rpois</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lambda</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">mean</span> <span class="o">=</span> <span class="m">50</span><span class="p">,</span> <span class="n">sd</span> <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">()</span> <span class="c1"># for continuous values</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">()</span>       <span class="c1"># for discrete values</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
