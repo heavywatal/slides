@@ -51,7 +51,7 @@ unlisted = false
 -   教科書
     - なし
 -   参考書
-    - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+    - [江崎貴裕「分析者のためのデータ解釈学入門」](https://amzn.to/3uznzCK) 2020
     - [Hadley Wickham, Garrett Grolemund "R for Data Science"](https://r4ds.had.co.nz/)
     - [本橋智光「前処理大全」](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)
 -   参照ウェブサイト: <https://heavywatal.github.io/slides/tohoku2022r/>
@@ -63,7 +63,7 @@ unlisted = false
 <https://das-kino.hatenablog.com/entry/2019/11/07/125044>
 
 1.  手元のコンピューターのユーザー名（ホームフォルダの名前）を確認。
-    半角アルファベットじゃない文字(日本語とか記号とか)が含まれている場合、不具合の原因になりがちです。
+    半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがちです。
     たぶん変更できない？ので新しいユーザーを作って引っ越すのがいいと思います。
     半角アルファベット小文字のみで短いものを推奨
     - ✅ Good: `watal`, `tamakino`
@@ -104,4 +104,4 @@ unlisted = false
 
 ## 講義資料
 
-全6回。リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。
+<kbd>←</kbd><kbd>→</kbd>キーで戻る・進むスライド形式。
