@@ -14,11 +14,11 @@ draft = false
 ### 8. データ解釈の基礎知識、レポート作成
 
 <div class="author">
-岩嵜航、牧野能士
+岩嵜航
 </div>
 
 <div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
 </div>
 
 <div class="footnote">
@@ -66,6 +66,19 @@ draft = false
 
 自分が一時データを作るときに気をつけること。
 
+https://comicalcommet.github.io/r-training-2021/R_training_2021_5.html#5
+
+
+---
+## Excelの危険性
+
+データ入力して表形式のファイルを作るには便利。
+
+しかし親切設計がユーザーに牙を剥く！
+
+- 数値が勝手に日付になる
+- 遺伝子名が勝手に日付になる
+
 
 ---
 ## 2種類の誤差: 偶然誤差と系統的誤差
@@ -99,34 +112,110 @@ draft = false
 ---
 ## 相関関係と因果関係
 
+<div class="column-container">
+<div class="column" style="flex-shrink: 1;">
+
 相関関係
-: ある値が大きいほど、別の値が大きくor小さくなる。
+: ある値が大きいほど、別の値も大きいor小さい。
 : e.g., 数学の成績と物理の成績。
 
 因果関係
 : ある事象が別の事象に影響を与える。
-: e.g., 筋トレしたら筋肉が増える。
+: e.g., 1時間勉強するごとに成績が3点伸びる。
+
+</div>
+<div class="column" style="flex-shrink: 1.8;">
+
+![plot of chunk causal-relationship](figure/causal-relationship-1.png)
+
+</div>
+</div>
+
+
+<hr>
+
+- 因果関係があれば相関関係として表れる
+- **相関関係があるからといって因果関係もあるとは限らない**→
+
 
 ---
-## 因果関係があれば相関関係として表れる
+## 因果・相関を見誤るパターン1: 交絡因子
 
-しかしその逆は成り立たない→
+アイスクリームの売り上げが増えるほどビールの売り上げが増える？
+
+両方とも気温の影響を受けている、というのが真相。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.2;">
+
+![plot of chunk confounding-factor](figure/confounding-factor-1.png)
+
+</div>
+<div class="column" style="flex-shrink: 1;">
+
+<figure>
+<img src="image/hermeneutics-4-1-3.drawio.svg" width="500">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+
+</div>
+</div>
+
 
 ---
-## 相関関係があるからといって因果関係があるとは限らない
+## 因果・相関を見誤るパターン2: 逆の因果関係
 
-見かけの因果関係が生じるパターン
+**誤:** 警察官が多いほど犯罪が増える
 
-- たまたま http://www.tylervigen.com/spurious-correlations
-- 交絡因子: 共通の原因
-- 逆の因果関係
-- 選択バイアス
+**正:** 犯罪が多いから警察官が多く配備される
+
+<br>
+
+## 因果・相関を見誤るパターン3: 選択バイアス
+
+(x + y) が一定の幅に収まるようなペアだけを集めてしまうとか
+
+![plot of chunk spurious-correlation-selection-bias](figure/spurious-correlation-selection-bias-1.png)
+
+
+---
+## 因果・相関を見誤るパターン4: 偶然
+
+ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？
+
+<figure>
+<img src="image/nicholas-cage-drowned.svg" width="100%">
+<figcaption><cite>
+<a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
+</cite></figcaption>
+</figure>
+
+このウェブサイトにはジョークとしてこうした例が多数集められている↑
+
+
+---
+## 相関係数の罠
+
+- 外れ値
+- グループ構造
+- 単純な相関ではない構造
 
 
 ---
 ## 変数間の関係性
 
-図 4.1.5
+<figure>
+<img src="image/hermeneutics-4-1-5.drawio.svg" width="700">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+
+???
+16--17世紀、怪我をしたら武器に軟膏を塗ると早く治るという迷信。
+質の低い軟膏を傷口に塗らないことがプラスに働いたというのが真相。
 
 
 ---
@@ -163,17 +252,7 @@ draft = false
 
 - カバレッジ誤差
   - ランダムな電話番号にアンケート。電話を持たない人はカバーされない。
--
 
----
-## Excelの危険性
-
-データ入力して表形式のファイルを作るには便利。
-
-しかし親切設計がユーザーに牙を剥く！
-
-- 数値が勝手に日付になる
-- 遺伝子名が勝手に日付になる
 
 ---
 ## 代表値 central tendency
@@ -253,13 +332,6 @@ df_modified = df %>%
 
 
 ---
-## 相関係数の罠
-
-- 外れ値
-- グループ構造
-- 単純な相関ではない構造
-
----
 ## 多重検定
 
 p = 0.05 の検定を100回やったら5回は有意になってしまう。
@@ -282,6 +354,13 @@ p = 0.05 の検定を100回やったら5回は有意になってしまう。
 軸をゼロから始めるべき場合
 
 飛んで ≈ を使わない
+
+
+
+
+<!--  -->
+
+
 
 
 ---
@@ -420,7 +499,7 @@ RStudio > 🟢 New File > R Markdown...<br>
 
 
 ---
-🔰 課題
+## 🔰 課題
 
 1. インターネットで良くないデータ解析を探し、
    悪い点と改善案を列挙しよう。
@@ -429,13 +508,14 @@ RStudio > 🟢 New File > R Markdown...<br>
 
 
 ---
-🔰 レポート
+## 🔰 レポート
 
-実習中に解いた課題をR Markdownでまとめてください。
-
-- 課題
+- 課題: 実習中に解いた課題をR Markdownでまとめる。
   - 講義資料の🔰若葉マークの練習問題
   - 毎日最後に出てた課題
+- 様式
+  - 1日分で1つのRmdファイル、別のトピックに提出。計4つ。
+  - ファイル名 `B0SB0000-iwasaki-day1.Rmd`
 - 評価ポイント
   - エラーも警告も無くコードが動く
   - 文書の構造や図が視覚的に見やすく整理されている

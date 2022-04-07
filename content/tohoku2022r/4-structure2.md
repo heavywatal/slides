@@ -14,11 +14,11 @@ draft = false
 ### 4. データ構造の処理2: 結合、変形など。
 
 <div class="author">
-岩嵜航、牧野能士
+岩嵜航
 </div>
 
 <div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
 </div>
 
 <div class="footnote">

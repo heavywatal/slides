@@ -14,11 +14,11 @@ draft = false
 ### 1. 導入: データ解析の全体像。Rを使うメリット。Rの基本。
 
 <div class="author">
-岩嵜航、牧野能士
+岩嵜航
 </div>
 
 <div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
 </div>
 
 <div class="footnote">
@@ -526,7 +526,7 @@ See https://support.apple.com/HT201236
 ## "Project" を新規作成する
 
 File → New Project... → New Directory → New Project →<br>
-→ Directory name: `r-training-2021`<br>
+→ Directory name: `r-training-2022`<br>
 → as subdirectory of: `~/project` (無ければ作る)
 
 <img src="/slides/image/rstudio/create-new-project.png" class="screenshot" width="90%"
@@ -576,8 +576,8 @@ e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 スクリプト、データ、結果を分けて整理する例:
 
 ```
-r-training-2021/           # プロジェクトの最上階
-├── r-training-2021.Rproj  # これダブルクリックでRStudioを起動
+r-training-2022/           # プロジェクトの最上階
+├── r-training-2022.Rproj  # これダブルクリックでRStudioを起動
 ├── hello.R
 ├── transform.R            # データ整理・変形のスクリプト
 ├── visualize.R            # 作図のスクリプト
