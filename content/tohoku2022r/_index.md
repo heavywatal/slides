@@ -59,26 +59,33 @@ unlisted = false
 
 ## 実習環境の設定
 
-参考: R初心者の館 by das_Kinoさん<br>
-<https://das-kino.hatenablog.com/entry/2019/11/07/125044>
+途中まででもいいので、できるかぎり実習前に済ませてもらえると助かります。
 
-1.  手元のコンピューターのユーザー名（ホームフォルダの名前）を確認。
+参考:
+[R初心者の館 by das_Kinoさん](https://das-kino.hatenablog.com/entry/2019/11/07/125044),
+[矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
+
+1.  手元のコンピューターの **ユーザー名（ホームフォルダの名前）** を確認。
     半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがちです。
     たぶん変更できない？ので新しいユーザーを作って引っ越すのがいいと思います。
-    半角アルファベット小文字のみで短いものを推奨
+    **半角アルファベット小文字のみ**で短いものを推奨。
     - ✅ Good: `watal`, `tamakino`
     - ❌ Bad: `岩嵜航`, `Watal Iwasaki`, `heavy.watal`
 1.  OSのソフトウェア・アップデートをすべて適用して再起動。
+1.  OSの設定で、ファイル名の末尾の拡張子(`.pdf` とか `.png` とか)を常時表示する。
+1.  Windowsの場合、
+    [矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
+    の情報を参照しつつOneDrive問題に対処する。
 1.  <https://cran.r-project.org/>
     から最新版の **R本体(≥4.1.3)** をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
 1.  <https://rstudio.com/products/rstudio/download/#download>
     から最新版の **RStudio(≥2022.02.1)** をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
-1.  Windowsの場合は **Rtools** も必要かも。次のページに従って設定:<br>
+1.  Windowsの場合、念のため **Rtools** をインストール。次のページに従って設定:<br>
     <https://cran.r-project.org/bin/windows/Rtools/>
 
-    Macの場合、念のため次のソフトウェアを入れておくとよい:
+    Macの場合、念のため次のソフトウェアをインストール:
     - **Command Line Tools**: `xcode-select --install` (Xcode本体は不要)
     - **XQuartz**: [手動ダウンロード](https://www.xquartz.org/) or `brew install xquartz`
 
