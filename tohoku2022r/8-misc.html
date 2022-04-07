@@ -63,10 +63,10 @@ if (!doNotTrack) {
 <h1 id="進化学実習-2022-牧野研"><a href=".">進化学実習 2022 牧野研</a></h1>
 <h3 id="8-データ解釈の基礎知識レポート作成">8. データ解釈の基礎知識、レポート作成</h3>
 <div class="author">
-岩嵜航、牧野能士
+岩嵜航
 </div>
 <div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
 </div>
 <div class="footnote">
 2022-04-11 東北大学 理学部生物学科 進化学実習
@@ -101,6 +101,17 @@ if (!doNotTrack) {
 <h2 id="rで下ごしらえして整然データにできるとはいえ">Rで下ごしらえして整然データにできる、とはいえ</h2>
 <p>読み込みすらままならないデータから始めるのは大変。</p>
 <p>自分が一時データを作るときに気をつけること。</p>
+<p><a href="https://comicalcommet.github.io/r-training-2021/R_training_2021_5.html#5">https://comicalcommet.github.io/r-training-2021/R_training_2021_5.html#5</a></p>
+
+</section>
+<section>
+<h2 id="excelの危険性">Excelの危険性</h2>
+<p>データ入力して表形式のファイルを作るには便利。</p>
+<p>しかし親切設計がユーザーに牙を剥く！</p>
+<ul>
+<li>数値が勝手に日付になる</li>
+<li>遺伝子名が勝手に日付になる</li>
+</ul>
 
 </section>
 <section>
@@ -142,34 +153,87 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="相関関係と因果関係">相関関係と因果関係</h2>
+<div class="column-container">
+<div class="column" style="flex-shrink: 1;">
 <dl>
 <dt>相関関係</dt>
-<dd>ある値が大きいほど、別の値が大きくor小さくなる。</dd>
+<dd>ある値が大きいほど、別の値も大きいor小さい。</dd>
 <dd>e.g., 数学の成績と物理の成績。</dd>
 <dt>因果関係</dt>
 <dd>ある事象が別の事象に影響を与える。</dd>
-<dd>e.g., 筋トレしたら筋肉が増える。</dd>
+<dd>e.g., 1時間勉強するごとに成績が3点伸びる。</dd>
 </dl>
+</div>
+<div class="column" style="flex-shrink: 1.8;">
+<p><img src="figure/causal-relationship-1.png" alt="plot of chunk causal-relationship"></p>
+</div>
+</div>
+<hr>
+<ul>
+<li>因果関係があれば相関関係として表れる</li>
+<li><strong>相関関係があるからといって因果関係もあるとは限らない</strong>→</li>
+</ul>
 
 </section>
 <section>
-<h2 id="因果関係があれば相関関係として表れる">因果関係があれば相関関係として表れる</h2>
-<p>しかしその逆は成り立たない→
+<h2 id="因果相関を見誤るパターン1-交絡因子">因果・相関を見誤るパターン1: 交絡因子</h2>
+<p>アイスクリームの売り上げが増えるほどビールの売り上げが増える？</p>
+<p>両方とも気温の影響を受けている、というのが真相。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.2;">
+<p><img src="figure/confounding-factor-1.png" alt="plot of chunk confounding-factor"></p>
+</div>
+<div class="column" style="flex-shrink: 1;">
+<figure>
+<img src="image/hermeneutics-4-1-3.drawio.svg" width="500">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+</div>
+</div>
+
 </section>
 <section>
-<h2 id="相関関係があるからといって因果関係があるとは限らない">相関関係があるからといって因果関係があるとは限らない</h2>
-<p>見かけの因果関係が生じるパターン</p>
+<h2 id="因果相関を見誤るパターン2-逆の因果関係">因果・相関を見誤るパターン2: 逆の因果関係</h2>
+<p><strong>誤:</strong> 警察官が多いほど犯罪が増える</p>
+<p><strong>正:</strong> 犯罪が多いから警察官が多く配備される</p>
+<br>
+<h2 id="因果相関を見誤るパターン3-選択バイアス">因果・相関を見誤るパターン3: 選択バイアス</h2>
+<p>(x + y) が一定の幅に収まるようなペアだけを集めてしまうとか</p>
+<p><img src="figure/spurious-correlation-selection-bias-1.png" alt="plot of chunk spurious-correlation-selection-bias"></p>
+
+</section>
+<section>
+<h2 id="因果相関を見誤るパターン4-偶然">因果・相関を見誤るパターン4: 偶然</h2>
+<p>ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？</p>
+<figure>
+<img src="image/nicholas-cage-drowned.svg" width="100%">
+<figcaption><cite>
+<a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
+</cite></figcaption>
+</figure>
+<p>このウェブサイトにはジョークとしてこうした例が多数集められている↑</p>
+
+</section>
+<section>
+<h2 id="相関係数の罠">相関係数の罠</h2>
 <ul>
-<li>たまたま <a href="http://www.tylervigen.com/spurious-correlations">http://www.tylervigen.com/spurious-correlations</a></li>
-<li>交絡因子: 共通の原因</li>
-<li>逆の因果関係</li>
-<li>選択バイアス</li>
+<li>外れ値</li>
+<li>グループ構造</li>
+<li>単純な相関ではない構造</li>
 </ul>
 
 </section>
 <section>
 <h2 id="変数間の関係性">変数間の関係性</h2>
-<p>図 4.1.5
+<figure>
+<img src="image/hermeneutics-4-1-5.drawio.svg" width="700">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+
 </section>
 <section>
 <h2 id="データの取り方">データの取り方</h2>
@@ -203,17 +267,6 @@ if (!doNotTrack) {
 <li>ランダムな電話番号にアンケート。電話を持たない人はカバーされない。</li>
 </ul>
 </li>
-<li></li>
-</ul>
-
-</section>
-<section>
-<h2 id="excelの危険性">Excelの危険性</h2>
-<p>データ入力して表形式のファイルを作るには便利。</p>
-<p>しかし親切設計がユーザーに牙を剥く！</p>
-<ul>
-<li>数値が勝手に日付になる</li>
-<li>遺伝子名が勝手に日付になる</li>
 </ul>
 
 </section>
@@ -283,15 +336,6 @@ if (!doNotTrack) {
 </span></span></code></pre></div>
 </section>
 <section>
-<h2 id="相関係数の罠">相関係数の罠</h2>
-<ul>
-<li>外れ値</li>
-<li>グループ構造</li>
-<li>単純な相関ではない構造</li>
-</ul>
-
-</section>
-<section>
 <h2 id="多重検定">多重検定</h2>
 <p>p = 0.05 の検定を100回やったら5回は有意になってしまう。
 </section>
@@ -309,6 +353,7 @@ if (!doNotTrack) {
 <h2 id="軸の範囲">軸の範囲</h2>
 <p>軸をゼロから始めるべき場合</p>
 <p>飛んで ≈ を使わない</p>
+<!--  -->
 
 </section>
 <section>
@@ -442,22 +487,26 @@ e.g., <code>report.Rmd</code></li>
 <p>🔰 編集 → Knit を繰り返して変化を確認しよう
 </section>
 <section>
-<p>🔰 課題</p>
+<h2 id="-課題">🔰 課題</h2>
 <ol>
 <li>インターネットで良くないデータ解析を探し、
 悪い点と改善案を列挙しよう。</li>
 </ol>
-<p>4/18月曜に班ごとに相談・発表してもらいます。</p>
-
+<p>4/18月曜に班ごとに相談・発表してもらいます。
 </section>
 <section>
-<p>🔰 レポート</p>
-<p>実習中に解いた課題をR Markdownでまとめてください。</p>
+<h2 id="-レポート">🔰 レポート</h2>
 <ul>
-<li>課題
+<li>課題: 実習中に解いた課題をR Markdownでまとめる。
 <ul>
 <li>講義資料の🔰若葉マークの練習問題</li>
 <li>毎日最後に出てた課題</li>
+</ul>
+</li>
+<li>様式
+<ul>
+<li>1日分で1つのRmdファイル、別のトピックに提出。計4つ。</li>
+<li>ファイル名 <code>B0SB0000-iwasaki-day1.Rmd</code></li>
 </ul>
 </li>
 <li>評価ポイント
