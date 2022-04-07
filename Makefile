@@ -37,7 +37,7 @@ ${DROPBOX}/%: | content/%
 .PHONY: stickers
 
 HEXDIR := static/image/hex-stickers
-TIDYVERSE := tidyverse dplyr tidyr purrr ggplot2 tibble readr pipe stringr forcats lubridate readxl
+TIDYVERSE := tidyverse dplyr tidyr purrr ggplot2 tibble readr pipe stringr forcats lubridate readxl rmarkdown
 TIDYVERSE := $(addsuffix .png, ${TIDYVERSE})
 TIDYVERSE := $(addprefix ${HEXDIR}/, ${TIDYVERSE})
 
