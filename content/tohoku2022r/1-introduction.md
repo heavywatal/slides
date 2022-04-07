@@ -11,6 +11,8 @@ draft = false
 
 # [進化学実習 2022 牧野研](.)
 
+### 1. 導入: データ解析の全体像。Rを使うメリット。Rの基本。
+
 <div class="author">
 岩嵜航、牧野能士
 </div>
@@ -18,16 +20,6 @@ draft = false
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野
 </div>
-
-<ol>
-<li class="current-deck"><a href="1-introduction.html">導入: データ解析の全体像。Rを使うメリット。Rの基本。</a>
-<li><a href="2-visualization.html">データの可視化。</a>
-<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
-<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
-<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
-<li><a href="6-distribution.html">統計モデリング1: 確率分布、尤度</a>
-<li><a href="7-glm.html">統計モデリング2: 一般化線形モデル</a>
-</ol>
 
 <div class="footnote">
 2022-04-11 東北大学 理学部生物学科 進化学実習
@@ -39,18 +31,215 @@ draft = false
 
 
 ---
+## 本実習のお品書き「データ取り扱いの基礎」
+
+- 生物学研究におけるデータ解析の重要性を認識する。
+  - 理解する、とは
+- プログラミング言語Rを習得し、長い目で見て楽をする。
+  - データの可視化
+  - データの前処理
+  - レポート作成
+- データ解析入門
+  - 統計モデリング
+  - データの性質・落とし穴
+
+牧野研以外の実習・研究でも使える知識・技術。<br>
+(研究じゃない場面でも役に立つはず。)
+
+
+---
+## 「生物の理（ことわり）を知りたい」理学部生物学科
+
+- 生物の複雑な機能や形態がどのように進化してきたのか解明したい
+- 多様な生態系がどう誕生し維持されてきたのか理解したい
+- 四肢と鰭の発生プログラムの違いや共通点を理解したい
+- 行動選択や学習に関わる分子神経機構を解明したい
+- 細胞内小器官の時空間的制御を理解したい
+- プラナリアなどの再生能力をもたらす遺伝的基盤を解明したい
+- 昆虫が植物に「虫こぶ」を作らせる機構を解明したい
+- etc.
+
+
+---
 ## 研究の基本プロセス
 
-1. 課題を見つける／仮説を立てる
-1. 実験🧫・観察🔬・インターネット🏄‍♀️でデータを集める
-1. **データを整理する**
-1. **データを解析して仮説を検証する**
-1. 結果を報告する
+1. 課題を見つける、仮説を立てる
+1. 実験🧫・観察🔬・文献📚などからデータを集める
+1. **データを整理・解析して仮説を検証する**
+1. **結果を報告する**、1に戻る
 
 <br>
 
-- 実験や観察は研究の半分くらい！
-- 残り半分はデータの整理＆解析！
+- 実験や観察は研究の半分くらい。
+- 残り半分はデータの整理・解析・報告。<br>
+  → しかし軽視されがち。ここを**ちゃんと、でも楽に**やりたい。
+
+
+---
+## データ解析って必要？ 生データこそ至高では？
+
+生のままでは複雑過ぎ、情報多すぎ、何もわからない。
+
+
+```r
+print(ggplot2::diamonds)
+```
+
+```
+      carat       cut color clarity depth table price     x     y     z
+      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+```
+
+ダイヤモンド53,940個について10項目の値を持つデータセット
+
+---
+## 要約統計量を見てみよう
+
+各列の**平均**とか**標準偏差**とか:
+
+
+```
+   stat carat depth table    price     x     y     z
+  <chr> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>
+1  mean  0.80 61.75 57.46  3932.80  5.73  5.73  3.54
+2    sd  0.47  1.43  2.23  3989.44  1.12  1.14  0.71
+3   max  5.01 79.00 95.00 18823.00 10.74 58.90 31.80
+```
+
+大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
+
+
+**生のままよりは把握しやすい**かも。
+
+しかし要注意...
+
+---
+## 平均値ばかり見て可視化を怠ると構造を見逃す
+
+<figure style="position: relative;">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<img src="/slides/image/rstats/datasaurus.png" width="800">
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+
+---
+## 作図してみると全体像・構造が見やすい
+
+情報をうまく絞って整理 → **直感的にわかる**
+
+![plot of chunk simplify-diamonds](figure/simplify-diamonds-1.png)
+
+`carat` が大きいほど `price` も高いらしい。<br>
+その度合いは `clarity` によって異なるらしい。
+
+---
+## 統計とは
+
+データをうまくまとめ、それに基づいて推論するための手法。
+
+- **記述統計**: データそのものを要約する
+    - 要約統計量 (e.g., 平均、標準偏差、etc.)
+    - 作図、作表
+- **推測統計**: データの背後にある母集団・生成過程を考える
+    - 数理モデル
+    - 確率分布
+    - パラメータ(母数)
+
+「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
+
+---
+## モデルとは
+
+対象システムを単純化・理想化して扱いやすくしたもの
+
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="150" align="right" style="margin: 0 -5px;">
+: 数学的な方程式として記述されるもの。
+: e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
+: <br>
+
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="140" align="right">
+: 数値計算の手続きとして記述されるもの。
+: e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
+: <br>
+
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="260" align="right">
+: 具体的な事物で作られるもの。
+: e.g., San Francisco Bay-Delta Model
+
+<cite>
+Weisberg 2012 "Simulation and Similarity" (科学とモデル)
+</cite>
+
+???
+数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
+解析的に解くことを諦めて計算機にやらせるという点で実装方法は異なるが、
+数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
+
+プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
+<img src="../lifesci2020seminar/image/schelling-segregation.gif" width="160" align="right" style="margin: -20px -15px; height: 160px; object-fit: cover;">
+
+---
+## ウェットな実験もモデルの一種と見なせる
+
+対象システムを単純化・理想化して扱いやすくしたもの<br>
+→ 自然ではありえない状況にしてでも、見たい関係を見る<br>
+→ 「Xを変えればYが変わる」という**還元的な理解の1ステップ**
+
+- ノイズをなるべく除去
+  - 栄養や温度など、**環境を揃える**
+  - 近親交配を繰り返して純系を作り、**遺伝的背景を揃える**
+- 興味のある要因のみ変えて、表現型の違いを評価
+  - 遺伝子1つ2つだけ改変
+  - 投与する薬剤の種類・量を変えてみる
+  - 栄養塩の濃度と光の強さを変えてみる
+
+ドライの理論研究者を指して「モデル屋」と呼びがちだが、<br>
+広い意味では生物学者みんな「モデル屋」。
+
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。<br>
+&nbsp;
+
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+???
+
+確率モデル: 決定論的なモデルじゃなくて確率論的なゆらぎを導入したもの。
+ただし、大塚淳さんの定義は異なる。
+帰納推論を可能にする枠組みとして自然の斉一性(ヒューム)を仮定した上で、
+データを生成している真の現象を確率用語で記述したものが確率モデルだ、という感じ。
+そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。<br>
+e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
+
+![plot of chunk lm-diamonds](figure/lm-diamonds-1.png)
+
+ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
+→ モデルをさらに改良していき、理解の精度を上げられるかも
 
 
 ---
@@ -70,7 +259,6 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 記録を残すことは何より重要
 : 実験や野外観察では些細なことも漏らさず記録。
 : 生データは何重にもバックアップ。
-: みんな結構できてる(はず)。
 
 データ整理・解析・作図も不可欠、だけど...
 : 再現不能の職人技で切り抜けちゃう人も多い。
@@ -240,299 +428,40 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 
 ---
-## この集中講義の目標
+## この実習の目標
+
+### ✅ <del>生物学研究にはデータとモデルが必須だと認識</del>
 
 ### ✅ <del>再現可能な解析を楽にやりたい気持ちになる</del>
-
-### ⬜ データ解析の基本を身につける
-
-- 全体のおおまかな流れがわかる
-- 解析しやすいデータの形を知る
 
 ### ⬜ 必要な方法を調べ、実践する力をつける
 
 - Rでできそうなことを把握する
 - 困ったときの対処法・相談先を知る
 
-<br>
-これさえ押さえれば、個々の方法は覚えなくても大丈夫！
-
-
----
-## データ解析のおおまかな流れ
-
-1. コンピュータ環境の整備
-1. データの取得、読み込み
-1. 探索的データ解析
-    - **前処理、加工** (地味。意外と重い)
-    - **可視化**、仮説生成 (派手！楽しい！) 👈 本日の主題
-    - 統計解析、仮説検証 (みんな勉強したがる)
-1. 報告、発表
-
-<figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
-</a>
-</figure>
-
-
----
-## そもそもなぜ解析？ 生の数字見ればよくない？
-
-生データは情報が多すぎて関係性も何も見えない
-
-
-```r
-print(ggplot2::diamonds)
-```
-
-```
-      carat       cut color clarity depth table price     x     y     z
-      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
-    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
-    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
-    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
-    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
-   --                                                                  
-53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
-53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
-53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
-53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
-```
-
-ダイヤモンド53,940個について10項目の値を持つデータセット
-
-
----
-## 要約統計量(平均とか分散とか)を見てみる
-
-各列の**平均**とか**標準偏差**とか:
-
-
-```
-   stat carat depth table    price     x     y     z
-  <chr> <dbl> <dbl> <dbl>    <dbl> <dbl> <dbl> <dbl>
-1  mean  0.80 61.75 57.46  3932.80  5.73  5.73  3.54
-2    sd  0.47  1.43  2.23  3989.44  1.12  1.14  0.71
-3   max  5.01 79.00 95.00 18823.00 10.74 58.90 31.80
-```
-
-大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
-
-
-**生のままよりは把握しやすい**かも。
-
-しかし要注意...
-
-
----
-## 平均値ばかり見て可視化を怠ると構造を見逃す
-
-<figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
-</a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
-     style="position: absolute; left: 0; top: 0; z-index: 255;">
-</figure>
-
-
----
-## 作図してみると全体像・構造が見やすい
-
-情報の整理 → **正しい解析・新しい発見・仮説生成**
-
-![plot of chunk simplify-diamonds](figure/simplify-diamonds-1.png)
-
-`carat` が大きいほど `price` も高いらしい。<br>
-その度合いは `clarity` によって異なるらしい。
-
----
-## 作図してみると全体像・構造が見やすい
-
-情報の整理 → **正しい解析・新しい発見・仮説生成**
-
-<figure>
-<a href="https://r4ds.had.co.nz/explore-intro.html">
-<img src="/slides/image/r4ds/data-science-explore.png">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
-</a>
-</figure>
+### ⬜ データ解析の基本に触れる
 
 <br>
-可視化だいじ。わかった。<br>
-でも「データ分析に費やす労力の8割は前処理」だって？
+個々の方法は覚えなくても大丈夫！<br>
+忘れては調べ、を何度も繰り返しながら染み込ませていこう。
 
 
 ---
-## 機械処理しやすい形 vs 人が読み書きしやすい形
+## 1時限目後半: Rの基礎
 
-作図や解析に使えるデータ形式はほぼ決まってる
-: `ggplot(data, ...)`, `glm(..., data, ...)`, ...
+✅ <del>Rはデータ解析に便利なプログラミング言語・環境</del>
 
-出発点となるデータはさまざま
-: 実験ノート、フィールドノート、データベース、...
+⬜ R環境のセットアップ
 
-> Happy families are all alike;<br>
-> every unhappy family is unhappy in its own way<br>
-> --- Leo Tolstoy "Anna Karenina"
+⬜ Rとの対話
 
-> tidy datasets are all alike,<br>
-> but every messy dataset is messy in its own way<br>
-> --- Hadley Wickham
+⬜ 「プロジェクト」と「スクリプト」を作る
 
+⬜ 基本的な型と演算
 
----
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+⬜ Rパッケージ
 
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.1;">
-    <img src="/slides/image/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
-  </div>
-  <div class="column">
-    <img src="/slides/image/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
-    <div style="position: absolute; top: 440px;">
-    縦1列は1つの変数<br>
-    横1行は1つの観測<br>
-    1セルは1つの値<br>
-    </div>
-  </div>
-</div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
-</a>
-</cite>
-
----
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.1;">
-    <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
-  </div>
-  <div class="column">
-    <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
-    <div style="position: absolute; top: 440px;">
-    <strong>縦1列は1つの変数</strong><br>
-    横1行は1つの観測<br>
-    1セルは1つの値<br>
-    </div>
-  </div>
-</div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
-</a>
-</cite>
-
----
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.1;">
-    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
-  </div>
-  <div class="column">
-    <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
-    <div style="position: absolute; top: 440px;">
-    縦1列は1つの変数<br>
-    <strong>横1行は1つの観測</strong><br>
-    1セルは1つの値<br>
-    </div>
-  </div>
-</div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
-</a>
-</cite>
-
----
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.1;">
-    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
-  </div>
-  <div class="column">
-    <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
-    <div style="position: absolute; top: 440px;">
-    縦1列は1つの変数<br>
-    横1行は1つの観測<br>
-    <strong>1セルは1つの値</strong><br>
-    </div>
-  </div>
-</div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
-</a>
-</cite>
-
-
----
-## 整然データ tidy data
-
-- **縦1列**は1つの**変数**
-- **横1行**は1つの**観測**
-- **1セル**は1つの**値**
-
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
-</cite>
-
-
-```r
-print(ggplot2::diamonds)
-```
-
-```
-      carat       cut color clarity depth table price     x     y     z
-      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
-    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
-    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
-    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
-    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
-   --                                                                  
-53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
-53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
-53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
-53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
-```
-
----
-## 整然データのご利益の例: ggplot2 (本日2時限目の話題)
-
-x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
-
-
-```r
-ggplot(diamonds) + aes(x = carat, y = price) +
-  geom_point(mapping = aes(color = color, size = clarity)) +
-  facet_wrap(vars(cut))
-```
-
-![plot of chunk tidy-data-benefit](figure/tidy-data-benefit-1.png)
-
----
-## 本日1時限目の話題
-
-### ✅ <del>なぜRを使うのか？</del>
-
-### ✅ <del>データ解析全体の流れ。可視化だいじ</del> <small style="font-weight: normal;">(詳細は本日後半)</small>
-
-### ✅ <del>作図・解析の前にデータの前処理が必要</del> <small style="font-weight: normal;">(詳細は明日)</small>
-
-### ⬜ Rの基礎
-
-- R環境のセットアップ
-- Rとの対話
-- 「プロジェクト」と「スクリプト」を作る
-- 基本的な型と演算
-- Rパッケージ
+⬜ 疑問・エラーの解決方法
 
 
 ---
@@ -697,7 +626,7 @@ r-training-2021/           # プロジェクトの最上階
     `Error` や `Warning` があったらよく読んで対処する。<br>
     (無視していい `Warning` もたまーにあるけど)
 
-1.  🔰 マークの練習問題があれば解いてみる。<br>
+1.  🔰若葉マークの練習問題があれば解いてみる。<br>
     そこまでのコードの**コピペ＋改変**でできるはず。
 
 疑問・困りごとがある場合は**気軽にChat欄に**書き込んでください。<br>
@@ -1250,9 +1179,9 @@ library(tidyverse)
 ```
 ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.4     ✔ dplyr   1.0.7
-✔ tidyr   1.1.3     ✔ stringr 1.4.0
-✔ readr   2.0.1     ✔ forcats 0.5.1
+✔ tibble  3.1.6     ✔ dplyr   1.0.7
+✔ tidyr   1.2.0     ✔ stringr 1.4.0
+✔ readr   2.1.2     ✔ forcats 0.5.1
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
@@ -1285,21 +1214,74 @@ library(tidyverse)
 
 
 ---
-## 本日1時限目の話題
+## 1時限目後半: Rの基礎
 
-### ✅ なぜRを使うのか？
+✅ Rはデータ解析に便利なプログラミング言語・環境
 
-### ✅ データ解析全体の流れ。可視化だいじ <small style="font-weight: normal;">(詳細は本日後半)</small>
+✅ R環境のセットアップ
 
-### ✅ 作図・解析の前にデータの前処理が必要 <small style="font-weight: normal;">(詳細は明日)</small>
+✅ **プロジェクト**を使ってファイルを管理
 
-### ✅ Rの基礎
+✅ **スクリプト**を書いてから**コンソール**で実行
 
-- まず**Rスクリプト**に書いてから、**コンソール**で実行
-- 変数には型がある: 数値、文字列、**データフレーム**など
-- 便利な**パッケージ**を使おう
-- 調べ方さえわかれば、全部覚えなくても大丈夫。
+✅ 変数には型がある: 数値、文字列、**データフレーム**など
 
+✅ 便利な**パッケージ**を使おう
+
+✅ 疑問・エラーの解決方法
+
+<hr>
+
+個々の方法は覚えなくても大丈夫！<br>
+忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備
+1. データの取得、読み込み
+1. 探索的データ解析
+    - **前処理、加工** (地味。意外と重い) 👈 明日以降の主題
+    - **可視化**、仮説生成 (派手！楽しい！) 👈 本日の主題
+    - **統計解析**、仮説検証 (みんな勉強したがる)
+1. 報告、発表
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+---
+## 実習全体の予定
+
+| 時間  | 4/11 Mon | 4/12 Tue | 4/13 Wed | 4/14 Thu |
+| ----- | -------- | -------- | -------- | -------- |
+| 13:00 | **導入** | 課題解答 | 課題解答 | 課題解答 |
+| 14:30 | **可視化** | **構造処理1** | **内容処理** | **モデリング2** |
+| 16:00 | 予備 | **構造処理2** | **モデリング1** | **データ解釈** |
+
+- 毎日最後に課題を出します
+- 翌日最初に班ごとに解答例を発表してもらいます。
+- 発表前に20分ほど、班ごとに相談する時間を設けます。
+- 4/18 Mon は講義なしで相談と発表の時間を長めに取ります。
+
+---
+## レポート課題
+
+4/14木曜に、Rを使ったレポート作成技術を習得します。<br>
+それを使って、実習中に解いた課題をまとめてください。
+
+- 課題
+  - 講義資料の🔰若葉マークの練習問題
+  - 毎日最後に出る課題
+- 評価ポイント
+  - エラーも警告も無くコードが動く
+  - 文書の構造や図が視覚的に見やすく整理されている
+  - 習った技術や自分で調べた技術がいろいろ盛り込まれている
+- 手抜きポイント
+  - 生物学的な意義、実用性があるか、みたいなのは不問
 
 ---
 ## Reference
@@ -1309,10 +1291,12 @@ R for Data Science --- Hadley Wickham and Garrett Grolemund
 : [Book](https://amzn.to/2tbRmVc)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
-Older versions
-: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
-   岩嵜航 2018
-: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
+  (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
+
+Other versions
 : 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2020/)」
    岩嵜航 2020 東京医科歯科大
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2021/)」

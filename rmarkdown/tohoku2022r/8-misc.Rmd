@@ -1,0 +1,456 @@
++++
+url = "tohoku2022r/8-misc.html"
+title = "8. データ解釈の基礎知識、レポート作成 — 進化学実習 2022 牧野研"
+linktitle = "データ解釈の基礎知識、レポート作成"
+date = 2022-04-14T16:00:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [進化学実習 2022 牧野研](.)
+
+### 8. データ解釈の基礎知識、レポート作成
+
+<div class="author">
+岩嵜航、牧野能士
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+
+<div class="footnote">
+2022-04-11 東北大学 理学部生物学科 進化学実習
+<a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+---
+## この実習の目標
+
+### ✅ <del>生物学研究にはデータとモデルが必須だと認識</del>
+
+### ✅ <del>再現可能な解析を楽にやりたい気持ちになる</del>
+
+### ✅ <del>必要な方法を調べ、実践する力をつける</del>
+
+### ⬜ データ解析の基本に触れる
+
+<br>
+個々の方法は覚えなくても大丈夫！<br>
+忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+
+
+---
+## 観測は簡単ではない
+
+- バイアス
+- 誤差
+
+
+---
+## Garbage in, garbage out
+
+どんなにすごい統計処理をしようとも、データがゴミなら結論もゴミ。
+
+
+---
+## Rで下ごしらえして整然データにできる、とはいえ
+
+読み込みすらままならないデータから始めるのは大変。
+
+自分が一時データを作るときに気をつけること。
+
+
+---
+## 2種類の誤差: 偶然誤差と系統的誤差
+
+偶然誤差 random error
+
+系統的誤差 systematic error
+
+---
+## 偶然誤差への対処
+
+
+
+---
+## データや解釈に潜むバイアス
+
+- 測定基準に関するバイアス
+  - 基準が揃っていない
+  - 基準が時間とともに変化
+- 選択バイアス
+  - 生存バイアス
+  - サンプリングバイアス
+  - 志願者バイアス
+  - 出版バイアス
+- 観測介入
+- データの扱いに起因するバイアス
+  - cherry picking
+  - 確証バイアス
+
+
+---
+## 相関関係と因果関係
+
+相関関係
+: ある値が大きいほど、別の値が大きくor小さくなる。
+: e.g., 数学の成績と物理の成績。
+
+因果関係
+: ある事象が別の事象に影響を与える。
+: e.g., 筋トレしたら筋肉が増える。
+
+---
+## 因果関係があれば相関関係として表れる
+
+しかしその逆は成り立たない→
+
+---
+## 相関関係があるからといって因果関係があるとは限らない
+
+見かけの因果関係が生じるパターン
+
+- たまたま http://www.tylervigen.com/spurious-correlations
+- 交絡因子: 共通の原因
+- 逆の因果関係
+- 選択バイアス
+
+
+---
+## 変数間の関係性
+
+図 4.1.5
+
+
+---
+## データの取り方
+
+全数調査 vs 標本調査
+
+無作為抽出
+
+---
+## サンプルサイズ
+
+🔰 仙台市民100万人のうち10万人がAB型だとする。サンプルサイズを変えて結果を見てみる。
+
+標準誤差
+
+信頼区間
+
+
+---
+## 標本抽出 (Sampling)
+
+スープの味見をするのに全部を飲み干す必要はない。
+
+- 無作為抽出
+- 有意抽出
+- 便宜的抽出
+
+
+🔰 「日本を代表する歌手は誰？渋谷の若者10人に聞きました」の注意点・問題点を列挙しよう
+
+---
+## サンプリングバイアス
+
+- カバレッジ誤差
+  - ランダムな電話番号にアンケート。電話を持たない人はカバーされない。
+-
+
+---
+## Excelの危険性
+
+データ入力して表形式のファイルを作るには便利。
+
+しかし親切設計がユーザーに牙を剥く！
+
+- 数値が勝手に日付になる
+- 遺伝子名が勝手に日付になる
+
+---
+## 代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="image/hist-income-japan-2019.png" width="100%" style="">
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  </a>
+  </div>
+</div>
+
+目的や状況に応じて使い分けよう。
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+---
+## ばらつきを捉える記述統計量
+
+- 最大値、最小値
+- パーセンタイル
+- 分散、標準偏差
+
+
+---
+## 記述統計量に頼りすぎず分布を可視化する
+
+```{r visualize-distribution}
+library(palmerpenguins)
+df = mpg %>% dplyr::mutate(y = hwy)
+p0 = ggplot(df) + aes(y = y) +
+  theme_classic() +
+  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+cowplot::plot_grid(
+  p0 + geom_point(aes(x = 0), shape = 16, alpha = 0.2),
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.2) + coord_cartesian(xlim = c(-1, 1)),
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1),
+  p0 + geom_histogram(fill = "#999999"),
+  p0 + geom_density(fill = "#999999", color = NA),
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_cartesian(xlim = c(-1, 1)),
+  p0 + geom_boxplot() + coord_cartesian(xlim = c(-1, 1))
+)
+```
+
+
+```r
+library(tidyverse)
+col_names = c("gene", "terms")
+df = readr::read_tsv("Metal-GO-list.txt", col_names = col_names) %>% print()
+df_modified = df %>%
+  dplyr::mutate(terms = stringr::str_split(terms, ",")) %>%
+  print()
+```
+
+
+---
+## 相関係数の罠
+
+- 外れ値
+- グループ構造
+- 単純な相関ではない構造
+
+---
+## 多重検定
+
+p = 0.05 の検定を100回やったら5回は有意になってしまう。
+
+
+---
+## 割合
+
+実数を見たら割合を疑え。割合を見たら実数を疑え。
+
+シンプソンのパラドックス
+
+---
+## 切り取りによる印象操作
+
+
+---
+## 軸の範囲
+
+軸をゼロから始めるべき場合
+
+飛んで ≈ を使わない
+
+
+---
+## R Markdown 形式でレポートを書く
+
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/slides/image/hex-stickers/rmarkdown.png" width="120" align="right">
+</a>
+
+解析からレポート作成まで一元管理できて楽ちん。
+
+- 本文とRコードを含むテキストファイル.Rmdを作る。
+- HTML, PDF, Wordなどの形式に変換する。
+  - コードそのものも当然埋め込める。
+  - 実行結果の**図**や**表**も埋め込める。
+
+<hr>
+
+R Markdown (`.Rmd`)
+: Rなどで図や表を埋め込めるようにした**Markdown**亜種。
+
+Markdown (`.md`)
+: 最もよく普及している**軽量マークアップ言語**のひとつ。
+: 微妙に異なる方言がある。Rmdで使うのは Pandoc Markdown 。
+
+🔰 どんなものが作れるのか
+[作成例ギャラリー](https://rmarkdown.rstudio.com/gallery.html)
+を見てみよう。
+
+---
+## マークアップ言語
+
+文書の構造や視覚的修飾を記述するための言語。<br>
+e.g., **HTML**+CSS, XML, LaTeX
+
+```html
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
+
+🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
+
+
+---
+## 軽量マークアップ言語
+
+**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
+e.g., **Markdown**, reStructuredText, 各種Wiki記法など
+
+```md
+### 見出し3
+
+ここは段落。
+*強調(italic)*、
+**強い強調(bold)**、
+[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+
+---
+## Markdown記法で書いてみよう
+
+1. RStudio > New File > Markdown File
+   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
+1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
+   - 見出し
+   - 箇条書き (番号あり・なし)
+   - インラインコード、コードブロック
+1. <kbd>Preview</kbd>ボタンで確認
+
+---
+## R Markdown を作ってみよう
+
+RStudio > 🟢 New File > R Markdown...<br>
+(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
+
+<img src="/slides/image/rstudio/new-r-markdown.png" width="70%">
+
+---
+## 普通のmdには無いRmdの特徴
+
+**ヘッダー**
+: 最上部の `---` で挟まれた部分。
+  文書全体に関わるメタデータを入力。
+: オプションは出力形式によって異なる。
+  e.g., [`html_document`](https://bookdown.org/yihui/rmarkdown/html-document.html)
+
+**R code chunk**
+: `` ```{r chunk-name, opt1=FALSE, ...} `` のように始まるブロック。
+: コードの実行結果を最終産物に埋め込める。
+: [オプションがいろいろある](https://yihui.org/knitr/options/)。e.g.,
+  - `echo=FALSE`: コードを非表示。結果は表示。
+  - `eval=FALSE`: コードを実行せず表示だけ。
+  - `include=FALSE`: コードも結果も表示せず、実行だけする。
+  - `fig.width=7, fig.height=7`: 図の大きさを制御。
+
+まあ細かいことは必要になってから調べるとして...
+
+
+---
+## R MarkdownをHTMLに変換してみよう
+
+1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
+   e.g., `report.Rmd`
+1. 🧶 Knit ボタンを押す。
+   - 埋め込まれたRコードが実行される。
+   - 実行結果を含むMarkdownが作られる。
+   - MarkdownからHTMLに変換される。 e.g., `report.html`
+   - プレビューが自動的に開く。
+
+🔰 編集 → Knit を繰り返して変化を確認しよう
+
+
+---
+🔰 課題
+
+1. インターネットで良くないデータ解析を探し、
+   悪い点と改善案を列挙しよう。
+
+4/18月曜に班ごとに相談・発表してもらいます。
+
+
+---
+🔰 レポート
+
+実習中に解いた課題をR Markdownでまとめてください。
+
+- 課題
+  - 講義資料の🔰若葉マークの練習問題
+  - 毎日最後に出てた課題
+- 評価ポイント
+  - エラーも警告も無くコードが動く
+  - 文書の構造や図が視覚的に見やすく整理されている
+  - 習った技術や自分で調べた技術がいろいろ盛り込まれている
+- 手抜きポイント
+  - 生物学的な意義、実用性があるか、みたいなのは不問
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- R Markdown
+  - [Cheat sheet (PDF)](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf)
+  - [R for Data Science --- R Markdown](https://r4ds.had.co.nz/r-markdown.html)
+  - [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)

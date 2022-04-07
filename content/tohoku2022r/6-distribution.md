@@ -11,6 +11,8 @@ draft = false
 
 # [進化学実習 2022 牧野研](.)
 
+### 6. 統計モデリング1: 確率分布、尤度
+
 <div class="author">
 岩嵜航、牧野能士
 </div>
@@ -18,16 +20,6 @@ draft = false
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野
 </div>
-
-<ol>
-<li><a href="1-introduction.html">導入: データ解析の全体像。Rを使うメリット。Rの基本。</a>
-<li><a href="2-visualization.html">データの可視化。</a>
-<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
-<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
-<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
-<li class="current-deck"><a href="6-distribution.html">統計モデリング1: 確率分布、尤度</a>
-<li><a href="7-glm.html">統計モデリング2: 一般化線形モデル</a>
-</ol>
 
 <div class="footnote">
 2022-04-11 東北大学 理学部生物学科 進化学実習
@@ -244,7 +236,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 
 ---
-## 本講演のお品書き
+## 統計モデリングのお品書き
 
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
@@ -256,12 +248,12 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 「データ解析のための統計モデリング入門」<br>
 をベースに回帰分析の概要を紹介。
 
-1. イントロ [(#7 9/30)](distribution.html)
+1. イントロ [(#6 今回)](6-distribution.html)
 1. 統計モデルの基本
-    - 確率変数・**確率分布** 👈 本日の主役
+    - 確率変数・**確率分布** 👈 主役
     - 尤度・最尤推定
-1. 一般化線形モデル、混合モデル [(#10 12/14 前半)](glm.html)
-1. ベイズ統計、階層ベイズモデル [(#10 12/14 後半)](bayesian.html)
+1. 一般化線形モデル、混合モデル [(#7 次回)](7-glm.html)
+1. <del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない
 
 回帰のキモは**線ではなく分布**。
 
@@ -859,6 +851,12 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
+<!--
+> データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
+> 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
+> 三中信宏「統計思考の世界」
+-->
+
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
@@ -881,6 +879,11 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 ---
+## 🔰 課題
+
+
+
+---
 ## 参考文献
 
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
@@ -892,6 +895,6 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 - [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
 
-<a href="6-distribution.html" rel="next" class="readmore">
+<a href="7-glm.html" rel="next" class="readmore">
 7. 統計モデリング2: 一般化線形モデル
 </a>

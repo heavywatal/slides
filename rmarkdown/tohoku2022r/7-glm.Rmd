@@ -11,6 +11,8 @@ draft = false
 
 # [進化学実習 2022 牧野研](.)
 
+### 7. 統計モデリング2: 一般化線形モデル
+
 <div class="author">
 岩嵜航、牧野能士
 </div>
@@ -18,16 +20,6 @@ draft = false
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野
 </div>
-
-<ol>
-<li><a href="1-introduction.html">導入: データ解析の全体像。Rを使うメリット。Rの基本。</a>
-<li><a href="2-visualization.html">データの可視化。</a>
-<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
-<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
-<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
-<li><a href="6-distribution.html">統計モデリング1: 確率分布、尤度</a>
-<li class="current-deck"><a href="7-glm.html">統計モデリング2: 一般化線形モデル</a>
-</ol>
 
 <div class="footnote">
 2022-04-11 東北大学 理学部生物学科 進化学実習
@@ -46,7 +38,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
-## 全体の構成
+## 統計モデリングのお品書き
 
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
@@ -58,12 +50,12 @@ knitr::opts_chunk$set(cache = TRUE)
 「データ解析のための統計モデリング入門」<br>
 をベースに回帰分析の概要を紹介。
 
-1. イントロ [(#7 9/30)](distribution.html)
+1. イントロ [(#6 昨日)](6-distribution.html)
 1. 統計モデルの基本
     - 確率変数・**確率分布** 👈 主役
     - 尤度・最尤推定
-1. 一般化線形モデル、混合モデル [(#10 12/14 前半)](glm.html)
-1. ベイズ統計、階層ベイズモデル [(#10 12/14 後半)](bayesian.html)
+1. 一般化線形モデル、混合モデル [(#7 今回)](7-glm.html)
+1. <del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない
 
 回帰のキモは**線ではなく分布**。
 
@@ -966,7 +958,7 @@ tidy_od %>%
 「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
 i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
 
-```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, warning = FALSE}
 df_od %>%
   tibble::rowid_to_column("id") %>%
   ggplot() + aes(id, y / 8) +
@@ -987,7 +979,7 @@ df_od %>%
 その能力値は全個体共通の正規分布に従うと仮定:
 $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
-```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
 # tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) %>%
 z_hat = wtl::logit(p_hat)
 p_sigmoid =
@@ -1022,7 +1014,7 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 
 普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
 
-```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
 df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) %>%
@@ -1071,7 +1063,7 @@ p_mixed + geom_col(width = 0.4, fill = "#3366ff", alpha = 0.6)
 
 正規分布と二項分布の混ぜ合わせ......?
 
-```{r alter-sigma-z, echo = FALSE, fig.height = 3.5, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r alter-sigma-z, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 p_z + geom_col(aes(fill = z), width = 0.1) +
   scale_fill_viridis_b(option = "turbo", breaks = breaks)
 
@@ -1084,7 +1076,7 @@ p_mixed + geom_col(aes(fill = z), width = 0.4) +
 
 パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
 
-```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 df_mixed %>%
   dplyr::filter(sigma == max(sigma)) %>%
   dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf))) %>%
@@ -1102,7 +1094,7 @@ df_mixed %>%
 
 <div align="center">
 
-```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, cache = FALSE, warning = FALSE}
+```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, warning = FALSE}
 p1 = df_mixed %>%
   dplyr::filter(sigma == max(sigma)) %>%
   ggplot() + aes(y, Density) +
@@ -1209,6 +1201,11 @@ e.g.,<br>
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
+
+
+---
+## 🔰 課題
+
 
 
 ---

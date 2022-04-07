@@ -11,6 +11,8 @@ draft = false
 
 # [進化学実習 2022 牧野研](.)
 
+### 5. データ内容の処理: 数値、文字列、日時など。
+
 <div class="author">
 岩嵜航、牧野能士
 </div>
@@ -18,16 +20,6 @@ draft = false
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野
 </div>
-
-<ol>
-<li><a href="1-introduction.html">導入: データ解析の全体像。Rを使うメリット。Rの基本。</a>
-<li><a href="2-visualization.html">データの可視化。</a>
-<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
-<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
-<li class="current-deck"><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
-<li><a href="6-distribution.html">統計モデリング1: 確率分布、尤度</a>
-<li><a href="7-glm.html">統計モデリング2: 一般化線形モデル</a>
-</ol>
 
 <div class="footnote">
 2022-04-11 東北大学 理学部生物学科 進化学実習
@@ -898,6 +890,125 @@ wday(today, label = TRUE)
 </a>
 </figure>
 
+
+---
+## 🔰 課題: 好きなデータをいじくり倒してみよう
+
+- 自分がこれから解析したいデータ (もし手元にあれば)
+- Rやパッケージに付属のデータ
+    - `diamonds`, `starwars`, `mpg`, etc. See `data()`
+- 何か適当なパブリックデータ
+    - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
+    - [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+    - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
+    - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+    - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
+- 「うまくいかない」「こうしたい」「もっとエレガントな方法」
+  など気軽に質問してください
+
+---
+## 実演: [目黒区オープンデータ](https://odcs.bodik.jp/131105/)
+
+[町丁別・年齢別・男女別人口...](https://data.bodik.jp/organization/968e265c-d998-4475-8abf-7e8a53f81595?res_format=CSV&groups=gr_0200)
+の最新CSVをダウンロード、読み込み
+
+```{r meguro_read, echo = -1}
+if (FALSE) {
+  infile = "https://data.bodik.jp/dataset/98331303-9277-4266-bac6-a637ab5e47a5/resource/8019010f-a2b1-4313-bcd8-45ade27d2a3d/download/131105_population_20211001.csv"
+  raw_meguro = readr::read_csv(infile)
+  readr::write_csv(raw_meguro, fs::path_file(infile), na = "")
+}
+infile = "131105_population_20211001.csv"
+raw_meguro = readr::read_csv(infile)
+print(raw_meguro)
+```
+
+---
+## 実演: 目黒区オープンデータ
+
+ggplotしたくなる形に変形。1行ずつ経過を確認しよう。
+
+```{r meguro_tidy}
+tidy_meguro = raw_meguro %>%
+  select("地域名", matches("の.+性$")) %>%
+  rename(place = 地域名) %>%
+  mutate(place = str_remove(place, "\\S丁目")) %>%
+  group_by(place) %>%
+  summarize(across(everything(), sum)) %>%
+  ungroup() %>%
+  pivot_longer(!place, names_to = "category", values_to = "count") %>%
+  separate(category, c("age", "sex"), sep = "の") %>%
+  mutate(age = as.integer(str_extract(age, "^\\d+"))) %>%
+  filter(!is.na(age)) %>%
+  print()
+```
+
+---
+## 実演: 目黒区オープンデータ
+
+作図してみる
+
+```{r meguro_plot, fig.height = 4.5, fig.width = 10}
+ggplot(tidy_meguro) +
+  aes(age, count) +
+  geom_col(aes(fill = sex)) +
+  facet_wrap(vars(place), nrow = 3L) +
+  theme_bw(base_family = "HiraginoSans-W3") # 日本語は鬼門
+```
+
+---
+## 実演: [e-Stat 国勢調査2015](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) (宮城県)
+
+文字コードが古い。列名が2行にまたがってる。数値の列に変な文字。
+
+```{r estat_read}
+infile = "tblT000849C04.txt"
+sjis = locale(encoding = "SJIS")
+# readr::read_csv(infile, locale = sjis)
+miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) %>%
+  dplyr::slice(-1)
+miyagi_R = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7), skip = 1L, na = c("-", "X"), name_repair = "minimal")
+raw_miyagi = bind_cols(miyagi_L, miyagi_R) %>% print()
+```
+
+---
+## 実演: e-Stat 国勢調査2015 (宮城県)
+
+まだ罠がたくさん: 列名の頭にスペース。全角数字。変な区分。
+
+```{r estat_tidy}
+tidy_miyagi = raw_miyagi %>%
+  dplyr::filter(HYOSYO == 1) %>%
+  dplyr::select(CITYNAME, matches("[男女].+[歳上]$")) %>%
+  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") %>%
+  dplyr::mutate(category = str_trim(category)) %>%
+  tidyr::separate(category, c("sex", "age"), 1) %>%
+  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) %>%
+  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") %>%
+  dplyr::mutate(lower = parse_number(lower), upper = parse_number(upper)) %>%
+  dplyr::filter((upper - lower) < 5 | lower == 75) %>%
+  dplyr::rename(age = lower) %>%
+  print()
+```
+
+---
+## 実演: e-Stat 国勢調査2015 (宮城県)
+
+```{r estat_factor, include = FALSE}
+total_miyagi = tidy_miyagi %>%
+  dplyr::count(CITYNAME, wt = count, name = "count") %>%
+  dplyr::arrange(desc(count))
+tidy_miyagi = tidy_miyagi %>%
+  dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
+```
+
+```{r estat_plot, fig.height = 6, fig.width = 11}
+ggplot(tidy_miyagi) +
+  aes(age, count) +
+  geom_col(aes(fill = sex)) +
+  facet_wrap(vars(CITYNAME), ncol = 8L) +
+  theme_minimal(base_family = "HiraginoSans-W3", base_size = 14)
+```
 
 ---
 ## Reference

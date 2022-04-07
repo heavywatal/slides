@@ -11,6 +11,8 @@ draft = false
 
 # [進化学実習 2022 牧野研](.)
 
+### 7. 統計モデリング2: 一般化線形モデル
+
 <div class="author">
 岩嵜航、牧野能士
 </div>
@@ -18,16 +20,6 @@ draft = false
 <div class="affiliation">
 東北大学 生命科学研究科 進化ゲノミクス分野
 </div>
-
-<ol>
-<li><a href="1-introduction.html">導入: データ解析の全体像。Rを使うメリット。Rの基本。</a>
-<li><a href="2-visualization.html">データの可視化。</a>
-<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
-<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
-<li><a href="5-content.html">データ内容の処理: 数値、文字列、日時など。</a>
-<li><a href="6-distribution.html">統計モデリング1: 確率分布、尤度</a>
-<li class="current-deck"><a href="7-glm.html">統計モデリング2: 一般化線形モデル</a>
-</ol>
 
 <div class="footnote">
 2022-04-11 東北大学 理学部生物学科 進化学実習
@@ -39,7 +31,7 @@ draft = false
 
 
 ---
-## 全体の構成
+## 統計モデリングのお品書き
 
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
@@ -51,12 +43,12 @@ draft = false
 「データ解析のための統計モデリング入門」<br>
 をベースに回帰分析の概要を紹介。
 
-1. イントロ [(#7 9/30)](distribution.html)
+1. イントロ [(#6 昨日)](6-distribution.html)
 1. 統計モデルの基本
     - 確率変数・**確率分布** 👈 主役
     - 尤度・最尤推定
-1. 一般化線形モデル、混合モデル [(#10 12/14 前半)](glm.html)
-1. ベイズ統計、階層ベイズモデル [(#10 12/14 後半)](bayesian.html)
+1. 一般化線形モデル、混合モデル [(#7 今回)](7-glm.html)
+1. <del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない
 
 回帰のキモは**線ではなく分布**。
 
@@ -677,6 +669,11 @@ e.g.,<br>
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
+
+
+---
+## 🔰 課題
+
 
 
 ---

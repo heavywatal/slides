@@ -1,7 +1,7 @@
 +++
 title = "進化学実習 2022 牧野研"
 date = 2022-04-11T08:45:00+13:00
-draft = true
+draft = false
 unlisted = false
 +++
 
@@ -27,7 +27,7 @@ unlisted = false
     本実習では、近年さらに易しくなったR言語を用いることで、
     生データから効果的な作図まで簡単に辿り着けるということを体験してもらいます。
 -   到達目標:
-    生物学研究におけるデータ解釈・解析の重要性を理解する。
+    生物学研究におけるデータ解釈・解析の重要性を認識する。
     Rを使用してデータの前処理・可視化ができるようになる。
 -   授業計画
     1. 導入: データ解析の全体像。Rを使うメリット。Rの基本。
@@ -37,7 +37,7 @@ unlisted = false
     5. データ内容の処理: 数値、文字列、日時など。
     6. 統計モデリング1: 確率分布、尤度
     7. 統計モデリング2: 一般化線形モデル
-    8. データ解釈の基礎知識
+    8. データ解釈の基礎知識、レポート作成方法
     9. 実践・発表
 
     | 時間  | 4/11 Mon | 4/12 Tue | 4/13 Wed | 4/14 Thu | 4/18 Mon |
@@ -54,7 +54,7 @@ unlisted = false
     - [江崎貴裕「分析者のためのデータ解釈学入門」](https://amzn.to/3uznzCK) 2020
     - [Hadley Wickham, Garrett Grolemund "R for Data Science"](https://r4ds.had.co.nz/)
     - [本橋智光「前処理大全」](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)
--   参照ウェブサイト: <https://heavywatal.github.io/slides/tohoku2022r/>
+-   講義資料置き場: <https://heavywatal.github.io/slides/tohoku2022r/>
 
 
 ## 実習環境の設定
