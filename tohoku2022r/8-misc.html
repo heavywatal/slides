@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>8. データ解釈の基礎知識、レポート作成 — 進化学実習 2022 牧野研</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="8. データ解釈の基礎知識、レポート作成 — 進化学実習 2022 牧野研">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tohoku2022r/8-misc.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.96.0" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="進化学実習-2022-牧野研"><a href=".">進化学実習 2022 牧野研</a></h1>
+<h3 id="8-データ解釈の基礎知識レポート作成">8. データ解釈の基礎知識、レポート作成</h3>
+<div class="author">
+岩嵜航、牧野能士
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野
+</div>
+<div class="footnote">
+2022-04-11 東北大学 理学部生物学科 進化学実習
+<a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
+</div>
+
+</section>
+<section>
+<h2 id="この実習の目標">この実習の目標</h2>
+<h3 id="-del生物学研究にはデータとモデルが必須だと認識del">✅ <del>生物学研究にはデータとモデルが必須だと認識</del></h3>
+<h3 id="-del再現可能な解析を楽にやりたい気持ちになるdel">✅ <del>再現可能な解析を楽にやりたい気持ちになる</del></h3>
+<h3 id="-del必要な方法を調べ実践する力をつけるdel">✅ <del>必要な方法を調べ、実践する力をつける</del></h3>
+<h3 id="-データ解析の基本に触れる">⬜ データ解析の基本に触れる</h3>
+<br>
+個々の方法は覚えなくても大丈夫！<br>
+忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+
+</section>
+<section>
+<h2 id="観測は簡単ではない">観測は簡単ではない</h2>
+<ul>
+<li>バイアス</li>
+<li>誤差</li>
+</ul>
+
+</section>
+<section>
+<h2 id="garbage-in-garbage-out">Garbage in, garbage out</h2>
+<p>どんなにすごい統計処理をしようとも、データがゴミなら結論もゴミ。
+</section>
+<section>
+<h2 id="rで下ごしらえして整然データにできるとはいえ">Rで下ごしらえして整然データにできる、とはいえ</h2>
+<p>読み込みすらままならないデータから始めるのは大変。</p>
+<p>自分が一時データを作るときに気をつけること。</p>
+
+</section>
+<section>
+<h2 id="2種類の誤差-偶然誤差と系統的誤差">2種類の誤差: 偶然誤差と系統的誤差</h2>
+<p>偶然誤差 random error</p>
+<p>系統的誤差 systematic error</p>
+
+</section>
+<section>
+<h2 id="偶然誤差への対処">偶然誤差への対処</h2>
+
+</section>
+<section>
+<h2 id="データや解釈に潜むバイアス">データや解釈に潜むバイアス</h2>
+<ul>
+<li>測定基準に関するバイアス
+<ul>
+<li>基準が揃っていない</li>
+<li>基準が時間とともに変化</li>
+</ul>
+</li>
+<li>選択バイアス
+<ul>
+<li>生存バイアス</li>
+<li>サンプリングバイアス</li>
+<li>志願者バイアス</li>
+<li>出版バイアス</li>
+</ul>
+</li>
+<li>観測介入</li>
+<li>データの扱いに起因するバイアス
+<ul>
+<li>cherry picking</li>
+<li>確証バイアス</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="相関関係と因果関係">相関関係と因果関係</h2>
+<dl>
+<dt>相関関係</dt>
+<dd>ある値が大きいほど、別の値が大きくor小さくなる。</dd>
+<dd>e.g., 数学の成績と物理の成績。</dd>
+<dt>因果関係</dt>
+<dd>ある事象が別の事象に影響を与える。</dd>
+<dd>e.g., 筋トレしたら筋肉が増える。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="因果関係があれば相関関係として表れる">因果関係があれば相関関係として表れる</h2>
+<p>しかしその逆は成り立たない→
+</section>
+<section>
+<h2 id="相関関係があるからといって因果関係があるとは限らない">相関関係があるからといって因果関係があるとは限らない</h2>
+<p>見かけの因果関係が生じるパターン</p>
+<ul>
+<li>たまたま <a href="http://www.tylervigen.com/spurious-correlations">http://www.tylervigen.com/spurious-correlations</a></li>
+<li>交絡因子: 共通の原因</li>
+<li>逆の因果関係</li>
+<li>選択バイアス</li>
+</ul>
+
+</section>
+<section>
+<h2 id="変数間の関係性">変数間の関係性</h2>
+<p>図 4.1.5
+</section>
+<section>
+<h2 id="データの取り方">データの取り方</h2>
+<p>全数調査 vs 標本調査</p>
+<p>無作為抽出</p>
+
+</section>
+<section>
+<h2 id="サンプルサイズ">サンプルサイズ</h2>
+<p>🔰 仙台市民100万人のうち10万人がAB型だとする。サンプルサイズを変えて結果を見てみる。</p>
+<p>標準誤差</p>
+<p>信頼区間</p>
+
+</section>
+<section>
+<h2 id="標本抽出-sampling">標本抽出 (Sampling)</h2>
+<p>スープの味見をするのに全部を飲み干す必要はない。</p>
+<ul>
+<li>無作為抽出</li>
+<li>有意抽出</li>
+<li>便宜的抽出</li>
+</ul>
+<p>🔰 「日本を代表する歌手は誰？渋谷の若者10人に聞きました」の注意点・問題点を列挙しよう</p>
+
+</section>
+<section>
+<h2 id="サンプリングバイアス">サンプリングバイアス</h2>
+<ul>
+<li>カバレッジ誤差
+<ul>
+<li>ランダムな電話番号にアンケート。電話を持たない人はカバーされない。</li>
+</ul>
+</li>
+<li></li>
+</ul>
+
+</section>
+<section>
+<h2 id="excelの危険性">Excelの危険性</h2>
+<p>データ入力して表形式のファイルを作るには便利。</p>
+<p>しかし親切設計がユーザーに牙を剥く！</p>
+<ul>
+<li>数値が勝手に日付になる</li>
+<li>遺伝子名が勝手に日付になる</li>
+</ul>
+
+</section>
+<section>
+<h2 id="代表値-central-tendency">代表値 central tendency</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+<dl>
+<dt>平均値 mean</dt>
+<dd>和を観察数で割る</dd>
+<dt>中央値 median</dt>
+<dd>順に並べて真ん中</dd>
+<dt>最頻値 mode</dt>
+<dd>最も頻度が高い値
+</div>
+<div class="column">
+<a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+<img src="image/hist-income-japan-2019.png" width="100%" style="">
+<figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+</a>
+</div>
+</dd>
+</dl>
+</div>
+<p>目的や状況に応じて使い分けよう。</p>
+<dl>
+<dt>外れ値に対する応答</dt>
+<dd>もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+→ 県民の<strong>平均</strong>資産は4000万円上昇。<strong>中央値</strong>・<strong>最頻値</strong>はほぼそのまま。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="ばらつきを捉える記述統計量">ばらつきを捉える記述統計量</h2>
+<ul>
+<li>最大値、最小値</li>
+<li>パーセンタイル</li>
+<li>分散、標準偏差</li>
+</ul>
+
+</section>
+<section>
+<h2 id="記述統計量に頼りすぎず分布を可視化する">記述統計量に頼りすぎず分布を可視化する</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">mpg</span> <span class="o">%&gt;%</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">hwy</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p0</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_classic</span><span class="p">()</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme</span><span class="p">(</span><span class="n">axis.title.x</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">(),</span> <span class="n">axis.text.x</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">(),</span> <span class="n">axis.ticks</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="m">0</span><span class="p">),</span> <span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.2</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_jitter</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="m">0</span><span class="p">),</span> <span class="n">height</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.2</span><span class="p">)</span> <span class="o">+</span> <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">xlim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">-1</span><span class="p">,</span> <span class="m">1</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_dotplot</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="m">0</span><span class="p">),</span> <span class="n">binaxis</span> <span class="o">=</span> <span class="s">&#34;y&#34;</span><span class="p">,</span> <span class="n">binwidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;#999999&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_density</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;#999999&#34;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="kc">NA</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_violin</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="m">0</span><span class="p">),</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;#999999&#34;</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="kc">NA</span><span class="p">)</span> <span class="o">+</span> <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">xlim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">-1</span><span class="p">,</span> <span class="m">1</span><span class="p">)),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p0</span> <span class="o">+</span> <span class="nf">geom_boxplot</span><span class="p">()</span> <span class="o">+</span> <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">xlim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">-1</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre><p><img src="figure/visualize-distribution-1.png" alt="plot of chunk visualize-distribution"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">col_names</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;gene&#34;</span><span class="p">,</span> <span class="s">&#34;terms&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;Metal-GO-list.txt&#34;</span><span class="p">,</span> <span class="n">col_names</span> <span class="o">=</span> <span class="n">col_names</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_modified</span> <span class="o">=</span> <span class="n">df</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">terms</span> <span class="o">=</span> <span class="n">stringr</span><span class="o">::</span><span class="nf">str_split</span><span class="p">(</span><span class="n">terms</span><span class="p">,</span> <span class="s">&#34;,&#34;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="相関係数の罠">相関係数の罠</h2>
+<ul>
+<li>外れ値</li>
+<li>グループ構造</li>
+<li>単純な相関ではない構造</li>
+</ul>
+
+</section>
+<section>
+<h2 id="多重検定">多重検定</h2>
+<p>p = 0.05 の検定を100回やったら5回は有意になってしまう。
+</section>
+<section>
+<h2 id="割合">割合</h2>
+<p>実数を見たら割合を疑え。割合を見たら実数を疑え。</p>
+<p>シンプソンのパラドックス</p>
+
+</section>
+<section>
+<h2 id="切り取りによる印象操作">切り取りによる印象操作</h2>
+
+</section>
+<section>
+<h2 id="軸の範囲">軸の範囲</h2>
+<p>軸をゼロから始めるべき場合</p>
+<p>飛んで ≈ を使わない</p>
+
+</section>
+<section>
+<h2 id="r-markdown-形式でレポートを書く">R Markdown 形式でレポートを書く</h2>
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/slides/image/hex-stickers/rmarkdown.png" width="120" align="right">
+</a>
+<p>解析からレポート作成まで一元管理できて楽ちん。</p>
+<ul>
+<li>本文とRコードを含むテキストファイル.Rmdを作る。</li>
+<li>HTML, PDF, Wordなどの形式に変換する。
+<ul>
+<li>コードそのものも当然埋め込める。</li>
+<li>実行結果の<strong>図</strong>や<strong>表</strong>も埋め込める。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<dl>
+<dt>R Markdown (<code>.Rmd</code>)</dt>
+<dd>Rなどで図や表を埋め込めるようにした<strong>Markdown</strong>亜種。</dd>
+<dt>Markdown (<code>.md</code>)</dt>
+<dd>最もよく普及している<strong>軽量マークアップ言語</strong>のひとつ。</dd>
+<dd>微妙に異なる方言がある。Rmdで使うのは Pandoc Markdown 。</dd>
+</dl>
+<p>🔰 どんなものが作れるのか
+<a href="https://rmarkdown.rstudio.com/gallery.html">作成例ギャラリー</a>
+を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="マークアップ言語">マークアップ言語</h2>
+<p>文書の構造や視覚的修飾を記述するための言語。<br>
+e.g., <strong>HTML</strong>+CSS, XML, LaTeX</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>見出し3<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>ここは段落。
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">em</span><span class="p">&gt;</span>強調(italic)<span class="p">&lt;/</span><span class="nt">em</span><span class="p">&gt;</span>、
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>強い強調(bold)<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>、
+</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;https://www.lifesci.tohoku.ac.jp/&#34;</span><span class="p">&gt;</span>リンク<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>とか。
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</span></span></code></pre></div><div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+<p>表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。</p>
+<p>🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="軽量マークアップ言語">軽量マークアップ言語</h2>
+<p><strong>マークアップ言語</strong>の中でも人間が読み書きしやすいもの。<br>
+e.g., <strong>Markdown</strong>, reStructuredText, 各種Wiki記法など</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-md" data-lang="md"><span class="line"><span class="cl"><span class="gu">### 見出し3
+</span></span></span><span class="line"><span class="cl"><span class="gu"></span>
+</span></span><span class="line"><span class="cl">ここは段落。
+</span></span><span class="line"><span class="cl"><span class="ge">*強調(italic)*</span>、
+</span></span><span class="line"><span class="cl"><span class="gs">**強い強調(bold)**</span>、
+</span></span><span class="line"><span class="cl">[<span class="nt">リンク</span>](<span class="na">https://www.lifesci.tohoku.ac.jp/</span>)とか。
+</span></span></code></pre></div><div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+</section>
+<section>
+<h2 id="markdown記法で書いてみよう">Markdown記法で書いてみよう</h2>
+<ol>
+<li>RStudio &gt; New File &gt; Markdown File
+<img src="/slides/image/rstudio/new-markdown.png" width="60%"></li>
+<li><a href="https://duckduckgo.com/?q=markdown+syntax">&ldquo;markdown 記法&quot;とかで検索</a>しつつ何か書く。
+<ul>
+<li>見出し</li>
+<li>箇条書き (番号あり・なし)</li>
+<li>インラインコード、コードブロック</li>
+</ul>
+</li>
+<li><kbd>Preview</kbd>ボタンで確認</li>
+</ol>
+
+</section>
+<section>
+<h2 id="r-markdown-を作ってみよう">R Markdown を作ってみよう</h2>
+<p>RStudio &gt; 🟢 New File &gt; R Markdown&hellip;<br>
+(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。</p>
+<img src="/slides/image/rstudio/new-r-markdown.png" width="70%">
+</section>
+<section>
+<h2 id="普通のmdには無いrmdの特徴">普通のmdには無いRmdの特徴</h2>
+<dl>
+<dt><strong>ヘッダー</strong></dt>
+<dd>最上部の <code>---</code> で挟まれた部分。
+文書全体に関わるメタデータを入力。</dd>
+<dd>オプションは出力形式によって異なる。
+e.g., <a href="https://bookdown.org/yihui/rmarkdown/html-document.html"><code>html_document</code></a></dd>
+<dt><strong>R code chunk</strong></dt>
+<dd><code>```{r chunk-name, opt1=FALSE, ...}</code> のように始まるブロック。</dd>
+<dd>コードの実行結果を最終産物に埋め込める。</dd>
+<dd><a href="https://yihui.org/knitr/options/">オプションがいろいろある</a>。e.g.,
+<ul>
+<li><code>echo=FALSE</code>: コードを非表示。結果は表示。</li>
+<li><code>eval=FALSE</code>: コードを実行せず表示だけ。</li>
+<li><code>include=FALSE</code>: コードも結果も表示せず、実行だけする。</li>
+<li><code>fig.width=7, fig.height=7</code>: 図の大きさを制御。</li>
+</ul>
+</dd>
+</dl>
+<p>まあ細かいことは必要になってから調べるとして&hellip;
+</section>
+<section>
+<h2 id="r-markdownをhtmlに変換してみよう">R MarkdownをHTMLに変換してみよう</h2>
+<ol>
+<li>ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
+e.g., <code>report.Rmd</code></li>
+<li>🧶 Knit ボタンを押す。
+<ul>
+<li>埋め込まれたRコードが実行される。</li>
+<li>実行結果を含むMarkdownが作られる。</li>
+<li>MarkdownからHTMLに変換される。 e.g., <code>report.html</code></li>
+<li>プレビューが自動的に開く。</li>
+</ul>
+</li>
+</ol>
+<p>🔰 編集 → Knit を繰り返して変化を確認しよう
+</section>
+<section>
+<p>🔰 課題</p>
+<ol>
+<li>インターネットで良くないデータ解析を探し、
+悪い点と改善案を列挙しよう。</li>
+</ol>
+<p>4/18月曜に班ごとに相談・発表してもらいます。</p>
+
+</section>
+<section>
+<p>🔰 レポート</p>
+<p>実習中に解いた課題をR Markdownでまとめてください。</p>
+<ul>
+<li>課題
+<ul>
+<li>講義資料の🔰若葉マークの練習問題</li>
+<li>毎日最後に出てた課題</li>
+</ul>
+</li>
+<li>評価ポイント
+<ul>
+<li>エラーも警告も無くコードが動く</li>
+<li>文書の構造や図が視覚的に見やすく整理されている</li>
+<li>習った技術や自分で調べた技術がいろいろ盛り込まれている</li>
+</ul>
+</li>
+<li>手抜きポイント
+<ul>
+<li>生物学的な意義、実用性があるか、みたいなのは不問</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li>R Markdown
+<ul>
+<li><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf">Cheat sheet (PDF)</a></li>
+<li><a href="https://r4ds.had.co.nz/r-markdown.html">R for Data Science &mdash; R Markdown</a></li>
+<li><a href="https://bookdown.org/yihui/rmarkdown/">R Markdown: The Definitive Guide</a></li>
+</ul>
+</li>
+</ul>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
