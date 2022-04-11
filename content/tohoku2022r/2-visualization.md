@@ -295,7 +295,10 @@ boxplot(Petal.Width ~ Species, data = iris)
 
 R標準のやつとは根本的に違うシステムで作図する。
 
+<figure>
 <img src="/slides/image/rstats/r-graphics.svg">
+<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+</figure>
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -827,10 +830,10 @@ ggplot2は3Dが苦手
 <hr>
 
 ---
-## 🔰 課題
+## 🔰 1日目の課題
 
 下図になるべく似るように調整して `ggsave()` してください。<br>
-次回、数人グループに分かれてコードと図を見せ合います。
+次回、グループに分かれてコードと図を見せ合います。
 
 ![plot of chunk ggplot-homework](figure/ggplot-homework-1.png)
 

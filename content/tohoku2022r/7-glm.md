@@ -524,6 +524,277 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 - モデルを比較するときは情報量基準を参考にする
 
 
+
+---
+## penguinsデータセット
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```r
+# install.packages("palmerpenguins")
+library(palmerpenguins)
+print(penguins)
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```
+
+---
+## penguinsデータセット
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+
+```
+      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex  year
+        <fct>     <fct>          <dbl>         <dbl>             <int>       <int>  <fct> <int>
+  1    Adelie Torgersen           39.1          18.7               181        3750   male  2007
+  2    Adelie Torgersen           39.5          17.4               186        3800 female  2007
+  3    Adelie Torgersen           40.3          18.0               195        3250 female  2007
+  4    Adelie Torgersen             NA            NA                NA          NA     NA  2007
+ --                                                                                            
+341 Chinstrap     Dream           43.5          18.1               202        3400 female  2009
+342 Chinstrap     Dream           49.6          18.2               193        3775   male  2009
+343 Chinstrap     Dream           50.8          19.0               210        4100   male  2009
+344 Chinstrap     Dream           50.2          18.7               198        3775 female  2009
+```
+
+---
+## 単回帰の練習: 1. まず作図
+
+どうやら、重いペンギンほど翼長も長い。
+
+
+```r
+p_penweight = ggplot(penguins) +
+  aes(body_mass_g, flipper_length_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+p_penweight
+```
+
+![plot of chunk penguins-weight](figure/penguins-weight-1.png)
+
+
+---
+## 単回帰の練習: 2. モデル作成、フィッティング
+
+
+```r
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
+broom::tidy(fit1)
+```
+
+```
+         term     estimate   std.error statistic       p.value
+        <chr>        <dbl>       <dbl>     <dbl>         <dbl>
+1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
+2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
+```
+
+```r
+broom::glance(fit1)
+```
+
+```
+  null.deviance df.null    logLik      AIC     BIC deviance df.residual  nobs
+          <dbl>   <int>     <dbl>    <dbl>   <dbl>    <dbl>       <int> <int>
+1      67426.54     341 -1145.518 2297.035 2308.54  16250.3         340   342
+```
+
+---
+## 単回帰の練習: 3. フィッティング結果を作図
+
+$y = 136.7 + 0.0153 x$
+
+
+```r
+added1 = modelr::add_predictions(penguins, fit1)
+p1 = p_penweight +
+  geom_line(aes(y = pred), data = added1, size = 1, color = "#3366ff")
+p1
+```
+
+![plot of chunk penguins-weight-glm](figure/penguins-weight-glm-1.png)
+
+---
+## 重回帰の練習: 1. まず作図
+
+重いペンギンほど翼長も長い。翼長は種によっても違うかも。
+
+
+```r
+p_penweight_color = p_penweight + aes(color = species) +
+  scale_color_manual(values = penguins_colors)
+p_penweight_color
+```
+
+![plot of chunk penguins-weight-sp](figure/penguins-weight-sp-1.png)
+
+
+---
+## 重回帰の練習: 2. モデル作成、フィッティング
+
+Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+体重の効果は単回帰のときより小さい。
+
+
+```r
+fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
+broom::tidy(fit2)
+```
+
+```
+              term     estimate    std.error statistic       p.value
+             <chr>        <dbl>        <dbl>     <dbl>         <dbl>
+1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
+2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
+4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+```
+
+```r
+broom::glance(fit2)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
+          <dbl>   <int>     <dbl>    <dbl>    <dbl>    <dbl>       <int> <int>
+1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
+```
+
+---
+## 重回帰の練習: 3. フィッティング結果を作図
+
+
+```r
+added2 = modelr::add_predictions(penguins, fit2)
+p2 = p_penweight_color +
+  geom_line(aes(y = pred), data = added2, size = 1)
+p2
+```
+
+![plot of chunk penguins-weight-sp-glm](figure/penguins-weight-sp-glm-1.png)
+
+**傾き**も種によって違うかも。**交互作用**を入れてみたい。
+
+
+---
+## 交互作用の練習: モデル作成、フィッティング
+
+Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+切片の違いは解釈しにくくなった。
+
+
+```r
+fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
+broom::tidy(fit2)
+```
+
+```
+              term     estimate    std.error statistic       p.value
+             <chr>        <dbl>        <dbl>     <dbl>         <dbl>
+1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
+2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
+4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+```
+
+```r
+broom::glance(fit2)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
+          <dbl>   <int>     <dbl>    <dbl>    <dbl>    <dbl>       <int> <int>
+1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
+```
+
+---
+## 交互作用の練習: フィッティング結果を作図
+
+
+```r
+added3 = modelr::add_predictions(penguins, fit3)
+p3 = p_penweight_color +
+  geom_line(aes(y = pred), data = added3, size = 1)
+p3
+```
+
+![plot of chunk penguins-interaction](figure/penguins-interaction-1.png)
+
+---
+## ここまでの3つのモデルでどれがいいか？
+
+AICで選ぶなら交互作用入り重回帰のが良さそう。
+
+```r
+AIC(fit1, fit2, fit3)$AIC
+```
+![plot of chunk penguins-aic](figure/penguins-aic-1.png)
+
+
+---
+## GLMの練習
+
+🔰クチバシの長さと深さで同じ解析をやってみよう。
+
+![plot of chunk penguins-bill](figure/penguins-bill-1.png)
+
+🔰余裕があったら性別や年なども説明変数に入れてみよう。
+
+
+---
+## 確率分布とリンク関数を明示的に指定したい
+
+何も指定しない場合は正規分布・恒等リンクだった:
+
+```r
+formula = flipper_length_mm ~ body_mass_g
+fit1 = glm(formula, data = penguins)
+fit1$family
+```
+
+```
+
+Family: gaussian 
+Link function: identity 
+```
+
+こう書いたのと同じ:
+```r
+glm(formula, data = penguins, family = gaussian(link = identity))
+```
+
+利用可能な確率分布リンク関数は `?family` などを参照。
+
+
+---
+## 🔰 4日目の課題1
+
+1. これまでに登場したデータセット、何でもいいのでGLMを適用してみよう。
+1. 確率分布とリンク関数を差し替えてAICの変化を確認しよう。
+1. 正規分布**じゃない**ほうが当てはまりのいいデータを探してみよう。
+
+4/18月曜はまず30分ほど班ごとに相談。<br>
+その後、各班の代表事例な発表してもらいます。
+
+- データの出どころ、概要
+- 読み込み、前処理、可視化、フィッティングのコード
+- できあがりの図
+
+<!--  -->
+
+---
+## ここ以降は余裕があれば進む
+
 ---
 ## n個のうちy個生存。二項分布に従......わない！
 
@@ -669,11 +940,6 @@ e.g.,<br>
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
-
-
----
-## 🔰 課題
-
 
 
 ---

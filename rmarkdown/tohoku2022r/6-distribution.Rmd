@@ -414,12 +414,30 @@ result = optim(par_init, fn = rss_weight, data = df_weight)
 result$par
 ```
 
-```{r weight-lm, echo = FALSE, fig.height = 5, fig.width = 5}
+```{r weight-lm, echo = FALSE, fig.height = 4, fig.width = 4}
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label)
 ```
+
+上記コードは最適化一般の書き方。<br>
+回帰が目的なら次ページのようにするのが楽 →
+
+---
+## `lm()` で直線あてはめしてみる
+
+```{r lm-mpg, fig.height = 2.5, fig.width = 2.5}
+fit = lm(data = mpg, formula = hwy ~ displ)
+broom::tidy(fit)
+
+mpg_added = modelr::add_predictions(mpg, fit)
+ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = pred), size = 1, color = "#3366ff")
+```
+
+🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
+
 
 ---
 ## 何でもかんでも直線あてはめではよろしくない
@@ -1236,12 +1254,6 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
-<!--
-> データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
-> 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
-> 三中信宏「統計思考の世界」
--->
-
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
@@ -1264,7 +1276,15 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 ---
-## 🔰 課題
+## 🔰 3日目の課題2
+
+サイコロを10回振ったら6の目が3回出た。
+
+1. 6の目の出る確率が1/6だとした場合の尤度は？
+
+1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
+
+1. このサイコロで6の目が出る確率を最尤推定しよう。
 
 
 

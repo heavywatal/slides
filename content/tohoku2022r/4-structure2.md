@@ -880,7 +880,7 @@ print(economics)
 ## 🔰 課題: `world_bank_pop` を変形して作図しよう
 
 ```r
-printdf(world_bank_pop)
+print(world_bank_pop)
 ```
 
 ```

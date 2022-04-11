@@ -913,6 +913,220 @@ ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
 - モデルを比較するときは情報量基準を参考にする
 
 
+
+---
+## penguinsデータセット
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```r
+# install.packages("palmerpenguins")
+library(palmerpenguins)
+print(penguins)
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```
+
+---
+## penguinsデータセット
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```{r penguins, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
+if (!require(palmerpenguins, quietly = TRUE)) {
+  install.packages("palmerpenguins")
+  library(palmerpenguins)
+}
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+print(penguins)
+```
+
+---
+## 単回帰の練習: 1. まず作図
+
+どうやら、重いペンギンほど翼長も長い。
+
+```{r penguins-weight, fig.height = 5, fig.width = 5, warning = FALSE}
+p_penweight = ggplot(penguins) +
+  aes(body_mass_g, flipper_length_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+p_penweight
+```
+
+
+---
+## 単回帰の練習: 2. モデル作成、フィッティング
+
+```{r penguins-fit1}
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
+broom::tidy(fit1)
+broom::glance(fit1)
+```
+
+---
+## 単回帰の練習: 3. フィッティング結果を作図
+
+$y = 136.7 + 0.0153 x$
+
+```{r penguins-weight-glm, fig.height = 5, fig.width = 5, warning = FALSE}
+added1 = modelr::add_predictions(penguins, fit1)
+p1 = p_penweight +
+  geom_line(aes(y = pred), data = added1, size = 1, color = "#3366ff")
+p1
+```
+
+---
+## 重回帰の練習: 1. まず作図
+
+重いペンギンほど翼長も長い。翼長は種によっても違うかも。
+
+```{r penguins-weight-sp, fig.height = 5, fig.width = 7, warning = FALSE}
+p_penweight_color = p_penweight + aes(color = species) +
+  scale_color_manual(values = penguins_colors)
+p_penweight_color
+```
+
+
+---
+## 重回帰の練習: 2. モデル作成、フィッティング
+
+Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+体重の効果は単回帰のときより小さい。
+
+```{r penguins-fit2}
+fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
+broom::tidy(fit2)
+broom::glance(fit2)
+```
+
+---
+## 重回帰の練習: 3. フィッティング結果を作図
+
+```{r penguins-weight-sp-glm, fig.height = 5, fig.width = 7, warning = FALSE}
+added2 = modelr::add_predictions(penguins, fit2)
+p2 = p_penweight_color +
+  geom_line(aes(y = pred), data = added2, size = 1)
+p2
+```
+
+**傾き**も種によって違うかも。**交互作用**を入れてみたい。
+
+
+---
+## 交互作用の練習: モデル作成、フィッティング
+
+Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+切片の違いは解釈しにくくなった。
+
+```{r penguins-fit3}
+fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
+broom::tidy(fit2)
+broom::glance(fit2)
+```
+
+---
+## 交互作用の練習: フィッティング結果を作図
+
+```{r penguins-interaction, fig.height = 5, fig.width = 7, warning = FALSE}
+added3 = modelr::add_predictions(penguins, fit3)
+p3 = p_penweight_color +
+  geom_line(aes(y = pred), data = added3, size = 1)
+p3
+```
+
+---
+## ここまでの3つのモデルでどれがいいか？
+
+AICで選ぶなら交互作用入り重回帰のが良さそう。
+
+```r
+AIC(fit1, fit2, fit3)$AIC
+```
+```{r penguins-aic, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
+labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
+cowplot::plot_grid(p1 + labs(title = labels[1]),
+                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
+                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
+```
+
+
+---
+## GLMの練習
+
+🔰クチバシの長さと深さで同じ解析をやってみよう。
+
+```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
+p_bill = penguins %>%
+  ggplot() + aes(bill_length_mm, bill_depth_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  scale_color_manual(values = penguins_colors) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins)
+fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins)
+fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins)
+p1 = p_bill +
+  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
+p2 = p_bill + aes(color = species) +
+  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit2), size = 1)
+p3 = p_bill + aes(color = species) +
+  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit3), size = 1)
+labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
+cowplot::plot_grid(p1 + labs(title = labels[1]),
+                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
+                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
+```
+
+🔰余裕があったら性別や年なども説明変数に入れてみよう。
+
+
+---
+## 確率分布とリンク関数を明示的に指定したい
+
+何も指定しない場合は正規分布・恒等リンクだった:
+```{r glm-default-family}
+formula = flipper_length_mm ~ body_mass_g
+fit1 = glm(formula, data = penguins)
+fit1$family
+```
+
+こう書いたのと同じ:
+```r
+glm(formula, data = penguins, family = gaussian(link = identity))
+```
+
+利用可能な確率分布リンク関数は `?family` などを参照。
+
+
+---
+## 🔰 4日目の課題1
+
+1. これまでに登場したデータセット、何でもいいのでGLMを適用してみよう。
+1. 確率分布とリンク関数を差し替えてAICの変化を確認しよう。
+1. 正規分布**じゃない**ほうが当てはまりのいいデータを探してみよう。
+
+4/18月曜はまず30分ほど班ごとに相談。<br>
+その後、各班の代表事例な発表してもらいます。
+
+- データの出どころ、概要
+- 読み込み、前処理、可視化、フィッティングのコード
+- できあがりの図
+
+<!--  -->
+
+---
+## ここ以降は余裕があれば進む
+
 ---
 ## n個のうちy個生存。二項分布に従......わない！
 
@@ -1201,11 +1415,6 @@ e.g.,<br>
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
-
-
----
-## 🔰 課題
-
 
 
 ---

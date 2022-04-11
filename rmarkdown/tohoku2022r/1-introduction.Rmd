@@ -48,8 +48,8 @@ iris = tibble::as_tibble(iris)
   - データの前処理
   - レポート作成
 - データ解析入門
-  - 統計モデリング
-  - データの性質・落とし穴
+  - 統計モデリング・仮説検定
+  - データ解釈の心構え・落とし穴
 
 牧野研以外の実習・研究でも使える知識・技術。<br>
 (研究じゃない場面でも役に立つはず。)
@@ -937,15 +937,32 @@ print(mydata)
     iris2 = read_tsv("data/iris.tsv")  # 読み込み
     ```
 
-- 現在の作業ディレクトリとその中身を確認しておこう:
+あれれー、エラーが出る？
 
-    ```r
-    getwd()               # Get Working Directory
-    list.files(".")       # List files in "."
-    list.files("data")    # List files in "./data"
-    ```
+```{r cannot-open, echo = FALSE}
+readr::write_tsv(iris, "data/iris.tsv")
+```
 
-🔰 R組み込みデータや自作データを読み書きしてみよう
+---
+## ファイル読み書きでありがちなエラー
+
+- 読みたいファイル名が間違っている。
+- 読みたいファイルが作業ディレクトリとは違うところにある。
+- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
+
+冷静に、現在の作業ディレクトリとその中身を確認しよう:
+```r
+getwd()               # GET Working Directory
+list.files(".")       # List files in "." (here)
+list.files("data")    # List files in "./data"
+dir.create("data")    # Create directory
+```
+
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html)
+を読んでおきましょう。
+
+🔰 R組み込みデータや自作データを読み書きしてみよう。
+
 
 ---
 ## R package
@@ -1034,9 +1051,9 @@ library(tidyverse)
 
 - エラーのほとんどは凡ミス由来。よく確認しよう。
     - エラー文をちゃんと読む: `No such file or directory`
+    - 変数の中身を確かめる: `str(iris)`, `attributes(iris)`
     - [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html)
       をチェックする
-    - 変数の中身を確かめる: `str(iris)`, `attributes(iris)`
 - エラー文やパッケージ名をコピペしてウェブ検索<br>
   → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
   や個人サイトに解決策

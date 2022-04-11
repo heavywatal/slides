@@ -342,6 +342,36 @@ intercept     slope
 
 ![plot of chunk weight-lm](figure/weight-lm-1.png)
 
+上記コードは最適化一般の書き方。<br>
+回帰が目的なら次ページのようにするのが楽 →
+
+---
+## `lm()` で直線あてはめしてみる
+
+
+```r
+fit = lm(data = mpg, formula = hwy ~ displ)
+broom::tidy(fit)
+```
+
+```
+         term  estimate std.error statistic       p.value
+        <chr>     <dbl>     <dbl>     <dbl>         <dbl>
+1 (Intercept) 35.697651 0.7203676  49.55477 2.123519e-125
+2       displ -3.530589 0.1945137 -18.15085  2.038974e-46
+```
+
+```r
+mpg_added = modelr::add_predictions(mpg, fit)
+ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = pred), size = 1, color = "#3366ff")
+```
+
+![plot of chunk lm-mpg](figure/lm-mpg-1.png)
+
+🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
+
+
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
@@ -851,12 +881,6 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
-<!--
-> データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
-> 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
-> 三中信宏「統計思考の世界」
--->
-
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
@@ -879,7 +903,15 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 ---
-## 🔰 課題
+## 🔰 3日目の課題2
+
+サイコロを10回振ったら6の目が3回出た。
+
+1. 6の目の出る確率が1/6だとした場合の尤度は？
+
+1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
+
+1. このサイコロで6の目が出る確率を最尤推定しよう。
 
 
 

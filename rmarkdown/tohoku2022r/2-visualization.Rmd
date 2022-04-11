@@ -312,7 +312,10 @@ boxplot(Petal.Width ~ Species, data = iris)
 
 R標準のやつとは根本的に違うシステムで作図する。
 
+<figure>
 <img src="/slides/image/rstats/r-graphics.svg">
+<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+</figure>
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -788,10 +791,10 @@ ggplot2は3Dが苦手
 <hr>
 
 ---
-## 🔰 課題
+## 🔰 1日目の課題
 
 下図になるべく似るように調整して `ggsave()` してください。<br>
-次回、数人グループに分かれてコードと図を見せ合います。
+次回、グループに分かれてコードと図を見せ合います。
 
 ```{r ggplot-homework, fig.height = 3.8, fig.width = 12, echo = FALSE}
 p_iris = ggplot(iris) +
@@ -810,10 +813,12 @@ p_diamonds = ggplot(diamonds) +
   theme(panel.grid.minor = element_blank())
 
 p_mpg = ggplot(mpg) +
-  aes(drv, cty) +
-  geom_boxplot(aes(fill = drv)) +
+  aes(class, cty) +
+  geom_boxplot(aes(fill = class)) +
   geom_jitter(height = 0, width = 0.2, alpha = 0.5, shape = 16) +
-  theme_classic(base_size = 16)
+  scale_fill_viridis_d(option = "turbo", guide = "none") +
+  coord_flip() +
+  theme_classic(base_size = 15)
 
 cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
 ```
