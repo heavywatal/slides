@@ -91,8 +91,8 @@ if (!doNotTrack) {
 </li>
 <li>データ解析入門
 <ul>
-<li>統計モデリング</li>
-<li>データの性質・落とし穴</li>
+<li>統計モデリング・仮説検定</li>
+<li>データ解釈の心構え・落とし穴</li>
 </ul>
 </li>
 </ul>
@@ -919,14 +919,27 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 </span></span><span class="line"><span class="cl"><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
 </span></span><span class="line"><span class="cl"><span class="n">iris2</span> <span class="o">=</span> <span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
 </span></span></code></pre></div></li>
-<li>
-<p>現在の作業ディレクトリとその中身を確認しておこう:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># Get Working Directory</span>
-</span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
-</span></span></code></pre></div></li>
 </ul>
-<p>🔰 R組み込みデータや自作データを読み書きしてみよう</p>
+<p>あれれー、エラーが出る？</p>
+<pre tabindex="0"><code>Error: Cannot open file for writing:
+* &#39;data/iris.tsv&#39;
+</code></pre>
+</section>
+<section>
+<h2 id="ファイル読み書きでありがちなエラー">ファイル読み書きでありがちなエラー</h2>
+<ul>
+<li>読みたいファイル名が間違っている。</li>
+<li>読みたいファイルが作業ディレクトリとは違うところにある。</li>
+<li>書き込み先のディレクトリが存在しない。→ 予め作っておこう</li>
+</ul>
+<p>冷静に、現在の作業ディレクトリとその中身を確認しよう:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">getwd</span><span class="p">()</span>               <span class="c1"># GET Working Directory</span>
+</span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34; (here)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="nf">dir.create</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># Create directory</span>
+</span></span></code></pre></div><p><a href="https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
+を読んでおきましょう。</p>
+<p>🔰 R組み込みデータや自作データを読み書きしてみよう。</p>
 
 </section>
 <section>
@@ -1002,9 +1015,9 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 <li>エラーのほとんどは凡ミス由来。よく確認しよう。
 <ul>
 <li>エラー文をちゃんと読む: <code>No such file or directory</code></li>
+<li>変数の中身を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
 <li><a href="https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
 をチェックする</li>
-<li>変数の中身を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
 </ul>
 </li>
 <li>エラー文やパッケージ名をコピペしてウェブ検索<br>

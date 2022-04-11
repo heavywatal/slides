@@ -363,6 +363,23 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 </span></span></code></pre></div><pre tabindex="0"><code>intercept     slope 
 -50.54532  67.18659 
 </code></pre><p><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
+<p>上記コードは最適化一般の書き方。<br>
+回帰が目的なら次ページのようにするのが楽 →</p>
+
+</section>
+<section>
+<h2 id="lm-で直線あてはめしてみる"><code>lm()</code> で直線あてはめしてみる</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">lm</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">hwy</span> <span class="o">~</span> <span class="n">displ</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>         term  estimate std.error statistic       p.value
+        &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+1 (Intercept) 35.697651 0.7203676  49.55477 2.123519e-125
+2       displ -3.530589 0.1945137 -18.15085  2.038974e-46
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mpg_added</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">mpg</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg_added</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/lm-mpg-1.png" alt="plot of chunk lm-mpg"></p>
+<p>🔰 <code>diamonds</code> などほかのデータでも <code>lm()</code> を試してみよう。</p>
 
 </section>
 <section>
@@ -752,11 +769,6 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 <blockquote>
 <p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
 </blockquote>
-<!--
-> データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
-> 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
-> 三中信宏「統計思考の世界」
--->
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
@@ -786,7 +798,19 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 
 </section>
 <section>
-<h2 id="-課題">🔰 課題</h2>
+<h2 id="-3日目の課題2">🔰 3日目の課題2</h2>
+<p>サイコロを10回振ったら6の目が3回出た。</p>
+<ol>
+<li>
+<p>6の目の出る確率が1/6だとした場合の尤度は？</p>
+</li>
+<li>
+<p>横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。</p>
+</li>
+<li>
+<p>このサイコロで6の目が出る確率を最尤推定しよう。</p>
+</li>
+</ol>
 
 </section>
 <section>
