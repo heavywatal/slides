@@ -851,7 +851,7 @@ world_bank_pop %>%
   pivot_longer(matches("^\\d+$"), names_to = "year")
 ```
 
-See ["tidyselect helpers"](https://tidyselect.r-lib.org/reference/select_helpers.html) for more details.
+See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) for more details.
 
 
 ---
@@ -1287,16 +1287,18 @@ Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
 ## 🔰 3日目の課題1: 好きなデータをいじくり倒してみよう
 
 - 自分がこれから解析したいデータ (もし手元にあれば)
-- Rやパッケージに付属のデータ
-    - `diamonds`, `starwars`, `mpg`, etc. See `data()`
-- 何か適当なパブリックデータ
+- 何か適当なパブリックデータ。例えば:
     - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
     - [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
     - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
     - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
     - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
-- 「うまくいかない」「こうしたい」「もっとエレガントな方法」
-  など気軽に質問してください
+- (苦肉の策) Rやパッケージに付属のデータ
+    - `diamonds`, `starwars`, `mpg`, etc. See `data()`
+
+発表・レポートの条件
+: 最低1枚の図と、そこに至る前処理＋可視化のコード。
+: グラフから読み取れることを一言。
 
 ---
 ## 実演: [目黒区オープンデータ](https://odcs.bodik.jp/131105/)

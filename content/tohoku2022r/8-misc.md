@@ -348,7 +348,7 @@ $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 
 <figure style="margin-top: -1em;">
 <a href="http://leeswijzer.org/R/R-top.html">
-<img src="/slides/image/rstats/Mandala2004-small" width="80%">
+<img src="/slides/image/rstats/Mandala2004-small.jpg" width="80%">
 <figcaption><cite>「大統計曼荼羅」三中信宏</cite></figcaption>
 </a>
 </figure>
@@ -840,7 +840,7 @@ e.g., **Markdown**, reStructuredText, 各種Wiki記法など
 1. RStudio > New File > Markdown File
    <img src="/slides/image/rstudio/new-markdown.png" width="60%">
 1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
-   - 見出し
+   - 見出し1, 2, 3
    - 箇条書き (番号あり・なし)
    - インラインコード、コードブロック
 1. <kbd>Preview</kbd>ボタンで確認
@@ -889,6 +889,11 @@ RStudio > 🟢 New File > R Markdown...<br>
 
 
 ---
+## レポートの体裁の例
+
+
+
+---
 ## 🔰 4日目の課題2
 
 書籍、ニュースサイト、ブログ記事などを検索し、
@@ -897,9 +902,9 @@ RStudio > 🟢 New File > R Markdown...<br>
 1. データの集め方(サンプルの選び方)が良くない例
 1. データの解釈が良くない例
 1. 生データを公開しているのはいいけど、形式が良くない例
-1. 図の書き方で嘘をついている例
+1. 図の描き方で嘘をついている例
 
-4/18月曜はまず30分ほど班ごとに相談。<br>
+4/18月曜はまず40分ほど班ごとに相談。<br>
 その後、各班の代表事例な発表してもらいます。
 
 

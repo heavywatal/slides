@@ -798,16 +798,16 @@ ggplot2は3Dが苦手
 
 ```{r ggplot-homework, fig.height = 3.8, fig.width = 12, echo = FALSE}
 p_iris = ggplot(iris) +
-  aes(Sepal.Length, Sepal.Width) +
-  geom_point(aes(color = Species), shape = 16, size = 2, alpha = 0.6) +
-  stat_smooth(aes(color = Species), method = lm, formula = y ~ x, se = FALSE, size = 1, alpha = 0.6) +
+  aes(Sepal.Length, Sepal.Width, color = Species) +
+  geom_point(shape = 16, size = 2, alpha = 0.6) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, size = 1, alpha = 0.6) +
   scale_color_brewer(palette = "Set1") +
   theme_gray(base_size = 14) +
   theme(legend.position = "top", axis.ticks = element_blank())
 
 p_diamonds = ggplot(diamonds) +
   aes(price) +
-  geom_histogram(bins = 20, fill = "darkorange") +
+  geom_histogram(bins = 20, boundary = 0, fill = "darkorange") +
   labs(title = "Distribution of diamonds price") +
   theme_bw(base_size = 14) +
   theme(panel.grid.minor = element_blank())
