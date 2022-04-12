@@ -654,8 +654,6 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 </section>
 <section>
 <h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
-<p>🔰 <code>?rbinom</code> などヘルプを参照しつつたくさん試そう。</p>
-<p>🔰 e.g., 1%の当たりを狙って100連ガチャを回した場合とか</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">100</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">sample.int</span><span class="p">(</span><span class="m">6</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">min</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
@@ -668,7 +666,11 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">()</span> <span class="c1"># for continuous values</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">()</span>       <span class="c1"># for discrete values</span>
-</span></span></code></pre></div>
+</span></span></code></pre></div><p>🔰 小さい <code>n</code> から徐々に大きくして変化を確認しよう。</p>
+<p>🔰 ほかのオプションもいろいろ変えて変化を確認しよう。</p>
+<p>🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
+全部はずれ、1つ当たり、2つ当たり&hellip; の人はどれくらいいるか？</p>
+
 </section>
 <section>
 <h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
@@ -802,15 +804,24 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 <p>サイコロを10回振ったら6の目が3回出た。</p>
 <ol>
 <li>
-<p>6の目の出る確率が1/6だとした場合の尤度は？</p>
+<p>6の目の出る確率が1/6だとした場合の尤度は?</p>
+</li>
+<li>
+<p>6の目の出る確率が0.2だとした場合の尤度は?</p>
 </li>
 <li>
 <p>横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。</p>
 </li>
 <li>
-<p>このサイコロで6の目が出る確率を最尤推定しよう。</p>
+<p>このサイコロで6の目が出る確率を最尤推定しよう。<br>
+数学で解ければ優。Rで見つければ良。目分量・勘で可。</p>
 </li>
 </ol>
+<dl>
+<dt>ヒント</dt>
+<dd>確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。</dd>
+<dd>数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは <code>choose(5, 2)</code> 。</dd>
+</dl>
 
 </section>
 <section>
