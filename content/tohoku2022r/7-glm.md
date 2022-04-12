@@ -953,3 +953,7 @@ e.g.,<br>
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
 - [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
+
+<a href="8-misc.html" rel="next" class="readmore">
+8. データ解釈の基礎知識、レポート作成
+</a>

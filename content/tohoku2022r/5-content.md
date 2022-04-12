@@ -693,7 +693,7 @@ str_subset(fruit, "^\\w{3,4}$")
 ---
 ## 正規表現: 柔軟な検索・置換を可能にするツール
 
-| メタ文字 | 意味 | &emsp;&emsp;&emsp; | 演算子 | 意味 |
+| メタ文字 | 意味 | &emsp;&emsp; | 演算子 | 意味 |
 | ---- | ---- | --- | ---- | ---- |
 | `\d` | 数字 (逆は `\D`) | | `?`  | 0回か1回 |
 | `\s` | 空白 (逆は `\S`) | | `*`  | 0回以上繰り返し |
@@ -1308,22 +1308,6 @@ Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
 ```r
 infile = "131105_population_20211001.csv"
 raw_meguro = readr::read_csv(infile)
-```
-
-```
-Rows: 88 Columns: 50
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (3): 都道府県名, 市区町村名, 地域名
-dbl  (45): 都道府県コード又は市区町村コード, 地域コード, 総人口, 男性, 女性, 0-4歳の男性, 0-4歳の女性, 5-9歳の男性, 5-9歳の女性, 10-14歳の男性, 10-14歳の女性, 15-19歳の男性, 15-19歳の女性, 20-24歳の男性, 20-24歳の女性, 25-29歳の男性, 25-29歳の女性, 30-34歳の男性, 30-34歳の女性, 35-39歳の男性, 35-39歳の女性, 40-44歳の男性, 40-44歳の女性, 45-49歳の男性, 45-49歳の女性, 50-54歳の男性, 50-54歳の女性, 55-59歳の男性, 55-59歳の女性, 60-64歳の男性, 60-64歳の女性, 65-69歳の男性, 65-69歳の女性, 70-74歳の男性, 70-74歳の女性, 75-79歳の男性, 75-79歳の女性, 80-84歳の男性, 80-84歳の女性, 85歳以上の男性, 85歳以上の女性, 不詳者の男性, 不詳者の女性, 世帯数, KEY_CODE
-lgl   (1): 備考
-date  (1): 調査年月日
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-
-```r
 print(raw_meguro)
 ```
 
@@ -1390,9 +1374,7 @@ ggplot(tidy_meguro) +
   theme_bw(base_family = "HiraginoSans-W3") # 日本語は鬼門
 ```
 
-```
-Error in ggplot(tidy_meguro): object 'tidy_meguro' not found
-```
+![plot of chunk meguro_plot](figure/meguro_plot-1.png)
 
 ---
 ## 実演: [e-Stat 国勢調査2015](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) (宮城県)
@@ -1406,34 +1388,7 @@ sjis = locale(encoding = "SJIS")
 # readr::read_csv(infile, locale = sjis)
 miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) %>%
   dplyr::slice(-1)
-```
-
-```
-Rows: 5884 Columns: 7
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (5): KEY_CODE, CITYNAME, NAME, HTKSAKI, GASSAN
-dbl (2): HYOSYO, HTKSYORI
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-
-```r
 miyagi_R = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7), skip = 1L, na = c("-", "X"), name_repair = "minimal")
-```
-
-```
-Rows: 5883 Columns: 60
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-dbl (60): 総数、年齢「不詳」含む, 　総数０〜４歳, 　総数５〜９歳, 　総数１０〜１４歳, 　総数１５〜１９歳, 　総数２０〜２４歳, 　総数２５〜２９歳, 　総数３０〜３４歳, 　総数３５〜３９歳, 　総数４０〜４４歳, 　総数４５〜４９歳, 　総数５０〜５４歳, 　総数５５〜５９歳, 　総数６０〜６４歳, 　総数６５〜６９歳, 　総数７０〜７４歳, 　総数１５歳未満, 　総数１５〜６４歳, 　総数６５歳以上, 　総数７５歳以上, 男の総数、年齢「不詳」含む, 　男０〜４歳, 　男５〜９歳, 　男１０〜１４歳, 　男１５〜１９歳, 　男２０〜２４歳, 　男２５〜２９歳, 　男３０〜３４歳, 　男３５〜３９歳, 　男４０〜４４歳, 　男４５〜４９歳, 　男５０〜５４歳, 　男５５〜５９歳, 　男６０〜６４歳, 　男６５〜６９歳, 　男７０〜７４歳, 　男１５歳未満, 　男１５〜６４歳, 　男６５歳以上, 　男７５歳以上, 女の総数、年齢「不詳」含む, 　女０〜４歳, 　女５〜９歳, 　女１０〜１４歳, 　女１５〜１９歳, 　女２０〜２４歳, 　女２５〜２９歳, 　女３０〜３４歳, 　女３５〜３９歳, 　女４０〜４４歳, 　女４５〜４９歳, 　女５０〜５４歳, 　女５５〜５９歳, 　女６０〜６４歳, 　女６５〜６９歳, 　女７０〜７４歳, 　女１５歳未満, 　女１５〜６４歳, 　女６５歳以上, 　女７５歳以上
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-
-```r
 raw_miyagi = bind_cols(miyagi_L, miyagi_R) %>% print()
 ```
 

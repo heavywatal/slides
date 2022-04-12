@@ -448,7 +448,7 @@ print(p3)
 
 ![plot of chunk ggplot-object](figure/ggplot-object-1.png)
 
-普段はあんまりやらなけど、今日は `p2` とか使う
+普段はあんまりやらなけど、今日は後で `p3` とか使う
 
 ---
 ## ひとまずggplotしてみよう
@@ -722,7 +722,7 @@ p3 + theme_bw() + theme(
 
 ```r
 pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
-cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol=1L)
+cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 ```
 
 ![plot of chunk cowplot](figure/cowplot-1.png)

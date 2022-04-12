@@ -411,7 +411,7 @@ https://r4ds.had.co.nz/strings.html
 <img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
 </a>
 
-```{r stringr, include = FALSE}
+```{r stringr, include = FALSE, cache = FALSE}
 library(stringr)
 ```
 
@@ -470,7 +470,7 @@ str_subset(fruit, "^\\w{3,4}$")
 ---
 ## 正規表現: 柔軟な検索・置換を可能にするツール
 
-| メタ文字 | 意味 | &emsp;&emsp;&emsp; | 演算子 | 意味 |
+| メタ文字 | 意味 | &emsp;&emsp; | 演算子 | 意味 |
 | ---- | ---- | --- | ---- | ---- |
 | `\d` | 数字 (逆は `\D`) | | `?`  | 0回か1回 |
 | `\s` | 空白 (逆は `\S`) | | `*`  | 0回以上繰り返し |
@@ -913,7 +913,7 @@ wday(today, label = TRUE)
 の最新CSVをダウンロード、読み込み
 
 ```{r meguro_read, echo = -1}
-if (FALSE) {
+if (!fs::file_exists("131105_population_20211001.csv")) {
   infile = "https://data.bodik.jp/dataset/98331303-9277-4266-bac6-a637ab5e47a5/resource/8019010f-a2b1-4313-bcd8-45ade27d2a3d/download/131105_population_20211001.csv"
   raw_meguro = readr::read_csv(infile)
   readr::write_csv(raw_meguro, fs::path_file(infile), na = "")
@@ -928,7 +928,7 @@ print(raw_meguro)
 
 ggplotしたくなる形に変形。1行ずつ経過を確認しよう。
 
-```{r meguro_tidy}
+```{r meguro_tidy, cache = FALSE}
 tidy_meguro = raw_meguro %>%
   select("地域名", matches("の.+性$")) %>%
   rename(place = 地域名) %>%
@@ -961,7 +961,8 @@ ggplot(tidy_meguro) +
 
 文字コードが古い。列名が2行にまたがってる。数値の列に変な文字。
 
-```{r estat_read}
+```{r estat_read, echo = -1}
+options(readr.show_col_types = FALSE)
 infile = "tblT000849C04.txt"
 sjis = locale(encoding = "SJIS")
 # readr::read_csv(infile, locale = sjis)
