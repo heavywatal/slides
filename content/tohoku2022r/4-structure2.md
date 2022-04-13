@@ -982,6 +982,21 @@ as.data.frame(VADeaths) %>%              # data.frameに変換
 5 70-74       66.0         54.3       71.1         50.0
 ```
 
+
+```
+   lbound ubound region    sex death
+    <int>  <int>  <chr>  <chr> <dbl>
+ 1     50     54  Rural   Male  11.7
+ 2     50     54  Rural Female   8.7
+ 3     50     54  Urban   Male  15.4
+ 4     50     54  Urban Female   8.4
+--                                  
+17     70     74  Rural   Male  66.0
+18     70     74  Rural Female  54.3
+19     70     74  Urban   Male  71.1
+20     70     74  Urban Female  50.0
+```
+
 ![plot of chunk vadeaths_plot](figure/vadeaths_plot-1.png)
 
 ---

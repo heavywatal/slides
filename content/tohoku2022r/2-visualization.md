@@ -535,8 +535,9 @@ print(diamonds)
 
 
 ```r
-p1 + aes(x = carat, y = price) +
-  geom_point(mapping = aes(color = color, size = clarity))
+ggplot(diamonds) +
+  aes(x = carat, y = price) +
+  geom_point(mapping = aes(color = clarity, size = cut))
 ```
 
 ![plot of chunk aes-map](figure/aes-map-1.png)
@@ -548,7 +549,8 @@ p1 + aes(x = carat, y = price) +
 
 
 ```r
-p1 + aes(x = carat, y = price) +
+ggplot(diamonds) +
+  aes(x = carat, y = price) +
   geom_point(color = "darkorange", size = 6, alpha = 0.4)
 ```
 
@@ -598,7 +600,8 @@ p1 + aes(x = carat, y = price) +
 
 
 ```r
-p1 + aes(x = clarity, y = price) +
+ggplot(diamonds) +
+  aes(clarity, price) +
   geom_boxplot(color = "darkgreen", fill = "gold", alpha = 0.6)
 ```
 
@@ -608,18 +611,39 @@ p1 + aes(x = clarity, y = price) +
 ## 色パレットの変更 `scale_color_*()`
 
 個々の色を自分で決めず、既存のパレットを利用するのが吉。<br>
-e.g., [ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5),
-[viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html)
+e.g., [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html),
+[ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5)
 (色覚多様性・グレースケール対策にも有効)
 
 
 ```r
-p2 + geom_point(mapping = aes(color = color)) +
-  scale_color_viridis_d(option = "plasma") + theme_dark()
+ggplot(diamonds) + aes(carat, price) +
+  geom_point(mapping = aes(color = clarity)) +
+  scale_color_viridis_d(option = "inferno")
 # scale_color_brewer(palette = "Spectral")
 ```
 
-![plot of chunk plasma](figure/plasma-1.png)
+![plot of chunk scale-color](figure/scale-color-1.png)
+
+---
+## 連続値(continuous)と離散値(discrete)を区別する
+
+渡す値とscale関数が合ってないと怒られる:<br>
+`Error: Continuous value supplied to discrete scale`
+
+
+```r
+ggplot(diamonds) + aes(carat, price) +
+  geom_point(mapping = aes(color = price)) +
+  scale_color_viridis_c(option = "inferno")
+# scale_color_distiller(palette = "Spectral")
+```
+
+![plot of chunk scale-color-continous](figure/scale-color-continous-1.png)
+
+- discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
+- continous: `scale_color_viridis_c()`, `scale_color_distiller()`
+- binned: `scale_color_viridis_b()`, `scale_color_fermenter()`
 
 ---
 ## 値に応じてパネル切り分け (1変数facet)

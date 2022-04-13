@@ -505,9 +505,10 @@ print(diamonds)
 
 `aes()` の中で列名を指定する。
 
-```{r aes-map, fig.height = 6, fig.width = 8}
-p1 + aes(x = carat, y = price) +
-  geom_point(mapping = aes(color = color, size = clarity))
+```{r aes-map, fig.height = 5, fig.width = 7}
+ggplot(diamonds) +
+  aes(x = carat, y = price) +
+  geom_point(mapping = aes(color = clarity, size = cut))
 ```
 
 ---
@@ -515,8 +516,9 @@ p1 + aes(x = carat, y = price) +
 
 `aes()` の外で値を指定する。
 
-```{r aes-nomap, fig.height=6, fig.width=7}
-p1 + aes(x = carat, y = price) +
+```{r aes-nomap, fig.height=5, fig.width=5.8}
+ggplot(diamonds) +
+  aes(x = carat, y = price) +
   geom_point(color = "darkorange", size = 6, alpha = 0.4)
 ```
 
@@ -533,15 +535,16 @@ wtl::printdf(mpg, n = 4)
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によって色を塗り分けしてみよう
 
 ```{r ggplot-mpg-color, echo = FALSE, fig.height = 3, fig.width = 10}
-pL = ggplot(data = mpg) +
+pL = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(color = "blue")
-pC = ggplot(data = mpg) +
+pC = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv))
-pR = ggplot(data = mpg) +
+pR = ggplot(mpg) +
   aes(x = displ, y = cty) +
-  geom_point(aes(color = cyl))
+  geom_point(aes(color = cyl)) +
+  scale_color_continuous(type = "gradient")
 cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ```
 
@@ -566,8 +569,9 @@ cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ## 点と線と文字は `color`, 面は `fill`
 
 
-```{r fill, fig.height=6, fig.width=7}
-p1 + aes(x = clarity, y = price) +
+```{r fill, fig.height=5, fig.width=6}
+ggplot(diamonds) +
+  aes(clarity, price) +
   geom_boxplot(color = "darkgreen", fill = "gold", alpha = 0.6)
 ```
 
@@ -575,15 +579,33 @@ p1 + aes(x = clarity, y = price) +
 ## 色パレットの変更 `scale_color_*()`
 
 個々の色を自分で決めず、既存のパレットを利用するのが吉。<br>
-e.g., [ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5),
-[viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html)
+e.g., [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html),
+[ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5)
 (色覚多様性・グレースケール対策にも有効)
 
-```{r plasma, fig.show="hold", fig.height=5, fig.width=7}
-p2 + geom_point(mapping = aes(color = color)) +
-  scale_color_viridis_d(option = "plasma") + theme_dark()
+```{r scale-color, fig.show="hold", fig.height=4, fig.width=6}
+ggplot(diamonds) + aes(carat, price) +
+  geom_point(mapping = aes(color = clarity)) +
+  scale_color_viridis_d(option = "inferno")
 # scale_color_brewer(palette = "Spectral")
 ```
+
+---
+## 連続値(continuous)と離散値(discrete)を区別する
+
+渡す値とscale関数が合ってないと怒られる:<br>
+`Error: Continuous value supplied to discrete scale`
+
+```{r scale-color-continous, fig.show="hold", fig.height=4, fig.width=6}
+ggplot(diamonds) + aes(carat, price) +
+  geom_point(mapping = aes(color = price)) +
+  scale_color_viridis_c(option = "inferno")
+# scale_color_distiller(palette = "Spectral")
+```
+
+- discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
+- continous: `scale_color_viridis_c()`, `scale_color_distiller()`
+- binned: `scale_color_viridis_b()`, `scale_color_fermenter()`
 
 ---
 ## 値に応じてパネル切り分け (1変数facet)
