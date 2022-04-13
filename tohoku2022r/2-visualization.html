@@ -455,15 +455,17 @@ Error in ggplot(diamonds) : could not find function &#34;ggplot&#34;
 <section>
 <h2 id="aesthetic-mapping-でデータと見せ方を紐付け">Aesthetic mapping でデータと見せ方を紐付け</h2>
 <p><code>aes()</code> の中で列名を指定する。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">cut</span><span class="p">))</span>
 </span></span></code></pre></div><p><img src="figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
 
 </section>
 <section>
 <h2 id="データによらず一律でaestheticsを変える">データによらず一律でaestheticsを変える</h2>
 <p><code>aes()</code> の外で値を指定する。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">6</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/aes-nomap-1.png" alt="plot of chunk aes-nomap"></p>
 
@@ -515,7 +517,8 @@ Error in ggplot(diamonds) : could not find function &#34;ggplot&#34;
 </section>
 <section>
 <h2 id="点と線と文字は-color-面は-fill">点と線と文字は <code>color</code>, 面は <code>fill</code></h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">clarity</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkgreen&#34;</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;gold&#34;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.6</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/fill-1.png" alt="plot of chunk fill"></p>
 
@@ -523,13 +526,30 @@ Error in ggplot(diamonds) : could not find function &#34;ggplot&#34;
 <section>
 <h2 id="色パレットの変更-scale_color_">色パレットの変更 <code>scale_color_*()</code></h2>
 <p>個々の色を自分で決めず、既存のパレットを利用するのが吉。<br>
-e.g., <a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;n=5">ColorBrewer</a>,
-<a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html">viridis</a>
+e.g., <a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html">viridis</a>,
+<a href="https://colorbrewer2.org/#type=diverging&amp;scheme=Spectral&amp;n=5">ColorBrewer</a>
 (色覚多様性・グレースケール対策にも有効)</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">))</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_viridis_d</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;plasma&#34;</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme_dark</span><span class="p">()</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_viridis_d</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;inferno&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># scale_color_brewer(palette = &#34;Spectral&#34;)</span>
-</span></span></code></pre></div><p><img src="figure/plasma-1.png" alt="plot of chunk plasma"></p>
+</span></span></code></pre></div><p><img src="figure/scale-color-1.png" alt="plot of chunk scale-color"></p>
+
+</section>
+<section>
+<h2 id="連続値continuousと離散値discreteを区別する">連続値(continuous)と離散値(discrete)を区別する</h2>
+<p>渡す値とscale関数が合ってないと怒られる:<br>
+<code>Error: Continuous value supplied to discrete scale</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">price</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_viridis_c</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;inferno&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># scale_color_distiller(palette = &#34;Spectral&#34;)</span>
+</span></span></code></pre></div><p><img src="figure/scale-color-continous-1.png" alt="plot of chunk scale-color-continous"></p>
+<ul>
+<li>discrete: <code>scale_color_viridis_d()</code>, <code>scale_color_brewer()</code></li>
+<li>continous: <code>scale_color_viridis_c()</code>, <code>scale_color_distiller()</code></li>
+<li>binned: <code>scale_color_viridis_b()</code>, <code>scale_color_fermenter()</code></li>
+</ul>
 
 </section>
 <section>

@@ -178,13 +178,13 @@ if (!doNotTrack) {
 <dl>
 <dt>チェリー・ピッキング 🍒</dt>
 <dd>自分の仮説と矛盾する情報を無視し、都合のいい情報だけ集めること。</dd>
-<dd>研究活動における3つの不正のうち<strong>改竄</strong>にあたる。</dd>
+<dd><a href="https://www.mext.go.jp/b_menu/shingi/gijyutu/gijyutu12/houkoku/attach/1334660.htm">研究活動における3つの不正</a>のうち<strong>改竄</strong>にあたる。</dd>
 <dt>確証バイアス</dt>
 <dd>無意識にチェリー・ピッキングしてしまう心理的傾向。</dd>
 <dd>悪気なくやってしまわないよう、自覚を持つことが大事。</dd>
 </dl>
 <p>表に数字、裏にアルファベットが書いてあるカード。<br>
-「偶数の裏は必ずA」<br>
+「偶数の裏は必ずA、という法則があるか？」<br>
 これを確かめるには次の4枚のうちどれを裏返せばいいか？</p>
 <p><img src="figure/four-cards-1.png" alt="plot of chunk four-cards"></p>
 
@@ -272,19 +272,19 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="2つの量の関係性-大小の比較">2つの量の関係性: 大小の比較</h2>
-<p>ばらつきの度合いも加味することで判断できる。</p>
-<div class="column-container">
-<div class="column" style="flex-shrink: 1;">
+<p>ばらつきの度合いも加味して判断する。</p>
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
 観測値1つだけ。<br>
 たまたまかも。
 </div>
 <div class="column" style="flex-shrink: 1;">
 ばらつき大きい。<br>
-差は無さそう。
+Bが高いのもたまたま?
 </div>
 <div class="column" style="flex-shrink: 1;">
 ばらつき小さい。<br>
-差はありそう。
+AとBには差がありそう。
 </div>
 </div>
 <p><img src="figure/comparison-1.png" alt="plot of chunk comparison"></p>
@@ -293,40 +293,9 @@ if (!doNotTrack) {
 
 </section>
 <section>
-<h2 id="統計的仮説検定の考え方">統計的仮説検定の考え方</h2>
-<p>サイコロを10回振ったら9回も6の目が出たぞ。イカサマのダイスじゃないか？</p>
-<dl>
-<dt>帰無仮説</dt>
-<dd>6の目が出る確率 = 1/6。普通のサイコロです。</dd>
-<dt>対立仮説</dt>
-<dd>6の目が出る確率 ≠ 1/6。</dd>
-</dl>
-<div>\[\begin{split}
-p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6} ^ {10}
-  = 8.43 \times 10 ^ {-7}
-\end{split}\]</div>
-<ol>
-<li>帰無仮説のもとで今回のデータ以上に極端な値が得られる確率$p$を計算</li>
-<li>この <strong><em>p</em>-value</strong> が<strong>有意水準(危険率)</strong>$\alpha$より低い場合、帰無仮説を棄却<br>
-(有意水準は大概0.05とか0.01とか)</li>
-<li>対立仮説を採択。(6の目の出る確率は1/6と有意に異なる)</li>
-</ol>
-
-</section>
-<section>
-<h2 id="統計的仮説検定の考え方">統計的仮説検定の考え方</h2>
-<p>サイコロを12回振ったら4回も6の目が出たぞ。<br>
-これも1/6よりは高いけど、イカサマのダイスかな？</p>
-<p>帰無仮説のもとで12回中<span style="color: #990000;">4回以上6が出る確率: $p = 0.125$</span><br>
-(これは二項分布を使って求められる。詳細は省略)</p>
-<p><img src="figure/test-dice-1.png" alt="plot of chunk test-dice"></p>
-<p>帰無仮説を棄却できず。6の目の出る確率が1/6と有意に異なるとは言えない。</p>
-
-</section>
-<section>
-<h2 id="検定にはいろいろな種類がある">検定にはいろいろな種類がある</h2>
-<p>データの様子や解析の目的に応じて正しいものを選ぶ必要がある。<br>
-が、今回はそこには深入りしない。</p>
+<h2 id="目的やデータに応じて正しい検定を選ぶ">目的やデータに応じて正しい検定を選ぶ</h2>
+<p>例えば「2つの量の大小を比較したい」だけでもいくつかある。<br>
+今回は選定には深入りせず、検定の考え方だけ触れておく。</p>
 <figure><a href="https://comicalcommet.github.io/r-training-2021/">
 <img src="/slides/image/rstats/comicalcommet-test-chart.jpg" width="90%">
 <figcaption><cite>
@@ -336,14 +305,45 @@ p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6
 
 </section>
 <section>
-<h2 id="偽陽性のリスクと多重検定">偽陽性のリスクと多重検定</h2>
+<h2 id="統計的仮説検定の考え方">統計的仮説検定の考え方</h2>
+<p>🎲サイコロを<strong>10回</strong>振ったら<strong>9回</strong>も6の目が出たぞ。イカサマじゃないか？</p>
+<dl>
+<dt>帰無仮説</dt>
+<dd>6の目が出る確率 = 1/6。普通のサイコロです。</dd>
+<dt>対立仮説</dt>
+<dd>6の目が出る確率 ≠ 1/6。イカサマです。</dd>
+</dl>
+<div>\[\begin{split}
+p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6} ^ {10}
+  = 8.43 \times 10 ^ {-7}
+\end{split}\]</div>
+<ol>
+<li>帰無仮説のもとで今回のデータ以上に極端な値が得られる確率<em>p</em>を計算</li>
+<li>この <strong><em>p</em>-value</strong> が<strong>有意水準(危険率)</strong>$\alpha$より低い場合、帰無仮説を棄却<br>
+(大概 $\alpha$ = 0.05 とか 0.01 とか。予め決めておく。)</li>
+<li>対立仮説を採択。6の目の出る確率は1/6と<strong>有意に異なる</strong>。</li>
+</ol>
+
+</section>
+<section>
+<h2 id="統計的仮説検定の考え方">統計的仮説検定の考え方</h2>
+<p>🎲サイコロを<strong>12回</strong>振ったら<strong>4回</strong>も6の目が出たぞ。<br>
+これも1/6よりは高いけど、イカサマのダイスかな？</p>
+<p><span style="color: #990000;">帰無仮説のもとで12回中4回以上6が出る確率: $p = 0.125 &gt; \alpha$</span><br></p>
+<p>帰無仮説を棄却できず。6の目の出る確率が1/6と<strong>有意に異なるとは言えない</strong>。</p>
+<p><img src="figure/test-dice-1.png" alt="plot of chunk test-dice"></p>
+<p>平たく言えば「普通のサイコロでもそんなに珍しい出目じゃない」</p>
+
+</section>
+<section>
+<h2 id="多重検定で偽陽性のリスクが上昇">多重検定で偽陽性のリスクが上昇</h2>
 <p>危険率$\alpha=0.05$の検定は、最大5%の確率で誤って帰無仮説を棄却(<strong>偽陽性</strong>)。<br>
 同様の検定を10回やると、そのうち少なくとも1つで偽陽性になる確率は<br>
 $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br></p>
 <p><img src="figure/multiple-tests-1.png" alt="plot of chunk multiple-tests"></p>
 <dl>
 <dt>多重比較補正</dt>
-<dd>全体の偽陽性率が下がるように有意水準/危険率を調整すること。</dd>
+<dd>検定を繰り返したぶんだけ基準を厳しくして偽陽性率を抑えること。</dd>
 <dd>Bonferroni法、Holm法、Benjamini and Hochberg法など。</dd>
 </dl>
 
@@ -770,7 +770,7 @@ e.g., <strong>Markdown</strong>, reStructuredText, 各種Wiki記法など</p>
 </section>
 <section>
 <h2 id="r-markdown-を作ってみよう">R Markdown を作ってみよう</h2>
-<p>RStudio &gt; 🟢 New File &gt; R Markdown&hellip;<br>
+<p>RStudio &gt; New File &gt; R Markdown&hellip;<br>
 (DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。</p>
 <img src="/slides/image/rstudio/new-r-markdown.png" width="70%">
 </section>
@@ -814,21 +814,11 @@ e.g., <code>report.Rmd</code></li>
 </section>
 <section>
 <h2 id="レポートの体裁の例">レポートの体裁の例</h2>
-
-</section>
-<section>
-<h2 id="-4日目の課題2">🔰 4日目の課題2</h2>
-<p>書籍、ニュースサイト、ブログ記事などを検索し、
-良くないデータ解析の例を探して改善案を挙げよう。</p>
-<ol>
-<li>データの集め方(サンプルの選び方)が良くない例</li>
-<li>データの解釈が良くない例</li>
-<li>生データを公開しているのはいいけど、形式が良くない例</li>
-<li>図の描き方で嘘をついている例</li>
-</ol>
-<p>4/18月曜はまず40分ほど班ごとに相談。<br>
-その後、各班の代表事例な発表してもらいます。</p>
-
+<p>左のようなRmdを作って🧶Knitし、右のようなHTMLファイルを提出。</p>
+<div>
+<img src="image/report-example.webp" width="52%"></img>
+<img src="image/report-example-html.webp" width="47%" style="vertical-align: top"></img>
+</div>
 </section>
 <section>
 <h2 id="-レポート">🔰 レポート</h2>
@@ -841,23 +831,37 @@ e.g., <code>report.Rmd</code></li>
 </li>
 <li>様式
 <ul>
-<li>1日分で1つのRmdファイル、別のトピックに提出。計4つ。</li>
-<li>ファイル名 <code>B0SB0000-iwasaki-day1.Rmd</code></li>
+<li>1日分で1つのhtmlファイル、別のトピックに提出。計4つ。</li>
+<li>ファイル名 <code>B0SB0000-iwasaki-day1.html</code></li>
 </ul>
 </li>
 <li>評価ポイント
 <ul>
-<li>エラーも警告も無くコードが動く</li>
+<li>エラーも警告も無くコード(🧶Knit)が走っている</li>
 <li>文書の構造や図が視覚的に見やすく整理されている</li>
-<li>習った技術や自分で調べた技術がいろいろ盛り込まれている</li>
+<li>半年後の自分が読んでわかるような親切コメント</li>
 </ul>
 </li>
 <li>手抜きポイント
 <ul>
-<li>生物学的な意義、実用性があるか、みたいなのは不問</li>
+<li>生物学的な意義があるか、みたいなのは不問</li>
 </ul>
 </li>
 </ul>
+
+</section>
+<section>
+<h2 id="-4日目の課題2">🔰 4日目の課題2</h2>
+<p>書籍、ニュースサイト、ブログ記事などを検索し、<br>
+<strong>良くないデータ解析の例</strong>を探して<strong>改善案</strong>を挙げよう。</p>
+<ol>
+<li>データの集め方(サンプルの選び方)が良くない例</li>
+<li>データの解釈(相関や因果)を誤っている例</li>
+<li>生データを公開してくれてるのはいいけど、形式が良くない例</li>
+<li>図の描き方で嘘をついている例</li>
+</ol>
+<p>4/18月曜はまず40分ほど班ごとに相談。<br>
+その後、各班の代表事例を発表してもらいます。</p>
 
 </section>
 <section>
@@ -868,6 +872,8 @@ e.g., <code>report.Rmd</code></li>
 <li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/3urpls1">統計思考の世界</a> 三中信宏 2018</li>
 <li>R Markdown
 <ul>
 <li><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf">Cheat sheet (PDF)</a></li>
