@@ -842,7 +842,7 @@ L(\lambda \mid D)
 ## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
 
 扱いやすい **対数尤度** (log likelihood) にしてから計算する。<br>
-一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
+一階微分が0になる $\lambda$ を求めると...この場合は**標本平均**と一致。
 
 <div>\[\begin{split}
 \log L(\lambda \mid D)

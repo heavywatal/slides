@@ -269,9 +269,40 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
 ---
 ## ばらつきを捉える記述統計量
 
-- 最大値、最小値
-- パーセンタイル
-- 分散、標準偏差
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r quantile, fig.width = 10, fig.height = 4, echo = FALSE}
+df = tibble::tibble(x = rnorm(200)) %>%
+  dplyr::filter(abs(x) < 2) %>%
+  dplyr::mutate(x = x + 3)
+dfq = df %>% summarize(
+  min = min(x),
+  Q1 = quantile(x, 0.25),
+  Q2 = quantile(x, 0.50),
+  Q3 = quantile(x, 0.75),
+  max = max(x)
+) %>%
+  tidyr::pivot_longer(everything(), values_to = "x") %>%
+  dplyr::mutate(percent = paste0(c(0, 25, 50, 75, 100), "%"))
+p_hist = ggplot(df) + aes(x) + geom_histogram(bins = 30) +
+  theme_void(base_size = 18)
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(length = unit(0.06, "npc"), alpha = 0.7) +
+  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
+  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
+  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  coord_cartesian(ylim = c(-1.2, 0.4)) +
+  theme_void(base_size = 18)
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
 
 
 ---
@@ -949,7 +980,7 @@ Markdown (`.md`)
 : 微妙に異なる方言がある。Rmdで使うのは Pandoc Markdown 。
 
 🔰 どんなものが作れるのか
-[作成例ギャラリー](https://rmarkdown.rstudio.com/gallery.html)
+[作成例ギャラリー](https://r-markdown-gallery.com/)
 を見てみよう。
 
 ---

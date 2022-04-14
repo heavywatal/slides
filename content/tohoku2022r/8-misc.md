@@ -239,9 +239,16 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
 ---
 ## ばらつきを捉える記述統計量
 
-- 最大値、最小値
-- パーセンタイル
-- 分散、標準偏差
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+![plot of chunk quantile](figure/quantile-1.png)
+
 
 
 ---
@@ -782,7 +789,7 @@ Markdown (`.md`)
 : 微妙に異なる方言がある。Rmdで使うのは Pandoc Markdown 。
 
 🔰 どんなものが作れるのか
-[作成例ギャラリー](https://rmarkdown.rstudio.com/gallery.html)
+[作成例ギャラリー](https://r-markdown-gallery.com/)
 を見てみよう。
 
 ---
