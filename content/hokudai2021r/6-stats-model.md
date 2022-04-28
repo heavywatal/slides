@@ -337,7 +337,7 @@ result$par
 
 ```
 intercept     slope 
--66.63000  77.04308 
+-50.54532  67.18659 
 ```
 
 ![plot of chunk weight-lm](figure/weight-lm-1.png)
@@ -1500,26 +1500,28 @@ Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 
 ```r
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
-broom::tidy(fit2)
+broom::tidy(fit3)
 ```
 
 ```
-              term     estimate    std.error statistic       p.value
-             <chr>        <dbl>        <dbl>     <dbl>         <dbl>
-1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
-2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
-3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
-4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+                          term      estimate    std.error statistic       p.value
+                         <chr>         <dbl>        <dbl>     <dbl>         <dbl>
+1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
+2                  body_mass_g   0.006676867 0.0009522935  7.011354  1.301783e-11
+3             speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
+4                speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
+5 body_mass_g:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
+6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
 ```
 
 ```r
-broom::glance(fit2)
+broom::glance(fit3)
 ```
 
 ```
   null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
           <dbl>   <int>     <dbl>    <dbl>    <dbl>    <dbl>       <int> <int>
-1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
+1      67426.54     341 -1055.711 2125.422 2152.265 9611.166         336   342
 ```
 
 ---

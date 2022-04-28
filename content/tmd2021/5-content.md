@@ -511,9 +511,12 @@ df %>% mutate(z = coalesce(x, y))
 ```
 
 ```
-Error: Problem with `mutate()` column `z`.
+Error in `mutate_cols()`:
+! Problem with `mutate()` column `z`.
 ℹ `z = coalesce(x, y)`.
 ✖ Can't combine `..1` <double> and `..2` <character>.
+Caused by error in `stop_vctrs()`:
+! Can't combine `..1` <double> and `..2` <character>.
 ```
 
 🔰 `starwars` で**髪色の欠損値を肌色で補おう**
@@ -859,7 +862,7 @@ world_bank_pop %>%
   pivot_longer(matches("^\\d+$"), names_to = "year")
 ```
 
-See ["tidyselect helpers"](https://tidyselect.r-lib.org/reference/select_helpers.html) for more details.
+See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) for more details.
 
 
 ---

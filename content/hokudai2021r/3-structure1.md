@@ -637,7 +637,7 @@ result = diamonds %>%
 53940  0.75     Ideal     D     SI2
 ```
 
-See `?dplyr_tidy_select` or [tidyselect helpers](https://tidyselect.r-lib.org/reference/select_helpers.html) for more details.
+See `?dplyr_tidy_select` or [selection helpers](https://tidyselect.r-lib.org/reference/language.html) for more details.
 
 🔰 `starwars` の **"s" で終わる列**を抽出してみよう
 
