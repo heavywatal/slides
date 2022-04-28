@@ -363,7 +363,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 </span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">$</span><span class="n">par</span>
 </span></span></code></pre></div><pre tabindex="0"><code>intercept     slope 
--66.63000  77.04308 
+-50.54532  67.18659 
 </code></pre><p><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
 
 </section>
@@ -1374,17 +1374,19 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
-             &lt;chr&gt;        &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
-1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
-2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
-3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
-4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                          term      estimate    std.error statistic       p.value
+                         &lt;chr&gt;         &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
+2                  body_mass_g   0.006676867 0.0009522935  7.011354  1.301783e-11
+3             speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
+4                speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
+5 body_mass_g:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
+6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual  nobs
           &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;       &lt;int&gt; &lt;int&gt;
-1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338   342
+1      67426.54     341 -1055.711 2125.422 2152.265 9611.166         336   342
 </code></pre>
 </section>
 <section>

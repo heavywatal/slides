@@ -409,9 +409,12 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 </code></pre><p>異なる型を混ぜると怒られる:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="kc">NA</span><span class="p">),</span> <span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;a&#34;</span><span class="p">,</span> <span class="kc">NA</span><span class="p">,</span> <span class="s">&#34;b&#34;</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">%&gt;%</span> <span class="nf">mutate</span><span class="p">(</span><span class="n">z</span> <span class="o">=</span> <span class="nf">coalesce</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Error: Problem with `mutate()` column `z`.
+</span></span></code></pre></div><pre tabindex="0"><code>Error in `mutate_cols()`:
+! Problem with `mutate()` column `z`.
 ℹ `z = coalesce(x, y)`.
 ✖ Can&#39;t combine `..1` &lt;double&gt; and `..2` &lt;character&gt;.
+Caused by error in `stop_vctrs()`:
+! Can&#39;t combine `..1` &lt;double&gt; and `..2` &lt;character&gt;.
 </code></pre><p>🔰 <code>starwars</code> で<strong>髪色の欠損値を肌色で補おう</strong></p>
 
 </section>
@@ -686,7 +689,7 @@ https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expressi
 </span></span><span class="line"><span class="cl"><span class="n">starwars</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;s$&#34;</span><span class="p">))</span>   <span class="c1"># ends_with(&#34;s&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="n">world_bank_pop</span> <span class="o">%&gt;%</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">matches</span><span class="p">(</span><span class="s">&#34;^\\d+$&#34;</span><span class="p">),</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;year&#34;</span><span class="p">)</span>
-</span></span></code></pre></div><p>See <a href="https://tidyselect.r-lib.org/reference/select_helpers.html">&ldquo;tidyselect helpers&rdquo;</a> for more details.</p>
+</span></span></code></pre></div><p>See <a href="https://tidyselect.r-lib.org/reference/language.html">selection helpers</a> for more details.</p>
 
 </section>
 <section>
