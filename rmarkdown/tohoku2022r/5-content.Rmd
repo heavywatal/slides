@@ -26,14 +26,10 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -113,15 +109,8 @@ knitr::opts_chunk$set(cache = TRUE)
 # install.packages("tidyverse")
 library(tidyverse)  # パッケージ読み込み
 ```
-```
-── Attaching packages ───────────────────────────── tidyverse 1.3.1 ──
-✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.6     ✔ dplyr   1.0.7
-✔ tidyr   1.2.0     ✔ stringr 1.4.0
-✔ readr   2.1.2     ✔ forcats 0.5.1
-── Conflicts ──────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
+```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+cat(tidyverse_msg, sep = "\n")
 ```
 
 たまには更新しよう:
@@ -558,7 +547,7 @@ str_replace(fruit4, "(..)$", "_\\1_")
 🔰 `starwars` の `name` 列の数字を全部ゼロにしてみよう
 
 ```{r starwars-replace, echo=FALSE}
-starwars
+wtl::printdf(starwars, n = 6L)
 ```
 
 ---

@@ -26,14 +26,10 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -923,11 +919,14 @@ ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```r
+```{r penguins, echo = -1, results = "hide"}
+if (!require(palmerpenguins, quietly = TRUE)) {
+  install.packages("palmerpenguins")
+}
 # install.packages("palmerpenguins")
 library(palmerpenguins)
-print(penguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+print(penguins)
 ```
 
 ---
@@ -939,12 +938,7 @@ penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{r penguins, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
-if (!require(palmerpenguins, quietly = TRUE)) {
-  install.packages("palmerpenguins")
-  library(palmerpenguins)
-}
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```{r penguins-print, echo = FALSE, dependson = "penguins"}
 print(penguins)
 ```
 
@@ -953,7 +947,7 @@ print(penguins)
 
 どうやら、重いペンギンほど翼長も長い。
 
-```{r penguins-weight, fig.height = 5, fig.width = 5, warning = FALSE}
+```{r penguins-weight, fig.height = 4.5, fig.width = 4.5, warning = FALSE, dependson = "penguins"}
 p_penweight = ggplot(penguins) +
   aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +

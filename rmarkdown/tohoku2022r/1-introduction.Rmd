@@ -26,16 +26,11 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 knitr::opts_chunk$set(cache = TRUE)
-iris = tibble::as_tibble(iris)
 ```
 
 ---
@@ -849,7 +844,8 @@ y
 同じ長さの列vectorを複数束ねた長方形の表。<br>
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
-```{r data.frame}
+```{r data.frame, echo = -1}
+iris = tibble::as_tibble(iris)
 print(iris)
 ```
 
@@ -1029,19 +1025,11 @@ library(tidyverse)
 # 関連パッケージが一挙に読み込まれる
 ```
 
-- `Conflicts ❌` とか表示されて不安だけど<br>
-  これは大丈夫なやつ:
+```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+cat(tidyverse_msg, sep = "\n")
+```
 
-```
-── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.6     ✔ dplyr   1.0.7
-✔ tidyr   1.2.0     ✔ stringr 1.4.0
-✔ readr   2.1.2     ✔ forcats 0.5.1
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-```
+`Conflicts ❌` とか表示されて不安だけど ↑ これは大丈夫なやつ
 
 次回からはこれらを使って解説
 

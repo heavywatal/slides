@@ -276,10 +276,11 @@ band_members          band_instruments
 
 🔰 関連するdata.frameをいろいろな方法で結合してみよう。
 
+
 ```r
-install.packages("nycflights13")
+# install.packages("nycflights13")
 library(nycflights13)
-data(package = "nycflights13")
+# data(package = "nycflights13")
 # airlines, airports, flights, planes, weather
 ```
 
@@ -864,6 +865,7 @@ mpg_nested$data[[1]]
 print(economics)
 ```
 
+
 ```
           date     pce      pop psavert uempmed unemploy
         <date>   <dbl>    <dbl>   <dbl>   <dbl>    <dbl>
@@ -892,6 +894,7 @@ print(world_bank_pop)
 1055     ZWE SP.POP.TOTL 1.222225e+07 1.236616e+07 1.250052e+07 1.26339e+07 1.277751e+07 1.294003e+07  1.312427e+07  1.332991e+07  1.355847e+07  1.381060e+07  1.408632e+07 1.438665e+07 1.471083e+07 1.505451e+07 1.541168e+07 1.577745e+07 1.615036e+07 1.652990e+07
 1056     ZWE SP.POP.GROW 1.298782e+00 1.170597e+00 1.080653e+00 1.06128e+00 1.130323e+00 1.263909e+00  1.413720e+00  1.554735e+00  1.700106e+00  1.842497e+00  1.976756e+00 2.109672e+00 2.228306e+00 2.309366e+00 2.344799e+00 2.345643e+00 2.336070e+00 2.322864e+00
 ```
+
 ![plot of chunk world_bank_pop-pivot](figure/world_bank_pop-pivot-1.png)
 
 ---
@@ -1002,8 +1005,6 @@ as.data.frame(VADeaths) %>%              # data.frameに変換
 ---
 ## 🔰 課題: `anscombe` を縦長にしてggplotしてみよう
 
-
-
 ```r
 anscombe %>% rowid_to_column("id")   # IDをつけておく
 ```
@@ -1014,15 +1015,11 @@ anscombe %>% rowid_to_column("id")   # IDをつけておく
  1     1    10    10    10     8  8.04  9.14  7.46  6.58
  2     2     8     8     8     8  6.95  8.14  6.77  5.76
  3     3    13    13    13     8  7.58  8.74 12.74  7.71
- 4     4     9     9     9     8  8.81  8.77  7.11  8.84
 --                                                      
- 8     8     4     4     4    19  4.26  3.10  5.39 12.50
  9     9    12    12    12     8 10.84  9.13  8.15  5.56
 10    10     7     7     7     8  4.82  7.26  6.42  7.91
 11    11     5     5     5     8  5.68  4.74  5.73  6.89
 ```
-
-
 
 <img src="figure/plot_anscombe-1.png" title="plot of chunk plot_anscombe" alt="plot of chunk plot_anscombe" width="98%" />
 

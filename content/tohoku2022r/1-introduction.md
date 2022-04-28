@@ -1192,19 +1192,19 @@ library(tidyverse)
 # 関連パッケージが一挙に読み込まれる
 ```
 
-- `Conflicts ❌` とか表示されて不安だけど<br>
-  これは大丈夫なやつ:
 
 ```
-── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+── Attaching packages ─────────────────── tidyverse 1.3.1 ──
 ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.6     ✔ dplyr   1.0.7
+✔ tibble  3.1.6     ✔ dplyr   1.0.8
 ✔ tidyr   1.2.0     ✔ stringr 1.4.0
 ✔ readr   2.1.2     ✔ forcats 0.5.1
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+── Conflicts ────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ```
+
+`Conflicts ❌` とか表示されて不安だけど ↑ これは大丈夫なやつ
 
 次回からはこれらを使って解説
 

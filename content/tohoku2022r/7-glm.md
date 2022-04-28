@@ -534,11 +534,12 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
+
 ```r
 # install.packages("palmerpenguins")
 library(palmerpenguins)
-print(penguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+print(penguins)
 ```
 
 ---

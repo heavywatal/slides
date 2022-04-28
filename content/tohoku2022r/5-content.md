@@ -106,13 +106,14 @@ draft = false
 # install.packages("tidyverse")
 library(tidyverse)  # パッケージ読み込み
 ```
+
 ```
-── Attaching packages ───────────────────────────── tidyverse 1.3.1 ──
+── Attaching packages ─────────────────── tidyverse 1.3.1 ──
 ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.6     ✔ dplyr   1.0.7
+✔ tibble  3.1.6     ✔ dplyr   1.0.8
 ✔ tidyr   1.2.0     ✔ stringr 1.4.0
 ✔ readr   2.1.2     ✔ forcats 0.5.1
-── Conflicts ──────────────────────────────── tidyverse_conflicts() ──
+── Conflicts ────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ```
@@ -828,15 +829,13 @@ str_replace(fruit4, "(..)$", "_\\1_")
 ```
              name height  mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
             <chr>  <int> <dbl>      <chr>       <chr>     <chr>      <dbl>  <chr>     <chr>     <chr>   <chr>    <list>    <list>    <list>
- 1 Luke Skywalker    172    77      blond        fair      blue       19.0   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
- 2          C-3PO    167    75       <NA>        gold    yellow      112.0   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
- 3          R2-D2     96    32       <NA> white, blue       red       33.0   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
- 4    Darth Vader    202   136       none       white    yellow       41.9   male masculine  Tatooine   Human <chr [4]> <chr [0]> <chr [1]>
+ 1 Luke Skywalker    172    77      blond        fair      blue         19   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
+ 2          C-3PO    167    75       <NA>        gold    yellow        112   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 3          R2-D2     96    32       <NA> white, blue       red         33   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
 --                                                                                                                                         
-84    Poe Dameron     NA    NA      brown       light     brown         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [1]>
 85            BB8     NA    NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
 86 Captain Phasma     NA    NA    unknown     unknown   unknown         NA   <NA>      <NA>      <NA>    <NA> <chr [1]> <chr [0]> <chr [0]>
-87  Padmé Amidala    165    45      brown       light     brown       46.0 female  feminine     Naboo   Human <chr [3]> <chr [0]> <chr [3]>
+87  Padmé Amidala    165    45      brown       light     brown         46 female  feminine     Naboo   Human <chr [3]> <chr [0]> <chr [3]>
 ```
 
 ---
