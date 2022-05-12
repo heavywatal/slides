@@ -1058,23 +1058,26 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
-```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
-p_bill = penguins %>%
+```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11}
+panguins_bill_nona = penguins %>% drop_na(bill_length_mm, bill_depth_mm)
+p_bill = panguins_bill_nona %>%
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins)
+# penguins %>% filter(is.na(bill_length_mm) | is.na(bill_depth_mm))
+
+fit1 = glm(bill_depth_mm ~ bill_length_mm, data = panguins_bill_nona)
+fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = panguins_bill_nona)
+fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = panguins_bill_nona)
 p1 = p_bill +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit1), size = 1, color = "#3366ff")
 p2 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit2), size = 1)
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit2), size = 1)
 p3 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit3), size = 1)
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit3), size = 1)
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
@@ -1082,6 +1085,15 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 ```
 
 🔰余裕があったら性別や年なども説明変数に入れてみよう。
+
+```{r penguins-multiple, echo = FALSE, include = FALSE}
+fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
+broom::tidy(fit4)
+broom::glance(fit4)
+added4 = modelr::add_predictions(penguins, fit4)
+p_bill + geom_line(aes(y = pred, color = sex), data = added4, size = 1) +
+  scale_color_discrete()
+```
 
 
 ---
