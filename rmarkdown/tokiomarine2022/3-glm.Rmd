@@ -1,15 +1,15 @@
 +++
-url = "tokiomarine2021/3-glm.html"
-title = "3. 一般化線形モデル、混合モデル — 統計モデリング概論 DSHC 2021"
+url = "tokiomarine2022/3-glm.html"
+title = "3. 一般化線形モデル、混合モデル — 統計モデリング概論 DSHC 2022"
 linktitle = "一般化線形モデル、混合モデル"
-date = 2021-06-30T13:00:00+09:00
+date = 2022-08-17T13:00:00+09:00
 type = "reveal"
 draft = false
 +++
 
 <link rel="stylesheet" href="style.css">
 
-# [統計モデリング概論 DSHC 2021](.)
+# [統計モデリング概論 DSHC 2022](.)
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -28,8 +28,8 @@ draft = false
 </ol>
 
 <div class="footnote">
-2021-06-30 東京海上 Data Science Hill Climb
-<a href="https://heavywatal.github.io/slides/tokiomarine2021/">https://heavywatal.github.io/slides/tokiomarine2021/</a>
+2022-08-17 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
 </div>
 
 ```{r setup-global, include=FALSE, code=readLines("setup.R")}
@@ -54,7 +54,7 @@ e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分�
 X \sim \text{Poisson}(\lambda)
 \end{split}\]</div>
 
-```{r only-dist, echo = FALSE, fig.height = 4, fig.width = 4, cache = FALSE}
+```{r only-dist, echo = FALSE, fig.height = 4, fig.width = 4}
 df_rpois = tibble::tibble(X = rpois(50L, 3))
 df_dpois = tibble(X = seq(0, 11), Prob = dpois(X, mean(df_rpois$X)))
 p_pois = ggplot(df_rpois) + aes(X) +
@@ -79,7 +79,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 \lambda_i &= \beta_0
 \end{split}\]</div>
 
-```{r glm-without-x, echo = FALSE, fig.height = 4, fig.width = 4, cache = FALSE}
+```{r glm-without-x, echo = FALSE, fig.height = 4, fig.width = 4}
 p_pois +
   labs(x = "y") +
   coord_flip() +
@@ -100,13 +100,13 @@ p_pois +
   <div class="column" style="flex-shrink: 1.0;">
 
 <figure>
-<img src="glm.drawio.svg" width="100%"><br>
+<img src="../tokiomarine2021/glm.drawio.svg" width="100%"><br>
 </figure>
 
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r glm-poisson, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE}
+```{r glm-poisson, echo = FALSE, fig.height = 5, fig.width = 5}
 n = 300L
 a = 3
 b = -3
@@ -145,7 +145,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 気温も湿度も高いほどビールが売れる、とか
 
-```{r multiple-regression, echo = FALSE, fig.height = 5, fig.width = 10, cache = FALSE}
+```{r multiple-regression, echo = FALSE, fig.height = 5, fig.width = 10}
 n = 200L
 true_coef = c(3, 0.05, 0.006)
 df_beer = tibble::tibble(
@@ -205,7 +205,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r glm-logistic, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE}
+```{r glm-logistic, echo = FALSE, fig.height = 5, fig.width = 5}
 nrep = 200L
 n = 10L
 df_rlogistic = tibble::tibble(
@@ -273,7 +273,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r wind, echo = FALSE, fig.height = 4, fig.width = 5, cache = FALSE}
+```{r wind, echo = FALSE, fig.height = 4, fig.width = 5}
 n = 200
 df_wind = tibble::tibble(
   max_wind = runif(n, 0, 40),
@@ -320,7 +320,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r glm-weight, echo = FALSE, fig.height = 4, fig.width = 4, cache = FALSE}
+```{r glm-weight, echo = FALSE, fig.height = 4, fig.width = 4}
 n = 100
 df_weight = tibble::tibble(
   height = rnorm(n, 1.70, 0.06),
@@ -374,7 +374,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r glm-anova, echo = FALSE, fig.height = 4.5, fig.width = 4.5, cache = FALSE}
+```{r glm-anova, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
 n = 200L
 coef = c(70, 3, 20, -20)
 weather_levels = c("sunny", "cloudy", "rainy")
@@ -466,7 +466,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
   <div class="column" style="flex-shrink: 1.3;">
 
 
-```{r glm-ancova, echo = FALSE, fig.height = 4.5, fig.width = 4.5, cache = FALSE}
+```{r glm-ancova, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
 lm_ancova = lm(beer_sales ~ temperature + weather, df_beer)
 df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
   modelr::add_predictions(lm_ancova) %>%
@@ -569,7 +569,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
 この場合は直線回帰よりもポアソン回帰が良さそう:
 
-```{r compare-loglik, echo = FALSE, fig.height = 5, fig.width = 9, cache = FALSE}
+```{r compare-loglik, echo = FALSE, fig.height = 5, fig.width = 9}
 n = 300L
 a = 3
 b = -3
@@ -626,7 +626,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 : パラメータを増やせば**現データへの**適合度・尤度を高くできるが、<br>
   予測・理解の役には立たなくなる。
 
-```{r saturated-model, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r saturated-model, echo = FALSE, fig.height = 4, fig.width = 11}
 n = 16L
 true_coef = c(0.1, 0.2)
 df_plant = tibble::tibble(
@@ -673,7 +673,7 @@ cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
 観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
 
-```{r many-models, echo = FALSE, fig.height = 7, fig.width = 7, cache = FALSE}
+```{r many-models, echo = FALSE, fig.height = 7, fig.width = 7}
 set.seed(24601)
 n = 120L
 true_coef = c(1, 0.12, 0)
@@ -728,7 +728,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 \text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
 \end{split}\]</p>
 
-- AICが小さいほど予測精度の良いモデル。
+- **AICが小さいほど予測精度の良いモデル**。
     - 尤度は上げたい。
     - パラメータ数 $k$ が増えるとペナルティ。
 - どのデータに対する当てはまりを目指すかという観点
@@ -748,7 +748,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
 観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
 
-```{r many-models-aic, echo = FALSE, fig.height = 7, fig.width = 7, cache = FALSE}
+```{r many-models-aic, echo = FALSE, fig.height = 7, fig.width = 7}
 labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(models))
 p_null = p_plant +
   labs(title = "null model") +
@@ -792,7 +792,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="math-model.drawio.svg" width="600"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -833,7 +833,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r interaction, echo = FALSE, fig.height = 4.5, fig.width = 4.5, cache = FALSE}
+```{r interaction, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
 n = 200L
 coef = c(70, 3, 100, -2)
 weather_levels = c("sunny", "rainy")
@@ -867,7 +867,7 @@ ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
 解釈が一気に難しくなるのでむやみに使わない。
 
 ---
-## GLM座学まとめ
+## 一般化線形モデル座学まとめ
 
 - 何はともあれ散布図を描く
 - 適切な確率分布・リンク関数・説明変数を考える
@@ -914,9 +914,14 @@ penguins = sm.datasets.get_rdataset('penguins', 'palmerpenguins').data
 print(penguins)
 ```
 
-```r
+```{r penguins, echo = -1, results = "hide"}
+if (!require(palmerpenguins, quietly = TRUE)) {
+  install.packages("palmerpenguins")
+}
 # R
+# install.packages("palmerpenguins")
 library(palmerpenguins)
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 print(penguins)
 ```
 
@@ -929,12 +934,7 @@ print(penguins)
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{r penguins, echo = FALSE, fig.height = 4.5, fig.width = 4.5, cache = FALSE}
-if (!require(palmerpenguins, quietly = TRUE)) {
-  install.packages("palmerpenguins")
-  library(palmerpenguins)
-}
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```{r penguins-print, echo = FALSE, dependson = "penguins"}
 print(penguins)
 ```
 
@@ -947,24 +947,13 @@ print(penguins)
 sns.relplot(x='body_mass_g', y='flipper_length_mm', data=penguins)
 ```
 
-```{r penguins-weight, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE, warning = FALSE}
-p_penweight = penguins %>%
-  ggplot() + aes(body_mass_g, flipper_length_mm) +
+```{r penguins-weight, echo = FALSE, fig.height = 5, fig.width = 5, warning = FALSE}
+p_penweight = ggplot(penguins) +
+  aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +
-  scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 p_penweight
-
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
-fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
-fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
-p1 = p_penweight +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
-p2 = p_penweight + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit2), size = 1)
-p3 = p_penweight + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit3), size = 1)
 ```
 
 
@@ -973,6 +962,11 @@ p3 = p_penweight + aes(color = species) +
 
 結構たくさん出力される。上がモデルの評価、下が推定結果。
 
+```{r penguins-fit1, include = FALSE}
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
+broom::tidy(fit1)
+broom::glance(fit1)
+```
 ```python
 formula = 'flipper_length_mm ~ body_mass_g'
 model1 = smf.glm(formula, data=penguins)
@@ -1007,7 +1001,10 @@ grid = sns.relplot(x='body_mass_g', y='flipper_length_mm', data=penguins)
 grid.map(sns.lineplot, x=penguins['body_mass_g'], y=y_pred)
 ```
 
-```{r penguins-weight-glm, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE, warning = FALSE}
+```{r penguins-weight-glm, echo = FALSE, fig.height = 5, fig.width = 5, warning = FALSE}
+added1 = modelr::add_predictions(penguins, fit1)
+p1 = p_penweight +
+  geom_line(aes(y = pred), data = added1, size = 1, color = "#3366ff")
 p1
 ```
 
@@ -1020,8 +1017,10 @@ p1
 sns.relplot(x='body_mass_g', y='flipper_length_mm', hue='species', data=penguins, palette=palette)
 ```
 
-```{r penguins-weight-sp, echo = FALSE, fig.height = 5, fig.width = 7, cache = FALSE, warning = FALSE}
-p_penweight + aes(color = species)
+```{r penguins-weight-sp, echo = FALSE, fig.height = 5, fig.width = 7, warning = FALSE}
+p_penweight_color = p_penweight + aes(color = species) +
+  scale_color_manual(values = penguins_colors)
+p_penweight_color
 ```
 
 
@@ -1031,6 +1030,11 @@ p_penweight + aes(color = species)
 Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のときより小さい。
 
+```{r penguins-fit2, include = FALSE}
+fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
+broom::tidy(fit2)
+broom::glance(fit2)
+```
 ```python
 formula = 'flipper_length_mm ~ body_mass_g + species'
 model2 = smf.glm(formula, data=penguins)
@@ -1055,7 +1059,10 @@ grid = sns.relplot(x='body_mass_g', y='flipper_length_mm', hue='species', data=p
 grid.map(sns.lineplot, x='body_mass_g', y='pred', hue='species', data=pen_pred, palette=palette)
 ```
 
-```{r penguins-weight-sp-glm, echo = FALSE, fig.height = 5, fig.width = 7, cache = FALSE, warning = FALSE}
+```{r penguins-weight-sp-glm, echo = FALSE, fig.height = 5, fig.width = 7, warning = FALSE}
+added2 = modelr::add_predictions(penguins, fit2)
+p2 = p_penweight_color +
+  geom_line(aes(y = pred), data = added2, size = 1)
 p2
 ```
 
@@ -1068,6 +1075,11 @@ p2
 Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
+```{r penguins-fit3, include = FALSE}
+fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
+broom::tidy(fit3)
+broom::glance(fit3)
+```
 ```python
 formula = 'flipper_length_mm ~ body_mass_g + species + body_mass_g:species'
 model3 = smf.glm(formula, data=penguins)
@@ -1093,14 +1105,17 @@ pen_pred = penguins.assign(pred=results3.predict(penguins))
 grid = sns.relplot(x='body_mass_g', y='flipper_length_mm', hue='species', data=pen_pred, palette=palette)
 grid.map(sns.lineplot, x='body_mass_g', y='pred', hue='species', data=pen_pred, palette=palette)
 ```
-```{r penguins-interaction, echo = FALSE, fig.height = 5, fig.width = 7, cache = FALSE, warning = FALSE}
+```{r penguins-interaction, echo = FALSE, fig.height = 5, fig.width = 7, warning = FALSE}
+added3 = modelr::add_predictions(penguins, fit3)
+p3 = p_penweight_color +
+  geom_line(aes(y = pred), data = added3, size = 1)
 p3
 ```
 
 ---
 ## ここまでの3つのモデルでどれがいいか？
 
-AICで選ぶなら交互作用入り重回帰のが良さそう。
+AICで選ぶなら交互作用入り重回帰が良さそう。
 
 ```python
 results1.aic
@@ -1108,7 +1123,7 @@ results2.aic
 results3.aic
 ```
 
-```{r penguins-aic, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r penguins-aic, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
@@ -1121,23 +1136,26 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
-```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE, warning = FALSE}
-p_bill = penguins %>%
+```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11}
+panguins_bill_nona = penguins %>% drop_na(bill_length_mm, bill_depth_mm)
+p_bill = panguins_bill_nona %>%
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins)
+# penguins %>% filter(is.na(bill_length_mm) | is.na(bill_depth_mm))
+
+fit1 = glm(bill_depth_mm ~ bill_length_mm, data = panguins_bill_nona)
+fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = panguins_bill_nona)
+fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = panguins_bill_nona)
 p1 = p_bill +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit1), size = 1, color = "#3366ff")
 p2 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit2), size = 1)
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit2), size = 1)
 p3 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit3), size = 1)
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit3), size = 1)
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
@@ -1198,7 +1216,7 @@ Slackで報告していただけると嬉しいです。
 親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
-```{r overdispersion, echo = FALSE, fig.height = 6, fig.width = 7, cache = FALSE, warning = FALSE}
+```{r overdispersion, echo = FALSE, fig.height = 5, fig.width = 6, warning = FALSE}
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -1236,14 +1254,11 @@ tidy_od %>%
 「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
 i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
 
-```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, warning = FALSE}
 df_od %>%
   tibble::rowid_to_column("id") %>%
   ggplot() + aes(id, y / 8) +
   geom_col(width = 0.6, fill = "#3366ff", alpha = 0.66) +
-  # geom_col(width = 0.4) +
-  # scale_x_continuous(breaks = seq_len(100)) +
-  # coord_cartesian(xlim = c(0.4, 12.9), expand = FALSE) +
   labs(y = expression(italic(p[i]))) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(),
@@ -1260,7 +1275,7 @@ df_od %>%
 その能力値は全個体共通の正規分布に従うと仮定:
 $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
-```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
 # tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) %>%
 z_hat = wtl::logit(p_hat)
 p_sigmoid =
@@ -1295,7 +1310,7 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 
 普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
 
-```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
 df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) %>%
@@ -1344,7 +1359,7 @@ p_mixed + geom_col(width = 0.4, fill = "#3366ff", alpha = 0.6)
 
 正規分布と二項分布の混ぜ合わせ......?
 
-```{r alter-sigma-z, echo = FALSE, fig.height = 3.5, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r alter-sigma-z, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 p_z + geom_col(aes(fill = z), width = 0.1) +
   scale_fill_viridis_b(option = "turbo", breaks = breaks)
 
@@ -1357,7 +1372,7 @@ p_mixed + geom_col(aes(fill = z), width = 0.4) +
 
 パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
 
-```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, cache = FALSE, warning = FALSE}
+```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 df_mixed %>%
   dplyr::filter(sigma == max(sigma)) %>%
   dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf))) %>%
@@ -1375,7 +1390,7 @@ df_mixed %>%
 
 <div align="center">
 
-```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, cache = FALSE, warning = FALSE}
+```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, warning = FALSE}
 p1 = df_mixed %>%
   dplyr::filter(sigma == max(sigma)) %>%
   ggplot() + aes(y, Density) +
@@ -1465,7 +1480,7 @@ e.g.,<br>
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="image/kubo-p2.png" width="60%">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>

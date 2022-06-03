@@ -1,15 +1,15 @@
 +++
-url = "tokiomarine2021/4-bayesian.html"
-title = "4. ベイズ推定、階層ベイズモデル — 統計モデリング概論 DSHC 2021"
+url = "tokiomarine2022/4-bayesian.html"
+title = "4. ベイズ推定、階層ベイズモデル — 統計モデリング概論 DSHC 2022"
 linktitle = "ベイズ推定、階層ベイズモデル"
-date = 2021-06-30T15:00:00+09:00
+date = 2022-08-17T15:00:00+09:00
 type = "reveal"
 draft = false
 +++
 
 <link rel="stylesheet" href="style.css">
 
-# [統計モデリング概論 DSHC 2021](.)
+# [統計モデリング概論 DSHC 2022](.)
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -28,8 +28,8 @@ draft = false
 </ol>
 
 <div class="footnote">
-2021-06-30 東京海上 Data Science Hill Climb
-<a href="https://heavywatal.github.io/slides/tokiomarine2021/">https://heavywatal.github.io/slides/tokiomarine2021/</a>
+2022-08-17 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
 </div>
 
 ```{r setup-global, include=FALSE, code=readLines("setup.R")}
@@ -41,6 +41,7 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 library(rstan)
+knitr::opts_chunk$set(cache = FALSE)
 rstan_options(auto_write = TRUE)
 ```
 
@@ -67,7 +68,7 @@ rstan_options(auto_write = TRUE)
   </div>
   <div class="column" style="flex-shrink: 1.4;">
 
-```{r freq-vs-bayes, echo = FALSE, fig.height = 4, fig.width = 4, cache = FALSE}
+```{r freq-vs-bayes, echo = FALSE, fig.height = 4, fig.width = 4}
 tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) %>%
   dplyr::filter(logLik > -1e6) %>%
   ggplot() + aes(p, logLik) +
@@ -93,7 +94,7 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) %>%
 
 **最尤推定**: 推定値が真の値に近づいていく
 
-```{r coin-frequentist, echo = FALSE, fig.width = 11, fig.height = 3, cache = FALSE}
+```{r coin-frequentist, echo = FALSE, fig.width = 11, fig.height = 3}
 size = 1L; p = 0.5
 X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
 df_rbinom = purrr::map_dfr(c(4, 20, 100, 500), ~{
@@ -116,7 +117,7 @@ df_rbinom %>%
 
 **ベイズ推定**: 確率分布がどんどん尖り、確信が強まる
 
-```{r coin-bayesian, echo = FALSE, fig.width = 11, fig.height = 3, cache = FALSE}
+```{r coin-bayesian, echo = FALSE, fig.width = 11, fig.height = 3}
 purrr::map_dfr(c(4, 20, 100, 500), ~{
   k = sum(head(X, .x))
   tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), Density = dbeta(p, k + 1, .x - k + 1))
@@ -141,7 +142,7 @@ purrr::map_dfr(c(4, 20, 100, 500), ~{
 条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率。重要。</span>
 : $\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$
 
-```{r venn, echo = FALSE, fig.width = 6, fig.height = 3, cache = FALSE}
+```{r venn, echo = FALSE, fig.width = 6, fig.height = 3}
 make_circle = function(radius, center, n = 100L) {
   tibble::tibble(theta = seq(0, 2 * pi, length.out = n + 1L)[-1]) %>%
     dplyr::mutate(x = radius * cos(theta) + center[1],
@@ -179,10 +180,10 @@ ggplot() + aes(x, y) +
 : $\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$
 
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
-<img src="image/Thomas_Bayes.gif" height="150" align="right"></a>
+<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="150" align="right"></a>
 
 移項するだけで**ベイズの定理**:
-<img src="bayes.drawio.svg" style="padding-left: 1rem;">
+<img src="../tokiomarine2021/bayes.drawio.svg" style="padding-left: 1rem;">
 
 宴会場にビールが運ばれてきた。これはどこのブルワリーの？
 
@@ -236,7 +237,7 @@ devnull = tibble::tibble(
 ## ベイズの定理 in 統計モデリング
 
 <p>
-<img src="bayesian.drawio.svg">
+<img src="../tokiomarine2021/bayesian.drawio.svg">
 </p>
 
 モデル$M$に対する確信度合いをデータ$D$に基づいて更新する。<br>
@@ -266,7 +267,7 @@ devnull = tibble::tibble(
 ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
 投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:
 
-```{r prior-beta, echo = FALSE, fig.width = 3, fig.height = 3, cache = FALSE}
+```{r prior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
 size = 1L; p = 0.5
 X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
 df_beta = purrr::map_dfr(c(0, 1, 2, 3, 4, 20, 100, 500), ~{
@@ -302,7 +303,7 @@ df_beta %>%
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
 
-```{r likelihood-binom, echo = FALSE, fig.width = 3, fig.height = 3, cache = FALSE}
+```{r likelihood-binom, echo = FALSE, fig.width = 3, fig.height = 3}
 tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) %>%
   ggplot() + aes(p, L) +
   geom_line(color = "#3366ff", size = 2) +
@@ -342,7 +343,7 @@ tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) %>%
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r posterior-beta, echo = FALSE, fig.width = 3, fig.height = 3, cache = FALSE}
+```{r posterior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
 df_beta %>%
   dplyr::filter(i == 4) %>%
   ggplot() + aes(p, Density) +
@@ -426,7 +427,7 @@ df_beta %>%
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r integrate, echo = FALSE, fig.width = 6, fig.height = 4, cache = FALSE}
+```{r integrate, echo = FALSE, fig.width = 6, fig.height = 4}
 n_head = 6
 n_total = 10
 bound = qbeta(c(0.025, 0.975), n_head, n_total - n_head)
@@ -474,7 +475,7 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)
 ## MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo
 
 <a href="https://en.wikipedia.org/wiki/Andrey_Markov">
-<img src="image/AAMarkov.jpg" height="180" align="right"></a>
+<img src="../tokiomarine2021/image/AAMarkov.jpg" height="180" align="right"></a>
 
 マルコフ連鎖
 : 次の時点の挙動が現在の値だけで決定されるような確率過程。
@@ -485,13 +486,13 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)
 モンテカルロ法
 : 乱数を用いた計算方法の総称。
 : <a href="https://en.wikipedia.org/wiki/Monte_Carlo_Casino">
-  <img src="image/Real_Monte_Carlo_Casino.jpg" height="200"></a>
+  <img src="../tokiomarine2021/image/Real_Monte_Carlo_Casino.jpg" height="200"></a>
   <a href="https://en.wikipedia.org/wiki/Stanislaw_Ulam">
-  <img src="image/Stanislaw_Ulam.jpg" height="200"></a>
+  <img src="../tokiomarine2021/image/Stanislaw_Ulam.jpg" height="200"></a>
   <a href="https://en.wikipedia.org/wiki/John_von_Neumann">
-  <img src="image/John_von_Neumann.jpg" height="200"></a>
+  <img src="../tokiomarine2021/image/John_von_Neumann.jpg" height="200"></a>
   <a href="https://en.wikipedia.org/wiki/Nicholas_Metropolis">
-  <img src="image/Nicholas_Metropolis.png" height="200"></a>
+  <img src="../tokiomarine2021/image/Nicholas_Metropolis.png" height="200"></a>
 
 ???
 スタニスワフ・ウラムがソリテアの成功率を考えてた時に思いついて、
@@ -521,7 +522,7 @@ e.g., 半径1の円の面積
 面積4の正方形に400個の一様乱数を打ち込んだら318個乗った:<br>
 $4 \times \frac {318} {400} = 3.18$
 
-```{r circle, echo = FALSE, fig.width = 4, fig.height = 4, cache = FALSE}
+```{r circle, echo = FALSE, fig.width = 4, fig.height = 4}
 n = 100L
 points = tibble(x = runif(n, -1, 1), y = runif(n, -1, 1))
 theta = seq(0, 2 * pi, length.out = 100)
@@ -541,7 +542,7 @@ ggplot(points) + aes(x, y) +
 
 e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。
 
-```{r mcpdf, echo = FALSE, fig.width = 11, fig.height = 6, cache = FALSE}
+```{r mcpdf, echo = FALSE, fig.width = 11, fig.height = 6}
 n = 800
 df_point = tibble::tibble(p = runif(n, -0.2, 1.2), Density = runif(n, 0, 5)) %>%
   dplyr::mutate(accepted = Density < (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2)
@@ -606,7 +607,7 @@ cowplot::plot_grid(p_pdf, p_accepted, nrow = 1L)
       確率 $r = \frac {L(\theta_\text{new})} {L(\theta)}$ で  $\theta_\text{new}$ を採択
 3.  $\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。
 
-```{r metropolis, echo = FALSE, fig.width = 11, fig.height = 3.5, cache = FALSE}
+```{r metropolis, echo = FALSE, fig.width = 11, fig.height = 3.5}
 n_head = 12
 n_total = 20
 dp = 0.02
@@ -646,7 +647,7 @@ df_point %>%
 尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
 通ったパラメータ値を集めるといい感じの分布が得られる。
 
-```{r metropolis-trajectory, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.2, fig.width = 12, fig.height = 6, cache = FALSE}
+```{r metropolis-trajectory, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.2, fig.width = 12, fig.height = 6}
 dp = 0.05
 mh_sample = function(n, p0, n_head, n_total, dp) {
   p = p0
@@ -707,7 +708,7 @@ for (i in seq.int(50, 1000, 50)) {
 全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
 が、パラメータ1つの1次元ではご利益はわかりにくい。
 
-```{r propto-lik, echo = FALSE, fig.width = 11, fig.height = 4, cache = FALSE}
+```{r propto-lik, echo = FALSE, fig.width = 11, fig.height = 4}
 p_lik = tibble::tibble(p = seq(0, 1, 0.01), Likelihood = dbinom(n_head, n_total, p, log = FALSE)) %>%
   ggplot() + aes(p, Likelihood) +
   geom_hline(yintercept = 0) +
@@ -752,7 +753,7 @@ cowplot::plot_grid(p_lik, p_dens, p_hist, nrow = 1L)
 
 e.g., 二次元正規分布。(-2, 2) からスタート。
 
-```{r gibbs, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.1, fig.width = 5, fig.height = 5, cache = FALSE}
+```{r gibbs, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.1, fig.width = 5, fig.height = 5}
 gibbs_sample = function(n, rho) {
   x = double(n)
   y = double(n)
@@ -808,7 +809,7 @@ for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
 
 e.g., `chains = 3, iter = 600` 。ほぼ同じところをうろうろ:
 
-```{r chains, echo = FALSE, fig.height = 5, fig.width = 12, cache = FALSE}
+```{r chains, echo = FALSE, fig.height = 5, fig.width = 12}
 df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) %>%
   dplyr::mutate(data = purrr::map(init, ~{mh_sample(600, .x, 18, 30, dp = 0.02)})) %>%
   tidyr::unnest(data) %>%
@@ -844,7 +845,7 @@ cowplot::plot_grid(p_trace, p_hist, nrow = 1L, rel_widths = c(4, 1))
 
 e.g., `iter = 600, warmup = 200` で灰色の部分を捨てる:
 
-```{r warmup, echo = FALSE, fig.height = 5, fig.width = 12, cache = FALSE}
+```{r warmup, echo = FALSE, fig.height = 5, fig.width = 12}
 cowplot::plot_grid(
   p_trace + annotate("ribbon", x = c(0, t_warmup), ymin = Inf, ymax = -Inf, alpha = 0.3),
   p_hist %+% (df_trace %>% dplyr::mutate(init = as.factor(ifelse(t < t_warmup, NA, init)))),
@@ -861,7 +862,7 @@ cowplot::plot_grid(
 
 e.g., `thin = 5` で5回に1回だけサンプルする:
 
-```{r thin, echo = FALSE, fig.height = 5, fig.width = 7, cache = FALSE, message = FALSE}
+```{r thin, echo = FALSE, fig.height = 5, fig.width = 7, message = FALSE}
 p_trace +
   coord_cartesian(ylim = c(0, 1), xlim = c(200, 260)) +
   geom_point(data = function(.x) {dplyr::filter(.x, t %% 5 == 0)}, alpha = 0.6, size = 3, shape = 16)
@@ -878,13 +879,13 @@ p_trace +
 - Gelman-Rubin統計量 $\hat R < 1.05$
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
-```{r convergence, echo = FALSE, fig.height = 3, fig.width = 11, cache = FALSE, message = FALSE, warning = FALSE}
-data = list(x = rep(10L, 10L))
-data$N = length(data$x)
+```{r convergence, echo = FALSE, fig.height = 3, fig.width = 11, message = FALSE, warning = FALSE}
+mydata = list(x = rep(10L, 10L))
+mydata$N = length(mydata$x)
 model_yes = rstan::stan_model("converge-yes.stan")
 model_no = rstan::stan_model("converge-no.stan")
-fit_yes = rstan::sampling(model_yes, data = data)
-fit_no = rstan::sampling(model_no, data = data)
+fit_yes = rstan::sampling(model_yes, data = mydata)
+fit_no = rstan::sampling(model_no, data = mydata)
 s = rstan::summary(fit_yes, pars = "lambda")$summary
 template = "Rhat = %.4f, n_eff = %.1f"
 label_yes = sprintf(template, s[, "Rhat"], s[, "n_eff"])
@@ -959,7 +960,7 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 
 大部分はRで説明し、部分的にPythonでの練習を挟みます。<br>
 
-聞きながら手元で[tokiomarine2021-stan.ipynb](tokiomarine2021-stan.ipynb)を実行してもいいです。
+聞きながら手元で[tokiomarine2022-stan.ipynb](tokiomarine2022-stan.ipynb)を実行してもいいです。
 
 ```r
 # install.packages("rstan")
@@ -997,11 +998,11 @@ rstan::stan_ac(fit)
 ```{r stan-set-seed, echo = FALSE}
 set.seed(42)
 ```
-```{r stan-binom, fig.width = 4, fig.height = 4, cache = FALSE}
+```{r stan-binom, fig.width = 4, fig.height = 4}
 true_p = 0.7
 N = 40L
-data = list(N = N, x = rbinom(N, 1, true_p))
-print(data)
+mydata = list(N = N, x = rbinom(N, 1, true_p))
+print(mydata)
 ```
 
 Rならlist型、Pythonならdict型にまとめてStanに渡す。
@@ -1042,7 +1043,7 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 
 予め実行速度の速い機械語に翻訳(コンパイル):
 
-```{r stan-binom-model, fig.width = 4, fig.height = 4, cache = FALSE}
+```{r stan-binom-model, fig.width = 4, fig.height = 4}
 model = rstan::stan_model("binom.stan")
 ```
 
@@ -1053,8 +1054,8 @@ model = rstan::stan_model("binom.stan")
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-binom-sample, fig.width = 4, fig.height = 3, cache = FALSE}
-fit = rstan::sampling(model, data = data)
+```{r stan-binom-sample, fig.width = 4, fig.height = 3}
+fit = rstan::sampling(model, data = mydata)
 ```
 
 いろいろオプションはあるけどとりあえずデフォルトで:<br>
@@ -1068,7 +1069,7 @@ fit = rstan::sampling(model, data = data)
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
 念のため trace plot も確認しておこう。
 
-```{r stan-binom-fit, fig.width = 4, fig.height = 3, cache = FALSE}
+```{r stan-binom-fit, fig.width = 4, fig.height = 3}
 print(fit)
 ```
 
@@ -1080,7 +1081,7 @@ print(fit)
 
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
-```{r stan-binom-traceplot, fig.width = 11, fig.height = 4, cache = FALSE}
+```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
 rstan::stan_trace(fit)
 ```
 
@@ -1089,7 +1090,7 @@ rstan::stan_trace(fit)
 
 2--3ステップくらいで自己相関がほぼ消えるので問題なし:
 
-```{r stan-binom-ac, fig.width = 4, fig.height = 4, cache = FALSE}
+```{r stan-binom-ac, fig.width = 4, fig.height = 4}
 rstan::stan_ac(fit, pars = c("p"))
 ```
 
@@ -1099,7 +1100,7 @@ rstan::stan_ac(fit, pars = c("p"))
 サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
 真の$p$の値も含まれている:
 
-```{r stan-binom-hist, fig.width = 4, fig.height = 4, cache = FALSE}
+```{r stan-binom-hist, fig.width = 4, fig.height = 4}
 rstan::stan_hist(fit, bins = 30)
 ```
 
@@ -1114,7 +1115,7 @@ rstan::stan_hist(fit, bins = 30)
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{r stan-penguins-glm, echo = FALSE, fig.width = 7, fig.height = 4, cache = FALSE, warning = FALSE}
+```{r stan-penguins-glm, echo = FALSE, fig.width = 7, fig.height = 4, warning = FALSE}
 if (!require(palmerpenguins, quietly = TRUE)) {
   install.packages("palmerpenguins")
   library(palmerpenguins)
@@ -1145,13 +1146,13 @@ p_penweight +
 
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
-```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4, cache = FALSE}
-data = penguins %>%
+```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4}
+mydata = penguins %>%
   dplyr::select(c("body_mass_g", "flipper_length_mm")) %>%
   tidyr::drop_na() %>%
   as.list()
-data$N = length(data$body_mass_g)
-str(data)
+mydata$N = length(mydata$body_mass_g)
+str(mydata)
 ```
 
 ---
@@ -1168,14 +1169,14 @@ str(data)
 
 予め実行速度の速い機械語に翻訳(コンパイル):
 
-```{r stan-penguins-model, fig.width = 4, fig.height = 4, cache = FALSE}
+```{r stan-penguins-model, fig.width = 4, fig.height = 4}
 model = rstan::stan_model("penguins.stan")
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-penguins-sample, fig.width = 4, fig.height = 3, cache = FALSE}
-fit = rstan::sampling(model, data = data)
+```{r stan-penguins-sample, fig.width = 4, fig.height = 3}
+fit = rstan::sampling(model, data = mydata)
 ```
 
 いろいろオプションはあるけどとりあえずデフォルトで:<br>
@@ -1189,7 +1190,7 @@ fit = rstan::sampling(model, data = data)
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
 念のため trace plot も確認しておこう。
 
-```{r stan-penguins-fit, fig.width = 4, fig.height = 3, cache = FALSE}
+```{r stan-penguins-fit, fig.width = 4, fig.height = 3}
 print(fit)
 ```
 
@@ -1199,7 +1200,7 @@ print(fit)
 
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
-```{r stan-penguins-traceplot, fig.width = 11, fig.height = 4, cache = FALSE}
+```{r stan-penguins-traceplot, fig.width = 11, fig.height = 4}
 rstan::stan_trace(fit)
 ```
 
@@ -1208,7 +1209,7 @@ rstan::stan_trace(fit)
 
 どれもまあまあすぐ消えるので問題なし:
 
-```{r stan-penguins-ac, fig.width = 11, fig.height = 4, cache = FALSE}
+```{r stan-penguins-ac, fig.width = 11, fig.height = 4}
 rstan::stan_ac(fit, pars = c("intercept", "slope", "sigma"))
 ```
 
@@ -1217,7 +1218,7 @@ rstan::stan_ac(fit, pars = c("intercept", "slope", "sigma"))
 
 正規分布っぽいきれいな形:
 
-```{r stan-penguins-hist, fig.width = 11, fig.height = 3, cache = FALSE}
+```{r stan-penguins-hist, fig.width = 11, fig.height = 3}
 rstan::stan_hist(fit, bins = 30)
 ```
 
@@ -1229,7 +1230,7 @@ rstan::stan_hist(fit, bins = 30)
 
 無事に最尤推定と似たような線が引けた。
 
-```{r stan-penguins-regression, fig.width = 4, fig.height = 4, cache = FALSE, warning = FALSE}
+```{r stan-penguins-regression, fig.width = 4, fig.height = 4, warning = FALSE}
 coef = rstan::get_posterior_mean(fit)[, "mean-all chains"]
 p_penweight +
   geom_abline(intercept = coef["intercept"], slope = coef["slope"], size = 1, color = "#3366ff")
@@ -1244,7 +1245,7 @@ p_penweight +
 - モデルの主要部品がコンパイル済みなので試行錯誤も機敏に。
 - 区間推定の可視化までお世話してくれる。
 
-```{r rstanarm-penguins, fig.width = 8, fig.height = 4, cache = FALSE, message = FALSE, warning = FALSE}
+```{r rstanarm-penguins, fig.width = 8, fig.height = 4, message = FALSE, warning = FALSE}
 library(rstanarm)
 library(tidybayes)
 fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g, family = gaussian(), data = penguins)
@@ -1260,7 +1261,7 @@ p_penweight +
 
 GLMのような書き味で書ける。
 
-```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, cache = FALSE, message = FALSE, warning = FALSE}
+```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
 fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species, family = gaussian(), data = penguins)
 pred = penguins %>% tidyr::drop_na() %>% tidybayes::add_fitted_draws(fit)
 p_penweight + aes(color = species, group = species) +
@@ -1275,7 +1276,7 @@ p_penweight + aes(color = species, group = species) +
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="image/kubo-p2.png" width="100%">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>
@@ -1297,7 +1298,7 @@ p_penweight + aes(color = species, group = species) +
 事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ
 
 <figure>
-<img src="hbm.drawio.svg">
+<img src="../tokiomarine2021/hbm.drawio.svg">
 </figure>
 
 
@@ -1315,7 +1316,7 @@ p_penweight + aes(color = species, group = species) +
 ---
 ## 変量効果が入った推定結果
 
-```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, cache = FALSE, message = FALSE}
+```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, message = FALSE}
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -1330,12 +1331,12 @@ df_od = tibble::tibble(
 #   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
 #   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
 #   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
-data = list(y = df_od$y, N = ninds)
+mydata = list(y = df_od$y, N = ninds)
 model = rstan::stan_model("glmm.stan")
-fit = rstan::sampling(model, data = data)
+fit = rstan::sampling(model, data = mydata)
 ```
 
-```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3, cache = FALSE}
+```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3}
 print(fit)
 ```
 
@@ -1344,7 +1345,7 @@ print(fit)
 
 データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。
 
-```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7, cache = FALSE}
+```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7}
 .pars = c("a", "s", "r[1]", "r[2]")
 p_trace = rstan::stan_trace(fit, pars = .pars, nrow = 1L) + coord_flip()
 p_hist = rstan::stan_hist(fit, pars = .pars, nrow = 1L, bins = 30)
@@ -1378,7 +1379,7 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 - 自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。
 - スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
 
-```{r student_t, echo = FALSE, fig.height = 5, fig.width = 10, cache = FALSE}
+```{r student_t, echo = FALSE, fig.height = 5, fig.width = 10}
 tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
   dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) %>%
   ggplot() + aes(x, Density, group = df) +
@@ -1403,7 +1404,7 @@ tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
 y = ae ^ {-bx} - ce ^ {-dx}
 \end{split}\]</div>
 
-```{r non-linear, echo = FALSE, fig.width = 10, fig.height = 5, cache = FALSE}
+```{r non-linear, echo = FALSE, fig.width = 10, fig.height = 5}
 expo = function(x, y0, lambda) y0 * exp(- lambda * x)
 
 genfunc = function(params) {
@@ -1502,7 +1503,7 @@ model {
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="image/kubo-p2.png" width="100%">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>
