@@ -2,7 +2,7 @@
 url = "tokiomarine2022/4-bayesian.html"
 title = "4. ベイズ推定、階層ベイズモデル — 統計モデリング概論 DSHC 2022"
 linktitle = "ベイズ推定、階層ベイズモデル"
-date = 2022-08-17T15:00:00+09:00
+date = 2022-08-24T09:30:00+09:00
 type = "reveal"
 draft = false
 +++
@@ -28,7 +28,7 @@ draft = false
 </ol>
 
 <div class="footnote">
-2022-08-17 東京海上 Data Science Hill Climb
+2022-08-24 東京海上 Data Science Hill Climb
 <a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
 </div>
 
@@ -41,8 +41,8 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 library(rstan)
-knitr::opts_chunk$set(cache = FALSE)
 rstan_options(auto_write = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -1237,29 +1237,19 @@ p_penweight +
 ```
 
 ---
-## ベイズ推定を使った回帰に便利なパッケージ
+## 🔰 単回帰の練習問題
 
-[rstanarm](https://mc-stan.org/rstanarm/) + [tidybayes](https://mjskay.github.io/tidybayes)
+TODO
 
-- Stan言語のモデルを自分で書かずに済む。
-- モデルの主要部品がコンパイル済みなので試行錯誤も機敏に。
-- 区間推定の可視化までお世話してくれる。
+<hr>
 
-```{r rstanarm-penguins, fig.width = 8, fig.height = 4, message = FALSE, warning = FALSE}
-library(rstanarm)
-library(tidybayes)
-fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g, family = gaussian(), data = penguins)
-pred = penguins %>% tidyr::drop_na() %>% tidybayes::add_fitted_draws(fit)
-p_penweight +
-  ggdist::stat_lineribbon(aes(y = .value), data = pred, color = "#3366ff", size = 0.4) +
-  scale_fill_brewer(palette = "Greys")
-```
+☕️ 休憩 + 質疑応答
 
 
 ---
-## rstanarmを使えば重回帰のベイズ推定も簡単
+## Stanで重回帰
 
-GLMのような書き味で書ける。
+TODO
 
 ```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
 fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species, family = gaussian(), data = penguins)
@@ -1269,6 +1259,47 @@ p_penweight + aes(color = species, group = species) +
   scale_color_manual(values = penguins_colors) +
   scale_fill_brewer(palette = "Greys")
 ```
+
+---
+## 🔰 Stanで重回帰の練習問題
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
+---
+## Stanでポアソン回帰
+
+TODO
+
+
+---
+## 🔰 Stanでポアソン回帰の練習問題
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
+---
+## Stanでロジスティック回帰
+
+TODO
+
+
+---
+## 🔰 Stanでロジスティック回帰
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
 
 
 ---
@@ -1395,6 +1426,12 @@ tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
 
 
 ---
+## 🔰 階層ベイズモデルの練習問題
+
+TODO
+
+
+---
 ## 非線形回帰の例: データ
 
 刺激強度xに対する応答強度yを20個体調査。<br>
@@ -1467,12 +1504,6 @@ model {
 }
 ```
 
----
-## 練習問題
-
-🔰 `penguins` データでStanを動かしてみよう。
-
-[定義済みの関数](https://mc-stan.org/docs/functions-reference/)
 
 
 ---

@@ -40,6 +40,7 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -110,7 +111,7 @@ cor(diamonds$carat, diamonds$price)
 
 情報をうまく絞って整理 → **直感的にわかる**
 
-```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7, cache = FALSE}
+```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
 diamonds %>%
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
   ggplot(aes(carat, price, color = clarity)) +
@@ -203,7 +204,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 データ生成をうまく真似できそうな仮定の数式表現。<br>
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
-```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6, cache = FALSE}
+```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
 diamonds %>%
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
   ggplot(aes(carat, price)) +

@@ -40,6 +40,7 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -55,7 +56,7 @@ library(tidyr)
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r lm-bad, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE}
+```{r lm-bad, echo = FALSE, fig.height = 5, fig.width = 5}
 n = 300L
 a = 3
 b = -3
@@ -71,6 +72,7 @@ p_pois = ggplot(df_pois) + aes(x, y) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), linetype = 0, alpha = 0) +
   geom_point(alpha = 0.5, shape = 16, size = 2) +
   scale_x_continuous(breaks = x_breaks) +
+  coord_cartesian(ylim = c(-5, 15)) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
@@ -83,7 +85,7 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r glm-better, echo = FALSE, fig.height = 5, fig.width = 10, cache = FALSE}
+```{r glm-better, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "lm-bad"}
 p_lm = p_pois +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), fill = "#3366ffaa", linetype = 0)
@@ -148,7 +150,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 &nbsp;
 
-```{r weight-height, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE}
+```{r weight-height, echo = FALSE, fig.height = 5, fig.width = 5}
 n = 50
 df_weight = tibble::tibble(
   height = rnorm(n, 1.70, 0.05),
@@ -168,7 +170,7 @@ p_weight
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 じゃあ切片と傾き、どう決める？
 
-```{r weight-lines, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE}
+```{r weight-lines, echo = FALSE, fig.height = 5, fig.width = 5}
 df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) %>%
   dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
 p_weight +
@@ -181,7 +183,7 @@ p_weight +
 
 回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。
 
-```{r weight-residual, echo = FALSE, fig.height = 5, fig.width = 10, cache = FALSE}
+```{r weight-residual, echo = FALSE, fig.height = 5, fig.width = 10}
 predict_weight = function(parameters, data) {
   parameters[1] + parameters[2] * data$height
 }
@@ -219,7 +221,7 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 
 ランダムに試してみて、上位のものを採用
 
-```{r weight-goodlines, echo = FALSE, fig.height = 5, fig.width = 10, cache = FALSE}
+```{r weight-goodlines, echo = FALSE, fig.height = 5, fig.width = 10}
 n = 200
 df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) %>%
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
@@ -239,7 +241,7 @@ cowplot::plot_grid(p_ab, p2, nrow = 1L)
 
 **グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す
 
-```{r weight-grid, echo = FALSE, fig.height = 5, fig.width = 10, cache = FALSE}
+```{r weight-grid, echo = FALSE, fig.height = 5, fig.width = 10}
 df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) %>%
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
 
@@ -256,18 +258,35 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ---
 ## これくらいなら一瞬で計算してもらえる
 
-```{r lm}
+```{r lm, echo = FALSE}
 par_init = c(intercept = 0, slope = 0)
 result = optim(par_init, fn = rss_weight, data = df_weight)
 result$par
 ```
 
-```{r weight-lm, echo = FALSE, fig.height = 5, fig.width = 5, cache = FALSE}
+```{r weight-lm, echo = FALSE, fig.height = 5, fig.width = 5}
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label)
 ```
+
+
+---
+## 🔰 直線あてはめしてみる (TODO: python)
+
+```{r lm-mpg, fig.height = 2.5, fig.width = 2.5}
+fit = lm(data = mpg, formula = hwy ~ displ)
+broom::tidy(fit)
+
+mpg_added = modelr::add_predictions(mpg, fit)
+ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = pred), size = 1, color = "#3366ff")
+```
+
+<hr>
+
+☕️ 休憩 + 質疑応答
 
 
 ---
@@ -286,7 +305,7 @@ p_weight +
 手元のデータを数えて作るのが**経験分布**<br>
 e.g., サイコロを12回投げた結果、学生1000人の身長
 
-```{r distribution, echo = FALSE, fig.height = 4, fig.width = 8, cache = FALSE}
+```{r distribution, echo = FALSE, fig.height = 4, fig.width = 8}
 p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) %>%
   ggplot() + aes(face) +
   geom_bar(aes(y = after_stat(prop))) +
@@ -318,7 +337,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
 
-```{r dbinom, echo = FALSE, fig.height = 3, fig.width = 3, cache = FALSE}
+```{r dbinom, echo = FALSE, fig.height = 3, fig.width = 3}
 size = 3L; p = 0.5
 tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) %>%
   ggplot() + aes(X, Prob) +
@@ -348,7 +367,7 @@ k &\in \{0, 1, 2, \ldots, n\}
 試行2: 裏 裏 裏 → $X = 0$<br>
 試行3: **表** 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$
 
-```{r rbinom, echo = FALSE, fig.height = 3, fig.width = 11, cache = FALSE}
+```{r rbinom, echo = FALSE, fig.height = 3, fig.width = 11}
 size = 3L; p = 0.5
 X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
 df_rbinom = purrr::map_dfr(c(1, 2, 3, 10, 100), ~{
@@ -449,7 +468,7 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 e.g., コインの表裏、サイコロの出目1–6
 
-```{r dunif, echo = FALSE, fig.height = 4, fig.width = 6, cache = FALSE}
+```{r dunif, echo = FALSE, fig.height = 4, fig.width = 6}
 df_coin = tibble::tibble(X = c("head", "tail"), Prob = c(0.5, 0.5), group = "Coin")
 df_dice = tibble::tibble(X = as.character(seq_len(6L)), Prob = rep(1 / 6, 6), group = "Dice")
 dplyr::bind_rows(df_coin, df_dice) %>%
@@ -471,7 +490,7 @@ dplyr::bind_rows(df_coin, df_dice) %>%
 
 e.g., コイントスで表が出るまでに何回裏が出るか
 
-```{r geometric, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r geometric, echo = FALSE, fig.height = 4, fig.width = 11}
 df = purrr::map_dfr(c(0.2, 0.5, 0.9), function(p) {
   tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
 }) %>%
@@ -499,7 +518,7 @@ ggplot(df) + aes(X, Prob) +
 
 確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
 
-```{r dbinom-n, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r dbinom-n, echo = FALSE, fig.height = 4, fig.width = 11}
 p = 0.25
 df = purrr::map_dfr(2 ** seq.int(0, 4), function(n) {
   tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
@@ -528,7 +547,7 @@ ggplot(df) + aes(X, Prob) +
 
 e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数
 
-```{r dpoisson, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r dpoisson, echo = FALSE, fig.height = 4, fig.width = 11}
 lambda = c(1, 5, 10)
 
 p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) %>%
@@ -570,7 +589,7 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 
 e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔
 
-```{r dexp, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r dexp, echo = FALSE, fig.height = 4, fig.width = 11}
 p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) %>%
   dplyr::mutate(Prob = dexp(x, rate = lambda)) %>%
   ggplot() + aes(x, Prob) +
@@ -597,7 +616,7 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 
 e.g., メッセージを2つ受信するまでの待ち時間
 
-```{r dgamma, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r dgamma, echo = FALSE, fig.height = 4, fig.width = 11}
 p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) %>%
   dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) %>%
   ggplot() + aes(x, Prob) +
@@ -622,7 +641,7 @@ shapeパラメータ $k = 1$ のとき指数分布と一致。
 平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
 e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):
 
-```{r gaussian, echo = FALSE, fig.height = 5, fig.width = 11, cache = FALSE}
+```{r gaussian, echo = FALSE, fig.height = 5, fig.width = 11}
 ci = qnorm(c(0.005, 0.025, 0.975, 0.995), 50, 10)
 tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) %>%
   ggplot() + aes(x, Prob) +
@@ -644,7 +663,7 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) %>%
 標本平均の反復(**中心極限定理**);
 e.g., 一様分布 [0, 100) から40サンプル
 
-```{r central-limit, echo = FALSE, fig.height = 3, fig.width = 11, cache = FALSE}
+```{r central-limit, echo = FALSE, fig.height = 3, fig.width = 11}
 n = 40L
 X = replicate(10000L, mean(runif(n, 0, 100)))
 purrr::map_dfr(c(10, 100, 1000, 10000), ~{tibble::tibble(X = head(X, .x), Repl = .x)}) %>%
@@ -658,7 +677,7 @@ purrr::map_dfr(c(10, 100, 1000, 10000), ~{tibble::tibble(X = head(X, .x), Repl =
 
 大きい$n$の二項分布
 
-```{r binom-normal, echo = FALSE, fig.height = 3, fig.width = 11, cache = FALSE}
+```{r binom-normal, echo = FALSE, fig.height = 3, fig.width = 11}
 purrr::map_dfr(c(1, 4, 16, 64, 256), ~{
   tibble::tibble(X = seq(0, .x), Prob = dbinom(X, .x, 0.25), n = .x) %>%
   dplyr::filter(Prob > 1e-5)
@@ -676,7 +695,7 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~{
 
 大きい$\lambda$のポアソン分布
 
-```{r poisson-normal, echo = FALSE, fig.height = 2.5, fig.width = 11, cache = FALSE}
+```{r poisson-normal, echo = FALSE, fig.height = 2.5, fig.width = 11}
 purrr::map_dfr(c(1, 4, 16, 64, 256), ~{
   tibble::tibble(X = seq(0, 4 * .x), Prob = dpois(X, .x), lambda = .x) %>%
   dplyr::filter(Prob > 1e-5)
@@ -691,7 +710,7 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~{
 
 平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布
 
-```{r gamma-normal, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r gamma-normal, echo = FALSE, fig.height = 4, fig.width = 11}
 .guide = guide_legend(reverse = TRUE, label.position = "left", label.hjust = 1)
 tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10 ** seq.int(0, 3)) %>%
   dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) %>%
@@ -772,10 +791,6 @@ rng.integers(1, 6, 8)
 ---
 ## いろんな乱数を生成・可視化して感覚を掴もう
 
-🔰 [numpy公式ドキュメント](https://numpy.org/doc/stable/reference/random/generator.html)を参考に、とにかくたくさん試そう。
-
-🔰 e.g., 1%の当たりを狙って100連ガチャを回した場合とか
-
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -795,6 +810,8 @@ print(x)
 sns.countplot(x)    # for discrete values
 ```
 
+🔰 上のコードを使って `binomial()` や `poisson()` も試してみよう。
+
 ???
 
 plt.clf()
@@ -802,11 +819,25 @@ plt.close()
 
 
 ---
+## いろんな乱数を生成・可視化して感覚を掴もう
+
+🔰 [numpy公式ドキュメント](https://numpy.org/doc/stable/reference/random/generator.html)
+を参考に、以下のような乱数を作って作図しよう。
+
+- 1%の当たりを狙って100連ガチャを回した場合
+- TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
+---
 ## データに分布をあてはめたい
 
 ある植物を50個体調べて、それぞれの種子数Xを数えた。
 
-```{r poisson-seed, echo = FALSE, fig.height = 4, fig.width = 4, cache = FALSE}
+```{r poisson-seed, echo = FALSE, fig.height = 4, fig.width = 4}
 df_rpois = tibble::tibble(X = rpois(50L, 3))
 ggplot(df_rpois) + aes(X) +
   geom_bar() +
@@ -824,7 +855,7 @@ ggplot(df_rpois) + aes(X) +
 
 ある植物を50個体調べて、それぞれの種子数Xを数えた。
 
-```{r poisson-seed-lambda, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r poisson-seed-lambda, echo = FALSE, fig.height = 4, fig.width = 11}
 df_dpois = purrr::map_dfr(c(1, 3, 5), ~{
   tibble(lambda = .x, X = seq(0, 11), Prob = dpois(X, lambda))
 })
@@ -896,7 +927,7 @@ L(\lambda \mid D)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 
-```{r poisson-seed-likelihood, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r poisson-seed-likelihood, echo = FALSE, fig.height = 4, fig.width = 11}
 df_likelihood = df_rpois %>%
   dplyr::left_join(df_dpois, by = "X") %>%
   dplyr::group_by(lambda) %>%
@@ -923,7 +954,7 @@ p_pois +
 \end{split}\]</div>
 
 
-```{r poisson-mle, echo = FALSE, fig.height = 3, fig.width = 10, cache = FALSE}
+```{r poisson-mle, echo = FALSE, fig.height = 3, fig.width = 10}
 count_rpois = df_rpois %>% dplyr::count(X)
 calc_likelihood_rpois = function(lambda) {
   prod(dpois(count_rpois[["X"]], lambda) ** count_rpois[["n"]])
@@ -959,7 +990,7 @@ cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
 今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
 「50個体サンプル→最尤推定」を1,000回繰り返してみると:
 
-```{r poisson-mle-repl, echo = FALSE, fig.height = 5, fig.width = 11, cache = FALSE}
+```{r poisson-mle-repl, echo = FALSE, fig.height = 5, fig.width = 11}
 nrep = 1000L
 df_repl = tibble::tibble(X = rpois(50L * nrep, 3), repl = rep(seq_len(nrep), each = 50L))
 df_sum = df_repl %>%
@@ -1001,7 +1032,7 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 
 “$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:
 
-```{r poisson-mle-nsam, echo = FALSE, fig.height = 4, fig.width = 11, cache = FALSE}
+```{r poisson-mle-nsam, echo = FALSE, fig.height = 4, fig.width = 11}
 nrep = 1000L
 purrr::map_dfr(c(5, 50, 500, 5000), ~{
   tibble::tibble(X = rpois(.x * nrep, 3), repl = rep(seq_len(nrep), each = .x)) %>%
@@ -1047,6 +1078,35 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
     - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
     - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
     - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**
+
+
+---
+## 🔰 尤度の練習問題 (TODO: python)
+
+サイコロを10回振ったら6の目が3回出た。
+
+1. 6の目の出る確率が1/6だとした場合の尤度は?
+
+1. 6の目の出る確率が0.2だとした場合の尤度は?
+
+1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
+
+1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
+   数学で解ければ優。Rで見つければ良。目分量・勘で可。
+
+ヒント
+: 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
+: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。
+
+
+```{r day3-2, include = FALSE}
+get_likelihood = function(p, k = 3, n = 10) {
+  choose(n, k) * p ** k * (1 - p) ** (n - k)
+  # dbinom(k, n, p)
+}
+
+get_likelihood(0.2)
+```
 
 
 ---
