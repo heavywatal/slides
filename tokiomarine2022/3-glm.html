@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>3. 一般化線形モデル、混合モデル — 統計モデリング概論 DSHC 2022</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="3. 一般化線形モデル、混合モデル — 統計モデリング概論 DSHC 2022">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2022/3-glm.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.96.0" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="統計モデリング概論-dshc-2022"><a href=".">統計モデリング概論 DSHC 2022</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li class="current-deck"><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定、階層ベイズモデル</a>
+</ol>
+<div class="footnote">
+2022-08-17 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
+</div>
+
+</section>
+<section>
+<h2 id="前章で見た統計モデル">前章で見た統計モデル</h2>
+<p>確率変数$X$はパラメータ$\theta$の確率分布$f$に“従う”: 
+$X \sim f(\theta) $</p>
+<p>e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分布に従う:</p>
+<div>\[\begin{split}
+X \sim \text{Poisson}(\lambda)
+\end{split}\]</div>
+<p><img src="figure/only-dist-1.png" alt="plot of chunk only-dist"></p>
+<p>これを一般化線形モデル(GLM)として見ることもできる。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデルglmとして記述してみる">一般化線形モデル(GLM)として記述してみる</h2>
+<p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+平均値$\lambda_i$は<strong>他のデータによらず$\beta_0$で一定</strong>。</p>
+<div>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\lambda_i &= \beta_0
+\end{split}\]</div>
+<p><img src="figure/glm-without-x-1.png" alt="plot of chunk glm-without-x"></p>
+<p>種子数をY軸にして、式を2つに分けただけ&hellip;?<br>
+<strong>説明変数</strong>を含むモデルを見ればご利益が分かるかも。</p>
+
+</section>
+<section>
+<h2 id="説明変数が1つある一般化線形モデル">説明変数が1つある一般化線形モデル</h2>
+<p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+平均値の対数$\log(\lambda_i)$は<strong>その個体の大きさ$x_i$に比例</strong>する。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<figure>
+<img src="../tokiomarine2021/glm.drawio.svg" width="100%"><br>
+</figure>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
+  </div>
+</div>
+<p>この場合は<strong>単回帰</strong>。説明変数が複数あると<strong>重回帰</strong>。</p>
+
+</section>
+<section>
+<h2 id="複数の説明変数を同時に扱う重回帰">複数の説明変数を同時に扱う重回帰</h2>
+<p>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\end{split}\]</p>
+<p>気温も湿度も高いほどビールが売れる、とか</p>
+<p><img src="figure/multiple-regression-1.png" alt="plot of chunk multiple-regression"></p>
+<p>今度は<strong>確率分布</strong>と<strong>リンク関数</strong>を変えてみよう。</p>
+
+</section>
+<section>
+<h2 id="ロジスティック回帰">ロジスティック回帰</h2>
+<ul>
+<li>確率分布: <strong>二項分布</strong></li>
+<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>客10人中$y_i$人がビールを注文。<br>
+その日$i$の気温$x_i$によって割合が変化。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+<p>ロジスティック関数↑</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
+<ul>
+<li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
+<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>風が吹けば桶屋が儲かる。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Bernoulli}(p_i) \\
+  &= \text{Binomial}(1,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+<p>ロジスティック関数↑</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/wind-1.png" alt="plot of chunk wind"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="一般線形モデル-化無し-はglmの一種">一般線形モデル (“化”無し) はGLMの一種</h2>
+<ul>
+<li>確率分布: <strong>正規分布</strong></li>
+<li>リンク関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
+</ul>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
+\text{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
+  </div>
+</div>
+<p>最小二乗法の直線あてはめと結果的に同じになる。</p>
+<p><small style="color: #999999;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small></p>
+
+</section>
+<section>
+<h2 id="分散分析-uanualysis-uouf-uvauriance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
+<p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等リンク</strong>のGLM、と解釈可能。<br>
+<span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">→</th>
+<th style="text-align:center">$x_1$ ☀️ 晴れ</th>
+<th style="text-align:center">$x_2$ ☔️ 雨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☁️ くもり</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="figure/glm-anova-1.png" alt="plot of chunk glm-anova"></p>
+  </div>
+</div>
+<p>くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。</p>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="共分散分析-uanualysis-of-ucovauriance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
+<p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
+正規分布・等分散・恒等リンクなどが仮定される。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">→</th>
+<th style="text-align:center">$x_1$ ☀️ 晴れ</th>
+<th style="text-align:center">$x_2$ ☔️ 雨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☁️ くもり</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
+  </div>
+</div>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
+<p>確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
+特定の組み合わせには名前がある。</p>
+<table>
+<thead>
+<tr>
+<th>名前</th>
+<th>確率分布</th>
+<th>リンク関数</th>
+<th>説明変数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ポアソン回帰</td>
+<td>ポアソン分布</td>
+<td>log</td>
+<td></td>
+</tr>
+<tr>
+<td>ロジスティック回帰</td>
+<td>二項分布</td>
+<td>logit</td>
+<td></td>
+</tr>
+<tr>
+<td>一般線形回帰</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td></td>
+</tr>
+<tr>
+<td>分散分析</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td>質的変数</td>
+</tr>
+<tr>
+<td>共分散分析</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td>質的変数+量的変数</td>
+</tr>
+</tbody>
+</table>
+<p>確率分布については<a href="2-stats-model.html">前章を参照</a>。<br>
+リンク関数をもう少しだけ掘り下げたい。</p>
+
+</section>
+<section>
+<h2 id="リンク関数">リンク関数</h2>
+<p>統計モデリングにおいて「まっすぐ以外も表現できる」意味</p>
+<dl>
+<dt>$\text{identity}(\mu_i)$</dt>
+<dd>$\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$</dd>
+<dd>説明変数の効果が<strong>足し算</strong>的に働く。</dd>
+<dt>$\log(\lambda_i)$</dt>
+<dd>$\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$</dd>
+<dd>説明変数の効果が<strong>掛け算</strong>的に働く。<br>
+e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる</dd>
+<dt>$\text{logit}(p_i)$</dt>
+<dd>$p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)</dd>
+<dd>説明変数の効果が<strong>頭打ち</strong>になる。<br>
+e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
+</dl>
+<p>ほかに <code>probit</code>, <code>inverse</code>, <code>sqrt</code>, etc.</p>
+
+</section>
+<section>
+<h2 id="-とにかくglmを使ってみる練習">🔰 とにかくGLMを使ってみる練習</h2>
+<p>とりあえず当てはめと作図だけ。</p>
+<p>結果の解釈やモデルの評価は後で。</p>
+<p>TODO</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="データはひとつモデルはたくさん">データはひとつ、モデルはたくさん</h2>
+<p>どう選ぶ？</p>
+<ol>
+<li>メカニズム的に納得できるものを選ぶ
+<ul>
+<li>ポアソン過程の<strong>カウント</strong>ならポアソン分布、<strong>間隔</strong>ならガンマ分布</li>
+<li>n回中k回のように<strong>割合的なカウント</strong>なら二項分布</li>
+</ul>
+</li>
+<li>データを可視化してみて、それっぽい形・性質のものを選ぶ
+<ul>
+<li><strong>左右対称のひと山</strong>ならとりあえず正規分布</li>
+<li><strong>負の値を取らない</strong>ならガンマ分布</li>
+<li>直線的か、指数関数的か、頭打ちか、などなど</li>
+</ul>
+</li>
+</ol>
+<p>客観的な指標もほしい。<br>
+モデルの尤もらしさといえば&hellip;</p>
+
+</section>
+<section>
+<h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
+<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>:<br>
+$\text{Prob}(D \mid M)$</p>
+<p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
+$L(M \mid D)$</p>
+<p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+$L(\theta \mid D)$ or $L(\theta)$</p>
+<p><strong>対数尤度</strong> $\log L$ の形にしたほうがいろいろ便利。</p>
+<hr>
+<p>各モデルで最適なパラメータを探して、比較:<br>
+$\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$</p>
+
+</section>
+<section>
+<h2 id="たしかに尤度はあてはまりの良さを表してそう">たしかに尤度はあてはまりの良さを表してそう</h2>
+<p>この場合は直線回帰よりもポアソン回帰が良さそう:</p>
+<p><img src="figure/compare-loglik-1.png" alt="plot of chunk compare-loglik"></p>
+<p>この調子で、より尤度の高いモデルを探していけばいいだろうか？</p>
+
+</section>
+<section>
+<h2 id="あてはまりが良ければいいってもんでもない">あてはまりが良ければいいってもんでもない</h2>
+<dl>
+<dt>過剰適合 / 過学習 / overfitting</dt>
+<dd>パラメータを増やせば<strong>現データへの</strong>適合度・尤度を高くできるが、<br>
+予測・理解の役には立たなくなる。</dd>
+</dl>
+<p><img src="figure/saturated-model-1.png" alt="plot of chunk saturated-model"></p>
+<p><strong>帰無モデル</strong>: 説明変数なし。切片のみ。<br>
+<strong>飽和モデル</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル</p>
+
+</section>
+<section>
+<h2 id="無駄な説明変数を加えても尤度は上がる">無駄な説明変数を加えても尤度は上がる</h2>
+<p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+観察時に着てた服の色 $x_2$ を追加すると尤度が上がる&hellip;&hellip;?</p>
+<p><img src="figure/many-models-1.png" alt="plot of chunk many-models"></p>
+
+</section>
+<section>
+<h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
+<p>\[\begin{split}
+\text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
+\end{split}\]</p>
+<ul>
+<li><strong>AICが小さいほど予測精度の良いモデル</strong>。
+<ul>
+<li>尤度は上げたい。</li>
+<li>パラメータ数 $k$ が増えるとペナルティ。</li>
+</ul>
+</li>
+<li>どのデータに対する当てはまりを目指すかという観点
+<ul>
+<li>「手元のデータ」に対する対数尤度は $\log L^*$<br></li>
+<li>「真のメカニズムから出てくる未来のデータ」に対する<br>
+平均対数尤度の推定量は $(\log L^* - k)$<br>
+(Kullback&ndash;Leibler情報量を使って導出するらしい)</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="無駄な説明変数の追加でaic増加">無駄な説明変数の追加でAIC増加</h2>
+<p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。</p>
+<p><img src="figure/many-models-aic-1.png" alt="plot of chunk many-models-aic"></p>
+
+</section>
+<section>
+<h2 id="ほかの情報量基準">ほかの情報量基準</h2>
+<ul>
+<li>$\text{BIC} = -2 \log L^* + k \log n$
+<ul>
+<li>パラメータ数 $k$ でペナルティを付けるのはAICと同じ。</li>
+<li>データの観測数 $n$ に依存する点でAICと異なる。<br>
+感覚としては「AICはデータサイズによるペナルティが無い」</li>
+<li>(周辺尤度の最大化という観点で導出するらしい)</li>
+</ul>
+</li>
+<li><a href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html">WAIC</a>,
+<a href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html">WBIC</a>
+<ul>
+<li>AIC, BICを一般化し、広く使えるようにしたもの。</li>
+<li>理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
+そうじゃない場合(現実的には常に)こちらが優位。</li>
+<li>WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="モデル選択の心構え">モデル選択の心構え</h2>
+<p>「正しい」ものを選べるわけではない。<br>
+予測・理解に useful なものを何らかの基準で選ぶだけ。</p>
+<blockquote>
+<p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
+</blockquote>
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+</section>
+<section>
+<h2 id="現実的な注意点悩みどころ">現実的な注意点・悩みどころ</h2>
+<ul>
+<li>多重共線性(multicollinearity):
+<ul>
+<li>説明変数同士が強い相関関係にある</li>
+</ul>
+</li>
+<li>変数変換:
+<ul>
+<li>気安くやるべきじゃないけど、対数変換などしばしば有用</li>
+<li>割り算した値は危険</li>
+</ul>
+</li>
+<li>交互作用を入れると解釈が難しくなる。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="交互作用">交互作用</h2>
+<p>ある説明変数の効果が、別の説明変数によって異なる。<br>
+e.g., ビール売上の温度依存性が天気によって異なる。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">$x_1$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
+\end{split}\]</p>
+<p>雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="figure/interaction-1.png" alt="plot of chunk interaction"></p>
+  </div>
+</div>
+<p>解釈が一気に難しくなるのでむやみに使わない。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデル座学まとめ">一般化線形モデル座学まとめ</h2>
+<ul>
+<li>何はともあれ散布図を描く</li>
+<li>適切な確率分布・リンク関数・説明変数を考える</li>
+<li>パラメータを最尤推定する</li>
+<li>尤度は「手元のデータへのあてはまり」</li>
+<li>モデルを比較するときは情報量基準を参考にする</li>
+</ul>
+
+</section>
+<section>
+<h2 id="pythonでglmをやるパッケージ">PythonでGLMをやるパッケージ</h2>
+<dl>
+<dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
+<dd>統計モデリング寄り。今回はこちらを紹介。</dd>
+<dd>AICやp値などの指標も適宜計算してくれるので楽</dd>
+<dt><a href="https://scikit-learn.org">scikit-learn</a></dt>
+<dd>機械学習寄り</dd>
+<dd>回帰以外のさまざまな手法も統一的な書き方で使える</dd>
+</dl>
+<p>以降のコードで共通のライブラリ読み込み</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</span></span><span class="line"><span class="cl"><span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;Adelie&#34;</span><span class="p">:</span> <span class="s2">&#34;#ff6600&#34;</span><span class="p">,</span> <span class="s2">&#34;Gentoo&#34;</span><span class="p">:</span> <span class="s2">&#34;#c35bcc&#34;</span><span class="p">,</span> <span class="s2">&#34;Chinstrap&#34;</span><span class="p">:</span> <span class="s2">&#34;#007174&#34;</span><span class="p">}</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Python</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+</span></span><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;penguins&#39;</span><span class="p">,</span> <span class="s1">&#39;palmerpenguins&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># R</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;palmerpenguins&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">penguins_colors</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">Adelie</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">Chinstrap</span> <span class="o">=</span> <span class="s">&#34;purple&#34;</span><span class="p">,</span> <span class="n">Gentoo</span> <span class="o">=</span> <span class="s">&#34;cyan4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<pre tabindex="0"><code>      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex  year
+        &lt;fct&gt;     &lt;fct&gt;          &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;  &lt;fct&gt; &lt;int&gt;
+  1    Adelie Torgersen           39.1          18.7               181        3750   male  2007
+  2    Adelie Torgersen           39.5          17.4               186        3800 female  2007
+  3    Adelie Torgersen           40.3          18.0               195        3250 female  2007
+  4    Adelie Torgersen             NA            NA                NA          NA     NA  2007
+ --                                                                                            
+341 Chinstrap     Dream           43.5          18.1               202        3400 female  2009
+342 Chinstrap     Dream           49.6          18.2               193        3775   male  2009
+343 Chinstrap     Dream           50.8          19.0               210        4100   male  2009
+344 Chinstrap     Dream           50.2          18.7               198        3775 female  2009
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
+<p>どうやら、重いペンギンほど翼長も長い。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-1.png" alt="plot of chunk penguins-weight"></p>
+
+</section>
+<section>
+<h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
+<p>結構たくさん出力される。上がモデルの評価、下が推定結果。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">model1</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">results1</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results1</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Dep. Variable:      flipper_length_mm   No. Observations:                  342
+Model:                            GLM   Df Residuals:                      340
+Model Family:                Gaussian   Df Model:                            1
+Link Function:               identity   Scale:                          47.795
+Method:                          IRLS   Log-Likelihood:                -1145.5
+Date:                Tue, 29 Jun 2021   Deviance:                       16250.
+Time:                        10:32:40   Pearson chi2:                 1.63e+04
+No. Iterations:                     3
+Covariance Type:            nonrobust
+===============================================================================
+                  coef    std err          z      P&gt;|z|      [0.025      0.975]
+-------------------------------------------------------------------------------
+Intercept     136.7296      1.997     68.473      0.000     132.816     140.643
+body_mass_g     0.0153      0.000     32.722      0.000       0.014       0.016
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰の練習-3-フィッティング結果を作図">単回帰の練習: 3. フィッティング結果を作図</h2>
+<p>$y = 136.7 + 0.0153 x$</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">y_pred</span> <span class="o">=</span> <span class="n">results1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">penguins</span><span class="p">[</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y_pred</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm"></p>
+
+</section>
+<section>
+<h2 id="重回帰の練習-1-まず作図">重回帰の練習: 1. まず作図</h2>
+<p>重いペンギンほど翼長も長い。翼長は種によっても違うかも。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp"></p>
+
+</section>
+<section>
+<h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
+<p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+体重の効果は単回帰のときより小さい。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g + species&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">model2</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">results2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                           coef    std err          z      P&gt;|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------
+Intercept              158.8603      2.387     66.564      0.000     154.183     163.538
+species[T.Chinstrap]     5.5974      0.788      7.101      0.000       4.053       7.142
+species[T.Gentoo]       15.6775      1.091     14.374      0.000      13.540      17.815
+body_mass_g              0.0084      0.001     13.255      0.000       0.007       0.010
+</code></pre>
+</section>
+<section>
+<h2 id="重回帰の練習-3-フィッティング結果を作図">重回帰の練習: 3. フィッティング結果を作図</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pen_pred</span> <span class="o">=</span> <span class="n">penguins</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pred</span><span class="o">=</span><span class="n">results2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm"></p>
+<p><strong>傾き</strong>も種によって違うかも。<strong>交互作用</strong>を入れてみたい。</p>
+
+</section>
+<section>
+<h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
+<p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+切片の違いは解釈しにくくなった。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g + species + body_mass_g:species&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">model3</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">results3</span> <span class="o">=</span> <span class="n">model3</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                                       coef    std err          z      P&gt;|z|      [0.025      0.975]
+----------------------------------------------------------------------------------------------------
+Intercept                          165.2448      3.551     46.536      0.000     158.285     172.204
+species[T.Chinstrap]               -13.8639      7.301     -1.899      0.058     -28.174       0.446
+species[T.Gentoo]                    6.0594      6.051      1.001      0.317      -5.800      17.919
+body_mass_g                          0.0067      0.001      7.011      0.000       0.005       0.009
+body_mass_g:species[T.Chinstrap]     0.0052      0.002      2.683      0.007       0.001       0.009
+body_mass_g:species[T.Gentoo]        0.0024      0.001      1.746      0.081      -0.000       0.005
+</code></pre>
+</section>
+<section>
+<h2 id="交互作用の練習-フィッティング結果を作図">交互作用の練習: フィッティング結果を作図</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pen_pred</span> <span class="o">=</span> <span class="n">penguins</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pred</span><span class="o">=</span><span class="n">results3</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction"></p>
+
+</section>
+<section>
+<h2 id="ここまでの3つのモデルでどれがいいか">ここまでの3つのモデルでどれがいいか？</h2>
+<p>AICで選ぶなら交互作用入り重回帰が良さそう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">results1</span><span class="o">.</span><span class="n">aic</span>
+</span></span><span class="line"><span class="cl"><span class="n">results2</span><span class="o">.</span><span class="n">aic</span>
+</span></span><span class="line"><span class="cl"><span class="n">results3</span><span class="o">.</span><span class="n">aic</span>
+</span></span></code></pre></div><p><img src="figure/penguins-aic-1.png" alt="plot of chunk penguins-aic"></p>
+
+</section>
+<section>
+<h2 id="glmの練習">GLMの練習</h2>
+<p>🔰クチバシの長さと深さで同じ解析をやってみよう。</p>
+<p><img src="figure/penguins-bill-1.png" alt="plot of chunk penguins-bill"></p>
+<p>🔰余裕があったら性別や年なども説明変数に入れてみよう。</p>
+
+</section>
+<section>
+<h2 id="確率分布とリンク関数を明示的に指定したい">確率分布とリンク関数を明示的に指定したい</h2>
+<p>何も指定しない場合は正規分布・恒等リンクだった:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">#### results.summary()</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Model Family:                Gaussian</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># Link Function:               identity</span>
+</span></span></code></pre></div><p>こう書いたのと同じ:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="n">link</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">identity</span>
+</span></span><span class="line"><span class="cl"><span class="n">family</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">link</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
+</span></span></code></pre></div><p>利用可能な<a href="https://www.statsmodels.org/stable/glm.html#families">確率分布</a>と<a href="https://www.statsmodels.org/stable/glm.html#link-functions">リンク関数</a>は公式ドキュメントを参照。</p>
+
+</section>
+<section>
+<h2 id="手元のデータ公共データなどでglmしてみよう">手元のデータ、公共データなどでGLMしてみよう</h2>
+<p>正規分布・恒等リンクじゃないものだとなお良し。</p>
+<p>Pythonパッケージに付属のものを探すのもあり。<br>
+e.g., <a href="https://vincentarelbundock.github.io/Rdatasets/articles/data.html"><code>sm.datasets.get_rdataset(item, package)</code></a></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</span></span><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">get_dataset_names</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">titanic</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;titanic&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;diamonds&#39;</span><span class="p">,</span> <span class="s1">&#39;ggplot2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span></code></pre></div><ul>
+<li>TODO: ポアソン回帰の練習に適した課題データ</li>
+<li>TODO: ロジスティック回帰の練習に適した課題データ</li>
+</ul>
+
+</section>
+<section>
+<h2 id="n個のうちy個生存二項分布に従わない">n個のうちy個生存。二項分布に従&hellip;&hellip;わない！</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<p><img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion"></p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$をそのままパラメータにすると<strong>過剰適合</strong>。<br>
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから&hellip;&hellip;</p>
+<p><img src="figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm"></p>
+<p>個体の生存能力をもっと少ないパラメータで表現できないか？</p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
+<p><img src="figure/sigmoid-1.png" alt="plot of chunk sigmoid"></p>
+<p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
+<p>前者は標本平均 $\hat p$ から求まるとして、後者どうする？</p>
+
+</section>
+<section>
+<h2 id="個体能力のばらつき-sigma-が大きいと両端が増える">個体能力のばらつき $\sigma$ が大きいと両端が増える</h2>
+<p>普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。</p>
+<p><img src="figure/alter-sigma-1.png" alt="plot of chunk alter-sigma"><img src="figure/alter-sigma-2.png" alt="plot of chunk alter-sigma"></p>
+
+</section>
+<section>
+<h2 id="zの値で色分けしてみると想像しやすい">zの値で色分けしてみると想像しやすい</h2>
+<p>正規分布と二項分布の混ぜ合わせ&hellip;&hellip;?</p>
+<p><img src="figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z"><img src="figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z"></p>
+
+</section>
+<section>
+<h2 id="混合分布ただの二項分布よりも良いあてはまり">混合分布。ただの二項分布よりも良いあてはまり。</h2>
+<p>パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。</p>
+<p><img src="figure/before-mixing-1.png" alt="plot of chunk before-mixing"></p>
+<div align="center">
+<p><img src="figure/after-mixing-1.png" alt="plot of chunk after-mixing"></p>
+</div>
+</section>
+<section>
+<h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
+<p><strong>固定効果(fixed effects)</strong> のみ扱っていたGLMを拡張して、<br>
+<strong>変量効果(random effect)</strong> を混合したモデル。<br>
+<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small></p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+  + z_{1i} + \ldots \\
+z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
+\end{split}\]</p>
+<p>e.g.,<br>
+個体$i$の種子生存率$p_i$は、<br>
+(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
+(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。</p>
+
+</section>
+<section>
+<h2 id="固定効果にするか変量効果にするか">固定効果にするか、変量効果にするか</h2>
+<p>推定したパラメータを予測に使うなら固定効果</p>
+<dl>
+<dt>予測に使えそうなので固定効果向き</dt>
+<dd><ul>
+<li>観測・操作した連続値変数: 長さ、重さ、温度、etc.</li>
+</ul>
+</dd>
+<dd><ul>
+<li>観測・操作したカテゴリカル変数: 性別、投薬、etc.</li>
+</ul>
+</dd>
+<dt>予測に使えないので変量効果向き</dt>
+<dd><ul>
+<li>観測・操作できなかった個体差:<br>
+たまたま集まってくれた学生15人 {A, B, C, &hellip;}。<br>
+Aさんの固定効果を推定できても、Zさんの予測には使えない。</li>
+</ul>
+</dd>
+<dd><ul>
+<li>観測・操作できなかったグループ差:<br>
+↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
+いグループの固定効果を推定できても、また集まることはない。</li>
+</ul>
+</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="どういうときに変量効果を考える必要があるか">どういうときに変量効果を考える必要があるか</h2>
+<p>データに<strong>擬似反復</strong>が含まれるとき。<br>
+ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。</p>
+<table>
+<thead>
+<tr>
+<th>植木鉢</th>
+<th>個体/植木鉢</th>
+<th>種子/個体</th>
+<th>疑似反復</th>
+<th>推定不可</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100個</td>
+<td>1個体ずつ</td>
+<td>1個ずつ</td>
+<td>–</td>
+<td>個体差・鉢差</td>
+</tr>
+<tr>
+<td>25個</td>
+<td>1個体ずつ</td>
+<td>4個ずつ</td>
+<td>個体</td>
+<td>鉢差</td>
+</tr>
+<tr>
+<td>20個</td>
+<td>5個体ずつ</td>
+<td>1個ずつ</td>
+<td>植木鉢</td>
+<td>個体差</td>
+</tr>
+<tr>
+<td>5個</td>
+<td>5個体ずつ</td>
+<td>4個ずつ</td>
+<td>植木鉢・個体</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<p>疑似反復あり<br>
+→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
+→ そのぶんを差し引いて固定効果を推定したい</p>
+
+</section>
+<section>
+<h2 id="glmmの問題点展望">GLMMの問題点・展望</h2>
+<ul>
+<li>最尤推定の計算が難しくなるので、あまり複雑にはできない
+<ul>
+<li>ベイズ推定を使えばクリアできる</li>
+</ul>
+</li>
+<li>GLMの拡張として理解はできても、実際に書くのは難しめ
+<ul>
+<li>階層ベイズモデルの一種として見るほうが便利</li>
+</ul>
+</li>
+</ul>
+<p>→ ここでGLMMの練習はせず、階層ベイズモデルに進む。</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="一般化線形混合モデルまとめ">一般化線形(混合)モデルまとめ</h2>
+<ul>
+<li>何はともあれ作図して俯瞰</li>
+<li>GLMは統計モデリングの考え方の根幹
+<ul>
+<li>確率分布・リンク関数・説明変数</li>
+<li>尤度・最尤法によるパラメータ推定</li>
+<li>情報量基準などによるモデル選択</li>
+</ul>
+</li>
+<li>GLMMは現実のデータ解析に向けた強化
+<ul>
+<li>疑似反復による変量効果を考慮</li>
+<li>階層ベイズモデルとして扱うほうが楽</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="4-bayesian.html" rel="next" class="readmore">
+4. ベイズ推定、階層ベイズモデル
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
