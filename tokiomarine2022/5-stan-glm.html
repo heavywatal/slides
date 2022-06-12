@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>5. StanでGLM — 統計モデリング概論 DSHC 2022</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="5. StanでGLM — 統計モデリング概論 DSHC 2022">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2022/5-stan-glm.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.96.0" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="統計モデリング概論-dshc-2022"><a href=".">統計モデリング概論 DSHC 2022</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定とMCMC</a>
+<li class="current-deck"><a href="5-stan-glm.html">StanでGLM</a>
+<li><a href="6-stan-hbm.html">Stanで階層ベイズモデル</a>
+</ol>
+<div class="footnote">
+2022-08-24 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
+</div>
+
+</section>
+<section>
+<h2 id="stan">Stan</h2>
+<a href="https://mc-stan.org/">
+<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+</a>
+<ul>
+<li>Stan言語でモデルを書く</li>
+<li>C++を介して機械語に翻訳(コンパイル)するので高速</li>
+<li>RやPythonなどから呼び出して使うのが便利</li>
+</ul>
+<p>大部分はRで説明し、部分的にPythonでの練習を挟みます。<br></p>
+<p>聞きながら手元で<a href="tokiomarine2022-stan.ipynb">tokiomarine2022-stan.ipynb</a>を実行してもいいです。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;rstan&#34;)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">rstan</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">rstan_options</span><span class="p">(</span><span class="n">auto_write</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># データ準備</span>
+</span></span><span class="line"><span class="cl"><span class="n">mydata</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># Stan言語で書いたモデルをコンパイル</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&#34;model.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># MCMCサンプリング</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 結果を眺める</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-データ準備">説明変数なしのベイズ推定: データ準備</h2>
+<p>表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">true_p</span> <span class="o">=</span> <span class="m">0.7</span>
+</span></span><span class="line"><span class="cl"><span class="n">N</span> <span class="o">=</span> <span class="m">40L</span>
+</span></span><span class="line"><span class="cl"><span class="n">mydata</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>$N
+[1] 40
+
+$x
+ [1] 0 0 1 0 1 1 0 1 1 0 1 0 0 1 1 0 0 1 1 1 0 1 0 0 1 1 1 0 1 0 0 0 1 1 1 0 1 1 0 1
+</code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
+<p>文字列として保持するか、別ファイルに書いておく:</p>
+<pre tabindex="0"><code>data {
+  int&lt;lower=0&gt; N;
+  int x[N];
+}
+
+parameters {
+  real&lt;lower=0,upper=1&gt; p;
+}
+
+model {
+  x ~ binomial(1, p);
+}
+</code></pre><ul>
+<li>いくつかのブロックに分けて記述する:<br>
+R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code>, 本体の <code>model</code>.</li>
+<li>整数型 <code>int</code>, 実数型 <code>real</code>, それらの配列がある。</li>
+<li>下限 <code>lower</code>, 上限 <code>upper</code> を設定できる。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="stan言語の7種のブロック">Stan言語の7種のブロック</h2>
+<p>順番厳守。よく使うのは<strong>太字のやつ</strong>。</p>
+<ol>
+<li><code>functions {...}</code></li>
+<li><strong><code>data {...}</code></strong></li>
+<li><code>transformed data {...}</code></li>
+<li><strong><code>parameters {...}</code></strong></li>
+<li><code>transformed parameters {...}</code></li>
+<li><strong><code>model {...}</code></strong></li>
+<li><code>generated quantities {...}</code></li>
+</ol>
+<p><a href="https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html">https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html</a></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;binom.stan&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>これに結構時間がかかるので、変更が無ければ再利用するため先ほど
+<code>rstan_options(auto_write = TRUE)</code> しておいた。</p>
+<hr>
+<p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span></code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-結果を眺める">説明変数なしのベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Inference for Stan model: binom.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+       mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
+p      0.55    0.00 0.08   0.39   0.50   0.55   0.60   0.69  1651    1
+lp__ -29.45    0.02 0.76 -31.61 -29.61 -29.16 -28.97 -28.92  1262    1
+
+Samples were drawn using NUTS(diag_e) at Wed Jun  8 09:32:06 2022.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
+<p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;p&#34;</span><span class="p">))</span>
+</span></span></code></pre></div><p><img src="figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
+<p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+<p>次はもう少しだけ複雑な例を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-データ準備">線形回帰のベイズ推定: データ準備</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<p><img src="figure/stan-penguins-glm-1.png" alt="plot of chunk stan-penguins-glm">
+</section>
+<section>
+<h2 id="線形回帰のベイズ推定-データ準備">線形回帰のベイズ推定: データ準備</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<p><code>Stan does not support NA</code> と怒られるので欠損値を取り除いておく:</p>
+<pre tabindex="0"><code>List of 3
+ $ body_mass_g      : int [1:342] 3750 3800 3250 3450 3650 3625 4675 3475 4250 3300 ...
+ $ flipper_length_mm: int [1:342] 181 186 195 193 190 181 195 193 190 186 ...
+ $ N                : int 342
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-stan言語でモデル定義">単回帰のベイズ推定: Stan言語でモデル定義</h2>
+<p>切片、傾き、ばらつきを推定する:</p>
+<pre tabindex="0"><code>data {
+  int&lt;lower=0&gt; N;
+  vector&lt;lower=0&gt;[N] body_mass_g;
+  vector&lt;lower=0&gt;[N] flipper_length_mm;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real&lt;lower=0&gt; sigma;
+}
+
+model {
+  flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-mcmcサンプル">単回帰のベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;penguins.stan&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span></code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-結果を眺める">単回帰のベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Inference for Stan model: penguins.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+             mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+intercept  136.76    0.05 1.97  132.89  135.40  136.75  138.04  140.67  1506    1
+slope        0.02    0.00 0.00    0.01    0.01    0.02    0.02    0.02  1526    1
+sigma        6.94    0.01 0.27    6.41    6.76    6.94    7.13    7.47  1198    1
+lp__      -830.83    0.04 1.24 -834.08 -831.39 -830.51 -829.93 -829.43  1120    1
+
+Samples were drawn using NUTS(diag_e) at Wed Jun  8 09:32:31 2022.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-trace-plot-確認">単回帰のベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-penguins-traceplot-1.png" alt="plot of chunk stan-penguins-traceplot"></p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-自己相関の確認">単回帰のベイズ推定: 自己相関の確認</h2>
+<p>どれもまあまあすぐ消えるので問題なし:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;intercept&#34;</span><span class="p">,</span> <span class="s">&#34;slope&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">))</span>
+</span></span></code></pre></div><p><img src="figure/stan-penguins-ac-1.png" alt="plot of chunk stan-penguins-ac"></p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-推定結果確認">単回帰のベイズ推定: 推定結果確認</h2>
+<p>正規分布っぽいきれいな形:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-penguins-hist-1.png" alt="plot of chunk stan-penguins-hist"></p>
+<p>これらの値を使って点推定・区間推定も可能。</p>
+
+</section>
+<section>
+<h2 id="単回帰のベイズ推定-推定結果で回帰">単回帰のベイズ推定: 推定結果で回帰</h2>
+<p>無事に最尤推定と似たような線が引けた。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">coef</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">get_posterior_mean</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="n">[</span><span class="p">,</span> <span class="s">&#34;mean-all chains&#34;</span><span class="n">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_abline</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;intercept&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;slope&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-penguins-regression-1.png" alt="plot of chunk stan-penguins-regression"></p>
+
+</section>
+<section>
+<h2 id="-単回帰の練習問題">🔰 単回帰の練習問題</h2>
+<p>TODO</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="stanで重回帰">Stanで重回帰</h2>
+<p>TODO</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstanarm</span><span class="o">::</span><span class="nf">stan_glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">pred</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">%&gt;%</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="n">tidybayes</span><span class="o">::</span><span class="nf">add_fitted_draws</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">,</span> <span class="n">group</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ggdist</span><span class="o">::</span><span class="nf">stat_lineribbon</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">.value</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">pred</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_fill_brewer</span><span class="p">(</span><span class="n">palette</span> <span class="o">=</span> <span class="s">&#34;Greys&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/rstanarm-penguins-multi-1.png" alt="plot of chunk rstanarm-penguins-multi"></p>
+
+</section>
+<section>
+<h2 id="-stanで重回帰の練習問題">🔰 Stanで重回帰の練習問題</h2>
+<p>TODO</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="stanでポアソン回帰">Stanでポアソン回帰</h2>
+<p>TODO</p>
+<img src="figure/glm-poisson-1.png">
+</section>
+<section>
+<h2 id="-stanでポアソン回帰の練習問題">🔰 Stanでポアソン回帰の練習問題</h2>
+<p>TODO</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="stanでロジスティック回帰">Stanでロジスティック回帰</h2>
+<p>TODO</p>
+<img src="figure/glm-logistic-1.png">
+</section>
+<section>
+<h2 id="-stanでロジスティック回帰">🔰 Stanでロジスティック回帰</h2>
+<p>TODO</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="6-stan-hbm.html" rel="next" class="readmore">
+6. Stanで階層ベイズモデル
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>

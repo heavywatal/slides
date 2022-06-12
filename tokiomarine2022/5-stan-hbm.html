@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>6. Stanで階層ベイズモデル — 統計モデリング概論 DSHC 2022</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="6. Stanで階層ベイズモデル — 統計モデリング概論 DSHC 2022">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2022/5-stan-hbm.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.96.0" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<link rel="stylesheet" href="style.css">
+<h1 id="統計モデリング概論-dshc-2022"><a href=".">統計モデリング概論 DSHC 2022</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定とMCMC</a>
+<li><a href="5-stan-glm.html">StanでGLM</a>
+<li class="current-deck"><a href="6-stan-hbm.html">Stanで階層ベイズモデル</a>
+</ol>
+<div class="footnote">
+2022-08-24 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
+</div>
+
+</section>
+<section>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+</section>
+<section>
+<h2 id="階層ベイズモデルのイメージ図">階層ベイズモデルのイメージ図</h2>
+<p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
+<figure>
+<img src="../tokiomarine2021/hbm.drawio.svg">
+</figure>
+
+</section>
+<section>
+<h2 id="さっきの図をstan言語で記述すると">さっきの図をStan言語で記述すると</h2>
+<p>お絵描きモデルとStanモデルを見比べてみよう。</p>
+<pre tabindex="0"><code>data {
+  int&lt;lower=0&gt; N;
+  int y[N];
+}
+
+parameters {
+  real a;           // mean ability
+  vector[N] r;      // individual difference
+  real&lt;lower=0&gt; s;  // sd of r
+}
+
+model {
+  y ~ binomial(8, inv_logit(a + r));
+  a ~ normal(0, 10);
+  r ~ normal(0, s);
+  s ~ exponential(0.01);
+}
+</code></pre><p><code>inv_logit(a + r)</code> が p に相当。<br>
+<code>10</code> とか <code>0.01</code> とか、エイヤっと決めてるやつが超パラメータ。</p>
+
+</section>
+<section>
+<h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
+<pre tabindex="0"><code>Inference for Stan model: glmm.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+          mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
+a         0.58    0.01 0.37   -0.15    0.32    0.58    0.83    1.32   642    1
+r[1]      3.77    0.04 2.06    0.57    2.28    3.49    4.96    8.51  3036    1
+r[2]      0.00    0.02 0.82   -1.56   -0.54   -0.03    0.54    1.65  2294    1
+r[3]     -1.09    0.02 0.85   -2.81   -1.64   -1.08   -0.50    0.50  2307    1
+r[4]     -4.62    0.04 1.97   -9.20   -5.65   -4.33   -3.19   -1.65  2330    1
+r[5]      3.79    0.03 2.04    0.66    2.33    3.50    4.95    8.54  3802    1
+r[6]     -1.74    0.02 0.92   -3.71   -2.30   -1.71   -1.12   -0.05  2370    1
+r[7]      3.80    0.03 2.09    0.65    2.28    3.52    5.01    8.59  3951    1
+r[8]      1.61    0.02 1.17   -0.44    0.81    1.51    2.30    4.27  2662    1
+r[9]      3.79    0.04 2.04    0.74    2.34    3.46    4.94    8.62  2784    1
+r[10]    -1.73    0.02 0.90   -3.57   -2.28   -1.72   -1.12   -0.07  2820    1
+r[11]     1.58    0.02 1.14   -0.37    0.79    1.47    2.23    4.19  3166    1
+r[12]    -4.63    0.04 1.96   -9.20   -5.78   -4.37   -3.21   -1.59  2631    1
+r[13]    -1.73    0.02 0.92   -3.76   -2.31   -1.67   -1.12   -0.06  2287    1
+r[14]    -4.63    0.04 2.00   -9.48   -5.74   -4.33   -3.23   -1.59  2403    1
+r[15]    -4.62    0.04 1.98   -9.33   -5.69   -4.30   -3.21   -1.62  3037    1
+r[16]    -1.11    0.02 0.83   -2.87   -1.65   -1.07   -0.55    0.46  2323    1
+r[17]     0.64    0.02 0.94   -1.09    0.01    0.61    1.21    2.60  2699    1
+r[18]    -2.64    0.02 1.14   -5.19   -3.29   -2.54   -1.86   -0.68  2666    1
+r[19]     1.58    0.02 1.14   -0.39    0.78    1.47    2.28    4.08  3418    1
+r[20]    -4.56    0.04 1.87   -8.90   -5.61   -4.30   -3.20   -1.64  2715    1
+r[21]    -2.61    0.02 1.12   -5.18   -3.26   -2.51   -1.84   -0.70  2764    1
+r[22]     0.63    0.02 0.94   -1.05    0.00    0.60    1.23    2.53  2767    1
+r[23]    -4.62    0.04 1.95   -9.14   -5.75   -4.34   -3.19   -1.66  3031    1
+r[24]     3.83    0.04 2.06    0.64    2.32    3.56    5.04    8.58  3251    1
+r[25]    -1.75    0.02 0.92   -3.74   -2.31   -1.71   -1.12   -0.06  2157    1
+r[26]     3.83    0.03 2.09    0.58    2.33    3.52    5.03    8.79  3723    1
+r[27]     0.00    0.02 0.83   -1.56   -0.57   -0.03    0.53    1.67  2271    1
+r[28]    -2.62    0.02 1.13   -5.14   -3.30   -2.52   -1.85   -0.68  2707    1
+r[29]     3.85    0.04 2.05    0.72    2.36    3.58    5.02    8.57  2945    1
+r[30]     3.86    0.04 2.12    0.64    2.31    3.57    5.08    8.87  3007    1
+r[31]     0.65    0.02 0.92   -1.05    0.00    0.61    1.24    2.56  2431    1
+r[32]     1.58    0.02 1.16   -0.46    0.77    1.51    2.27    4.07  3351    1
+r[33]     3.78    0.04 2.06    0.65    2.30    3.46    4.96    8.72  3404    1
+r[34]     1.58    0.02 1.11   -0.34    0.80    1.48    2.25    4.04  2612    1
+r[35]    -4.62    0.04 1.97   -9.23   -5.73   -4.34   -3.23   -1.55  3063    1
+r[36]    -0.56    0.02 0.81   -2.14   -1.10   -0.56   -0.05    1.06  2100    1
+r[37]    -1.72    0.02 0.94   -3.68   -2.31   -1.68   -1.07    0.00  2740    1
+r[38]     1.59    0.02 1.19   -0.44    0.79    1.48    2.28    4.22  3245    1
+r[39]     1.60    0.02 1.19   -0.39    0.79    1.48    2.30    4.26  2393    1
+r[40]     3.81    0.04 2.02    0.63    2.33    3.54    4.99    8.46  3188    1
+r[41]    -2.63    0.02 1.13   -5.20   -3.31   -2.52   -1.85   -0.69  2397    1
+r[42]     3.87    0.04 2.12    0.63    2.36    3.57    5.12    8.78  3403    1
+r[43]    -0.01    0.02 0.82   -1.63   -0.54   -0.02    0.55    1.59  2244    1
+r[44]     3.84    0.04 2.08    0.68    2.33    3.54    4.98    8.69  2920    1
+r[45]     3.85    0.04 2.13    0.53    2.32    3.55    5.07    8.98  3391    1
+r[46]     3.80    0.04 2.12    0.60    2.28    3.48    5.00    8.77  2880    1
+r[47]    -4.65    0.04 2.06   -9.51   -5.81   -4.33   -3.17   -1.61  2865    1
+r[48]     0.63    0.02 0.93   -1.03    0.00    0.57    1.19    2.63  2526    1
+r[49]     1.59    0.02 1.20   -0.49    0.78    1.48    2.29    4.25  3496    1
+r[50]    -2.62    0.02 1.15   -5.29   -3.29   -2.52   -1.84   -0.64  2749    1
+r[51]    -2.63    0.02 1.10   -5.10   -3.28   -2.53   -1.87   -0.77  2875    1
+r[52]     3.85    0.03 2.12    0.50    2.31    3.60    5.12    8.79  3797    1
+r[53]     3.76    0.04 2.05    0.64    2.32    3.46    4.89    8.56  2911    1
+r[54]     1.57    0.02 1.16   -0.33    0.75    1.44    2.26    4.20  3088    1
+r[55]    -4.62    0.04 1.95   -9.18   -5.74   -4.36   -3.21   -1.61  3075    1
+r[56]    -4.62    0.04 1.95   -9.16   -5.73   -4.36   -3.20   -1.66  2247    1
+r[57]     3.75    0.04 2.04    0.65    2.30    3.45    4.86    8.57  3404    1
+r[58]    -0.55    0.02 0.81   -2.15   -1.09   -0.55   -0.01    1.03  2614    1
+r[59]     0.63    0.02 0.90   -1.00    0.02    0.58    1.22    2.56  2475    1
+r[60]     0.63    0.02 0.96   -1.10   -0.03    0.57    1.25    2.68  2577    1
+r[61]    -4.60    0.03 1.92   -9.13   -5.69   -4.34   -3.23   -1.61  3126    1
+r[62]     3.78    0.04 2.06    0.64    2.27    3.49    4.97    8.52  3245    1
+r[63]    -1.74    0.02 0.93   -3.69   -2.31   -1.72   -1.13   -0.01  2426    1
+r[64]     1.58    0.02 1.16   -0.40    0.77    1.49    2.28    4.20  3601    1
+r[65]     3.82    0.04 2.04    0.73    2.33    3.49    5.03    8.47  2853    1
+r[66]     3.77    0.04 2.00    0.68    2.27    3.53    4.99    8.35  3006    1
+r[67]     3.82    0.04 2.08    0.58    2.32    3.54    5.06    8.58  3101    1
+r[68]    -0.56    0.02 0.78   -2.14   -1.08   -0.54   -0.05    0.96  2038    1
+r[69]     3.86    0.04 2.11    0.63    2.34    3.54    5.06    8.79  3173    1
+r[70]     3.81    0.04 2.09    0.63    2.33    3.47    4.98    8.79  3132    1
+r[71]    -2.65    0.02 1.18   -5.18   -3.33   -2.55   -1.86   -0.59  2951    1
+r[72]    -1.11    0.02 0.85   -2.86   -1.64   -1.09   -0.52    0.47  2296    1
+r[73]    -4.62    0.04 1.95   -9.18   -5.71   -4.36   -3.22   -1.65  2643    1
+r[74]    -4.59    0.04 1.93   -9.14   -5.63   -4.32   -3.24   -1.62  2921    1
+r[75]     1.56    0.02 1.13   -0.45    0.80    1.48    2.24    4.10  3230    1
+r[76]     3.81    0.03 2.05    0.66    2.31    3.53    4.99    8.68  3758    1
+r[77]     3.82    0.03 2.09    0.55    2.30    3.51    5.02    8.61  3834    1
+r[78]     1.62    0.02 1.19   -0.44    0.81    1.52    2.36    4.22  3063    1
+r[79]    -4.57    0.03 1.89   -9.01   -5.66   -4.30   -3.23   -1.61  3237    1
+r[80]     3.78    0.04 2.04    0.61    2.32    3.51    4.90    8.69  3316    1
+r[81]    -1.73    0.02 0.91   -3.67   -2.31   -1.69   -1.10   -0.09  2390    1
+r[82]    -0.01    0.02 0.81   -1.58   -0.58   -0.03    0.52    1.61  2257    1
+r[83]    -0.55    0.02 0.82   -2.17   -1.09   -0.55   -0.01    1.04  2282    1
+r[84]     3.81    0.04 2.05    0.66    2.36    3.51    4.96    8.64  2613    1
+r[85]     1.59    0.02 1.18   -0.38    0.77    1.46    2.28    4.25  2865    1
+r[86]     0.65    0.02 0.91   -1.04    0.03    0.59    1.24    2.52  2543    1
+r[87]    -0.55    0.02 0.80   -2.10   -1.09   -0.56   -0.01    1.05  2109    1
+r[88]     0.64    0.02 0.93   -1.08    0.00    0.58    1.24    2.57  2944    1
+r[89]    -1.74    0.02 0.91   -3.63   -2.30   -1.70   -1.11   -0.05  2721    1
+r[90]    -2.64    0.02 1.12   -5.16   -3.29   -2.52   -1.88   -0.72  3005    1
+r[91]    -4.63    0.04 1.99   -9.37   -5.66   -4.34   -3.24   -1.68  2237    1
+r[92]    -1.73    0.02 0.89   -3.62   -2.30   -1.69   -1.11   -0.11  2556    1
+r[93]    -1.71    0.02 0.90   -3.60   -2.27   -1.66   -1.09   -0.07  2328    1
+r[94]     3.77    0.04 2.06    0.59    2.31    3.50    4.87    8.60  3412    1
+r[95]    -4.61    0.03 1.89   -9.01   -5.69   -4.34   -3.28   -1.69  3014    1
+r[96]     0.64    0.02 0.98   -1.17   -0.03    0.60    1.23    2.78  3067    1
+r[97]    -4.61    0.04 1.89   -8.92   -5.77   -4.35   -3.21   -1.69  2705    1
+r[98]    -4.63    0.04 1.97   -9.34   -5.70   -4.31   -3.24   -1.57  2638    1
+r[99]    -1.11    0.02 0.86   -2.81   -1.67   -1.09   -0.52    0.52  2276    1
+r[100]   -4.61    0.04 1.89   -8.96   -5.67   -4.35   -3.26   -1.60  2757    1
+s         3.46    0.01 0.44    2.71    3.15    3.43    3.74    4.45   945    1
+lp__   -433.99    0.35 9.69 -454.15 -440.31 -433.69 -427.41 -416.15   783    1
+
+Samples were drawn using NUTS(diag_e) at Wed Jun  8 09:33:10 2022.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+</code></pre>
+</section>
+<section>
+<h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
+<p>データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。</p>
+<p><img src="figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
+
+</section>
+<section>
+<h2 id="事前分布の選別">事前分布の選別</h2>
+<ol>
+<li>
+<p>とりあえず<strong>無情報事前分布</strong> $[-\infty, \infty]$。Stanのデフォルト。</p>
+</li>
+<li>
+<p>収束が悪かったら<strong>弱情報事前分布</strong>を試す。<br>
+事後分布を更新していったとき<strong>事前分布っぽさが残らない</strong>のが良い。</p>
+<ul>
+<li>取りうる値を逃すような狭すぎる分布はダメ。</li>
+<li>狭すぎるよりはマシだが、広すぎても良くない。</li>
+<li>一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。</li>
+</ul>
+<p>おすすめ: <strong>Student&rsquo;s t分布</strong>、正規分布、指数分布など。</p>
+</li>
+</ol>
+<p><cite><a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></cite></p>
+
+</section>
+<section>
+<h2 id="stanおすすめ弱情報事前分布-students-t分布">Stanおすすめ弱情報事前分布: Student&rsquo;s t分布</h2>
+<p>Student&rsquo;s $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$</p>
+<ul>
+<li>自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。</li>
+<li>スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。</li>
+</ul>
+<p><img src="figure/student_t-1.png" alt="plot of chunk student_t"></p>
+<p>正の値しか取らない場合は <code>&lt;lower=0&gt;</code> として右半分だけ使うとか。</p>
+
+</section>
+<section>
+<h2 id="-階層ベイズモデルの練習問題">🔰 階層ベイズモデルの練習問題</h2>
+<p>TODO
+</section>
+<section>
+<h2 id="非線形回帰の例-データ">非線形回帰の例: データ</h2>
+<p>刺激強度xに対する応答強度yを20個体調査。<br>
+非対称なひと山。応答変数も説明変数も正の値。</p>
+<div>\[\begin{split}
+y = ae ^ {-bx} - ce ^ {-dx}
+\end{split}\]</div>
+<p><img src="figure/non-linear-1.png" alt="plot of chunk non-linear"></p>
+
+</section>
+<section>
+<h2 id="非線形回帰の例-stanコード">非線形回帰の例: Stanコード</h2>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=1&gt; N;
+  vector[N] x;
+  vector[N] y;
+  int id[N];
+  int&lt;lower=1&gt; Ninds;
+}
+
+parameters {
+  real a;
+  real d;
+  real&lt;upper=a&gt; c;
+  real&lt;upper=d&gt; b;
+  real shape;
+  vector[Ninds] intercept;
+}
+
+model {
+  vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
+  y ~ gamma(shape, shape ./ mu);
+  a ~ exponential(1);
+  b ~ exponential(1);
+  c ~ exponential(1);
+  d ~ exponential(1);
+  shape ~ exponential(0.001);
+  intercept ~ normal(0, 0.005);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="階層ベイズモデルのほかの応用先">階層ベイズモデルのほかの応用先</h2>
+<ul>
+<li>時系列モデル (状態空間モデル)</li>
+<li>空間構造のあるモデル (e.g., CARモデル)</li>
+<li>欠損値の補完</li>
+</ul>
+
+</section>
+<section>
+<h2 id="ベイズ推定まとめ">ベイズ推定まとめ</h2>
+<ul>
+<li>条件付き確率 $\text{Prob}(B \mid A)$ の理解が大事。
+<ul>
+<li>事後分布 $\propto$ 尤度 ⨉ 事前分布</li>
+<li>確信度合いをデータで更新していく。</li>
+</ul>
+</li>
+<li>推定結果は分布そのもの。
+<ul>
+<li>そこから点推定も区間推定も可能。</li>
+</ul>
+</li>
+<li>解析的に解けない問題は計算機に乱数を振らせて解く。
+<ul>
+<li>理論・技術の進歩が目覚ましい。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="回帰分析ふりかえり">回帰分析ふりかえり</h2>
+<p>より柔軟にモデルを記述できるようになった。計算方法も変化。</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="全体まとめ">全体まとめ</h2>
+<ul>
+<li>統計とは、データをうまくまとめ、それに基づいて推論するための手法。</li>
+<li>モデルには<strong>理解志向</strong>と<strong>応用志向</strong>があり、統計モデルは前者寄り。
+<ul>
+<li>どちらも多少は分かった上で使い分けたい。</li>
+<li>どっちにしろ真の正しい何かではない。</li>
+</ul>
+</li>
+<li><strong>確率分布</strong>とその背後にある<strong>確率過程</strong>の理解が重要。
+<ul>
+<li>乱数生成→作図を繰り返してイメージを掴もう。</li>
+<li>MCMCサンプリングも事後分布からの乱数生成。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="." class="readmore">
+目次に戻る
+</a>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
