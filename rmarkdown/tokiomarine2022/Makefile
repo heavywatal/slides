@@ -2,15 +2,20 @@ DECK := $(notdir ${CURDIR})
 DESTINATION := ../../content/${DECK}
 SOURCES := $(wildcard *.Rmd)
 KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
+PYPERCENT := $(wildcard *.py)
+NOTEBOOKS := $(addprefix ${DESTINATION}/,$(PYPERCENT:.py=.ipynb))
 
 .DEFAULT_GOAL := all
 .PHONY: all clean
 
-all: ${KNITTED}
+all: ${KNITTED} ${NOTEBOOKS}
 	@:
 
 ${DESTINATION}/%.md : %.Rmd | ${DESTINATION}
 	Rscript --no-init-file -e "wtl::exec_knit('$<', '$@')"
+
+${DESTINATION}/%.ipynb : %.py | ${DESTINATION}
+	jupytext --output $@ $<
 
 ${DESTINATION}:
 	mkdir -p $@

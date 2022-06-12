@@ -1,0 +1,94 @@
+# %% [markdown]
+# # 環境構築 for 統計モデリング概論 DSHC 2022
+#
+# 岩嵜 航 (Watal M. Iwasaki, PhD)<br>
+# 東北大学 生命科学研究科 進化ゲノミクス分野 特任助教
+#
+# 2022-08-17 東京海上 Data Science Hill Climb<br>
+#
+# ## 方針
+# ほかの講義で使っている環境をなるべくそのまま使う。
+
+# ### Google Colab (Python 3.7.13) を使っている場合
+# 各資料の頭に `%pip install` コマンドを置いておくので、事前準備は不要。
+# 念のため、このファイルが最後まで問題なく動くことを確認する。
+
+# ### ローカルのPython 3.7.7を使っている場合
+# 以下の手順でパッケージをいくつか追加する。
+
+# ただし numpy や pandas のバージョンを上げることになるので、
+# ほかの講義に影響が出るかもしれない。
+# その場合は再び `pip3 install -r requirements.txt` を実行すれば戻せるはず。
+
+# %%
+import sys
+print(sys.version)
+
+# %% [markdown]
+# ## パッケージのインストールと動作確認
+
+# ### [statsmodels](https://www.statsmodels.org)
+
+# %%
+# %pip install 'statsmodels>=0.13.2'
+import statsmodels.api as sm  # noqa: E402
+sm.show_versions()
+
+# %% [markdown]
+# ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
+
+# %%
+# %pip install 'cmdstanpy>=1.0.1'
+import cmdstanpy
+print(cmdstanpy.__version__)
+
+# %% [markdown]
+# `fbprophet 0.7.1 requires cmdstanpy==0.9.5` だから conflict してるよ、
+# というERRORが出るかもしれないけど今回は `fbprophet` を使わないので無視。
+
+# [CmdStan](https://mc-stan.org/users/interfaces/cmdstan) 本体をインストール(数分かかるかも):
+
+# %%
+cmdstanpy.install_cmdstan()
+
+# %% [markdown]
+# [公式example](https://github.com/stan-dev/cmdstanpy#example) が走ることを確認:
+
+# %%
+import os
+from cmdstanpy import cmdstan_path, CmdStanModel
+
+# specify locations of Stan program file and data
+stan_file = os.path.join(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.stan')
+data_file = os.path.join(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.data.json')
+
+# instantiate a model; compiles the Stan program by default
+model = CmdStanModel(stan_file=stan_file)
+
+# obtain a posterior sample from the model conditioned on the data
+fit = model.sample(chains=4, data=data_file)
+
+# summarize the results (wraps CmdStan `bin/stansummary`):
+fit.summary()
+
+
+# %% [markdown]
+# ### [ArviZ](https://python.arviz.org/)
+
+# %%
+# %pip install 'arviz>=0.12.1'
+import arviz as az  # noqa: E402
+print(az.__version__)
+
+# %% [markdown]
+# 上記exampleの可視化:
+
+# %%
+cmdstanpy_data = az.from_cmdstanpy(fit)
+az.plot_trace(cmdstanpy_data)
+
+# %%
+# pyright: reportMissingTypeStubs=false
+# pyright: reportUnknownMemberType=false
+# pyright: reportUnknownVariableType=false
+# pyright: reportUnknownArgumentType=false

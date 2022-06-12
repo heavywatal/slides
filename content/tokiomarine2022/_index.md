@@ -11,7 +11,11 @@ unlisted = false
 - 日程: 2022-08-17&24 09:30--17:30
 - 場所: zoom.us
 
-![plot of chunk schedule](figure/schedule-1.png)
+![plot of chunk schedule](figure/schedule-1.svg)
+
+## 実行環境の準備
+
+[`preparation.ipynb`](./preparation.ipynb) をダウンロードして実行。
 
 
 ## 講義資料
