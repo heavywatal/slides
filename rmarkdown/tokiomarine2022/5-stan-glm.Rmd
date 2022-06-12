@@ -1,0 +1,420 @@
++++
+url = "tokiomarine2022/5-stan-glm.html"
+title = "5. StanでGLM — 統計モデリング概論 DSHC 2022"
+linktitle = "StanでGLM"
+date = 2022-08-24T11:10:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [統計モデリング概論 DSHC 2022](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定とMCMC</a>
+<li class="current-deck"><a href="5-stan-glm.html">StanでGLM</a>
+<li><a href="6-stan-hbm.html">Stanで階層ベイズモデル</a>
+</ol>
+
+<div class="footnote">
+2022-08-24 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(rstan)
+rstan_options(auto_write = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+---
+## Stan
+
+<a href="https://mc-stan.org/">
+<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+</a>
+
+- Stan言語でモデルを書く
+- C++を介して機械語に翻訳(コンパイル)するので高速
+- RやPythonなどから呼び出して使うのが便利
+
+大部分はRで説明し、部分的にPythonでの練習を挟みます。<br>
+
+聞きながら手元で[tokiomarine2022-stan.ipynb](tokiomarine2022-stan.ipynb)を実行してもいいです。
+
+```r
+# install.packages("rstan")
+library(rstan)
+rstan_options(auto_write = TRUE)
+```
+
+---
+## おおまかな流れ
+
+```r
+# データ準備
+mydata
+
+# Stan言語で書いたモデルをコンパイル
+model = rstan::stan_model(file = "model.stan")
+
+# MCMCサンプリング
+fit = rstan::sampling(model, data = mydata)
+
+# 結果を眺める
+print(fit)
+rstan::stan_trace(fit)
+rstan::stan_hist(fit)
+rstan::stan_ac(fit)
+```
+
+
+---
+## 説明変数なしのベイズ推定: データ準備
+
+表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。
+
+```{r stan-set-seed, echo = FALSE}
+set.seed(42)
+```
+```{r stan-binom, fig.width = 4, fig.height = 4}
+true_p = 0.7
+N = 40L
+mydata = list(N = N, x = rbinom(N, 1, true_p))
+print(mydata)
+```
+
+Rならlist型、Pythonならdict型にまとめてStanに渡す。
+
+
+---
+## 説明変数なしのベイズ推定: Stan言語でモデル定義
+
+文字列として保持するか、別ファイルに書いておく:
+
+```{r read-binom-stan, code = 'cat(readr::read_file("binom.stan"))', echo = FALSE}
+```
+
+- いくつかのブロックに分けて記述する:<br>
+  R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
+- 整数型 `int`, 実数型 `real`, それらの配列がある。
+- 下限 `lower`, 上限 `upper` を設定できる。
+
+
+---
+## Stan言語の7種のブロック
+
+順番厳守。よく使うのは**太字のやつ**。
+
+1. `functions {...}`
+1. **`data {...}`**
+1. `transformed data {...}`
+1. **`parameters {...}`**
+1. `transformed parameters {...}`
+1. **`model {...}`**
+1. `generated quantities {...}`
+
+<https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html>
+
+
+---
+## 説明変数なしのベイズ推定: MCMCサンプル
+
+予め実行速度の速い機械語に翻訳(コンパイル):
+
+```{r stan-binom-model, fig.width = 4, fig.height = 4}
+model = rstan::stan_model("binom.stan")
+```
+
+これに結構時間がかかるので、変更が無ければ再利用するため先ほど
+`rstan_options(auto_write = TRUE)` しておいた。
+
+<hr>
+
+モデルとデータを使ってMCMCサンプリング:
+
+```{r stan-binom-sample, fig.width = 4, fig.height = 3}
+fit = rstan::sampling(model, data = mydata)
+```
+
+いろいろオプションはあるけどとりあえずデフォルトで:<br>
+`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
+
+問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
+
+---
+## 説明変数なしのベイズ推定: 結果を眺める
+
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。
+
+```{r stan-binom-fit, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
+
+
+---
+## 説明変数なしのベイズ推定: trace plot 確認
+
+どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
+
+```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
+rstan::stan_trace(fit)
+```
+
+---
+## 説明変数なしのベイズ推定: 自己相関の確認
+
+2--3ステップくらいで自己相関がほぼ消えるので問題なし:
+
+```{r stan-binom-ac, fig.width = 4, fig.height = 4}
+rstan::stan_ac(fit, pars = c("p"))
+```
+
+---
+## 説明変数なしのベイズ推定: 推定結果確認
+
+サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:
+
+```{r stan-binom-hist, fig.width = 4, fig.height = 4}
+rstan::stan_hist(fit, bins = 30)
+```
+
+次はもう少しだけ複雑な例を見てみよう。
+
+---
+## 線形回帰のベイズ推定: データ準備
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```{r stan-penguins-glm, echo = FALSE, fig.width = 7, fig.height = 4, warning = FALSE}
+if (!require(palmerpenguins, quietly = TRUE)) {
+  install.packages("palmerpenguins")
+  library(palmerpenguins)
+}
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+
+p_penweight = penguins %>%
+  ggplot() + aes(body_mass_g, flipper_length_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  scale_color_manual(values = penguins_colors) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
+p_penweight +
+  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
+```
+
+
+---
+## 線形回帰のベイズ推定: データ準備
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+`Stan does not support NA` と怒られるので欠損値を取り除いておく:
+
+```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4}
+mydata = penguins %>%
+  dplyr::select(c("body_mass_g", "flipper_length_mm")) %>%
+  tidyr::drop_na() %>%
+  as.list()
+mydata$N = length(mydata$body_mass_g)
+str(mydata)
+```
+
+---
+## 単回帰のベイズ推定: Stan言語でモデル定義
+
+切片、傾き、ばらつきを推定する:
+
+```{r read-penguins-stan, code = 'cat(readr::read_file("penguins.stan"))', echo = FALSE}
+```
+
+
+---
+## 単回帰のベイズ推定: MCMCサンプル
+
+予め実行速度の速い機械語に翻訳(コンパイル):
+
+```{r stan-penguins-model, fig.width = 4, fig.height = 4}
+model = rstan::stan_model("penguins.stan")
+```
+
+モデルとデータを使ってMCMCサンプリング:
+
+```{r stan-penguins-sample, fig.width = 4, fig.height = 3}
+fit = rstan::sampling(model, data = mydata)
+```
+
+いろいろオプションはあるけどとりあえずデフォルトで:<br>
+`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
+
+問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
+
+---
+## 単回帰のベイズ推定: 結果を眺める
+
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。
+
+```{r stan-penguins-fit, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+
+---
+## 単回帰のベイズ推定: trace plot 確認
+
+どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
+
+```{r stan-penguins-traceplot, fig.width = 11, fig.height = 4}
+rstan::stan_trace(fit)
+```
+
+---
+## 単回帰のベイズ推定: 自己相関の確認
+
+どれもまあまあすぐ消えるので問題なし:
+
+```{r stan-penguins-ac, fig.width = 11, fig.height = 4}
+rstan::stan_ac(fit, pars = c("intercept", "slope", "sigma"))
+```
+
+---
+## 単回帰のベイズ推定: 推定結果確認
+
+正規分布っぽいきれいな形:
+
+```{r stan-penguins-hist, fig.width = 11, fig.height = 3}
+rstan::stan_hist(fit, bins = 30)
+```
+
+これらの値を使って点推定・区間推定も可能。
+
+
+---
+## 単回帰のベイズ推定: 推定結果で回帰
+
+無事に最尤推定と似たような線が引けた。
+
+```{r stan-penguins-regression, fig.width = 4, fig.height = 4, warning = FALSE}
+coef = rstan::get_posterior_mean(fit)[, "mean-all chains"]
+p_penweight +
+  geom_abline(intercept = coef["intercept"], slope = coef["slope"], size = 1, color = "#3366ff")
+```
+
+---
+## 🔰 単回帰の練習問題
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
+---
+## Stanで重回帰
+
+TODO
+
+```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
+fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species, family = gaussian(), data = penguins)
+pred = penguins %>% tidyr::drop_na() %>% tidybayes::add_fitted_draws(fit)
+p_penweight + aes(color = species, group = species) +
+  ggdist::stat_lineribbon(aes(y = .value), data = pred, size = 0.4) +
+  scale_color_manual(values = penguins_colors) +
+  scale_fill_brewer(palette = "Greys")
+```
+
+---
+## 🔰 Stanで重回帰の練習問題
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
+---
+## Stanでポアソン回帰
+
+TODO
+
+<img src="figure/glm-poisson-1.png">
+
+
+---
+## 🔰 Stanでポアソン回帰の練習問題
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
+---
+## Stanでロジスティック回帰
+
+TODO
+
+<img src="figure/glm-logistic-1.png">
+
+
+---
+## 🔰 Stanでロジスティック回帰
+
+TODO
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+
+<a href="6-stan-hbm.html" rel="next" class="readmore">
+6. Stanで階層ベイズモデル
+</a>

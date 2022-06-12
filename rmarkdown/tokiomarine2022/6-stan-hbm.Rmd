@@ -1,0 +1,312 @@
++++
+url = "tokiomarine2022/5-stan-hbm.html"
+title = "6. Stanで階層ベイズモデル — 統計モデリング概論 DSHC 2022"
+linktitle = "Stanで階層ベイズモデル"
+date = 2022-08-24T15:30:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [統計モデリング概論 DSHC 2022](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-stats-model.html">統計モデルの基本: 確率分布、尤度</a>
+<li><a href="3-glm.html">一般化線形モデル、混合モデル</a>
+<li><a href="4-bayesian.html">ベイズ推定とMCMC</a>
+<li><a href="5-stan-glm.html">StanでGLM</a>
+<li class="current-deck"><a href="6-stan-hbm.html">Stanで階層ベイズモデル</a>
+</ol>
+
+<div class="footnote">
+2022-08-24 東京海上 Data Science Hill Climb
+<a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
+</div>
+
+```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(rstan)
+rstan_options(auto_write = TRUE)
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+---
+## GLMMで登場した個体差を階層ベイズモデルで
+
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+
+---
+## GLMMで登場した個体差を階層ベイズモデルで
+
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？
+
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+
+
+---
+## 階層ベイズモデルのイメージ図
+
+事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ
+
+<figure>
+<img src="../tokiomarine2021/hbm.drawio.svg">
+</figure>
+
+
+---
+## さっきの図をStan言語で記述すると
+
+お絵描きモデルとStanモデルを見比べてみよう。
+
+```{r read-glmm-stan, code = 'cat(readr::read_file("glmm.stan"))', echo = FALSE}
+```
+
+`inv_logit(a + r)` が p に相当。<br>
+`10` とか `0.01` とか、エイヤっと決めてるやつが超パラメータ。
+
+---
+## 変量効果が入った推定結果
+
+```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, message = FALSE}
+ninds = 100L
+mu_ind = 0.5
+sd_ind = 3
+df_od = tibble::tibble(
+  z = rnorm(ninds, mu_ind, sd_ind),
+  p = wtl::sigmoid(z),
+  y = rbinom(ninds, 8L, p))
+# sum_y = sum(df_od$y)
+# p_hat = sum_y / 800
+# tidy_od = df_od %>%
+#   dplyr::count(y, name = "observed") %>%
+#   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
+#   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
+#   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
+mydata = list(y = df_od$y, N = ninds)
+model = rstan::stan_model("glmm.stan")
+fit = rstan::sampling(model, data = mydata)
+```
+
+```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+---
+## 抜粋して作図。悪くない。
+
+データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。
+
+```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7}
+.pars = c("a", "s", "r[1]", "r[2]")
+p_trace = rstan::stan_trace(fit, pars = .pars, nrow = 1L) + coord_flip()
+p_hist = rstan::stan_hist(fit, pars = .pars, nrow = 1L, bins = 30)
+cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
+```
+
+
+---
+## 事前分布の選別
+
+1.  とりあえず**無情報事前分布** $[-\infty, \infty]$。Stanのデフォルト。
+
+1.  収束が悪かったら**弱情報事前分布**を試す。<br>
+    事後分布を更新していったとき**事前分布っぽさが残らない**のが良い。
+
+    - 取りうる値を逃すような狭すぎる分布はダメ。
+    - 狭すぎるよりはマシだが、広すぎても良くない。
+    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+      事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。
+
+    おすすめ: **Student's t分布**、正規分布、指数分布など。
+
+<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
+
+
+---
+## Stanおすすめ弱情報事前分布: Student's t分布
+
+Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
+
+- 自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。
+- スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
+
+```{r student_t, echo = FALSE, fig.height = 5, fig.width = 10}
+tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
+  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) %>%
+  ggplot() + aes(x, Density, group = df) +
+  geom_line(aes(color = nu), size = 1, alpha = 0.7) +
+  scale_color_viridis_d(end = 0.88, direction = 1, guide = guide_legend(reverse = TRUE)) +
+  scale_x_continuous(breaks = c(-1, 0, 1), labels = c(expression(-sigma), 0, expression(sigma))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank())
+```
+
+正の値しか取らない場合は `<lower=0>` として右半分だけ使うとか。
+
+
+---
+## 🔰 階層ベイズモデルの練習問題
+
+TODO
+
+
+---
+## 非線形回帰の例: データ
+
+刺激強度xに対する応答強度yを20個体調査。<br>
+非対称なひと山。応答変数も説明変数も正の値。
+
+<div>\[\begin{split}
+y = ae ^ {-bx} - ce ^ {-dx}
+\end{split}\]</div>
+
+```{r non-linear, echo = FALSE, fig.width = 10, fig.height = 5}
+expo = function(x, y0, lambda) y0 * exp(- lambda * x)
+
+genfunc = function(params) {
+  function(x) {
+    expo(x, params["a"], params["b"]) - expo(x, params["c"], params["d"])
+  }
+}
+
+params = c(a = 0.08, b = 0.01, c = 0.05, d = 0.05)
+func = genfunc(params)
+n_inds = 20L
+sd_inds = 0.005
+shape = 60
+min_ipi = 5
+intercept = sort(rnorm(n_inds, 0, sd_inds))
+df = tidyr::crossing(id = seq_len(n_inds), x = seq(min_ipi, 105, 10)) %>%
+  dplyr::mutate(y = rgamma(length(x), shape = shape, scale = (func(x) + intercept[id]) / shape))
+
+p_base = ggplot(df) + aes(x, y) +
+  geom_point(aes(color = id), alpha = 0.7, shape = 16, size = 3) +
+  geom_line(aes(color = id, group = id), alpha = 0.2) +
+  xlim(0, NA) + ylim(0, NA) +
+  geom_function(fun = func) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+p_base
+```
+
+---
+## 非線形回帰の例: Stanコード
+
+```stan
+data {
+  int<lower=1> N;
+  vector[N] x;
+  vector[N] y;
+  int id[N];
+  int<lower=1> Ninds;
+}
+
+parameters {
+  real a;
+  real d;
+  real<upper=a> c;
+  real<upper=d> b;
+  real shape;
+  vector[Ninds] intercept;
+}
+
+model {
+  vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
+  y ~ gamma(shape, shape ./ mu);
+  a ~ exponential(1);
+  b ~ exponential(1);
+  c ~ exponential(1);
+  d ~ exponential(1);
+  shape ~ exponential(0.001);
+  intercept ~ normal(0, 0.005);
+}
+```
+
+
+
+---
+## 階層ベイズモデルのほかの応用先
+
+- 時系列モデル (状態空間モデル)
+- 空間構造のあるモデル (e.g., CARモデル)
+- 欠損値の補完
+
+
+
+---
+## ベイズ推定まとめ
+
+- 条件付き確率 $\text{Prob}(B \mid A)$ の理解が大事。
+    - 事後分布 $\propto$ 尤度 ⨉ 事前分布
+    - 確信度合いをデータで更新していく。
+- 推定結果は分布そのもの。
+    - そこから点推定も区間推定も可能。
+- 解析的に解けない問題は計算機に乱数を振らせて解く。
+    - 理論・技術の進歩が目覚ましい。
+
+
+---
+## 回帰分析ふりかえり
+
+より柔軟にモデルを記述できるようになった。計算方法も変化。
+
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 全体まとめ
+
+- 統計とは、データをうまくまとめ、それに基づいて推論するための手法。
+- モデルには**理解志向**と**応用志向**があり、統計モデルは前者寄り。
+    - どちらも多少は分かった上で使い分けたい。
+    - どっちにしろ真の正しい何かではない。
+- **確率分布**とその背後にある**確率過程**の理解が重要。
+    - 乱数生成→作図を繰り返してイメージを掴もう。
+    - MCMCサンプリングも事後分布からの乱数生成。
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+
+<a href="." class="readmore">
+目次に戻る
+</a>
