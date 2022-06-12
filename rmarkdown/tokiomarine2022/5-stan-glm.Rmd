@@ -42,9 +42,7 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-library(rstan)
-rstan_options(auto_write = TRUE)
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
 ```
 
 ---
@@ -58,14 +56,36 @@ knitr::opts_chunk$set(cache = TRUE)
 - C++を介して機械語に翻訳(コンパイル)するので高速
 - RやPythonなどから呼び出して使うのが便利
 
-大部分はRで説明し、部分的にPythonでの練習を挟みます。<br>
+スライドではRで説明。
+皆さんの手元では配布したipynbをPython/Jupyterで実行。
 
-聞きながら手元で[tokiomarine2022-stan.ipynb](tokiomarine2022-stan.ipynb)を実行してもいいです。
+---
+## RからStanを動かすCmdStanR
 
 ```r
-# install.packages("rstan")
-library(rstan)
-rstan_options(auto_write = TRUE)
+install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+library(cmdstanr)
+check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
+install_cmdstan()
+cmdstan_version()
+```
+
+```r
+install.packages("bayesplot")
+library(bayesplot)
+```
+
+
+```{r cmdstanr, include = FALSE}
+if (!require(cmdstanr, quietly = TRUE)) {
+  install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+  library(cmdstanr)
+  install_cmdstan()
+}
+if (!require(bayesplot, quietly = TRUE)) {
+  install.packages("bayesplot")
+  library(bayesplot)
+}
 ```
 
 ---
@@ -76,16 +96,13 @@ rstan_options(auto_write = TRUE)
 mydata
 
 # Stan言語で書いたモデルをコンパイル
-model = rstan::stan_model(file = "model.stan")
+model = cmdstan_model(stan_file = "model.stan")
 
 # MCMCサンプリング
-fit = rstan::sampling(model, data = mydata)
+fit = model$sample(data = mydata)
 
 # 結果を眺める
-print(fit)
-rstan::stan_trace(fit)
-rstan::stan_hist(fit)
-rstan::stan_ac(fit)
+fit$summary()
 ```
 
 
@@ -95,9 +112,6 @@ rstan::stan_ac(fit)
 表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
 この $p$ をStanで推定してみよう。
 
-```{r stan-set-seed, echo = FALSE}
-set.seed(42)
-```
 ```{r stan-binom, fig.width = 4, fig.height = 4}
 true_p = 0.7
 N = 40L
@@ -144,18 +158,15 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 予め実行速度の速い機械語に翻訳(コンパイル):
 
 ```{r stan-binom-model, fig.width = 4, fig.height = 4}
-model = rstan::stan_model("binom.stan")
+model = cmdstan_model("binom.stan")
+params = names(model$variables()$parameters)
 ```
-
-これに結構時間がかかるので、変更が無ければ再利用するため先ほど
-`rstan_options(auto_write = TRUE)` しておいた。
-
-<hr>
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-binom-sample, fig.width = 4, fig.height = 3}
-fit = rstan::sampling(model, data = mydata)
+```{r stan-binom-sample, fig.width = 4, fig.height = 3, results = FALSE}
+fit = model$sample(mydata)
+draws = fit$draws()
 ```
 
 いろいろオプションはあるけどとりあえずデフォルトで:<br>
@@ -182,7 +193,7 @@ print(fit)
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
 ```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
-rstan::stan_trace(fit)
+bayesplot::mcmc_trace(draws, pars = params)
 ```
 
 ---
@@ -191,7 +202,7 @@ rstan::stan_trace(fit)
 2--3ステップくらいで自己相関がほぼ消えるので問題なし:
 
 ```{r stan-binom-ac, fig.width = 4, fig.height = 4}
-rstan::stan_ac(fit, pars = c("p"))
+bayesplot::mcmc_acf_bar(draws, pars = params)
 ```
 
 ---
@@ -201,7 +212,7 @@ rstan::stan_ac(fit, pars = c("p"))
 真の$p$の値も含まれている:
 
 ```{r stan-binom-hist, fig.width = 4, fig.height = 4}
-rstan::stan_hist(fit, bins = 30)
+bayesplot::mcmc_hist(draws, bins = 20, pars = params)
 ```
 
 次はもう少しだけ複雑な例を見てみよう。
@@ -222,10 +233,9 @@ if (!require(palmerpenguins, quietly = TRUE)) {
 }
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 
-p_penweight = penguins %>%
-  ggplot() + aes(body_mass_g, flipper_length_mm) +
+p_penweight = ggplot(penguins) +
+  aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +
-  scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 
@@ -247,12 +257,12 @@ p_penweight +
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
 ```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4}
-mydata = penguins %>%
+penguins_data = penguins %>%
   dplyr::select(c("body_mass_g", "flipper_length_mm")) %>%
   tidyr::drop_na() %>%
   as.list()
-mydata$N = length(mydata$body_mass_g)
-str(mydata)
+penguins_data$N = length(penguins_data$body_mass_g)
+str(penguins_data)
 ```
 
 ---
@@ -270,13 +280,15 @@ str(mydata)
 予め実行速度の速い機械語に翻訳(コンパイル):
 
 ```{r stan-penguins-model, fig.width = 4, fig.height = 4}
-model = rstan::stan_model("penguins.stan")
+model = cmdstan_model("penguins.stan")
+params = names(model$variables()$parameters)
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-penguins-sample, fig.width = 4, fig.height = 3}
-fit = rstan::sampling(model, data = mydata)
+```{r stan-penguins-sample, fig.width = 4, fig.height = 3, results = FALSE}
+fit = model$sample(data = penguins_data)
+draws = fit$draws()
 ```
 
 いろいろオプションはあるけどとりあえずデフォルトで:<br>
@@ -301,7 +313,7 @@ print(fit)
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
 ```{r stan-penguins-traceplot, fig.width = 11, fig.height = 4}
-rstan::stan_trace(fit)
+bayesplot::mcmc_trace(draws, pars = params)
 ```
 
 ---
@@ -310,7 +322,7 @@ rstan::stan_trace(fit)
 どれもまあまあすぐ消えるので問題なし:
 
 ```{r stan-penguins-ac, fig.width = 11, fig.height = 4}
-rstan::stan_ac(fit, pars = c("intercept", "slope", "sigma"))
+bayesplot::mcmc_acf_bar(draws, pars = params)
 ```
 
 ---
@@ -319,7 +331,7 @@ rstan::stan_ac(fit, pars = c("intercept", "slope", "sigma"))
 正規分布っぽいきれいな形:
 
 ```{r stan-penguins-hist, fig.width = 11, fig.height = 3}
-rstan::stan_hist(fit, bins = 30)
+bayesplot::mcmc_hist(draws, bins = 30, pars = params)
 ```
 
 これらの値を使って点推定・区間推定も可能。
@@ -328,13 +340,15 @@ rstan::stan_hist(fit, bins = 30)
 ---
 ## 単回帰のベイズ推定: 推定結果で回帰
 
-無事に最尤推定と似たような線が引けた。
+普通のGLMと似たような線が引ける:
 
 ```{r stan-penguins-regression, fig.width = 4, fig.height = 4, warning = FALSE}
-coef = rstan::get_posterior_mean(fit)[, "mean-all chains"]
+coef = fit$summary() %>% dplyr::select(variable, mean) %>% tidyr::pivot_wider(names_from = variable, values_from = mean) %>% unlist()
 p_penweight +
   geom_abline(intercept = coef["intercept"], slope = coef["slope"], size = 1, color = "#3366ff")
 ```
+
+TODO: `model$optimize()`
 
 ---
 ## 🔰 単回帰の練習問題

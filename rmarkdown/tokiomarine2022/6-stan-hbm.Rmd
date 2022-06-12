@@ -1,5 +1,5 @@
 +++
-url = "tokiomarine2022/5-stan-hbm.html"
+url = "tokiomarine2022/6-stan-hbm.html"
 title = "6. Stanで階層ベイズモデル — 統計モデリング概論 DSHC 2022"
 linktitle = "Stanで階層ベイズモデル"
 date = 2022-08-24T15:30:00+09:00
@@ -42,9 +42,8 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-library(rstan)
-rstan_options(auto_write = TRUE)
-knitr::opts_chunk$set(cache = TRUE)
+library(cmdstanr)
+knitr::opts_chunk$set(cache = FALSE)
 ```
 
 ---
@@ -92,7 +91,7 @@ knitr::opts_chunk$set(cache = TRUE)
 ---
 ## 変量効果が入った推定結果
 
-```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, message = FALSE}
+```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, message = FALSE, result = FALSE}
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -108,8 +107,8 @@ df_od = tibble::tibble(
 #   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
 #   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 mydata = list(y = df_od$y, N = ninds)
-model = rstan::stan_model("glmm.stan")
-fit = rstan::sampling(model, data = mydata)
+model = cmdstan_model("glmm.stan")
+fit = model$sample(data = mydata, refresh = 0)
 ```
 
 ```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3}
@@ -122,9 +121,9 @@ print(fit)
 データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。
 
 ```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7}
-.pars = c("a", "s", "r[1]", "r[2]")
-p_trace = rstan::stan_trace(fit, pars = .pars, nrow = 1L) + coord_flip()
-p_hist = rstan::stan_hist(fit, pars = .pars, nrow = 1L, bins = 30)
+draws = fit$draws(c("a", "s", "r[1]", "r[2]"))
+p_trace = bayesplot::mcmc_trace(draws) + coord_flip()
+p_hist = bayesplot::mcmc_hist(draws, bins = 30)
 cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 ```
 
