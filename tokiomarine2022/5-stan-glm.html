@@ -92,11 +92,18 @@ if (!doNotTrack) {
 <li>C++を介して機械語に翻訳(コンパイル)するので高速</li>
 <li>RやPythonなどから呼び出して使うのが便利</li>
 </ul>
-<p>大部分はRで説明し、部分的にPythonでの練習を挟みます。<br></p>
-<p>聞きながら手元で<a href="tokiomarine2022-stan.ipynb">tokiomarine2022-stan.ipynb</a>を実行してもいいです。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;rstan&#34;)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">rstan</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">rstan_options</span><span class="p">(</span><span class="n">auto_write</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+<p>スライドではRで説明。
+皆さんの手元では配布したipynbをPython/Jupyterで実行。
+</section>
+<section>
+<h2 id="rからstanを動かすcmdstanr">RからStanを動かすCmdStanR</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;cmdstanr&#34;</span><span class="p">,</span> <span class="n">repos</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;https://mc-stan.org/r-packages/&#34;</span><span class="p">,</span> <span class="nf">getOption</span><span class="p">(</span><span class="s">&#34;repos&#34;</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">cmdstanr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">check_cmdstan_toolchain</span><span class="p">(</span><span class="n">fix</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> <span class="n">quiet</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">install_cmdstan</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nf">cmdstan_version</span><span class="p">()</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;bayesplot&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">bayesplot</span><span class="p">)</span>
 </span></span></code></pre></div>
 </section>
 <section>
@@ -105,16 +112,13 @@ if (!doNotTrack) {
 </span></span><span class="line"><span class="cl"><span class="n">mydata</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># Stan言語で書いたモデルをコンパイル</span>
-</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="n">file</span> <span class="o">=</span> <span class="s">&#34;model.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="n">stan_file</span> <span class="o">=</span> <span class="s">&#34;model.stan&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># MCMCサンプリング</span>
-</span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="c1"># 結果を眺める</span>
-</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit</span><span class="o">$</span><span class="nf">summary</span><span class="p">()</span>
 </span></span></code></pre></div>
 </section>
 <section>
@@ -129,7 +133,7 @@ if (!doNotTrack) {
 [1] 40
 
 $x
- [1] 0 0 1 0 1 1 0 1 1 0 1 0 0 1 1 0 0 1 1 1 0 1 0 0 1 1 1 0 1 0 0 0 1 1 1 0 1 1 0 1
+ [1] 1 1 0 0 1 1 1 1 1 1 1 1 1 0 1 1 1 1 1 1 1 0 1 1 1 1 1 1 0 1 1 1 1 1 1 1 1 0 0 0
 </code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
 
 </section>
@@ -138,7 +142,7 @@ $x
 <p>文字列として保持するか、別ファイルに書いておく:</p>
 <pre tabindex="0"><code>data {
   int&lt;lower=0&gt; N;
-  int x[N];
+  array[N] int x;
 }
 
 parameters {
@@ -174,12 +178,11 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 <section>
 <h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
 <p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;binom.stan&#34;</span><span class="p">)</span>
-</span></span></code></pre></div><p>これに結構時間がかかるので、変更が無ければ再利用するため先ほど
-<code>rstan_options(auto_write = TRUE)</code> しておいた。</p>
-<hr>
-<p>モデルとデータを使ってMCMCサンプリング:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;binom.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
+</span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
 </span></span></code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
 <code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
 <p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
@@ -190,32 +193,23 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 <p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
 念のため trace plot も確認しておこう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Inference for Stan model: binom.
-4 chains, each with iter=2000; warmup=1000; thin=1; 
-post-warmup draws per chain=1000, total post-warmup draws=4000.
-
-       mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff Rhat
-p      0.55    0.00 0.08   0.39   0.50   0.55   0.60   0.69  1651    1
-lp__ -29.45    0.02 0.76 -31.61 -29.61 -29.16 -28.97 -28.92  1262    1
-
-Samples were drawn using NUTS(diag_e) at Wed Jun  8 09:32:06 2022.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).
+</span></span></code></pre></div><pre tabindex="0"><code> variable   mean median   sd  mad     q5    q95 rhat ess_bulk ess_tail
+     lp__ -22.31 -22.05 0.70 0.31 -23.69 -21.82 1.00     1887     2092
+     p      0.79   0.79 0.06 0.06   0.68   0.88 1.00     1475     1778
 </code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
 
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
 <p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
 
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
 <p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;p&#34;</span><span class="p">))</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_acf_bar</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
 
 </section>
@@ -223,8 +217,10 @@ convergence, Rhat=1).
 <h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
 <p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
 真の$p$の値も含まれている:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
-</span></span></code></pre></div><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">20</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
+</code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
 <p>次はもう少しだけ複雑な例を見てみよう。</p>
 
 </section>
@@ -274,9 +270,11 @@ model {
 <section>
 <h2 id="単回帰のベイズ推定-mcmcサンプル">単回帰のベイズ推定: MCMCサンプル</h2>
 <p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">stan_model</span><span class="p">(</span><span class="s">&#34;penguins.stan&#34;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;penguins.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
 </span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">sampling</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">penguins_data</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
 </span></span></code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
 <code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
 <p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
@@ -287,51 +285,45 @@ model {
 <p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
 念のため trace plot も確認しておこう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Inference for Stan model: penguins.
-4 chains, each with iter=2000; warmup=1000; thin=1; 
-post-warmup draws per chain=1000, total post-warmup draws=4000.
-
-             mean se_mean   sd    2.5%     25%     50%     75%   97.5% n_eff Rhat
-intercept  136.76    0.05 1.97  132.89  135.40  136.75  138.04  140.67  1506    1
-slope        0.02    0.00 0.00    0.01    0.01    0.02    0.02    0.02  1526    1
-sigma        6.94    0.01 0.27    6.41    6.76    6.94    7.13    7.47  1198    1
-lp__      -830.83    0.04 1.24 -834.08 -831.39 -830.51 -829.93 -829.43  1120    1
-
-Samples were drawn using NUTS(diag_e) at Wed Jun  8 09:32:31 2022.
-For each parameter, n_eff is a crude measure of effective sample size,
-and Rhat is the potential scale reduction factor on split chains (at 
-convergence, Rhat=1).
+</span></span></code></pre></div><pre tabindex="0"><code>  variable    mean  median   sd  mad      q5     q95 rhat ess_bulk ess_tail
+ lp__      -830.84 -830.55 1.25 1.01 -833.28 -829.49 1.00     1201     1470
+ intercept  136.57  136.58 2.02 2.01  133.18  139.77 1.00     1546     1465
+ slope        0.02    0.02 0.00 0.00    0.01    0.02 1.00     1572     1526
+ sigma        6.94    6.93 0.27 0.27    6.51    7.41 1.00     1332     1141
 </code></pre>
 </section>
 <section>
 <h2 id="単回帰のベイズ推定-trace-plot-確認">単回帰のベイズ推定: trace plot 確認</h2>
 <p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_trace</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-penguins-traceplot-1.png" alt="plot of chunk stan-penguins-traceplot"></p>
 
 </section>
 <section>
 <h2 id="単回帰のベイズ推定-自己相関の確認">単回帰のベイズ推定: 自己相関の確認</h2>
 <p>どれもまあまあすぐ消えるので問題なし:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_ac</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;intercept&#34;</span><span class="p">,</span> <span class="s">&#34;slope&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">))</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_acf_bar</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-penguins-ac-1.png" alt="plot of chunk stan-penguins-ac"></p>
 
 </section>
 <section>
 <h2 id="単回帰のベイズ推定-推定結果確認">単回帰のベイズ推定: 推定結果確認</h2>
 <p>正規分布っぽいきれいな形:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">rstan</span><span class="o">::</span><span class="nf">stan_hist</span><span class="p">(</span><span class="n">fit</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
-</span></span></code></pre></div><p><img src="figure/stan-penguins-hist-1.png" alt="plot of chunk stan-penguins-hist"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
+</code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre><p><img src="figure/stan-penguins-hist-1.png" alt="plot of chunk stan-penguins-hist"></p>
 <p>これらの値を使って点推定・区間推定も可能。</p>
 
 </section>
 <section>
 <h2 id="単回帰のベイズ推定-推定結果で回帰">単回帰のベイズ推定: 推定結果で回帰</h2>
-<p>無事に最尤推定と似たような線が引けた。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">coef</span> <span class="o">=</span> <span class="n">rstan</span><span class="o">::</span><span class="nf">get_posterior_mean</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="n">[</span><span class="p">,</span> <span class="s">&#34;mean-all chains&#34;</span><span class="n">]</span>
+<p>普通のGLMと似たような線が引ける:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">coef</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">summary</span><span class="p">()</span> <span class="o">%&gt;%</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">mean</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_wider</span><span class="p">(</span><span class="n">names_from</span> <span class="o">=</span> <span class="n">variable</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">mean</span><span class="p">)</span> <span class="o">%&gt;%</span> <span class="nf">unlist</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_abline</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;intercept&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="n">coef[</span><span class="s">&#34;slope&#34;</span><span class="n">]</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-penguins-regression-1.png" alt="plot of chunk stan-penguins-regression"></p>
+<p>TODO: <code>model$optimize()</code></p>
 
 </section>
 <section>
