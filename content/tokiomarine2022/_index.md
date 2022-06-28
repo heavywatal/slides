@@ -1,5 +1,5 @@
 +++
-title = "統計モデリング概論 DSHC 2021"
+title = "統計モデリング概論 DSHC 2022"
 date = 2022-08-17T09:30:00+09:00
 draft = false
 unlisted = false

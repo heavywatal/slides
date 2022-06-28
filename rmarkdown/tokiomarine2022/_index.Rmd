@@ -1,5 +1,5 @@
 +++
-title = "統計モデリング概論 DSHC 2021"
+title = "統計モデリング概論 DSHC 2022"
 date = 2022-08-17T09:30:00+09:00
 draft = false
 unlisted = false
@@ -39,10 +39,10 @@ Stanでポアソン回帰,40,10,2
 "
 
 df_raw = readr::read_csv(csv_text, show_col_types = FALSE)
-df = df_raw %>%
-  dplyr::group_by(day) %>%
-  dplyr::mutate(elapsed = dplyr::lag(cumsum(run + rest), 1L, default = 0)) %>%
-  dplyr::mutate(run = lubridate::minutes(run), elapsed = lubridate::minutes(elapsed)) %>%
+df = df_raw |>
+  dplyr::group_by(day) |>
+  dplyr::mutate(elapsed = dplyr::lag(cumsum(run + rest), 1L, default = 0)) |>
+  dplyr::mutate(run = lubridate::minutes(run), elapsed = lubridate::minutes(elapsed)) |>
   dplyr::mutate(start = day_start + elapsed, end = start + run)
 
 ggplot(df) +
