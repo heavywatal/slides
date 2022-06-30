@@ -12,20 +12,49 @@
 # %%
 import sys
 import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 import statsmodels.api as sm
+import statsmodels.formula.api as smf
 import seaborn as sns
 rng = np.random.default_rng(seed=24601)
 sys.version
 
 # %% [markdown]
 # ## 直線あてはめ
+# 架空のデータを作って散布図。
+# 擬似乱数生成については後述。
 
 # %%
-penguins = sm.datasets.get_rdataset('penguins', 'palmerpenguins', True).data
+n = 300
+df = (
+  pd.DataFrame(dict(x=rng.uniform(0.4, 1.7, n)))
+    .assign(y=lambda _: rng.poisson(np.exp(3 * _.x - 3)))
+)
+print(df)
 
-sns.set_theme()
-ax = sns.regplot(x="body_mass_g", y="flipper_length_mm", data=penguins)
+fig, ax = plt.subplots()
+sns.scatterplot(x="x", y="y", data=df, ax=ax)
 
+# %% [markdown]
+# OLS: ordinary least square
+
+# %%
+model = smf.ols("y ~ x", df)
+result = model.fit()
+result.params
+
+# %% [markdown]
+# 推定結果を用いて回帰線のy座標を計算:
+# pred = slope * x + intercept
+
+# %%
+df_pred = df.assign(pred=lambda _: result.predict(_))
+print(df_pred)
+
+fig, ax = plt.subplots()
+sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
+sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
 
 # %% [markdown]
 # ## 擬似乱数生成

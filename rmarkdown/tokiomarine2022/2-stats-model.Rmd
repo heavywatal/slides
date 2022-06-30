@@ -44,7 +44,7 @@ library(dplyr)
 library(tidyr)
 library(reticulate)
 use_virtualenv("dshc2022")
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
 ```
 
 ---
@@ -263,13 +263,9 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ## 残差平方和(RSS)が最小となるパラメータを探せ
 
 これくらいなら一瞬で計算してもらえる
-```{r ols-prepare, echo = FALSE}
-height = df_weight[["height"]]
-weight = df_weight[["weight"]]
-```
 ```{python ols}
-import statsmodels.api as sm
-model = sm.OLS(r.weight, sm.add_constant(r.height))
+import statsmodels.formula.api as smf
+model = smf.ols("weight ~ height", r.df_weight)
 result = model.fit()
 result.params
 ```
