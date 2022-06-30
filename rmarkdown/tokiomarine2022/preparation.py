@@ -38,7 +38,7 @@ sm.show_versions()
 # ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
 
 # %%
-# %pip install 'cmdstanpy>=1.0.1'
+# %pip install 'cmdstanpy>=1.0.2'
 import cmdstanpy
 print(cmdstanpy.__version__)
 
