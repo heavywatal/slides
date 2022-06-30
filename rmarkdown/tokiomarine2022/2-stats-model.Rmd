@@ -44,7 +44,7 @@ library(dplyr)
 library(tidyr)
 library(reticulate)
 use_virtualenv("dshc2022")
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -270,27 +270,22 @@ result = model.fit()
 result.params
 ```
 
-```{r weight-lm, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
+```{r weight-lm, echo = FALSE, fig.height = 3.7, fig.width = 3.7}
 par_init = c(intercept = 0, slope = 0)
 result = optim(par_init, fn = rss_weight, data = df_weight)
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, size = 6, color = "#3366ff")
 ```
 
 
 ---
-## 🔰 直線あてはめしてみる (TODO: python)
+## 🔰 直線あてはめしてみる
 
-```{r lm-mpg, fig.height = 2.5, fig.width = 2.5}
-fit = lm(data = mpg, formula = hwy ~ displ)
-broom::tidy(fit)
-
-mpg_added = modelr::add_predictions(mpg, fit)
-ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
-  geom_line(aes(y = pred), size = 1, color = "#3366ff")
-```
+🔰
+[`2-stats-model.ipynb`](./2-stats-model.ipynb)
+をJupyterで開き、順々に実行してみよう。
 
 <hr>
 
@@ -804,36 +799,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-## Random Number Generator
-rng = np.random.default_rng(seed=24601)
+rng = np.random.default_rng(seed=24601)  # Random Number Generator
 
 x = rng.integers(1, 6, 100)
 # x = rng.binomial(3, 0.5, 100)
-# x = rng.poisson(10, 100)
+# x = rng.poisson(3, 100)
 # x = rng.normal(50, 10, 100)
 
-## Visualize
 print(x)
 # sns.histplot(x)   # for continuous values
 sns.countplot(x)    # for discrete values
 ```
 
-🔰 上のコードを使って `binomial()` や `poisson()` も試してみよう。
-
-???
-
-plt.clf()
-plt.close()
-
-
----
-## いろんな乱数を生成・可視化して感覚を掴もう
-
-🔰 [numpy公式ドキュメント](https://numpy.org/doc/stable/reference/random/generator.html)
-を参考に、以下のような乱数を作って作図しよう。
-
-- 1%の当たりを狙って100連ガチャを回した場合
-- TODO
+🔰
+[`2-stats-model.ipynb`](./2-stats-model.ipynb)
+をJupyterで開き、順々に実行してみよう。
 
 <hr>
 
@@ -1089,7 +1069,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 ---
-## 🔰 尤度の練習問題 (TODO: python)
+## 🔰 尤度の練習問題
 
 サイコロを10回振ったら6の目が3回出た。
 
@@ -1100,12 +1080,13 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
 
 1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
-   数学で解ければ優。Rで見つければ良。目分量・勘で可。
+   数学で解ければ**優**。Pythonで見つければ**良**。目分量・勘で**可**。
 
 ヒント
 : 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
-: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。
-
+: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はPythonでは
+  [`scipy.special.comb(5, 2)`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.comb.html)。<br>
+  NumPy Array も渡せる。
 
 ```{r day3-2, include = FALSE}
 get_likelihood = function(p, k = 3, n = 10) {
