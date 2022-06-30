@@ -38,7 +38,7 @@ sm.show_versions()
 # ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
 
 # %%
-# %pip install 'cmdstanpy>=1.0.2'
+# %pip install 'cmdstanpy>=1.0.3'
 import cmdstanpy
 print(cmdstanpy.__version__)
 
@@ -52,6 +52,11 @@ print(cmdstanpy.__version__)
 cmdstanpy.install_cmdstan()
 
 # %% [markdown]
+# バージョンによっては `ValueError: CmdStan installataion missing binaries.`
+# というエラーが出ることもあるけど、その上のほうに
+# `CmdStan version 2.29.2 already installed` と表示されていればOK。
+# [報告した](https://github.com/stan-dev/cmdstanpy/issues/585)のでそのうち直るはず。
+#
 # [公式example](https://github.com/stan-dev/cmdstanpy#example) が走ることを確認:
 
 # %%
@@ -89,6 +94,7 @@ az.plot_trace(cmdstanpy_data)
 
 # %%
 # pyright: reportMissingTypeStubs=false
+# pyright: reportPrivateImportUsage=false
+# pyright: reportUnknownArgumentType=false
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownVariableType=false
-# pyright: reportUnknownArgumentType=false
