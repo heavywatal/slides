@@ -372,9 +372,11 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </section>
 <section>
 <h2 id="-とにかくglmを使ってみる練習">🔰 とにかくGLMを使ってみる練習</h2>
+<p>🔰
+<a href="./3-glm.ipynb"><code>3-glm.ipynb</code></a>
+をJupyterで開き、順々に実行してみよう。</p>
 <p>とりあえず当てはめと作図だけ。</p>
-<p>結果の解釈やモデルの評価は後で。</p>
-<p>TODO</p>
+<p>結果の解釈やモデルの評価はこの後。</p>
 <hr>
 <p>☕️ 休憩 + 質疑応答</p>
 
@@ -413,7 +415,9 @@ $L(\theta \mid D)$ or $L(\theta)$</p>
 <hr>
 <p>各モデルで最適なパラメータを探して、比較:<br>
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$</p>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">.</span><span class="n">llf</span>  <span class="c1"># log likelihood</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="たしかに尤度はあてはまりの良さを表してそう">たしかに尤度はあてはまりの良さを表してそう</h2>
@@ -462,7 +466,9 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </ul>
 </li>
 </ul>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-py" data-lang="py"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">.</span><span class="n">aic</span>
+</span></span></code></pre></div>
 </section>
 <section>
 <h2 id="無駄な説明変数の追加でaic増加">無駄な説明変数の追加でAIC増加</h2>
@@ -572,42 +578,22 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <li>尤度は「手元のデータへのあてはまり」</li>
 <li>モデルを比較するときは情報量基準を参考にする</li>
 </ul>
+<hr>
+<p>🔰 単回帰と重回帰の練習をしてみよう。</p>
+<p><a href="./3-glm.ipynb"><code>3-glm.ipynb</code></a>
+をJupyterで開き、スライドの進行に合わせて順々に実行。</p>
 
 </section>
 <section>
-<h2 id="pythonでglmをやるパッケージ">PythonでGLMをやるパッケージ</h2>
-<dl>
-<dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
-<dd>統計モデリング寄り。今回はこちらを紹介。</dd>
-<dd>AICやp値などの指標も適宜計算してくれるので楽</dd>
-<dt><a href="https://scikit-learn.org">scikit-learn</a></dt>
-<dd>機械学習寄り</dd>
-<dd>回帰以外のさまざまな手法も統一的な書き方で使える</dd>
-</dl>
-<p>以降のコードで共通のライブラリ読み込み</p>
+<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-</span></span><span class="line"><span class="cl"><span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;Adelie&#34;</span><span class="p">:</span> <span class="s2">&#34;#ff6600&#34;</span><span class="p">,</span> <span class="s2">&#34;Gentoo&#34;</span><span class="p">:</span> <span class="s2">&#34;#c35bcc&#34;</span><span class="p">,</span> <span class="s2">&#34;Chinstrap&#34;</span><span class="p">:</span> <span class="s2">&#34;#007174&#34;</span><span class="p">}</span>
-</span></span></code></pre></div>
-</section>
-<section>
-<h2 id="penguinsデータセット">penguinsデータセット</h2>
-<a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
-<img src="/slides/image/rstats/lter_penguins.png" width="45%">
-<img src="/slides/image/rstats/culmen_depth.png" width="45%">
-</a>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># Python</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
-</span></span><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;penguins&#39;</span><span class="p">,</span> <span class="s1">&#39;palmerpenguins&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s2">&#34;penguins&#34;</span><span class="p">,</span> <span class="s2">&#34;palmerpenguins&#34;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
 </span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># R</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;palmerpenguins&#34;)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">penguins_colors</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">Adelie</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">Chinstrap</span> <span class="o">=</span> <span class="s">&#34;purple&#34;</span><span class="p">,</span> <span class="n">Gentoo</span> <span class="o">=</span> <span class="s">&#34;cyan4&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
 </span></span></code></pre></div>
 </section>
 <section>
@@ -617,86 +603,93 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
-<pre tabindex="0"><code>      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex  year
-        &lt;fct&gt;     &lt;fct&gt;          &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt;  &lt;fct&gt; &lt;int&gt;
-  1    Adelie Torgersen           39.1          18.7               181        3750   male  2007
-  2    Adelie Torgersen           39.5          17.4               186        3800 female  2007
-  3    Adelie Torgersen           40.3          18.0               195        3250 female  2007
-  4    Adelie Torgersen             NA            NA                NA          NA     NA  2007
- --                                                                                            
-341 Chinstrap     Dream           43.5          18.1               202        3400 female  2009
-342 Chinstrap     Dream           49.6          18.2               193        3775   male  2009
-343 Chinstrap     Dream           50.8          19.0               210        4100   male  2009
-344 Chinstrap     Dream           50.2          18.7               198        3775 female  2009
+<pre tabindex="0"><code>       species     island  bill_length_mm  bill_depth_mm  flipper_length_mm  body_mass_g     sex  year
+0       Adelie  Torgersen            39.1           18.7              181.0       3750.0    male  2007
+1       Adelie  Torgersen            39.5           17.4              186.0       3800.0  female  2007
+2       Adelie  Torgersen            40.3           18.0              195.0       3250.0  female  2007
+3       Adelie  Torgersen             NaN            NaN                NaN          NaN     NaN  2007
+4       Adelie  Torgersen            36.7           19.3              193.0       3450.0  female  2007
+..         ...        ...             ...            ...                ...          ...     ...   ...
+339  Chinstrap      Dream            55.8           19.8              207.0       4000.0    male  2009
+340  Chinstrap      Dream            43.5           18.1              202.0       3400.0  female  2009
+341  Chinstrap      Dream            49.6           18.2              193.0       3775.0    male  2009
+342  Chinstrap      Dream            50.8           19.0              210.0       4100.0    male  2009
+343  Chinstrap      Dream            50.2           18.7              198.0       3775.0  female  2009
+
+[344 rows x 8 columns]
 </code></pre>
 </section>
 <section>
 <h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
 <p>どうやら、重いペンギンほど翼長も長い。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;flipper_length_mm&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/penguins-weight-1.png" alt="plot of chunk penguins-weight"></p>
 
 </section>
 <section>
 <h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
-<p>結構たくさん出力される。上がモデルの評価、下が推定結果。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g&#39;</span>
+<p>とりあえずデフォルトの正規分布・恒等リンク。
+$y = 136.7 + 0.0153 x$</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+</span></span><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s2">&#34;flipper_length_mm ~ body_mass_g&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="n">model1</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">results1</span> <span class="o">=</span> <span class="n">model1</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results1</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Dep. Variable:      flipper_length_mm   No. Observations:                  342
-Model:                            GLM   Df Residuals:                      340
-Model Family:                Gaussian   Df Model:                            1
-Link Function:               identity   Scale:                          47.795
-Method:                          IRLS   Log-Likelihood:                -1145.5
-Date:                Tue, 29 Jun 2021   Deviance:                       16250.
-Time:                        10:32:40   Pearson chi2:                 1.63e+04
-No. Iterations:                     3
-Covariance Type:            nonrobust
-===============================================================================
-                  coef    std err          z      P&gt;|z|      [0.025      0.975]
--------------------------------------------------------------------------------
-Intercept     136.7296      1.997     68.473      0.000     132.816     140.643
-body_mass_g     0.0153      0.000     32.722      0.000       0.014       0.016
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results1</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Intercept      136.729559
+body_mass_g      0.015276
+dtype: float64
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results1</span><span class="o">.</span><span class="n">llf</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>-1145.5175473095946
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results1</span><span class="o">.</span><span class="n">aic</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>2295.0350946191893
 </code></pre>
 </section>
 <section>
 <h2 id="単回帰の練習-3-フィッティング結果を作図">単回帰の練習: 3. フィッティング結果を作図</h2>
-<p>$y = 136.7 + 0.0153 x$</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">y_pred</span> <span class="o">=</span> <span class="n">results1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">penguins</span><span class="p">[</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">y_pred</span><span class="p">)</span>
+<p>結果とデータから予測値を作って回帰線を引く。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pen_pred</span> <span class="o">=</span> <span class="n">penguins</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pred</span><span class="o">=</span><span class="n">results1</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">pen_pred</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;flipper_length_mm&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;pred&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm"></p>
 
 </section>
 <section>
 <h2 id="重回帰の練習-1-まず作図">重回帰の練習: 1. まず作図</h2>
-<p>重いペンギンほど翼長も長い。翼長は種によっても違うかも。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+<p>種によって色分けしてみると、傾向の違いが見える。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">palette</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&#34;Adelie&#34;</span><span class="p">:</span> <span class="s2">&#34;#ff6600&#34;</span><span class="p">,</span> <span class="s2">&#34;Gentoo&#34;</span><span class="p">:</span> <span class="s2">&#34;#c35bcc&#34;</span><span class="p">,</span> <span class="s2">&#34;Chinstrap&#34;</span><span class="p">:</span> <span class="s2">&#34;#007174&#34;</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&#34;species&#34;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;flipper_length_mm&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp"></p>
 
 </section>
 <section>
 <h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
 <p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
-体重の効果は単回帰のときより小さい。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g + species&#39;</span>
+体重の効果は単回帰のとき(0.0153)より小さい。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s2">&#34;flipper_length_mm ~ body_mass_g + species&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="n">model2</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">results2</span> <span class="o">=</span> <span class="n">model2</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
-</span></span></code></pre></div><pre tabindex="0"><code>                           coef    std err          z      P&gt;|z|      [0.025      0.975]
-----------------------------------------------------------------------------------------
-Intercept              158.8603      2.387     66.564      0.000     154.183     163.538
-species[T.Chinstrap]     5.5974      0.788      7.101      0.000       4.053       7.142
-species[T.Gentoo]       15.6775      1.091     14.374      0.000      13.540      17.815
-body_mass_g              0.0084      0.001     13.255      0.000       0.007       0.010
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Intercept               158.860261
+species[T.Chinstrap]      5.597440
+species[T.Gentoo]        15.677470
+body_mass_g               0.008402
+dtype: float64
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">llf</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>-1059.7183131897373
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">aic</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>2127.4366263794745
 </code></pre>
 </section>
 <section>
 <h2 id="重回帰の練習-3-フィッティング結果を作図">重回帰の練習: 3. フィッティング結果を作図</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pen_pred</span> <span class="o">=</span> <span class="n">penguins</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pred</span><span class="o">=</span><span class="n">results2</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&#34;species&#34;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;flipper_length_mm&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;pred&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm"></p>
 <p><strong>傾き</strong>も種によって違うかも。<strong>交互作用</strong>を入れてみたい。</p>
 
@@ -705,25 +698,29 @@ body_mass_g              0.0084      0.001     13.255      0.000       0.007    
 <h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
 <p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g + species + body_mass_g:species&#39;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s2">&#34;flipper_length_mm ~ body_mass_g + species + body_mass_g:species&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="n">model3</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">results3</span> <span class="o">=</span> <span class="n">model3</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">summary</span><span class="p">())</span>
-</span></span></code></pre></div><pre tabindex="0"><code>                                       coef    std err          z      P&gt;|z|      [0.025      0.975]
-----------------------------------------------------------------------------------------------------
-Intercept                          165.2448      3.551     46.536      0.000     158.285     172.204
-species[T.Chinstrap]               -13.8639      7.301     -1.899      0.058     -28.174       0.446
-species[T.Gentoo]                    6.0594      6.051      1.001      0.317      -5.800      17.919
-body_mass_g                          0.0067      0.001      7.011      0.000       0.005       0.009
-body_mass_g:species[T.Chinstrap]     0.0052      0.002      2.683      0.007       0.001       0.009
-body_mass_g:species[T.Gentoo]        0.0024      0.001      1.746      0.081      -0.000       0.005
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Intercept                           165.244813
+species[T.Chinstrap]                -13.863939
+species[T.Gentoo]                     6.059376
+body_mass_g                           0.006677
+body_mass_g:species[T.Chinstrap]      0.005228
+body_mass_g:species[T.Gentoo]         0.002362
+dtype: float64
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">llf</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>-1055.7107640450004
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results3</span><span class="o">.</span><span class="n">aic</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>2123.4215280900007
 </code></pre>
 </section>
 <section>
 <h2 id="交互作用の練習-フィッティング結果を作図">交互作用の練習: フィッティング結果を作図</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">pen_pred</span> <span class="o">=</span> <span class="n">penguins</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">pred</span><span class="o">=</span><span class="n">results3</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">penguins</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">relplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;flipper_length_mm&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;body_mass_g&#39;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">&#39;pred&#39;</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">&#39;species&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">pen_pred</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s2">&#34;species&#34;</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;flipper_length_mm&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">grid</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">,</span> <span class="s2">&#34;body_mass_g&#34;</span><span class="p">,</span> <span class="s2">&#34;pred&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction"></p>
 
 </section>
@@ -746,31 +743,29 @@ body_mass_g:species[T.Gentoo]        0.0024      0.001      1.746      0.081    
 <section>
 <h2 id="確率分布とリンク関数を明示的に指定したい">確率分布とリンク関数を明示的に指定したい</h2>
 <p>何も指定しない場合は正規分布・恒等リンクだった:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g&#39;</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s2">&#34;flipper_length_mm ~ body_mass_g&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="c1">#### results.summary()</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Model Family:                Gaussian</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># Link Function:               identity</span>
-</span></span></code></pre></div><p>こう書いたのと同じ:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s1">&#39;flipper_length_mm ~ body_mass_g&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="n">link</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">identity</span>
-</span></span><span class="line"><span class="cl"><span class="n">family</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">link</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">family</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">family</span>
+</span></span></code></pre></div><pre tabindex="0"><code>&lt;statsmodels.genmod.families.family.Gaussian object at 0x135fa3c50&gt;
+</code></pre><p>こう書いたのと同じ:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">ln</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">identity</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">fam</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">ln</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">fam</span><span class="p">)</span>
 </span></span></code></pre></div><p>利用可能な<a href="https://www.statsmodels.org/stable/glm.html#families">確率分布</a>と<a href="https://www.statsmodels.org/stable/glm.html#link-functions">リンク関数</a>は公式ドキュメントを参照。</p>
 
 </section>
 <section>
-<h2 id="手元のデータ公共データなどでglmしてみよう">手元のデータ、公共データなどでGLMしてみよう</h2>
+<h2 id="-手元のデータ公共データなどでglmしてみよう">🔰 手元のデータ、公共データなどでGLMしてみよう</h2>
 <p>正規分布・恒等リンクじゃないものだとなお良し。</p>
-<p>Pythonパッケージに付属のものを探すのもあり。<br>
+<p>Pythonパッケージから読み込めるものを探すのもあり。<br>
 e.g., <a href="https://vincentarelbundock.github.io/Rdatasets/articles/data.html"><code>sm.datasets.get_rdataset(item, package)</code></a></p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 </span></span><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">get_dataset_names</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">titanic</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s1">&#39;titanic&#39;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">titanic</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">load_dataset</span><span class="p">(</span><span class="s2">&#34;titanic&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;iris&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-</span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s1">&#39;diamonds&#39;</span><span class="p">,</span> <span class="s1">&#39;ggplot2&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s2">&#34;iris&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s2">&#34;diamonds&#34;</span><span class="p">,</span> <span class="s2">&#34;ggplot2&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
 </span></span></code></pre></div><ul>
 <li>TODO: ポアソン回帰の練習に適した課題データ</li>
 <li>TODO: ロジスティック回帰の練習に適した課題データ</li>

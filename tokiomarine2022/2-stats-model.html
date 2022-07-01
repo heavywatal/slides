@@ -177,32 +177,43 @@ if (!doNotTrack) {
 
 </section>
 <section>
-<h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
-<pre tabindex="0"><code>intercept     slope 
--66.63000  77.04308 
+<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
+<p>これくらいなら一瞬で計算してもらえる</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s2">&#34;weight ~ height&#34;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">.</span><span class="n">params</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Intercept   -66.691613
+height       77.075208
+dtype: float64
 </code></pre><p><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
 
 </section>
 <section>
-<h2 id="-直線あてはめしてみる-todo-python">🔰 直線あてはめしてみる (TODO: python)</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">lm</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">hwy</span> <span class="o">~</span> <span class="n">displ</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>         term  estimate std.error statistic       p.value
-        &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
-1 (Intercept) 35.697651 0.7203676  49.55477 2.123519e-125
-2       displ -3.530589 0.1945137 -18.15085  2.038974e-46
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mpg_added</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">mpg</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg_added</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">size</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
-</span></span></code></pre></div><p><img src="figure/lm-mpg-1.png" alt="plot of chunk lm-mpg"></p>
+<h2 id="-直線あてはめしてみる">🔰 直線あてはめしてみる</h2>
+<p>回帰に使えるPythonパッケージ2選:</p>
+<dl>
+<dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
+<dd>統計モデリング寄り。今回はこちらを紹介。</dd>
+<dd>Rに似た書き方や統計量の計算などいろいろ楽。</dd>
+<dt><a href="https://scikit-learn.org">scikit-learn</a></dt>
+<dd>機械学習寄り</dd>
+<dd>回帰以外のさまざまな手法も統一的な書き方で使える</dd>
+</dl>
+<p>🔰
+<a href="./2-stats-model.ipynb"><code>2-stats-model.ipynb</code></a>
+をJupyterで開き、順々に実行してみよう。</p>
 <hr>
 <p>☕️ 休憩 + 質疑応答</p>
 
 </section>
 <section>
 <h2 id="さてもう少し複雑なあてはめをするために">さて、もう少し複雑なあてはめをするために</h2>
-<p>統計モデルの重要な部品「<strong>確率分布</strong>」を扱う。</p>
+<p>統計モデルの重要な部品「<strong>確率分布</strong>」を理解したい。</p>
 <img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
+<p>既にほかの講義で触れられているかもしれませんが、<br>
+脊髄反射レベルで身につけたいくらい重要なので時間をかけます。</p>
+
 </section>
 <section>
 <h2 id="確率分布">確率分布</h2>
@@ -450,29 +461,19 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 </span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">## Random Number Generator</span>
-</span></span><span class="line"><span class="cl"><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">24601</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">24601</span><span class="p">)</span>  <span class="c1"># Random Number Generator</span>
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># x = rng.binomial(3, 0.5, 100)</span>
-</span></span><span class="line"><span class="cl"><span class="c1"># x = rng.poisson(10, 100)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># x = rng.poisson(3, 100)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># x = rng.normal(50, 10, 100)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">## Visualize</span>
 </span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># sns.histplot(x)   # for continuous values</span>
 </span></span><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    <span class="c1"># for discrete values</span>
-</span></span></code></pre></div><p>🔰 上のコードを使って <code>binomial()</code> や <code>poisson()</code> も試してみよう。</p>
-
-</section>
-<section>
-<h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
-<p>🔰 <a href="https://numpy.org/doc/stable/reference/random/generator.html">numpy公式ドキュメント</a>
-を参考に、以下のような乱数を作って作図しよう。</p>
-<ul>
-<li>1%の当たりを狙って100連ガチャを回した場合</li>
-<li>TODO</li>
-</ul>
+</span></span></code></pre></div><p>🔰
+<a href="./2-stats-model.ipynb"><code>2-stats-model.ipynb</code></a>
+をJupyterで開き、順々に実行してみよう。</p>
 <hr>
 <p>☕️ 休憩 + 質疑応答</p>
 
@@ -604,7 +605,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 
 </section>
 <section>
-<h2 id="-尤度の練習問題-todo-python">🔰 尤度の練習問題 (TODO: python)</h2>
+<h2 id="-尤度の練習問題">🔰 尤度の練習問題</h2>
 <p>サイコロを10回振ったら6の目が3回出た。</p>
 <ol>
 <li>
@@ -618,13 +619,15 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 </li>
 <li>
 <p>このサイコロで6の目が出る確率を最尤推定しよう。<br>
-数学で解ければ優。Rで見つければ良。目分量・勘で可。</p>
+数学で解ければ<strong>優</strong>。Pythonで見つければ<strong>良</strong>。目分量・勘で<strong>可</strong>。</p>
 </li>
 </ol>
 <dl>
 <dt>ヒント</dt>
 <dd>確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。</dd>
-<dd>数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは <code>choose(5, 2)</code> 。</dd>
+<dd>数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はPythonでは
+<a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.comb.html"><code>scipy.special.comb(5, 2)</code></a>。<br>
+NumPy Array も渡せる。</dd>
 </dl>
 
 </section>

@@ -343,6 +343,20 @@ p = 0.6 とかである可能性もまあある。
 
 </section>
 <section>
+<h2 id="ベイズ推定の中間まとめ">ベイズ推定の中間まとめ</h2>
+<ul>
+<li>推定結果は<strong>事後分布</strong> ∝ 尤度関数。
+<ul>
+<li>広がり具合によって不確実性も表現できる。</li>
+<li><strong>逐次学習</strong>で尖っていき、確信が強まる。</li>
+</ul>
+</li>
+</ul>
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+<hr>
+<p>☕️ 休憩 + 質疑応答
+</section>
+<section>
 <h2 id="mcmc-umuarcov-ucuhain-umuonte-ucuarlo">MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo</h2>
 <a href="https://en.wikipedia.org/wiki/Andrey_Markov">
 <img src="../tokiomarine2021/image/AAMarkov.jpg" height="180" align="right"></a>
@@ -435,16 +449,6 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <p>e.g., 二次元正規分布。(-2, 2) からスタート。</p>
 <p><img src="figure/gibbs-.gif" alt="plot of chunk gibbs"></p>
 
-</section>
-<section>
-<h2 id="中間まとめ">中間まとめ</h2>
-<ul>
-<li>ベイズ推定では不確実性も表現できる。</li>
-<li>コンピュータに頼った計算方法としてのモンテカルロ法。</li>
-<li>多次元でも効率よくサンプルするためのMCMC。</li>
-</ul>
-<hr>
-<p>ここから、実行するにあたっての注意点を見ていく。
 </section>
 <section>
 <h2 id="何回やっても似たような結果になってほしい">何回やっても似たような結果になってほしい</h2>
@@ -549,15 +553,156 @@ http://mc-stan.org/misc/warnings.html
 
 </section>
 <section>
+<h2 id="ベイズ推定とmcmcまとめ">ベイズ推定とMCMCまとめ</h2>
+<ul>
+<li>推定結果は<strong>事後分布</strong> ∝ 尤度関数。
+<ul>
+<li>広がり具合によって不確実性も表現できる。</li>
+<li><strong>逐次学習</strong>で尖っていき、確信が強まる。</li>
+</ul>
+</li>
+<li>コンピュータに頼った計算方法としてのモンテカルロ法。
+<ul>
+<li>高次元・変な形の分布でも効率よくサンプルできるかが肝。</li>
+<li>ソフトウェアの代表は<strong>Stan</strong> → これから見ていく</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
 <h2 id="stan">Stan</h2>
 <a href="https://mc-stan.org/">
 <img src="/slides/image/stan/logo_name.png" width="120" align="right">
 </a>
 <ul>
-<li>Stan言語でモデルを書く</li>
-<li>C++を介して機械語に翻訳(コンパイル)するので高速</li>
+<li>Stan言語で<strong>モデルを柔軟に記述</strong>できる。</li>
+<li>C++で書かれていて<strong>高速に動作</strong>。</li>
 <li>RやPythonなどから呼び出して使うのが便利</li>
 </ul>
+<h2 id="python-interface">Python Interface</h2>
+<dl>
+<dt><a href="https://pystan.readthedocs.io">PyStan</a></dt>
+<dd>WindowsやJupyterで使うには難あり。</dd>
+<dt><a href="https://cmdstanpy.readthedocs.io">CmdStanPy</a> 👈 今後の主流</dt>
+<dd><a href="https://mc-stan.org/users/interfaces/cmdstan">CmdStan</a>
+を呼び出し、書き出されたCSVを読み取る。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="おおまかな流れ">おおまかな流れ</h2>
+<ol>
+<li>データ準備</li>
+<li>Stan言語でモデルを書く</li>
+<li>モデルをコンパイルして機械語に翻訳 → 実行ファイル</li>
+<li>実行ファイルにデータを渡してMCMCサンプリング</li>
+<li>結果を見る</li>
+</ol>
+<p>🔰
+<a href="4-bayesian.ipynb"><code>4-bayesian.ipynb</code></a>
+をJupyterで開き、スライド説明に沿って実行してみよう。
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-データ準備">説明変数なしのベイズ推定: データ準備</h2>
+<p>表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">true_p</span> <span class="o">=</span> <span class="m">0.7</span>
+</span></span><span class="line"><span class="cl"><span class="n">N</span> <span class="o">=</span> <span class="m">40L</span>
+</span></span><span class="line"><span class="cl"><span class="n">mydata</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>$N
+[1] 40
+
+$x
+ [1] 1 1 1 1 1 1 0 1 1 1 1 0 0 1 1 1 0 1 1 1 1 1 0 1 1 1 1 0 1 1 1 1 1 0 1 1 1 1 1 1
+</code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
+<p>文字列として保持するか、別ファイルに書いておく:</p>
+<pre tabindex="0"><code>
+data {
+  int&lt;lower=0&gt; N;
+  int x[N];
+}
+parameters {
+  real&lt;lower=0,upper=1&gt; p;
+}
+model {
+  x ~ binomial(1, p);
+  p ~ beta(1, 1);
+}
+</code></pre><ul>
+<li>いくつかのブロックに分けて記述する:<br>
+R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code>, 本体の <code>model</code>.</li>
+<li>整数型 <code>int</code>, 実数型 <code>real</code>, それらの配列がある。</li>
+<li>下限 <code>lower</code>, 上限 <code>upper</code> を設定できる。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="stan言語の7種のブロック">Stan言語の7種のブロック</h2>
+<p>順番厳守。よく使うのは<strong>太字のやつ</strong>。</p>
+<ol>
+<li><code>functions {...}</code></li>
+<li><strong><code>data {...}</code></strong></li>
+<li><code>transformed data {...}</code></li>
+<li><strong><code>parameters {...}</code></strong></li>
+<li><code>transformed parameters {...}</code></li>
+<li><strong><code>model {...}</code></strong></li>
+<li><code>generated quantities {...}</code></li>
+</ol>
+<p><a href="https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html">https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html</a></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;coin.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
+</span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
+</span></span></code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
+<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
+<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-結果を眺める">説明変数なしのベイズ推定: 結果を眺める</h2>
+<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code> variable   mean median   sd  mad     q5    q95 rhat ess_bulk ess_tail
+     lp__ -20.96 -20.69 0.69 0.32 -22.39 -20.45 1.00     1672     1848
+     p      0.81   0.81 0.06 0.06   0.70   0.90 1.00     1616     1705
+</code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
+<p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_acf_bar</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
+<p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">20</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
+</code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+</code></pre><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
 
 </section>
 <section>
