@@ -7,59 +7,62 @@
 # 2022-08-24 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2022/
 #
-# ## PythonからStanを使う、おおまかな流れ
-# - データ準備
-# - Stan言語でモデルを書く
-# - それをコンパイルして機械語に翻訳→実行ファイル
-# - 実行ファイルにデータを渡してMCMCサンプリング
-# - 結果を見る
-#
 # ## 環境セットアップ
 
 # %%
 from pathlib import Path
 
 import arviz as az
+import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import seaborn as sns
+import statsmodels.api as sm
 from cmdstanpy import CmdStanModel
+from scipy.special import expit
 
 rng = np.random.default_rng(seed=24601)
 
 # %% [markdown]
-# ## 説明変数なしのベイズ推定
+# ## 階層ベイズモデル
 #
 # ### データ準備
 #
-# 表が出る確率70%のイカサマコインをN回投げたデータを作る。
-#
 # %%
-true_p = 0.7
-N = 40
-coin_data = {"N": N, "x": rng.binomial(1, true_p, N)}
-print(coin_data)
-sns.countplot(x="x", data=coin_data)
+N = 100
+mu_ind = 0.5
+sd_ind = 3
+z = rng.normal(mu_ind, sd_ind, size=N)
+p = expit(z)
+y = rng.binomial(8, p)
+od_data = {
+    "N": N,
+    "y": y,
+}
+df_od = pd.DataFrame(dict(z=z, p=p, y=y))
 
-# %% [markdown]
-# ### モデルの定義
 # %%
 model_code = """
 data {
   int<lower=0> N;
-  int x[N];
+  array[N] int<lower=0> y;
 }
+
 parameters {
-  real<lower=0,upper=1> p;
+  real a;           // mean ability
+  vector[N] r;      // individual difference
+  real<lower=0> s;  // sd of r
 }
+
 model {
-  x ~ binomial(1, p);
-  p ~ beta(1, 1);
+  y ~ binomial(8, inv_logit(a + r));
+  a ~ normal(0, 10);
+  r ~ normal(0, s);
+  s ~ exponential(0.01);
 }
 """
-
-# %%
-stan_file = Path("coin.stan")
-if not stan_file.exists():
+stan_file = Path("glmm.stan")
+if True or not stan_file.exists():
     with open(stan_file, "w") as fout:
         fout.write(model_code)
 
@@ -68,20 +71,7 @@ model = CmdStanModel(stan_file=stan_file)
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(coin_data, chains=4, iter_sampling=2000)
-
-# %% [markdown]
-# 結果はchainごとにファイル出力されているらしい。
-# %%
-print(fit)
-
-# %% [markdown]
-# `numpy.ndarray` 型か `pandas.DataFrame` 型で全部参照できる。
-# が、生の値を見たところであまりよくわからない。
-# %%
-print(fit.draws().shape)  # Array
-# %%
-print(fit.draws_pd())  # DataFrame
+fit = model.sample(od_data, chains=4, iter_sampling=2000)
 
 # %% [markdown]
 # ### 推定結果の要約と収束診断
@@ -94,7 +84,7 @@ print(fit.diagnose())
 # ### トレースプロット確認
 # 分布はきれいなひと山、軌跡はきれいな毛虫
 # %%
-stan_data = az.from_cmdstanpy(fit)
+stan_data = az.from_cmdstanpy(fit, observed_data=od_data)
 az.plot_trace(stan_data)
 
 # %% [markdown]
@@ -105,9 +95,15 @@ az.plot_trace(stan_data)
 # %%
 az.plot_posterior(stan_data)
 
+# %% [markdown]
+# 事後分布の平均を使って回帰線を引いてみる。
 # %%
-stan_data.posterior.mean()
+post_mean = stan_data.posterior.mean().to_pandas()
+print(post_mean)
 
+# %%
 # pyright: reportGeneralTypeIssues=false
 # pyright: reportMissingTypeStubs=false
+# pyright: reportUnknownArgumentType=false
 # pyright: reportUnknownMemberType=false
+# pyright: reportUnknownVariableType=false

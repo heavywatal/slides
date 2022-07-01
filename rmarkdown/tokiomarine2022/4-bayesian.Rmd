@@ -42,6 +42,7 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
+library(cmdstanr)
 knitr::opts_chunk$set(cache = FALSE)
 ```
 
@@ -471,6 +472,21 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)
 真の値は1つに定まっていて、不確実性は有限のサンプリングに由来する。
 
 
+
+---
+## ベイズ推定の中間まとめ
+
+- 推定結果は**事後分布** ∝ 尤度関数。
+    - 広がり具合によって不確実性も表現できる。
+    - **逐次学習**で尖っていき、確信が強まる。
+
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+
+<hr>
+
+☕️ 休憩 + 質疑応答
+
+
 ---
 ## MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo
 
@@ -791,18 +807,6 @@ for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
 
 
 ---
-## 中間まとめ
-
-- ベイズ推定では不確実性も表現できる。
-- コンピュータに頼った計算方法としてのモンテカルロ法。
-- 多次元でも効率よくサンプルするためのMCMC。
-
-<hr>
-
-ここから、実行するにあたっての注意点を見ていく。
-
-
----
 ## 何回やっても似たような結果になってほしい
 
 乱数や初期値によって偶々、じゃないことを確認したい。
@@ -880,7 +884,6 @@ p_trace +
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
 ```{r convergence, echo = FALSE, fig.height = 3, fig.width = 11, message = FALSE, warning = FALSE, results = FALSE}
-library(cmdstanr)
 mydata = list(x = rep(10L, 10L))
 mydata$N = length(mydata$x)
 model_yes = cmdstan_model("converge-yes.stan")
@@ -949,16 +952,170 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 
 
 ---
+## ベイズ推定とMCMCまとめ
+
+- 推定結果は**事後分布** ∝ 尤度関数。
+    - 広がり具合によって不確実性も表現できる。
+    - **逐次学習**で尖っていき、確信が強まる。
+- コンピュータに頼った計算方法としてのモンテカルロ法。
+    - 高次元・変な形の分布でも効率よくサンプルできるかが肝。
+    - ソフトウェアの代表は**Stan** → これから見ていく
+
+
+---
 ## Stan
 
 <a href="https://mc-stan.org/">
 <img src="/slides/image/stan/logo_name.png" width="120" align="right">
 </a>
 
-- Stan言語でモデルを書く
-- C++を介して機械語に翻訳(コンパイル)するので高速
+- Stan言語で**モデルを柔軟に記述**できる。
+- C++で書かれていて**高速に動作**。
 - RやPythonなどから呼び出して使うのが便利
 
+## Python Interface
+
+[PyStan](https://pystan.readthedocs.io)
+: WindowsやJupyterで使うには難あり。
+
+[CmdStanPy](https://cmdstanpy.readthedocs.io) 👈 今後の主流
+: [CmdStan](https://mc-stan.org/users/interfaces/cmdstan)
+  を呼び出し、書き出されたCSVを読み取る。
+
+```{r cmdstanr, include = FALSE}
+if (!require(cmdstanr, quietly = TRUE)) {
+  install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+  library(cmdstanr)
+  install_cmdstan()
+}
+if (!require(bayesplot, quietly = TRUE)) {
+  install.packages("bayesplot")
+  library(bayesplot)
+}
+```
+
+---
+## おおまかな流れ
+
+1. データ準備
+1. Stan言語でモデルを書く
+1. モデルをコンパイルして機械語に翻訳 → 実行ファイル
+1. 実行ファイルにデータを渡してMCMCサンプリング
+1. 結果を見る
+
+🔰
+[`4-bayesian.ipynb`](4-bayesian.ipynb)
+をJupyterで開き、スライド説明に沿って実行してみよう。
+
+
+---
+## 説明変数なしのベイズ推定: データ準備
+
+表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。
+
+```{r stan-binom, fig.width = 4, fig.height = 4}
+true_p = 0.7
+N = 40L
+mydata = list(N = N, x = rbinom(N, 1, true_p))
+print(mydata)
+```
+
+Rならlist型、Pythonならdict型にまとめてStanに渡す。
+
+
+---
+## 説明変数なしのベイズ推定: Stan言語でモデル定義
+
+文字列として保持するか、別ファイルに書いておく:
+
+```{r read-binom-stan, code = 'cat(readr::read_file("coin.stan"))', echo = FALSE}
+```
+
+- いくつかのブロックに分けて記述する:<br>
+  R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
+- 整数型 `int`, 実数型 `real`, それらの配列がある。
+- 下限 `lower`, 上限 `upper` を設定できる。
+
+
+---
+## Stan言語の7種のブロック
+
+順番厳守。よく使うのは**太字のやつ**。
+
+1. `functions {...}`
+1. **`data {...}`**
+1. `transformed data {...}`
+1. **`parameters {...}`**
+1. `transformed parameters {...}`
+1. **`model {...}`**
+1. `generated quantities {...}`
+
+<https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html>
+
+
+---
+## 説明変数なしのベイズ推定: MCMCサンプル
+
+予め実行速度の速い機械語に翻訳(コンパイル):
+
+```{r stan-binom-model, fig.width = 4, fig.height = 4}
+model = cmdstan_model("coin.stan")
+params = names(model$variables()$parameters)
+```
+
+モデルとデータを使ってMCMCサンプリング:
+
+```{r stan-binom-sample, fig.width = 4, fig.height = 3, results = FALSE}
+fit = model$sample(mydata)
+draws = fit$draws()
+```
+
+いろいろオプションはあるけどとりあえずデフォルトで:<br>
+`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
+
+問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
+
+---
+## 説明変数なしのベイズ推定: 結果を眺める
+
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
+念のため trace plot も確認しておこう。
+
+```{r stan-binom-fit, fig.width = 4, fig.height = 3}
+print(fit)
+```
+
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
+
+
+---
+## 説明変数なしのベイズ推定: trace plot 確認
+
+どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
+
+```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
+bayesplot::mcmc_trace(draws, pars = params)
+```
+
+---
+## 説明変数なしのベイズ推定: 自己相関の確認
+
+2--3ステップくらいで自己相関がほぼ消えるので問題なし:
+
+```{r stan-binom-ac, fig.width = 4, fig.height = 4}
+bayesplot::mcmc_acf_bar(draws, pars = params)
+```
+
+---
+## 説明変数なしのベイズ推定: 推定結果確認
+
+サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:
+
+```{r stan-binom-hist, fig.width = 4, fig.height = 4}
+bayesplot::mcmc_hist(draws, bins = 20, pars = params)
+```
 
 ---
 ## 参考文献

@@ -42,6 +42,7 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
+library(cmdstanr)
 knitr::opts_chunk$set(cache = FALSE)
 ```
 
@@ -52,170 +53,18 @@ knitr::opts_chunk$set(cache = FALSE)
 <img src="/slides/image/stan/logo_name.png" width="120" align="right">
 </a>
 
-- Stan言語でモデルを書く
-- C++を介して機械語に翻訳(コンパイル)するので高速
+- Stan言語で**モデルを柔軟に記述**できる。
+- C++で書かれていて高速に動作。
 - RやPythonなどから呼び出して使うのが便利
 
-スライドではRで説明。
-皆さんの手元では配布したipynbをPython/Jupyterで実行。
+前回、回帰ではないパラメータ推定をやった。
 
----
-## RからStanを動かすCmdStanR
+次は単純な直線回帰に進んでみよう。
 
-```r
-install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-library(cmdstanr)
-check_cmdstan_toolchain(fix = TRUE, quiet = TRUE)
-install_cmdstan()
-cmdstan_version()
-```
+🔰
+[`5-stan-glm.ipynb`](5-stan-glm.ipynb)
+をJupyterで開き、スライド説明に沿って実行していこう。
 
-```r
-install.packages("bayesplot")
-library(bayesplot)
-```
-
-
-```{r cmdstanr, include = FALSE}
-if (!require(cmdstanr, quietly = TRUE)) {
-  install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-  library(cmdstanr)
-  install_cmdstan()
-}
-if (!require(bayesplot, quietly = TRUE)) {
-  install.packages("bayesplot")
-  library(bayesplot)
-}
-```
-
----
-## おおまかな流れ
-
-```r
-# データ準備
-mydata
-
-# Stan言語で書いたモデルをコンパイル
-model = cmdstan_model(stan_file = "model.stan")
-
-# MCMCサンプリング
-fit = model$sample(data = mydata)
-
-# 結果を眺める
-fit$summary()
-```
-
-
----
-## 説明変数なしのベイズ推定: データ準備
-
-表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
-この $p$ をStanで推定してみよう。
-
-```{r stan-binom, fig.width = 4, fig.height = 4}
-true_p = 0.7
-N = 40L
-mydata = list(N = N, x = rbinom(N, 1, true_p))
-print(mydata)
-```
-
-Rならlist型、Pythonならdict型にまとめてStanに渡す。
-
-
----
-## 説明変数なしのベイズ推定: Stan言語でモデル定義
-
-文字列として保持するか、別ファイルに書いておく:
-
-```{r read-binom-stan, code = 'cat(readr::read_file("binom.stan"))', echo = FALSE}
-```
-
-- いくつかのブロックに分けて記述する:<br>
-  R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
-- 整数型 `int`, 実数型 `real`, それらの配列がある。
-- 下限 `lower`, 上限 `upper` を設定できる。
-
-
----
-## Stan言語の7種のブロック
-
-順番厳守。よく使うのは**太字のやつ**。
-
-1. `functions {...}`
-1. **`data {...}`**
-1. `transformed data {...}`
-1. **`parameters {...}`**
-1. `transformed parameters {...}`
-1. **`model {...}`**
-1. `generated quantities {...}`
-
-<https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html>
-
-
----
-## 説明変数なしのベイズ推定: MCMCサンプル
-
-予め実行速度の速い機械語に翻訳(コンパイル):
-
-```{r stan-binom-model, fig.width = 4, fig.height = 4}
-model = cmdstan_model("binom.stan")
-params = names(model$variables()$parameters)
-```
-
-モデルとデータを使ってMCMCサンプリング:
-
-```{r stan-binom-sample, fig.width = 4, fig.height = 3, results = FALSE}
-fit = model$sample(mydata)
-draws = fit$draws()
-```
-
-いろいろオプションはあるけどとりあえずデフォルトで:<br>
-`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
-
-問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
-
----
-## 説明変数なしのベイズ推定: 結果を眺める
-
-$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
-念のため trace plot も確認しておこう。
-
-```{r stan-binom-fit, fig.width = 4, fig.height = 3}
-print(fit)
-```
-
-乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
-
-
----
-## 説明変数なしのベイズ推定: trace plot 確認
-
-どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
-
-```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
-bayesplot::mcmc_trace(draws, pars = params)
-```
-
----
-## 説明変数なしのベイズ推定: 自己相関の確認
-
-2--3ステップくらいで自己相関がほぼ消えるので問題なし:
-
-```{r stan-binom-ac, fig.width = 4, fig.height = 4}
-bayesplot::mcmc_acf_bar(draws, pars = params)
-```
-
----
-## 説明変数なしのベイズ推定: 推定結果確認
-
-サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
-真の$p$の値も含まれている:
-
-```{r stan-binom-hist, fig.width = 4, fig.height = 4}
-bayesplot::mcmc_hist(draws, bins = 20, pars = params)
-```
-
-次はもう少しだけ複雑な例を見てみよう。
 
 ---
 ## 線形回帰のベイズ推定: データ準備
@@ -232,16 +81,18 @@ if (!require(palmerpenguins, quietly = TRUE)) {
   library(palmerpenguins)
 }
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
-
-p_penweight = ggplot(penguins) +
+penguins_dropna = penguins %>% drop_na(bill_length_mm, bill_depth_mm)
+p_penweight = penguins_dropna %>%
+  ggplot() +
   aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
-p_penweight +
-  geom_line(aes(y = pred), data = modelr::add_predictions(penguins, fit1), size = 1, color = "#3366ff")
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
+p_penweight %+%
+  modelr::add_predictions(penguins_dropna, fit1) +
+  geom_line(aes(y = pred), size = 1, color = "#3366ff")
 ```
 
 
@@ -257,9 +108,8 @@ p_penweight +
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
 ```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4}
-penguins_data = penguins %>%
+penguins_data = penguins_dropna %>%
   dplyr::select(c("body_mass_g", "flipper_length_mm")) %>%
-  tidyr::drop_na() %>%
   as.list()
 penguins_data$N = length(penguins_data$body_mass_g)
 str(penguins_data)
@@ -270,7 +120,7 @@ str(penguins_data)
 
 切片、傾き、ばらつきを推定する:
 
-```{r read-penguins-stan, code = 'cat(readr::read_file("penguins.stan"))', echo = FALSE}
+```{r read-penguins-stan, code = 'cat(readr::read_file("penguins-lm.stan"))', echo = FALSE}
 ```
 
 
@@ -280,7 +130,7 @@ str(penguins_data)
 予め実行速度の速い機械語に翻訳(コンパイル):
 
 ```{r stan-penguins-model, fig.width = 4, fig.height = 4}
-model = cmdstan_model("penguins.stan")
+model = cmdstan_model("penguins-lm.stan")
 params = names(model$variables()$parameters)
 ```
 
@@ -343,81 +193,38 @@ bayesplot::mcmc_hist(draws, bins = 30, pars = params)
 普通のGLMと似たような線が引ける:
 
 ```{r stan-penguins-regression, fig.width = 4, fig.height = 4, warning = FALSE}
-coef = fit$summary() %>% dplyr::select(variable, mean) %>% tidyr::pivot_wider(names_from = variable, values_from = mean) %>% unlist()
+coef = fit$summary() %>% dplyr::select(variable, mean) %>%
+  tidyr::pivot_wider(names_from = variable, values_from = mean) %>% unlist()
 p_penweight +
   geom_abline(intercept = coef["intercept"], slope = coef["slope"], size = 1, color = "#3366ff")
 ```
-
-TODO: `model$optimize()`
-
----
-## 🔰 単回帰の練習問題
-
-TODO
-
-<hr>
-
-☕️ 休憩 + 質疑応答
-
-
----
-## Stanで重回帰
-
-TODO
-
-```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
-fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species, family = gaussian(), data = penguins)
-pred = penguins %>% tidyr::drop_na() %>% tidybayes::add_fitted_draws(fit)
-p_penweight + aes(color = species, group = species) +
-  ggdist::stat_lineribbon(aes(y = .value), data = pred, size = 0.4) +
-  scale_color_manual(values = penguins_colors) +
-  scale_fill_brewer(palette = "Greys")
-```
-
----
-## 🔰 Stanで重回帰の練習問題
-
-TODO
-
-<hr>
-
-☕️ 休憩 + 質疑応答
 
 
 ---
 ## Stanでポアソン回帰
 
-TODO
-
 <img src="figure/glm-poisson-1.png">
-
-
----
-## 🔰 Stanでポアソン回帰の練習問題
-
-TODO
-
-<hr>
-
-☕️ 休憩 + 質疑応答
 
 
 ---
 ## Stanでロジスティック回帰
 
-TODO
-
 <img src="figure/glm-logistic-1.png">
 
 
 ---
-## 🔰 Stanでロジスティック回帰
+## Stanで重回帰
 
-TODO
+```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
+fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species,
+                         family = gaussian(), data = penguins_dropna)
+pred = penguins_dropna %>% tidybayes::add_linpred_draws(fit)
+p_penweight + aes(color = species, group = species) +
+  ggdist::stat_lineribbon(aes(y = .linpred), data = pred, size = 0.4) +
+  scale_color_manual(values = penguins_colors) +
+  scale_fill_brewer(palette = "Greys")
+```
 
-<hr>
-
-☕️ 休憩 + 質疑応答
 
 ---
 ## 参考文献
