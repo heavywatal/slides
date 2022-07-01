@@ -41,6 +41,16 @@ DSHC 2022 に参加せずこの資料に辿り着いた人はわざわざ古い3
 を実行する。
 
 
+## 演習資料
+
+- [`preparation.ipynb`](./preparation.ipynb)
+- [`2-stats-model.ipynb`](./2-stats-model.ipynb)
+- [`3-glm.ipynb`](./3-glm.ipynb)
+- [`4-bayesian.ipynb`](4-bayesian.ipynb)
+- [`5-stan-glm.ipynb`](5-stan-glm.ipynb)
+- [`6-stan-hbm.ipynb`](6-stan-hbm.ipynb)
+
+
 ## 講義資料
 
 リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。
