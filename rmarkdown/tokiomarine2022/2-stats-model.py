@@ -9,6 +9,9 @@
 #
 # ## 環境セットアップ
 
+# %% active="py"
+# %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
+
 # %%
 import sys
 
@@ -31,7 +34,7 @@ _x = rng.uniform(0.4, 1.7, 300)
 _y = rng.poisson(np.exp(3 * _x - 3))
 df = pd.DataFrame(dict(x=_x, y=_y))
 print(df)
-
+# %%
 fig, ax = plt.subplots()
 sns.scatterplot(x="x", y="y", data=df, ax=ax)
 
@@ -50,7 +53,7 @@ result.params
 # %%
 df_pred = df.assign(pred=lambda _: result.predict(_))
 print(df_pred)
-
+# %%
 fig, ax = plt.subplots()
 sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
 sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)

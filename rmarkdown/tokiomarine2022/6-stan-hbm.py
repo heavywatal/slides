@@ -9,6 +9,10 @@
 #
 # ## 環境セットアップ
 
+# %% active="py"
+# %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
+# %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
+
 # %%
 from pathlib import Path
 

@@ -9,6 +9,9 @@
 #
 # ## 環境セットアップ
 
+# %% active="py"
+# %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
+
 # %%
 import sys
 
@@ -24,13 +27,13 @@ sys.version
 
 # %% [markdown]
 # ## とにかくGLMを使ってみる練習
-# まず、直線当てはめの復習。
+# まず、OLSによる直線当てはめの復習。
 
 # %%
 _x = rng.uniform(0.4, 1.7, 300)
 _y = rng.poisson(np.exp(3 * _x - 3))
 df = pd.DataFrame(dict(x=_x, y=_y))
-
+print(df)
 # %%
 model = smf.ols("y ~ x", df)
 result = model.fit()
@@ -51,10 +54,9 @@ sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
 sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
 
 # %% [markdown]
-# デフォルトでは正規分布・恒等リンクなのでOLSと同じ結果になる。
+# デフォルトでは正規分布・恒等リンクなのでOLSと同じ結果になった。
 
-# 確率分布とリンク関数を変えてみよう。
-
+# 次に、確率分布とリンク関数を変えてみよう。
 # 大本命、ポアソン分布・指数リンクを試す。
 
 # %%
@@ -141,7 +143,9 @@ formula = "flipper_length_mm ~ body_mass_g + species"
 model2 = smf.glm(formula, data=penguins)
 results2 = model2.fit()
 print(results2.params)
+# %%
 print(results2.llf)
+# %%
 print(results2.aic)
 
 # %% [markdown]
@@ -169,7 +173,9 @@ formula = "flipper_length_mm ~ body_mass_g + species + body_mass_g:species"
 model3 = smf.glm(formula, data=penguins)
 results3 = model3.fit()
 print(results3.params)
+# %%
 print(results3.llf)
+# %%
 print(results3.aic)
 
 # %% [markdown]
