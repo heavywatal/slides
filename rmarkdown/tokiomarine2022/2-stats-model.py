@@ -79,42 +79,42 @@ sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
 # %%
 x = rng.integers(low=1, high=7, size=100)
 print(x)
-sns.countplot(x=x)    # for discrete values
+sns.countplot(x=x)  # for discrete values
 
 # %% [markdown]
 # ## 一様分布 (実数・連続値)
 # %%
 x = rng.uniform(low=0, high=1, size=100)
 print(x)
-sns.histplot(x=x)   # for continuous values
+sns.histplot(x=x)  # for continuous values
 
 # %% [markdown]
 # ## 幾何分布
 # %%
 x = rng.geometric(p=0.3, size=100)
 print(x)
-sns.histplot(x=x)   # for continuous values
+sns.histplot(x=x)  # for continuous values
 
 # %% [markdown]
 # ## 二項分布
 # %%
 x = rng.binomial(n=3, p=0.5, size=100)
 print(x)
-sns.countplot(x=x)    # for discrete values
+sns.countplot(x=x)  # for discrete values
 
 # %% [markdown]
 # ## ポアソン分布
 # %%
 x = rng.poisson(lam=3, size=100)
 print(x)
-sns.countplot(x=x)    # for discrete values
+sns.countplot(x=x)  # for discrete values
 
 # %% [markdown]
 # ## 正規分布
 # %%
 x = rng.normal(loc=50, scale=10, size=100)
 print(x)
-sns.histplot(x=x)   # for continuous values
+sns.histplot(x=x)  # for continuous values
 
 # %% [markdown]
 # ## 🔰 自由課題
@@ -123,8 +123,64 @@ sns.histplot(x=x)   # for continuous values
 
 # %%
 
+# %% [markdown]
+# ---
+# ## 🔰 尤度の練習問題
+# サイコロを10回振ったら6の目が3回出た。
+#
+# 1. 6の目の出る確率が1/6だとした場合の尤度は?
+# 1. 6の目の出る確率が0.2だとした場合の尤度は?
+# 1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
+# 1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
+#    数学で解ければ**優**。Pythonで見つければ**良**。目分量・勘で**可**。
+#
+# ヒント: 次のような部品を使って `get_likelihood()` 関数を作るとか。
+# %%
+from scipy import special  # noqa: E402
+
+n = 5
+k = 2
+combination = special.comb(n, k)
+print(combination)
+
+vector = np.linspace(0, 1, 11)
+print(vector)
+
+
+def cubic(x):
+    return x**3
+
+
+vec3 = cubic(vector)
+sns.lineplot(x=vector, y=vec3)
+
+
+# %% tags=["remove_cell"]
+def get_likelihood(k, n, p):
+    return special.comb(n, k) * (p**k) * (1 - p) ** (n - k)
+
+
+n = 10
+k = 3
+get_likelihood(k, n, 1 / 6)
+get_likelihood(k, n, 0.2)
+p = np.linspace(0, 1, 101)
+lik = get_likelihood(k, n, p)
+sns.lineplot(x=p, y=lik)
+
+
+# %% tags=["remove_cell"]
+from scipy import stats  # noqa: E402
+
+lik = stats.binom.pmf(k, n, p)
+sns.lineplot(x=p, y=lik)
+
+
+# %%
 # pyright: reportMissingTypeStubs=false
+# pyright: reportMissingParameterType=false
 # pyright: reportUnknownArgumentType=false
 # pyright: reportUnknownLambdaType=false
 # pyright: reportUnknownMemberType=false
+# pyright: reportUnknownParameterType=false
 # pyright: reportUnknownVariableType=false

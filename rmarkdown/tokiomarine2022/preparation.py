@@ -10,15 +10,15 @@
 # ほかの講義で使っている環境をなるべくそのまま使う。
 
 # ### Google Colab (Python 3.7.13) を使っている場合
-# 各資料の頭に `%pip install` コマンドを置いておくので、事前準備は不要。
+# 各ipynbファイルの頭に `%pip install` コマンドを置いておくので、事前準備は不要。
 # 念のため、このファイルが最後まで問題なく動くことを確認する。
 
 # ### ローカルのPython 3.7.7を使っている場合
 # 以下の手順でパッケージをいくつか追加する。
 
-# ただし numpy や pandas のバージョンを上げることになるので、
-# ほかの講義に影響が出るかもしれない。
-# その場合は再び `pip3 install -r requirements.txt` を実行すれば戻せるはず。
+# ほかの講義で入れたいくつかのパッケージのバージョンを上げてしまうので、
+# 本講義が終わったら、ほかの講義に参加する前に再び
+# `pip3 install -r requirements.txt` を実行して指定バージョンに戻してください。
 
 # %%
 import sys
@@ -27,6 +27,12 @@ print(sys.version)
 # %% [markdown]
 # ## パッケージのインストールと動作確認
 
+# ほかの講義でインストール済みだが古すぎるものを更新:
+# %%
+# %pip install -U 'seaborn>=0.11'
+# %pip install -U 'matplotlib>=3.1'
+
+# %% [markdown]
 # ### [statsmodels](https://www.statsmodels.org)
 
 # %%
@@ -38,7 +44,7 @@ sm.show_versions()
 # ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
 
 # %%
-# %pip install 'cmdstanpy>=1.0.3'
+# %pip install 'cmdstanpy>=1.0.4'
 import cmdstanpy
 print(cmdstanpy.__version__)
 
@@ -52,10 +58,11 @@ print(cmdstanpy.__version__)
 cmdstanpy.install_cmdstan()
 
 # %% [markdown]
-# バージョンによっては `ValueError: CmdStan installataion missing binaries.`
-# というエラーが出ることもあるけど、その上のほうに
-# `CmdStan version 2.29.2 already installed` と表示されていればOK。
-# [報告した](https://github.com/stan-dev/cmdstanpy/issues/585)のでそのうち直るはず。
+# バージョン 1.0.2, 1.0.3 では正常にインストールされていても
+# `ValueError: CmdStan installataion missing binaries.`
+# というエラーが出る。その上のほうに
+# `CmdStan version 2.**.* already installed` と表示されていればOK。
+# バージョン 1.0.4 で修正済み。
 #
 # [公式example](https://github.com/stan-dev/cmdstanpy#example) が走ることを確認:
 

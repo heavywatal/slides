@@ -15,7 +15,7 @@ ${DESTINATION}/%.md : %.Rmd | ${DESTINATION}
 	Rscript --no-init-file -e "wtl::exec_knit('$<', '$@')"
 
 ${DESTINATION}/%.ipynb : %.py | ${DESTINATION}
-	jupytext --output $@ $<
+	jupytext --to ipynb --output - $< | jupyter nbconvert --to notebook --stdin --output $@
 
 ${DESTINATION}:
 	mkdir -p $@

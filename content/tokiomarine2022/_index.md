@@ -29,8 +29,6 @@ $(pyenv prefix 3.7.13)/bin/python3 -m venv ~/.virtualenvs/dshc2022
 source ~/.virtualenvs/dshc2022/bin/activate
 pip3 install -U setuptools pip wheel
 pip3 install -r requirements.txt
-# matplotlib==3.0.3 is too old (macosx backend requires Framework)
-pip3 install -U "matplotlib>=3.1"
 jupyter-notebook preparation.ipynb
 ```
 
