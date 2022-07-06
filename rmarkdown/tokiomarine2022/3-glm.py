@@ -32,8 +32,12 @@ sys.version
 # まず、OLSによる直線当てはめの復習。
 
 # %%
-x = rng.uniform(0.4, 1.7, 300)
-y = rng.poisson(np.exp(3 * x - 3))
+n_samples = 300
+true_intercept = -3
+true_coef = 3
+x = rng.uniform(0.4, 1.7, n_samples)
+lambda_ = np.exp(true_intercept + true_coef * x)
+y = rng.poisson(lambda_)
 df = pd.DataFrame(dict(x=x, y=y))
 print(df)
 # %%
@@ -55,6 +59,8 @@ df_pred = df.assign(pred=lambda _: result.predict(_))
 fig, ax = plt.subplots()
 sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
 sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
+# %%
+print(result.params)
 
 # %% [markdown]
 # デフォルトでは正規分布・恒等リンクなのでOLSと同じ結果になった。
@@ -73,9 +79,57 @@ df_pred = df.assign(pred=lambda _: result.predict(_))
 fig, ax = plt.subplots()
 sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
 sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
+# %%
+print(result.params)
 
 # %% [markdown]
 # いい感じにできた。
+
+# ### 重回帰: 複数の説明変数を同時に扱う
+# ビールの注文数が気温と湿度の両方に依存して増加するデータを作る。
+# %%
+n_samples = 200
+true_intercept = 3
+true_coefs = {"temperature": 0.05, "humidity": 0.006}
+temperature = rng.uniform(8, 32, n_samples)
+humidity = rng.uniform(20, 80, n_samples)
+lambda_ = np.exp(
+    true_intercept
+    + true_coefs["temperature"] * temperature
+    + true_coefs["humidity"] * humidity
+)
+beer_sales = rng.poisson(lambda_)
+_dic = {
+    "temperature": temperature,
+    "humidity": humidity,
+    "beer_sales": beer_sales,
+}
+df = pd.DataFrame(_dic)
+print(df)
+# %%
+fig, ax = plt.subplots(ncols=2)
+sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df, ax=ax[0])
+sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df, ax=ax[1])
+# %% [markdown]
+# 縦軸は上限が無さそうなカウントデータで、x軸に対して指数的な増加。
+# %%
+poisson = sm.families.Poisson(link=sm.families.links.Log())
+model = smf.glm("beer_sales ~ temperature + humidity", df, family=poisson)
+result = model.fit()
+print(result.params)
+# %%
+from itertools import product  # noqa: E402
+
+it = product(range(8, 33, 4), range(20, 90, 10))
+df_pred = pd.DataFrame(list(it), columns=["temperature", "humidity"])
+df_pred = df_pred.assign(pred=lambda _: result.predict(_))
+fig, ax = plt.subplots(ncols=2)
+sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df, ax=ax[0])
+sns.lineplot(x="temperature", y="pred", hue="humidity", data=df_pred, ax=ax[0])
+sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df, ax=ax[1])
+sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
+
+# %% [markdown]
 # ### ロジスティック回帰
 # 客10人中y人がビールを注文した。
 # その日の気温xによって割合が変化した。
@@ -132,12 +186,11 @@ sd = 10
 weather_levels = ["cloudy", "sunny", "rainy"]
 # %%
 weather = rng.choice(weather_levels, n_samples, replace=True)
-_df = pd.DataFrame(
-    {
-        "temperature": rng.uniform(8, 32, n_samples),
-        "weather": pd.Categorical(weather, categories=weather_levels),
-    }
-)
+_dic = {
+    "temperature": rng.uniform(8, 32, n_samples),
+    "weather": pd.Categorical(weather, categories=weather_levels),
+}
+_df = pd.DataFrame(_dic)
 
 df = (
     _df.join(pd.get_dummies(_df["weather"]))
@@ -179,6 +232,11 @@ model = smf.glm("beer_sales ~ weather + temperature", df, family=fam)
 result = model.fit()
 print(result.params)
 # %%
+fig, ax = plt.subplots()
+sns.scatterplot(
+    x="temperature", y="beer_sales", hue="weather", data=df, ax=ax, alpha=0.6
+)
+# %%
 df_pred = df.assign(pred=lambda _: result.predict(_))
 fig, ax = plt.subplots()
 sns.scatterplot(
@@ -194,6 +252,50 @@ sns.lineplot(x="temperature", y="pred", hue="weather", data=df_pred, ax=ax)
 
 # ----
 
+# ### 交互作用
+# ビール売上の温度依存性が天気によって異なる。
+
+# %%
+n_samples = 200
+sd = 10
+true_intercept = 100
+true_coefs = {"sunny": -30, "temp": 3, "sunny:temp": 2}
+weather_levels = ["rainy", "sunny"]
+temperature = rng.uniform(8, 32, n_samples)
+weather = rng.choice(weather_levels, n_samples, True)
+_dic = {
+    "temperature": rng.uniform(8, 32, n_samples),
+    "weather": pd.Categorical(weather, categories=weather_levels),
+}
+_df = pd.DataFrame(_dic)
+df = (
+    _df.join(pd.get_dummies(_df["weather"]))
+    .assign(
+        mu=lambda _: true_intercept
+        + true_coefs["temp"] * _["temperature"]
+        + true_coefs["sunny"] * _["sunny"]
+        + true_coefs["sunny:temp"] * _["sunny"] * _["temperature"]
+    )
+    .assign(beer_sales=lambda _: rng.normal(_["mu"], sd))
+)
+print(df)
+# %%
+fig, ax = plt.subplots()
+sns.scatterplot(
+    x="temperature", y="beer_sales", hue="weather", data=df, ax=ax, alpha=0.6
+)
+# %%
+fam = sm.families.Gaussian()
+model = smf.glm("beer_sales ~ weather + temperature + weather:temperature", df, family=fam)
+result = model.fit()
+print(result.params)
+# %%
+df_pred = df.assign(pred=lambda _: result.predict(_))
+fig, ax = plt.subplots()
+sns.scatterplot(
+    x="temperature", y="beer_sales", hue="weather", data=df_pred, ax=ax, alpha=0.6
+)
+sns.lineplot(x="temperature", y="pred", hue="weather", data=df_pred, ax=ax)
 
 # %% [markdown]
 # ## penguins データで単回帰と重回帰の練習
