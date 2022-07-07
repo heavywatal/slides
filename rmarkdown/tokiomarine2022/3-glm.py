@@ -44,9 +44,9 @@ print(df)
 model = smf.ols("y ~ x", df)
 result = model.fit()
 df_pred = df.assign(pred=lambda _: result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
-sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred)
+grid.map(sns.scatterplot, "x", "y")
+grid.map(sns.lineplot, "x", "pred")
 
 # %% [markdown]
 # ### GLMで直線回帰
@@ -56,9 +56,9 @@ sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
 model = smf.glm("y ~ x", df)
 result = model.fit()
 df_pred = df.assign(pred=lambda _: result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
-sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred)
+grid.map(sns.scatterplot, "x", "y")
+grid.map(sns.lineplot, "x", "pred")
 # %%
 print(result.params)
 
@@ -76,9 +76,9 @@ poisson = sm.families.Poisson(link=sm.families.links.Log())
 model = smf.glm("y ~ x", df, family=poisson)
 result = model.fit()
 df_pred = df.assign(pred=lambda _: result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
-sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred)
+grid.map(sns.scatterplot, "x", "y")
+grid.map(sns.lineplot, "x", "pred")
 # %%
 print(result.params)
 
@@ -153,8 +153,8 @@ _dic = {
 df = pd.DataFrame(_dic)
 print(df)
 # %%
-fig, ax = plt.subplots()
-sns.scatterplot(x="temperature", y="beer_sales", data=df, ax=ax)
+grid = sns.FacetGrid(df)
+grid.map(sns.scatterplot, "temperature", "beer_sales")
 # %% [markdown]
 # 上限10のシグモイド型の曲線でつながりそう。誤差は二項分布。
 
@@ -171,9 +171,9 @@ print(result.params)
 # 作図するときは試行数をかけるか縦軸を割合にする。
 # %%
 df_pred = df.assign(pred=lambda _: n_traials * result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(x="temperature", y="beer_sales", data=df_pred, ax=ax)
-sns.lineplot(x="temperature", y="pred", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred)
+grid.map(sns.scatterplot, "temperature", "beer_sales")
+grid.map(sns.lineplot, "temperature", "pred")
 
 # %% [markdown]
 # ### 分散分析: GLM with 質的(カテゴリカル)変数
@@ -205,8 +205,8 @@ df = (
 )
 print(df)
 # %%
-fig, ax = plt.subplots()
-sns.scatterplot(x="weather", y="beer_sales", hue="weather", data=df, ax=ax)
+grid = sns.FacetGrid(df, hue="weather")
+grid.map(sns.scatterplot, "weather", "beer_sales", alpha=0.6)
 # %%
 gaussian = sm.families.Gaussian()
 model = smf.glm("beer_sales ~ weather", df, family=gaussian)
@@ -215,34 +215,28 @@ print(result.params)
 
 # %%
 df_pred = df.assign(pred=lambda _: result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(
-    x="weather", y="beer_sales", hue="weather", alpha=0.6, data=df_pred, ax=ax
-)
-sns.scatterplot(
-    x="weather", y="pred", s=120, color="black", marker="x", data=df_pred, ax=ax
-)
+grid = sns.FacetGrid(df_pred, hue="weather")
+grid.map(sns.scatterplot, "weather", "beer_sales", alpha=0.6)
+grid.map(sns.scatterplot, "weather", "pred", color="black", marker="x", s=120)
 
 # %% [markdown]
 # ### 共分散分析: GLM with 質的変数 + 量的変数
 #
+# %%
+grid = sns.FacetGrid(df, hue="weather")
+grid.map(sns.scatterplot, "temperature", "beer_sales", alpha=0.6)
+grid.add_legend()
 # %%
 gaussian = sm.families.Gaussian()
 model = smf.glm("beer_sales ~ weather + temperature", df, family=gaussian)
 result = model.fit()
 print(result.params)
 # %%
-fig, ax = plt.subplots()
-sns.scatterplot(
-    x="temperature", y="beer_sales", hue="weather", data=df, ax=ax, alpha=0.6
-)
-# %%
 df_pred = df.assign(pred=lambda _: result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(
-    x="temperature", y="beer_sales", hue="weather", data=df_pred, ax=ax, alpha=0.6
-)
-sns.lineplot(x="temperature", y="pred", hue="weather", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred, hue="weather")
+grid.map(sns.scatterplot, "temperature", "beer_sales", alpha=0.6)
+grid.map(sns.lineplot, "temperature", "pred")
+grid.add_legend()
 
 # %% [markdown]
 # ### 交互作用
@@ -273,24 +267,21 @@ df = (
 )
 print(df)
 # %%
-fig, ax = plt.subplots()
-sns.scatterplot(
-    x="temperature", y="beer_sales", hue="weather", data=df, ax=ax, alpha=0.6
-)
+grid = sns.FacetGrid(df, hue="weather")
+grid.map(sns.scatterplot, "temperature", "beer_sales", alpha=0.6)
+grid.add_legend()
 # %%
 gaussian = sm.families.Gaussian()
-model = smf.glm(
-    "beer_sales ~ weather + temperature + weather:temperature", df, family=gaussian
-)
+formula = "beer_sales ~ weather + temperature + weather:temperature"
+model = smf.glm(formula, df, family=gaussian)
 result = model.fit()
 print(result.params)
 # %%
 df_pred = df.assign(pred=lambda _: result.predict(_))
-fig, ax = plt.subplots()
-sns.scatterplot(
-    x="temperature", y="beer_sales", hue="weather", data=df_pred, ax=ax, alpha=0.6
-)
-sns.lineplot(x="temperature", y="pred", hue="weather", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred, hue="weather")
+grid.map(sns.scatterplot, "temperature", "beer_sales", alpha=0.6)
+grid.map(sns.lineplot, "temperature", "pred")
+grid.add_legend()
 
 # %% [markdown]
 # ほかに利用可能な確率分布・リンク関数などはstatsmodels公式サイトを参照:

@@ -96,7 +96,8 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) %>%
 **最尤推定**: 推定値が真の値に近づいていく
 
 ```{r coin-frequentist, echo = FALSE, fig.width = 11, fig.height = 3}
-size = 1L; p = 0.5
+size = 1L
+p = 0.5
 X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
 df_rbinom = purrr::map_dfr(c(4, 20, 100, 500), ~{
   k = sum(head(X, .x))
@@ -229,7 +230,7 @@ devnull = tibble::tibble(
   true_positive = prevalence * sensitivity / p_positive,
   false_positive = (1 - prevalence) * (1 - specificity) / p_positive,
   true_negative = (1 - prevalence) * specificity / p_negative,
-  false_negative = prevalence * (1 - sensitivity) / p_negative,
+  false_negative = prevalence * (1 - sensitivity) / p_negative
 )
 ```
 
@@ -269,7 +270,8 @@ devnull = tibble::tibble(
 投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:
 
 ```{r prior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
-size = 1L; p = 0.5
+size = 1L
+p = 0.5
 X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
 df_beta = purrr::map_dfr(c(0, 1, 2, 3, 4, 20, 100, 500), ~{
   k = sum(head(X, .x))
@@ -883,7 +885,7 @@ p_trace +
 - Gelman-Rubin統計量 $\hat R < 1.05$
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
-```{cat, engine.opts = list(file = "converge-yes.stan")}
+```{cat, engine.opts = list(file = "converge-yes.stan"), cache.rebuild = !file.exists("converge-yes.stan")}
 data {
   int<lower=0> N;
   array[N] int x;
@@ -897,7 +899,7 @@ model {
   x ~ poisson(lambda);
 }
 ```
-```{cat, engine.opts = list(file = "converge-no.stan")}
+```{cat, engine.opts = list(file = "converge-no.stan"), cache.rebuild = !file.exists("converge-no.stan")}
 data {
   int<lower=0> N;
   array[N] int x;
@@ -924,10 +926,10 @@ myplot_trace = function(stan_file, data) {
   bayesplot::mcmc_trace(fit$draws("lambda")) + labs(title = label)
 }
 ```
-```{r converge-yes, echo = FALSE, dependson = c(-1, -3), message = FALSE, warning = FALSE, results = FALSE}
+```{r converge-yes, echo = FALSE, dependson = -1, cache.extra = tools::md5sum("converge-yes.stan"), message = FALSE, warning = FALSE, results = FALSE}
 p_yes = myplot_trace("converge-yes.stan", mydata)
 ```
-```{r converge-no, echo = FALSE, dependson = c(-2, -3), message = FALSE, warning = FALSE, results = FALSE}
+```{r converge-no, echo = FALSE, dependson = -2, cache.extra = tools::md5sum("converge-no.stan"), message = FALSE, warning = FALSE, results = FALSE}
 p_no = myplot_trace("converge-no.stan", mydata)
 ```
 ```{r convergence, echo = FALSE, dependson = c(-1, -2), fig.height = 3, fig.width = 11}
@@ -1064,7 +1066,7 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 別ファイルに書いておく。
 e.g., `coin.stan`:
 
-```{cat coin-stan, engine.opts = list(file = "coin.stan"), class.source = "stan"}
+```{cat engine.opts = list(file = "coin.stan"), class.source = "stan"}
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1103,11 +1105,7 @@ model {
 ## 説明変数なしのベイズ推定: MCMCサンプル
 
 予め実行速度の速い機械語に翻訳(コンパイル):
-```{r stan-binom-model-j1, dependson = -1, include = FALSE}
-# to suppress "warning: jobserver unavailable: using -j1"
-model = cmdstan_model("coin.stan", cpp_options = list("-j" = 1))
-```
-```{r stan-binom-model, dependson = -1}
+```{r stan-binom-model, cache.extra = tools::md5sum("coin.stan")}
 model = cmdstan_model("coin.stan")
 params = names(model$variables()$parameters)
 ```

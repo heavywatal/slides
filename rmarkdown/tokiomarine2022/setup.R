@@ -23,3 +23,5 @@ options(
 )
 registerS3method("print", "tbl", wtl::printdf)
 registerS3method("print", "tbl_df", wtl::printdf)
+# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
+Sys.setenv(MAKEFLAGS = "-j1")

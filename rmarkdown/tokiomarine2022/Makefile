@@ -22,3 +22,6 @@ ${DESTINATION}:
 
 clean:
 	$(RM) -r ${KNITTED} cache ${DESTINATION}/figure/*-1.png
+
+stan:
+	rsync -auv *.stan ${DESTINATION}

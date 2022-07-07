@@ -15,7 +15,6 @@
 # %%
 import sys
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -35,8 +34,8 @@ _y = rng.poisson(np.exp(3 * _x - 3))
 df = pd.DataFrame(dict(x=_x, y=_y))
 print(df)
 # %%
-fig, ax = plt.subplots()
-sns.scatterplot(x="x", y="y", data=df, ax=ax)
+grid = sns.FacetGrid(df)
+grid.map(sns.scatterplot, "x", "y")
 
 # %% [markdown]
 # OLS: ordinary least square
@@ -54,9 +53,9 @@ result.params
 df_pred = df.assign(pred=lambda _: result.predict(_))
 print(df_pred)
 # %%
-fig, ax = plt.subplots()
-sns.scatterplot(x="x", y="y", data=df_pred, ax=ax)
-sns.lineplot(x="x", y="pred", data=df_pred, ax=ax)
+grid = sns.FacetGrid(df_pred)
+grid.map(sns.scatterplot, "x", "y")
+grid.map(sns.lineplot, "x", "pred")
 
 # %% [markdown]
 # 一旦ここまで。講義スライドに戻る。
