@@ -208,8 +208,8 @@ print(df)
 fig, ax = plt.subplots()
 sns.scatterplot(x="weather", y="beer_sales", hue="weather", data=df, ax=ax)
 # %%
-fam = sm.families.Gaussian()
-model = smf.glm("beer_sales ~ weather", df, family=fam)
+gaussian = sm.families.Gaussian()
+model = smf.glm("beer_sales ~ weather", df, family=gaussian)
 result = model.fit()
 print(result.params)
 
@@ -227,8 +227,8 @@ sns.scatterplot(
 # ### 共分散分析: GLM with 質的変数 + 量的変数
 #
 # %%
-fam = sm.families.Gaussian()
-model = smf.glm("beer_sales ~ weather + temperature", df, family=fam)
+gaussian = sm.families.Gaussian()
+model = smf.glm("beer_sales ~ weather + temperature", df, family=gaussian)
 result = model.fit()
 print(result.params)
 # %%
@@ -285,8 +285,10 @@ sns.scatterplot(
     x="temperature", y="beer_sales", hue="weather", data=df, ax=ax, alpha=0.6
 )
 # %%
-fam = sm.families.Gaussian()
-model = smf.glm("beer_sales ~ weather + temperature + weather:temperature", df, family=fam)
+gaussian = sm.families.Gaussian()
+model = smf.glm(
+    "beer_sales ~ weather + temperature + weather:temperature", df, family=gaussian
+)
 result = model.fit()
 print(result.params)
 # %%

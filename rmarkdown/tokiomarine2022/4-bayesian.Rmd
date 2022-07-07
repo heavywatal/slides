@@ -34,7 +34,7 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, file="setup.R"}
 ```
 
 ```{r setup-local, include=FALSE}
@@ -43,7 +43,7 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 library(cmdstanr)
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 ---
@@ -883,21 +883,55 @@ p_trace +
 - Gelman-Rubin統計量 $\hat R < 1.05$
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
-```{r convergence, echo = FALSE, fig.height = 3, fig.width = 11, message = FALSE, warning = FALSE, results = FALSE}
+```{cat, engine.opts = list(file = "converge-yes.stan")}
+data {
+  int<lower=0> N;
+  array[N] int x;
+}
+
+parameters {
+  real<lower=0> lambda;
+}
+
+model {
+  x ~ poisson(lambda);
+}
+```
+```{cat, engine.opts = list(file = "converge-no.stan")}
+data {
+  int<lower=0> N;
+  array[N] int x;
+}
+
+parameters {
+  real lambda;
+  real jammer;
+}
+
+model {
+  x ~ poisson(lambda + jammer);
+}
+```
+
+```{r converge-template, include = FALSE}
 mydata = list(x = rep(10L, 10L))
 mydata$N = length(mydata$x)
-model_yes = cmdstan_model("converge-yes.stan")
-model_no = cmdstan_model("converge-no.stan")
-fit_yes = model_yes$sample(data = mydata, show_messages = FALSE, refresh = 0)
-fit_no = model_no$sample(data = mydata, show_messages = FALSE, refresh = 0)
-s = fit_yes$summary(variables = "lambda")
-template = "Rhat = %.4f, n_eff = %.1f"
-label_yes = sprintf(template, s[["rhat"]], s[["ess_bulk"]])
-s = fit_no$summary(variables = "lambda")
-label_no = sprintf(template, s[["rhat"]], s[["ess_bulk"]])
-p1 = bayesplot::mcmc_trace(fit_yes$draws("lambda")) + labs(title = label_yes)
-p2 = bayesplot::mcmc_trace(fit_no$draws("lambda")) + labs(title = label_no)
-cowplot::plot_grid(p1, p2, nrow = 1L)
+myplot_trace = function(stan_file, data) {
+  model = cmdstan_model(stan_file)
+  fit = model$sample(data = data, show_messages = FALSE, refresh = 0)
+  s = fit$summary(variables = "lambda")
+  label = sprintf("Rhat = %.4f, n_eff = %.1f", s[["rhat"]], s[["ess_bulk"]])
+  bayesplot::mcmc_trace(fit$draws("lambda")) + labs(title = label)
+}
+```
+```{r converge-yes, echo = FALSE, dependson = c(-1, -3), message = FALSE, warning = FALSE, results = FALSE}
+p_yes = myplot_trace("converge-yes.stan", mydata)
+```
+```{r converge-no, echo = FALSE, dependson = c(-2, -3), message = FALSE, warning = FALSE, results = FALSE}
+p_no = myplot_trace("converge-no.stan", mydata)
+```
+```{r convergence, echo = FALSE, dependson = c(-1, -2), fig.height = 3, fig.width = 11}
+cowplot::plot_grid(p_yes, p_no, nrow = 1L)
 ```
 
 ```
@@ -1014,7 +1048,7 @@ if (!require(bayesplot, quietly = TRUE)) {
 表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
 この $p$ をStanで推定してみよう。
 
-```{r stan-binom, fig.width = 4, fig.height = 4}
+```{r stan-binom}
 true_p = 0.7
 N = 40L
 mydata = list(N = N, x = rbinom(N, 1, true_p))
@@ -1027,9 +1061,21 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 ---
 ## 説明変数なしのベイズ推定: Stan言語でモデル定義
 
-文字列として保持するか、別ファイルに書いておく:
+別ファイルに書いておく。
+e.g., `coin.stan`:
 
-```{r read-binom-stan, code = 'cat(readr::read_file("coin.stan"))', echo = FALSE}
+```{cat coin-stan, engine.opts = list(file = "coin.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  array[N] int x;
+}
+parameters {
+  real<lower=0,upper=1> p;
+}
+model {
+  x ~ binomial(1, p);
+  p ~ beta(1, 1);
+}
 ```
 
 - いくつかのブロックに分けて記述する:<br>
@@ -1059,14 +1105,14 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 
 予め実行速度の速い機械語に翻訳(コンパイル):
 
-```{r stan-binom-model, fig.width = 4, fig.height = 4}
+```{r stan-binom-model, dependson = -1}
 model = cmdstan_model("coin.stan")
 params = names(model$variables()$parameters)
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-binom-sample, fig.width = 4, fig.height = 3, results = FALSE}
+```{r stan-binom-sample, results = FALSE}
 fit = model$sample(mydata)
 draws = fit$draws()
 ```
@@ -1082,7 +1128,7 @@ draws = fit$draws()
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
 念のため trace plot も確認しておこう。
 
-```{r stan-binom-fit, fig.width = 4, fig.height = 3}
+```{r stan-binom-fit}
 print(fit)
 ```
 

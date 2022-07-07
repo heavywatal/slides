@@ -34,7 +34,7 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, file = "setup.R"}
 ```
 
 ```{r setup-local, include=FALSE}
@@ -43,7 +43,7 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 library(cmdstanr)
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 ---
@@ -82,7 +82,25 @@ knitr::opts_chunk$set(cache = FALSE)
 
 お絵描きモデルとStanモデルを見比べてみよう。
 
-```{r read-glmm-stan, code = 'cat(readr::read_file("glmm.stan"))', echo = FALSE}
+```{cat glmm-stan, engine.opts = list(file = "glmm.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  array[N] int<lower=0> y;
+}
+
+parameters {
+  real a;           // mean ability
+  vector[N] r;      // individual difference
+  real<lower=0> s;  // sd of r
+}
+
+model {
+  y ~ binomial(8, inv_logit(a + r));
+  a ~ normal(0, 10);
+  r ~ normal(0, s);
+  s ~ exponential(0.01);
+//  s ~ exponential(0.01);
+}
 ```
 
 `inv_logit(a + r)` が p に相当。<br>
@@ -108,7 +126,7 @@ df_od = tibble::tibble(
 #   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 mydata = list(y = df_od$y, N = ninds)
 model = cmdstan_model("glmm.stan")
-fit = model$sample(data = mydata, refresh = 0)
+fit = model$sample(data = mydata, step_size = 0.1, refresh = 0)
 ```
 
 ```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3}

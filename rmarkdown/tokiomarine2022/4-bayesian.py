@@ -42,32 +42,14 @@ true_p = 0.7
 N = 40
 coin_data = {"N": N, "x": rng.binomial(1, true_p, N)}
 print(coin_data)
+# %%
 sns.countplot(x="x", data=coin_data)
 
 # %% [markdown]
 # ### モデルの定義
+# スライドにあるコードを `coin.stan` というファイルに保存しておき、読み込む。
 # %%
-model_code = """
-data {
-  int<lower=0> N;
-  int x[N];
-}
-parameters {
-  real<lower=0,upper=1> p;
-}
-model {
-  x ~ binomial(1, p);
-  p ~ beta(1, 1);
-}
-"""
-
-# %%
-stan_file = Path("coin.stan")
-if not stan_file.exists():
-    with open(stan_file, "w") as fout:
-        fout.write(model_code)
-
-model = CmdStanModel(stan_file=stan_file)
+model = CmdStanModel(stan_file="coin.stan")
 
 # %% [markdown]
 # ### MCMCサンプル

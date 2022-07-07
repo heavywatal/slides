@@ -34,7 +34,7 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tokiomarine2022/">https://heavywatal.github.io/slides/tokiomarine2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, file = "setup.R"}
 ```
 
 ```{r setup-local, include=FALSE}
@@ -43,7 +43,7 @@ library(tibble)
 library(dplyr)
 library(tidyr)
 library(cmdstanr)
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 ---
@@ -107,7 +107,7 @@ p_penweight %+%
 
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
-```{r stan-penguins-bill-data, echo = FALSE, fig.width = 7, fig.height = 4}
+```{r stan-penguins-bill-data, echo = FALSE}
 penguins_data = penguins_dropna %>%
   dplyr::select(c("body_mass_g", "flipper_length_mm")) %>%
   as.list()
@@ -120,7 +120,23 @@ str(penguins_data)
 
 切片、傾き、ばらつきを推定する:
 
-```{r read-penguins-stan, code = 'cat(readr::read_file("penguins-lm.stan"))', echo = FALSE}
+```{cat, engine.opts = list(file = "penguins-lm.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] body_mass_g;
+  vector<lower=0>[N] flipper_length_mm;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
+  sigma ~ student_t(3, 0, 1);
+}
 ```
 
 
@@ -129,14 +145,14 @@ str(penguins_data)
 
 予め実行速度の速い機械語に翻訳(コンパイル):
 
-```{r stan-penguins-model, fig.width = 4, fig.height = 4}
+```{r stan-penguins-model, dependson = -1}
 model = cmdstan_model("penguins-lm.stan")
 params = names(model$variables()$parameters)
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-penguins-sample, fig.width = 4, fig.height = 3, results = FALSE}
+```{r stan-penguins-sample, fig.width = 4, fig.height = 3, results = FALSE, dependson = -1}
 fit = model$sample(data = penguins_data)
 draws = fit$draws()
 ```
@@ -152,7 +168,7 @@ draws = fit$draws()
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
 念のため trace plot も確認しておこう。
 
-```{r stan-penguins-fit, fig.width = 4, fig.height = 3}
+```{r stan-penguins-fit}
 print(fit)
 ```
 
@@ -203,17 +219,77 @@ p_penweight +
 ---
 ## Stanでポアソン回帰
 
+```{cat, engine.opts = list(file = "poisson.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  array[N] int<lower=0> y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+}
+
+model {
+  y ~ poisson(exp(intercept + slope * x));
+}
+```
+
 <img src="figure/glm-poisson-1.png">
 
 
 ---
 ## Stanでロジスティック回帰
 
+```{cat, engine.opts = list(file = "logistic.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  vector[N] temp;
+  array[N] int<lower=0,upper=10> sales;
+}
+
+parameters {
+  real intercept;
+  real slope;
+}
+
+model {
+  sales ~ binomial(10, inv_logit(intercept + slope * temp));
+}
+```
+
 <img src="figure/glm-logistic-1.png">
 
 
 ---
 ## Stanで重回帰
+
+```{cat, engine.opts = list(file = "penguins-multiple.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] body_mass_g;
+  vector<lower=0>[N] flipper_length_mm;
+  array[N] int<lower=0,upper=1> sp_Chinstrap;
+  array[N] int<lower=0,upper=1> sp_Gentoo;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real b_chinstrap;
+  real b_gentoo;
+  real<lower=0> sigma;
+}
+
+model {
+  array[N] real mu;
+  for (i in 1:N) {
+    mu[i] = intercept + slope * body_mass_g[i] + b_chinstrap * sp_Chinstrap[i] + b_gentoo * sp_Gentoo[i];
+  }
+  flipper_length_mm ~ normal(mu, sigma);
+}
+```
 
 ```{r rstanarm-penguins-multi, fig.width = 8, fig.height = 5, message = FALSE, warning = FALSE}
 fit = rstanarm::stan_glm(flipper_length_mm ~ body_mass_g + species,

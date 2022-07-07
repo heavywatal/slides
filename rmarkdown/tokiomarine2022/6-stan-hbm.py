@@ -46,31 +46,7 @@ od_data = {
 df_od = pd.DataFrame(dict(z=z, p=p, y=y))
 
 # %%
-model_code = """
-data {
-  int<lower=0> N;
-  array[N] int<lower=0> y;
-}
-
-parameters {
-  real a;           // mean ability
-  vector[N] r;      // individual difference
-  real<lower=0> s;  // sd of r
-}
-
-model {
-  y ~ binomial(8, inv_logit(a + r));
-  a ~ normal(0, 10);
-  r ~ normal(0, s);
-  s ~ exponential(0.01);
-}
-"""
-stan_file = Path("glmm.stan")
-if True or not stan_file.exists():
-    with open(stan_file, "w") as fout:
-        fout.write(model_code)
-
-model = CmdStanModel(stan_file=stan_file)
+model = CmdStanModel(stan_file="glmm.stan")
 
 # %% [markdown]
 # ### MCMCサンプル

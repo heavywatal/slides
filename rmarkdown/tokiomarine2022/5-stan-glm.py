@@ -52,29 +52,7 @@ pen_data = {
 # %% [markdown]
 # ### モデルの定義
 # %%
-model_code = """
-data {
-  int<lower=0> N;
-  vector<lower=0>[N] body_mass_g;
-  vector<lower=0>[N] flipper_length_mm;
-}
-
-parameters {
-  real intercept;
-  real slope;
-  real<lower=0> sigma;
-}
-
-model {
-  flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
-}
-"""
-stan_file = Path("penguins-lm.stan")
-if not stan_file.exists():
-    with open(stan_file, "w") as fout:
-        fout.write(model_code)
-
-model = CmdStanModel(stan_file=stan_file)
+model = CmdStanModel(stan_file="penguins-lm.stan")
 
 # %% [markdown]
 # ### MCMCサンプル
@@ -139,28 +117,7 @@ poisson_data = {
     "y": _y,
 }
 # %%
-model_code = """
-data {
-  int<lower=0> N;
-  vector<lower=0>[N] x;
-  array[N] int<lower=0> y;
-}
-
-parameters {
-  real intercept;
-  real slope;
-}
-
-model {
-  y ~ poisson(exp(intercept + slope * x));
-}
-"""
-stan_file = Path("poisson.stan")
-if not stan_file.exists():
-    with open(stan_file, "w") as fout:
-        fout.write(model_code)
-
-model = CmdStanModel(stan_file=stan_file)
+model = CmdStanModel(stan_file="poisson.stan")
 
 # %%
 fit = model.sample(poisson_data, chains=4, iter_sampling=2000)
@@ -206,28 +163,7 @@ logistic_data = {
     "sales": sales,
 }
 # %%
-model_code = """
-data {
-  int<lower=0> N;
-  vector[N] temp;
-  array[N] int<lower=0,upper=10> sales;
-}
-
-parameters {
-  real intercept;
-  real slope;
-}
-
-model {
-  sales ~ binomial(10, inv_logit(intercept + slope * temp));
-}
-"""
-stan_file = Path("binomial.stan")
-if not stan_file.exists():
-    with open(stan_file, "w") as fout:
-        fout.write(model_code)
-
-model = CmdStanModel(stan_file=stan_file)
+model = CmdStanModel(stan_file="logistic.stan")
 
 # %%
 fit = model.sample(logistic_data, chains=4, iter_sampling=2000)
@@ -276,37 +212,7 @@ pen_sp_data = {
 # %% [markdown]
 # ### モデルの定義
 # %%
-model_code = """
-data {
-  int<lower=0> N;
-  vector<lower=0>[N] body_mass_g;
-  vector<lower=0>[N] flipper_length_mm;
-  array[N] int<lower=0,upper=1> sp_Chinstrap;
-  array[N] int<lower=0,upper=1> sp_Gentoo;
-}
-
-parameters {
-  real intercept;
-  real slope;
-  real b_chinstrap;
-  real b_gentoo;
-  real<lower=0> sigma;
-}
-
-model {
-  array[N] real mu;
-  for (i in 1:N) {
-    mu[i] = intercept + slope * body_mass_g[i] + b_chinstrap * sp_Chinstrap[i] + b_gentoo * sp_Gentoo[i];
-  }
-  flipper_length_mm ~ normal(mu, sigma);
-}
-"""
-stan_file = Path("penguins-multiple.stan")
-if not stan_file.exists():
-    with open(stan_file, "w") as fout:
-        fout.write(model_code)
-
-model = CmdStanModel(stan_file=stan_file)
+model = CmdStanModel(stan_file="penguins-multiple.stan")
 
 # %% [markdown]
 # ### MCMCサンプル
