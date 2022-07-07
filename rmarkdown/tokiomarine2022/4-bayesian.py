@@ -21,8 +21,6 @@
 # %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
 
 # %%
-from pathlib import Path
-
 import arviz as az
 import numpy as np
 import seaborn as sns

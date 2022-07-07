@@ -7,13 +7,6 @@
 # 2022-08-24 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2022/
 #
-# ## PythonからStanを使う、おおまかな流れ
-# - データ準備
-# - Stan言語でモデルを書く
-# - それをコンパイルして機械語に翻訳→実行ファイル
-# - 実行ファイルにデータを渡してMCMCサンプリング
-# - 結果を見る
-#
 # ## 環境セットアップ
 
 # %% active="py"
@@ -21,8 +14,6 @@
 # %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
 
 # %%
-from pathlib import Path
-
 import arviz as az
 import matplotlib.pyplot as plt
 import numpy as np
@@ -35,10 +26,120 @@ from scipy.special import expit
 rng = np.random.default_rng(seed=24601)
 
 # %% [markdown]
-# ## 単純な直線回帰
+# ## StanでベイジアンGLM
 #
-# ### データ準備
+# ### Stanで直線回帰
 #
+# %%
+n_samples = 300
+true_intercept = -3
+true_coef = 3
+x = rng.uniform(0.4, 1.7, n_samples)
+lambda_ = np.exp(true_intercept + true_coef * x)
+y = rng.poisson(lambda_)
+df = pd.DataFrame(dict(x=x, y=y))
+print(df)
+# %%
+fig, ax = plt.subplots()
+sns.scatterplot(x="x", y="y", data=df, ax=ax)
+
+# %% [markdown]
+# ### 🔰 直線回帰の練習問題
+# TODO
+
+# %%
+
+# %% [markdown]
+# ----
+#
+# ### Stanでポアソン回帰
+
+# %%
+n_samples = 300
+_x = rng.uniform(0.4, 1.7, n_samples)
+_y = rng.poisson(np.exp(3 * _x - 3))
+df_poisson = pd.DataFrame(dict(x=_x, y=_y))
+poisson_data = {
+    "N": n_samples,
+    "x": _x,
+    "y": _y,
+}
+# %%
+model = CmdStanModel(stan_file="poisson.stan")
+
+# %%
+fit = model.sample(poisson_data, chains=4, iter_sampling=2000)
+fit.summary()
+print(fit.diagnose())
+
+# %%
+stan_data = az.from_cmdstanpy(fit, observed_data=poisson_data)
+az.plot_trace(stan_data)
+az.plot_posterior(stan_data)
+# %%
+post_mean = stan_data.posterior.mean().to_pandas()
+df_poisson_pred = df_poisson.assign(
+    pred=np.exp(post_mean["intercept"] + post_mean["slope"] * df_poisson.x)
+)
+grid = sns.FacetGrid(df_poisson_pred)
+grid.map(sns.scatterplot, "x", "y")
+grid.map(sns.lineplot, "x", "pred")
+grid.add_legend()
+
+# %% [markdown]
+# ### 🔰 ポアソン回帰の練習問題
+# TODO
+
+# %%
+
+# %% [markdown]
+# ----
+# ### Stanでロジスティック回帰
+#
+# %%
+n_samples = 200
+_n = 10
+temp = rng.uniform(-10, 35, size=n_samples)
+logit_p = -3 + np.array(0.3) * temp
+p = expit(logit_p)
+sales = rng.binomial(_n, p)
+
+df_logistic = pd.DataFrame(dict(temp=temp, sales=sales))
+logistic_data = {
+    "N": n_samples,
+    "temp": temp,
+    "sales": sales,
+}
+# %%
+model = CmdStanModel(stan_file="logistic.stan")
+
+# %%
+fit = model.sample(logistic_data, chains=4, iter_sampling=2000)
+fit.summary()
+print(fit.diagnose())
+
+# %%
+stan_data = az.from_cmdstanpy(fit, observed_data=logistic_data)
+az.plot_trace(stan_data)
+az.plot_posterior(stan_data)
+# %%
+post_mean = stan_data.posterior.mean().to_pandas()
+df_logistic_pred = df_logistic.assign(
+    pred=10 * expit(post_mean["intercept"] + post_mean["slope"] * df_logistic.temp)
+)
+grid = sns.FacetGrid(df_logistic_pred)
+grid.map(sns.scatterplot, "temp", "sales")
+grid.map(sns.lineplot, "temp", "pred")
+grid.add_legend()
+
+# %% [markdown]
+#
+# ### 🔰 ロジスティック回帰の練習問題
+# TODO
+# %%
+
+# %% [markdown]
+# ## Stanでpenguins単回帰
 # %%
 penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
 penguins_dropna = penguins.dropna()
@@ -94,106 +195,10 @@ grid = sns.FacetGrid(pen_pred)
 grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
 grid.map(sns.lineplot, "body_mass_g", "pred")
 
-
-# %% [markdown]
-# ### 🔰 直線回帰の練習問題
-# TODO
-
-# %%
-
 # %% [markdown]
 # ----
 #
-# ## Stanでポアソン回帰
-
-# %%
-_N = 300
-_x = rng.uniform(0.4, 1.7, _N)
-_y = rng.poisson(np.exp(3 * _x - 3))
-df_poisson = pd.DataFrame(dict(x=_x, y=_y))
-poisson_data = {
-    "N": _N,
-    "x": _x,
-    "y": _y,
-}
-# %%
-model = CmdStanModel(stan_file="poisson.stan")
-
-# %%
-fit = model.sample(poisson_data, chains=4, iter_sampling=2000)
-fit.summary()
-print(fit.diagnose())
-
-# %%
-stan_data = az.from_cmdstanpy(fit, observed_data=poisson_data)
-az.plot_trace(stan_data)
-az.plot_posterior(stan_data)
-# %%
-post_mean = stan_data.posterior.mean().to_pandas()
-df_poisson_pred = df_poisson.assign(
-    pred=np.exp(post_mean["intercept"] + post_mean["slope"] * df_poisson.x)
-)
-grid = sns.FacetGrid(df_poisson_pred)
-grid.map(sns.scatterplot, "x", "y")
-grid.map(sns.lineplot, "x", "pred")
-grid.add_legend()
-
-# %% [markdown]
-# ### 🔰 ポアソン回帰の練習問題
-# TODO
-
-# %%
-
-# %% [markdown]
-# ----
-# ## Stanでロジスティック回帰
-#
-# %%
-_N = 200
-_n = 10
-temp = rng.uniform(-10, 35, size=_N)
-logit_p = -3 + np.array(0.3) * temp
-p = expit(logit_p)
-sales = rng.binomial(_n, p)
-
-df_logistic = pd.DataFrame(dict(temp=temp, sales=sales))
-logistic_data = {
-    "N": _N,
-    "temp": temp,
-    "sales": sales,
-}
-# %%
-model = CmdStanModel(stan_file="logistic.stan")
-
-# %%
-fit = model.sample(logistic_data, chains=4, iter_sampling=2000)
-fit.summary()
-print(fit.diagnose())
-
-# %%
-stan_data = az.from_cmdstanpy(fit, observed_data=logistic_data)
-az.plot_trace(stan_data)
-az.plot_posterior(stan_data)
-# %%
-post_mean = stan_data.posterior.mean().to_pandas()
-df_logistic_pred = df_logistic.assign(
-    pred=10 * expit(post_mean["intercept"] + post_mean["slope"] * df_logistic.temp)
-)
-grid = sns.FacetGrid(df_logistic_pred)
-grid.map(sns.scatterplot, "temp", "sales")
-grid.map(sns.lineplot, "temp", "pred")
-grid.add_legend()
-
-# %% [markdown]
-#
-# ### 🔰 ロジスティック回帰の練習問題
-# TODO
-# %%
-
-# %% [markdown]
-# ----
-#
-# ## Stanで重回帰
+# ## Stanでpenguins重回帰
 #
 # ### データ準備
 # %%

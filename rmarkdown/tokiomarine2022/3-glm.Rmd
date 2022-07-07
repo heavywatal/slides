@@ -44,7 +44,7 @@ library(dplyr)
 library(tidyr)
 library(reticulate)
 use_virtualenv("dshc2022")
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 ---
@@ -493,6 +493,65 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 
 
 ---
+## 交互作用
+
+ある説明変数の効果が、別の説明変数によって異なる。<br>
+e.g., ビール売上の温度依存性が天気によって異なる。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
+
+| 天気 | $x_1$ |
+| ---- | :---: |
+| ☀️ 晴れ | 1 |
+| ☔️ 雨 | 0 |
+
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
+\end{split}\]</p>
+
+雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
+
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+
+```{r interaction, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
+n = 200L
+coef = c(70, 3, 100, -2)
+weather_levels = c("sunny", "rainy")
+df_beer = tibble::tibble(
+    temperature = runif(n, 8, 32),
+    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
+  ) %>%
+  dplyr::mutate(name = weather, value = 1L) %>%
+  tidyr::pivot_wider(values_fill = 0L) %>%
+  dplyr::mutate(mu = coef[1] * sunny + coef[2] * temperature + coef[3] * rainy + coef[4] * temperature * rainy) %>%
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10))
+
+lm_int = lm(beer_sales ~ temperature * weather, df_beer)
+df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
+  modelr::add_predictions(lm_int) %>%
+  dplyr::mutate(y_pred = pred)
+
+ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
+  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, size = 2) +
+  geom_point(alpha = 0.6, shape = 16, size = 3) +
+  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
+```
+
+  </div>
+</div>
+
+
+解釈が一気に難しくなるのでむやみに使わない。
+
+
+---
 ## 一般化線形モデル(GLM)ふりかえり
 
 確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
@@ -532,16 +591,43 @@ $\text{logit}(p_i)$
 ほかに `probit`, `inverse`, `sqrt`, etc.
 
 
+---
+## statsmodelsにおけるGLMのやりかた
+
+[`smf.glm`](https://www.statsmodels.org/stable/generated/statsmodels.formula.api.glm.html)
+の使い方はOLSとほぼ同じ
+
+```{python smf-glm}
+import statsmodels.formula.api as smf
+formula = "weight ~ height"
+model = smf.glm(formula, data=r.df_weight)
+result = model.fit()
+print(model.family)
+```
+
+何も指定しない場合は正規分布・恒等リンク。<br>
+`family=` オプションで
+[確率分布](https://www.statsmodels.org/stable/glm.html#families)
+と
+[リンク関数](https://www.statsmodels.org/stable/glm.html#link-functions)
+を明示的に指定:
+```{python family-explicit}
+import statsmodels.api as sm
+identity = sm.families.links.identity()
+gaussian = sm.families.Gaussian(link=identity)
+model = smf.glm(formula, data=r.df_weight, family=gaussian)
+```
+
 
 ---
 ## 🔰 とにかくGLMを使ってみる練習
 
 🔰
 [`3-glm.ipynb`](./3-glm.ipynb)
-をJupyterで開き、順々に実行してみよう。
+をJupyterで開き、順々に実行してみよう。<br>
+ここまでに登場した回帰分析のPythonコードが書いてあります。
 
-とりあえず当てはめと作図だけ。
-
+とりあえず当てはめと作図だけ。<br>
 結果の解釈やモデルの評価はこの後。
 
 <hr>
@@ -840,64 +926,6 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 
 
 ---
-## 交互作用
-
-ある説明変数の効果が、別の説明変数によって異なる。<br>
-e.g., ビール売上の温度依存性が天気によって異なる。
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
-
-| 天気 | $x_1$ |
-| ---- | :---: |
-| ☀️ 晴れ | 1 |
-| ☔️ 雨 | 0 |
-
-<p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
-\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
-\end{split}\]</p>
-
-雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
-晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
-
-  </div>
-  <div class="column" style="flex-shrink: 1.3;">
-
-```{r interaction, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
-n = 200L
-coef = c(70, 3, 100, -2)
-weather_levels = c("sunny", "rainy")
-df_beer = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) %>%
-  dplyr::mutate(name = weather, value = 1L) %>%
-  tidyr::pivot_wider(values_fill = 0L) %>%
-  dplyr::mutate(mu = coef[1] * sunny + coef[2] * temperature + coef[3] * rainy + coef[4] * temperature * rainy) %>%
-  dplyr::mutate(beer_sales = rnorm(n, mu, 10))
-
-lm_int = lm(beer_sales ~ temperature * weather, df_beer)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_int) %>%
-  dplyr::mutate(y_pred = pred)
-
-ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, size = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-```
-
-  </div>
-</div>
-
-
-解釈が一気に難しくなるのでむやみに使わない。
-
----
 ## 一般化線形モデル座学まとめ
 
 - 何はともあれ散布図を描く
@@ -908,11 +936,7 @@ ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
 
 <hr>
 
-🔰 単回帰と重回帰の練習をしてみよう。
-
-[`3-glm.ipynb`](./3-glm.ipynb)
-をJupyterで開き、スライドの進行に合わせて順々に実行。
-
+☕️ 休憩 + 質疑応答
 
 ---
 ## penguinsデータセット
@@ -949,6 +973,21 @@ print(penguins)
 ```{python penguins-print, echo = FALSE}
 print(penguins)
 ```
+
+---
+## 🔰 penguinsでGLMの練習
+
+🔰
+[`3-glm.ipynb`](./3-glm.ipynb)
+に戻り、次の課題を解いてみよう。<br>
+(次ページ以降に解答。まずは自力で。)
+
+1. `boby_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
+1. 単回帰して、切片と傾きを求める。そして作図。
+1. `species` で色分けして作図。
+1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
+1. 余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。
+
 
 ---
 ## 単回帰の練習: 1. まず作図
@@ -1125,7 +1164,7 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 
 ---
-## GLMの練習
+## 余裕があったら追加の練習
 
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
@@ -1156,26 +1195,6 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 ```
 
 🔰余裕があったら性別や年なども説明変数に入れてみよう。
-
-
----
-## 確率分布とリンク関数を明示的に指定したい
-
-何も指定しない場合は正規分布・恒等リンクだった:
-```{python family-default}
-formula = "flipper_length_mm ~ body_mass_g"
-model = smf.glm(formula, data=penguins)
-model.family
-```
-
-こう書いたのと同じ:
-```{python family-explicit}
-ln = sm.families.links.identity()
-fam = sm.families.Gaussian(link=ln)
-model = smf.glm(formula, data=penguins, family=fam)
-```
-
-利用可能な[確率分布](https://www.statsmodels.org/stable/glm.html#families)と[リンク関数](https://www.statsmodels.org/stable/glm.html#link-functions)は公式ドキュメントを参照。
 
 
 ---

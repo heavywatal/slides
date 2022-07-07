@@ -55,11 +55,11 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 
 - Stan言語で**モデルを柔軟に記述**できる。
 - C++で書かれていて高速に動作。
-- RやPythonなどから呼び出して使うのが便利
+- RやPythonなどから呼び出して使うのが便利。
 
 前回、回帰ではないパラメータ推定をやった。
 
-次は単純な直線回帰に進んでみよう。
+次に、statsmodelで扱った回帰分析をStanで書き直してみよう。
 
 🔰
 [`5-stan-glm.ipynb`](5-stan-glm.ipynb)
@@ -67,7 +67,64 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 
 
 ---
-## 線形回帰のベイズ推定: データ準備
+## Stanで直線回帰
+
+
+
+---
+## Stanでポアソン回帰
+
+```{cat, engine.opts = list(file = "poisson.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  array[N] int<lower=0> y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+}
+
+model {
+  y ~ poisson(exp(intercept + slope * x));
+}
+```
+
+<img src="figure/glm-poisson-1.png">
+
+
+---
+## Stanでロジスティック回帰
+
+```{cat, engine.opts = list(file = "logistic.stan"), class.source = "stan"}
+data {
+  int<lower=0> N;
+  vector[N] temp;
+  array[N] int<lower=0,upper=10> sales;
+}
+
+parameters {
+  real intercept;
+  real slope;
+}
+
+model {
+  sales ~ binomial(10, inv_logit(intercept + slope * temp));
+}
+```
+
+<img src="figure/glm-logistic-1.png">
+
+
+---
+## Stanで重回帰
+
+<img src="figure/multiple-regression-1.png">
+
+
+---
+## Stanでpenguins単回帰
 
 <a href="https://allisonhorst.github.io/palmerpenguins/">
 <cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
@@ -135,7 +192,6 @@ parameters {
 
 model {
   flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
-  sigma ~ student_t(3, 0, 1);
 }
 ```
 
@@ -217,53 +273,7 @@ p_penweight +
 
 
 ---
-## Stanでポアソン回帰
-
-```{cat, engine.opts = list(file = "poisson.stan"), class.source = "stan"}
-data {
-  int<lower=0> N;
-  vector<lower=0>[N] x;
-  array[N] int<lower=0> y;
-}
-
-parameters {
-  real intercept;
-  real slope;
-}
-
-model {
-  y ~ poisson(exp(intercept + slope * x));
-}
-```
-
-<img src="figure/glm-poisson-1.png">
-
-
----
-## Stanでロジスティック回帰
-
-```{cat, engine.opts = list(file = "logistic.stan"), class.source = "stan"}
-data {
-  int<lower=0> N;
-  vector[N] temp;
-  array[N] int<lower=0,upper=10> sales;
-}
-
-parameters {
-  real intercept;
-  real slope;
-}
-
-model {
-  sales ~ binomial(10, inv_logit(intercept + slope * temp));
-}
-```
-
-<img src="figure/glm-logistic-1.png">
-
-
----
-## Stanで重回帰
+## Stanでpenguins重回帰
 
 ```{cat, engine.opts = list(file = "penguins-multiple.stan"), class.source = "stan"}
 data {

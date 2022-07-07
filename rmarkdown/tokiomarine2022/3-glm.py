@@ -245,13 +245,6 @@ sns.scatterplot(
 sns.lineplot(x="temperature", y="pred", hue="weather", data=df_pred, ax=ax)
 
 # %% [markdown]
-# ほかに利用可能な確率分布・リンク関数などはstatsmodels公式サイトを参照:
-# <https://www.statsmodels.org/stable/glm.html>
-
-# 一旦ここまで。講義スライドに戻る。
-
-# ----
-
 # ### 交互作用
 # ビール売上の温度依存性が天気によって異なる。
 
@@ -300,6 +293,14 @@ sns.scatterplot(
 sns.lineplot(x="temperature", y="pred", hue="weather", data=df_pred, ax=ax)
 
 # %% [markdown]
+# ほかに利用可能な確率分布・リンク関数などはstatsmodels公式サイトを参照:
+# <https://www.statsmodels.org/stable/glm.html>
+
+# 一旦ここまで。講義スライドに戻る。
+
+# ----
+
+# %% [markdown]
 # ## penguins データで単回帰と重回帰の練習
 # まずデータをダウンロード。
 
@@ -327,7 +328,9 @@ formula = "flipper_length_mm ~ body_mass_g"
 model1 = smf.glm(formula, data=penguins)
 results1 = model1.fit()
 print(results1.params)
+# %%
 print(results1.llf)
+# %%
 print(results1.aic)
 
 # %% [markdown]

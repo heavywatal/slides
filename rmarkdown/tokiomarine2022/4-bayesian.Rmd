@@ -1005,7 +1005,7 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 
 - Stan言語で**モデルを柔軟に記述**できる。
 - C++で書かれていて**高速に動作**。
-- RやPythonなどから呼び出して使うのが便利
+- RやPythonなどから呼び出して使うのが便利。
 
 ## Python Interface
 
@@ -1074,7 +1074,6 @@ parameters {
 }
 model {
   x ~ binomial(1, p);
-  p ~ beta(1, 1);
 }
 ```
 
@@ -1104,7 +1103,10 @@ model {
 ## 説明変数なしのベイズ推定: MCMCサンプル
 
 予め実行速度の速い機械語に翻訳(コンパイル):
-
+```{r stan-binom-model-j1, dependson = -1, include = FALSE}
+# to suppress "warning: jobserver unavailable: using -j1"
+model = cmdstan_model("coin.stan", cpp_options = list("-j" = 1))
+```
 ```{r stan-binom-model, dependson = -1}
 model = cmdstan_model("coin.stan")
 params = names(model$variables()$parameters)
