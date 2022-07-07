@@ -109,9 +109,8 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="さっきの図をstan言語で記述すると">さっきの図をStan言語で記述すると</h2>
-<p>お絵描きモデルとStanモデルを見比べてみよう。</p>
-<pre tabindex="0"><code>
-data {
+<p><code>10</code> とか <code>3</code> とか、エイヤっと決めてるやつが超パラメータ。</p>
+<pre tabindex="0"><code class="language-{.stan" data-lang="{.stan">data {
   int&lt;lower=0&gt; N;
   array[N] int&lt;lower=0&gt; y;
 }
@@ -122,41 +121,43 @@ parameters {
   real&lt;lower=0&gt; s;  // sd of r
 }
 
+transformed parameters {
+  vector[N] p = inv_logit(a + r);
+}
+
 model {
-  y ~ binomial(8, inv_logit(a + r));
+  y ~ binomial(8, p);
   a ~ normal(0, 10);
   r ~ normal(0, s);
-  s ~ exponential(0.01);
+  s ~ student_t(3, 0, 1);
 }
-</code></pre><p><code>inv_logit(a + r)</code> が p に相当。<br>
-<code>10</code> とか <code>0.01</code> とか、エイヤっと決めてるやつが超パラメータ。</p>
-
+</code></pre>
 </section>
 <section>
 <h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
 <pre tabindex="0"><code>Running MCMC with 4 chains, at most 6 in parallel...
 
-Chain 1 finished in 0.3 seconds.
-Chain 2 finished in 0.3 seconds.
-Chain 3 finished in 0.3 seconds.
-Chain 4 finished in 0.3 seconds.
+Chain 1 finished in 0.4 seconds.
+Chain 2 finished in 0.4 seconds.
+Chain 3 finished in 0.4 seconds.
+Chain 4 finished in 0.4 seconds.
 
 All 4 chains finished successfully.
-Mean chain execution time: 0.3 seconds.
+Mean chain execution time: 0.4 seconds.
 Total execution time: 0.5 seconds.
 </code></pre><pre tabindex="0"><code> variable    mean  median   sd  mad      q5     q95 rhat ess_bulk ess_tail
-     lp__ -455.20 -454.87 9.24 9.31 -471.19 -440.89 1.01      858     1543
-     a       0.27    0.27 0.32 0.32   -0.26    0.80 1.00      567     1161
-     r[1]   -0.26   -0.26 0.79 0.78   -1.54    1.03 1.00     2924     2514
-     r[2]    1.77    1.68 1.08 1.07    0.15    3.64 1.00     4828     2714
-     r[3]    1.77    1.67 1.09 1.01    0.18    3.74 1.00     3284     1963
-     r[4]   -3.85   -3.64 1.64 1.56   -6.87   -1.60 1.00     5074     2731
-     r[5]   -2.24   -2.16 1.06 1.04   -4.06   -0.65 1.00     3370     2479
-     r[6]   -2.24   -2.14 1.10 1.00   -4.19   -0.64 1.00     3832     2252
-     r[7]    0.89    0.85 0.89 0.86   -0.50    2.38 1.00     3181     2308
-     r[8]   -2.22   -2.15 1.03 1.01   -4.09   -0.63 1.00     3482     2450
+     lp__ -455.89 -455.53 9.32 9.31 -472.22 -440.97 1.00      840     1614
+     a       0.26    0.25 0.31 0.32   -0.25    0.78 1.00      759     1530
+     r[1]   -0.23   -0.23 0.78 0.75   -1.53    1.09 1.00     3297     2636
+     r[2]    1.73    1.67 1.05 1.03    0.16    3.54 1.00     4425     2188
+     r[3]    1.74    1.68 1.06 1.02    0.13    3.63 1.00     4100     2308
+     r[4]   -3.74   -3.51 1.62 1.51   -6.65   -1.53 1.00     3645     2302
+     r[5]   -2.19   -2.11 1.04 0.97   -4.02   -0.63 1.00     3815     2762
+     r[6]   -2.21   -2.13 1.07 1.03   -4.08   -0.59 1.00     4072     2888
+     r[7]    0.92    0.88 0.85 0.84   -0.39    2.37 1.00     3410     2892
+     r[8]   -2.20   -2.10 1.07 1.03   -4.06   -0.63 1.00     3295     2457
 
- # showing 10 of 103 rows (change via &#39;max_rows&#39; argument or &#39;cmdstanr_max_rows&#39; option)
+ # showing 10 of 203 rows (change via &#39;max_rows&#39; argument or &#39;cmdstanr_max_rows&#39; option)
 </code></pre>
 </section>
 <section>
@@ -168,43 +169,10 @@ Total execution time: 0.5 seconds.
 
 </section>
 <section>
-<h2 id="事前分布の選別">事前分布の選別</h2>
-<ol>
-<li>
-<p>とりあえず<strong>無情報事前分布</strong> $[-\infty, \infty]$。Stanのデフォルト。</p>
-</li>
-<li>
-<p>収束が悪かったら<strong>弱情報事前分布</strong>を試す。<br>
-事後分布を更新していったとき<strong>事前分布っぽさが残らない</strong>のが良い。</p>
-<ul>
-<li>取りうる値を逃すような狭すぎる分布はダメ。</li>
-<li>狭すぎるよりはマシだが、広すぎても良くない。</li>
-<li>一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
-事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。</li>
-</ul>
-<p>おすすめ: <strong>Student&rsquo;s t分布</strong>、正規分布、指数分布など。</p>
-</li>
-</ol>
-<p><cite><a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></cite></p>
-
-</section>
-<section>
-<h2 id="stanおすすめ弱情報事前分布-students-t分布">Stanおすすめ弱情報事前分布: Student&rsquo;s t分布</h2>
-<p>Student&rsquo;s $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$</p>
-<ul>
-<li>自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。</li>
-<li>スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。</li>
-</ul>
-<p><img src="figure/student_t-1.png" alt="plot of chunk student_t"></p>
-<p>正の値しか取らない場合は <code>&lt;lower=0&gt;</code> として右半分だけ使うとか。</p>
-
-</section>
-<section>
 <h2 id="-階層ベイズモデルの練習問題">🔰 階層ベイズモデルの練習問題</h2>
 <p><a href="6-stan-hbm.ipynb"><code>6-stan-hbm.ipynb</code></a>
 をJupyterで開き、スライド説明に沿って実行していこう。</p>
-<p>TODO: 時間が余った場合の練習問題</p>
-
+<!-- TODO: 時間が余った場合の練習問題 -->
 </section>
 <section>
 <h2 id="非線形回帰の例-データ">非線形回帰の例: データ</h2>
@@ -227,10 +195,10 @@ y = ae ^ {-bx} - ce ^ {-dx}
 }
 
 parameters {
-  real a;
-  real d;
-  real&lt;upper=a&gt; c;
-  real&lt;upper=d&gt; b;
+  real&lt;lower=0&gt; a;
+  real&lt;lower=0&gt; d;
+  real&lt;lower=0,upper=a&gt; c;
+  real&lt;lower=0,upper=d&gt; b;
   real shape;
   vector[Ninds] intercept;
 }
@@ -238,11 +206,11 @@ parameters {
 model {
   vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
   y ~ gamma(shape, shape ./ mu);
-  a ~ exponential(1);
-  b ~ exponential(1);
-  c ~ exponential(1);
-  d ~ exponential(1);
-  shape ~ exponential(0.001);
+  a ~ normal(0, 100);
+  b ~ normal(0, 100);
+  c ~ normal(0, 100);
+  d ~ normal(0, 100);
+  shape ~ normal(0, 100);
   intercept ~ normal(0, 0.005);
 }
 </code></pre>

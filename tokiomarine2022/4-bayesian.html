@@ -453,7 +453,7 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <section>
 <h2 id="何回やっても似たような結果になってほしい">何回やっても似たような結果になってほしい</h2>
 <p>乱数や初期値によって偶々、じゃないことを確認したい。</p>
-<p>e.g., <code>chains = 3, iter = 600</code> 。ほぼ同じところをうろうろ:</p>
+<p>e.g., <code>chains = 3</code> 。ほぼ同じところをうろうろ:</p>
 <p><img src="figure/chains-1.png" alt="plot of chunk chains"></p>
 <p>収束(convergence)の判定については後ほど。</p>
 
@@ -461,7 +461,7 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <section>
 <h2 id="初期値の影響が消えるまでウォーミングアップ">初期値の影響が消えるまでウォーミングアップ</h2>
 <p>定常分布の山に到達してからが本番。</p>
-<p>e.g., <code>iter = 600, warmup = 200</code> で灰色の部分を捨てる:</p>
+<p>e.g., <code>iter_warmup = 200, iter_sampling = 400</code> で灰色の部分を捨てる:</p>
 <p><img src="figure/warmup-1.png" alt="plot of chunk warmup"></p>
 <p>どれくらい長く捨てるべきかは場合による。</p>
 
@@ -578,7 +578,7 @@ http://mc-stan.org/misc/warnings.html
 <ul>
 <li>Stan言語で<strong>モデルを柔軟に記述</strong>できる。</li>
 <li>C++で書かれていて<strong>高速に動作</strong>。</li>
-<li>RやPythonなどから呼び出して使うのが便利</li>
+<li>RやPythonなどから呼び出して使うのが便利。</li>
 </ul>
 <h2 id="python-interface">Python Interface</h2>
 <dl>
@@ -591,7 +591,8 @@ http://mc-stan.org/misc/warnings.html
 
 </section>
 <section>
-<h2 id="おおまかな流れ">おおまかな流れ</h2>
+<h2 id="-とりあえずstanを動かしてみよう">🔰 とりあえずStanを動かしてみよう</h2>
+<p>おおまかな流れ:</p>
 <ol>
 <li>データ準備</li>
 <li>Stan言語でモデルを書く</li>
@@ -601,7 +602,8 @@ http://mc-stan.org/misc/warnings.html
 </ol>
 <p>🔰
 <a href="4-bayesian.ipynb"><code>4-bayesian.ipynb</code></a>
-をJupyterで開き、スライド説明に沿って実行してみよう。
+を開き、スライド説明に沿って実行しよう。</p>
+
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-データ準備">説明変数なしのベイズ推定: データ準備</h2>
@@ -615,30 +617,29 @@ http://mc-stan.org/misc/warnings.html
 [1] 40
 
 $x
- [1] 1 1 1 1 1 1 0 1 1 1 1 0 0 1 1 1 0 1 1 1 1 1 0 1 1 1 1 0 1 1 1 1 1 0 1 1 1 1 1 1
+ [1] 1 1 1 0 0 1 1 1 0 1 1 1 0 0 1 1 0 1 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1
 </code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
 
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
-<p>文字列として保持するか、別ファイルに書いておく:</p>
-<pre tabindex="0"><code>
-data {
+<p>別ファイルに書いておく。
+e.g., <code>coin.stan</code>:</p>
+<pre tabindex="0"><code class="language-{.stan" data-lang="{.stan">data {
   int&lt;lower=0&gt; N;
-  int x[N];
+  array[N] int x;
 }
 parameters {
   real&lt;lower=0,upper=1&gt; p;
 }
 model {
   x ~ binomial(1, p);
-  p ~ beta(1, 1);
 }
 </code></pre><ul>
 <li>いくつかのブロックに分けて記述する:<br>
 R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code>, 本体の <code>model</code>.</li>
-<li>整数型 <code>int</code>, 実数型 <code>real</code>, それらの配列がある。</li>
-<li>下限 <code>lower</code>, 上限 <code>upper</code> を設定できる。</li>
+<li><a href="https://mc-stan.org/docs/reference-manual/overview-of-data-types.html">変数には型や制約を設定できる</a></li>
+<li><a href="https://mc-stan.org/docs/functions-reference/">関数もたくさん用意されている</a></li>
 </ul>
 
 </section>
@@ -661,13 +662,12 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 <h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
 <p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;coin.stan&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
 </span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
-</span></span></code></pre></div><p>いろいろオプションはあるけどとりあえずデフォルトで:<br>
-<code>chains = 4</code>, <code>iter = 2000</code>, <code>warmup = floor(iter/2)</code>, <code>thin = 1</code>, &hellip;</p>
-<p>問題があったら実行終了時に警告してくれるので<strong>ちゃんと読む</strong>。</p>
+</span></span></code></pre></div><p>いろいろオプションはあるけど、とりあえずデフォルトに任せる:<br>
+<code>chains</code>, <code>inits</code>, <code>iter_warmup</code>, <code>iter_samples</code>, <code>thin</code>, &hellip;</p>
+<p>問題があったら警告してくれるので<strong>ちゃんと読む</strong>。</p>
 
 </section>
 <section>
@@ -676,15 +676,16 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 念のため trace plot も確認しておこう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code> variable   mean median   sd  mad     q5    q95 rhat ess_bulk ess_tail
-     lp__ -20.96 -20.69 0.69 0.32 -22.39 -20.45 1.00     1672     1848
-     p      0.81   0.81 0.06 0.06   0.70   0.90 1.00     1616     1705
+     lp__ -23.55 -23.27 0.69 0.30 -24.96 -23.05 1.00     1561     2163
+     p      0.76   0.76 0.07 0.06   0.64   0.86 1.00     1248     1605
 </code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
 
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
 <p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
 
 </section>

@@ -302,6 +302,44 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 
 </section>
 <section>
+<h2 id="交互作用">交互作用</h2>
+<p>ある説明変数の効果が、別の説明変数によって異なる。<br>
+e.g., ビール売上の温度依存性が天気によって異なる。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">$x_1$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
+\end{split}\]</p>
+<p>雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="figure/interaction-1.png" alt="plot of chunk interaction"></p>
+  </div>
+</div>
+<p>解釈が一気に難しくなるのでむやみに使わない。</p>
+
+</section>
+<section>
 <h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
 <p>確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
 特定の組み合わせには名前がある。</p>
@@ -371,12 +409,35 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 
 </section>
 <section>
+<h2 id="statsmodelsにおけるglmのやりかた">statsmodelsにおけるGLMのやりかた</h2>
+<p><a href="https://www.statsmodels.org/stable/generated/statsmodels.formula.api.glm.html"><code>smf.glm</code></a>
+の使い方はOLSとほぼ同じ</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+</span></span><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s2">&#34;weight ~ height&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">family</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>&lt;statsmodels.genmod.families.family.Gaussian object at 0x12b9eeb50&gt;
+</code></pre><p>何も指定しない場合は正規分布・恒等リンク。<br>
+<code>family=</code> オプションで
+<a href="https://www.statsmodels.org/stable/glm.html#families">確率分布</a>
+と
+<a href="https://www.statsmodels.org/stable/glm.html#link-functions">リンク関数</a>
+を明示的に指定:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+</span></span><span class="line"><span class="cl"><span class="n">identity</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">identity</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">gaussian</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">identity</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">df_weight</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">gaussian</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
 <h2 id="-とにかくglmを使ってみる練習">🔰 とにかくGLMを使ってみる練習</h2>
 <p>🔰
 <a href="./3-glm.ipynb"><code>3-glm.ipynb</code></a>
-をJupyterで開き、順々に実行してみよう。</p>
-<p>とりあえず当てはめと作図だけ。</p>
-<p>結果の解釈やモデルの評価はこの後。</p>
+をJupyterで開き、順々に実行してみよう。<br>
+ここまでに登場した回帰分析のPythonコードが書いてあります。</p>
+<p>とりあえず当てはめと作図だけ。<br>
+結果の解釈やモデルの評価はこの後。</p>
 <hr>
 <p>☕️ 休憩 + 質疑応答</p>
 
@@ -532,44 +593,6 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="交互作用">交互作用</h2>
-<p>ある説明変数の効果が、別の説明変数によって異なる。<br>
-e.g., ビール売上の温度依存性が天気によって異なる。</p>
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
-<table>
-<thead>
-<tr>
-<th>天気</th>
-<th style="text-align:center">$x_1$</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>☀️ 晴れ</td>
-<td style="text-align:center">1</td>
-</tr>
-<tr>
-<td>☔️ 雨</td>
-<td style="text-align:center">0</td>
-</tr>
-</tbody>
-</table>
-<p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
-\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
-\end{split}\]</p>
-<p>雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
-晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
-  </div>
-  <div class="column" style="flex-shrink: 1.3;">
-<p><img src="figure/interaction-1.png" alt="plot of chunk interaction"></p>
-  </div>
-</div>
-<p>解釈が一気に難しくなるのでむやみに使わない。</p>
-
-</section>
-<section>
 <h2 id="一般化線形モデル座学まとめ">一般化線形モデル座学まとめ</h2>
 <ul>
 <li>何はともあれ散布図を描く</li>
@@ -579,10 +602,7 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 <li>モデルを比較するときは情報量基準を参考にする</li>
 </ul>
 <hr>
-<p>🔰 単回帰と重回帰の練習をしてみよう。</p>
-<p><a href="./3-glm.ipynb"><code>3-glm.ipynb</code></a>
-をJupyterで開き、スライドの進行に合わせて順々に実行。</p>
-
+<p>☕️ 休憩 + 質疑応答
 </section>
 <section>
 <h2 id="penguinsデータセット">penguinsデータセット</h2>
@@ -618,6 +638,21 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 
 [344 rows x 8 columns]
 </code></pre>
+</section>
+<section>
+<h2 id="-penguinsでglmの練習">🔰 penguinsでGLMの練習</h2>
+<p>🔰
+<a href="./3-glm.ipynb"><code>3-glm.ipynb</code></a>
+に戻り、次の課題を解いてみよう。<br>
+(次ページ以降に解答。まずは自力で。)</p>
+<ol>
+<li><code>boby_mass_g</code> を横軸、 <code>flipper_length_mm</code> を縦軸に、まず作図。</li>
+<li>単回帰して、切片と傾きを求める。そして作図。</li>
+<li><code>species</code> で色分けして作図。</li>
+<li><code>species</code> も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。</li>
+<li>余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。</li>
+</ol>
+
 </section>
 <section>
 <h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
@@ -734,24 +769,10 @@ dtype: float64
 
 </section>
 <section>
-<h2 id="glmの練習">GLMの練習</h2>
+<h2 id="余裕があったら追加の練習">余裕があったら追加の練習</h2>
 <p>🔰クチバシの長さと深さで同じ解析をやってみよう。</p>
 <p><img src="figure/penguins-bill-1.png" alt="plot of chunk penguins-bill"></p>
 <p>🔰余裕があったら性別や年なども説明変数に入れてみよう。</p>
-
-</section>
-<section>
-<h2 id="確率分布とリンク関数を明示的に指定したい">確率分布とリンク関数を明示的に指定したい</h2>
-<p>何も指定しない場合は正規分布・恒等リンクだった:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="s2">&#34;flipper_length_mm ~ body_mass_g&#34;</span>
-</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">model</span><span class="o">.</span><span class="n">family</span>
-</span></span></code></pre></div><pre tabindex="0"><code>&lt;statsmodels.genmod.families.family.Gaussian object at 0x135fa3c50&gt;
-</code></pre><p>こう書いたのと同じ:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">ln</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">identity</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">fam</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">families</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">link</span><span class="o">=</span><span class="n">ln</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">penguins</span><span class="p">,</span> <span class="n">family</span><span class="o">=</span><span class="n">fam</span><span class="p">)</span>
-</span></span></code></pre></div><p>利用可能な<a href="https://www.statsmodels.org/stable/glm.html#families">確率分布</a>と<a href="https://www.statsmodels.org/stable/glm.html#link-functions">リンク関数</a>は公式ドキュメントを参照。</p>
 
 </section>
 <section>
@@ -766,10 +787,7 @@ e.g., <a href="https://vincentarelbundock.github.io/Rdatasets/articles/data.html
 </span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
 </span></span><span class="line"><span class="cl"><span class="n">iris</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s2">&#34;iris&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
 </span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s2">&#34;diamonds&#34;</span><span class="p">,</span> <span class="s2">&#34;ggplot2&#34;</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
-</span></span></code></pre></div><ul>
-<li>TODO: ポアソン回帰の練習に適した課題データ</li>
-<li>TODO: ロジスティック回帰の練習に適した課題データ</li>
-</ul>
+</span></span></code></pre></div><!-- TODO: 練習に適した課題データ -->
 
 </section>
 <section>
