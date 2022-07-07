@@ -37,8 +37,8 @@ rng = np.random.default_rng(seed=24601)
 #
 # %%
 true_p = 0.7
-N = 40
-coin_data = {"N": N, "x": rng.binomial(1, true_p, N)}
+sample_size = 40
+coin_data = {"N": sample_size, "x": rng.binomial(1, true_p, sample_size)}
 print(coin_data)
 # %%
 sns.countplot(x="x", data=coin_data)

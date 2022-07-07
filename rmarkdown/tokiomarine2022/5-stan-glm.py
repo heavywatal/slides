@@ -31,10 +31,10 @@ rng = np.random.default_rng(seed=24601)
 # ## Stanで直線回帰
 #
 # %%
-n_samples = 300
+sample_size = 300
 true_intercept = -3
 true_coef = 3
-x = rng.uniform(0.4, 1.7, n_samples)
+x = rng.uniform(0.4, 1.7, sample_size)
 lambda_ = np.exp(true_intercept + true_coef * x)
 y = rng.poisson(lambda_)
 df = pd.DataFrame(dict(x=x, y=y))
@@ -45,9 +45,9 @@ grid.map(sns.scatterplot, "x", "y")
 # %% [markdown]
 # stanに渡せるdict形式に加工
 # %%
-mydata = {"N": n_samples}
+mydata = {"N": sample_size}
 mydata.update(df.to_dict("list"))
-print(mydata)
+# print(mydata)
 # %% [markdown]
 # ### モデルのコンパイル
 # スライドにあるコードを `lm.stan` というファイルに保存しておき、読み込む。
@@ -140,12 +140,12 @@ grid.add_legend()
 n_trials = 10
 true_intercept = -3
 true_coef = 0.3
-n_samples = 200
+sample_size = 200
 # Generate random numbers
-temperature = rng.uniform(-10, 35, n_samples)
+temperature = rng.uniform(-10, 35, sample_size)
 logit_p = true_intercept + true_coef * temperature
 p = special.expit(logit_p)
-beer_sales = rng.binomial(n_trials, p, n_samples)
+beer_sales = rng.binomial(n_trials, p, sample_size)
 _dic = {
     "temperature": temperature,
     "beer_sales": beer_sales,
@@ -157,7 +157,7 @@ print(df)
 grid = sns.FacetGrid(df)
 grid.map(sns.scatterplot, "temperature", "beer_sales")
 # %%
-logistic_data = {"N": n_samples, "n_trials": n_trials}
+logistic_data = {"N": sample_size, "n_trials": n_trials}
 logistic_data.update(df.to_dict("list"))
 # %%
 model = CmdStanModel(stan_file="logistic.stan")
@@ -189,11 +189,11 @@ grid.add_legend()
 # ### 重回帰: 複数の説明変数を同時に扱う
 # ビールの注文数が気温と湿度の両方に依存して増加するデータを作る。
 # %%
-n_samples = 200
+sample_size = 200
 true_intercept = 3
 true_coefs = {"temperature": 0.05, "humidity": 0.006}
-temperature = rng.uniform(8, 32, n_samples)
-humidity = rng.uniform(20, 80, n_samples)
+temperature = rng.uniform(8, 32, sample_size)
+humidity = rng.uniform(20, 80, sample_size)
 lambda_ = np.exp(
     true_intercept
     + true_coefs["temperature"] * temperature
@@ -212,7 +212,7 @@ fig, ax = plt.subplots(ncols=2)
 sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df, ax=ax[0])
 sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df, ax=ax[1])
 # %%
-multiple_data = {"N": n_samples}
+multiple_data = {"N": sample_size}
 multiple_data.update(df.to_dict("list"))
 # %%
 model = CmdStanModel(stan_file="multiple.stan")
@@ -250,15 +250,15 @@ sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
 # ### 分散分析: GLM with 質的(カテゴリカル)変数
 #
 # %% Parameters
-n_samples = 200
+sample_size = 200
 true_intercept = 70
 true_coefs = {"temp": 3, "sunny": 20, "rainy": -20}
 sd = 10
 weather_levels = ["cloudy", "sunny", "rainy"]
 # %%
-weather = rng.choice(weather_levels, n_samples, replace=True)
+weather = rng.choice(weather_levels, sample_size, replace=True)
 _dic = {
-    "temperature": rng.uniform(8, 32, n_samples),
+    "temperature": rng.uniform(8, 32, sample_size),
     "weather": pd.Categorical(weather, categories=weather_levels),
 }
 _df = pd.DataFrame(_dic)
@@ -279,7 +279,7 @@ print(df)
 grid = sns.FacetGrid(df, hue="weather")
 grid.map(sns.scatterplot, "weather", "beer_sales", alpha=0.6)
 # %%
-mydata = {"N": n_samples}
+mydata = {"N": sample_size}
 mydata.update(df.to_dict("list"))
 del mydata["weather"]
 # %%
@@ -348,8 +348,8 @@ penguins_dropna = penguins.dropna()
 print(penguins_dropna)
 pen_data = {
     "N": penguins_dropna.shape[0],
-    "body_mass_g": penguins_dropna.body_mass_g,
-    "flipper_length_mm": penguins_dropna.flipper_length_mm,
+    "body_mass_g": penguins_dropna["body_mass_g"],
+    "flipper_length_mm": penguins_dropna["flipper_length_mm"],
 }
 
 # %% [markdown]
@@ -409,10 +409,10 @@ penguins_sp = penguins_dropna.assign(
 ).assign(sp_Gentoo=(penguins_dropna.species == "Gentoo").astype(int))
 pen_sp_data = {
     "N": penguins_sp.shape[0],
-    "body_mass_g": penguins_sp.body_mass_g,
-    "flipper_length_mm": penguins_sp.flipper_length_mm,
-    "sp_Chinstrap": penguins_sp.sp_Chinstrap,
-    "sp_Gentoo": penguins_sp.sp_Gentoo,
+    "body_mass_g": penguins_sp["body_mass_g"],
+    "flipper_length_mm": penguins_sp["flipper_length_mm"],
+    "sp_Chinstrap": penguins_sp["sp_Chinstrap"],
+    "sp_Gentoo": penguins_sp["sp_Gentoo"],
 }
 
 # %% [markdown]
@@ -455,7 +455,7 @@ post_mean = stan_data.posterior.mean().to_pandas()
 # %%
 pen_pred = penguins_sp.assign(
     pred=post_mean["intercept"]
-    + penguins_sp.body_mass_g * post_mean["slope"]
+    + penguins_sp["body_mass_g"] * post_mean["slope"]
     + penguins_sp["sp_Chinstrap"] * post_mean["b_chinstrap"]
     + penguins_sp["sp_Gentoo"] * post_mean["b_gentoo"]
 )

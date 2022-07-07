@@ -14,8 +14,6 @@
 # %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
 
 # %%
-from pathlib import Path
-
 import arviz as az
 import matplotlib.pyplot as plt
 import numpy as np
@@ -23,7 +21,7 @@ import pandas as pd
 import seaborn as sns
 import statsmodels.api as sm
 from cmdstanpy import CmdStanModel
-from scipy.special import expit
+from scipy import special, stats
 
 rng = np.random.default_rng(seed=24601)
 
@@ -33,17 +31,19 @@ rng = np.random.default_rng(seed=24601)
 # ### データ準備
 #
 # %%
-N = 100
+sample_size = 100
 mu_ind = 0.5
 sd_ind = 3
-z = rng.normal(mu_ind, sd_ind, size=N)
-p = expit(z)
+z = rng.normal(mu_ind, sd_ind, size=sample_size)
+p = special.expit(z)
 y = rng.binomial(8, p)
-od_data = {
-    "N": N,
+mydata = {
+    "N": sample_size,
     "y": y,
 }
-df_od = pd.DataFrame(dict(z=z, p=p, y=y))
+df = pd.DataFrame(dict(z=z, p=p, y=y))
+# %%
+sns.countplot(x="y", data=df)
 
 # %%
 model = CmdStanModel(stan_file="glmm.stan")
@@ -51,7 +51,7 @@ model = CmdStanModel(stan_file="glmm.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(od_data, chains=4, iter_sampling=2000)
+fit = model.sample(mydata)
 
 # %% [markdown]
 # ### 推定結果の要約と収束診断
@@ -62,24 +62,31 @@ print(fit.diagnose())
 
 # %% [markdown]
 # ### トレースプロット確認
-# 分布はきれいなひと山、軌跡はきれいな毛虫
 # %%
-stan_data = az.from_cmdstanpy(fit, observed_data=od_data)
+stan_data = az.from_cmdstanpy(fit, observed_data=mydata)
 az.plot_trace(stan_data)
 
 # %% [markdown]
 #
 # ### 推定結果の事後分布を確認
-# - 点推定: 事後分布平均
-# - 区間推定: HDI(Highest Density Interval)
 # %%
 az.plot_posterior(stan_data)
 
 # %% [markdown]
-# 事後分布の平均を使って回帰線を引いてみる。
+# 事後分布の平均を使って予測値を描いてみる。
 # %%
-post_mean = stan_data.posterior.mean().to_pandas()
-print(post_mean)
+df_p = fit.draws_pd("p")
+p = np.ravel(df_p)
+
+y = np.arange(0, 9)
+count_exp = []
+for y_i in y:
+    freqs = stats.binom.pmf(y_i, 8, p)
+    count_exp.append(sample_size * np.mean(freqs))
+
+df_exp = pd.DataFrame({"y": y, "count": count_exp})
+sns.countplot(x="y", data=df)
+sns.scatterplot(x="y", y="count", data=df_exp, color="black", s=120)
 
 # %%
 # pyright: reportGeneralTypeIssues=false

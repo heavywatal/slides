@@ -813,7 +813,7 @@ for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
 
 乱数や初期値によって偶々、じゃないことを確認したい。
 
-e.g., `chains = 3, iter = 600` 。ほぼ同じところをうろうろ:
+e.g., `chains = 3` 。ほぼ同じところをうろうろ:
 
 ```{r chains, echo = FALSE, fig.height = 5, fig.width = 12}
 df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) %>%
@@ -849,7 +849,7 @@ cowplot::plot_grid(p_trace, p_hist, nrow = 1L, rel_widths = c(4, 1))
 
 定常分布の山に到達してからが本番。
 
-e.g., `iter = 600, warmup = 200` で灰色の部分を捨てる:
+e.g., `iter_warmup = 200, iter_sampling = 400` で灰色の部分を捨てる:
 
 ```{r warmup, echo = FALSE, fig.height = 5, fig.width = 12}
 cowplot::plot_grid(
@@ -916,8 +916,8 @@ model {
 ```
 
 ```{r converge-template, include = FALSE}
-mydata = list(x = rep(10L, 10L))
-mydata$N = length(mydata$x)
+sample_size = 10L
+mydata = list(N = sample_size, x = rep(10L, sample_size))
 myplot_trace = function(stan_file, data) {
   model = cmdstan_model(stan_file)
   fit = model$sample(data = data, show_messages = FALSE, refresh = 0)
@@ -1031,7 +1031,9 @@ if (!require(bayesplot, quietly = TRUE)) {
 ```
 
 ---
-## おおまかな流れ
+## 🔰 とりあえずStanを動かしてみよう
+
+おおまかな流れ:
 
 1. データ準備
 1. Stan言語でモデルを書く
@@ -1041,7 +1043,7 @@ if (!require(bayesplot, quietly = TRUE)) {
 
 🔰
 [`4-bayesian.ipynb`](4-bayesian.ipynb)
-をJupyterで開き、スライド説明に沿って実行してみよう。
+を開き、スライド説明に沿って実行しよう。
 
 
 ---
@@ -1081,9 +1083,8 @@ model {
 
 - いくつかのブロックに分けて記述する:<br>
   R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
-- 整数型 `int`, 実数型 `real`, それらの配列がある。
-- 下限 `lower`, 上限 `upper` を設定できる。
-
+- [変数には型や制約を設定できる](https://mc-stan.org/docs/reference-manual/overview-of-data-types.html)
+- [関数もたくさん用意されている](https://mc-stan.org/docs/functions-reference/)
 
 ---
 ## Stan言語の7種のブロック
@@ -1107,7 +1108,6 @@ model {
 予め実行速度の速い機械語に翻訳(コンパイル):
 ```{r stan-binom-model, cache.extra = tools::md5sum("coin.stan")}
 model = cmdstan_model("coin.stan")
-params = names(model$variables()$parameters)
 ```
 
 モデルとデータを使ってMCMCサンプリング:
@@ -1117,10 +1117,10 @@ fit = model$sample(mydata)
 draws = fit$draws()
 ```
 
-いろいろオプションはあるけどとりあえずデフォルトで:<br>
-`chains = 4`, `iter = 2000`, `warmup = floor(iter/2)`, `thin = 1`, ...
+いろいろオプションはあるけど、とりあえずデフォルトに任せる:<br>
+`chains`, `inits`, `iter_warmup`, `iter_samples`, `thin`, ...
 
-問題があったら実行終了時に警告してくれるので**ちゃんと読む**。
+問題があったら警告してくれるので**ちゃんと読む**。
 
 ---
 ## 説明変数なしのベイズ推定: 結果を眺める
@@ -1141,6 +1141,7 @@ print(fit)
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
 ```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
+params = names(model$variables()$parameters)
 bayesplot::mcmc_trace(draws, pars = params)
 ```
 

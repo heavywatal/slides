@@ -80,9 +80,9 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ---
 ## さっきの図をStan言語で記述すると
 
-お絵描きモデルとStanモデルを見比べてみよう。
+`10` とか `3` とか、エイヤっと決めてるやつが超パラメータ。
 
-```{cat glmm-stan, engine.opts = list(file = "glmm.stan"), class.source = "stan"}
+```{cat glmm-stan, engine.opts = list(file = "glmm.stan"), cache.rebuild = !file.exists("glmm.stan"), class.source = "stan"}
 data {
   int<lower=0> N;
   array[N] int<lower=0> y;
@@ -94,21 +94,22 @@ parameters {
   real<lower=0> s;  // sd of r
 }
 
+transformed parameters {
+  vector[N] p = inv_logit(a + r);
+}
+
 model {
-  y ~ binomial(8, inv_logit(a + r));
+  y ~ binomial(8, p);
   a ~ normal(0, 10);
   r ~ normal(0, s);
-  s ~ exponential(0.01);
+  s ~ student_t(3, 0, 1);
 }
 ```
-
-`inv_logit(a + r)` が p に相当。<br>
-`10` とか `0.01` とか、エイヤっと決めてるやつが超パラメータ。
 
 ---
 ## 変量効果が入った推定結果
 
-```{r stan-glmm-prep, echo=FALSE, fig.width = 4, fig.height = 3, message = FALSE, result = FALSE}
+```{r stan-glmm-prep, echo=FALSE, cache.extra = file.mtime("glmm.stan"), message = FALSE, result = FALSE}
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -128,7 +129,7 @@ model = cmdstan_model("glmm.stan")
 fit = model$sample(data = mydata, step_size = 0.1, refresh = 0)
 ```
 
-```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3}
+```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3, dependson=-1}
 print(fit)
 ```
 
@@ -137,53 +138,12 @@ print(fit)
 
 データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。
 
-```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7}
+```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7, dependson=-2}
 draws = fit$draws(c("a", "s", "r[1]", "r[2]"))
 p_trace = bayesplot::mcmc_trace(draws) + coord_flip()
 p_hist = bayesplot::mcmc_hist(draws, bins = 30)
 cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 ```
-
-
----
-## 事前分布の選別
-
-1.  とりあえず**無情報事前分布** $[-\infty, \infty]$。Stanのデフォルト。
-
-1.  収束が悪かったら**弱情報事前分布**を試す。<br>
-    事後分布を更新していったとき**事前分布っぽさが残らない**のが良い。
-
-    - 取りうる値を逃すような狭すぎる分布はダメ。
-    - 狭すぎるよりはマシだが、広すぎても良くない。
-    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
-      事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。
-
-    おすすめ: **Student's t分布**、正規分布、指数分布など。
-
-<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
-
-
----
-## Stanおすすめ弱情報事前分布: Student's t分布
-
-Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
-
-- 自由度 $\nu$: 小さいほど裾野が広い。$3 \le \nu_0 \le 7 $ で適当に固定。
-- スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
-
-```{r student_t, echo = FALSE, fig.height = 5, fig.width = 10}
-tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
-  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) %>%
-  ggplot() + aes(x, Density, group = df) +
-  geom_line(aes(color = nu), size = 1, alpha = 0.7) +
-  scale_color_viridis_d(end = 0.88, direction = 1, guide = guide_legend(reverse = TRUE)) +
-  scale_x_continuous(breaks = c(-1, 0, 1), labels = c(expression(-sigma), 0, expression(sigma))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
-        panel.grid.major.y = element_blank())
-```
-
-正の値しか取らない場合は `<lower=0>` として右半分だけ使うとか。
 
 
 ---
@@ -248,10 +208,10 @@ data {
 }
 
 parameters {
-  real a;
-  real d;
-  real<upper=a> c;
-  real<upper=d> b;
+  real<lower=0> a;
+  real<lower=0> d;
+  real<lower=0,upper=a> c;
+  real<lower=0,upper=d> b;
   real shape;
   vector[Ninds] intercept;
 }
@@ -259,11 +219,11 @@ parameters {
 model {
   vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
   y ~ gamma(shape, shape ./ mu);
-  a ~ exponential(1);
-  b ~ exponential(1);
-  c ~ exponential(1);
-  d ~ exponential(1);
-  shape ~ exponential(0.001);
+  a ~ normal(0, 100);
+  b ~ normal(0, 100);
+  c ~ normal(0, 100);
+  d ~ normal(0, 100);
+  shape ~ normal(0, 100);
   intercept ~ normal(0, 0.005);
 }
 ```

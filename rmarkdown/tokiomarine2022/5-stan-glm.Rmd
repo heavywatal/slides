@@ -59,19 +59,16 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 
 前回、回帰ではないパラメータ推定をやった。
 
-次に、statsmodelで扱った回帰分析をStanで書き直してみよう。
+<hr>
 
-🔰
-[`5-stan-glm.ipynb`](5-stan-glm.ipynb)
-をJupyterで開き、スライド説明に沿って実行していこう。
-
+次に、回帰分析をStanでやってみる。
 
 ---
-## Stanで直線回帰
+## 直線回帰するStanコードの例
 
-<img src="figure/lm-bad-1.png">
+`slope * x` のようなベクトル演算ができる。
 
-```{cat, engine.opts = list(file = "lm.stan")}
+```{cat, engine.opts = list(file = "lm.stan"), class.source = "stan"}
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -81,7 +78,7 @@ data {
 parameters {
   real intercept;
   real slope;
-  real sigma;
+  real<lower=0> sigma;
 }
 
 model {
@@ -89,11 +86,121 @@ model {
 }
 ```
 
+---
+## 変数をうまく使って可読性アップ
+
+新しい変数は `model` か `transformed parameters` に書ける。
+
+```stan
+model {
+  vector[N] mu = intercept + slope * x;
+  y ~ normal(mu, sigma);
+}
+```
+
+チルダ `~` 入りのサンプリング文だけを `model` に、<br>
+そのほかを `transformed *` に、とすると見通しが良い。
+
+```stan
+transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+model {
+  y ~ normal(mu, sigma);
+}
+```
 
 ---
-## Stanでポアソン回帰
+## パラメータの事前分布を明示的に設定できる
 
-<img src="figure/glm-poisson-1.png">
+が、省略してもStanがデフォルトでうまくやってくれる。<br>
+そのせいで収束が悪いかも、となってから考えても遅くない。
+
+```stan
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  sigma ~ student_t(3, 0, 10);
+}
+```
+
+---
+## 事前分布の選別
+
+1.  とりあえず**無情報事前分布** $[-\infty, \infty]$。Stanのデフォルト。
+
+1.  収束が悪かったら**弱情報事前分布**を試す。<br>
+    事後分布を更新していったとき**事前分布っぽさが残らない**のが良い。
+
+    - 取りうる値を逃すような狭すぎる分布はダメ。
+    - 狭すぎるよりはマシだが、広すぎても良くない。
+    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+      事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。
+
+    おすすめ: [**Student's t分布**](https://mc-stan.org/docs/functions-reference/student-t-distribution.html)
+    or [**正規分布**](https://mc-stan.org/docs/functions-reference/normal-distribution.html)
+
+<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
+
+
+---
+## Stanおすすめ弱情報事前分布: Student's t分布
+
+Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
+
+- 自由度 $3 \le \nu_0 \le 7 $ で適当に固定。
+  - $\nu = 1$ でコーシー分布。裾野が広すぎて良くないらしい。
+  - $\nu \to \infty$ で**正規分布**。だいたいこれでいいらしい。
+- スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
+
+```{r student_t, echo = FALSE, fig.height = 4, fig.width = 9}
+tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
+  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) %>%
+  ggplot() + aes(x, Density, group = df) +
+  geom_line(aes(color = nu), size = 1, alpha = 0.7) +
+  scale_color_viridis_d(end = 0.88, direction = 1, guide = guide_legend(reverse = TRUE)) +
+  scale_x_continuous(breaks = c(-1, 0, 1), labels = c(expression(-sigma), 0, expression(sigma))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank())
+```
+
+---
+## 🔰 Stanで一般化線形モデル
+🔰
+[`5-stan-glm.ipynb`](5-stan-glm.ipynb)
+を開いて実行していこう。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+
+- 直線回帰
+- ポアソン回帰
+- ポアソン重回帰
+- ロジスティック回帰
+- 分散分析
+- 共分散分析
+
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<figure>
+<img height=160 src="figure/lm-bad-1.png">
+<img height=160 src="figure/glm-poisson-1.png">
+<img height=160 src="figure/multiple-regression-1.png">
+<img height=160 src="figure/glm-logistic-1.png">
+<img height=160 src="figure/glm-anova-1.png">
+<img height=160 src="figure/glm-ancova-1.png">
+</figure>
+  </div>
+</div>
+
 
 ```{cat, engine.opts = list(file = "poisson.stan")}
 data {
@@ -108,15 +215,11 @@ parameters {
 }
 
 model {
-  y ~ poisson(exp(intercept + slope * x));
+  vector[N] lambda = exp(intercept + slope * x);
+  y ~ poisson(lambda);
 }
 ```
 
-
----
-## Stanでポアソン重回帰
-
-<img src="figure/multiple-regression-1.png">
 
 ```{cat, engine.opts = list(file = "multiple.stan")}
 data {
@@ -133,15 +236,11 @@ parameters {
 }
 
 model {
-  beer_sales ~ poisson(exp(intercept + coef_t * temperature + coef_h * humidity));
+  vector[N] lambda = exp(intercept + coef_t * temperature + coef_h * humidity);
+  beer_sales ~ poisson(lambda);
 }
 ```
 
-
----
-## Stanでロジスティック回帰
-
-<img src="figure/glm-logistic-1.png">
 
 ```{cat, engine.opts = list(file = "logistic.stan")}
 data {
@@ -157,14 +256,10 @@ parameters {
 }
 
 model {
-  beer_sales ~ binomial(n_trials, inv_logit(intercept + slope * temperature));
+  vector[N] p = inv_logit(intercept + slope * temperature);
+  beer_sales ~ binomial(n_trials, p);
 }
 ```
-
----
-## Stanで分散分析
-
-<img src="figure/glm-anova-1.png">
 
 ```{cat, engine.opts = list(file = "anova.stan")}
 data {
@@ -182,15 +277,10 @@ parameters {
 }
 
 model {
-  beer_sales ~ normal(intercept + coef_s * sunny + coef_r * rainy, sigma);
+  vector[N] mu = intercept + coef_s * sunny + coef_r * rainy;
+  beer_sales ~ normal(mu, sigma);
 }
 ```
-
-
----
-## Stanで共分散分析
-
-<img src="figure/glm-ancova-1.png">
 
 ```{cat, engine.opts = list(file = "ancova.stan")}
 data {
@@ -210,9 +300,11 @@ parameters {
 }
 
 model {
-  beer_sales ~ normal(intercept + coef_s * sunny +
-                                  coef_r * rainy +
-                                  coef_t * temperature, sigma);
+  vector[N] mu = intercept +
+                 coef_s * sunny +
+                 coef_r * rainy +
+                 coef_t * temperature;
+  beer_sales ~ normal(mu, sigma);
 }
 ```
 

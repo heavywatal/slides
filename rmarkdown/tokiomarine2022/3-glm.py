@@ -32,10 +32,10 @@ sys.version
 # まず、OLSによる直線当てはめの復習。
 
 # %%
-n_samples = 300
+sample_size = 300
 true_intercept = -3
 true_coef = 3
-x = rng.uniform(0.4, 1.7, n_samples)
+x = rng.uniform(0.4, 1.7, sample_size)
 lambda_ = np.exp(true_intercept + true_coef * x)
 y = rng.poisson(lambda_)
 df = pd.DataFrame(dict(x=x, y=y))
@@ -88,11 +88,11 @@ print(result.params)
 # ### 重回帰: 複数の説明変数を同時に扱う
 # ビールの注文数が気温と湿度の両方に依存して増加するデータを作る。
 # %%
-n_samples = 200
+sample_size = 200
 true_intercept = 3
 true_coefs = {"temperature": 0.05, "humidity": 0.006}
-temperature = rng.uniform(8, 32, n_samples)
-humidity = rng.uniform(20, 80, n_samples)
+temperature = rng.uniform(8, 32, sample_size)
+humidity = rng.uniform(20, 80, sample_size)
 lambda_ = np.exp(
     true_intercept
     + true_coefs["temperature"] * temperature
@@ -139,12 +139,12 @@ sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
 n_traials = 10
 true_intercept = -3
 true_coef = 0.3
-n_samples = 200
+sample_size = 200
 # Generate random numbers
-temperature = rng.uniform(-10, 35, n_samples)
+temperature = rng.uniform(-10, 35, sample_size)
 logit_p = true_intercept + true_coef * temperature
 p = special.expit(logit_p)
-beer_sales = rng.binomial(n_traials, p, n_samples)
+beer_sales = rng.binomial(n_traials, p, sample_size)
 _dic = {
     "temperature": temperature,
     "beer_sales": beer_sales,
@@ -179,15 +179,15 @@ grid.map(sns.lineplot, "temperature", "pred")
 # ### 分散分析: GLM with 質的(カテゴリカル)変数
 #
 # %% Parameters
-n_samples = 200
+sample_size = 200
 true_intercept = 70
 true_coefs = {"temp": 3, "sunny": 20, "rainy": -20}
 sd = 10
 weather_levels = ["cloudy", "sunny", "rainy"]
 # %%
-weather = rng.choice(weather_levels, n_samples, replace=True)
+weather = rng.choice(weather_levels, sample_size, replace=True)
 _dic = {
-    "temperature": rng.uniform(8, 32, n_samples),
+    "temperature": rng.uniform(8, 32, sample_size),
     "weather": pd.Categorical(weather, categories=weather_levels),
 }
 _df = pd.DataFrame(_dic)
@@ -243,15 +243,15 @@ grid.add_legend()
 # ビール売上の温度依存性が天気によって異なる。
 
 # %%
-n_samples = 200
+sample_size = 200
 sd = 10
 true_intercept = 100
 true_coefs = {"sunny": -30, "temp": 3, "sunny:temp": 2}
 weather_levels = ["rainy", "sunny"]
-temperature = rng.uniform(8, 32, n_samples)
-weather = rng.choice(weather_levels, n_samples, True)
+temperature = rng.uniform(8, 32, sample_size)
+weather = rng.choice(weather_levels, sample_size, True)
 _dic = {
-    "temperature": rng.uniform(8, 32, n_samples),
+    "temperature": rng.uniform(8, 32, sample_size),
     "weather": pd.Categorical(weather, categories=weather_levels),
 }
 _df = pd.DataFrame(_dic)
