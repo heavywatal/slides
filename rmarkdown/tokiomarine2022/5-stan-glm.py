@@ -102,8 +102,10 @@ grid = sns.FacetGrid(df_pred)
 grid.map(sns.scatterplot, "x", "y")
 grid.map(sns.lineplot, "x", "pred")
 
-
 # %% [markdown]
+# 95%確信区間などを得たい場合は
+# `generated quantities` ブロックにサンプリング文を書き、
+# できあがりの `draws` から抜き出す。
 # ----
 #
 # ### Stanでポアソン回帰

@@ -173,6 +173,76 @@ tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
 ```
 
 ---
+## MCMCサンプルを使ってベイズ確信区間を作図
+
+```stan
+data {
+  // ...
+  int<lower=0> N_tilde
+  vector[N_tilde] x_tilde;
+}
+// ...
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+```
+
+```{cat, engine.opts = list(file = "lm-credible.stan"), cache.rebuild = !file.exists("lm-credible.stan")}
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  vector[N] y;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+}
+
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+```
+
+```{r stan-lm-generated, include = FALSE, cache.extra = file.mtime("lm-credible.stan")}
+n = 300L
+a = 3
+b = -3
+df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
+mydata = as.list(df_pois)
+mydata[["N"]] = n
+mydata[["x_tilde"]] = seq(0.4, 1.7, 0.1)
+mydata[["N_tilde"]] = length(mydata[["x_tilde"]])
+
+model = cmdstan_model("lm-credible.stan")
+fit = model$sample(mydata, show_messages = FALSE, refresh = 0)
+draws = fit$draws(format = "draws_df") %>% print()
+
+.probs = c(lower = 0.025, median = 0.5, upper = 0.975)
+df_quant = draws %>%
+  dplyr::summarize(across(starts_with("y_tilde"), quantile, probs = .probs)) %>%
+  dplyr::mutate(label = names(.probs)) %>%
+  tidyr::pivot_longer(!label, names_to = "x", values_to = "y") %>%
+  dplyr::mutate(x = mydata[["x_tilde"]][readr::parse_number(x)]) %>%
+  tidyr::pivot_wider(names_from = label, values_from = y)
+```
+```{r stan-lm-credible, echo = FALSE, fig.height = 4.5, fig.width = 6}
+ggplot(df_pois) +
+  aes(x) +
+  geom_point(aes(y = y), shape = 16L, alpha = 0.5) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), data = df_quant, alpha = 0.3) +
+  geom_line(aes(y = median), data = df_quant) +
+  theme_bw(18)
+```
+
+---
 ## 🔰 Stanで一般化線形モデル
 🔰
 [`5-stan-glm.ipynb`](5-stan-glm.ipynb)
@@ -202,7 +272,7 @@ tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
 </div>
 
 
-```{cat, engine.opts = list(file = "poisson.stan")}
+```{cat, engine.opts = list(file = "poisson.stan"), cache.rebuild = !file.exists("poisson.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -221,7 +291,7 @@ model {
 ```
 
 
-```{cat, engine.opts = list(file = "multiple.stan")}
+```{cat, engine.opts = list(file = "multiple.stan"), cache.rebuild = !file.exists("multiple.stan")}
 data {
   int<lower=0> N;
   vector[N] temperature;
@@ -242,7 +312,7 @@ model {
 ```
 
 
-```{cat, engine.opts = list(file = "logistic.stan")}
+```{cat, engine.opts = list(file = "logistic.stan"), cache.rebuild = !file.exists("logistic.stan")}
 data {
   int<lower=0> N;
   int<lower=0> n_trials;
@@ -261,7 +331,7 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "anova.stan")}
+```{cat, engine.opts = list(file = "anova.stan"), cache.rebuild = !file.exists("anova.stan")}
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -282,7 +352,7 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "ancova.stan")}
+```{cat, engine.opts = list(file = "ancova.stan"), cache.rebuild = !file.exists("ancova.stan")}
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -336,7 +406,7 @@ penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
 penguins_dropna = penguins.dropna()
 ```
 
-```{cat, engine.opts = list(file = "penguins-lm.stan")}
+```{cat, engine.opts = list(file = "penguins-lm.stan"), cache.rebuild = !file.exists("penguins-lm.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;
@@ -354,7 +424,7 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "penguins-multiple.stan")}
+```{cat, engine.opts = list(file = "penguins-multiple.stan"), cache.rebuild = !file.exists("penguins-multiple.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;
