@@ -190,6 +190,20 @@ or <a href="https://mc-stan.org/docs/functions-reference/normal-distribution.htm
 
 </section>
 <section>
+<h2 id="mcmcサンプルを使ってベイズ確信区間を作図">MCMCサンプルを使ってベイズ確信区間を作図</h2>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  // ...
+  int&lt;lower=0&gt; N_tilde
+  vector[N_tilde] x_tilde;
+}
+// ...
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+</code></pre><p><img src="figure/stan-lm-credible-1.png" alt="plot of chunk stan-lm-credible"></p>
+
+</section>
+<section>
 <h2 id="-stanで一般化線形モデル">🔰 Stanで一般化線形モデル</h2>
 <p>🔰
 <a href="5-stan-glm.ipynb"><code>5-stan-glm.ipynb</code></a>
