@@ -166,20 +166,20 @@ p = 0.6 とかである可能性もまあある。
 <section>
 <h2 id="ベイズの定理-in-感染症検査">ベイズの定理 in 感染症検査</h2>
 <ul>
-<li>有病率 $\text{Prob}(M)$ : 0.3% (この地域の感染者の割合; 事前確率)</li>
-<li>感度 $\text{Prob}(P \mid M)$ : 90% (感染してる人に陽性判定が出る)</li>
-<li>特異度 $\text{Prob}(N \mid \overline{M})$: 99% (感染してない人に陰性判定が出る)</li>
+<li>有病率 $\text{Prob}(I)$ : 0.3% (この地域の感染者の割合; 事前確率)</li>
+<li>感度 $\text{Prob}(P \mid I)$ : 90% (感染してる人に陽性判定が出る)</li>
+<li>特異度 $\text{Prob}(\lnot P \mid \lnot I)$: 99% (感染してない人に陰性判定が出る)</li>
 </ul>
-<p>$\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者である確率)は？</p>
+<p>さて、陽性適中率(検査陽性の人が実際に感染者である確率)は？</p>
 <div>\[\begin{split}
-\text{Prob}(M \mid P)
-  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)} {\text{Prob}(P)} \\
-  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)}
-           {\text{Prob}(P \mid M)~\text{Prob}(M) + (1 - \text{Prob}(N \mid \overline{M}))~\text{Prob}(\overline{M})} \\
+\text{Prob}(I \mid P)
+  &= \frac {\text{Prob}(P \mid I)~\text{Prob}(I)} {\text{Prob}(P)} \\
+  &= \frac {\text{Prob}(P \mid I)~\text{Prob}(I)}
+           {\text{Prob}(P \mid I)~\text{Prob}(I) + \text{Prob}(P \mid \lnot I)~\text{Prob}(\lnot I)} \\
   &= \frac {0.9 \times 0.003} {0.9 \times 0.003 + 0.01 \times 0.997} \approx 0.21
 \end{split}\]</div>
 <p>感染者を隔離するスクリーニング目的では使いものにならない性能。</p>
-<p>🔰 同様に $\text{Prob}(\overline{M} \mid N)$ 真陰性率を計算してみよう<br>
+<p>🔰 同様に $\text{Prob}(\lnot I \mid \lnot P)$ 陰性的中率を計算してみよう<br>
 🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう</p>
 
 </section>
@@ -192,11 +192,11 @@ p = 0.6 とかである可能性もまあある。
 モデル$M$を仮説$H$やパラメータ$\theta$に置き換えてもいい。</p>
 <p><strong>周辺尤度</strong>は「確率分布の積分は1」を満たすための正規化定数とみなせる。<br>
 比例関係だけ抜き出してこう書くことが多い:</p>
-<div>\[\begin{split}
-\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \\
-\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \\
-\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta)
-\end{split}\]</div>
+<div>\[\begin{align}
+\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \tag{Model}\\
+\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \tag{Hypothesis} \\
+\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta) \tag{Parameter}
+\end{align}\]</div>
 
 </section>
 <section>
@@ -324,11 +324,15 @@ p = 0.6 とかである可能性もまあある。
 <dl>
 <dt>区間推定</dt>
 <dd>幅のある推定値を提示</dd>
-<dd>e.g., 95%ベイズ確信区間<br>
-(等裾事後信用区間, 最高密度区間)</dd>
+<dd>e.g., 95%ベイズ確信区間:<br>
+等裾事後確信区間 (<u>E</u>qual-<u>T</u>ailed <u>I</u>nterval)<br>
+最高密度区間 (<u>H</u>ighest <u>D</u>ensity <u>I</u>nterval)</dd>
 <dt>点推定</dt>
 <dd>値を1点だけ提示</dd>
-<dd>e.g., MAP, MED, EAP
+<dd>e.g.,<br>
+事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori)<br>
+事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)<br>
+事後中央値 (Posteriori <u>Med</u>ian)
 </div>
 <div class="column" style="flex-shrink: 1.3;">
 </dd>
@@ -336,10 +340,6 @@ p = 0.6 とかである可能性もまあある。
 <p><img src="figure/integrate-1.png" alt="plot of chunk integrate"></p>
   </div>
 </div>
-<p>コイン投げモデルのベータ分布は美しい例。<br>
-→ 解析的(数学的)に解ける。</p>
-<p>実践的なモデル・事後分布はもっと複雑。<br>
-→ コンピュータに頼って数値計算: MCMC</p>
 
 </section>
 <section>
@@ -352,9 +352,14 @@ p = 0.6 とかである可能性もまあある。
 </ul>
 </li>
 </ul>
-<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian" width="70%">
 <hr>
-<p>☕️ 休憩 + 質疑応答
+<p>コイン投げモデルのベータ分布は美しい例。<br>
+→ 解析的(数学的)に解ける。</p>
+<p>実践的なモデル・事後分布はもっと複雑。<br>
+→ コンピュータに頼って数値計算: MCMC</p>
+<p>☕️ 休憩 + 質疑応答</p>
+
 </section>
 <section>
 <h2 id="mcmc-umuarcov-ucuhain-umuonte-ucuarlo">MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo</h2>
@@ -477,7 +482,7 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <section>
 <h2 id="収束判定">収束判定</h2>
 <ul>
-<li>複数chainsで異なる初期値から実行し、軌跡や分布を可視化</li>
+<li>複数chainsで異なる初期値から実行し、軌跡を可視化(traceplot)</li>
 <li>Gelman-Rubin統計量 $\hat R &lt; 1.05$</li>
 <li>Effective Sample Size (ESS) $N_\text{eff} &gt; 100$ per chain</li>
 </ul>
@@ -494,14 +499,14 @@ http://mc-stan.org/misc/warnings.html
 <ul>
 <li>小手先の対処
 <ul>
-<li>warmupとiterをもっと長くする</li>
+<li>iteration (warnup + sampling) をもっと長く</li>
 <li>thinを大きくして間引く</li>
 </ul>
 </li>
 <li>ちょっと大掛かり
 <ul>
-<li>モデルを見直す</li>
-<li>プログラムを見直す</li>
+<li>プログラムの書き方を改善する</li>
+<li>モデルの構造を見直す</li>
 <li>アルゴリズム・ソフトウェアを変える</li>
 </ul>
 </li>
@@ -664,27 +669,32 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;coin.stan&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
-</span></span></code></pre></div><p>いろいろオプションはあるけど、とりあえずデフォルトに任せる:<br>
+</span></span></code></pre></div><p>いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
 <code>chains</code>, <code>inits</code>, <code>iter_warmup</code>, <code>iter_samples</code>, <code>thin</code>, &hellip;</p>
 <p>問題があったら警告してくれるので<strong>ちゃんと読む</strong>。</p>
 
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-結果を眺める">説明変数なしのベイズ推定: 結果を眺める</h2>
-<p>$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
-念のため trace plot も確認しておこう。</p>
+<p><code>parameters</code> ブロックに書いた変数の情報が出てくる。<br>
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code> variable   mean median   sd  mad     q5    q95 rhat ess_bulk ess_tail
-     lp__ -23.55 -23.27 0.69 0.30 -24.96 -23.05 1.00     1561     2163
-     p      0.76   0.76 0.07 0.06   0.64   0.86 1.00     1248     1605
-</code></pre><p>乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
+     lp__ -23.59 -23.30 0.77 0.34 -25.17 -23.05 1.00     1760     2102
+     p      0.76   0.77 0.07 0.07   0.65   0.86 1.00     1462     1749
+</code></pre><p>真の値に近い $p \approx 0.7$ が得られた
+(0.65 から
+0.86 である確率が90%)。<br>
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
+<p><code>lp__</code> はlog posterior(対数事後確率)。後述。</p>
+<p>念のため trace plot も確認しておこう→</p>
 
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
 <p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
 
@@ -704,6 +714,43 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 </span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
 </code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 </code></pre><p><img src="figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+
+</section>
+<section>
+<h2 id="lp__-log-posterior-とは"><code>lp__</code>: log posterior とは?</h2>
+<p><code>model</code> ブロックに次のように書いてあると:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">model {
+  mu ~ normal(0.0, 10.0);  // prior
+  x ~ normal(mu, 1.0);     // likelihood
+}
+</code></pre><p>内部的には次のような処理が行われている:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">target += normal_lpdf(theta | 0.0, 10.0)  // prior
+target += normal_lpdf(x | theta, 1.0);    // likelihood
+</code></pre><p>つまり、事前確率と尤度の対数の和を取っている。<br>
+ベイズの定理により、事後確率はこれに比例する。<br>
+<code>lp__</code> はこの <code>target</code> 変数を記録しておいたようなもの。</p>
+
+</section>
+<section>
+<h2 id="ベイズ推定とmcmc">ベイズ推定とMCMC</h2>
+<p>
+<img src="../tokiomarine2021/bayesian.drawio.svg">
+</p>
+<ul>
+<li>推定結果は<strong>事後分布</strong> ∝ 尤度関数。
+<ul>
+<li>広がり具合によって不確実性も表現できる。</li>
+<li><strong>逐次学習</strong>で尖っていき、確信が強まる。</li>
+</ul>
+</li>
+<li>コンピュータに頼った計算方法としてのモンテカルロ法。
+<ul>
+<li>高次元・変な形の分布でも効率よくサンプルできるかが肝。</li>
+<li>ソフトウェアの代表は<strong>Stan</strong>。</li>
+<li>Stan言語でモデルを書き、RやPythonから動かす。</li>
+</ul>
+</li>
+</ul>
 
 </section>
 <section>
