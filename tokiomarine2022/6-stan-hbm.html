@@ -100,6 +100,37 @@ if (!doNotTrack) {
 <img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
 </section>
 <section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$をそのままパラメータにすると<strong>過剰適合</strong>。<br>
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから&hellip;&hellip;</p>
+<img src="figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm">
+<p>個体の生存能力をもっと少ないパラメータで表現できないか？</p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
+<img src="figure/sigmoid-1.png" alt="plot of chunk sigmoid">
+<p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
+<p>前者は標本平均 $\hat p$ から求まるとして、後者どうする？</p>
+
+</section>
+<section>
+<h2 id="個体能力のばらつき-sigma-が大きいと両端が増える">個体能力のばらつき $\sigma$ が大きいと両端が増える</h2>
+<p>普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。</p>
+<img src="figure/alter-sigma-1.png" alt="plot of chunk alter-sigma">
+<img src="figure/alter-sigma-2.png" alt="plot of chunk alter-sigma">
+</section>
+<section>
+<h2 id="zの値で色分けしてみると想像しやすい">zの値で色分けしてみると想像しやすい</h2>
+<p>正規分布と二項分布の混ぜ合わせ&hellip;&hellip;?</p>
+<img src="figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z">
+<img src="figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z">
+</section>
+<section>
 <h2 id="階層ベイズモデルのイメージ図">階層ベイズモデルのイメージ図</h2>
 <p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
 <figure>
