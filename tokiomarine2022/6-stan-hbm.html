@@ -134,7 +134,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 <h2 id="階層ベイズモデルのイメージ図">階層ベイズモデルのイメージ図</h2>
 <p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
 <figure>
-<img src="../tokiomarine2021/hbm.drawio.svg">
+<img src="../tokiomarine2022/hbm.drawio.svg">
 </figure>
 
 </section>
@@ -147,20 +147,21 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 }
 
 parameters {
-  real a;           // mean ability
-  vector[N] r;      // individual difference
-  real&lt;lower=0&gt; s;  // sd of r
+  real z_hat;           // mean ability
+  real&lt;lower=0&gt; sigma;  // sd of r
+  vector[N] r;          // individual difference
 }
 
 transformed parameters {
-  vector[N] p = inv_logit(a + r);
+  vector[N] z = z_hat + r;
+  vector[N] p = inv_logit(z);
 }
 
 model {
   y ~ binomial(8, p);
-  a ~ normal(0, 10);
-  r ~ normal(0, s);
-  s ~ student_t(3, 0, 1);
+  z_hat ~ normal(0, 10);
+  r ~ normal(0, sigma);
+  sigma ~ student_t(3, 0, 1);
 }
 </code></pre>
 </section>
@@ -177,23 +178,23 @@ All 4 chains finished successfully.
 Mean chain execution time: 0.4 seconds.
 Total execution time: 0.5 seconds.
 </code></pre><pre tabindex="0"><code> variable    mean  median   sd  mad      q5     q95 rhat ess_bulk ess_tail
-     lp__ -455.89 -455.53 9.32 9.31 -472.22 -440.97 1.00      840     1614
-     a       0.26    0.25 0.31 0.32   -0.25    0.78 1.00      759     1530
-     r[1]   -0.23   -0.23 0.78 0.75   -1.53    1.09 1.00     3297     2636
-     r[2]    1.73    1.67 1.05 1.03    0.16    3.54 1.00     4425     2188
-     r[3]    1.74    1.68 1.06 1.02    0.13    3.63 1.00     4100     2308
-     r[4]   -3.74   -3.51 1.62 1.51   -6.65   -1.53 1.00     3645     2302
-     r[5]   -2.19   -2.11 1.04 0.97   -4.02   -0.63 1.00     3815     2762
-     r[6]   -2.21   -2.13 1.07 1.03   -4.08   -0.59 1.00     4072     2888
-     r[7]    0.92    0.88 0.85 0.84   -0.39    2.37 1.00     3410     2892
-     r[8]   -2.20   -2.10 1.07 1.03   -4.06   -0.63 1.00     3295     2457
+    lp__  -455.91 -455.40 9.20 9.28 -471.72 -442.03 1.00      901     1283
+    z_hat    0.25    0.25 0.31 0.31   -0.26    0.76 1.00      669     1152
+    sigma    2.78    2.75 0.33 0.33    2.28    3.36 1.00     1245     1425
+    r[1]    -0.24   -0.24 0.78 0.77   -1.51    1.04 1.00     3474     2795
+    r[2]     1.76    1.69 1.04 1.01    0.17    3.54 1.00     4261     2733
+    r[3]     1.78    1.69 1.07 1.02    0.23    3.71 1.00     4065     2639
+    r[4]    -3.77   -3.54 1.64 1.51   -6.65   -1.49 1.00     3422     2092
+    r[5]    -2.21   -2.12 1.05 1.00   -4.10   -0.66 1.00     4879     2579
+    r[6]    -2.18   -2.10 1.05 1.03   -4.01   -0.59 1.00     4225     2830
+    r[7]     0.91    0.90 0.86 0.87   -0.42    2.38 1.00     3393     2735
 
- # showing 10 of 203 rows (change via &#39;max_rows&#39; argument or &#39;cmdstanr_max_rows&#39; option)
+ # showing 10 of 303 rows (change via &#39;max_rows&#39; argument or &#39;cmdstanr_max_rows&#39; option)
 </code></pre>
 </section>
 <section>
 <h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
-<p>データ生成の真のパラメータ値は $a = 0.5,~s = 3.0$ だった。</p>
+<p>データ生成の真のパラメータ値は $\hat z = 0.5,~\sigma = 3.0$ だった。</p>
 <pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
 </code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 </code></pre><p><img src="figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>

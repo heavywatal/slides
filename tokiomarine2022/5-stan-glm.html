@@ -118,21 +118,45 @@ model {
 </code></pre>
 </section>
 <section>
+<h2 id="変数の型-vector-vs-array">変数の型: <code>vector</code> vs <code>array</code></h2>
+<p><code>vector</code>, <code>row_vector</code>, <code>matrix</code> は実数 <code>real</code> のみで、行列演算できる:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">real x;
+vector[3] v;
+row_vector[3] r;
+matrix[3, 3] m;
+
+x * v  // vector[3]
+r * v  // real
+v * r  // matrix[3, 3]
+m * v  // vector[3]
+m * m  // matrix[3, 3]
+m[1]   // row_vector[3]
+</code></pre><p><code>array</code> に型の制約は無いが、行列演算はできないので自力forループ:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">array[3] int a;
+array[3] int b;
+for (i in 1:3) {
+  b[i] = 2 * a[i] + 1
+}
+</code></pre>
+</section>
+<section>
 <h2 id="変数をうまく使って可読性アップ">変数をうまく使って可読性アップ</h2>
-<p>新しい変数は <code>model</code> か <code>transformed parameters</code> に書ける。</p>
+<p>途中計算に名前をつけることでモデルが読みやすくなる:</p>
 <pre tabindex="0"><code class="language-stan" data-lang="stan">model {
   vector[N] mu = intercept + slope * x;
   y ~ normal(mu, sigma);
 }
-</code></pre><p>チルダ <code>~</code> 入りのサンプリング文だけを <code>model</code> に、<br>
-そのほかを <code>transformed *</code> に、とすると見通しが良い。</p>
+</code></pre><p><code>transformed parameters</code> に書くと<br>
+<code>parameters</code> と同様にMCMCサンプルが記録される:</p>
 <pre tabindex="0"><code class="language-stan" data-lang="stan">transformed parameters {
   vector[N] mu = intercept + slope * x;
 }
+
 model {
   y ~ normal(mu, sigma);
 }
-</code></pre>
+</code></pre><p>コードの見通しは良くなるが、結果の閲覧はちょっとやりづらくなる。</p>
+
 </section>
 <section>
 <h2 id="パラメータの事前分布を明示的に設定できる">パラメータの事前分布を明示的に設定できる</h2>
@@ -218,10 +242,10 @@ generated quantities {
 <p>ポアソン回帰</p>
 </li>
 <li>
-<p>ポアソン重回帰</p>
+<p>ロジスティック回帰</p>
 </li>
 <li>
-<p>ロジスティック回帰</p>
+<p>重回帰</p>
 </li>
 <li>
 <p>分散分析</p>
@@ -235,8 +259,8 @@ generated quantities {
 <figure>
 <img height=160 src="figure/lm-bad-1.png">
 <img height=160 src="figure/glm-poisson-1.png">
-<img height=160 src="figure/multiple-regression-1.png">
-<img height=160 src="figure/glm-logistic-1.png">
+<img height=160 src="figure/glm-logistic-1.png"><br>
+<img height=160 src="figure/multiple-regression-1.png"><br>
 <img height=160 src="figure/glm-anova-1.png">
 <img height=160 src="figure/glm-ancova-1.png">
 </figure>
