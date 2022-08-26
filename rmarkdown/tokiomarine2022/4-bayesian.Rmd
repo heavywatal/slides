@@ -201,23 +201,23 @@ ggplot() + aes(x, y) +
 ---
 ## ベイズの定理 in 感染症検査
 
-- 有病率 $\text{Prob}(M)$ : 0.3% (この地域の感染者の割合; 事前確率)
-- 感度 $\text{Prob}(P \mid M)$ : 90% (感染してる人に陽性判定が出る)
-- 特異度 $\text{Prob}(N \mid \overline{M})$: 99% (感染してない人に陰性判定が出る)
+- 有病率 $\text{Prob}(I)$ : 0.3% (この地域の感染者の割合; 事前確率)
+- 感度 $\text{Prob}(P \mid I)$ : 90% (感染してる人に陽性判定が出る)
+- 特異度 $\text{Prob}(\lnot P \mid \lnot I)$: 99% (感染してない人に陰性判定が出る)
 
-$\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者である確率)は？
+さて、陽性適中率(検査陽性の人が実際に感染者である確率)は？
 
 <div>\[\begin{split}
-\text{Prob}(M \mid P)
-  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)} {\text{Prob}(P)} \\
-  &= \frac {\text{Prob}(P \mid M)~\text{Prob}(M)}
-           {\text{Prob}(P \mid M)~\text{Prob}(M) + (1 - \text{Prob}(N \mid \overline{M}))~\text{Prob}(\overline{M})} \\
+\text{Prob}(I \mid P)
+  &= \frac {\text{Prob}(P \mid I)~\text{Prob}(I)} {\text{Prob}(P)} \\
+  &= \frac {\text{Prob}(P \mid I)~\text{Prob}(I)}
+           {\text{Prob}(P \mid I)~\text{Prob}(I) + \text{Prob}(P \mid \lnot I)~\text{Prob}(\lnot I)} \\
   &= \frac {0.9 \times 0.003} {0.9 \times 0.003 + 0.01 \times 0.997} \approx 0.21
 \end{split}\]</div>
 
 感染者を隔離するスクリーニング目的では使いものにならない性能。
 
-🔰 同様に $\text{Prob}(\overline{M} \mid N)$ 真陰性率を計算してみよう<br>
+🔰 同様に $\text{Prob}(\lnot I \mid \lnot P)$ 陰性的中率を計算してみよう<br>
 🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう
 
 ```{r infection-test, echo = FALSE, eval = FALSE, include = FALSE}
@@ -247,11 +247,11 @@ devnull = tibble::tibble(
 
 **周辺尤度**は「確率分布の積分は1」を満たすための正規化定数とみなせる。<br>
 比例関係だけ抜き出してこう書くことが多い:
-<div>\[\begin{split}
-\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \\
-\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \\
-\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta)
-\end{split}\]</div>
+<div>\[\begin{align}
+\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \tag{Model}\\
+\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \tag{Hypothesis} \\
+\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta) \tag{Parameter}
+\end{align}\]</div>
 
 
 ---
@@ -420,56 +420,109 @@ df_beta %>%
 
 区間推定
 : 幅のある推定値を提示
-: e.g., 95%ベイズ確信区間<br>
-  (等裾事後信用区間, 最高密度区間)
+: e.g., 95%ベイズ確信区間:<br>
+  等裾事後確信区間 (<u>E</u>qual-<u>T</u>ailed <u>I</u>nterval)<br>
+  最高密度区間 (<u>H</u>ighest <u>D</u>ensity <u>I</u>nterval)
 
 点推定
 : 値を1点だけ提示
-: e.g., MAP, MED, EAP
+: e.g.,<br>
+  事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori)<br>
+  事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)<br>
+  事後中央値 (Posterior <u>Med</u>ian)
 
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r integrate, echo = FALSE, fig.width = 6, fig.height = 4}
-n_head = 6
-n_total = 10
+```{r integrate, echo = FALSE, fig.width = 5, fig.height = 8.2}
+hdi_lowerbound = function(density, ci = 0.95) {
+  x = sort(density, decreasing = TRUE)
+  cumsum_x = cumsum(x)
+  sum_x = cumsum_x[length(x)]
+  y = x[cumsum_x < (ci * sum_x)]
+  y[length(y)]
+}
+
+n_head = 3
+n_total = 12
+df_density = tibble::tibble(
+  p = seq(0, 1, 0.001),
+  Density = dbeta(p, n_head, n_total - n_head))
+
+.theme = theme_minimal(base_size = 18) + theme(
+  panel.grid.minor = element_blank(),
+  panel.grid.major.y = element_blank(),
+  axis.text = element_blank())
+
 bound = qbeta(c(0.025, 0.975), n_head, n_total - n_head)
 .f = function(.x) {dplyr::filter(.x, dplyr::between(p, bound[1], bound[2]))}
-.g = function(.x) {dplyr::slice_max(.x, Density)}
-tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)) %>%
+.g = function(.x) {dplyr::mutate(.x, Density = ifelse(dplyr::between(p, bound[1], bound[2]), 0, Density))}
+p_eti = df_density %>%
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_line(color = "#3366ff", size = 1) +
+  geom_line(color = "#999999", size = 1) +
   geom_area(data = .f, fill = "#3366ff", alpha = 0.5) +
-  geom_vline(aes(xintercept = p), data = .g, color = "#3366ff", size = 1) +
-  geom_point(data = .g, color = "#3366ff", size = 5, shape = 16) +
-  scale_x_continuous(breaks = round(bound, 2)) +
-  labs(title = sprintf("%d / %d", n_head, n_total)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
-        panel.grid.major.y = element_blank(), panel.border = element_blank())
+  geom_area(data = .g, fill = "#333333", alpha = 0.8) +
+  annotate("text", x = bound[1], y = 0.7, label = "2.5%", color = "#333333", hjust = 1) +
+  annotate("text", x = bound[2], y = 0.7, label = "2.5%", color = "#333333", hjust = 0) +
+  scale_x_continuous(breaks = bound, labels = round(bound, 2)) +
+  labs(title = "Equal-Tailed Interval (ETI)", x = "Parameter") +
+  .theme + theme(panel.grid.major = element_line(color = "#3366ff"))
+
+hdi_lb = hdi_lowerbound(df_density$Density)
+df_hdi = df_density %>% dplyr::filter(Density >= hdi_lb)
+range_hdi = df_hdi %>% dplyr::summarize(p = range(p)) %>% dplyr::pull(p)
+p_hdi = df_density %>%
+  ggplot() + aes(p, Density) +
+  geom_hline(yintercept = 0) +
+  geom_area(data = df_hdi, fill = "#3366ff", alpha = 0.5) +
+  geom_line(color = "#999999", size = 1) +
+  geom_hline(aes(yintercept = hdi_lb), color = "#444444", size = 1, linetype = "dashed") +
+  scale_x_continuous(breaks = range_hdi, labels = round(range_hdi, 2)) +
+  labs(title = "Highest Density Interval (HDI)", x = "Parameter") +
+  .theme + theme(panel.grid.major = element_line(color = "#3366ff"))
+
+.map = function(.x) {dplyr::slice_max(.x, Density)}
+.med = function(.x) {
+  .x %>%
+    dplyr::mutate(cs = cumsum(Density)) %>%
+    dplyr::mutate(diff = abs(cs - 0.5 * max(cs))) %>%
+    dplyr::slice_min(diff)
+}
+.eap = function(.x) {
+  .x %>%
+    dplyr::mutate(diff = abs(.data$p - sum(p * Density) / sum(Density))) %>%
+    dplyr::slice_min(diff)
+}
+.colors = setNames(scales::viridis_pal(end = 0.92, option = "viridis")(3), c("map", "med", "eap"))
+p_point = df_density %>%
+  ggplot() + aes(p, Density) +
+  geom_hline(yintercept = 0) +
+  geom_line(color = "#999999", size = 1) +
+  geom_vline(aes(xintercept = p), data = .map, color = .colors["map"], size = 1) +
+  geom_vline(aes(xintercept = p), data = .med, color = .colors["med"], size = 1) +
+  geom_vline(aes(xintercept = p), data = .eap, color = .colors["eap"], size = 1) +
+  geom_point(aes(y = 0), data = .map, color = .colors["map"], size = 4, shape = 16) +
+  geom_point(aes(y = 0), data = .med, color = .colors["med"], size = 4, shape = 16) +
+  geom_point(aes(y = 0), data = .eap, color = .colors["eap"], size = 4, shape = 16) +
+  ggrepel::geom_text_repel(data = .map, aes(y = 0.25, label = "MAP"), color = .colors["map"], size = 5, nudge_x = -0.08) +
+  ggrepel::geom_text_repel(data = .med, aes(y = 0.45, label = "MED"), color = .colors["med"], size = 5, nudge_x = 0.1) +
+  ggrepel::geom_text_repel(data = .eap, aes(y = 0.25, label = "EAP"), color = .colors["eap"], size = 5, nudge_x = 0.2) +
+  labs(title = "Point Estimation", x = "Parameter") +
+  .theme + theme(panel.grid = element_blank())
+cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
 ```
 
   </div>
 </div>
 
-コイン投げモデルのベータ分布は美しい例。<br>
-→ 解析的(数学的)に解ける。
-
-実践的なモデル・事後分布はもっと複雑。<br>
-→ コンピュータに頼って数値計算: MCMC
-
 ???
 
-- 95%ベイズ確信区間 (credible interval): 真の値が95%の確率で含まれる区間。
-- 等裾事後信用区間 (equal-tailed interval): 両端から2.5%ずつ削る
-- 最高密度区間 (highest density interval): 分布密度に閾値を設ける
-- 事後中央値 (Posteriori <u>Med</u>ian: MED)
-- 事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori: EAP)
-- 事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori: MAP)
+ベイズ確信区間 (credible interval)
+: 真の値が95%の確率で含まれる区間。
 
 信頼区間 (confidence interval)
-頻度主義の考え方に基づいていて、解釈が難しい。
+: 頻度主義の考え方に基づいていて、解釈が難しい。
 「標本抽出を100回繰り返すとそのうちの95回はその区間に母平均が含まれる」
 真の値は1つに定まっていて、不確実性は有限のサンプリングに由来する。
 
@@ -482,9 +535,15 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)
     - 広がり具合によって不確実性も表現できる。
     - **逐次学習**で尖っていき、確信が強まる。
 
-<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian" width="70%">
 
 <hr>
+
+コイン投げモデルのベータ分布は美しい例。<br>
+→ 解析的(数学的)に解ける。
+
+実践的なモデル・事後分布はもっと複雑。<br>
+→ コンピュータに頼って数値計算: MCMC
 
 ☕️ 休憩 + 質疑応答
 
@@ -537,7 +596,9 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)
 
 e.g., 半径1の円の面積
 
-面積4の正方形に400個の一様乱数を打ち込んだら318個乗った:<br>
+数学を知っていれば $\pi r ^ 2 \approx 3.14159$
+
+面積4の正方形に400個の一様乱数を打ち込んだら318個が円に乗った:<br>
 $4 \times \frac {318} {400} = 3.18$
 
 ```{r circle, echo = FALSE, fig.width = 4, fig.height = 4}
@@ -552,8 +613,6 @@ ggplot(points) + aes(x, y) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
-
-数学を知っていれば $\pi r ^ 2 \approx 3.14$
 
 ---
 ## 変な分布もモンテカルロ法で扱えそう
@@ -760,9 +819,6 @@ cowplot::plot_grid(p_lik, p_dens, p_hist, nrow = 1L)
 
 パラメータが複数ある場合は？
 
-???
-これは「コイン10回投げて6回表。表の出る確率pは？」という簡単なモデル。
-
 
 ---
 ## Gibbs Sampling
@@ -786,6 +842,7 @@ gibbs_sample = function(n, rho) {
   tibble::tibble(x = x[-1], y = y[-2 * n])
 }
 
+set.seed(19937)
 rho = 0.8
 df_gibbs = gibbs_sample(40, rho)
 
@@ -881,11 +938,11 @@ p_trace +
 ---
 ## 収束判定
 
-- 複数chainsで異なる初期値から実行し、軌跡や分布を可視化
+- 複数chainsで異なる初期値から実行し、軌跡を可視化(traceplot)
 - Gelman-Rubin統計量 $\hat R < 1.05$
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
-```{cat, engine.opts = list(file = "converge-yes.stan"), cache.rebuild = !file.exists("converge-yes.stan")}
+```{cat, engine.opts = list(file = "stan/converge-yes.stan"), cache.rebuild = !file.exists("stan/converge-yes.stan")}
 data {
   int<lower=0> N;
   array[N] int x;
@@ -899,7 +956,7 @@ model {
   x ~ poisson(lambda);
 }
 ```
-```{cat, engine.opts = list(file = "converge-no.stan"), cache.rebuild = !file.exists("converge-no.stan")}
+```{cat, engine.opts = list(file = "stan/converge-no.stan"), cache.rebuild = !file.exists("stan/converge-no.stan")}
 data {
   int<lower=0> N;
   array[N] int x;
@@ -926,23 +983,20 @@ myplot_trace = function(stan_file, data) {
   bayesplot::mcmc_trace(fit$draws("lambda")) + labs(title = label)
 }
 ```
-```{r converge-yes, echo = FALSE, dependson = -1, cache.extra = tools::md5sum("converge-yes.stan"), message = FALSE, warning = FALSE, results = FALSE}
-p_yes = myplot_trace("converge-yes.stan", mydata)
+```{r converge-yes, echo = FALSE, dependson = -1, cache.extra = tools::md5sum("stan/converge-yes.stan"), message = FALSE, warning = FALSE, results = FALSE}
+p_yes = myplot_trace("stan/converge-yes.stan", mydata)
 ```
-```{r converge-no, echo = FALSE, dependson = -2, cache.extra = tools::md5sum("converge-no.stan"), message = FALSE, warning = FALSE, results = FALSE}
-p_no = myplot_trace("converge-no.stan", mydata)
+```{r converge-no, echo = FALSE, dependson = -2, cache.extra = tools::md5sum("stan/converge-no.stan"), message = FALSE, warning = FALSE, results = FALSE}
+p_no = myplot_trace("stan/converge-no.stan", mydata)
 ```
 ```{r convergence, echo = FALSE, dependson = c(-1, -2), fig.height = 3, fig.width = 11}
 cowplot::plot_grid(p_yes, p_no, nrow = 1L)
 ```
 
-```
-Warning: The largest R-hat is ***, indicating chains have not mixed.
-Warning: Bulk Effective Samples Size (ESS) is too low, indicating posterior means and medians may be unreliable.
-Warning: Tail Effective Samples Size (ESS) is too low, indicating posterior variances and tail quantiles may be unreliable.
-Running the chains for more iterations may help. See
-http://mc-stan.org/misc/warnings.html
-```
+[`diagnose()`](https://mc-stan.org/docs/cmdstan-guide/diagnose.html)
+みたいな機能が提供されていれば利用する。
+
+実行時に[警告してもらえること](https://mc-stan.org/misc/warnings.html)もある。
 
 ???
 https://ill-identified.hatenablog.com/entry/2020/05/21/001158
@@ -952,11 +1006,11 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 ## 収束・自己相関が悪い場合にどう改善するか
 
 - 小手先の対処
-    - warmupとiterをもっと長くする
+    - iteration (warnup + sampling) をもっと長く
     - thinを大きくして間引く
 - ちょっと大掛かり
-    - モデルを見直す
-    - プログラムを見直す
+    - プログラムの書き方を改善する
+    - モデルの構造を見直す
     - アルゴリズム・ソフトウェアを変える
 
 ---
@@ -1068,7 +1122,7 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 別ファイルに書いておく。
 e.g., `coin.stan`:
 
-```{cat engine.opts = list(file = "coin.stan"), class.source = "stan"}
+```{cat engine.opts = list(file = "stan/coin.stan"), class.source = "stan"}
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1106,18 +1160,20 @@ model {
 ## 説明変数なしのベイズ推定: MCMCサンプル
 
 予め実行速度の速い機械語に翻訳(コンパイル):
-```{r stan-binom-model, cache.extra = tools::md5sum("coin.stan")}
-model = cmdstan_model("coin.stan")
+```{r stan-binom-model, cache.extra = tools::md5sum("stan/coin.stan")}
+model = cmdstan_model("stan/coin.stan")
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-binom-sample, results = FALSE}
+```{r stan-binom-sample, include = FALSE, dependson = -1L}
+fit = model$sample(mydata, seed = 19937L)
+```
+```r
 fit = model$sample(mydata)
-draws = fit$draws()
 ```
 
-いろいろオプションはあるけど、とりあえずデフォルトに任せる:<br>
+いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
 `chains`, `inits`, `iter_warmup`, `iter_samples`, `thin`, ...
 
 問題があったら警告してくれるので**ちゃんと読む**。
@@ -1125,14 +1181,22 @@ draws = fit$draws()
 ---
 ## 説明変数なしのベイズ推定: 結果を眺める
 
-$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。<br>
-念のため trace plot も確認しておこう。
+`parameters` ブロックに書いた変数の情報が出てくる。<br>
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
 
-```{r stan-binom-fit}
+```{r stan-binom-fit, dependson = -1L, echo = -1L}
+summary_p = fit$summary("p")
 print(fit)
 ```
 
-乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
+真の値に近い $p \approx 0.7$ が得られた
+(`r round(summary_p[["q5"]], 2)` から
+`r round(summary_p[["q95"]], 2)` である確率が90%)。<br>
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。
+
+`lp__` はlog posterior(対数事後確率)。後述。
+
+念のため trace plot も確認しておこう→
 
 
 ---
@@ -1141,6 +1205,7 @@ print(fit)
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
 ```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
+draws = fit$draws()
 params = names(model$variables()$parameters)
 bayesplot::mcmc_trace(draws, pars = params)
 ```
@@ -1163,6 +1228,45 @@ bayesplot::mcmc_acf_bar(draws, pars = params)
 ```{r stan-binom-hist, fig.width = 4, fig.height = 4}
 bayesplot::mcmc_hist(draws, bins = 20, pars = params)
 ```
+
+
+---
+## `lp__`: log posterior とは?
+
+`model` ブロックに次のように書いてあると:
+```stan
+model {
+  mu ~ normal(0.0, 10.0);  // prior
+  x ~ normal(mu, 1.0);     // likelihood
+}
+```
+
+内部的には次のような処理が行われている:
+```stan
+target += normal_lpdf(theta | 0.0, 10.0)  // prior
+target += normal_lpdf(x | theta, 1.0);    // likelihood
+```
+
+つまり、事前確率と尤度の対数の和を取っている。<br>
+ベイズの定理により、事後確率はこれに比例する。<br>
+`lp__` はこの `target` 変数を記録しておいたようなもの。
+
+
+---
+## ベイズ推定とMCMC
+
+<p>
+<img src="../tokiomarine2021/bayesian.drawio.svg">
+</p>
+
+- 推定結果は**事後分布** ∝ 尤度関数。
+    - 広がり具合によって不確実性も表現できる。
+    - **逐次学習**で尖っていき、確信が強まる。
+- コンピュータに頼った計算方法としてのモンテカルロ法。
+    - 高次元・変な形の分布でも効率よくサンプルできるかが肝。
+    - ソフトウェアの代表は**Stan**。
+    - Stan言語でモデルを書き、RやPythonから動かす。
+
 
 ---
 ## 参考文献

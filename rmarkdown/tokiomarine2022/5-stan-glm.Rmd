@@ -68,7 +68,7 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 
 `slope * x` のようなベクトル演算ができる。
 
-```{cat, engine.opts = list(file = "lm.stan"), class.source = "stan"}
+```{cat, engine.opts = list(file = "stan/lm.stan"), class.source = "stan"}
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -87,9 +87,37 @@ model {
 ```
 
 ---
+## 変数の型: `vector` vs `array`
+
+`vector`, `row_vector`, `matrix` は実数 `real` のみで、行列演算できる:
+
+```stan
+real x;
+vector[3] v;
+row_vector[3] r;
+matrix[3, 3] m;
+
+x * v  // vector[3]
+r * v  // real
+v * r  // matrix[3, 3]
+m * v  // vector[3]
+m * m  // matrix[3, 3]
+m[1]   // row_vector[3]
+```
+
+`array` に型の制約は無いが、行列演算はできないので自力forループ:
+```stan
+array[3] int a;
+array[3] int b;
+for (i in 1:3) {
+  b[i] = 2 * a[i] + 1
+}
+```
+
+---
 ## 変数をうまく使って可読性アップ
 
-新しい変数は `model` か `transformed parameters` に書ける。
+途中計算に名前をつけることでモデルが読みやすくなる:
 
 ```stan
 model {
@@ -98,17 +126,21 @@ model {
 }
 ```
 
-チルダ `~` 入りのサンプリング文だけを `model` に、<br>
-そのほかを `transformed *` に、とすると見通しが良い。
+`transformed parameters` に書くと<br>
+`parameters` と同様にMCMCサンプルが記録される:
 
 ```stan
 transformed parameters {
   vector[N] mu = intercept + slope * x;
 }
+
 model {
   y ~ normal(mu, sigma);
 }
 ```
+
+コードの見通しは良くなるが、結果の閲覧はちょっとやりづらくなる。
+
 
 ---
 ## パラメータの事前分布を明示的に設定できる
@@ -187,7 +219,7 @@ generated quantities {
 }
 ```
 
-```{cat, engine.opts = list(file = "lm-credible.stan"), cache.rebuild = !file.exists("lm-credible.stan")}
+```{cat, engine.opts = list(file = "stan/lm-credible.stan"), cache.rebuild = !file.exists("stan/lm-credible.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -211,7 +243,7 @@ generated quantities {
 }
 ```
 
-```{r stan-lm-generated, include = FALSE, cache.extra = file.mtime("lm-credible.stan")}
+```{r stan-lm-generated, include = FALSE, cache.extra = file.mtime("stan/lm-credible.stan")}
 n = 300L
 a = 3
 b = -3
@@ -221,7 +253,7 @@ mydata[["N"]] = n
 mydata[["x_tilde"]] = seq(0.4, 1.7, 0.1)
 mydata[["N_tilde"]] = length(mydata[["x_tilde"]])
 
-model = cmdstan_model("lm-credible.stan")
+model = cmdstan_model("stan/lm-credible.stan")
 fit = model$sample(mydata, show_messages = FALSE, refresh = 0)
 draws = fit$draws(format = "draws_df") %>% print()
 
@@ -253,8 +285,8 @@ ggplot(df_pois) +
 
 - 直線回帰
 - ポアソン回帰
-- ポアソン重回帰
 - ロジスティック回帰
+- 重回帰
 - 分散分析
 - 共分散分析
 
@@ -263,8 +295,8 @@ ggplot(df_pois) +
 <figure>
 <img height=160 src="figure/lm-bad-1.png">
 <img height=160 src="figure/glm-poisson-1.png">
-<img height=160 src="figure/multiple-regression-1.png">
-<img height=160 src="figure/glm-logistic-1.png">
+<img height=160 src="figure/glm-logistic-1.png"><br>
+<img height=160 src="figure/multiple-regression-1.png"><br>
 <img height=160 src="figure/glm-anova-1.png">
 <img height=160 src="figure/glm-ancova-1.png">
 </figure>
@@ -272,7 +304,7 @@ ggplot(df_pois) +
 </div>
 
 
-```{cat, engine.opts = list(file = "poisson.stan"), cache.rebuild = !file.exists("poisson.stan")}
+```{cat, engine.opts = list(file = "stan/poisson.stan"), cache.rebuild = !file.exists("stan/poisson.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -291,7 +323,7 @@ model {
 ```
 
 
-```{cat, engine.opts = list(file = "multiple.stan"), cache.rebuild = !file.exists("multiple.stan")}
+```{cat, engine.opts = list(file = "stan/multiple.stan"), cache.rebuild = !file.exists("stan/multiple.stan")}
 data {
   int<lower=0> N;
   vector[N] temperature;
@@ -312,7 +344,7 @@ model {
 ```
 
 
-```{cat, engine.opts = list(file = "logistic.stan"), cache.rebuild = !file.exists("logistic.stan")}
+```{cat, engine.opts = list(file = "stan/logistic.stan"), cache.rebuild = !file.exists("stan/logistic.stan")}
 data {
   int<lower=0> N;
   int<lower=0> n_trials;
@@ -331,7 +363,7 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "anova.stan"), cache.rebuild = !file.exists("anova.stan")}
+```{cat, engine.opts = list(file = "stan/anova.stan"), cache.rebuild = !file.exists("stan/anova.stan")}
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -352,7 +384,7 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "ancova.stan"), cache.rebuild = !file.exists("ancova.stan")}
+```{cat, engine.opts = list(file = "stan/ancova.stan"), cache.rebuild = !file.exists("stan/ancova.stan")}
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -406,7 +438,7 @@ penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
 penguins_dropna = penguins.dropna()
 ```
 
-```{cat, engine.opts = list(file = "penguins-lm.stan"), cache.rebuild = !file.exists("penguins-lm.stan")}
+```{cat, engine.opts = list(file = "stan/penguins-lm.stan"), cache.rebuild = !file.exists("stan/penguins-lm.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;
@@ -424,7 +456,7 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "penguins-multiple.stan"), cache.rebuild = !file.exists("penguins-multiple.stan")}
+```{cat, engine.opts = list(file = "stan/penguins-multiple.stan"), cache.rebuild = !file.exists("stan/penguins-multiple.stan")}
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;

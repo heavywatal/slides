@@ -7,13 +7,21 @@
 # 2022-08-24 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2022/
 #
+# # StanでベイジアンGLM
+
 # ## 環境セットアップ
 
-# %% active="py"
+# Google Colab の場合はインストールから:
+# ```py
 # %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
 # %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
+# import cmdstanpy
+# cmdstanpy.install_cmdstan()
+# ```
 
 # %%
+# %matplotlib inline
+
 import arviz as az
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,7 +34,6 @@ from scipy import special
 rng = np.random.default_rng(seed=24601)
 
 # %% [markdown]
-# ## StanでベイジアンGLM
 #
 # ## Stanで直線回帰
 #
@@ -52,7 +59,7 @@ mydata.update(df.to_dict("list"))
 # ### モデルのコンパイル
 # スライドにあるコードを `lm.stan` というファイルに保存しておき、読み込む。
 # %%
-model = CmdStanModel(stan_file="lm.stan")
+model = CmdStanModel(stan_file="stan/lm.stan")
 
 # %% [markdown]
 # ### MCMCサンプル
@@ -108,10 +115,10 @@ grid.map(sns.lineplot, "x", "pred")
 # できあがりの `draws` から抜き出す。
 # ----
 #
-# ### Stanでポアソン回帰
+# ## Stanでポアソン回帰
 
 # %%
-model = CmdStanModel(stan_file="poisson.stan")
+model = CmdStanModel(stan_file="stan/poisson.stan")
 # %%
 fit = model.sample(mydata, chains=4, iter_sampling=2000)
 # %%
@@ -136,7 +143,7 @@ grid.add_legend()
 
 # %% [markdown]
 # ----
-# ### Stanでロジスティック回帰
+# ## Stanでロジスティック回帰
 #
 # %%
 n_trials = 10
@@ -162,7 +169,7 @@ grid.map(sns.scatterplot, "temperature", "beer_sales")
 logistic_data = {"N": sample_size, "n_trials": n_trials}
 logistic_data.update(df.to_dict("list"))
 # %%
-model = CmdStanModel(stan_file="logistic.stan")
+model = CmdStanModel(stan_file="stan/logistic.stan")
 
 # %%
 fit = model.sample(logistic_data, chains=4, iter_sampling=2000)
@@ -188,7 +195,7 @@ grid.add_legend()
 
 # %% [markdown]
 # ---
-# ### 重回帰: 複数の説明変数を同時に扱う
+# ## 重回帰: 複数の説明変数を同時に扱う
 # ビールの注文数が気温と湿度の両方に依存して増加するデータを作る。
 # %%
 sample_size = 200
@@ -217,13 +224,13 @@ sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df, ax=ax[
 multiple_data = {"N": sample_size}
 multiple_data.update(df.to_dict("list"))
 # %%
-model = CmdStanModel(stan_file="multiple.stan")
+model = CmdStanModel(stan_file="stan/multiple.stan")
 # %%
 fit = model.sample(multiple_data, chains=4, iter_sampling=2000)
 fit.summary()
 print(fit.diagnose())
 # %%
-stan_data = az.from_cmdstanpy(fit, observed_data=logistic_data)
+stan_data = az.from_cmdstanpy(fit, observed_data=multiple_data)
 # %%
 az.plot_trace(stan_data)
 # %%
@@ -249,7 +256,7 @@ sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
 
 # %% [markdown]
 # ---
-# ### 分散分析: GLM with 質的(カテゴリカル)変数
+# ## 分散分析: GLM with 質的(カテゴリカル)変数
 #
 # %% Parameters
 sample_size = 200
@@ -285,7 +292,7 @@ mydata = {"N": sample_size}
 mydata.update(df.to_dict("list"))
 del mydata["weather"]
 # %%
-model = CmdStanModel(stan_file="anova.stan")
+model = CmdStanModel(stan_file="stan/anova.stan")
 # %%
 fit = model.sample(mydata, chains=4, iter_sampling=2000)
 fit.summary()
@@ -310,10 +317,10 @@ grid.map(sns.scatterplot, "weather", "beer_sales", alpha=0.6)
 grid.map(sns.scatterplot, "weather", "pred", color="black", marker="x", s=120)
 
 # %% [markdown]
-# ### 共分散分析: GLM with 質的変数 + 量的変数
+# ## 共分散分析: GLM with 質的変数 + 量的変数
 #
 # %%
-model = CmdStanModel(stan_file="ancova.stan")
+model = CmdStanModel(stan_file="stan/ancova.stan")
 # %%
 fit = model.sample(mydata, chains=4, iter_sampling=2000)
 fit.summary()
@@ -357,7 +364,7 @@ pen_data = {
 # %% [markdown]
 # ### モデルの定義
 # %%
-model = CmdStanModel(stan_file="penguins-lm.stan")
+model = CmdStanModel(stan_file="stan/penguins-lm.stan")
 
 # %% [markdown]
 # ### MCMCサンプル
@@ -420,7 +427,7 @@ pen_sp_data = {
 # %% [markdown]
 # ### モデルの定義
 # %%
-model = CmdStanModel(stan_file="penguins-multiple.stan")
+model = CmdStanModel(stan_file="stan/penguins-multiple.stan")
 
 # %% [markdown]
 # ### MCMCサンプル

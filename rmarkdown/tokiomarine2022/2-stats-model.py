@@ -7,12 +7,18 @@
 # 2022-08-17 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2022/
 #
+# # 直線あてはめ、擬似乱数生成、尤度関数
+
 # ## 環境セットアップ
 
-# %% active="py"
+# Google Colab の場合はインストールから:
+# ```
 # %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
+# ```
 
 # %%
+# %matplotlib inline
+
 import sys
 
 import numpy as np
@@ -46,12 +52,21 @@ result = model.fit()
 result.params
 
 # %% [markdown]
-# 推定結果を用いて回帰線のy座標を計算:
+# 推定結果を用いて回帰線のy座標を計算し、predという名前の列に格納:
+#
 # pred = slope * x + intercept
 
 # %%
 df_pred = df.assign(pred=lambda _: result.predict(_))
 print(df_pred)
+
+# %% [markdown]
+# `assign()` や `lambda` に不慣れなら次のようにも書いても同じ:
+# ```py
+# df_pred = df.copy()
+# df_pred["pred"] = result.predict(df)
+# ```
+
 # %%
 grid = sns.FacetGrid(df_pred)
 grid.map(sns.scatterplot, "x", "y")
@@ -77,49 +92,49 @@ grid.map(sns.lineplot, "x", "pred")
 #   を見て、ほかにどんな関数やパラメータがあるか眺めてみる。
 
 # %% [markdown]
-# ## 一様分布 (整数・離散値)
+# ### 一様分布 (整数・離散値)
 # %%
 x = rng.integers(low=1, high=7, size=100)
 print(x)
 sns.countplot(x=x)  # for discrete values
 
 # %% [markdown]
-# ## 一様分布 (実数・連続値)
+# ### 一様分布 (実数・連続値)
 # %%
 x = rng.uniform(low=0, high=1, size=100)
 print(x)
 sns.histplot(x=x)  # for continuous values
 
 # %% [markdown]
-# ## 幾何分布
+# ### 幾何分布
 # %%
 x = rng.geometric(p=0.3, size=100)
 print(x)
 sns.histplot(x=x)  # for continuous values
 
 # %% [markdown]
-# ## 二項分布
+# ### 二項分布
 # %%
 x = rng.binomial(n=3, p=0.5, size=100)
 print(x)
 sns.countplot(x=x)  # for discrete values
 
 # %% [markdown]
-# ## ポアソン分布
+# ### ポアソン分布
 # %%
 x = rng.poisson(lam=3, size=100)
 print(x)
 sns.countplot(x=x)  # for discrete values
 
 # %% [markdown]
-# ## 正規分布
+# ### 正規分布
 # %%
 x = rng.normal(loc=50, scale=10, size=100)
 print(x)
 sns.histplot(x=x)  # for continuous values
 
 # %% [markdown]
-# ## 🔰 自由課題
+# ### 🔰 自由課題
 
 # 1%の当たりを狙って10連ガチャを回した10万人の結果
 

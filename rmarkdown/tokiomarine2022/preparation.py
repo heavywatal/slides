@@ -56,6 +56,7 @@ print(cmdstanpy.__version__)
 
 # %%
 cmdstanpy.install_cmdstan()
+# cmdstanpy.install_cmdstan(compiler=True)  # Windowsで何かが無いと怒られたら
 
 # %% [markdown]
 # バージョン 1.0.2, 1.0.3 では正常にインストールされていても

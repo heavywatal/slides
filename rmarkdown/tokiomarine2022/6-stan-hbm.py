@@ -9,17 +9,21 @@
 #
 # ## 環境セットアップ
 
-# %% active="py"
+# Google Colab の場合はインストールから:
+# ```py
 # %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
 # %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
+# import cmdstanpy
+# cmdstanpy.install_cmdstan()
+# ```
 
 # %%
+# %matplotlib inline
+
 import arviz as az
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import statsmodels.api as sm
 from cmdstanpy import CmdStanModel
 from scipy import special, stats
 
@@ -46,7 +50,7 @@ df = pd.DataFrame(dict(z=z, p=p, y=y))
 sns.countplot(x="y", data=df)
 
 # %%
-model = CmdStanModel(stan_file="glmm.stan")
+model = CmdStanModel(stan_file="stan/glmm.stan")
 
 # %% [markdown]
 # ### MCMCサンプル

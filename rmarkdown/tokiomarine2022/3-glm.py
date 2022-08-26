@@ -7,12 +7,18 @@
 # 2022-08-17 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2022/
 #
+# # GLM with Python statsmodels
+
 # ## 環境セットアップ
 
-# %% active="py"
+# Google Colab の場合はインストールから:
+# ```
 # %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
+# ```
 
 # %%
+# %matplotlib inline
+
 import sys
 
 import matplotlib.pyplot as plt
@@ -27,8 +33,7 @@ rng = np.random.default_rng(seed=24601)
 sys.version
 
 # %% [markdown]
-# ## とにかくGLMを使ってみる練習
-# ### OLS (復習)
+# ## OLS (復習)
 # まず、OLSによる直線当てはめの復習。
 
 # %%
@@ -49,7 +54,7 @@ grid.map(sns.scatterplot, "x", "y")
 grid.map(sns.lineplot, "x", "pred")
 
 # %% [markdown]
-# ### GLMで直線回帰
+# ## GLMで直線回帰
 # `glm()` を使う以外の操作は共通。
 
 # %%
@@ -68,9 +73,10 @@ print(result.params)
 # 次に、確率分布とリンク関数を変えてみよう。
 # 大本命、ポアソン分布・指数リンクを試す。
 
-# ### ポアソン回帰
+# ## ポアソン回帰
 # `family` の指定以外はさっきと全く同じ。
 # `Poinson()` の `link` はデフォルトで `Log()` なので省略可能。
+# なぜか小文字の `log()` にしないと動かない環境もあるらしい。
 # %%
 poisson = sm.families.Poisson(link=sm.families.links.Log())
 model = smf.glm("y ~ x", df, family=poisson)
@@ -85,7 +91,7 @@ print(result.params)
 # %% [markdown]
 # いい感じにできた。
 
-# ### 重回帰: 複数の説明変数を同時に扱う
+# ## 重回帰: 複数の説明変数を同時に扱う
 # ビールの注文数が気温と湿度の両方に依存して増加するデータを作る。
 # %%
 sample_size = 200
@@ -130,7 +136,7 @@ sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df, ax=ax[
 sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
 
 # %% [markdown]
-# ### ロジスティック回帰
+# ## ロジスティック回帰
 # 客10人中y人がビールを注文した。
 # その日の気温xによって割合が変化した。
 
@@ -176,7 +182,7 @@ grid.map(sns.scatterplot, "temperature", "beer_sales")
 grid.map(sns.lineplot, "temperature", "pred")
 
 # %% [markdown]
-# ### 分散分析: GLM with 質的(カテゴリカル)変数
+# ## 分散分析: GLM with 質的(カテゴリカル)変数
 #
 # %% Parameters
 sample_size = 200
@@ -220,7 +226,7 @@ grid.map(sns.scatterplot, "weather", "beer_sales", alpha=0.6)
 grid.map(sns.scatterplot, "weather", "pred", color="black", marker="x", s=120)
 
 # %% [markdown]
-# ### 共分散分析: GLM with 質的変数 + 量的変数
+# ## 共分散分析: GLM with 質的変数 + 量的変数
 #
 # %%
 grid = sns.FacetGrid(df, hue="weather")
@@ -239,7 +245,7 @@ grid.map(sns.lineplot, "temperature", "pred")
 grid.add_legend()
 
 # %% [markdown]
-# ### 交互作用
+# ## 交互作用
 # ビール売上の温度依存性が天気によって異なる。
 
 # %%
@@ -405,7 +411,7 @@ grid.add_legend()
 # %% [markdown]
 # ----
 
-# ## GLMの練習
+# ## 練習問題
 #
 # 🔰クチバシの長さと深さで同じ解析をやってみよう。
 # %%

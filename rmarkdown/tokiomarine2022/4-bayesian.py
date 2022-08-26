@@ -7,7 +7,10 @@
 # 2022-08-24 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2022/
 #
-# ## PythonからStanを使う、おおまかな流れ
+# # PythonからStanを使ってみる
+#
+# おおまかな流れ:
+#
 # - データ準備
 # - Stan言語でモデルを書く
 # - それをコンパイルして機械語に翻訳→実行ファイル
@@ -16,11 +19,17 @@
 #
 # ## 環境セットアップ
 
-# %% active="py"
+# Google Colab の場合はインストールから:
+# ```py
 # %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
 # %pip install 'arviz>=0.12.1' 'cmdstanpy>=1.0.4'
+# import cmdstanpy
+# cmdstanpy.install_cmdstan()
+# ```
 
 # %%
+# %matplotlib inline
+
 import arviz as az
 import numpy as np
 import seaborn as sns
@@ -47,7 +56,7 @@ sns.countplot(x="x", data=coin_data)
 # ### モデルの定義
 # スライドにあるコードを `coin.stan` というファイルに保存しておき、読み込む。
 # %%
-model = CmdStanModel(stan_file="coin.stan")
+model = CmdStanModel(stan_file="stan/coin.stan")
 
 # %% [markdown]
 # ### MCMCサンプル
