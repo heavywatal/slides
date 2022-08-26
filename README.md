@@ -30,8 +30,9 @@ and [others supported in `rmarkdown` package](https://bookdown.org/yihui/rmarkdo
 install.packages("knitr")
 install.packages("tidyverse")
 install.packages("cowplot")
-install.packages("ggridges")
+install.packages("ggrepel", "ggridges")
 install.packages("tidymodels")
+install.packages("cmdstanr", "bayesplot")
 install.packages(c("rstan", "rstanarm", "tidybayes"))
 install.packages("gifski")
 install.packages("palmerpenguins")
@@ -44,15 +45,15 @@ remotes::install_github("heavywatal/rwtl")
 ## Save as PDF
 
 1. Install [nvm](https://github.com/nvm-sh/nvm)
-1. Install node v12: `nvm install v12` (comes with `npm` v6)
+1. Install node: `nvm install --lts --latest-npm`
+1. Setup node: `nvm use stable`
 1. Change directory to this repo: `cd ~/git/slides/`
-1. `nvm use` (v12 via `.nvmrc`)
-1. `npm install` ([decktape](https://github.com/astefanutti/decktape) v2.10 via `package.json`)
+1. `npm install` ([decktape](https://github.com/astefanutti/decktape) via `package.json`)
 1.  Run decktape:
 
     ```sh
     npm run decktape https://heavywatal.github.io/slides/tmd2021/1-introduction.html 1-introduction.pdf
     # or manually
-    npx decktape -s 960x720 --chrome-arg=--disable-web-security reveal https://heavywatal.github.io/slides/hokudai2021r/1-introduction.html 1-introduction.pdf
+    npx decktape -s 960x720 --chrome-arg=--disable-web-security reveal https://heavywatal.github.io/slides/tohoku2022r/1-introduction.html 1-introduction.pdf
     npx decktape -s 800x600 --chrome-arg=--disable-web-security generic https://comicalcommet.github.io/r-training-2021/R_training_2021_1.html R_training_2021_1.pdf
     ```
