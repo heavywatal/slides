@@ -34,15 +34,11 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022/">https://heavywatal.github.io/slides/tmd2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -230,10 +226,13 @@ band_members          band_instruments
 
 🔰 関連するdata.frameをいろいろな方法で結合してみよう。
 
-```r
-install.packages("nycflights13")
+```{r nycflights13, echo = -1, message = FALSE, results = "hide"}
+if (!require(nycflights13, quietly = TRUE)) {
+  install.packages("nycflights13")
+}
+# install.packages("nycflights13")
 library(nycflights13)
-data(package = "nycflights13")
+# data(package = "nycflights13")
 # airlines, airports, flights, planes, weather
 ```
 
@@ -606,11 +605,9 @@ mpg_nested$data[[1]]
 ```r
 print(economics)
 ```
-```{r economics, echo = FALSE}
-wtl::printdf(economics, n = 4L)
-```
 
 ```{r economics-longer, echo = FALSE, fig.height = 4.5, fig.width = 8}
+wtl::printdf(economics, n = 4L)
 economics %>%
   pivot_longer(!date) %>%
   ggplot() +
@@ -623,22 +620,20 @@ economics %>%
 ## 🔰 課題: `world_bank_pop` を変形して作図しよう
 
 ```r
-printdf(world_bank_pop)
-```
-```{r world_bank_pop, echo = FALSE}
-wtl::printdf(world_bank_pop, n = 4L)
+print(world_bank_pop)
 ```
 ```{r world_bank_pop-pivot, fig.height = 4, fig.width = 11.5, echo = FALSE}
+wtl::printdf(world_bank_pop, n = 4L)
 wbp_tidy = world_bank_pop %>%
-  pivot_longer(!1:2, names_to = "year") %>%
-  dplyr::filter(country %in% c("DEU", "FIN", "JPN")) %>%
+  pivot_longer(!c(country, indicator), names_to = "year") %>%
+  mutate(year = as.numeric(year)) %>%
+  filter(country %in% c("DEU", "FIN", "JPN")) %>%
   separate(indicator, c(NA, "region", "name"))
 
 ggplot(wbp_tidy) +
   aes(year, value) +
-  geom_line(aes(group = country, color = country)) +
-  facet_grid(vars(name), vars(region), scale = "free_y") +
-  scale_x_discrete(breaks = seq(2000, 2020, 5))
+  geom_line(aes(color = country, group = country)) +
+  facet_grid(vars(name), vars(region), scale = "free_y")
 ```
 
 ---
@@ -671,7 +666,7 @@ VADeaths %>%
 ```
 
 ---
-## 🔰 課題: `VADeaths` を変形して作図しよう
+## 🔰 課題: `VADeaths` を縦長にしてggplotしてみよう
 
 ```{r vadeaths_rownames, results="hold"}
 as.data.frame(VADeaths) %>%              # data.frameに変換
@@ -688,6 +683,13 @@ va_deaths = as.data.frame(VADeaths) %>%  # data.frameに変換
     values_to = "death") %>%             # 値の行き先の列名
   separate(age, c("lbound", "ubound"), "-", convert = TRUE)
 
+# 別解
+as.data.frame(VADeaths) %>%
+  rownames_to_column("age") %>%
+  pivot_longer(!age, names_to = "region_sex", values_to = "death") %>%
+  separate(region_sex, c("region", "sex")) %>%
+  separate(age, c("lbound", "ubound"), convert = TRUE)
+
 ggplot(va_deaths) +
   aes(lbound, death) +
   geom_point(aes(color = sex, shape = region), size = 5) +
@@ -695,27 +697,32 @@ ggplot(va_deaths) +
 ```
 
 ---
-## 🔰 課題: `anscombe` を変形して作図しよう
+## 🔰 課題: `anscombe` を縦長にしてggplotしてみよう
 
-```{r anscombe_tbl, include = FALSE}
-anscombe = tibble::as_tibble(anscombe) # for printing with wtl::printdf()
-```
-```{r anscombe, results="hold"}
+```r
 anscombe %>% rowid_to_column("id")   # IDをつけておく
 ```
+```{r anscombe, echo = FALSE}
+anscombe %>% rowid_to_column("id") %>% wtl::printdf(n = 6L)
+```
 
-```{r anscombe_pivot, include = FALSE}
+```{r plot_anscombe, fig.height=3, fig.width=10, out.width="98%", echo = FALSE}
 tidy_anscombe = anscombe %>%
   pivot_longer(                       # 縦長に変形したい
     everything(),                     # すべての列について
     names_to = c(".value", "group"),  # 新しい列名
     names_sep = 1L,                   # 切る位置
     names_transform = list(group = as.integer)) %>% # 型変換
-  arrange(group) %>%                  # グループごとに並べる
-  print()                             # ggplotしたい形！
-```
+  arrange(group)                      # グループごとに並べる
 
-```{r plot_anscombe, fig.height=3, fig.width=10, out.width="98%", echo = FALSE}
+# 別解
+tidy_anscombe = anscombe %>%
+  rowid_to_column("id") %>%
+  pivot_longer(!id) %>%
+  separate(name, c("axis", "group"), sep = 1) %>%
+  pivot_wider(names_from = "axis", values_from = "value") %>%
+  arrange(group)
+
 ggplot(tidy_anscombe) + aes(x, y) +
   geom_point(size = 3) +
   stat_smooth(method = lm, formula = y ~ x, se = FALSE, fullrange = TRUE) +

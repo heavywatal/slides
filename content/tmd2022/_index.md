@@ -36,21 +36,35 @@ draft = false
 
 ## 実習環境の設定 (遠隔参加者、自習)
 
-参考: R初心者の館 by das_Kinoさん<br>
-<https://das-kino.hatenablog.com/entry/2019/11/07/125044>
+参考:
+[R初心者の館 by das_Kinoさん](https://das-kino.hatenablog.com/entry/2019/11/07/125044),
+[矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
 
-1.  手元のコンピューターのユーザー名（ホームフォルダの名前）を確認。
-    半角アルファベットじゃない文字(日本語とか記号とか)が含まれている場合、不具合の原因になりがちです。
+1.  手元のコンピューターの **ユーザー名（ホームフォルダの名前）** を確認。
+    半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがちです。
     たぶん変更できない？ので新しいユーザーを作って引っ越すのがいいと思います。
+    **半角アルファベット小文字のみ**で短いものを推奨。
+    - ✅ Good: `watal`, `tamakino`
+    - ❌ Bad: `岩嵜航`, `Watal Iwasaki`, `heavy.watal`
 1.  OSのソフトウェア・アップデートをすべて適用して再起動。
+1.  OSの設定で、ファイル名の末尾の拡張子(`.pdf` とか `.png` とか)を常時表示する。
+1.  Windowsの場合、
+    [矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
+    の情報を参照しつつOneDrive問題に対処する。
 1.  <https://cran.r-project.org/>
-    から最新版のR本体(≥4.1.0)をダウンロードしてインストール。
+    から最新版の **R本体(≥4.2.1)** をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
 1.  <https://rstudio.com/products/rstudio/download/#download>
-    から最新版のRStudio(≥1.4.1717)をダウンロードしてインストール。
+    から最新版の **RStudio(≥2022.07.1)** をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
-1.  Windowsの場合はRtoolsも必要かも。次のページに従って設定:<br>
+1.  Windowsの場合、念のため **Rtools** をインストール。
+    バージョンに注意。次のページに従って設定:<br>
     <https://cran.r-project.org/bin/windows/Rtools/>
+
+    Macの場合、念のため次のソフトウェアをインストール:
+    - **Command Line Tools**: `xcode-select --install` (Xcode本体は不要)
+    - **XQuartz**: [手動ダウンロード](https://www.xquartz.org/) or `brew install xquartz`
+
 1.  RStudioを起動し、左側のConsoleで `install.packages("tidyverse", type = "binary")` を実行。
     何か訊かれたら `yes` と回答。
     パッケージがたくさんインストールされます。
@@ -60,14 +74,14 @@ draft = false
 
     ```r
     > library(tidyverse)
-    ── Attaching packages ───────────────────────────── tidyverse 1.3.1 ──
-    ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-    ✔ tibble  3.1.3     ✔ dplyr   1.0.7
-    ✔ tidyr   1.1.3     ✔ stringr 1.4.0
-    ✔ readr   2.0.1     ✔ forcats 0.5.1
+    ── Attaching packages ───────────────────────────── tidyverse 1.3.2 ──
+    ✔ ggplot2 3.3.6      ✔ purrr   0.3.4
+    ✔ tibble  3.1.8      ✔ dplyr   1.0.10
+    ✔ tidyr   1.2.0      ✔ stringr 1.4.1
+    ✔ readr   2.1.2      ✔ forcats 0.5.2
     ── Conflicts ──────────────────────────────── tidyverse_conflicts() ──
-    x dplyr::filter() masks stats::filter()
-    x dplyr::lag()    masks stats::lag()
+    ✖ dplyr::filter() masks stats::filter()
+    ✖ dplyr::lag()    masks stats::lag()
     ```
 
 

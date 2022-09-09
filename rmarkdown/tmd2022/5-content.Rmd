@@ -34,15 +34,11 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022/">https://heavywatal.github.io/slides/tmd2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -121,15 +117,8 @@ knitr::opts_chunk$set(cache = FALSE)
 # install.packages("tidyverse")
 library(tidyverse)  # パッケージ読み込み
 ```
-```
-── Attaching packages ──────────────────────── tidyverse 1.3.1 ──
-✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.5     ✔ dplyr   1.0.7
-✔ tidyr   1.1.4     ✔ stringr 1.4.0
-✔ readr   2.0.2     ✔ forcats 0.5.1
-── Conflicts ─────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
+```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+cat(tidyverse_msg, sep = "\n")
 ```
 
 たまには更新しよう:
@@ -212,17 +201,17 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 dia = diamonds    # 別名コピー
 
 # dollar演算子 $ で指定
-dia$price = 113.71 * dia$price
+dia$price = 144 * dia$price
 
 # 名前を [[文字列]] で指定
-dia[["price"]] = 113.71 * dia[["price"]]
+dia[["price"]] = 144 * dia[["price"]]
 
 x = "price"
-dia[[x]] = 113.71 * dia[[x]]
+dia[[x]] = 144 * dia[[x]]
 
 # dplyr::mutate with pipe
 dia = diamonds %>%
-  mutate(price = 113.71 * price)
+  mutate(price = 144 * price)
 ```
 
 1発ならどれでもいい。流れ作業には `mutate()` が便利。
@@ -422,10 +411,6 @@ https://r4ds.had.co.nz/strings.html
 <img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
 </a>
 
-```{r stringr, include = FALSE}
-library(stringr)
-```
-
 -   tidyverseの一部
 -   何をやる関数なのか名前から分かりやすい
 -   対象文字列が一貫して第一引数
@@ -481,7 +466,7 @@ str_subset(fruit, "^\\w{3,4}$")
 ---
 ## 正規表現: 柔軟な検索・置換を可能にするツール
 
-| メタ文字 | 意味 | &emsp;&emsp;&emsp; | 演算子 | 意味 |
+| メタ文字 | 意味 | &emsp;&emsp; | 演算子 | 意味 |
 | ---- | ---- | --- | ---- | ---- |
 | `\d` | 数字 (逆は `\D`) | | `?`  | 0回か1回 |
 | `\s` | 空白 (逆は `\S`) | | `*`  | 0回以上繰り返し |
@@ -503,7 +488,7 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 </aside>
 
 ---
-## 正規表現: チートシート (1卓に1枚！)
+## 正規表現: チートシート
 
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
@@ -569,7 +554,7 @@ str_replace(fruit4, "(..)$", "_\\1_")
 🔰 `starwars` の `name` 列の数字を全部ゼロにしてみよう
 
 ```{r starwars-replace, echo=FALSE}
-starwars
+wtl::printdf(starwars, n = 6L)
 ```
 
 ---
@@ -598,7 +583,7 @@ str_pad(fruit4, 8, "left", "_")   # 幅を埋めて指定幅に
 
 [`stringi`](http://www.gagolewski.com/software/stringi/) パッケージはさらに多機能
 ```{r stringi}
-stringi::stri_trans_nfkc("ｶﾀｶﾅ")  # 半角カナを全角に
+stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角数字に対処
 ```
 
 🔰 `starwars` の `name` 列を全部小文字にしてみよう
@@ -609,10 +594,6 @@ stringi::stri_trans_nfkc("ｶﾀｶﾅ")  # 半角カナを全角に
 <a href="https://readr.tidyverse.org/">
 <img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
 </a>
-
-```{r readr, include = FALSE}
-library(readr)
-```
 
 これはstringrではなくreadrの担当:
 
@@ -722,10 +703,6 @@ y3 < "Sep"
 <img src="/slides/image/hex-stickers/forcats.png" width="120" align="right">
 </a>
 
-```{r forcats, include = FALSE}
-library(forcats)
-```
-
 - `fct_relevel()`: 手動で順序設定
 - `fct_reorder()`: 別の変数に応じて順序を並べ替え
 - `fct_infreq()`: 頻度に応じて順序を並べ替え
@@ -792,7 +769,7 @@ iris %>% rowid_to_column() %>%
 - POSIXlt: list(秒, 分, 時, 日, 月, 年, ...)。単位ごとに抜き出しやすい。
 
 ```{r datetime}
-now = "2022-10-16 14:00:00"
+now = "2022-10-01 14:00:00"
 ct = as.POSIXct(now)
 unclass(ct)
 lt = as.POSIXlt(now)

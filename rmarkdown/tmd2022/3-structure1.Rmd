@@ -34,15 +34,11 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022/">https://heavywatal.github.io/slides/tmd2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
-knitr::opts_chunk$set(cache = FALSE)
+knitr::opts_chunk$set(cache = TRUE)
 ```
 
 ---
@@ -282,18 +278,11 @@ VADeaths %>%
 # install.packages("tidyverse")
 library(tidyverse)  # パッケージ読み込み
 ```
-```
-── Attaching packages ──────────────────────── tidyverse 1.3.1 ──
-✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-✔ tibble  3.1.5     ✔ dplyr   1.0.7
-✔ tidyr   1.1.4     ✔ stringr 1.4.0
-✔ readr   2.0.2     ✔ forcats 0.5.1
-── Conflicts ─────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
+```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+cat(tidyverse_msg, sep = "\n")
 ```
 
-**dplyr ≥1.0.0** と **tidyr ≥1.1.0** を使いたいので古かったら更新:
+**dplyr ≥1.0.10** と **tidyr ≥1.2.0** を使いたいので古かったら更新:
 ```r
 update.packages(ask = "no", type = "binary")
 # いちいち確認せずにコンパイル済み安定版を入れるオプション

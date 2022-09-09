@@ -2,7 +2,7 @@
 url = "tmd2022/2-visualization.html"
 title = "2. 入門2: データ可視化の重要性と方法 — Rによるデータ前処理実習 2022"
 linktitle = "入門2: データ可視化の重要性と方法。"
-date = 2022-9-24T14:40:00+09:00
+date = 2022-09-24T14:40:00+09:00
 type = "reveal"
 draft = false
 +++
@@ -34,14 +34,10 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022/">https://heavywatal.github.io/slides/tmd2022/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
 ```
 
 ```{r setup-local, include=FALSE}
-library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -160,7 +156,7 @@ cor(diamonds$carat, diamonds$price)
 平均値の差？ ばらつきの様子？ 軸はゼロから始まる？<br>
 **目的に合わせて見せ方を吟味**しよう。
 
-```{r iris-compare, echo=FALSE, fig.height=7, fig.width=10, message=FALSE, cache = TRUE}
+```{r iris-compare, echo=FALSE, fig.height=7, fig.width=10, message=FALSE}
 tidy_iris = iris %>%
   tibble::rownames_to_column("id") %>%
   tidyr::pivot_longer(!c(id, Species)) %>%
@@ -173,7 +169,7 @@ mean_sd = function(x, mult = 1.96) {
   data.frame(y = mu, ymin = mu - div, ymax = mu + div)
 }
 
-theme_iris = theme_linedraw(base_size=15) + theme(
+theme_iris = theme_linedraw(base_size = 15) + theme(
     strip.placement = "outside", strip.background = element_blank(),
     axis.title = element_blank(), axis.text.y = element_blank(),
     axis.ticks.y = element_blank(), legend.position = "top"
@@ -209,7 +205,7 @@ p_ridges = ggplot(tidy_iris) +
   facet_grid(vars(measure), vars(part), switch = "both", scale = "free_x", space = "free_x") +
   theme_iris
 
-cowplot::plot_grid(p_bar, p_box, p_dot, p_ridges, ncol=2L)
+cowplot::plot_grid(p_bar, p_box, p_dot, p_ridges, ncol = 2L)
 ```
 
 ---
@@ -251,11 +247,9 @@ cowplot::plot_grid(p_bar, p_box, p_dot, p_ridges, ncol=2L)
 `iris` はアヤメ属3種150個体に関する測定データ。<br>
 Rに最初から入ってて、例としてよく使われる。
 
-```r
+```{r data.frame, echo = -1}
+iris = tibble::as_tibble(iris)
 print(iris)
-```
-```{r data.frame, echo = FALSE}
-wtl::printdf(iris)
 ```
 
 長さ150の数値ベクトル4本と因子ベクトル1本。
@@ -322,7 +316,10 @@ boxplot(Petal.Width ~ Species, data = iris)
 
 R標準のやつとは根本的に違うシステムで作図する。
 
+<figure>
 <img src="/slides/image/rstats/r-graphics.svg">
+<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+</figure>
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -445,7 +442,7 @@ p4 = p3 + facet_wrap(vars(clarity))
 print(p3)
 ```
 
-普段はあんまりやらなけど、今日は `p2` とか使う
+普段はあんまりやらなけど、今日は後で `p3` とか使う
 
 ---
 ## ひとまずggplotしてみよう
@@ -512,9 +509,10 @@ print(diamonds)
 
 `aes()` の中で列名を指定する。
 
-```{r aes-map, fig.height = 6, fig.width = 8}
-p1 + aes(x = carat, y = price) +
-  geom_point(mapping = aes(color = color, size = clarity))
+```{r aes-map, fig.height = 5, fig.width = 7}
+ggplot(diamonds) +
+  aes(x = carat, y = price) +
+  geom_point(mapping = aes(color = clarity, size = cut))
 ```
 
 ---
@@ -522,8 +520,9 @@ p1 + aes(x = carat, y = price) +
 
 `aes()` の外で値を指定する。
 
-```{r aes-nomap, fig.height=6, fig.width=7}
-p1 + aes(x = carat, y = price) +
+```{r aes-nomap, fig.height=5, fig.width=5.8}
+ggplot(diamonds) +
+  aes(x = carat, y = price) +
   geom_point(color = "darkorange", size = 6, alpha = 0.4)
 ```
 
@@ -540,15 +539,16 @@ wtl::printdf(mpg, n = 4)
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によって色を塗り分けしてみよう
 
 ```{r ggplot-mpg-color, echo = FALSE, fig.height = 3, fig.width = 10}
-pL = ggplot(data = mpg) +
+pL = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(color = "blue")
-pC = ggplot(data = mpg) +
+pC = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv))
-pR = ggplot(data = mpg) +
+pR = ggplot(mpg) +
   aes(x = displ, y = cty) +
-  geom_point(aes(color = cyl))
+  geom_point(aes(color = cyl)) +
+  scale_color_continuous(type = "gradient")
 cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ```
 
@@ -573,8 +573,9 @@ cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ## 点と線と文字は `color`, 面は `fill`
 
 
-```{r fill, fig.height=6, fig.width=7}
-p1 + aes(x = clarity, y = price) +
+```{r fill, fig.height=5, fig.width=6}
+ggplot(diamonds) +
+  aes(clarity, price) +
   geom_boxplot(color = "darkgreen", fill = "gold", alpha = 0.6)
 ```
 
@@ -582,15 +583,33 @@ p1 + aes(x = clarity, y = price) +
 ## 色パレットの変更 `scale_color_*()`
 
 個々の色を自分で決めず、既存のパレットを利用するのが吉。<br>
-e.g., [ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5),
-[viridis](https://ggplot2.tidyverse.org/reference/scale_viridis.html)
+e.g., [viridis](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html),
+[ColorBrewer](https://colorbrewer2.org/#type=diverging&scheme=Spectral&n=5)
 (色覚多様性・グレースケール対策にも有効)
 
-```{r plasma, fig.show="hold", fig.height=5, fig.width=7}
-p2 + geom_point(mapping = aes(color = color)) +
-  scale_color_viridis_d(option = "plasma") + theme_dark()
+```{r scale-color, fig.show="hold", fig.height=4, fig.width=6}
+ggplot(diamonds) + aes(carat, price) +
+  geom_point(mapping = aes(color = clarity)) +
+  scale_color_viridis_d(option = "inferno")
 # scale_color_brewer(palette = "Spectral")
 ```
+
+---
+## 連続値(continuous)と離散値(discrete)を区別する
+
+渡す値とscale関数が合ってないと怒られる:<br>
+`Error: Continuous value supplied to discrete scale`
+
+```{r scale-color-continous, fig.show="hold", fig.height=4, fig.width=6}
+ggplot(diamonds) + aes(carat, price) +
+  geom_point(mapping = aes(color = price)) +
+  scale_color_viridis_c(option = "inferno")
+# scale_color_distiller(palette = "Spectral")
+```
+
+- discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
+- continous: `scale_color_viridis_c()`, `scale_color_distiller()`
+- binned: `scale_color_viridis_b()`, `scale_color_fermenter()`
 
 ---
 ## 値に応じてパネル切り分け (1変数facet)
@@ -693,7 +712,7 @@ p3 + theme_bw() + theme(
 
 ```{r cowplot, fig.height=5.5, fig.width=6}
 pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
-cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol=1L)
+cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 ```
 
 ---
@@ -805,25 +824,27 @@ ggplot2は3Dが苦手
 
 ```{r ggplot-homework, fig.height = 3.8, fig.width = 12, echo = FALSE}
 p_iris = ggplot(iris) +
-  aes(Sepal.Length, Sepal.Width) +
-  geom_point(aes(color = Species), shape = 16, size = 2, alpha = 0.6) +
-  stat_smooth(aes(color = Species), method = lm, formula = y ~ x, se = FALSE, size = 1, alpha = 0.6) +
+  aes(Sepal.Length, Sepal.Width, color = Species) +
+  geom_point(shape = 16, size = 2, alpha = 0.6) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, size = 1, alpha = 0.6) +
   scale_color_brewer(palette = "Set1") +
   theme_gray(base_size = 14) +
   theme(legend.position = "top", axis.ticks = element_blank())
 
 p_diamonds = ggplot(diamonds) +
   aes(price) +
-  geom_histogram(bins = 20, fill = "darkorange") +
+  geom_histogram(bins = 20, boundary = 0, fill = "darkorange") +
   labs(title = "Distribution of diamonds price") +
   theme_bw(base_size = 14) +
   theme(panel.grid.minor = element_blank())
 
 p_mpg = ggplot(mpg) +
-  aes(drv, cty) +
-  geom_boxplot(aes(fill = drv)) +
+  aes(class, cty) +
+  geom_boxplot(aes(fill = class)) +
   geom_jitter(height = 0, width = 0.2, alpha = 0.5, shape = 16) +
-  theme_classic(base_size = 16)
+  scale_fill_viridis_d(option = "turbo", guide = "none") +
+  coord_flip() +
+  theme_classic(base_size = 15)
 
 cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
 ```
@@ -834,7 +855,7 @@ cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
 公式サイトや解説ブログなどを参考に**いろいろな関数・オプション**を試そう。<br>
 最終日、何人かにコードと図を画面共有してもらい、私が添削します。
 
-- 図の内容や独創性は置いておいて「描きたいものが描ける」を目指す。
+- 図の意義や独創性は置いておいて「描きたいものが描ける」を目指す。
 - 「講義で紹介されなかったこのオプションが便利」<br>
   「ホントはこうしたかったけど方法が見つからなかった」<br>
   などのコメント・質問が多く出ることを期待します。
