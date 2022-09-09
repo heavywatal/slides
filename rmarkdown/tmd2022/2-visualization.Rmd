@@ -61,37 +61,44 @@ knitr::opts_chunk$set(cache = TRUE)
 
 
 ---
-## そもそもなぜ解析？ 生の数字見ればよくない？
+## データ解析って必要？ 生の数字見ればよくない？
 
-生データは情報が多すぎて関係性も何も見えない
+生データは情報が多すぎて関係性も何も見えない。
 
 ```{r diamonds}
-print(diamonds)
+print(ggplot2::diamonds)
 ```
 
-ダイヤモンド53,940個について10項目の値を持つ `data.frame`
+ダイヤモンド53,940個について10項目の値を持つデータセット
 
 ---
-## 要約統計量(平均とか分散とか)を見てみる
+## 要約統計量を見てみよう
 
 各列の**平均**とか**標準偏差**とか:
 
 ```{r summary-diamonds, echo = FALSE}
+dia_cols = c("carat", "depth", "table", "price")
 diamonds %>%
-  dplyr::summarize(across(where(is.numeric), list(mean = mean, sd = sd, max = max))) %>%
-  dplyr::mutate(across(where(is.numeric), round, digits = 2)) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_")
+  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max))) %>%
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") %>%
+  dplyr::mutate(across(where(is.numeric), round, digits = 2))
 ```
 
-大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
-```{r cor-diamonds, eval = FALSE, include = FALSE}
-cor(diamonds$carat, diamonds$price)
-# [1] 0.9215913
+大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+```{r cov-diamonds, echo = FALSE}
+diamonds %>%
+  dplyr::select(all_of(dia_cols)) %>%
+  scale() %>%
+  cov() %>%
+  wtl::printmat("%.2f", upper = FALSE)
 ```
+
+<hr>
 
 **生のままよりは把握しやすい**かも。
 
 しかし要注意...
+
 
 ---
 ## 平均値ばかり見て可視化を怠ると構造を見逃す

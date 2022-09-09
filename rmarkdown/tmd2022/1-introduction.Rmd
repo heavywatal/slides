@@ -61,9 +61,9 @@ draft = false
 
 
 ---
-## データ解析って必要？ 生データこそ至高では？
+## データ解析って必要？ 生の数字見ればよくない？
 
-生のままでは複雑過ぎ、情報多すぎ、何もわからない。
+生データは情報が多すぎて関係性も何も見えない。
 
 ```{r diamonds}
 print(ggplot2::diamonds)
@@ -77,17 +77,23 @@ print(ggplot2::diamonds)
 各列の**平均**とか**標準偏差**とか:
 
 ```{r summary-diamonds, echo = FALSE}
+dia_cols = c("carat", "depth", "table", "price")
 diamonds %>%
-  dplyr::summarize(across(where(is.numeric), list(mean = mean, sd = sd, max = max))) %>%
-  dplyr::mutate(across(where(is.numeric), round, digits = 2)) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_")
+  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max))) %>%
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") %>%
+  dplyr::mutate(across(where(is.numeric), round, digits = 2))
 ```
 
-大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
-```{r cor-diamonds, eval = FALSE, include = FALSE}
-cor(diamonds$carat, diamonds$price)
-# [1] 0.9215913
+大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+```{r cov-diamonds, echo = FALSE}
+diamonds %>%
+  dplyr::select(all_of(dia_cols)) %>%
+  scale() %>%
+  cov() %>%
+  wtl::printmat("%.2f", upper = FALSE)
 ```
+
+<hr>
 
 **生のままよりは把握しやすい**かも。
 
@@ -112,7 +118,7 @@ cor(diamonds$carat, diamonds$price)
 
 情報の整理 → **正しい解析・新しい発見・仮説生成**
 
-```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7, cache = TRUE}
+```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
 diamonds %>%
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
   ggplot(aes(carat, price, color = clarity)) +
