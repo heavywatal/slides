@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Rによるデータ前処理実習 2022 東京医科歯科大</title>
+<link rel="stylesheet" href="/slides/css/theme-plain.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Rによるデータ前処理実習 2022 東京医科歯科大">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tmd2022/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.101.0" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<main>
+<header>
+<h1>Rによるデータ前処理実習 2022 東京医科歯科大</h1>
+</header>
+<ul>
+<li>講師: 岩嵜航 (東北大学生命科学研究科)</li>
+<li>日程: 2022年9月24日から3週</li>
+<li>場所: 東京医科歯科大学 M&amp;Dタワー 情報検索室1</li>
+</ul>
+<h2 id="概要">概要</h2>
+<ol>
+<li>授業内容 (100&ndash;150字程度)<br>
+データを元に可視化や検定・予測を行うためのソフトウェアは華々しく発展していますが、
+それらを利用するためにはまず入力データを整える必要があり、
+「データ分析に費やす労力の8割は前処理」などとも言われています。
+その地味ながら重要な作業をなるべく楽に行うためにRを使う方法を学びましょう。</li>
+<li>授業タイトル
+<ol>
+<li>入門1: 前処理とは。Rを使うメリット。Rの基本。</li>
+<li>入門2: データ可視化の重要性と方法。</li>
+<li>データ構造の処理1: 抽出、集約など。</li>
+<li>データ構造の処理2: 結合、変形など。</li>
+<li>データ内容の処理: 数値、文字列、日時など。</li>
+<li>実践: 現実の問題に対処してみる。</li>
+</ol>
+</li>
+<li>受講するうえで必要になる前提知識
+<ul>
+<li>ファイル、フォルダ、クリックなど一般的なパソコンの基礎知識と経験</li>
+</ul>
+</li>
+<li>教科書
+<ul>
+<li>なし</li>
+</ul>
+</li>
+<li>参考書
+<ul>
+<li><a href="https://r4ds.had.co.nz/">Hadley Wickham, Garrett Grolemund &ldquo;R for Data Science&rdquo;</a></li>
+<li><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&amp;linkCode=ll1&amp;tag=heavywatal-22&amp;linkId=8a3fd4e9a0c944b1b41242bbab8d147b">本橋智光「前処理大全」</a></li>
+</ul>
+</li>
+<li>その他 (注意事項等)
+<ul>
+<li>講義資料は公開予定: <a href="https://heavywatal.github.io/slides/tmd2022/">https://heavywatal.github.io/slides/tmd2022/</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="実習環境の設定-遠隔参加者自習">実習環境の設定 (遠隔参加者、自習)</h2>
+<p>参考:
+<a href="https://das-kino.hatenablog.com/entry/2019/11/07/125044">R初心者の館 by das_Kinoさん</a>,
+<a href="https://yukiyanai.github.io/jp/resources/">矢内勇生さん</a></p>
+<ol>
+<li>
+<p>手元のコンピューターの <strong>ユーザー名（ホームフォルダの名前）</strong> を確認。
+半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがちです。
+たぶん変更できない？ので新しいユーザーを作って引っ越すのがいいと思います。
+<strong>半角アルファベット小文字のみ</strong>で短いものを推奨。</p>
+<ul>
+<li>✅ Good: <code>watal</code>, <code>tamakino</code></li>
+<li>❌ Bad: <code>岩嵜航</code>, <code>Watal Iwasaki</code>, <code>heavy.watal</code></li>
+</ul>
+</li>
+<li>
+<p>OSのソフトウェア・アップデートをすべて適用して再起動。</p>
+</li>
+<li>
+<p>OSの設定で、ファイル名の末尾の拡張子(<code>.pdf</code> とか <code>.png</code> とか)を常時表示する。</p>
+</li>
+<li>
+<p>Windowsの場合、
+<a href="https://yukiyanai.github.io/jp/resources/">矢内勇生さん</a>
+の情報を参照しつつOneDrive問題に対処する。</p>
+</li>
+<li>
+<p><a href="https://cran.r-project.org/">https://cran.r-project.org/</a>
+から最新版の <strong>R本体(≥4.2.1)</strong> をダウンロードしてインストール。
+既にインストールしてある場合はバージョンを確認。</p>
+</li>
+<li>
+<p><a href="https://rstudio.com/products/rstudio/download/#download">https://rstudio.com/products/rstudio/download/#download</a>
+から最新版の <strong>RStudio(≥2022.07.1)</strong> をダウンロードしてインストール。
+既にインストールしてある場合はバージョンを確認。</p>
+</li>
+<li>
+<p>Windowsの場合、念のため <strong>Rtools</strong> をインストール。
+バージョンに注意。次のページに従って設定:<br>
+<a href="https://cran.r-project.org/bin/windows/Rtools/">https://cran.r-project.org/bin/windows/Rtools/</a></p>
+<p>Macの場合、念のため次のソフトウェアをインストール:</p>
+<ul>
+<li><strong>Command Line Tools</strong>: <code>xcode-select --install</code> (Xcode本体は不要)</li>
+<li><strong>XQuartz</strong>: <a href="https://www.xquartz.org/">手動ダウンロード</a> or <code>brew install xquartz</code></li>
+</ul>
+</li>
+<li>
+<p>RStudioを起動し、左側のConsoleで <code>install.packages(&quot;tidyverse&quot;, type = &quot;binary&quot;)</code> を実行。
+何か訊かれたら <code>yes</code> と回答。
+パッケージがたくさんインストールされます。</p>
+</li>
+<li>
+<p>Consoleに <code>update.packages(type = &quot;binary&quot;)</code> と打ち込んで全パッケージ更新。</p>
+</li>
+<li>
+<p>Consoleに <code>library(tidyverse)</code> と打ち込んでパッケージを読み込み、
+以下のようなメッセージと共に読み込まれるのを確認:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="o">&gt;</span> <span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">── <span class="n">Attaching</span> <span class="n">packages</span> ───────────────────────────── <span class="n">tidyverse</span> <span class="m">1.3.2</span> ──
+</span></span><span class="line"><span class="cl">✔ <span class="n">ggplot2</span> <span class="m">3.3.6</span>      ✔ <span class="n">purrr</span>   <span class="m">0.3.4</span>
+</span></span><span class="line"><span class="cl">✔ <span class="n">tibble</span>  <span class="m">3.1.8</span>      ✔ <span class="n">dplyr</span>   <span class="m">1.0.10</span>
+</span></span><span class="line"><span class="cl">✔ <span class="n">tidyr</span>   <span class="m">1.2.0</span>      ✔ <span class="n">stringr</span> <span class="m">1.4.1</span>
+</span></span><span class="line"><span class="cl">✔ <span class="n">readr</span>   <span class="m">2.1.2</span>      ✔ <span class="n">forcats</span> <span class="m">0.5.2</span>
+</span></span><span class="line"><span class="cl">── <span class="n">Conflicts</span> ──────────────────────────────── <span class="nf">tidyverse_conflicts</span><span class="p">()</span> ──
+</span></span><span class="line"><span class="cl">✖ <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">()</span> <span class="n">masks</span> <span class="n">stats</span><span class="o">::</span><span class="nf">filter</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">✖ <span class="n">dplyr</span><span class="o">::</span><span class="nf">lag</span><span class="p">()</span>    <span class="n">masks</span> <span class="n">stats</span><span class="o">::</span><span class="nf">lag</span><span class="p">()</span>
+</span></span></code></pre></div></li>
+</ol>
+<h2 id="講義資料">講義資料</h2>
+<p>全6回。リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。</p>
+
+<ul>
+<li>2022-09-24 13:00 | <a href="/slides/tmd2022/1-introduction.html">入門1: 前処理とは。Rを使うメリット。Rの基本。</a></li>
+<li>2022-09-24 14:40 | <a href="/slides/tmd2022/2-visualization.html">入門2: データ可視化の重要性と方法。</a></li>
+<li>2022-10-01 13:00 | <a href="/slides/tmd2022/3-structure1.html">データ構造の処理1: 抽出、集約など。</a></li>
+<li>2022-10-01 14:40 | <a href="/slides/tmd2022/4-structure2.html">データ構造の処理2: 結合、変形など。</a></li>
+<li>2022-10-08 13:00 | <a href="/slides/tmd2022/5-content.html">データ内容の処理: 数値、文字列、日時など。</a></li>
+<li>2022-10-08 14:40 | <a href="/slides/tmd2022/6-practice.html">実践: 現実の問題に対処してみる</a></li>
+</ul>
+</main>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
