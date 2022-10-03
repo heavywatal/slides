@@ -81,7 +81,7 @@ data.frame処理に使うのは主に [dplyr](/rstats/dplyr.html) と [tidyr](/r
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/dplyr.png" width="120" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
 </a>
 
 シンプルな関数がたくさん。繋げて使う (piping)
@@ -830,7 +830,7 @@ result = diamonds %>%
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/tidyr.png" width="120" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="120" align="right">
 </a>
 
 横長から縦長に

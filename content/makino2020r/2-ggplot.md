@@ -280,7 +280,7 @@ boxplot(Petal.Width ~ Species, data = iris)
 ## ggplot2
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/slides/image/hex-stickers/ggplot2.png" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
 </a>
 
 - tidyverseパッケージ群のひとつ
@@ -757,7 +757,7 @@ ggplot2は3Dが苦手
 ## Summary: Visualization with R
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/slides/image/hex-stickers/ggplot2.png" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
 </a>
 
 ### ✅ まずデータ全体を可視化してみよう

@@ -32,18 +32,3 @@ content/%/image: ${DROPBOX}/%
 
 ${DROPBOX}/%: | content/%
 	mkdir $@
-
-
-.PHONY: stickers
-
-HEXDIR := static/image/hex-stickers
-TIDYVERSE := tidyverse dplyr tidyr purrr ggplot2 tibble readr pipe stringr forcats lubridate readxl rmarkdown
-TIDYVERSE := $(addsuffix .png, ${TIDYVERSE})
-TIDYVERSE := $(addprefix ${HEXDIR}/, ${TIDYVERSE})
-
-stickers: ${TIDYVERSE}
-	@:
-
-${HEXDIR}/%.png: hex-stickers/PNG/%.png
-	@mkdir -p ${HEXDIR}
-	zopflipng $< $@

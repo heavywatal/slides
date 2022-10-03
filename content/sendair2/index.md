@@ -429,7 +429,7 @@ library(tidyverse)
 ## ggplot2とは
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/slides/image/hex-stickers/ggplot2.png" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
 </a>
 
 - tidyverseパッケージ群のひとつ

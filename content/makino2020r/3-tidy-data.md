@@ -350,7 +350,7 @@ That's all.
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/dplyr.png" width="120" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
 </a>
 
 シンプルな関数がたくさん。繋げて使う (piping)
@@ -1297,7 +1297,7 @@ result = diamonds %>%
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/tidyr.png" width="120" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="120" align="right">
 </a>
 
 横広から縦長に
@@ -2278,7 +2278,7 @@ https://r4ds.had.co.nz/strings.html
 ## stringr --- 文字列処理パッケージ
 
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/stringr.png" width="120" align="right">
+<img src="/_img/hex-stickers/stringr.webp" width="120" align="right">
 </a>
 
 -   tidyverseの一部
@@ -2522,7 +2522,7 @@ stringi::stri_trans_nfkc("ｶﾀｶﾅ")  # 半角カナを全角に
 ## 文字列から別の型に
 
 <a href="https://readr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="120" align="right">
 </a>
 
 これはstringrではなくreadrの担当:
@@ -2667,7 +2667,7 @@ diamonds %>%
 ## tidyverse の因子型担当は forcats
 
 <a href="https://forcats.tidyverse.org/">
-<img src="/slides/image/hex-stickers/forcats.png" width="120" align="right">
+<img src="/_img/hex-stickers/forcats.webp" width="120" align="right">
 </a>
 
 - `fct_reorder()`: 別の変数に応じて順序を並べ替え
@@ -2742,7 +2742,7 @@ unclass(lt) %>% as_tibble()
 ## lubridate --- 日時型処理パッケージ
 
 <a href="https://lubridate.tidyverse.org/">
-<img src="/slides/image/hex-stickers/lubridate.png" width="120" align="right">
+<img src="/_img/hex-stickers/lubridate.webp" width="120" align="right">
 </a>
 
 日時型への変換:

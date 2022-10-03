@@ -391,7 +391,7 @@ iris
 ## tibble --- data.frameの改良版
 
 <a href="https://tibble.tidyverse.org/">
-<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
+<img src="/_img/hex-stickers/tibble.webp" width="120" align="right">
 </a>
 
 - **巨大データをうっかり表示しても画面を埋め尽くさない**
@@ -422,7 +422,7 @@ as_tibble(iris)
 ## tibble --- data.frameの改良版
 
 <a href="https://tibble.tidyverse.org/">
-<img src="/slides/image/hex-stickers/tibble.png" width="120" align="right">
+<img src="/_img/hex-stickers/tibble.webp" width="120" align="right">
 </a>
 
 - 巨大データをうっかり表示しても画面を埋め尽くさない
@@ -453,7 +453,7 @@ tbl[["x-1"]]  # 当然character型のまま
 ## readr --- data.frameの読み書き担当
 
 <a href="https://readr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/readr.png" width="120" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="120" align="right">
 </a>
 
 - 生data.frameではなく安全なtibbleとして読んでくれる
@@ -488,7 +488,7 @@ readr::read_tsv("iris.tsv")
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/dplyr.png" width="120" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
 </a>
 
 ひとつの関数はひとつの仕事。<br>
@@ -676,7 +676,7 @@ result = iris %>%
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/tidyr.png" width="120" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="120" align="right">
 </a>
 
 横長から縦長に
@@ -832,7 +832,7 @@ nested_iris$data[[1L]]
 ## purrr
 
 <a href="https://purrr.tidyverse.org/">
-<img src="/slides/image/hex-stickers/purrr.png" width="120" align="right">
+<img src="/_img/hex-stickers/purrr.webp" width="120" align="right">
 </a>
 
 listやループの処理担当。
