@@ -18,7 +18,8 @@ https://heavywatal.github.io/slides/
 4.  The output and libraries are published via
     [`gh-pages` branch of this repository](https://github.com/heavywatal/slides/tree/gh-pages).
 
-But I would rather recommend using other user-friendly frameworks such as
+But I recommend using [Quarto Presentation](https://quarto.org/docs/presentations/) via [RStudio IDE](https://www.rstudio.com/products/rstudio/).
+It is user-friendly and has decent defaults compared to older alternatives such as
 [`xaringan`](https://slides.yihui.org/xaringan/),
 [`rstudio/revealjs`](https://bookdown.org/yihui/rmarkdown/revealjs.html),
 and [others supported in `rmarkdown` package](https://bookdown.org/yihui/rmarkdown/presentations.html).
