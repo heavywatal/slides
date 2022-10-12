@@ -3,6 +3,7 @@ title = "逆順で理解する R Markdown Presentation — Tokyo.R #102"
 date = 2022-10-22T16:30:00+09:00
 type = "reveal"
 draft = false
+og_image = "tokyor102/image/screenshot.webp"
 +++
 
 <style>
