@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>逆順で理解する R Markdown Presentation — Tokyo.R #102</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="逆順で理解する R Markdown Presentation — Tokyo.R #102">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokyor102/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.101.0" />
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script defer src="https://use.fontawesome.com/releases/v5.8.2/js/all.js" integrity="sha384-DJ25uNYET2XCl5ZF++U8eNxPWqcKohUUBUpKGlNLMchM7q4Wjg2CUpjHLaL8yYPH" crossorigin="anonymous"></script>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<style>
+.footnote img {
+  vertical-align: middle;
+  height: 110px;
+}
+</style>
+<h1>
+逆順で理解する R Markdown Presentation
+</h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+&nbsp;
+<a href="https://heavywatal.github.io/"><code>@heavywatal</code>
+<img src="https://raw.githubusercontent.com/heavywatal/rwtl/master/man/figures/logo.svg" height="60" style="vertical-align: middle;">
+</a>
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<div class="footnote">
+2022-10-22 <a href="https://tokyor.connpass.com/event/262836/">Tokyo.R #102</a><br>
+<a href="https://heavywatal.github.io/slides/tokyor102/">https://heavywatal.github.io/slides/tokyor102/</a>
+&ensp;=&ensp;
+<a href="https://github.com/heavywatal/slides/blob/main/rmarkdown/tokyor102/index.Rmd"><code>tokyor102.Rmd</code></a>
+&ensp;|><br><br>
+&emsp;
+<a href="https://yihui.org/knitr"><img src="/_img/hex-stickers/knitr.webp"></a>
+&ensp;|>&ensp;
+<a href="https://gohugo.io/"><img src="image/hugo-logo-wide.svg"></a>
+&ensp;|>&ensp;
+<a href="https://revealjs.com/"><img src="image/reveal-symbol.svg"></a>
+</div>
+
+</section>
+<section>
+<h2 id="powerpoint無理ウェブブラウザでプレゼンしたい">PowerPoint無理、ウェブブラウザでプレゼンしたい</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 0.4;">
+<p>Hello, R Markdown!</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="m">3</span> <span class="o">*</span> <span class="m">14</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">cut</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code>## [1] 42
+</code></pre><img src="figure/hello-1.webp" alt="plot of chunk hello" height="320" />
+  </div>
+  <div class="column">
+<p>普通のテキスト</p>
+<p>Rコード</p>
+<div style="margin-block-start: 4em;">実行結果</div>
+<p>図</p>
+  </div>
+</div>
+</section>
+<section>
+<h2 id="ウェブブラウザでスライドショーを表示する仕組み">ウェブブラウザでスライドショーを表示する仕組み</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.8;">
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">link</span> <span class="na">rel</span><span class="o">=</span><span class="s">&#34;stylesheet&#34;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">href</span><span class="o">=</span><span class="s">&#34;style.css&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="p">&lt;</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>見出し<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    スライド1 本文
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">section</span><span class="p">&gt;&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>見出し<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">    スライド2 本文
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">section</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&#34;reveal.js&#34;</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</span></span></code></pre></div>  </div>
+  <div class="column">
+<dl>
+<dt>HTML</dt>
+<dd>マークアップ言語。<code>&lt;タグ&gt;挟む&lt;/タグ&gt;</code></dd>
+<dd>文書の骨格、<strong>テキストの中身</strong>を書く。</dd>
+<dd>余白の右クリックから表示できる →</dd>
+<dt>CSS</dt>
+<dd>フォントや余白などの<strong>スタイルを調整</strong>。</dd>
+<dt>JavaScript</dt>
+<dd>ウェブブラウザに働きかける。</dd>
+<dd><strong>スライドっぽく見せる</strong>こともできる。<br>
+e.g.,
+<a href="https://revealjs.com/"><strong>reveal.js</strong></a>,
+<a href="https://remarkjs.com/">remark.js</a>,
+<a href="https://code.google.com/p/io-2012-slides/">ioslides</a>,
+etc.
+</div>
+</dd>
+</dl>
+</div>
+<p>しかし、生のHTMLを手で書くのは大変&hellip;</p>
+
+</section>
+<section>
+<h2 id="書きやすいmarkdownからhtmlに変換">書きやすいMarkdownからHTMLに変換</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.9;">
+<pre class="chroma"><code>## スライド1 見出し
+
+スライド1 本文
+
+&#45;--
+## スライド2 見出し
+
+スライド2 本文
+
+&#45;--
+## コードブロック
+
+```
+3 * 14
+ggplot(diamonds) +
+  aes(carat, price) +
+  geom_point()
+```</code></pre>
+  </div>
+  <div class="column">
+<dl>
+<dt>Markdown</dt>
+<dd><strong>軽量マークアップ言語</strong>の代表格。</dd>
+<dd>微妙に異なるflavorが乱立。<br>
+<a href="https://spec.commonmark.org/">CommonMark</a>,
+<a href="https://github.github.com/gfm/">GFM</a> が<strong>標準</strong>的な位置づけ。</dd>
+</dl>
+<hr>
+<dl>
+<dt><a href="https://gohugo.io/">Hugo</a></dt>
+<dd><strong>超高速</strong> Markdown → HTML スペシャリスト。</dd>
+<dd>CommonMark, GFM 準拠 + 拡張。</dd>
+<dd>ウェブサイト全体を作る前提。<strong>初期設定が難関</strong>。</dd>
+<dt><a href="https://pandoc.org/">Pandoc</a></dt>
+<dd><strong>様々な形式を相互変換</strong>できるジェネラリスト。</dd>
+<dd><strong><a href="https://pandoc.org/MANUAL.html#pandocs-markdown">Pandoc&rsquo;s Markdown</a> が独特</strong>。<br>
+CommonMark, GFM も扱えるけど。
+</div>
+</dd>
+</dl>
+</div>
+<p>コードブロックの実行結果も表示できたら嬉しい&hellip;</p>
+
+</section>
+<section>
+<h2 id="r-markdownのコード部分を実行してmarkdown化">R Markdownのコード部分を実行してMarkdown化</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.9;">
+<pre class="chroma"><code>&#45;--
+title: "Goodbye PowerPoint"
+format: revealjs
+&#45;--
+
+Hello, R Markdown!
+
+&#96;``{r hello}
+3 * 14
+ggplot(diamonds) +
+  aes(carat, price) +
+  geom_point()
+```
+</code></pre>
+<pre><code>```
+## [1] 42
+```
+&lt;img src="figure/hello-1.png">
+</code></pre>
+  </div>
+  <div class="column" style="padding-block-start: 0em;">
+<dl>
+<dt>R Markdown (.Rmd, .qmd)</dt>
+<dd>最上部に<strong>メタデータ</strong>を記述。<br>
+文書全体の設定など。</dd>
+<dd>実行してほしいRコードを<br>
+<strong>コードチャンク</strong>に書く。</dd>
+</dl>
+<br>
+<p><a href="https://yihui.org/knitr">knitr</a> 🧶 でコードチャンクを実行<br></p>
+<p>↓</p>
+<dl>
+<dt>普通のMarkdown (.md)</dt>
+<dd>実行結果が編み込まれる。</dd>
+<dd>画像ファイルとそこへのリンクも。
+</div>
+</dd>
+</dl>
+</div>
+<p>すべて繋がった。結果は<a href="#2">スライド#2</a>。簡単に実現する方法は？</p>
+
+</section>
+<section>
+<h2 id="r-markdownからスライドショーを作る枠組み">R Markdownからスライドショーを作る枠組み</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.8;">
+    <img src="image/rstudio-new-file.webp" width="100%">
+  </div>
+  <div class="column" style="padding-block-start: 0;">
+<dl>
+<dt><a href="https://quarto.org/docs/presentations/">Quarto Presentation</a> 🟢 <span style="font-weight: normal;">(<a href="https://github.com/quarto-dev/quarto-cli/releases/tag/v1.0.1">v1.0</a> in July 2022)</span></dt>
+<dd><code>.qmd</code> |&gt; knitr |&gt; Pandoc |&gt; reveal.js</dd>
+<dd><a href="https://quarto.org/docs/tools/rstudio.html">RStudio</a>,
+<a href="https://quarto.org/docs/tools/vscode.html">VS Code</a>が<strong>ぜーんぶ面倒みてくれる</strong>！</dd>
+<dt><a href="https://bookdown.org/yihui/rmarkdown/presentations.html">R Markdown&hellip; → Presentation</a> 🟡</dt>
+<dd><code>.Rmd</code> |&gt; knitr |&gt; Pandoc |&gt; <strong>ioslides, Slidy</strong></dd>
+<dd>デフォルトでは動作が鈍い、中央寄せ。</dd>
+<dt><a href="https://github.com/heavywatal/slides#readme">heavywatal/slides</a> 🔴 非推奨</dt>
+<dd><code>.Rmd</code> |&gt; knitr |&gt; <a href="https://github.com/heavywatal/hugo-theme-reveal"><strong>Hugo</strong> |&gt; reveal.js</a></dd>
+<dd>習得・設定が済んでしまえば速いけど&hellip;</dd>
+<dd>Quarto無き時代の俺俺フレームワーク。</dd>
+<dd>訊かれるので一度説明しておきたかった。</dd>
+</dl>
+<div style="opacity: 0.5;">
+<dl>
+<dt><a href="https://slides.yihui.org/xaringan/">xaringan</a> 🥷 Presentation Ninja</dt>
+<dd><code>.Rmd</code> |&gt; knitr |&gt; <strong>remark.js</strong></dd>
+</dl>
+</div>
+  </div>
+</div>
+</section>
+<section>
+<h2 id="補遺">補遺</h2>
+<ul>
+<li>見た目を微調整したければ<strong>CSS(+HTML)の知識</strong>は必要になる。</li>
+<li>人から見えるように公開したければ出力ファイル一式をアップロード:
+<ul>
+<li>大学や会社のサーバー</li>
+<li>各種サービス: e.g., <a href="https://docs.github.com/pages/getting-started-with-github-pages/about-github-pages">GitHub Pages</a></li>
+<li>RStudioから<kbd>Publish</kbd>ボタン:
+<a href="https://rpubs.com/">RPubs</a>,
+<a href="https://docs.rstudio.com/connect/user/">RStudio Connect</a></li>
+</ul>
+</li>
+<li>自分のコンピュータでプレゼンするだけなら <a href="http://localhost/">http://localhost/</a> で十分。</li>
+<li>HTMLスライドをPDF化したい場合は<a href="https://github.com/astefanutti/decktape">decktape</a>が使える。</li>
+<li><a href="https://quarto.org/">Quarto</a>は多機能。
+<ul>
+<li>入力には<a href="https://quarto.org/docs/tools/jupyter-lab.html">Jupyter (.ipynb)</a>も使える。</li>
+<li>HTMLスライド以外もいろいろ出力できる。
+<a href="https://quarto.org/docs/gallery/">See Gallery</a>.</li>
+</ul>
+</li>
+</ul>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script>
+Reveal.initialize({
+  width: 960,
+  height: 720,
+  margin: 0,
+  controls: true,
+  controlsLayout: 'bottom-right',
+  controlsTutorial: false,
+  controlsBackArrows: 'faded',
+  progress: false,
+  slideNumber: 'c/t',
+  showSlideNumber: 'all',
+  hashOneBasedIndex: true,
+  hash: true,
+  history: false,
+  keyboard: true,
+  overview: true,
+  center: false,
+  touch: true,
+  loop: false,
+  rtl: false,
+  navigationMode: 'linear',
+  shuffle: false,
+  fragments: true,
+  fragmentInURL: true,
+  embedded: false,
+  help: true,
+  showNotes: false,
+  autoPlayMedia: null,
+  preloadIframes: null,
+  mouseWheel: false,
+  previewLinks: false,
+  transition: 'none',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'none',
+  pdfMaxPagesPerSlide: 1,
+  pdfSeparateFragments: false,
+  viewDistance: 2,
+  plugins: [ RevealNotes ]
+});
+</script>
+<script>
+{
+const reload_all_img = function() {
+  const imgs = document.getElementsByTagName("img");
+  for (let i = 0; i < imgs.length; ++i) {
+    const src = imgs[i].src;
+    imgs[i].src += "?q";
+    imgs[i].src = src;
+  }
+};
+const reload_src_element = function(ev) {
+  const original_src = ev.srcElement.src;
+  ev.srcElement.src += "?q";
+  ev.srcElement.src = original_src;
+};
+const reload_src = function(ev) {
+  if (ev.shiftKey || ev.metaKey || ev.altKey) {
+    reload_all_img();
+  } else {
+    reload_src_element(ev);
+  }
+};
+const img_elements = document.getElementsByTagName("img");
+for (let i = 0; i < img_elements.length; ++i) {
+  img_elements[i].onclick = reload_src;
+}
+};
+</script>
+</body>
+</html>
