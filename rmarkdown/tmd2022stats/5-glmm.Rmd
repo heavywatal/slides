@@ -1,0 +1,343 @@
++++
+url = "tmd2022stats/5-glmm.html"
+title = "5. 一般化線形混合モデルGLMM — 統計モデリング実習 2022 TMDU"
+linktitle = "一般化線形混合モデルGLMM"
+date = 2023-03-25T13:00:00+09:00
+type = "reveal"
+draft = false
++++
+
+<link rel="stylesheet" href="style.css">
+
+# [統計モデリング実習 2022 TMDU](.)
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
+<li><a href="3-likelihood.html">尤度、最尤推定</a>
+<li><a href="4-glm.html">一般化線形モデル (GLM)</a>
+<li class="current-deck"><a href="5-glmm.html">個体差、一般化線形混合モデル (GLMM)</a>
+<li><a href="6-bayesian.html">ベイズ推定とMCMC</a>
+<li><a href="7-stan.html">StanでGLM</a>
+<li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
+</ol>
+
+<div class="footnote">
+2023-03-18 東京医科歯科大学
+<a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
+</div>
+
+```{r setup-global, include=FALSE, file = "setup.R"}
+```
+
+```{r setup-local, include=FALSE}
+library(ggplot2)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(reticulate)
+use_virtualenv("dshc2022")
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
+```
+
+---
+## n個のうちy個生存。二項分布に従......わない！
+
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？
+
+```{r overdispersion, echo = FALSE, fig.height = 5, fig.width = 6, warning = FALSE}
+ninds = 100L
+mu_ind = 0.5
+sd_ind = 3
+df_od = tibble::tibble(
+  z = rnorm(ninds, mu_ind, sd_ind),
+  p = wtl::sigmoid(z),
+  y = rbinom(ninds, 8L, p))
+sum_y = sum(df_od$y)
+p_hat = sum_y / 800
+tidy_od = df_od %>%
+  dplyr::count(y, name = "observed") %>%
+  dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
+  tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
+  dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
+# label = expression(hat(p) == paste(sprintf("%d/800 = %.2f", sum_y, p_hat)))
+label = bquote(hat(p) == .(paste(sprintf("%d/800 = %.2f", sum_y, p_hat))))
+tidy_od %>%
+  ggplot() + aes(y, count) +
+  geom_col(aes(fill = key, width = width, alpha = alpha), position = "identity") +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 6) +
+  scale_alpha_identity() +
+  scale_fill_manual(values = c(observed = "#333333", expected = "#3366ff")) +
+  coord_cartesian(xlim = c(0, 8)) +
+  labs(x = "# survived seeds") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
+
+
+---
+## 個体差をモデルに組み込みたい
+
+各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。<br>
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
+
+```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, warning = FALSE}
+df_od %>%
+  tibble::rowid_to_column("id") %>%
+  ggplot() + aes(id, y / 8) +
+  geom_col(width = 0.6, fill = "#3366ff", alpha = 0.66) +
+  labs(y = expression(italic(p[i]))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
+
+個体の生存能力をもっと少ないパラメータで表現できないか？
+
+
+---
+## 個体差をモデルに組み込みたい
+
+各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$
+
+```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
+# tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) %>%
+z_hat = wtl::logit(p_hat)
+p_sigmoid =
+df_od %>%
+  ggplot() + aes(z, p) +
+  geom_line(size = 2, alpha = 0.6, color = "#3366ff") +
+  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#3366ff") +
+  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = "#3366ff") +
+  scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
+  labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+p_normal =
+tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 100), Density = dnorm(z, z_hat, sd_ind)) %>%
+  ggplot() + aes(z, Density) +
+  geom_area(fill = "#3366ff", alpha = 0.5) +
+  geom_vline(xintercept = z_hat, color = "#3366ff") +
+  scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
+  labs(x = expression(italic(z))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
+```
+
+パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。
+
+前者は標本平均 $\hat p$ から求まるとして、後者どうする？
+
+---
+## 個体能力のばらつき $\sigma$ が大きいと両端が増える
+
+普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
+
+```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
+sigma = c(0.5, 1.5, 3)
+breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
+df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) %>%
+  dplyr::mutate(Density = dnorm(z, z_hat, sigma))
+
+p_z = df_z %>%
+  ggplot() + aes(z, Density) +
+  scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
+  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
+  labs(x = expression(italic(z))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), legend.position = "none")
+
+p_z + geom_col(width = 0.1, fill = "#3366ff", alpha = 0.6)
+
+df_unmixed = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 20)) %>%
+  dplyr::mutate(p = wtl::sigmoid(z)) %>%
+  purrr::pmap_dfr(function(z, p) {
+    tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))
+  }) %>%
+  dplyr::arrange(y)
+
+df_mixed = tibble::tibble(sigma) %>%
+  dplyr::mutate(data = purrr::map(sigma, ~{
+    df_unmixed %>%
+      dplyr::mutate(w = dnorm(z, z_hat, .x), Density = w * Density) %>%
+      dplyr::mutate(Density = Density / sum(Density))
+  })) %>%
+  tidyr::unnest(data)
+
+df_binom = tidyr::crossing(y = seq.int(0, 8)) %>% dplyr::mutate(Density = dbinom(y, 8, p_hat))
+
+p_mixed = df_mixed %>%
+  ggplot() + aes(y, Density) +
+  geom_col(data = df_binom, alpha = 0.5) +
+  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
+  labs(x = "# survived seeds") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), legend.position = "none")
+
+p_mixed + geom_col(width = 0.4, fill = "#3366ff", alpha = 0.6)
+```
+
+---
+## zの値で色分けしてみると想像しやすい
+
+正規分布と二項分布の混ぜ合わせ......?
+
+```{r alter-sigma-z, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
+p_z + geom_col(aes(fill = z), width = 0.1) +
+  scale_fill_viridis_b(option = "turbo", breaks = breaks)
+
+p_mixed + geom_col(aes(fill = z), width = 0.4) +
+  scale_fill_viridis_b(option = "turbo", breaks = breaks)
+```
+
+---
+## 混合分布。ただの二項分布よりも良いあてはまり。
+
+パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
+
+```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
+df_mixed %>%
+  dplyr::filter(sigma == max(sigma)) %>%
+  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf))) %>%
+  dplyr::group_by(Z) %>%
+  dplyr::mutate(Density = Density / sum(Density)) %>%
+  dplyr::ungroup() %>%
+  ggplot() + aes(y, Density) +
+  geom_col(aes(fill = z)) +
+  scale_fill_viridis_b(option = "turbo", breaks = breaks) +
+  facet_wrap(vars(Z), nrow = 1, labeller = label_both) +
+  labs(x = "# survived seeds") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), legend.position = "none")
+```
+
+<div align="center">
+
+```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, warning = FALSE}
+p1 = df_mixed %>%
+  dplyr::filter(sigma == max(sigma)) %>%
+  ggplot() + aes(y, Density) +
+  geom_col(aes(fill = z)) +
+  scale_fill_viridis_b(option = "turbo", breaks = breaks) +
+  labs(x = "# survived seeds", title = "expected") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), legend.position = "none")
+
+p2 = tidy_od %>%
+  dplyr::filter(key == "observed") %>%
+  ggplot() + aes(y, count) +
+  geom_col() +
+  labs(x = "# survived seeds", title = "observed") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+</div>
+
+---
+## 一般化線形混合モデル GLMM
+
+**固定効果(fixed effects)** のみ扱っていたGLMを拡張して、<br>
+**変量効果(random effect)** を混合したモデル。<br>
+<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small>
+
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+  + z_{1i} + \ldots \\
+z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
+\end{split}\]</p>
+
+e.g.,<br>
+個体$i$の種子生存率$p_i$は、<br>
+(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
+(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。
+
+---
+## 固定効果にするか、変量効果にするか
+
+推定したパラメータを予測に使うなら固定効果
+
+予測に使えそうなので固定効果向き
+: - 観測・操作した連続値変数: 長さ、重さ、温度、etc.
+: - 観測・操作したカテゴリカル変数: 性別、投薬、etc.
+
+予測に使えないので変量効果向き
+: - 観測・操作できなかった個体差:<br>
+    たまたま集まってくれた学生15人 {A, B, C, ...}。<br>
+    Aさんの固定効果を推定できても、Zさんの予測には使えない。
+: - 観測・操作できなかったグループ差:<br>
+    ↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
+    いグループの固定効果を推定できても、また集まることはない。
+
+---
+## どういうときに変量効果を考える必要があるか
+
+データに**擬似反復**が含まれるとき。<br>
+ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。
+
+| 植木鉢 | 個体/植木鉢 | 種子/個体 | 疑似反復 | 推定不可 |
+| -----  | ----------- | ----------| ---- | ------ |
+| 100個  | 1個体ずつ   | 1個ずつ   | – | 個体差・鉢差 |
+| 25個   | 1個体ずつ   | 4個ずつ   | 個体 | 鉢差 |
+| 20個   | 5個体ずつ   | 1個ずつ   | 植木鉢 | 個体差 |
+| 5個    | 5個体ずつ   | 4個ずつ   | 植木鉢・個体 | – |
+
+疑似反復あり<br>
+→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
+→ そのぶんを差し引いて固定効果を推定したい
+
+
+---
+## GLMMの問題点・展望
+
+- 最尤推定の計算が難しくなるので、あまり複雑にはできない
+    - ベイズ推定を使えばクリアできる
+- GLMの拡張として理解はできても、実際に書くのは難しめ
+    - 階層ベイズモデルの一種として見るほうが便利
+
+→ ここでGLMMの練習はせず、階層ベイズモデルに進む。
+
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 一般化線形(混合)モデルまとめ
+
+- 何はともあれ作図して俯瞰
+- GLMは統計モデリングの考え方の根幹
+    - 確率分布・リンク関数・説明変数
+    - 尤度・最尤法によるパラメータ推定
+    - 情報量基準などによるモデル選択
+- GLMMは現実のデータ解析に向けた強化
+    - 疑似反復による変量効果を考慮
+    - 階層ベイズモデルとして扱うほうが楽
+
+<a href="6-bayesian.html" rel="next" class="readmore">
+6. ベイズ推定、MCMC
+</a>
