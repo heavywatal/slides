@@ -44,8 +44,6 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-library(reticulate)
-use_virtualenv("dshc2022")
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
@@ -594,30 +592,23 @@ $\text{logit}(p_i)$
 
 
 ---
-## statsmodelsにおけるGLMのやりかた
+## RにおけるGLMのやりかた
 
-[`smf.glm`](https://www.statsmodels.org/stable/generated/statsmodels.formula.api.glm.html)
-の使い方はOLSとほぼ同じ
+`lm` と同じ。
 
-```{python smf-glm}
-import statsmodels.formula.api as smf
-formula = "weight ~ height"
-model = smf.glm(formula, data=r.df_weight)
-result = model.fit()
-print(model.family)
+```{r glm}
+formula = weight ~ height
+fit = glm(formula, data = df_weight)
+broom::tidy(fit)
+broom::glance(fit)
 ```
 
 何も指定しない場合は正規分布・恒等リンク。<br>
 `family=` オプションで
-[確率分布](https://www.statsmodels.org/stable/glm.html#families)
-と
-[リンク関数](https://www.statsmodels.org/stable/glm.html#link-functions)
+[確率分布とリンク関数](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/family.html)
 を明示的に指定:
-```{python family-explicit}
-import statsmodels.api as sm
-identity = sm.families.links.identity()
-gaussian = sm.families.Gaussian(link=identity)
-model = smf.glm(formula, data=r.df_weight, family=gaussian)
+```{r family-explicit}
+fit = glm(formula, data = df_weight, family = gaussian(link = identity))
 ```
 
 
@@ -949,16 +940,12 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{python penguins, results = "hide", cache = FALSE}
-import statsmodels.api as sm
-penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
-print(penguins)
-```
-
-```{r penguins-r, include = FALSE}
+```{r penguins, echo = -1L, results = FALSE}
 if (!require(palmerpenguins, quietly = TRUE)) {
   install.packages("palmerpenguins")
 }
+# install.packages("palmerpenguins")
+library(palmerpenguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 print(penguins)
 ```
@@ -972,7 +959,7 @@ print(penguins)
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{python penguins-print, echo = FALSE}
+```{r penguins-print, echo = FALSE}
 print(penguins)
 ```
 
@@ -1018,19 +1005,10 @@ p_penweight
 とりあえずデフォルトの正規分布・恒等リンク。
 $y = 136.7 + 0.0153 x$
 
-```{r penguins-fit1, include = FALSE}
+```{r penguins-fit1}
 fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
 broom::tidy(fit1)
 broom::glance(fit1)
-```
-```{python penguins-fit1-py, cache = FALSE}
-import statsmodels.formula.api as smf
-formula = "flipper_length_mm ~ body_mass_g"
-model1 = smf.glm(formula, data=penguins)
-results1 = model1.fit()
-print(results1.params)
-print(results1.llf)
-print(results1.aic)
 ```
 
 ---
@@ -1076,18 +1054,10 @@ p_penweight_color
 Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。
 
-```{r penguins-fit2, include = FALSE}
+```{r penguins-fit2}
 fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
 broom::tidy(fit2)
 broom::glance(fit2)
-```
-```{python penguins-fit2-py}
-formula = "flipper_length_mm ~ body_mass_g + species"
-model2 = smf.glm(formula, data=penguins)
-results2 = model2.fit()
-print(results2.params)
-print(results2.llf)
-print(results2.aic)
 ```
 
 ---
@@ -1116,18 +1086,10 @@ p2
 Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
-```{r penguins-fit3, include = FALSE}
+```{r penguins-fit3}
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
 broom::tidy(fit3)
 broom::glance(fit3)
-```
-```{python penguins-fit3-py}
-formula = "flipper_length_mm ~ body_mass_g + species + body_mass_g:species"
-model3 = smf.glm(formula, data=penguins)
-results3 = model3.fit()
-print(results3.params)
-print(results3.llf)
-print(results3.aic)
 ```
 
 ---

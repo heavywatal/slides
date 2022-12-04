@@ -44,8 +44,6 @@ library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-library(reticulate)
-use_virtualenv("dshc2022")
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
@@ -271,16 +269,13 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ## 残差平方和(RSS)が最小となるパラメータを探せ
 
 これくらいなら一瞬で計算してもらえる
-```{python ols}
-import statsmodels.formula.api as smf
-model = smf.ols("weight ~ height", r.df_weight)
-result = model.fit()
-result.params
+```{r ols}
+par_init = c(intercept = 0, slope = 0)
+result = optim(par_init, fn = rss_weight, data = df_weight)
+result$par
 ```
 
 ```{r weight-lm, echo = FALSE, fig.height = 3.7, fig.width = 3.7}
-par_init = c(intercept = 0, slope = 0)
-result = optim(par_init, fn = rss_weight, data = df_weight)
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
