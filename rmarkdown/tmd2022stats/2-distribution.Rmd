@@ -286,19 +286,7 @@ p_weight +
 ---
 ## 🔰 直線あてはめしてみる
 
-回帰に使えるPythonパッケージ2選:
-
-[statsmodels](https://www.statsmodels.org)
-: 統計モデリング寄り。今回はこちらを紹介。
-: Rに似た書き方や統計量の計算などいろいろ楽。
-
-[scikit-learn](https://scikit-learn.org)
-: 機械学習寄り
-: 回帰以外のさまざまな手法も統一的な書き方で使える
-
-🔰
-[`2-stats-model.ipynb`](./2-stats-model.ipynb)
-をJupyterで開き、順々に実行してみよう。
+TODO: `2-stats-model.ipynb`
 
 <hr>
 
@@ -835,16 +823,15 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) %>%
 実際には**決定論的**に計算されているので、<br>
 シード(出発点)と呼び出し回数が同じなら出る数も同じになる。
 
-```python
-import numpy as np
-rng = np.random.default_rng(seed=42)  # initialize
-rng.integers(1, 6, 4)
-# array([1, 4, 4, 3])
-rng.integers(1, 6, 4)
-# array([3, 5, 1, 4])
-rng = np.random.default_rng(seed=42)  # re-initialize
-rng.integers(1, 6, 8)
-# array([1, 4, 4, 3, 3, 5, 1, 4])
+```r
+set.seed(42)
+runif(3L)
+# 0.9148060 0.9370754 0.2861395
+runif(3L)
+# 0.8304476 0.6417455 0.5190959
+set.seed(42)
+runif(6L)
+# 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959
 ```
 
 シードに適当な固定値を与えておくことで再現性を保てる。<br>
@@ -855,31 +842,33 @@ rng.integers(1, 6, 8)
 ---
 ## いろんな乱数を生成・可視化して感覚を掴もう
 
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-rng = np.random.default_rng(seed=24601)  # Random Number Generator
-
-x = rng.integers(1, 6, 100)
-# x = rng.binomial(3, 0.5, 100)
-# x = rng.poisson(3, 100)
-# x = rng.normal(50, 10, 100)
-
+```r
+n = 100
+x = sample.int(6, n, replace = TRUE)
+x = runif(n, min = 0, max = 1)
+x = rgeom(n, prob = 0.5)
+x = rbinom(n, size = 3, prob = 0.5)
+x = rpois(n, lambda = 10)
+x = rnorm(n, mean = 50, sd = 10)
 print(x)
-# sns.histplot(x)   # for continuous values
-sns.countplot(x)    # for discrete values
+
+p1 = ggplot(data.frame(x)) + aes(x)
+p1 + geom_histogram() # for continuous values
+p1 + geom_bar()       # for discrete values
 ```
 
-🔰
-[`2-stats-model.ipynb`](./2-stats-model.ipynb)
-をJupyterで開き、順々に実行してみよう。
+🔰 小さい `n` から徐々に大きくして変化を確認しよう。
 
-<hr>
+🔰 ほかのオプションもいろいろ変えて変化を確認しよう。
 
-☕️ 休憩 + 質疑応答
+🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
+   全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
 
+```{r gacha, include = FALSE}
+x = rbinom(1000000, 10, 0.01)
+p = ggplot(data.frame(x)) + aes(x) + geom_bar()
+table(x)
+```
 
 ---
 ## 参考文献
