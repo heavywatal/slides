@@ -1,0 +1,526 @@
++++
+title = "Rデータ解析入門入門2023 — MILAB R講習会"
+linktitle = "Rデータ解析入門入門2023"
+date = 2023-02-24T18:00:00+09:00
+type = "reveal"
+draft = true
++++
+
+# [Rデータ解析入門入門2023](.)
+
+<!--
+データサイエンスに関する書籍の出版は年々増えており、
+無償で利用可能な情報もインターネット上のあちこちに散らばっています。
+とは言え、初学者にとってはそうした情報に辿り着く着くことさえも困難だったり、
+それらを読み解くための前提知識が無くて苦労したりすることが多いでしょう。
+本講演はこうした障壁を取り除き、自学自習の助けとなることを目指します。
+具体的には、データ解析の全体像や可視化の意義を整理し、
+Rを使ってより楽により正しくやっていくためのtipsをご紹介する予定です。
+-->
+
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div><div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+
+<div class="footnote">
+2023-02-24 MILAB R講習会<br>
+<a href="https://heavywatal.github.io/slides/milab2023/">https://heavywatal.github.io/slides/milab2023/</a>
+</div>
+
+```{r setup-global, include=FALSE, message = NA}
+set.seed(24601)
+knitr::opts_chunk$set(comment = NA)
+knitr::opts_chunk$set(dev = "ragg_png")
+knitr::opts_chunk$set(fig.retina = 120 / 72)  # change dpi without affecting out.width/height
+knitr::opts_chunk$set(fig.process = wtl::oxipng)
+options(
+  devtools.install.args = c("--no-multiarch", "--no-test-load"),
+  repos = c(CRAN = "https://cloud.r-project.org/"),
+  menu.graphics = FALSE,
+  mc.cores = parallel::detectCores(),
+  wtl.printdf.summarize = FALSE,
+  pillar.print_max = 8L,
+  tibble.print_max = 8L,
+  width = 9999L,
+  cli.width = 60L,
+  dplyr.summarise.inform = FALSE,
+  readr.num_columns = 0L,
+  readr.show_progress = FALSE,
+  readr.show_col_types = FALSE,
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis",
+  ggplot2.discrete.colour = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1]),
+  ggplot2.discrete.fill = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1])
+)
+tidyverse_msg = utils::capture.output(library(tidyverse), type = "message")
+registerS3method("print", "tbl", wtl::printdf)
+registerS3method("print", "tbl_df", wtl::printdf)
+```
+
+```{r setup-local, include=FALSE}
+knitr::opts_chunk$set(cache = TRUE)
+```
+
+
+---
+## 研究の基本プロセス
+
+1. 課題を見つける、仮説を立てる
+1. 実験🧫・観察🔬・文献📚などからデータを集める
+1. **データを整理・解析して仮説を検証する**
+1. **結果を報告する**、1に戻る
+
+<br>
+
+- 実験や観察は研究の半分くらい。
+- 残り半分はデータの整理・解析・報告。<br>
+  → しかし軽視されがち。ここを**ちゃんと、でも楽に**やりたい。
+
+
+---
+## データ解析って必要？ 生データこそ至高では？
+
+生のままでは複雑過ぎ、情報多すぎ、何もわからない。
+
+```{r diamonds}
+print(ggplot2::diamonds)
+```
+
+ダイヤモンド53,940個について10項目の値を持つデータセット
+
+---
+## 要約統計量を見てみよう
+
+各列の**平均**とか**標準偏差**とか:
+
+```{r summary-diamonds, echo = FALSE}
+dia_cols = c("carat", "depth", "table", "price")
+diamonds %>%
+  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max))) %>%
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") %>%
+  dplyr::mutate(across(where(is.numeric), round, digits = 2))
+```
+
+大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+```{r cov-diamonds, echo = FALSE}
+diamonds %>%
+  dplyr::select(all_of(dia_cols)) %>%
+  scale() %>%
+  cov() %>%
+  wtl::printmat("%.2f", upper = FALSE)
+```
+
+<hr>
+
+**生のままよりは把握しやすい**かも。
+
+しかし要注意...
+
+---
+## 平均値ばかり見て可視化を怠ると構造を見逃す
+
+<figure style="position: relative;">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<img src="/slides/image/rstats/datasaurus.png" width="800">
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+
+---
+## 作図してみると全体像・構造が見やすい
+
+情報をうまく絞って整理 → **直感的にわかる**
+
+```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
+diamonds %>%
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
+  ggplot(aes(carat, price, color = clarity)) +
+  geom_point(alpha = 0.4, size = 3) +
+  scale_color_viridis_d(
+    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
+  ) +
+  labs(title = "Diamonds") +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank())
+```
+
+`carat` が大きいほど `price` も高いらしい。<br>
+その度合いは `clarity` によって異なるらしい。
+
+---
+## 統計とは
+
+データをうまくまとめ、それに基づいて推論するための手法。
+
+- **記述統計**: データそのものを要約する
+    - 要約統計量 (e.g., 平均、標準偏差、etc.)
+    - 作図、作表
+- **推測統計**: データの背後にある母集団・生成過程を考える
+    - 数理モデル
+    - 確率分布
+    - パラメータ(母数)
+
+「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
+
+---
+## モデルとは
+
+対象システムを単純化・理想化して扱いやすくしたもの
+
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="150" align="right" style="margin: 0 -5px;">
+: 数学的な方程式として記述されるもの。
+: e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
+: <br>
+
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="140" align="right">
+: 数値計算の手続きとして記述されるもの。
+: e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
+: <br>
+
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="260" align="right">
+: 具体的な事物で作られるもの。
+: e.g., San Francisco Bay-Delta Model
+
+<cite>
+Weisberg 2012 "Simulation and Similarity" (科学とモデル)
+</cite>
+
+???
+数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
+解析的に解くことを諦めて計算機にやらせるという点で実装方法は異なるが、
+数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
+
+プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
+<img src="../lifesci2020seminar/image/schelling-segregation.gif" width="160" align="right" style="margin: -20px -15px; height: 160px; object-fit: cover;">
+
+---
+## ウェットな実験もモデルの一種と見なせる
+
+対象システムを単純化・理想化して扱いやすくしたもの<br>
+→ 自然ではありえない状況にしてでも、見たい関係を見る<br>
+→ 「Xを変えればYが変わる」という**還元的な理解の1ステップ**
+
+- ノイズをなるべく除去
+  - 栄養や温度など、**環境を揃える**
+  - 近親交配を繰り返して純系を作り、**遺伝的背景を揃える**
+- 興味のある要因のみ変えて、表現型の違いを評価
+  - 遺伝子1つ2つだけ改変
+  - 投与する薬剤の種類・量を変えてみる
+  - 栄養塩の濃度と光の強さを変えてみる
+
+ドライの理論研究者を指して「モデル屋」と呼びがちだが、<br>
+広い意味では生物学者みんな「モデル屋」。
+
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。<br>
+&nbsp;
+
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+???
+
+確率モデル: 決定論的なモデルじゃなくて確率論的なゆらぎを導入したもの。
+ただし、大塚淳さんの定義は異なる。
+帰納推論を可能にする枠組みとして自然の斉一性(ヒューム)を仮定した上で、
+データを生成している真の現象を確率用語で記述したものが確率モデルだ、という感じ。
+そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。<br>
+e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
+
+```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
+diamonds %>%
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
+  ggplot(aes(carat, price)) +
+  geom_point(alpha = 0.3, size = 3) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  coord_cartesian(ylim = c(0, 20000)) +
+  labs(title = "Diamonds") +
+  theme_classic(base_size = 22)
+```
+
+ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
+→ モデルをさらに改良していき、理解の精度を上げられるかも
+
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備
+1. データの取得、読み込み
+1. 探索的データ解析
+    - **前処理、加工** (労力の8割はここという説も)
+    - 可視化、仮説生成 (まずここを目指す！)
+    - 統計解析、仮説検証 (みんな重視しがち)
+1. 報告、発表
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 機械処理しやすい形 vs 人が読み書きしやすい形
+
+作図や解析に使えるデータ形式はほぼ決まってる
+: `ggplot(data, ...)`, `glm(..., data, ...)`, ...
+
+出発点となるデータはさまざま
+: 実験ノート、フィールドノート、データベース、...
+
+> Happy families are all alike;<br>
+> every unhappy family is unhappy in its own way<br>
+> --- Leo Tolstoy "Anna Karenina"
+
+> tidy datasets are all alike,<br>
+> but every messy dataset is messy in its own way<br>
+> --- Hadley Wickham
+
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
+    <div style="position: absolute; top: 440px;">
+    <strong>縦1列は1つの変数</strong><br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    <strong>横1行は1つの観測</strong><br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    <strong>1セルは1つの値</strong><br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+
+---
+## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+
+- **縦1列**は1つの**変数**
+- **横1行**は1つの**観測**
+- **1セル**は1つの**値**
+
+<cite style="display: block; text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</cite>
+
+```{r tidy_example}
+print(ggplot2::diamonds)
+```
+
+
+---
+## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+
+x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
+
+```{r tidy-data-benefit, fig.height = 6, fig.width = 9}
+ggplot(diamonds) + aes(x = carat, y = price) +
+  geom_point(mapping = aes(color = color, size = clarity)) +
+  facet_wrap(vars(cut))
+```
+
+---
+## 前処理: 生データを下ごしらえして食べやすい形に
+
+```{r messy_example}
+print(VADeaths)
+```
+
+↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+
+```{r tidy_vadeaths, echo=FALSE}
+VADeaths %>%
+  as.data.frame() %>%
+  rownames_to_column("age") %>%
+  pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
+  separate(age, c("lbound", "ubound"), convert = TRUE)
+```
+
+---
+## R package
+
+便利な関数やデータセットなどをひとまとめにしたもの。
+
+Standard Packages
+: Rの標準機能。何もしなくても使用可能
+
+Contributed Packages
+: 有志により開発され、
+  [CRAN](https://cran.rstudio.com/web/packages/index.html)
+  にまとめて公開されている。
+: 要インストール。使う前に読み込むおまじないが必要。
+
+```r
+install.packages("readr")  # 一度やればOK
+library(readr)             # 読み込みはRを起動するたびに必要
+update.packages()          # たまには更新しよう
+```
+
+素のRも覚えきってないのにいきなりパッケージ？
+: 大丈夫。誰も覚えきってない。
+: パッケージを使わないR作業 = 火もナイフも使わない料理
+
+---
+## tidyverse
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+```r
+install.packages("tidyverse")
+library(tidyverse)
+# 関連パッケージが一挙に読み込まれる
+```
+
+- 統一的な使い勝手
+- 暗黙の処理をなるべくしない安全設計
+- シンプルな関数を繋げて使うデザイン
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+---
+## tidyverse
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+
+Rでデータを上手に扱うためのパッケージ群
+
+```r
+install.packages("tidyverse")
+library(tidyverse)
+# 関連パッケージが一挙に読み込まれる
+```
+
+```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+cat(tidyverse_msg, sep = "\n")
+```
+
+`Conflicts ❌` とか表示されて不安だけど ↑ これは大丈夫なやつ
+
+次回からはこれらを使って解説
+
+
+---
+## 疑問やエラーの解決方法
+
+- エラーのほとんどは凡ミス由来。よく確認しよう。
+    - エラー文をちゃんと読む: `No such file or directory`
+    - [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2022/R_training_2022_7.html)
+      をチェックする
+    - 変数の中身を確かめる: `str(iris)`, `attributes(iris)`
+- エラー文やパッケージ名をコピペしてウェブ検索<br>
+  → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
+  や個人サイトに解決策
+- Slack <i class="fab fa-slack"></i>
+  [r-wakalang](https://github.com/tokyor/r-wakalang)
+  で質問を投稿する。<br>
+  (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)
+- 状況再現できる小さな例
+  [(reprex)](https://reprex.tidyverse.org/)
+  を添えると回答を得やすい。<br>
+  (これを準備してるうちに問題が切り分けられて自己解決したり)
+- パッケージの公式ドキュメントをちゃんと読む
+- R(Studio)内のヘルプを読む: `?sum`, `help.start()`
