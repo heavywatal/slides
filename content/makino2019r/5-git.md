@@ -8,19 +8,6 @@ draft = false
 +++
 
 <link rel="stylesheet" href="style.css">
-<style>
-.fa-share-alt-square {
-  color: #f03c2e;
-  transform: rotate(45deg);
-}
-.fa-tint {
-  color: #949494;
-}
-.fa-coffee {
-  color: #62982f;
-}
-</style>
-
 
 # [Hands-on R Lecture for Makino Lab](.)
 
@@ -134,10 +121,10 @@ You found a bug. How can you find its origin, and fix all the copies?
 ---
 ## Online Storages and Time Machine are useful
 
-- [Dropbox<i class="fab fa-fw fa-dropbox"></i>](https://dropbox.com) や
-  [Google Drive<i class="fab fa-fw fa-google-drive"></i>](https://drive.google.com/)
+- [Dropbox<img height=22 width=22 src="https://cdn.simpleicons.org/dropbox">](https://dropbox.com) や
+  [Google Drive<img height=22 width=22 src="https://cdn.simpleicons.org/googledrive">](https://drive.google.com/)
   では、保存のたびに履歴が残る。
-- [Time Machine<i class="fas fa-fw fa-clock"></i>](https://support.apple.com/HT201250)
+- [Time Machine](https://support.apple.com/HT201250)
   では、一定時間間隔で履歴が残る。
 
 <br>
@@ -150,7 +137,7 @@ But they are not designed for version control or collaborative work.
 
 
 ---
-## Git<i class="fas fa-fw fa-share-alt-square"></i> and GitHub<i class="fab fa-fw fa-github"></i>
+## Git<img height=22 width=22 src="https://cdn.simpleicons.org/git"> and GitHub<img height=22 width=22 src="https://cdn.simpleicons.org/github">
 
 - いつでも好きなところに戻れる安心感
     - 履歴を残すタイミングは任意 = 手動。
@@ -167,13 +154,13 @@ e.g., https://github.com/tidyverse/stringr/commits/master
 
 
 ---
-## Git<i class="fas fa-fw fa-share-alt-square"></i> and GitHub<i class="fab fa-fw fa-github"></i>
+## Git<img height=22 width=22 src="https://cdn.simpleicons.org/git"> and GitHub<img height=22 width=22 src="https://cdn.simpleicons.org/github">
 
-[Git<i class="fas fa-fw fa-share-alt-square"></i>](https://git-scm.com/)
+[Git<img height=22 width=22 src="https://cdn.simpleicons.org/git">](https://git-scm.com/)
 : 分散型バージョン管理システムとして最も広く使われるオープンソース・ソフトウェア。
 : 手元のコンピュータ上でこれを操作して、変更履歴を記録・閲覧したり送受信したりする。
 
-[GitHub<i class="fab fa-fw fa-github"></i>](https://github.com)
+[GitHub<img height=22 width=22 src="https://cdn.simpleicons.org/github">](https://github.com)
 : Gitをより便利に使うためのオンラインサービス。
 : それを運営する会社の名前でもある。
 : 多人数でプロジェクトを共有するプラットフォームとしても有用。
@@ -182,17 +169,17 @@ e.g., https://github.com/tidyverse/stringr/commits/master
 ## Alternative tools and services
 
 - Version Control System (VCS)
-    - [Git<i class="fas fa-fw fa-share-alt-square"></i> `git`](https://git-scm.com/)
-    - [Mercurial<i class="fas fa-fw fa-tint"></i> `hg`](https://www.mercurial-scm.org/)
+    - [Git<img height=22 width=22 src="https://cdn.simpleicons.org/git"> `git`](https://git-scm.com/)
+    - [Mercurial<img height=22 width=22 src="https://cdn.simpleicons.org/mercurial"> `hg`](https://www.mercurial-scm.org/)
     - その他 svn, cvs, rcs など。
 - Hosting Service
-    - [GitHub<i class="fab fa-fw fa-github"></i>](https://github.com):
+    - [GitHub<img height=22 width=22 src="https://cdn.simpleicons.org/github">](https://github.com):
       公開リポジトリは無料。教職員・学生なら非公開も無料。
-    - [Bitbucket<i class="fab fa-fw fa-bitbucket"></i>](https://bitbucket.org/):
+    - [Bitbucket<img height=22 width=22 src="https://cdn.simpleicons.org/bitbucket">](https://bitbucket.org/):
       非公開リポジトリも無料。
-    - [GitLab<i class="fab fa-fw fa-gitlab"></i>](https://about.gitlab.com/):
+    - [GitLab<img height=22 width=22 src="https://cdn.simpleicons.org/gitlab">](https://about.gitlab.com/):
       非公開リポジトリも無料。ローカル版もあり。
-    - [Gitea<i class="fas fa-fw fa-coffee"></i>](https://gitea.io/en-us/):
+    - [Gitea<img height=22 width=22 src="https://cdn.simpleicons.org/gitea">](https://gitea.io/en-us/):
       ローカル版のみ。
     - その他 SourceForge, Google Code など。
 
@@ -201,40 +188,40 @@ VCSは基本的にGit一択。<br>
 
 
 ---
-## Git<i class="fas fa-fw fa-share-alt-square"></i> basics: Export local changes
+## Git<img height=22 width=22 src="https://cdn.simpleicons.org/git"> basics: Export local changes
 
-<i class="fas fa-fw fa-folder"></i> working directory (working tree)
+📁 working directory (working tree)
 : 手元のファイルの変更はまだリポジトリに登録されていない
 : ↓ `git add`
 
-<i class="fas fa-fw fa-folder-plus"></i> staging area (index)
+<img height=22 width=22 src="https://cdn.simpleicons.org/git"> staging area (index)
 : 次のコミットに含めるファイルをマークする段階
 : ↓ `git commit`
 
-<i class="fas fa-fw fa-code-branch"></i> local repository
+<img height=22 width=22 src="https://cdn.simpleicons.org/git"> local repository
 : 変更履歴が `.git/` 内に記録されている
 : ↓ `git push`
 
-<i class="fab fa-fw fa-github"></i> remote repository
+<img height=22 width=22 src="https://cdn.simpleicons.org/github"> remote repository
 : GitHubなど別マシンのリポジトリに反映
 
 
 ---
-## Git<i class="fas fa-fw fa-share-alt-square"></i> basics: Import changes
+## Git<img height=22 width=22 src="https://cdn.simpleicons.org/git"> basics: Import changes
 
-<i class="fab fa-fw fa-github"></i> remote repository
+<img height=22 width=22 src="https://cdn.simpleicons.org/github"> remote repository
 : ↓ `git fetch`
 
-<i class="fas fa-fw fa-code-branch"></i> local repository
+<img height=22 width=22 src="https://cdn.simpleicons.org/git"> local repository
 : 変更が `.git/` に取り込まれたが、見えてるファイルには反映されてない
 : ↓ `git checkout` or `git merge`
 
-<i class="fas fa-fw fa-folder"></i> working directory
+📁 working directory
 : 手元のファイルが最新版に同期されている
 
 
 ---
-## GitHub<i class="fab fa-fw fa-github"></i> functions
+## GitHub<img height=22 width=22 src="https://cdn.simpleicons.org/github"> functions
 
 - Basic: version control of plain texts
     - Source code:
@@ -248,7 +235,7 @@ VCSは基本的にGit一択。<br>
 
 
 ---
-## GitHub<i class="fab fa-fw fa-github"></i> functions
+## GitHub<img height=22 width=22 src="https://cdn.simpleicons.org/github"> functions
 
 - Issues:
   バグ報告、機能要望、課題の列挙などに使われる。
