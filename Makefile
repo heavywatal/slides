@@ -1,4 +1,4 @@
-DROPBOX := ${HOME}/Dropbox/slides-draft
+DROPBOX := ${HOME}/Library/CloudStorage/Dropbox/slides-draft
 DECKS := $(wildcard content/*)
 NAMES := $(notdir ${DECKS})
 IMGDSTS := $(addsuffix /image,${DECKS})
