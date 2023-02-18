@@ -4,25 +4,25 @@ NAMES := $(notdir ${DECKS})
 IMGDSTS := $(addsuffix /image,${DECKS})
 IMGSRCS := $(addprefix ${DROPBOX}/,${NAMES})
 
-.PHONY: all clean development production watch server image
+.PHONY: all clean development public watch server image
 
 all: development
 	@:
 
 development:
-	hugo --environment development
+	hugo
 
 watch:
-	hugo --environment development --watch
+	hugo --watch
 
 server:
-	hugo server --environment development --watch -p 8080
+	hugo server -p 8080
 
 clean:
-	hugo --environment development --gc --cleanDestinationDir
+	hugo --gc --cleanDestinationDir
 
-production:
-	hugo --environment production --cleanDestinationDir
+public:
+	hugo --cleanDestinationDir --environment public
 
 image: ${IMGDSTS}
 	rsync -av ${DROPBOX}/static/ static/
