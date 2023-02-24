@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Rデータ解析入門入門2023 — MILAB R講習会</title>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Rデータ解析入門入門2023 — MILAB R講習会">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/milab2023r/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<meta name="generator" content="Hugo 0.110.0">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="rデータ解析入門入門2023"><a href=".">Rデータ解析入門入門2023</a></h1>
+<!--
+データサイエンスに関する書籍の出版は年々増えており、
+無償で利用可能な情報もインターネット上のあちこちに散らばっています。
+とは言え、初学者にとってはそうした情報に辿り着く着くことさえも困難だったり、
+それらを読み解くための前提知識が無くて苦労したりすることが多いでしょう。
+本講演はこうした障壁を取り除き、自学自習の助けとなることを目指します。
+具体的には、データ解析の全体像や可視化の意義を整理し、
+Rを使ってより楽により正しくやっていくためのtipsをご紹介する予定です。
+-->
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div><div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<div class="footnote">
+2023-02-24 MILAB R講習会<br>
+<a href="https://heavywatal.github.io/slides/milab2023/">https://heavywatal.github.io/slides/milab2023/</a>
+</div>
+
+</section>
+<section>
+<h2 id="岩嵜-航--watal-m-iwasakinbsp-call-me-metal">岩嵜 航 = Watal M. Iwasaki.  Call me METAL🤘</h2>
+<img src="/slides-draft/image/profile/google-map.png" height="580" align="right">
+<p>Born and raised in Sendai</p>
+<dl>
+<dt>PhD in Life Sciences, Tohoku University</dt>
+<dd>Evolutionary theory of complexity and diversity in biological systems. 🖥</dd>
+<dt>Postdoc in SOKENDAI, Hayama</dt>
+<dd>Evolution of diversity within a tumor/cancer. 🏥</dd>
+<dd>Population genetics of Pacific bluefin tuna. 🐟</dd>
+<dd>Speciation of transposons. 🧬</dd>
+</dl>
+<img src="/slides-draft/image/profile/bicycle.jpg" height="220" align="right" style="transform: translate(-10px, 0px);">
+<dl>
+<dt>Asst. Prof. in Tohoku University</dt>
+<dd>Genomics of Rice 🌾🍚, etc.</dd>
+<dt>Likes</dt>
+<dd>🍺 Beer, Sake, Whisky, Cooking</dd>
+<dd>♬ Heavy Metal, Classical, Folk</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="本日のおしながき">本日のおしながき</h2>
+<blockquote>
+<p>一時間程度のセミナー形式で、<br>
+データ解析、可視化の意義、哲学的なところの<br>
+お話を聞いてみたいです。<br>
+——新井田さん</p>
+</blockquote>
+<p><small><s>（なんという無茶振り&hellip;）</s></small>
+貴重な機会をありがとうございます。</p>
+<dl>
+<dt>90分6–8コマの講義からのダイジェスト</dt>
+<dd>科学研究におけるデータ解析とモデル</dd>
+<dd>データ可視化の重要性</dd>
+<dd>データ前処理</dd>
+<dd>R使用上の基本的な心構え</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="科学の営み--巨人の肩に立つ">科学の営み = 巨人の肩に立つ</h2>
+<figure style="position: absolute; top: 32px; right: 40px;">
+<a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
+<img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
+<figcaption class="url">
+https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
+</figcaption>
+</a>
+</figure>
+<p>先人たちの積み重ねに基づいて、新しい発見をする。<br>
+<strong>Reproducible Research (再現可能な研究)</strong><br>
+が巨人を大きくする。</p>
+<dl>
+<dt>記録を残すことは何より重要</dt>
+<dd>実験や野外観察では些細なことも漏らさず記録。</dd>
+<dd>生データは何重にもバックアップ。</dd>
+<dt>データ整理・解析・作図も不可欠、だけど&hellip;</dt>
+<dd>再現不能の職人技で切り抜けちゃう人も多い。</dd>
+<dd>コピペ、メニュー選択、配色と配置を微調整&hellip;</dd>
+<dt>疑義が生じたら&hellip;？ 別の人がその研究を発展させたいとき&hellip;？</dt>
+<dd>✅「誰でも確実に再現できるプロトコルがこちらです」</dd>
+<dd>💩「ありまぁす！」</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="マウス操作とコピペを駆使した職人技は再現不可能">マウス操作とコピペを駆使した職人技は再現不可能</h2>
+<p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
+<figure style="position: relative;">
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+     style="position: absolute; z-index: 100;">
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+     style="position: absolute; left: 250px; top: 50px;">
+<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
+     style="position: absolute; left: 30px; top: 20px; z-index: 200;">
+<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+     style="position: absolute; left: 260px; top: 40px; z-index: 300;">
+</figure>
+</section>
+<section>
+<h2 id="研究の基本プロセス">研究の基本プロセス</h2>
+<ol>
+<li>課題を見つける、仮説を立てる</li>
+<li>実験🧫・観察🔬・文献📚などからデータを集める</li>
+<li><strong>データを整理・解析して仮説を検証する</strong></li>
+<li><strong>結果を報告する</strong>、1に戻る</li>
+</ol>
+<br>
+<ul>
+<li>実験や観察は研究の半分くらい。</li>
+<li>残り半分はデータの整理・解析・報告。<br>
+→ しかし軽視されがち。ここを<strong>ちゃんと、でも楽に</strong>やりたい。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="データ解析って必要-生データこそ至高では">データ解析って必要？ 生データこそ至高では？</h2>
+<p>生のままでは複雑過ぎ、情報多すぎ、何もわからない。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre><p>ダイヤモンド53,940個について10項目の値を持つデータセット</p>
+
+</section>
+<section>
+<h2 id="要約統計量を見てみよう">要約統計量を見てみよう</h2>
+<p>各列の<strong>平均</strong>とか<strong>標準偏差</strong>とか:</p>
+<pre tabindex="0"><code>   stat carat depth table    price
+  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
+1  mean  0.80 61.75 57.46  3932.80
+2    sd  0.47  1.43  2.23  3989.44
+3   max  5.01 79.00 95.00 18823.00
+</code></pre><p>大きさ <code>carat</code> と価格 <code>price</code> の<strong>相関係数</strong>はかなり高い:</p>
+<pre tabindex="0"><code>      carat depth table price
+carat  1.00                  
+depth  0.03  1.00            
+table  0.18 -0.30  1.00      
+price  0.92 -0.01  0.13  1.00
+</code></pre><p><strong>生のままよりは把握しやすい</strong>かも。</p>
+
+</section>
+<section>
+<h2 id="分布を特徴づける代表値-central-tendency">分布を特徴づける代表値 central tendency</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+<dl>
+<dt>平均値 mean</dt>
+<dd>和を観察数で割る</dd>
+<dt>中央値 median</dt>
+<dd>順に並べて真ん中</dd>
+<dt>最頻値 mode</dt>
+<dd>最も頻度が高い値
+</div>
+<div class="column">
+<a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+<img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+<figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+</a>
+</div>
+</dd>
+</dl>
+</div>
+<p>目的や状況に応じて使い分けよう。</p>
+<dl>
+<dt>外れ値に対する応答</dt>
+<dd>もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+→ 県民の<strong>平均</strong>資産は4000万円上昇。<strong>中央値</strong>・<strong>最頻値</strong>はほぼそのまま。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="ばらつきを捉える記述統計量">ばらつきを捉える記述統計量</h2>
+<dl>
+<dt>分散 variance</dt>
+<dd>平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$</dd>
+<dd>これの平方根が<strong>標準偏差 (standard deviation)</strong>。</dd>
+<dt>Percentile, Quantile (四分位)</dt>
+<dd>小さい順にならべて上位何%にあるか。</dd>
+<dd>中央値 = 50th percentile = 第二四分位(Q2)</dd>
+</dl>
+<img src="./figure/quantile-1.png" alt="plot of chunk quantile" width="720" />
+
+</section>
+<section>
+<h2 id="2つの量の関係性-大小の比較">2つの量の関係性: 大小の比較</h2>
+<p>ばらつきの度合いも加味して判断する。</p>
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
+観測値1つだけ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき大きい。<br>
+Bが高いのもたまたま?
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+<img src="./figure/comparison-1.png" alt="plot of chunk comparison" width="792" />
+<p>「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが<strong>統計的仮説検定</strong>。</p>
+
+</section>
+<section>
+<h2 id="記述統計量に頼りすぎず分布を可視化する">記述統計量に頼りすぎず分布を可視化する</h2>
+<p>同じデータでも見せ方で印象・情報量が変わる。</p>
+<img src="./figure/visualize-distribution-1.png" alt="plot of chunk visualize-distribution" width="648" />
+</section>
+<section>
+<h2 id="代表値ばかり見て可視化を怠ると構造を見逃す">代表値ばかり見て可視化を怠ると構造を見逃す</h2>
+<figure style="position: relative;">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<img src="/slides/image/rstats/datasaurus.png" width="800">
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+</section>
+<section>
+<h2 id="作図してみると全体像構造が見やすい">作図してみると全体像・構造が見やすい</h2>
+<p>情報をうまく絞って整理 → <strong>直感的にわかる</strong>、仮説生成</p>
+<img src="./figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds" width="504" />
+<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
+その度合いは <code>clarity</code> によって異なるらしい。</p>
+
+</section>
+<section>
+<h2 id="統計とは">統計とは</h2>
+<p>データをうまくまとめ、それに基づいて推論するための手法。</p>
+<ul>
+<li><strong>記述統計</strong>: データそのものを要約する
+<ul>
+<li>要約統計量 (e.g., 平均、標準偏差、etc.)</li>
+<li>作図、作表</li>
+</ul>
+</li>
+<li><strong>推測統計</strong>: データの背後にある母集団・生成過程を考える
+<ul>
+<li>数理モデル</li>
+<li>確率分布</li>
+<li>パラメータ(母数)</li>
+</ul>
+</li>
+</ul>
+<p>「グラフを眺めてなんとなく分かる」以上の分析には<strong>モデル</strong>が必要</p>
+
+</section>
+<section>
+<h2 id="モデルとは">モデルとは</h2>
+<p>対象システムを単純化・理想化して扱いやすくしたもの</p>
+<dl>
+<dt>Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="150" align="right" style="margin: 0 -5px;"></dt>
+<dd>数学的な方程式として記述されるもの。</dd>
+<dd>e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span></dd>
+<dd><br>
+</dd>
+<dt>Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="140" align="right"></dt>
+<dd>数値計算の手続きとして記述されるもの。</dd>
+<dd>e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span></dd>
+<dd><br>
+</dd>
+<dt>Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="260" align="right"></dt>
+<dd>具体的な事物で作られるもの。</dd>
+<dd>e.g., San Francisco Bay-Delta Model</dd>
+</dl>
+<cite>
+Weisberg 2012 "Simulation and Similarity" (科学とモデル)
+</cite>
+
+</section>
+<section>
+<h2 id="ウェットな実験もモデルの一種と見なせる">ウェットな実験もモデルの一種と見なせる</h2>
+<p>対象システムを単純化・理想化して扱いやすくしたもの<br>
+→ 自然ではありえない状況にしてでも、見たい関係を見る<br>
+→ 「Xを変えればYが変わる」という<strong>還元的な理解の1ステップ</strong></p>
+<ul>
+<li>ノイズをなるべく除去
+<ul>
+<li>栄養や温度など、<strong>環境を揃える</strong></li>
+<li>近親交配を繰り返して純系を作り、<strong>遺伝的背景を揃える</strong></li>
+</ul>
+</li>
+<li>興味のある要因のみ変えて、表現型の違いを評価
+<ul>
+<li>遺伝子1つ2つだけ改変</li>
+<li>投与する薬剤の種類・量を変えてみる</li>
+<li>栄養塩の濃度と光の強さを変えてみる</li>
+</ul>
+</li>
+</ul>
+<p>ドライの理論研究者を指して「モデル屋」と呼びがちだが、<br>
+広い意味では生物学者みんな「モデル屋」。</p>
+
+</section>
+<section>
+<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
+<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
+ </p>
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+</section>
+<section>
+<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
+<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
+e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$</p>
+<img src="./figure/lm-diamonds-1.png" alt="plot of chunk lm-diamonds" width="432" />
+<p>ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
+→ モデルをさらに改良していき、理解の精度を上げられるかも</p>
+
+</section>
+<section>
+<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<ol>
+<li>コンピュータ環境の整備</li>
+<li>データの取得、読み込み</li>
+<li>探索的データ解析
+<ul>
+<li><strong>前処理、加工</strong> (労力の8割はここという説も)</li>
+<li>可視化、仮説生成 (まずここを目指す！)</li>
+<li>統計解析、仮説検証 (みんな重視しがち)</li>
+</ul>
+</li>
+<li>報告、発表</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="機械処理しやすい形-vs-人が読み書きしやすい形">機械処理しやすい形 vs 人が読み書きしやすい形</h2>
+<dl>
+<dt>作図や解析に使えるデータ形式はほぼ決まってる</dt>
+<dd><code>ggplot(data, ...)</code>, <code>glm(..., data, ...)</code>, &hellip;</dd>
+<dt>出発点となるデータはさまざま</dt>
+<dd>実験ノート、フィールドノート、データベース、&hellip;</dd>
+</dl>
+<blockquote>
+<p>Happy families are all alike;<br>
+every unhappy family is unhappy in its own way<br>
+&mdash; Leo Tolstoy &ldquo;Anna Karenina&rdquo;</p>
+</blockquote>
+<blockquote>
+<p>tidy datasets are all alike,<br>
+but every messy dataset is messy in its own way<br>
+&mdash; Hadley Wickham</p>
+</blockquote>
+
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
+    <div style="position: absolute; top: 440px;">
+    <strong>縦1列は1つの変数</strong><br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    <strong>横1行は1つの観測</strong><br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    <strong>1セルは1つの値</strong><br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp--nbsp-ggplot-したくなる形">整然データ tidy data   ≈   ggplot したくなる形</h2>
+<ul>
+<li><strong>縦1列</strong>は1つの<strong>変数</strong></li>
+<li><strong>横1行</strong>は1つの<strong>観測</strong></li>
+<li><strong>1セル</strong>は1つの<strong>値</strong></li>
+</ul>
+<cite style="display: block; text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</cite>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price     x     y     z
+      &lt;dbl&gt;     &lt;ord&gt; &lt;ord&gt;   &lt;ord&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
+</code></pre>
+</section>
+<section>
+<h2 id="整然データ-tidy-data-nbsp--nbsp-ggplot-したくなる形">整然データ tidy data   ≈   ggplot したくなる形</h2>
+<p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">cut</span><span class="p">))</span>
+</span></span></code></pre></div><img src="./figure/tidy-data-benefit-1.png" alt="plot of chunk tidy-data-benefit" width="648" />
+</section>
+<section>
+<h2 id="前処理-生データを下ごしらえして食べやすい形に">前処理: 生データを下ごしらえして食べやすい形に</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      Rural Male Rural Female Urban Male Urban Female
+50-54       11.7          8.7       15.4          8.4
+55-59       18.1         11.7       24.3         13.6
+60-64       26.9         20.3       37.0         19.3
+65-69       41.0         30.9       54.6         35.1
+70-74       66.0         54.3       71.1         50.0
+</code></pre><p>↓ 下ごしらえ: 作図・解析で使いやすい整然データに</p>
+<pre tabindex="0"><code>   lbound ubound region    sex death
+    &lt;int&gt;  &lt;int&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt;
+ 1     50     54  Rural   Male  11.7
+ 2     50     54  Rural Female   8.7
+ 3     50     54  Urban   Male  15.4
+ 4     50     54  Urban Female   8.4
+--                                  
+17     70     74  Rural   Male  66.0
+18     70     74  Rural Female  54.3
+19     70     74  Urban   Male  71.1
+20     70     74  Urban Female  50.0
+</code></pre>
+</section>
+<section>
+<h2 id="前処理は大きく2つに分けられる">前処理は大きく2つに分けられる</h2>
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="120">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="120">
+</a><br>
+<a href="https://stringr.tidyverse.org/">
+<img src="/_img/hex-stickers/stringr.webp" width="120">
+</a>
+</div>
+<ul>
+<li>データ構造を対象とする処理
+<ul>
+<li>使いたい部分だけ抽出</li>
+<li>グループごとに特徴を要約</li>
+<li>何かの順に並べ替え</li>
+<li>異なるテーブルの結合</li>
+<li>変形: 縦長 ↔ 横広</li>
+</ul>
+</li>
+<li>データ内容を対象とする処理
+<ul>
+<li>数値の変換: 対数、正規化</li>
+<li>外れ値・欠損値への対処</li>
+<li>型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時</li>
+<li>文字列処理: 正規表現によるパターンマッチ</li>
+</ul>
+</li>
+</ul>
+<p><cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></cite>
+</section>
+<section>
+<h2 id="r-package">R package</h2>
+<p>便利な関数やデータセットなどをひとまとめにしたもの。</p>
+<dl>
+<dt>Standard Packages</dt>
+<dd>Rの標準機能。何もしなくても使用可能</dd>
+<dt>Contributed Packages</dt>
+<dd>有志により開発され、
+<a href="https://cran.rstudio.com/web/packages/index.html">CRAN</a>
+にまとめて公開されている。</dd>
+<dd>要インストール。使う前に読み込むおまじないが必要。</dd>
+</dl>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
+</span></span><span class="line"><span class="cl"><span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
+</span></span></code></pre></div><dl>
+<dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
+<dd>大丈夫。誰も覚えきってない。</dd>
+<dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="tidyverse">tidyverse</h2>
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 関連パッケージが一挙に読み込まれる</span>
+</span></span></code></pre></div><ul>
+<li>統一的な使い勝手</li>
+<li>暗黙の処理をなるべくしない安全設計</li>
+<li>シンプルな関数を繋げて使うデザイン</li>
+</ul>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="tidyverse">tidyverse</h2>
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+<p>Rでデータを上手に扱うためのパッケージ群</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 関連パッケージが一挙に読み込まれる</span>
+</span></span></code></pre></div><pre tabindex="0"><code>── Attaching packages ─────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.1     ✔ purrr   1.0.1
+✔ tibble  3.1.8     ✔ dplyr   1.1.0
+✔ tidyr   1.3.0     ✔ stringr 1.5.0
+✔ readr   2.1.4     ✔ forcats 1.0.0
+── Conflicts ────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+</code></pre><p><code>Conflicts ❌</code> とか表示されて不安だけど ↑ これは大丈夫なやつ</p>
+
+</section>
+<section>
+<h2 id="dplyr-----dataframeの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
+</a>
+<p>シンプルな関数がたくさん。繋げて使う (piping)</p>
+<dl>
+<dt>抽出</dt>
+<dd>列: <code>select()</code>,</dd>
+<dd>行: <code>filter()</code>, <code>distinct()</code>, <code>slice()</code></dd>
+<dt>要約・集計</dt>
+<dd><code>group_by()</code>, <code>summarize()</code>, <code>count()</code></dd>
+<dt>並べ替え</dt>
+<dd><code>arrange()</code>, <code>relocate()</code></dd>
+<dt>列の追加・変更</dt>
+<dd><code>mutate()</code>, <code>rename()</code></dd>
+<dt>結合</dt>
+<dd>行方向: <code>bind_rows()</code></dd>
+<dd>列方向: <code>left_join()</code>, <code>inner_join()</code>, <code>full_join()</code></dd>
+</dl>
+
+</section>
+<section>
+<h2 id="dplyr-使用例">dplyr 使用例</h2>
+<p>小さな関数を繋げて使う流れ作業:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>              <span class="c1"># 生データから出発して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>    <span class="c1"># 列を抽出して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>            <span class="c1"># 行を抽出して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>                <span class="c1"># グループ化して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">summarize</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>       <span class="c1"># 平均を計算</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                         <span class="c1"># 表示してみる</span>
+</span></span></code></pre></div><pre tabindex="0"><code>        cut mean(price)
+      &lt;ord&gt;       &lt;dbl&gt;
+1      Fair    7177.856
+2      Good    7753.601
+3 Very Good    8340.549
+4   Premium    8487.249
+5     Ideal    8674.227
+</code></pre><p>この見慣れぬ記号 <code>|&gt;</code> は何？<br>
+(<code>select()</code> など個々の関数には今日は触れません)</p>
+
+</section>
+<section>
+<h2 id="pipe-operator-パイプ演算子-">Pipe operator (パイプ演算子) <code>|&gt;</code></h2>
+<p>パイプの左側の変数を、右側の関数の第一引数にねじ込む:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">|&gt;</span> <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">filter</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>     <span class="c1"># これと同じ</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 前処理の流れ作業に便利:</span>
+</span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">|&gt;</span> <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="kc">...</span>
+</span></span><span class="line"><span class="cl"><span class="n">potatos</span> <span class="o">|&gt;</span> <span class="nf">cut</span><span class="p">()</span> <span class="o">|&gt;</span> <span class="nf">fry</span><span class="p">()</span> <span class="o">|&gt;</span> <span class="nf">season</span><span class="p">(</span><span class="s">&#34;salt&#34;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">eat</span><span class="p">()</span>
+</span></span></code></pre></div><p>🔰 パイプを使わない形に書き換え、出力を確認しよう:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">sum</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 21
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="kc">letters</span> <span class="o">|&gt;</span> <span class="nf">toupper</span><span class="p">()</span> <span class="o">|&gt;</span> <span class="nf">head</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;A&#34; &#34;B&#34; &#34;C&#34;
+</code></pre><p>[解答例]</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">sum</span><span class="p">(</span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">6</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="nf">toupper</span><span class="p">(</span><span class="kc">letters</span><span class="p">),</span> <span class="m">3</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="パイプ演算子--を使わない方法">パイプ演算子 <code>|&gt;</code> を使わない方法</h2>
+<p>😐 一時変数をイチイチ作る:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tmp1</span> <span class="o">=</span> <span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span>   <span class="c1"># 列を抽出して</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp2</span> <span class="o">=</span> <span class="nf">filter</span><span class="p">(</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>               <span class="c1"># 行を抽出して</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp3</span> <span class="o">=</span> <span class="nf">group_by</span><span class="p">(</span><span class="n">tmp2</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>                   <span class="c1"># グループ化して</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">summarize</span><span class="p">(</span><span class="n">tmp3</span><span class="p">,</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>        <span class="c1"># 平均を計算</span>
+</span></span></code></pre></div><p>😐 同じ名前を使い回す:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="c1"># 列を抽出して</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">filter</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>           <span class="c1"># 行を抽出して</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">group_by</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>               <span class="c1"># グループ化して</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">summarize</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>      <span class="c1"># 平均を計算</span>
+</span></span></code></pre></div><p>どちらも悪くない。
+何度も変数名を入力するのがやや冗長。</p>
+
+</section>
+<section>
+<h2 id="パイプ演算子--を使わない方法">パイプ演算子 <code>|&gt;</code> を使わない方法</h2>
+<p>😫 一時変数を使わずに:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">summarize</span><span class="p">(</span>                    <span class="c1"># 平均を計算</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">group_by</span><span class="p">(</span>                            <span class="c1"># グループ化して</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">filter</span><span class="p">(</span>                              <span class="c1"># 行を抽出して</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">),</span> <span class="c1"># 列を抽出して</span>
+</span></span><span class="line"><span class="cl">        <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">),</span>                        <span class="c1"># 行を抽出して</span>
+</span></span><span class="line"><span class="cl">      <span class="n">cut</span><span class="p">),</span>                              <span class="c1"># グループ化して</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>                       <span class="c1"># 平均を計算</span>
+</span></span></code></pre></div><p>🤪 改行さえせずに:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">summarize</span><span class="p">(</span><span class="nf">group_by</span><span class="p">(</span><span class="nf">filter</span><span class="p">(</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">),</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">),</span> <span class="n">cut</span><span class="p">),</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>
+</span></span></code></pre></div><p>論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
+さっきのほうがぜんぜんマシ。</p>
+
+</section>
+<section>
+<h2 id="パイプ演算子--を使おう">パイプ演算子 <code>|&gt;</code> を使おう</h2>
+<p>😁 慣れれば、論理の流れを追いやすい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>    <span class="c1"># 列を抽出して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>            <span class="c1"># 行を抽出して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>                <span class="c1"># グループ化して</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">summarize</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>       <span class="c1"># 平均を計算</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                         <span class="c1"># 表示してみる</span>
+</span></span></code></pre></div><pre tabindex="0"><code>        cut mean(price)
+      &lt;ord&gt;       &lt;dbl&gt;
+1      Fair    7177.856
+2      Good    7753.601
+3 Very Good    8340.549
+4   Premium    8487.249
+5     Ideal    8674.227
+</code></pre><p>tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
+使わなければならないわけではないが、読めたほうがいい。</p>
+<div style="font-size: 0.8em; color: #888888;">
+<p>R &lt; 4.2 までよく使われていた <code>%&gt;%</code> もほぼ同じ。</p>
+</div>
+</section>
+<section>
+<h2 id="tidyr-----dataframeの変形整形担当">tidyr &mdash; data.frameの変形・整形担当</h2>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="120" align="right">
+</a>
+<dl>
+<dt>横広から縦長に</dt>
+<dd><code>pivot_longer()</code>, <del><code>gather()</code></del></dd>
+<dt>縦長から横広に</dt>
+<dd><code>pivot_wider()</code>, <del><code>spread()</code></del></dd>
+<dt>列を分離、結合</dt>
+<dd><code>separate()</code>, <code>unite()</code></dd>
+<dt>入れ子構造をつくる、解消する</dt>
+<dd><code>nest()</code>, <code>unnest()</code></dd>
+</dl>
+<p><em>etc.</em></p>
+<ul>
+<li>こういう変形なしでそのまま使えるデータは激レア</li>
+<li>エクセルでポチポチやらず、tidyrで手続きを記述しよう</li>
+<li>ちょっとハードルは高いけど、使えるようになると<strong>強い</strong>💪</li>
+</ul>
+
+</section>
+<section>
+<h2 id="pivot_longer-横広から縦長に"><code>pivot_longer()</code> 横広から縦長に</h2>
+<p>複数列にまたがる値を1列にする。<br>
+そのラベルも合わせて移動。</p>
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#longer">
+<img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="600">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#longer</figcaption>
+</a>
+</figure>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">table4a</span>
+</span></span><span class="line"><span class="cl"><span class="nf">pivot_longer</span><span class="p">(</span><span class="n">table4a</span><span class="p">,</span> <span class="m">2</span><span class="o">:</span><span class="m">3</span><span class="p">,</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;year&#34;</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;cases&#34;</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="pivot_wider-縦長から横広に"><code>pivot_wider()</code> 縦長から横広に</h2>
+<p>1列に収まっていた値を複数列の行列に変換。<br>
+そのラベルを列の名前にする。</p>
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#wider">
+<img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="560">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
+</a>
+</figure>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">pivot_wider</span><span class="p">(</span><span class="n">table2</span><span class="p">,</span> <span class="n">names_from</span> <span class="o">=</span> <span class="n">type</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">count</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="ggplot2">ggplot2</h2>
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
+</a>
+<ul>
+<li>tidyverseパッケージ群のひとつ</li>
+<li>&ldquo;The <strong><u>G</u></strong>rammer of <strong><u>G</u></strong>raphics&rdquo; という体系に基づく設計</li>
+<li>単にいろんなグラフを「描ける」だけじゃなく<br>
+<strong>一貫性のある文法で合理的に描ける</strong></li>
+</ul>
+<figure>
+<!--
+<a href="https://www.amazon.co.jp/dp/B00HWUVHXK/ref=as_li_ss_il?ie=UTF8&linkCode=li3&tag=heavywatal-22&linkId=d63d3627df82c09b0bb5ca8f47ee19cc&language=ja_JP" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00HWUVHXK&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=heavywatal-22&language=ja_JP" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=heavywatal-22&language=ja_JP&l=li3&o=9&a=B00HWUVHXK" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+<img src="/slides/image/nagoya/iris.png" width="24%">
+<img src="/slides/image/nagoya/binhex.png" width="24%">
+<img src="/slides/image/nagoya/faithful.png" width="24%">
+-->
+<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/image/tumopp/param-p.png" height="200">
+<img src="/slides/image/tumopp/param-k.png" height="200"><br>
+<img src="/slides/image/tumopp/paper/Fig3.png" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
+<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+</figure>
+</section>
+<section>
+<h2 id="いきなりggplot2から使い始めても大丈夫">いきなりggplot2から使い始めても大丈夫</h2>
+<p>R標準のやつとは根本的に違うシステムで作図する。</p>
+<figure>
+<img src="/slides/image/rstats/r-graphics.svg">
+<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+</figure>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<img src="/slides/image/rstats/ggplot-layers.png" height = "600">
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span>             <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># geom_point() +                    # 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus1-1.png" alt="plot of chunk ggplot-plus1" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span>         <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># geom_point() +                    # 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus2-1.png" alt="plot of chunk ggplot-plus2" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span>                      <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus3-1.png" alt="plot of chunk ggplot-plus3" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span>         <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus4-1.png" alt="plot of chunk ggplot-plus4" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>       <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span>          <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus5-1.png" alt="plot of chunk ggplot-plus5" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>       <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span> <span class="o">+</span>        <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">2e4</span><span class="p">))</span>   <span class="c1"># y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus6-1.png" alt="plot of chunk ggplot-plus6" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>       <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span> <span class="o">+</span>        <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">2e4</span><span class="p">))</span> <span class="o">+</span> <span class="c1"># y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>     <span class="c1"># クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus7-1.png" alt="plot of chunk ggplot-plus7" width="504" />
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>     <span class="c1"># クラシックなテーマで</span>
+</span></span></code></pre></div><img src="./figure/ggplot-plus8-1.png" alt="plot of chunk ggplot-plus8" width="504" />
+</section>
+<section>
+<h2 id="図をオブジェクトとして取っておける">図をオブジェクトとして取っておける</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">p4</span> <span class="o">=</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
+</span></span></code></pre></div><img src="./figure/ggplot-object-1.png" alt="plot of chunk ggplot-object" width="432" />
+
+</section>
+<section>
+<h2 id="ファイル名もサイズも再現可能な作図">ファイル名もサイズも再現可能な作図</h2>
+<p><code>width</code>や<code>height</code>が小さいほど、文字・点・線が相対的に大きく</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># 7inch x 300dpi = 2100px四方 (デフォルト)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia1.png&#34;</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span> <span class="c1"># width = 7, height = 7, dpi = 300</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 4     x 300    = 1200  全体7/4倍ズーム</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia2.png&#34;</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span> <span class="c1"># dpi = 300</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 2     x 600    = 1200  全体をさらに2倍ズーム</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia3.png&#34;</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">dpi</span> <span class="o">=</span> <span class="m">600</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 4     x 300    = 1200  テーマを使って文字だけ拡大</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia4.png&#34;</span><span class="p">,</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">22</span><span class="p">),</span> <span class="n">width</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+</span></span></code></pre></div><figure>
+<img src="../sendair2/image/dia1.png" width="24%">
+<img src="../sendair2/image/dia2.png" width="24%">
+<img src="../sendair2/image/dia3.png" width="24%">
+<img src="../sendair2/image/dia4.png" width="24%">
+</figure>
+
+</section>
+<section>
+<h2 id="論文のfigureみたいに並べるのもrで">論文のFigureみたいに並べるのもRで</h2>
+<p>別のパッケージ
+(<a href="https://wilkelab.org/cowplot/">cowplot</a>
+や
+<a href="https://patchwork.data-imaginist.com/">patchwork</a>)
+の助けを借りて</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">pAB</span> <span class="o">=</span> <span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">pAB</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">),</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
+</span></span></code></pre></div><img src="./figure/cowplot-1.png" alt="plot of chunk cowplot" width="432" />
+
+</section>
+<section>
+<h2 id="rと接する上での心構え">Rと接する上での心構え</h2>
+<figure>
+<img src="/slides/image/free/akusyu_uchuujin.png" height="200">
+</figure>
+<dl>
+<dt>エラー文を恐れない</dt>
+<dd>熟練プログラマでも頻繁にエラーを起こす。</dd>
+<dd>エラーはRからのメッセージ。<strong>意図を読み取って修正</strong>しよう。</dd>
+<dd>プログラミングの経験値 ≈ エラー解決の経験値</dd>
+<dt>困ったらウェブ検索</dt>
+<dd>あなたの問題は全世界のRユーザーが既に通った道。</dd>
+<dd>日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
+<ul>
+<li>エラーのほとんどは凡ミス由来。よく確認しよう。
+<ul>
+<li>エラー文をちゃんと読む: <code>No such file or directory</code></li>
+<li><a href="https://comicalcommet.github.io/r-training-2022/R_training_2022_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
+をチェックする</li>
+<li>変数の中身を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
+</ul>
+</li>
+<li>エラー文やパッケージ名をコピペしてウェブ検索<br>
+→ <a href="https://stackoverflow.com/questions/tagged/r">StackOverflow</a>
+や個人サイトに解決策</li>
+<li>Slack <img height=22 width=22 src="https://cdn.simpleicons.org/slack">
+<a href="https://github.com/tokyor/r-wakalang">r-wakalang</a>
+で質問を投稿する。<br>
+(質問に飢えた優しいワニが多数生息 👀   👀   👀   👀)</li>
+<li>状況再現できる小さな例
+<a href="https://reprex.tidyverse.org/">(reprex)</a>
+を添えると回答を得やすい。<br>
+(これを準備してるうちに問題が切り分けられて自己解決したり)</li>
+<li>パッケージの公式ドキュメントをちゃんと読む</li>
+<li>R(Studio)内のヘルプを読む: <code>?sum</code>, <code>help.start()</code></li>
+</ul>
+
+</section>
+<section>
+<h2 id="まとめ">まとめ</h2>
+<p>✅ 研究はドライでもウェットでも広い意味ではモデリング</p>
+<p>✅ データが取れたらまず可視化</p>
+<p>✅ そのために前処理して整然データを作る</p>
+<p>✅ R + tidyverse が解析全体を再現可能な形で強力サポート</p>
+<p>✅ エラーを落ち着いて読み、ダメならコミュニティに投げる</p>
+
+</section>
+<section>
+<h2 id="reference">Reference</h2>
+<dl>
+<dt>Other versions</dt>
+<dd>「<a href="/slides/tmd2022/">Rによるデータ前処理実習</a>」
+東京医科歯科大 <a href="https://ds.tmdu.org/">データ関連人材育成プログラム</a> (2022-09)</dd>
+<dd>「<a href="/slides/tokiomarine2022/">統計モデリング概論 DSHC 2022</a>」
+東京海上 <a href="https://tokiomarine-dshc.com/">Data Science Hill Climb</a> (2022-08)</dd>
+<dd>「<a href="/slides/tohoku2022r/">進化学実習2022</a>」
+東北大学 理学部生物学科 (2022-04)</dd>
+<dd>「<a href="https://comicalcommet.github.io/r-training-2022/">Rを用いたデータ解析の基礎と応用</a>」
+石川由希 2022 名古屋大学</dd>
+<dt>R for Data Science &mdash; Hadley Wickham and Garrett Grolemund</dt>
+<dd><a href="https://r4ds.had.co.nz/">https://r4ds.had.co.nz/</a>,
+<a href="https://amzn.to/2tbRmVc">Book</a>,
+<a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
+</dl>
+<ul>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/2Q0f6JQ">科学とモデル&mdash;シミュレーションの哲学 入門</a> Michael Weisberg 2017<br>
+(原著: <a href="https://amzn.to/3bdvhuI">Simulation and Similarity</a> 2013)</li>
+</ul>
+
+</section>
+</div>
+</div>
+<script src="/slides/lib/reveal.js/reveal.js"></script>
+<script src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script src="/slides/lib/reveal-initialize.js"></script>
+<script src="/slides/lib/reload-img-onclick.js"></script>
+</body>
+</html>
