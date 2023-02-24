@@ -30,39 +30,9 @@ Rを使ってより楽により正しくやっていくためのtipsをご紹介
 <a href="https://heavywatal.github.io/slides/milab2023/">https://heavywatal.github.io/slides/milab2023/</a>
 </div>
 
-```{r setup-global, include=FALSE, message = NA}
-set.seed(24601)
-knitr::opts_chunk$set(comment = NA)
-knitr::opts_chunk$set(dev = "ragg_png")
-knitr::opts_chunk$set(fig.retina = 120 / 72)  # change dpi without affecting out.width/height
-knitr::opts_chunk$set(fig.process = wtl::oxipng)
-options(
-  devtools.install.args = c("--no-multiarch", "--no-test-load"),
-  repos = c(CRAN = "https://cloud.r-project.org/"),
-  menu.graphics = FALSE,
-  mc.cores = parallel::detectCores(),
-  wtl.printdf.summarize = FALSE,
-  pillar.print_max = 8L,
-  tibble.print_max = 8L,
-  width = 9999L,
-  cli.width = 60L,
-  dplyr.summarise.inform = FALSE,
-  readr.num_columns = 0L,
-  readr.show_progress = FALSE,
-  readr.show_col_types = FALSE,
-  ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis",
-  ggplot2.discrete.colour = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1]),
-  ggplot2.discrete.fill = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1])
-)
-tidyverse_msg = utils::capture.output(library(tidyverse), type = "message")
-registerS3method("print", "tbl", wtl::printdf)
-registerS3method("print", "tbl_df", wtl::printdf)
-```
 
-```{r setup-local, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
-```
+
+
 
 ---
 ## 岩嵜 航 = Watal M. Iwasaki.&nbsp; Call me METAL🤘
@@ -171,8 +141,23 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 生のままでは複雑過ぎ、情報多すぎ、何もわからない。
 
-```{r diamonds}
+
+```r
 print(ggplot2::diamonds)
+```
+
+```
+      carat       cut color clarity depth table price     x     y     z
+      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
 ```
 
 ダイヤモンド53,940個について10項目の値を持つデータセット
@@ -182,21 +167,23 @@ print(ggplot2::diamonds)
 
 各列の**平均**とか**標準偏差**とか:
 
-```{r summary-diamonds, echo = FALSE}
-dia_cols = c("carat", "depth", "table", "price")
-diamonds %>%
-  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max))) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") %>%
-  dplyr::mutate(across(where(is.numeric), round, digits = 2))
+
+```
+   stat carat depth table    price
+  <chr> <dbl> <dbl> <dbl>    <dbl>
+1  mean  0.80 61.75 57.46  3932.80
+2    sd  0.47  1.43  2.23  3989.44
+3   max  5.01 79.00 95.00 18823.00
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
-```{r cov-diamonds, echo = FALSE}
-diamonds %>%
-  dplyr::select(all_of(dia_cols)) %>%
-  scale() %>%
-  cov() %>%
-  wtl::printmat("%.2f", upper = FALSE)
+
+```
+      carat depth table price
+carat  1.00                  
+depth  0.03  1.00            
+table  0.18 -0.30  1.00      
+price  0.92 -0.01  0.13  1.00
 ```
 
 **生のままよりは把握しやすい**かも。
@@ -243,31 +230,7 @@ Percentile, Quantile (四分位)
 : 小さい順にならべて上位何%にあるか。
 : 中央値 = 50th percentile = 第二四分位(Q2)
 
-```{r quantile, fig.width = 10, fig.height = 4, echo = FALSE}
-df = tibble::tibble(x = rnorm(200)) %>%
-  dplyr::filter(abs(x) < 2) %>%
-  dplyr::mutate(x = x + 3)
-dfq = df %>% summarize(
-  min = min(x),
-  Q1 = quantile(x, 0.25),
-  Q2 = quantile(x, 0.50),
-  Q3 = quantile(x, 0.75),
-  max = max(x)
-) %>%
-  tidyr::pivot_longer(everything(), values_to = "x") %>%
-  dplyr::mutate(percent = paste0(c(0, 25, 50, 75, 100), "%"))
-p_hist = ggplot(df) + aes(x) + geom_histogram(bins = 30) +
-  theme_void(base_size = 18)
-p_box = ggplot(df) + aes(x) +
-  geom_boxplot() +
-  geom_rug(length = unit(0.06, "npc"), alpha = 0.7) +
-  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
-  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
-  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
-  coord_cartesian(ylim = c(-1.2, 0.4)) +
-  theme_void(base_size = 18)
-cowplot::plot_grid(p_hist, p_box, ncol = 1L)
-```
+<img src="./figure/quantile-1.png" alt="plot of chunk quantile" width="720" />
 
 
 ---
@@ -290,28 +253,7 @@ AとBには差がありそう。
 </div>
 </div>
 
-```{r comparison, fig.width = 11, fig.height = 4, echo = FALSE}
-n = 20
-df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
-df2 = dplyr::bind_rows(
-  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
-  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
-df3 = dplyr::bind_rows(
-  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
-  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
-.lim = c(0, max(df2$y, df3$y))
-.th = list(coord_cartesian(ylim = .lim),
-  theme_classic(base_size = 20),
-  theme(legend.position = "none", axis.title = element_blank()))
-
-p1 = ggplot(df1) + aes(x, y, fill = x) +
-  geom_col() +
-  .th
-p2 = ggplot(df2) + aes(x, y, color = x) +
-  geom_jitter(height = 0, width = 0.2, shape = 16, size = 3, alpha = 0.66) +
-  .th
-cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
-```
+<img src="./figure/comparison-1.png" alt="plot of chunk comparison" width="792" />
 
 「こんなことがたまたま起こる確率はすごく低いです！」<br>
 をちゃんと示す手続きが**統計的仮説検定**。
@@ -321,32 +263,7 @@ cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
 
 同じデータでも見せ方で印象・情報量が変わる。
 
-```{r visualize-distribution, echo = FALSE, fig.width = 9, fig.height = 6}
-df = mpg |> dplyr::mutate(y = hwy)
-df_mean = df |> dplyr::summarize(y = mean(y))
-p0 = ggplot(df) + aes(y = y) +
-  theme_classic() +
-  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
-
-ylim = c(0, max(df$y))
-coord_y = coord_cartesian(ylim = ylim)
-coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
-
-pcol = p0 + aes(x = 0) +
-  geom_col(data = df_mean, fill = "#999999") +
-  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
-
-cowplot::plot_grid(nrow = 2L,
-  pcol + coord_one,
-  p0 + geom_boxplot() + coord_one,
-  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
-  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
-  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
-  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8, stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8, stroke = 0, alpha = 0.66) + coord_y
-)
-```
+<img src="./figure/visualize-distribution-1.png" alt="plot of chunk visualize-distribution" width="648" />
 
 
 ---
@@ -367,18 +284,7 @@ cowplot::plot_grid(nrow = 2L,
 
 情報をうまく絞って整理 → **直感的にわかる**、仮説生成
 
-```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
-  ggplot(aes(carat, price, color = clarity)) +
-  geom_point(alpha = 0.4, size = 3) +
-  scale_color_viridis_d(
-    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
-  ) +
-  labs(title = "Diamonds") +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank())
-```
+<img src="./figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds" width="504" />
 
 `carat` が大きいほど `price` も高いらしい。<br>
 その度合いは `clarity` によって異なるらしい。
@@ -474,16 +380,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 データ生成をうまく真似できそうな仮定の数式表現。<br>
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
-```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
-  ggplot(aes(carat, price)) +
-  geom_point(alpha = 0.3, size = 3) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  coord_cartesian(ylim = c(0, 20000)) +
-  labs(title = "Diamonds") +
-  theme_classic(base_size = 22)
-```
+<img src="./figure/lm-diamonds-1.png" alt="plot of chunk lm-diamonds" width="432" />
 
 ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
 → モデルをさらに改良していき、理解の精度を上げられるかも
@@ -626,8 +523,23 @@ diamonds %>%
 <a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
 </cite>
 
-```{r tidy_example}
+
+```r
 print(ggplot2::diamonds)
+```
+
+```
+      carat       cut color clarity depth table price     x     y     z
+      <dbl>     <ord> <ord>   <ord> <dbl> <dbl> <int> <dbl> <dbl> <dbl>
+    1  0.23     Ideal     E     SI2  61.5    55   326  3.95  3.98  2.43
+    2  0.21   Premium     E     SI1  59.8    61   326  3.89  3.84  2.31
+    3  0.23      Good     E     VS1  56.9    65   327  4.05  4.07  2.31
+    4  0.29   Premium     I     VS2  62.4    58   334  4.20  4.23  2.63
+   --                                                                  
+53937  0.72      Good     D     SI1  63.1    55  2757  5.69  5.75  3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757  5.66  5.68  3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757  6.15  6.12  3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
 ```
 
 
@@ -636,27 +548,47 @@ print(ggplot2::diamonds)
 
 x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
 
-```{r tidy-data-benefit, fig.height = 6, fig.width = 9}
+
+```r
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
   facet_wrap(vars(cut))
 ```
 
+<img src="./figure/tidy-data-benefit-1.png" alt="plot of chunk tidy-data-benefit" width="648" />
+
 ---
 ## 前処理: 生データを下ごしらえして食べやすい形に
 
-```{r messy_example}
+
+```r
 print(VADeaths)
+```
+
+```
+      Rural Male Rural Female Urban Male Urban Female
+50-54       11.7          8.7       15.4          8.4
+55-59       18.1         11.7       24.3         13.6
+60-64       26.9         20.3       37.0         19.3
+65-69       41.0         30.9       54.6         35.1
+70-74       66.0         54.3       71.1         50.0
 ```
 
 ↓ 下ごしらえ: 作図・解析で使いやすい整然データに
 
-```{r tidy_vadeaths, echo=FALSE}
-VADeaths %>%
-  as.data.frame() %>%
-  rownames_to_column("age") %>%
-  pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
-  separate(age, c("lbound", "ubound"), convert = TRUE)
+
+```
+   lbound ubound region    sex death
+    <int>  <int>  <chr>  <chr> <dbl>
+ 1     50     54  Rural   Male  11.7
+ 2     50     54  Rural Female   8.7
+ 3     50     54  Urban   Male  15.4
+ 4     50     54  Urban Female   8.4
+--                                  
+17     70     74  Rural   Male  66.0
+18     70     74  Rural Female  54.3
+19     70     74  Urban   Male  71.1
+20     70     74  Urban Female  50.0
 ```
 
 
@@ -757,8 +689,16 @@ library(tidyverse)
 # 関連パッケージが一挙に読み込まれる
 ```
 
-```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
-cat(tidyverse_msg, sep = "\n")
+
+```
+── Attaching packages ─────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.1     ✔ purrr   1.0.1
+✔ tibble  3.1.8     ✔ dplyr   1.1.0
+✔ tidyr   1.3.0     ✔ stringr 1.5.0
+✔ readr   2.1.4     ✔ forcats 1.0.0
+── Conflicts ────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
 ```
 
 `Conflicts ❌` とか表示されて不安だけど ↑ これは大丈夫なやつ
@@ -794,13 +734,24 @@ cat(tidyverse_msg, sep = "\n")
 ## dplyr 使用例
 
 小さな関数を繋げて使う流れ作業:
-```{r dplyr-example}
+
+```r
 result = diamonds |>              # 生データから出発して
   select(carat, cut, price) |>    # 列を抽出して
   filter(carat > 1) |>            # 行を抽出して
   group_by(cut) |>                # グループ化して
   summarize(mean(price)) |>       # 平均を計算
   print()                         # 表示してみる
+```
+
+```
+        cut mean(price)
+      <ord>       <dbl>
+1      Fair    7177.856
+2      Good    7753.601
+3 Very Good    8340.549
+4   Premium    8487.249
+5     Ideal    8674.227
 ```
 
 この見慣れぬ記号 `|>` は何？<br>
@@ -820,9 +771,21 @@ potatos |> cut() |> fry() |> season("salt") |> eat()
 ```
 
 🔰 パイプを使わない形に書き換え、出力を確認しよう:
-```{r letters}
+
+```r
 seq(1, 6) |> sum()
+```
+
+```
+[1] 21
+```
+
+```r
 letters |> toupper() |> head(3)
+```
+
+```
+[1] "A" "B" "C"
 ```
 
 [解答例]
@@ -835,7 +798,8 @@ head(toupper(letters), 3)
 ## パイプ演算子 `|>` を使わない方法
 
 😐 一時変数をイチイチ作る:
-```{r pipe-tmp-var}
+
+```r
 tmp1 = select(diamonds, carat, cut, price)   # 列を抽出して
 tmp2 = filter(tmp1, carat > 1)               # 行を抽出して
 tmp3 = group_by(tmp2, cut)                   # グループ化して
@@ -843,7 +807,8 @@ result = summarize(tmp3, mean(price))        # 平均を計算
 ```
 
 😐 同じ名前を使い回す:
-```{r pipe-recursive-assign}
+
+```r
 result = select(diamonds, carat, cut, price) # 列を抽出して
 result = filter(result, carat > 1)           # 行を抽出して
 result = group_by(result, cut)               # グループ化して
@@ -858,7 +823,8 @@ result = summarize(result, mean(price))      # 平均を計算
 ## パイプ演算子 `|>` を使わない方法
 
 😫 一時変数を使わずに:
-```{r pipe-nest}
+
+```r
 result = summarize(                    # 平均を計算
     group_by(                            # グループ化して
       filter(                              # 行を抽出して
@@ -869,7 +835,8 @@ result = summarize(                    # 平均を計算
 ```
 
 🤪 改行さえせずに:
-```{r pipe-oneliner}
+
+```r
 result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
 ```
 
@@ -880,13 +847,24 @@ result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 
 ## パイプ演算子 `|>` を使おう
 
 😁 慣れれば、論理の流れを追いやすい:
-```{r eg-pipe}
+
+```r
 result = diamonds |>
   select(carat, cut, price) |>    # 列を抽出して
   filter(carat > 1) |>            # 行を抽出して
   group_by(cut) |>                # グループ化して
   summarize(mean(price)) |>       # 平均を計算
   print()                         # 表示してみる
+```
+
+```
+        cut mean(price)
+      <ord>       <dbl>
+1      Fair    7177.856
+2      Good    7753.601
+3 Very Good    8340.549
+4   Premium    8487.249
+5     Ideal    8674.227
 ```
 
 tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
@@ -1012,7 +990,8 @@ R標準のやつとは根本的に違うシステムで作図する。
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus1, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -1022,10 +1001,13 @@ ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus1-1.png" alt="plot of chunk ggplot-plus1" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus2, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -1035,10 +1017,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus2-1.png" alt="plot of chunk ggplot-plus2" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus3, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point()                      # 散布図を描く
@@ -1048,10 +1033,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus3-1.png" alt="plot of chunk ggplot-plus3" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus4, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1061,10 +1049,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus4-1.png" alt="plot of chunk ggplot-plus4" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus5, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1074,10 +1065,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus5-1.png" alt="plot of chunk ggplot-plus5" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus6, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1087,10 +1081,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus6-1.png" alt="plot of chunk ggplot-plus6" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus7, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1100,10 +1097,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus7-1.png" alt="plot of chunk ggplot-plus7" width="504" />
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus8, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1113,16 +1113,21 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+<img src="./figure/ggplot-plus8-1.png" alt="plot of chunk ggplot-plus8" width="504" />
+
 ---
 ## 図をオブジェクトとして取っておける
 
-```{r ggplot-object, fig.show="hold", fig.height=5, fig.width=6}
+
+```r
 p1 = ggplot(data = diamonds)
 p2 = p1 + aes(x = carat, y = price)
 p3 = p2 + geom_point()
 p4 = p3 + facet_wrap(vars(clarity))
 print(p3)
 ```
+
+<img src="./figure/ggplot-object-1.png" alt="plot of chunk ggplot-object" width="432" />
 
 
 ---
@@ -1158,10 +1163,13 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 [patchwork](https://patchwork.data-imaginist.com/))
 の助けを借りて
 
-```{r cowplot, fig.height=5.5, fig.width=6}
+
+```r
 pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
 cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 ```
+
+<img src="./figure/cowplot-1.png" alt="plot of chunk cowplot" width="432" />
 
 
 ---
