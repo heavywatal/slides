@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li class="current-deck"><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -118,10 +118,10 @@ b = -3
 df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
 
 x_breaks = c(0.5, 1.0, 1.5)
-df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) %>%
- dplyr::mutate(density = dpois(y, exp(a * x + b))) %>%
+df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) |>
+ dplyr::mutate(density = dpois(y, exp(a * x + b))) |>
  dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
+df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 p_pois = ggplot(df_pois) + aes(x, y) +
   geom_point(alpha = 0.5, shape = 16, size = 2) +
@@ -160,8 +160,8 @@ df_beer = tibble::tibble(
 )
 glm_multi = glm(beer_sales ~ temperature + humidity, df_beer, family = poisson)
 
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) %>%
-  modelr::add_predictions(glm_multi) %>%
+df_pred = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) |>
+  modelr::add_predictions(glm_multi) |>
   dplyr::mutate(y_pred = exp(pred))
 
 p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
@@ -221,22 +221,22 @@ df_rlogistic = tibble::tibble(
   response = matrix(c(y, n - y), ncol = 2)
 )
 glm_logistic = glm(response ~ x, df_rlogistic, family = binomial)
-df_pred = df_rlogistic %>%
-  modelr::add_predictions(glm_logistic) %>%
+df_pred = df_rlogistic |>
+  modelr::add_predictions(glm_logistic) |>
   dplyr::mutate(y_pred = n * wtl::logistic(pred))
 
 coef = glm_logistic$coefficients
 
 x_breaks = c(-10, 0, 10, 20, 30)
-df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) %>%
-  dplyr::mutate(p = wtl::logistic(coef[1] + coef[2] * x), density = dbinom(y, n, p)) %>%
+df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) |>
+  dplyr::mutate(p = wtl::logistic(coef[1] + coef[2] * x), density = dbinom(y, n, p)) |>
   dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
+df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 ggplot(df_pred) + aes(x, y) +
   geom_point(alpha = 0.5, shape = 16) +
   ggridges::geom_vridgeline(data = df_bars, aes(width = density * 6, group = x), fill = "#3366ffaa", linetype = 0) +
-  geom_line(aes(y = y_pred), size = 2, color = "#3366ff") +
+  geom_line(aes(y = y_pred), linewidth = 2, color = "#3366ff") +
   scale_x_continuous(breaks = x_breaks) +
   scale_y_continuous(breaks = seq.int(0, 10)) +
   labs(x = "temperature", y = "beer_sales") +
@@ -287,14 +287,14 @@ glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = "binomial")
 
 coef = glm_bernoulli$coefficients
 x_breaks = c(0, 10, 20, 30, 40)
-df_ridges = tidyr::crossing(x = x_breaks, y = c(0, 1)) %>%
-  dplyr::mutate(p = wtl::logistic(coef[1] + coef[2] * x), density = dbinom(y, 1, p)) %>%
+df_ridges = tidyr::crossing(x = x_breaks, y = c(0, 1)) |>
+  dplyr::mutate(p = wtl::logistic(coef[1] + coef[2] * x), density = dbinom(y, 1, p)) |>
   dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density, width = 0.2)
+df_bars = df_ridges |> wtl::ridges2bars(y, density, width = 0.2)
 
-df_wind %>%
-  modelr::add_predictions(glm_bernoulli) %>%
-  dplyr::mutate(y_pred = wtl::logistic(pred)) %>%
+df_wind |>
+  modelr::add_predictions(glm_bernoulli) |>
+  dplyr::mutate(y_pred = wtl::logistic(pred)) |>
   ggplot() + aes(max_wind, bucket_sales) +
   geom_point(alpha = 0.3, shape = 124, size = 6) +
   ggridges::geom_vridgeline(data = df_bars, aes(x, y, width = density * 6, group = x), fill = "#3366ffaa", linetype = 0) +
@@ -331,14 +331,14 @@ df_weight = tibble::tibble(
   height = rnorm(n, 1.70, 0.06),
   bmi = rnorm(n, 22, 0.8),
   weight = bmi * (height ** 2)
-) %>%
+) |>
   dplyr::filter(dplyr::between(height, 1.6, 1.8))
 
 coef = lm(weight ~ height, df_weight)$coefficients
 
 x_breaks = c(1.65, 1.7, 1.75)
-df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) %>%
-  dplyr::mutate(density = dnorm(weight, coef[1] + coef[2] * height, 1.8)) %>%
+df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
+  dplyr::mutate(density = dnorm(weight, coef[1] + coef[2] * height, 1.8)) |>
   dplyr::filter(density > 1e-4)
 
 ggplot(df_weight) + aes(height, weight) +
@@ -386,22 +386,22 @@ weather_levels = c("sunny", "cloudy", "rainy")
 df_beer = tibble::tibble(
     temperature = runif(n, 8, 32),
     weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) %>%
-  dplyr::mutate(name = weather, value = 1L) %>%
-  tidyr::pivot_wider(values_fill = 0L) %>%
-  dplyr::select(!cloudy) %>%
+  ) |>
+  dplyr::mutate(name = weather, value = 1L) |>
+  tidyr::pivot_wider(values_fill = 0L) |>
+  dplyr::select(!cloudy) |>
   dplyr::mutate(beer_sales = rnorm(n, coef[1] + coef[2] * temperature + coef[3] * sunny + coef[4] * rainy, 10))
 
 lm_anova = lm(beer_sales ~ weather, df_beer)
-df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels), beer_sales = seq(50, 200, 1)) %>%
-  modelr::add_predictions(lm_anova) %>%
-  dplyr::mutate(density = dnorm(beer_sales, pred, 10)) %>%
+df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels), beer_sales = seq(50, 200, 1)) |>
+  modelr::add_predictions(lm_anova) |>
+  dplyr::mutate(density = dnorm(beer_sales, pred, 10)) |>
   dplyr::filter(density > 1e-4)
 
 tidy_anova = broom::tidy(lm_anova)
 
-avgs = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_anova) %>%
+avgs = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels)) |>
+  modelr::add_predictions(lm_anova) |>
   tibble::deframe()
 
 dfl = tibble::tribble(
@@ -425,7 +425,7 @@ dfs = tibble::tribble(
 )
 
 .arr = grid::arrow(length = grid::unit(0.1, "inches"))
-df_beer %>%
+df_beer |>
   ggplot() + aes(weather, beer_sales, color = weather) +
   ggridges::geom_vridgeline(data = df_ridges, aes(width = density * 6, group = weather), fill = "#3366ffaa", linetype = 0) +
   annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#3366ffaa") +
@@ -473,12 +473,12 @@ y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
 
 ```{r glm-ancova, echo = FALSE, fig.height = 4.5, fig.width = 4.5}
 lm_ancova = lm(beer_sales ~ temperature + weather, df_beer)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_ancova) %>%
+df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) |>
+  modelr::add_predictions(lm_ancova) |>
   dplyr::mutate(y_pred = pred)
 
 ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, size = 2) +
+  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, linewidth = 2) +
   geom_point(alpha = 0.6, shape = 16, size = 3) +
   scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
   theme_bw(base_size = 18) +
@@ -524,19 +524,19 @@ weather_levels = c("sunny", "rainy")
 df_beer = tibble::tibble(
     temperature = runif(n, 8, 32),
     weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) %>%
-  dplyr::mutate(name = weather, value = 1L) %>%
-  tidyr::pivot_wider(values_fill = 0L) %>%
-  dplyr::mutate(mu = coef[1] * sunny + coef[2] * temperature + coef[3] * rainy + coef[4] * temperature * rainy) %>%
+  ) |>
+  dplyr::mutate(name = weather, value = 1L) |>
+  tidyr::pivot_wider(values_fill = 0L) |>
+  dplyr::mutate(mu = coef[1] * sunny + coef[2] * temperature + coef[3] * rainy + coef[4] * temperature * rainy) |>
   dplyr::mutate(beer_sales = rnorm(n, mu, 10))
 
 lm_int = lm(beer_sales ~ temperature * weather, df_beer)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) %>%
-  modelr::add_predictions(lm_int) %>%
+df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) |>
+  modelr::add_predictions(lm_int) |>
   dplyr::mutate(y_pred = pred)
 
 ggplot(df_beer) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, size = 2) +
+  geom_line(data = df_pred, aes(y = y_pred, group = weather), alpha = 0.7, linewidth = 2) +
   geom_point(alpha = 0.6, shape = 16, size = 3) +
   scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
   theme_bw(base_size = 20) +
@@ -677,14 +677,14 @@ a = 3
 b = -3
 df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
 
-models = setNames(, c("gaussian", "poisson")) %>% purrr::map(~{
+models = setNames(, c("gaussian", "poisson")) |> purrr::map(~{
   glm(y ~ x, family = .x, data = df_pois)
 })
 
 x_breaks = c(0.5, 1.0, 1.5)
-df_lm = tidyr::crossing(x = x_breaks, y = seq(-5, 20, 0.1)) %>%
-  modelr::add_predictions(models[["gaussian"]]) %>%
-  dplyr::mutate(density = dnorm(y, pred, 1.4)) %>%
+df_lm = tidyr::crossing(x = x_breaks, y = seq(-5, 20, 0.1)) |>
+  modelr::add_predictions(models[["gaussian"]]) |>
+  dplyr::mutate(density = dnorm(y, pred, 1.4)) |>
   dplyr::filter(density > 1e-4)
 
 p_pois = ggplot(df_pois) + aes(x, y) +
@@ -702,11 +702,11 @@ p_lm = p_pois +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = x), fill = "#3366ffaa", linetype = 0)
 # p_lm
 
-df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) %>%
-  modelr::add_predictions(models[["poisson"]]) %>%
-  dplyr::mutate(density = dpois(y, exp(pred))) %>%
+df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) |>
+  modelr::add_predictions(models[["poisson"]]) |>
+  dplyr::mutate(density = dpois(y, exp(pred))) |>
   dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(y, density)
+df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 label = sprintf("logLik = %.1f", broom::glance(models[["poisson"]])$logLik)
 p_poisson = p_pois +
@@ -735,19 +735,19 @@ df_plant = tibble::tibble(
   x = runif(n, 7, 12.5),
   lambda = exp(true_coef[1] + true_coef[2] * x),
   y = rpois(n, lambda)
-) %>% tibble::rownames_to_column("id")
+) |> tibble::rownames_to_column("id")
 
-models = df_plant %>% modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
+models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
   null = ~ 1,
   x = ~ x,
   saturated = ~ id
 ))
 labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
 
-p_plant = df_plant %>%
-  modelr::add_predictions(models$null) %>%
+p_plant = df_plant |>
+  modelr::add_predictions(models$null) |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = exp(pred)), color = "#3366ff", size = 2, alpha = 0.7) +
+  geom_line(aes(y = exp(pred)), color = "#3366ff", linewidth = 2, alpha = 0.7) +
   geom_point(shape = 16, alpha = 0.6) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
@@ -784,9 +784,9 @@ df_plant = tibble::tibble(
   x2 = sample(c(FALSE, TRUE), n, replace = TRUE),
   lambda = exp(true_coef[1] + true_coef[2] * x + true_coef[3] * x2),
   y = rpois(n, lambda)
-) %>% tibble::rownames_to_column("id")
+) |> tibble::rownames_to_column("id")
 
-models = df_plant %>% modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
+models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
   null = ~ 1,
   x = ~ x,
   x2 = ~ x2,
@@ -795,10 +795,10 @@ models = df_plant %>% modelr::fit_with(glm, family = "poisson", modelr::formulas
 ))
 labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
 
-p_plant = df_plant %>%
-  modelr::add_predictions(models$null) %>%
+p_plant = df_plant |>
+  modelr::add_predictions(models$null) |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = exp(pred)), size = 1.5, alpha = 0.6) +
+  geom_line(aes(y = exp(pred)), linewidth = 1.5, alpha = 0.6) +
   geom_point(shape = 16, alpha = 0.6) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
@@ -806,14 +806,14 @@ p_plant = df_plant %>%
 p_null = p_plant +
   labs(title = "null model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
-p_x = p_plant %+% (df_plant %>% modelr::add_predictions(models$x)) +
+p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x)) +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_x2 = p_plant %+% (df_plant %>% modelr::add_predictions(models$x2)) %+%
+p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2)) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 6)
-p_both = p_plant %+% (df_plant %>% modelr::add_predictions(models$both)) %+%
+p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both)) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 6)
@@ -860,14 +860,14 @@ labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(mode
 p_null = p_plant +
   labs(title = "null model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
-p_x = p_plant %+% (df_plant %>% modelr::add_predictions(models$x)) +
+p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x)) +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_x2 = p_plant %+% (df_plant %>% modelr::add_predictions(models$x2)) %+%
+p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2)) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 6)
-p_both = p_plant %+% (df_plant %>% modelr::add_predictions(models$both)) %+%
+p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both)) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 6)
@@ -1022,7 +1022,7 @@ grid.map(sns.lineplot, "body_mass_g", "pred")
 ```{r penguins-weight-glm, echo = FALSE, fig.height = 5, fig.width = 5, warning = FALSE}
 added1 = modelr::add_predictions(penguins, fit1)
 p1 = p_penweight +
-  geom_line(aes(y = pred), data = added1, size = 1, color = "#3366ff")
+  geom_line(aes(y = pred), data = added1, linewidth = 1, color = "#3366ff")
 p1
 ```
 
@@ -1069,7 +1069,7 @@ grid.map(sns.lineplot, "body_mass_g", "pred")
 ```{r penguins-weight-sp-glm, echo = FALSE, fig.height = 5, fig.width = 7, warning = FALSE}
 added2 = modelr::add_predictions(penguins, fit2)
 p2 = p_penweight_color +
-  geom_line(aes(y = pred), data = added2, size = 1)
+  geom_line(aes(y = pred), data = added2, linewidth = 1)
 p2
 ```
 
@@ -1100,7 +1100,7 @@ grid.map(sns.lineplot, "body_mass_g", "pred")
 ```{r penguins-interaction, echo = FALSE, fig.height = 5, fig.width = 7, warning = FALSE}
 added3 = modelr::add_predictions(penguins, fit3)
 p3 = p_penweight_color +
-  geom_line(aes(y = pred), data = added3, size = 1)
+  geom_line(aes(y = pred), data = added3, linewidth = 1)
 p3
 ```
 
@@ -1129,25 +1129,25 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
 ```{r penguins-bill, echo = FALSE, fig.height = 4, fig.width = 11}
-panguins_bill_nona = penguins %>% drop_na(bill_length_mm, bill_depth_mm)
-p_bill = panguins_bill_nona %>%
+panguins_bill_nona = penguins |> drop_na(bill_length_mm, bill_depth_mm)
+p_bill = panguins_bill_nona |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 
-# penguins %>% filter(is.na(bill_length_mm) | is.na(bill_depth_mm))
+# penguins |> filter(is.na(bill_length_mm) | is.na(bill_depth_mm))
 
 fit1 = glm(bill_depth_mm ~ bill_length_mm, data = panguins_bill_nona)
 fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = panguins_bill_nona)
 fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = panguins_bill_nona)
 p1 = p_bill +
-  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit1), size = 1, color = "#3366ff")
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit1), linewidth = 1, color = "#3366ff")
 p2 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit2), size = 1)
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit2), linewidth = 1)
 p3 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit3), size = 1)
+  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit3), linewidth = 1)
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),

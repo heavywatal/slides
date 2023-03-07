@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -36,7 +36,7 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file="setup.R"}
+```{r setup-global, include=FALSE, file = "setup.R"}
 ```
 
 ```{r setup-local, include=FALSE}
@@ -72,8 +72,8 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
   <div class="column" style="flex-shrink: 1.4;">
 
 ```{r freq-vs-bayes, echo = FALSE, fig.height = 4, fig.width = 4}
-tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) %>%
-  dplyr::filter(logLik > -1e6) %>%
+tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
+  dplyr::filter(logLik > -1e6) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#3366ff") +
@@ -81,7 +81,7 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) %>%
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
-tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) %>%
+tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#3366ff", alpha = 0.5) +
   theme_bw(base_size = 18) +
@@ -104,12 +104,12 @@ X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
 df_rbinom = purrr::map_dfr(c(4, 20, 100, 500), ~{
   k = sum(head(X, .x))
   tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), logLik = dbinom(k, .x, p, log = TRUE))
-}) %>%
+}) |>
   # dplyr::bind_rows(tibble(p = seq(0, 1, 0.01), logLik = dbinom(sum(head(X, .x)), .x, p, log = TRUE), Repl = Inf))
-  dplyr::filter(logLik > -20) %>%
+  dplyr::filter(logLik > -20) |>
   dplyr::mutate(label = factor(label, levels = unique(label)))
-df_rbinom %>%
-  group_by(label) %>%
+df_rbinom |>
+  group_by(label) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#3366ff") +
@@ -125,8 +125,8 @@ df_rbinom %>%
 purrr::map_dfr(c(4, 20, 100, 500), ~{
   k = sum(head(X, .x))
   tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), Density = dbeta(p, k + 1, .x - k + 1))
-}) %>%
-  dplyr::mutate(label = factor(label, levels = unique(label))) %>%
+}) |>
+  dplyr::mutate(label = factor(label, levels = unique(label))) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#3366ff", alpha = 0.5) +
   facet_wrap(vars(label), nrow = 1L) +
@@ -148,7 +148,7 @@ purrr::map_dfr(c(4, 20, 100, 500), ~{
 
 ```{r venn, echo = FALSE, fig.width = 6, fig.height = 3}
 make_circle = function(radius, center, n = 100L) {
-  tibble::tibble(theta = seq(0, 2 * pi, length.out = n + 1L)[-1]) %>%
+  tibble::tibble(theta = seq(0, 2 * pi, length.out = n + 1L)[-1]) |>
     dplyr::mutate(x = radius * cos(theta) + center[1],
                   y = radius * sin(theta) + center[2])
 }
@@ -282,11 +282,11 @@ df_beta = purrr::map_dfr(c(0, 1, 2, 3, 4, 20, 100, 500), ~{
     label = sprintf("%d / %d", k, .x),
     p = seq(0, 1, 0.01),
     Density = dbeta(p, k + 1, .x - k + 1))
-}) %>%
+}) |>
   dplyr::mutate(label = factor(label, levels = unique(label)))
 
-df_beta %>%
-  dplyr::filter(i == 0) %>%
+df_beta |>
+  dplyr::filter(i == 0) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#3366ff", alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
@@ -309,9 +309,9 @@ df_beta %>%
   <div class="column" style="flex-shrink: 2.0;">
 
 ```{r likelihood-binom, echo = FALSE, fig.width = 3, fig.height = 3}
-tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) %>%
+tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
   ggplot() + aes(p, L) +
-  geom_line(color = "#3366ff", size = 2) +
+  geom_line(color = "#3366ff", linewidth = 2) +
   labs(title = "Likelihood") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -349,8 +349,8 @@ tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) %>%
   <div class="column" style="flex-shrink: 1.0;">
 
 ```{r posterior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
-df_beta %>%
-  dplyr::filter(i == 4) %>%
+df_beta |>
+  dplyr::filter(i == 4) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#3366ff", alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
@@ -459,10 +459,10 @@ df_density = tibble::tibble(
 bound = qbeta(c(0.025, 0.975), n_head, n_total - n_head)
 .f = function(.x) {dplyr::filter(.x, dplyr::between(p, bound[1], bound[2]))}
 .g = function(.x) {dplyr::mutate(.x, Density = ifelse(dplyr::between(p, bound[1], bound[2]), 0, Density))}
-p_eti = df_density %>%
+p_eti = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_line(color = "#999999", size = 1) +
+  geom_line(color = "#999999", linewidth = 1) +
   geom_area(data = .f, fill = "#3366ff", alpha = 0.5) +
   geom_area(data = .g, fill = "#333333", alpha = 0.8) +
   annotate("text", x = bound[1], y = 0.7, label = "2.5%", color = "#333333", hjust = 1) +
@@ -472,38 +472,38 @@ p_eti = df_density %>%
   .theme + theme(panel.grid.major = element_line(color = "#3366ff"))
 
 hdi_lb = hdi_lowerbound(df_density$Density)
-df_hdi = df_density %>% dplyr::filter(Density >= hdi_lb)
-range_hdi = df_hdi %>% dplyr::summarize(p = range(p)) %>% dplyr::pull(p)
-p_hdi = df_density %>%
+df_hdi = df_density |> dplyr::filter(Density >= hdi_lb)
+range_hdi = df_hdi |> dplyr::reframe(p = range(p)) |> dplyr::pull(p)
+p_hdi = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_area(data = df_hdi, fill = "#3366ff", alpha = 0.5) +
-  geom_line(color = "#999999", size = 1) +
-  geom_hline(aes(yintercept = hdi_lb), color = "#444444", size = 1, linetype = "dashed") +
+  geom_line(color = "#999999", linewidth = 1) +
+  geom_hline(aes(yintercept = hdi_lb), color = "#444444", linewidth = 1, linetype = "dashed") +
   scale_x_continuous(breaks = range_hdi, labels = round(range_hdi, 2)) +
   labs(title = "Highest Density Interval (HDI)", x = "Parameter") +
   .theme + theme(panel.grid.major = element_line(color = "#3366ff"))
 
 .map = function(.x) {dplyr::slice_max(.x, Density)}
 .med = function(.x) {
-  .x %>%
-    dplyr::mutate(cs = cumsum(Density)) %>%
-    dplyr::mutate(diff = abs(cs - 0.5 * max(cs))) %>%
+  .x |>
+    dplyr::mutate(cs = cumsum(Density)) |>
+    dplyr::mutate(diff = abs(cs - 0.5 * max(cs))) |>
     dplyr::slice_min(diff)
 }
 .eap = function(.x) {
-  .x %>%
-    dplyr::mutate(diff = abs(.data$p - sum(p * Density) / sum(Density))) %>%
+  .x |>
+    dplyr::mutate(diff = abs(.data$p - sum(p * Density) / sum(Density))) |>
     dplyr::slice_min(diff)
 }
 .colors = setNames(scales::viridis_pal(end = 0.92, option = "viridis")(3), c("map", "med", "eap"))
-p_point = df_density %>%
+p_point = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_line(color = "#999999", size = 1) +
-  geom_vline(aes(xintercept = p), data = .map, color = .colors["map"], size = 1) +
-  geom_vline(aes(xintercept = p), data = .med, color = .colors["med"], size = 1) +
-  geom_vline(aes(xintercept = p), data = .eap, color = .colors["eap"], size = 1) +
+  geom_line(color = "#999999", linewidth = 1) +
+  geom_vline(aes(xintercept = p), data = .map, color = .colors["map"], linewidth = 1) +
+  geom_vline(aes(xintercept = p), data = .med, color = .colors["med"], linewidth = 1) +
+  geom_vline(aes(xintercept = p), data = .eap, color = .colors["eap"], linewidth = 1) +
   geom_point(aes(y = 0), data = .map, color = .colors["map"], size = 4, shape = 16) +
   geom_point(aes(y = 0), data = .med, color = .colors["med"], size = 4, shape = 16) +
   geom_point(aes(y = 0), data = .eap, color = .colors["eap"], size = 4, shape = 16) +
@@ -623,22 +623,22 @@ e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング
 
 ```{r mcpdf, echo = FALSE, fig.width = 11, fig.height = 6}
 n = 800
-df_point = tibble::tibble(p = runif(n, -0.2, 1.2), Density = runif(n, 0, 5)) %>%
+df_point = tibble::tibble(p = runif(n, -0.2, 1.2), Density = runif(n, 0, 5)) |>
   dplyr::mutate(accepted = Density < (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2)
-p_pdf = tibble::tibble(p = seq(0, 1, 0.01), Density = (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2) %>%
+p_pdf = tibble::tibble(p = seq(0, 1, 0.01), Density = (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2) |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_area(fill = "#000000", alpha = 0.4) +
-  geom_point(data = df_point %>% filter(!accepted), shape = 16, alpha = 0.5) +
-  geom_point(data = df_point %>% filter(accepted), color = "#3366ff", shape = 16, size = 2, alpha = 1) +
+  geom_point(data = df_point |> filter(!accepted), shape = 16, alpha = 0.5) +
+  geom_point(data = df_point |> filter(accepted), color = "#3366ff", shape = 16, size = 2, alpha = 1) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(), panel.border = element_blank(),
         axis.text = element_blank())
 
-p_accepted = tibble::tibble(p = runif(n), th = dbeta(p, 4, 6) + dbeta(p, 70, 30)) %>%
-  dplyr::filter(runif(length(p), 0, max(th)) < th) %>%
+p_accepted = tibble::tibble(p = runif(n), th = dbeta(p, 4, 6) + dbeta(p, 70, 30)) |>
+  dplyr::filter(runif(length(p), 0, max(th)) < th) |>
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
   coord_cartesian(xlim = c(-0.2, 1.2)) +
@@ -692,8 +692,8 @@ n_total = 20
 dp = 0.02
 df_point = tibble::tibble(p = seq(0.48, 0.64, dp), logLik = dbinom(n_head, n_total, p, log = TRUE))
 offset = 0.005
-df_arrow = df_point %>%
-  dplyr::group_by(p) %>%
+df_arrow = df_point |>
+  dplyr::group_by(p) |>
   dplyr::mutate(data = purrr::map_dfr(p, ~{
     pl = p + offset
     pr = p + dp - offset
@@ -704,16 +704,16 @@ df_arrow = df_point %>%
     } else {
       data.frame(pbegin = pr, pend = pl, lbegin = lr, lend = ll)
     }
-  })) %>%
+  })) |>
   tidyr::unpack(data)
 
 .ar = grid::arrow(angle = 20, length = grid::unit(0.11, "inches"), type = "closed")
 .ar2 = grid::arrow(angle = 20, length = grid::unit(0.09, "inches"), type = "closed", ends = "first")
 .aes = aes(pbegin, lbegin, xend = pend, yend = lend)
-df_point %>%
+df_point |>
   ggplot() + aes(p, logLik) +
-  geom_segment(data = df_arrow, .aes, linejoin = "mitre", size = 1, position = position_nudge(0, +0.008), arrow = .ar) +
-  geom_segment(data = df_arrow, .aes, linejoin = "mitre", size = 1, position = position_nudge(0, -0.008), arrow = .ar2, alpha = 0.33) +
+  geom_segment(data = df_arrow, .aes, linejoin = "mitre", linewidth = 1, position = position_nudge(0, +0.008), arrow = .ar) +
+  geom_segment(data = df_arrow, .aes, linejoin = "mitre", linewidth = 1, position = position_nudge(0, -0.008), arrow = .ar2, alpha = 0.33) +
   geom_point(size = 6, alpha = 0.6, shape = 16) +
   labs(x = expression(theta)) +
   theme_bw(base_size = 18) +
@@ -747,12 +747,12 @@ mh_sample = function(n, p0, n_head, n_total, dp) {
     }
     posterior = c(posterior, p)
   }
-  tibble::tibble(p = posterior) %>% tibble::rowid_to_column("t")
+  tibble::tibble(p = posterior) |> tibble::rowid_to_column("t")
 }
 n = 1000
 df_traj = mh_sample(n, 0.1, n_head, n_total, dp = dp)
 
-p_traj = df_traj %>%
+p_traj = df_traj |>
   ggplot() + aes(t, p) +
   geom_line() +
   coord_cartesian(xlim = c(0, n), ylim = c(0, 1)) +
@@ -760,7 +760,7 @@ p_traj = df_traj %>%
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
-p_hist = df_traj %>%
+p_hist = df_traj |>
   ggplot() + aes(p) +
   geom_bar(width = 0.6 * dp) +
   coord_flip(xlim = c(0, 1)) +
@@ -772,7 +772,7 @@ p_hist = df_traj %>%
 ymax = max(ggplot_build(p_hist)$data[[1]]$count)
 
 for (i in seq.int(50, 1000, 50)) {
-  df_traj_head = df_traj %>% head(i)
+  df_traj_head = df_traj |> head(i)
   p1 = p_traj %+% df_traj_head
   p2 = p_hist %+% df_traj_head + ylim(c(0, ymax))
   p = cowplot::plot_grid(p1, p2, nrow = 1L, rel_widths = c(4, 1))
@@ -788,16 +788,16 @@ for (i in seq.int(50, 1000, 50)) {
 が、パラメータ1つの1次元ではご利益はわかりにくい。
 
 ```{r propto-lik, echo = FALSE, fig.width = 11, fig.height = 4}
-p_lik = tibble::tibble(p = seq(0, 1, 0.01), Likelihood = dbinom(n_head, n_total, p, log = FALSE)) %>%
+p_lik = tibble::tibble(p = seq(0, 1, 0.01), Likelihood = dbinom(n_head, n_total, p, log = FALSE)) |>
   ggplot() + aes(p, Likelihood) +
   geom_hline(yintercept = 0) +
-  geom_line(size = 2) +
+  geom_line(linewidth = 2) +
   labs(title = "Likelihood", x = expression(theta)) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(), panel.border = element_blank())
 
-p_dens = tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)) %>%
+p_dens = tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)) |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_area(alpha = 0.5) +
@@ -806,7 +806,7 @@ p_dens = tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total 
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(), panel.border = element_blank())
 
-p_hist = df_traj %>% tail(-100) %>%
+p_hist = df_traj |> tail(-100) |>
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
   geom_bar(width = 0.6 * dp) +
@@ -848,9 +848,9 @@ set.seed(19937)
 rho = 0.8
 df_gibbs = gibbs_sample(40, rho)
 
-p_tile = tidyr::crossing(x = seq(-3, 3, 0.05), y = x) %>%
+p_tile = tidyr::crossing(x = seq(-3, 3, 0.05), y = x) |>
   dplyr::mutate(z = x^2 + y^2 - 2 * rho * x * y,
-                d = (1 / (2 * pi * sqrt(1 - rho ** 2))) * exp(-0.5 * z / (1 - rho ** 2))) %>%
+                d = (1 / (2 * pi * sqrt(1 - rho ** 2))) * exp(-0.5 * z / (1 - rho ** 2))) |>
   ggplot() + aes(x, y) +
   geom_tile(aes(fill = d)) +
   scale_fill_gradient(low = "#f8f8f8", high = "black") +
@@ -875,9 +875,9 @@ for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
 e.g., `chains = 3` 。ほぼ同じところをうろうろ:
 
 ```{r chains, echo = FALSE, fig.height = 5, fig.width = 12}
-df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) %>%
-  dplyr::mutate(data = purrr::map(init, ~{mh_sample(600, .x, 18, 30, dp = 0.02)})) %>%
-  tidyr::unnest(data) %>%
+df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) |>
+  dplyr::mutate(data = purrr::map(init, ~{mh_sample(600, .x, 18, 30, dp = 0.02)})) |>
+  tidyr::unnest(data) |>
   dplyr::mutate(p = round(p, 2))
 t_warmup = 200
 p_trace = ggplot(df_trace) + aes(t, p, group = init) +
@@ -888,8 +888,8 @@ p_trace = ggplot(df_trace) + aes(t, p, group = init) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
-p_hist = df_trace %>%
-  dplyr::mutate(init = as.factor(init)) %>%
+p_hist = df_trace |>
+  dplyr::mutate(init = as.factor(init)) |>
   ggplot() + aes(p) +
   geom_bar(aes(fill = init), position = position_stack(reverse = TRUE)) +
   coord_flip(xlim = c(0, 1)) +
@@ -913,7 +913,7 @@ e.g., `iter_warmup = 200, iter_sampling = 400` で灰色の部分を捨てる:
 ```{r warmup, echo = FALSE, fig.height = 5, fig.width = 12}
 cowplot::plot_grid(
   p_trace + annotate("ribbon", x = c(0, t_warmup), ymin = Inf, ymax = -Inf, alpha = 0.3),
-  p_hist %+% (df_trace %>% dplyr::mutate(init = as.factor(ifelse(t < t_warmup, NA, init)))),
+  p_hist %+% (df_trace |> dplyr::mutate(init = as.factor(ifelse(t < t_warmup, NA, init)))),
   nrow = 1L, rel_widths = c(4, 1))
 ```
 
@@ -1186,7 +1186,7 @@ fit = model$sample(mydata)
 乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
 
 ```{r stan-binom-fit, dependson = -1L, echo = -1L}
-summary_p = fit$summary("p")
+summary_p = fit$summary("p") |> tibble::as_tibble()
 print(fit)
 ```
 

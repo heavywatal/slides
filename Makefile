@@ -12,6 +12,9 @@ all: development
 development:
 	hugo
 
+benchmark:
+	hugo --templateMetrics --templateMetricsHints
+
 watch:
 	hugo --watch
 

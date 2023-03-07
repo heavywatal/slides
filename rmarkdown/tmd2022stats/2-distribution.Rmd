@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li class="current-deck"><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -47,15 +47,6 @@ library(tidyr)
 knitr::opts_chunk$set(cache = TRUE)
 ```
 
----
-## 直線あてはめ: 統計モデルの出発点
-
-
-<img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
-
-- 身長が高いほど体重も重い。いい感じ。
-
-(説明のために作った架空のデータ。今後もほぼそうです)
 
 ---
 ## 何でもかんでも直線あてはめではよろしくない
@@ -68,8 +59,8 @@ df_pois = tibble::tibble(body_mass = runif(n, 0.4, 1.7), num_seeds = rpois(n, ex
 
 x_breaks = c(0.5, 1.0, 1.5)
 coeff = lm(num_seeds ~ body_mass, data = df_pois)$coefficients
-df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) %>%
-  dplyr::mutate(density = dnorm(num_seeds, coeff[1] + coeff[2] * body_mass, 1.4)) %>%
+df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
+  dplyr::mutate(density = dnorm(num_seeds, coeff[1] + coeff[2] * body_mass, 1.4)) |>
   dplyr::filter(density > 1e-4)
 
 p_pois = ggplot(df_pois) +
@@ -96,10 +87,10 @@ p_lm = p_pois +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), fill = "#3366ffaa", linetype = 0)
 # p_lm
 
-df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) %>%
-  dplyr::mutate(density = dpois(num_seeds, exp(a * body_mass + b))) %>%
+df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
+  dplyr::mutate(density = dpois(num_seeds, exp(a * body_mass + b))) |>
   dplyr::filter(density > 1e-4)
-df_bars = df_ridges %>% wtl::ridges2bars(num_seeds, density)
+df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
 
 p_poisson = p_pois +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
@@ -119,7 +110,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
 
 **一般化線形モデル GLM**
 
@@ -135,176 +126,6 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 
 
 ---
-## 回帰モデルの2段階
-
-1. Define a **family of models**: だいたいどんな形か、式をたてる
-    - 直線: $y = a_1 + a_2 x$
-    - 対数: $\log(y) = a_1 + a_2 x$
-    - 二次曲線: $y = a_1 + a_2 x^2$
-
-2. Generate a **fitted model**: データに合うようにパラメータを調整
-    - $y = 3x + 7$
-    - $y = 9x^2$
-
-<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
-
-
----
-## たぶん身長が高いほど体重も重い
-
-なんとなく $y = a x + b$ でいい線が引けそう<br>
-&nbsp;
-
-```{r weight-height, echo = FALSE, fig.height = 5, fig.width = 5}
-n = 50
-df_weight = tibble::tibble(
-  height = rnorm(n, 1.70, 0.05),
-  bmi = rnorm(n, 22, 1),
-  weight = bmi * (height**2)
-)
-p_weight = ggplot(df_weight) +
-  aes(height, weight) +
-  geom_point(alpha = 0.5) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid = element_blank())
-p_weight
-```
-
-
----
-## たぶん身長が高いほど体重も重い
-
-なんとなく $y = a x + b$ でいい線が引けそう<br>
-じゃあ切片と傾き、どう決める？
-
-```{r weight-lines, echo = FALSE, fig.height = 5, fig.width = 5}
-df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) %>%
-  dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
-p_weight +
-  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
-```
-
-
----
-## 最小二乗法 (Ordinary Least Square: OLS)
-
-回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。
-
-```{r weight-residual, echo = FALSE, fig.height = 5, fig.width = 10}
-predict_weight = function(parameters, data) {
-  parameters[1] + parameters[2] * data$height
-}
-
-rss_weight = function(parameters, data) {
-  pred = predict_weight(parameters, data)
-  sqdev = (data[["weight"]] - pred)**2
-  sum(sqdev)
-}
-# rss_weight(c(40, -5), df_weight)
-
-param1 = c(10, 30)
-lm_weight = lm(weight ~ height, data = df_weight)
-rss1 = rss_weight(param1, df_weight)
-rss2 = rss_weight(lm_weight$coefficients, df_weight)
-stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
-
-p1 = p_weight %+%
-  (df_weight %>% dplyr::mutate(pred = predict_weight(param1, .))) +
-  geom_line(aes(y = pred)) +
-  geom_linerange(aes(ymin = weight, ymax = pred), colour = "#3366ff") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = sprintf("RSS = %.1f", rss1))
-p2 = p_weight %+%
-  (df_weight %>% modelr::add_predictions(lm_weight)) +
-  geom_line(aes(y = pred)) +
-  geom_linerange(aes(ymin = weight, ymax = pred), colour = "#3366ff") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = sprintf("RSS = %.1f", rss2))
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
-
-
-
----
-## 残差平方和(RSS)が最小となるパラメータを探せ
-
-ランダムに試してみて、上位のものを採用
-
-```{r weight-goodlines, echo = FALSE, fig.height = 5, fig.width = 10}
-n = 200
-df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) %>%
-  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
-p_ab = ggplot(df_ab_random) +
-  aes(intercept, slope) +
-  geom_point(data = function(x) {
-    filter(x, rank(rss) < 6)
-  }, shape = 1, size = 4) +
-  geom_point(aes(color = log10(rss))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
-
-p2 = p_weight +
-  geom_abline(data = df_ab_random %>% dplyr::slice_min(rss, n = 5), aes(slope = slope, intercept = intercept), color = "#3366ff", alpha = 0.5)
-cowplot::plot_grid(p_ab, p2, nrow = 1L)
-```
-
----
-## 残差平方和(RSS)が最小となるパラメータを探せ
-
-**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す
-
-```{r weight-grid, echo = FALSE, fig.height = 5, fig.width = 10}
-df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) %>%
-  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
-
-p1 = p_ab %+% df_ab_grid
-
-p2 = p_weight +
-  geom_abline(data = df_ab_grid %>% dplyr::slice_min(rss, n = 5), aes(slope = slope, intercept = intercept), color = "#3366ff", alpha = 0.5)
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
-
-こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
-
-
----
-## 残差平方和(RSS)が最小となるパラメータを探せ
-
-これくらいなら一瞬で計算してもらえる
-```{r ols}
-par_init = c(intercept = 0, slope = 0)
-result = optim(par_init, fn = rss_weight, data = df_weight)
-result$par
-```
-
-```{r weight-lm, echo = FALSE, fig.height = 3.7, fig.width = 3.7}
-label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
-p_weight +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, size = 6, color = "#3366ff")
-```
-
-
----
-## 🔰 直線あてはめしてみる
-
-TODO: `2-stats-model.ipynb`
-
-<hr>
-
-☕️ 休憩 + 質疑応答
-
-
----
-## さて、もう少し複雑なあてはめをするために
-
-統計モデルの重要な部品「**確率分布**」を理解したい。
-
-<img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
-
-既にほかの講義で触れられているかもしれませんが、<br>
-脊髄反射レベルで身につけたいくらい重要なので時間をかけます。
-
-
----
 ## 確率分布
 
 発生する事象(値)と頻度の関係。
@@ -313,7 +134,7 @@ TODO: `2-stats-model.ipynb`
 e.g., サイコロを12回投げた結果、学生1000人の身長
 
 ```{r distribution, echo = FALSE, fig.height = 4, fig.width = 8}
-p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) %>%
+p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
   ggplot() +
   aes(face) +
   geom_bar(aes(y = after_stat(prop))) +
@@ -324,7 +145,7 @@ p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) %>%
     axis.ticks = element_blank()
   )
 
-p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) %>%
+p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) |>
   ggplot() +
   aes(height) +
   geom_histogram(aes(y = after_stat(density)), binwidth = 1, boundary = 0) +
@@ -351,7 +172,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 ```{r dbinom, echo = FALSE, fig.height = 3, fig.width = 3}
 size = 3L
 p = 0.5
-tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) %>%
+tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) |>
   ggplot() +
   aes(X, Prob) +
   geom_col() +
@@ -385,12 +206,12 @@ size = 3L
 p = 0.5
 X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
 df_rbinom = purrr::map_dfr(c(1, 2, 3, 10, 100), ~ {
-  tibble::tibble(X = head(X, .x)) %>%
-    dplyr::count(X) %>%
+  tibble::tibble(X = head(X, .x)) |>
+    dplyr::count(X) |>
     dplyr::mutate(Freq = n / .x, Repl = .x)
-}) %>%
+}) |>
   dplyr::bind_rows(tibble(X = seq(0, 3), Freq = dbinom(X, size, p), Repl = Inf))
-df_rbinom %>%
+df_rbinom |>
   ggplot() +
   aes(X, Freq) +
   geom_col() +
@@ -413,7 +234,7 @@ df_rbinom %>%
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
-<img src="figure/dbinom-1.png" alt="plot of chunk dbinom">
+<img src="./figure/dbinom-1.png" alt="plot of chunk dbinom" width="216" />
   </div>
   <div class="column" style="padding-top: 10px;">
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
@@ -487,7 +308,7 @@ e.g., コインの表裏、サイコロの出目1–6
 ```{r dunif, echo = FALSE, fig.height = 4, fig.width = 6}
 df_coin = tibble::tibble(X = c("head", "tail"), Prob = c(0.5, 0.5), group = "Coin")
 df_dice = tibble::tibble(X = as.character(seq_len(6L)), Prob = rep(1 / 6, 6), group = "Dice")
-dplyr::bind_rows(df_coin, df_dice) %>%
+dplyr::bind_rows(df_coin, df_dice) |>
   ggplot() +
   aes(X, Prob) +
   geom_col() +
@@ -510,7 +331,7 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 ```{r geometric, echo = FALSE, fig.height = 4, fig.width = 11}
 df = purrr::map_dfr(c(0.2, 0.5, 0.9), function(p) {
   tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
-}) %>%
+}) |>
   dplyr::filter(Prob > 0.001)
 x_br = c(seq.int(0, 10), seq.int(15, 100, 5))
 ggplot(df) +
@@ -568,13 +389,13 @@ e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の�
 
 ```{r dpoisson, echo = FALSE, fig.height = 4, fig.width = 11}
 lambda = c(1, 5, 10)
-
-p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) %>%
-  dplyr::mutate(time = purrr::map(lambda, ~ runif(.x * 3, 0, 3))) %>%
-  tidyr::unnest(time) %>%
+.arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed")
+p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
+  dplyr::mutate(time = purrr::map(lambda, ~ runif(.x * 3, 0, 3))) |>
+  tidyr::unnest(time) |>
   ggplot() +
   aes(time, y) +
-  annotate("segment", x = -0.1, xend = 3.1, y = 1:3, yend = 1:3, size = 2, arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed"), linejoin = "mitre") +
+  annotate("segment", x = -0.1, xend = 3.1, y = 1:3, yend = 1:3, linewidth = 2, arrow = .arrow, linejoin = "mitre") +
   geom_point(aes(color = lambda, fill = lambda), size = 8, shape = 124, key_glyph = draw_key_rect) +
   scale_color_continuous(guide = NULL) +
   scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
@@ -586,8 +407,8 @@ p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) %>%
     panel.grid.minor = element_blank(), legend.position = "top"
   )
 
-p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) %>%
-  dplyr::mutate(Prob = dpois(X, lambda)) %>%
+p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) |>
+  dplyr::mutate(Prob = dpois(X, lambda)) |>
   ggplot() +
   aes(X, Prob) +
   geom_col(aes(fill = lambda), position = "identity", alpha = 0.5) +
@@ -615,8 +436,8 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔
 
 ```{r dexp, echo = FALSE, fig.height = 4, fig.width = 11}
-p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) %>%
-  dplyr::mutate(Prob = dexp(x, rate = lambda)) %>%
+p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
+  dplyr::mutate(Prob = dexp(x, rate = lambda)) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
@@ -645,8 +466,8 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 e.g., メッセージを2つ受信するまでの待ち時間
 
 ```{r dgamma, echo = FALSE, fig.height = 4, fig.width = 11}
-p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) %>%
-  dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) %>%
+p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
+  dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
@@ -674,7 +495,7 @@ e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれ�
 
 ```{r gaussian, echo = FALSE, fig.height = 5, fig.width = 11}
 ci = qnorm(c(0.005, 0.025, 0.975, 0.995), 50, 10)
-tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) %>%
+tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(alpha = 0.4) +
@@ -706,7 +527,7 @@ n = 40L
 X = replicate(10000L, mean(runif(n, 0, 100)))
 purrr::map_dfr(c(10, 100, 1000, 10000), ~ {
   tibble::tibble(X = head(X, .x), Repl = .x)
-}) %>%
+}) |>
   ggplot() +
   aes(X) +
   geom_histogram(bins = 25) +
@@ -722,9 +543,9 @@ purrr::map_dfr(c(10, 100, 1000, 10000), ~ {
 
 ```{r binom-normal, echo = FALSE, fig.height = 3, fig.width = 11}
 purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
-  tibble::tibble(X = seq(0, .x), Prob = dbinom(X, .x, 0.25), n = .x) %>%
+  tibble::tibble(X = seq(0, .x), Prob = dbinom(X, .x, 0.25), n = .x) |>
     dplyr::filter(Prob > 1e-5)
-}) %>%
+}) |>
   ggplot() +
   aes(X, Prob) +
   geom_col(width = 1) +
@@ -743,9 +564,9 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
 
 ```{r poisson-normal, echo = FALSE, fig.height = 2.5, fig.width = 11}
 purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
-  tibble::tibble(X = seq(0, 4 * .x), Prob = dpois(X, .x), lambda = .x) %>%
+  tibble::tibble(X = seq(0, 4 * .x), Prob = dpois(X, .x), lambda = .x) |>
     dplyr::filter(Prob > 1e-5)
-}) %>%
+}) |>
   ggplot() +
   aes(X, Prob) +
   geom_col(width = 1) +
@@ -761,8 +582,8 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
 
 ```{r gamma-normal, echo = FALSE, fig.height = 4, fig.width = 11}
 .guide = guide_legend(reverse = TRUE, label.position = "left", label.hjust = 1)
-tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) %>%
-  dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) %>%
+tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
+  dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = k, group = k), position = "identity", alpha = 0.5) +

@@ -1,13 +1,15 @@
-# library(wtl)
 set.seed(24601)
 knitr::opts_chunk$set(comment = NA)
-# knitr::opts_chunk$set(dev = "ragg_png")
+knitr::opts_chunk$set(dev = "ragg_png")
+knitr::opts_chunk$set(fig.retina = 100 / 72)  # change dpi without affecting out.width/height
+knitr::opts_chunk$set(fig.process = wtl::oxipng)
 options(
   devtools.install.args = c("--no-multiarch", "--no-test-load"),
   repos = c(CRAN = "https://cloud.r-project.org/"),
   menu.graphics = FALSE,
   mc.cores = parallel::detectCores(),
   wtl.printdf.summarize = FALSE,
+  wtl.printdf.classes = FALSE,
   pillar.print_max = 8L,
   tibble.print_max = 8L,
   width = 9999L,

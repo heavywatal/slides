@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -41,7 +41,6 @@ draft = false
 
 ```{r setup-local, include=FALSE}
 library(ggplot2)
-library(tibble)
 library(dplyr)
 library(tidyr)
 library(cmdstanr)
@@ -170,10 +169,10 @@ fit = model$sample(data = mydata, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
 # sum_y = sum(df_od$y)
 # p_hat = sum_y / 800
-# tidy_od = df_od %>%
-#   dplyr::count(y, name = "observed") %>%
-#   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
-#   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
+# tidy_od = df_od |>
+#   dplyr::count(y, name = "observed") |>
+#   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) |>
+#   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") |>
 #   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 ```
 
@@ -227,7 +226,7 @@ sd_inds = 0.005
 shape = 60
 min_ipi = 5
 intercept = sort(rnorm(n_inds, 0, sd_inds))
-df = tidyr::crossing(id = seq_len(n_inds), x = seq(min_ipi, 105, 10)) %>%
+df = tidyr::crossing(id = seq_len(n_inds), x = seq(min_ipi, 105, 10)) |>
   dplyr::mutate(y = rgamma(length(x), shape = shape, scale = (func(x) + intercept[id]) / shape))
 
 p_base = ggplot(df) + aes(x, y) +

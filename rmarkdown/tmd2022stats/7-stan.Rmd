@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -41,7 +41,6 @@ draft = false
 
 ```{r setup-local, include=FALSE}
 library(ggplot2)
-library(tibble)
 library(dplyr)
 library(tidyr)
 library(cmdstanr)
@@ -195,10 +194,10 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 - スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
 
 ```{r student_t, echo = FALSE, fig.height = 4, fig.width = 9}
-tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) %>%
-  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) %>%
+tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) |>
+  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) |>
   ggplot() + aes(x, Density, group = df) +
-  geom_line(aes(color = nu), size = 1, alpha = 0.7) +
+  geom_line(aes(color = nu), linewidth = 1, alpha = 0.7) +
   scale_color_viridis_d(end = 0.88, direction = 1, guide = guide_legend(reverse = TRUE)) +
   scale_x_continuous(breaks = c(-1, 0, 1), labels = c(expression(-sigma), 0, expression(sigma))) +
   theme_bw(base_size = 20) +
@@ -257,14 +256,14 @@ mydata[["N_tilde"]] = length(mydata[["x_tilde"]])
 
 model = cmdstan_model("stan/lm-credible.stan")
 fit = model$sample(mydata, show_messages = FALSE, refresh = 0)
-draws = fit$draws(format = "draws_df") %>% print()
+draws = fit$draws(format = "draws_df") |> print()
 
 .probs = c(lower = 0.025, median = 0.5, upper = 0.975)
-df_quant = draws %>%
-  dplyr::summarize(across(starts_with("y_tilde"), quantile, probs = .probs)) %>%
-  dplyr::mutate(label = names(.probs)) %>%
-  tidyr::pivot_longer(!label, names_to = "x", values_to = "y") %>%
-  dplyr::mutate(x = mydata[["x_tilde"]][readr::parse_number(x)]) %>%
+df_quant = draws |>
+  dplyr::summarize(across(starts_with("y_tilde"), quantile, probs = .probs)) |>
+  dplyr::mutate(label = names(.probs)) |>
+  tidyr::pivot_longer(!label, names_to = "x", values_to = "y") |>
+  dplyr::mutate(x = mydata[["x_tilde"]][readr::parse_number(x)]) |>
   tidyr::pivot_wider(names_from = label, values_from = y)
 ```
 ```{r stan-lm-credible, echo = FALSE, fig.height = 4.5, fig.width = 6}

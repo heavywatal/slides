@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li class="current-deck"><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -149,10 +149,10 @@ L(\lambda \mid D)
 \end{split}\]</div>
 
 ```{r poisson-seed-likelihood, echo = FALSE, fig.height = 4, fig.width = 11}
-df_likelihood = df_rpois %>%
-  dplyr::left_join(df_dpois, by = "X") %>%
-  dplyr::group_by(lambda) %>%
-  dplyr::summarize(L = prod(Prob)) %>%
+df_likelihood = df_rpois |>
+  dplyr::left_join(df_dpois, by = "X") |>
+  dplyr::group_by(lambda) |>
+  dplyr::summarize(L = prod(Prob)) |>
   dplyr::mutate(logL = log(L), label = sprintf("L(%.0f|D) = %.1e", lambda, L))
 p_pois +
   geom_text(data = df_likelihood, aes(label = label), x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 6, color = "#3366ff")
@@ -176,14 +176,14 @@ p_pois +
 
 
 ```{r poisson-mle, echo = FALSE, fig.height = 3, fig.width = 10}
-count_rpois = df_rpois %>% dplyr::count(X)
+count_rpois = df_rpois |> dplyr::count(X)
 calc_likelihood_rpois = function(lambda) {
   prod(dpois(count_rpois[["X"]], lambda)**count_rpois[["n"]])
 }
 X_mle = mean(df_rpois[["X"]])
 L_mle = calc_likelihood_rpois(X_mle)
-p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_likelihood_rpois)) %>%
-  dplyr::mutate(logL = log(L)) %>%
+p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_likelihood_rpois)) |>
+  dplyr::mutate(logL = log(L)) |>
   ggplot() +
   aes(lambda, logL) +
   geom_line() +
@@ -220,12 +220,12 @@ cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
 ```{r poisson-mle-repl, echo = FALSE, fig.height = 5, fig.width = 11}
 nrep = 1000L
 df_repl = tibble::tibble(X = rpois(50L * nrep, 3), repl = rep(seq_len(nrep), each = 50L))
-df_sum = df_repl %>%
-  dplyr::group_by(repl) %>%
+df_sum = df_repl |>
+  dplyr::group_by(repl) |>
   dplyr::summarize(lambda = mean(X))
 df_minmax = dplyr::bind_rows(dplyr::slice_max(df_sum, lambda), dplyr::slice_min(df_sum, lambda))
 
-p_repl = df_sum %>%
+p_repl = df_sum |>
   ggplot() +
   aes(lambda) +
   geom_histogram(bins = 25, center = 3) +
@@ -237,11 +237,11 @@ p_repl = df_sum %>%
     axis.ticks = element_blank()
   )
 
-df_dpois = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) %>%
+df_dpois = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) |>
   dplyr::mutate(Prob = dpois(X, lambda))
-p_minmax = df_repl %>%
-  dplyr::filter(repl %in% df_minmax$repl) %>%
-  dplyr::left_join(df_minmax, by = "repl") %>%
+p_minmax = df_repl |>
+  dplyr::filter(repl %in% df_minmax$repl) |>
+  dplyr::left_join(df_minmax, by = "repl") |>
   ggplot() +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
@@ -268,11 +268,11 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 ```{r poisson-mle-nsam, echo = FALSE, fig.height = 4, fig.width = 11}
 nrep = 1000L
 purrr::map_dfr(c(5, 50, 500, 5000), ~ {
-  tibble::tibble(X = rpois(.x * nrep, 3), repl = rep(seq_len(nrep), each = .x)) %>%
-    dplyr::group_by(repl) %>%
-    dplyr::summarize(estimated_lambda = mean(X)) %>%
+  tibble::tibble(X = rpois(.x * nrep, 3), repl = rep(seq_len(nrep), each = .x)) |>
+    dplyr::group_by(repl) |>
+    dplyr::summarize(estimated_lambda = mean(X)) |>
     dplyr::mutate(n = .x)
-}) %>%
+}) |>
   ggplot() +
   aes(estimated_lambda) +
   geom_histogram(bins = 25, center = 3) +

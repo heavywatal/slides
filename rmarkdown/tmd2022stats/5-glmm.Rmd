@@ -21,7 +21,7 @@ draft = false
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入</a>
+<li><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -64,14 +64,14 @@ df_od = tibble::tibble(
   y = rbinom(ninds, 8L, p))
 sum_y = sum(df_od$y)
 p_hat = sum_y / 800
-tidy_od = df_od %>%
-  dplyr::count(y, name = "observed") %>%
-  dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) %>%
-  tidyr::pivot_longer(!y, names_to = "key", values_to = "count") %>%
+tidy_od = df_od |>
+  dplyr::count(y, name = "observed") |>
+  dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) |>
+  tidyr::pivot_longer(!y, names_to = "key", values_to = "count") |>
   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 # label = expression(hat(p) == paste(sprintf("%d/800 = %.2f", sum_y, p_hat)))
 label = bquote(hat(p) == .(paste(sprintf("%d/800 = %.2f", sum_y, p_hat))))
-tidy_od %>%
+tidy_od |>
   ggplot() + aes(y, count) +
   geom_col(aes(fill = key, width = width, alpha = alpha), position = "identity") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 6) +
@@ -93,8 +93,8 @@ tidy_od %>%
 i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
 
 ```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, warning = FALSE}
-df_od %>%
-  tibble::rowid_to_column("id") %>%
+df_od |>
+  tibble::rowid_to_column("id") |>
   ggplot() + aes(id, y / 8) +
   geom_col(width = 0.6, fill = "#3366ff", alpha = 0.66) +
   labs(y = expression(italic(p[i]))) +
@@ -114,12 +114,12 @@ df_od %>%
 $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
 ```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
-# tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) %>%
+# tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) |>
 z_hat = wtl::logit(p_hat)
 p_sigmoid =
-df_od %>%
+df_od |>
   ggplot() + aes(z, p) +
-  geom_line(size = 2, alpha = 0.6, color = "#3366ff") +
+  geom_line(linewidth = 2, alpha = 0.6, color = "#3366ff") +
   annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#3366ff") +
   annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = "#3366ff") +
   scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
@@ -127,7 +127,7 @@ df_od %>%
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 p_normal =
-tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 100), Density = dnorm(z, z_hat, sd_ind)) %>%
+tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 100), Density = dnorm(z, z_hat, sd_ind)) |>
   ggplot() + aes(z, Density) +
   geom_area(fill = "#3366ff", alpha = 0.5) +
   geom_vline(xintercept = z_hat, color = "#3366ff") +
@@ -151,10 +151,10 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 ```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
-df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) %>%
+df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) |>
   dplyr::mutate(Density = dnorm(z, z_hat, sigma))
 
-p_z = df_z %>%
+p_z = df_z |>
   ggplot() + aes(z, Density) +
   scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
@@ -164,24 +164,24 @@ p_z = df_z %>%
 
 p_z + geom_col(width = 0.1, fill = "#3366ff", alpha = 0.6)
 
-df_unmixed = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 20)) %>%
-  dplyr::mutate(p = wtl::sigmoid(z)) %>%
+df_unmixed = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 20)) |>
+  dplyr::mutate(p = wtl::sigmoid(z)) |>
   purrr::pmap_dfr(function(z, p) {
     tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))
-  }) %>%
+  }) |>
   dplyr::arrange(y)
 
-df_mixed = tibble::tibble(sigma) %>%
+df_mixed = tibble::tibble(sigma) |>
   dplyr::mutate(data = purrr::map(sigma, ~{
-    df_unmixed %>%
-      dplyr::mutate(w = dnorm(z, z_hat, .x), Density = w * Density) %>%
+    df_unmixed |>
+      dplyr::mutate(w = dnorm(z, z_hat, .x), Density = w * Density) |>
       dplyr::mutate(Density = Density / sum(Density))
-  })) %>%
+  })) |>
   tidyr::unnest(data)
 
-df_binom = tidyr::crossing(y = seq.int(0, 8)) %>% dplyr::mutate(Density = dbinom(y, 8, p_hat))
+df_binom = tidyr::crossing(y = seq.int(0, 8)) |> dplyr::mutate(Density = dbinom(y, 8, p_hat))
 
-p_mixed = df_mixed %>%
+p_mixed = df_mixed |>
   ggplot() + aes(y, Density) +
   geom_col(data = df_binom, alpha = 0.5) +
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
@@ -211,12 +211,12 @@ p_mixed + geom_col(aes(fill = z), width = 0.4) +
 パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
 
 ```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
-df_mixed %>%
-  dplyr::filter(sigma == max(sigma)) %>%
-  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf))) %>%
-  dplyr::group_by(Z) %>%
-  dplyr::mutate(Density = Density / sum(Density)) %>%
-  dplyr::ungroup() %>%
+df_mixed |>
+  dplyr::filter(sigma == max(sigma)) |>
+  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf))) |>
+  dplyr::group_by(Z) |>
+  dplyr::mutate(Density = Density / sum(Density)) |>
+  dplyr::ungroup() |>
   ggplot() + aes(y, Density) +
   geom_col(aes(fill = z)) +
   scale_fill_viridis_b(option = "turbo", breaks = breaks) +
@@ -229,8 +229,8 @@ df_mixed %>%
 <div align="center">
 
 ```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, warning = FALSE}
-p1 = df_mixed %>%
-  dplyr::filter(sigma == max(sigma)) %>%
+p1 = df_mixed |>
+  dplyr::filter(sigma == max(sigma)) |>
   ggplot() + aes(y, Density) +
   geom_col(aes(fill = z)) +
   scale_fill_viridis_b(option = "turbo", breaks = breaks) +
@@ -238,8 +238,8 @@ p1 = df_mixed %>%
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
-p2 = tidy_od %>%
-  dplyr::filter(key == "observed") %>%
+p2 = tidy_od |>
+  dplyr::filter(key == "observed") |>
   ggplot() + aes(y, count) +
   geom_col() +
   labs(x = "# survived seeds", title = "observed") +

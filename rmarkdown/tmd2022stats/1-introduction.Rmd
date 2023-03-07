@@ -20,7 +20,7 @@ draft = false
 </div>
 
 <ol>
-<li class="current-deck"><a href="1-introduction.html">導入</a>
+<li class="current-deck"><a href="1-introduction.html">導入、直線回帰</a>
 <li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
@@ -35,7 +35,7 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, code=readLines("setup.R")}
+```{r setup-global, include=FALSE, file = "setup.R"}
 ```
 
 ```{r setup-local, include=FALSE}
@@ -81,18 +81,18 @@ print(ggplot2::diamonds)
 
 ```{r summary-diamonds, echo = FALSE}
 dia_cols = c("carat", "depth", "table", "price")
-diamonds %>%
-  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max))) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") %>%
+diamonds |>
+  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
   dplyr::mutate(across(where(is.numeric), round, digits = 2))
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
 ```{r cov-diamonds, echo = FALSE}
-diamonds %>%
-  dplyr::select(all_of(dia_cols)) %>%
-  scale() %>%
-  cov() %>%
+diamonds |>
+  dplyr::select(all_of(dia_cols)) |>
+  scale() |>
+  cov() |>
   wtl::printmat("%.2f", upper = FALSE)
 ```
 
@@ -100,15 +100,164 @@ diamonds %>%
 
 **生のままよりは把握しやすい**かも。
 
-しかし要注意...
+---
+## 分布を特徴づける代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  </a>
+  </div>
+</div>
+
+目的や状況に応じて使い分けよう。
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
 
 ---
-## 平均値ばかり見て可視化を怠ると構造を見逃す
+## ばらつきを捉える記述統計量
+
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r quantile, fig.width = 10, fig.height = 4, echo = FALSE}
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
+  dplyr::mutate(x = x + 3)
+dfq = df |> summarize(
+  min = min(x),
+  Q1 = quantile(x, 0.25),
+  Q2 = quantile(x, 0.50),
+  Q3 = quantile(x, 0.75),
+  max = max(x)
+) |>
+  tidyr::pivot_longer(everything(), values_to = "x") |>
+  dplyr::mutate(percent = paste0(c(0, 25, 50, 75, 100), "%"))
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
+  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
+  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
+  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
+---
+## 2つの量の関係性: 大小の比較
+
+ばらつきの度合いも加味して判断する。
+
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
+観測値1つだけ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき大きい。<br>
+Bが高いのもたまたま?
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+
+```{r comparison, fig.width = 11, fig.height = 4, echo = FALSE}
+n = 20
+df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
+df2 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
+  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
+df3 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
+  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
+.lim = c(0, max(df2$y, df3$y))
+.th = list(coord_cartesian(ylim = .lim),
+  theme_classic(base_size = 20),
+  theme(legend.position = "none", axis.title = element_blank()))
+
+p1 = ggplot(df1) + aes(x, y, fill = x) +
+  geom_col() +
+  .th
+p2 = ggplot(df2) + aes(x, y, color = x) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 3, alpha = 0.66) +
+  .th
+cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
+```
+
+「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが**統計的仮説検定**。
+
+---
+## 記述統計量に頼りすぎず分布を可視化する
+
+同じデータでも見せ方で印象・情報量が変わる。
+
+```{r visualize-distribution, echo = FALSE, fig.width = 9, fig.height = 6}
+df = mpg |> dplyr::mutate(y = hwy)
+df_mean = df |> dplyr::summarize(y = mean(y))
+p0 = ggplot(df) + aes(y = y) +
+  theme_classic() +
+  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+ylim = c(0, max(df$y))
+coord_y = coord_cartesian(ylim = ylim)
+coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
+
+pcol = p0 + aes(x = 0) +
+  geom_col(data = df_mean, fill = "#999999") +
+  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
+
+cowplot::plot_grid(nrow = 2L,
+  pcol + coord_one,
+  p0 + geom_boxplot() + coord_one,
+  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
+  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8, stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8, stroke = 0, alpha = 0.66) + coord_y
+)
+```
+
+
+---
+## 代表値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodeskresearch.com/publications/samestats">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodeskresearch.com/publications/samestats/</figcaption>
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -121,8 +270,8 @@ diamonds %>%
 情報をうまく絞って整理 → **直感的にわかる**
 
 ```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price, color = clarity)) +
   geom_point(alpha = 0.4, size = 3) +
   scale_color_viridis_d(
@@ -214,8 +363,8 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
 ```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price)) +
   geom_point(alpha = 0.3, size = 3) +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
@@ -244,7 +393,7 @@ diamonds %>%
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-<img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
+<img src="./figure/glm-better-1.png" alt="plot of chunk glm-better" width="720" />
 
 - 観察データは常に**正の値**なのに予測が負に突入してない？
 - **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
@@ -331,6 +480,217 @@ diamonds %>%
 1. ベイズ統計、階層ベイズモデル
 
 回帰のキモは**線ではなく分布**
+
+
+---
+## 直線あてはめ: 統計モデルの出発点
+
+
+<img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
+
+- 身長が高いほど体重も重い。いい感じ。
+
+(説明のために作った架空のデータ。今後もほぼそうです)
+
+
+---
+## 回帰モデルの2段階
+
+1. Define a **family of models**: だいたいどんな形か、式をたてる
+    - 直線: $y = a_1 + a_2 x$
+    - 対数: $\log(y) = a_1 + a_2 x$
+    - 二次曲線: $y = a_1 + a_2 x^2$
+
+2. Generate a **fitted model**: データに合うようにパラメータを調整
+    - $y = 3x + 7$
+    - $y = 9x^2$
+
+<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
+
+
+---
+## たぶん身長が高いほど体重も重い
+
+なんとなく $y = a x + b$ でいい線が引けそう<br>
+&nbsp;
+
+```{r df_weight, echo = FALSE, cache = TRUE}
+set.seed(19937)
+n = 50
+df_weight = tibble::tibble(
+  height = rnorm(n, 1.70, 0.05),
+  bmi = rnorm(n, 22, 1),
+  weight = bmi * (height**2)
+)
+```
+```{r weight-height, echo = FALSE, fig.height = 5, fig.width = 5, dependson = "df_weight"}
+p_weight = ggplot(df_weight) +
+  aes(height, weight) +
+  geom_point(alpha = 0.5) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid = element_blank())
+p_weight
+```
+
+
+---
+## たぶん身長が高いほど体重も重い
+
+なんとなく $y = a x + b$ でいい線が引けそう<br>
+じゃあ傾き *a* と切片 *b*、どう決める？
+
+```{r weight-lines, echo = FALSE, fig.height = 5, fig.width = 5, dependson = "df_weight"}
+df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
+  dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
+p_weight +
+  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
+```
+
+
+---
+## 最小二乗法 (Ordinary Least Square: OLS)
+
+回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。
+
+```{r weight-residual, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "df_weight"}
+predict_weight = function(parameters, data) {
+  parameters[1] + parameters[2] * data$height
+}
+
+add_pred_weight = function(data, parameters) {
+  dplyr::mutate(data, pred = predict_weight(param1, data = data))
+}
+
+rss_weight = function(parameters, data) {
+  pred = predict_weight(parameters, data)
+  sqdev = (data[["weight"]] - pred)**2
+  sum(sqdev)
+}
+# rss_weight(c(40, -5), df_weight)
+
+param1 = c(10, 30)
+lm_weight = lm(weight ~ height, data = df_weight)
+rss1 = rss_weight(param1, df_weight)
+rss2 = rss_weight(lm_weight$coefficients, df_weight)
+stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
+
+p1 = p_weight %+%
+  add_pred_weight(df_weight, param1) +
+  geom_line(aes(y = pred)) +
+  geom_linerange(aes(ymin = weight, ymax = pred), color = "#3366ff")
+p2 = p1 %+%
+  (df_weight |> modelr::add_predictions(lm_weight))
+cowplot::plot_grid(nrow = 1L,
+  p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
+  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2))
+```
+
+
+
+---
+## 残差平方和(RSS)が最小となるパラメータを探せ
+
+ランダムに試してみて、上位のものを採用。<br>
+この程度の試行回数では足りなそう。
+
+```{r weight-goodlines, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "df_weight"}
+n = 200
+df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) |>
+  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
+p_ab = ggplot(df_ab_random) +
+  aes(intercept, slope) +
+  geom_point(data = function(x) {
+    filter(x, rank(rss) < 6)
+  }, shape = 1, size = 4) +
+  geom_point(aes(color = log10(rss))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
+
+p2 = p_weight +
+  geom_abline(data = df_ab_random |> dplyr::slice_min(rss, n = 5), aes(slope = slope, intercept = intercept), color = "#3366ff", alpha = 0.5)
+cowplot::plot_grid(p_ab, p2, nrow = 1L)
+```
+
+---
+## 残差平方和(RSS)が最小となるパラメータを探せ
+
+**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。<br>
+さっきのランダムよりはちょっとマシか。
+
+```{r weight-grid, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "df_weight"}
+df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) |>
+  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
+
+p1 = p_ab %+% df_ab_grid
+
+p2 = p_weight +
+  geom_abline(data = df_ab_grid |> dplyr::slice_min(rss, n = 5), aes(slope = slope, intercept = intercept), color = "#3366ff", alpha = 0.5)
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
+
+
+---
+## これくらいなら一瞬で計算してもらえる
+
+```{r ols, dependson = "df_weight"}
+par_init = c(intercept = 0, slope = 0)
+result = optim(par_init, fn = rss_weight, data = df_weight)
+result$par
+```
+
+```{r weight-lm, echo = FALSE, fig.height = 3.7, fig.width = 3.7, dependson = -1}
+label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
+p_weight +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, size = 6, color = "#3366ff")
+```
+
+上記コードは最適化一般の書き方。<br>
+回帰が目的なら次ページのようにするのが楽 →
+
+
+---
+## `lm()` で直線あてはめしてみる
+
+架空のデータを作る(乱数生成については後述):
+```{r df_weight_print, ref.label = "df_weight", echo = -1L, eval = FALSE}
+```
+
+データと関係式(`Y ~ X` の形)を `lm()` に渡して係数を読む:
+```{r lm-demo, dependson = "df_weight"}
+fit = lm(data = df_weight, formula = weight ~ height)
+coef(fit)
+```
+
+せっかくなので作図もやってみる→
+
+---
+## `lm()` の結果をggplotする
+
+```{r lm-ggplot, fig.height = 3, fig.width = 3, dependson = -1}
+df = modelr::add_predictions(df_weight, fit, type = "response")
+head(df, 2L)
+ggplot(df) +
+  aes(height, weight) +
+  geom_point() +
+  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+```
+
+---
+## 🔰 ほかのデータでも `lm()` を試してみよう
+
+```{r lm-mpg, fig.height = 2.5, fig.width = 2.5}
+fit = lm(data = mpg, formula = hwy ~ displ)
+broom::tidy(fit)
+
+mpg_added = modelr::add_predictions(mpg, fit)
+ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+```
+
+🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
 
 
 ---
