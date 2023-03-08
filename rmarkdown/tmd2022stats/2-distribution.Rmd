@@ -692,6 +692,213 @@ table(x)
 ```
 
 ---
+## いろいろ試した結果をとっておきたい
+
+スクリプト.Rさえ保存しておけばいつでも実行できるけど... **面倒**
+
+`ggsave()` で画像を書き出しておけるけど... **どのコードの結果か分からない**
+
+→ **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
+
+```{r hello, results = "hold", fig.show = "hold", fig.height = 3.5, fig.width = 5}
+3 * 14
+ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
+```
+
+
+---
+## Quarto Document として研究ノートを作る
+
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="120" align="right">
+</a>
+
+プログラミングからレポート作成まで一元管理できて楽ちん。
+
+- 本文とRコードを含むテキストファイル.qmdを作る。
+- HTML, PDFなどリッチな形式に変換して読む。
+  - コードだけでなく実行結果の**図**や**表**も埋め込める。
+
+<hr>
+
+Quarto Markdown (`.qmd`)
+: RやPythonのコードと図表を埋め込める**Markdown**亜種。
+: Quarto登場前にほぼR専用だった `.Rmd` と使い勝手は同じ。
+
+Markdown (`.md`)
+: 最もよく普及している**軽量マークアップ言語**のひとつ。
+: 微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。
+
+🔰 どんなものが作れるのか
+[作成例ギャラリー](https://quarto.org/docs/gallery/)
+を見てみよう。
+
+---
+## マークアップ言語
+
+文書の構造や視覚的修飾を記述するための言語。<br>
+e.g., **HTML**+CSS, XML, LaTeX
+
+```html
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
+
+🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
+
+
+---
+## 軽量マークアップ言語
+
+**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
+e.g., **Markdown**, reStructuredText, 各種Wiki記法など
+
+```md
+### 見出し3
+
+ここは段落。
+*強調(italic)*、
+**強い強調(bold)**、
+[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+
+---
+## Markdown記法で書いてみよう
+
+1. RStudio > New File > Markdown File
+   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
+1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
+   - 見出し1, 2, 3
+   - 箇条書き (番号あり・なし)
+   - インラインコード、コードブロック
+1. <kbd>Preview</kbd>ボタンで確認
+
+---
+## Quarto Document を作ってみよう
+
+RStudio > New File > Quarto Document...<br>
+(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
+
+<img src="/slides/image/rstudio/new-quarto-document.png" width="100%">
+
+---
+## 普通のmdには無いqmdの特徴
+
+**ヘッダー**
+: 最上部の `---` で挟まれた部分。
+  文書全体に関わるメタデータを入力。
+: オプションは出力形式によって異なる。
+  e.g., [`html`](https://quarto.org/docs/output-formats/html-basics.html)
+
+**R code chunk**
+: `` ```{r} `` のように始まるブロック。
+: コードの実行結果を最終産物に埋め込める。
+: [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
+  - `echo: FALSE`: コードを非表示。結果は表示。
+  - `eval: FALSE`: コードを実行せず表示だけ。
+  - `include: FALSE`: コードも結果も表示せず、実行だけする。
+  - `fig.width: 7, fig.height: 7`: 図の大きさを制御。
+
+まあ細かいことは必要になってから調べるとして...
+
+---
+## qmdをHTMLに変換してみよう
+
+<div>
+<img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
+</div>
+
+---
+## qmdをHTMLに変換してみよう
+
+1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
+   e.g., `report.qmd`
+1. ⚙️ ボタンから "Preview in Viewer Pane" を選択。
+1. <kbd>→Render</kbd> を押す。
+   - 埋め込まれたRコードが実行される。
+   - 実行結果を含むMarkdownが作られる。
+   - MarkdownからHTMLに変換される。 e.g., `report.html`
+   - プレビューが自動的に開く。
+
+🔰 編集 → Render を繰り返して変化を確認しよう
+
+
+---
+## 🔰 疑似乱数生成をいろいろ試した研究ノートを作ろう
+
+さっきはこんな汚いスクリプトだった:
+
+```r
+n = 100
+x = sample.int(6, n, replace = TRUE)
+x = runif(n, min = 0, max = 1)
+x = rgeom(n, prob = 0.5)
+x = rbinom(n, size = 3, prob = 0.5)
+x = rpois(n, lambda = 10)
+x = rnorm(n, mean = 50, sd = 10)
+print(x)
+
+p1 = ggplot(data.frame(x)) + aes(x)
+p1 + geom_histogram() # for continuous values
+p1 + geom_bar()       # for discrete values
+```
+
+1. ひとつの分布につきひとつの図を描くqmdに書き換える。
+1. コードチャンクを分けたり見出しを付けたりして整理する。
+1. パラメータをいろいろ変えた結果も加えていく。
+
+
+---
+## 本講義のお品書き
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="300" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに回帰分析の概要を紹介。
+
+1. イントロ
+1. Rの基礎を駆け足で
+1. 統計モデルの基本
+    - 直線回帰
+    - 確率変数・**確率分布** 👈 ここまで
+    - 尤度・最尤推定
+1. 一般化線形モデル、混合モデル
+1. ベイズ統計、階層ベイズモデル
+
+回帰のキモは**線ではなく分布**
+
+
+---
 ## 参考文献
 
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012

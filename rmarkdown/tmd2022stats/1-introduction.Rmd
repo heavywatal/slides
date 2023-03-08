@@ -35,7 +35,7 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R"}
+```{r setup-global, include=FALSE, file = "setup.R", message = NA}
 ```
 
 ```{r setup-local, include=FALSE}
@@ -173,13 +173,11 @@ cowplot::plot_grid(p_hist, p_box, ncol = 1L)
 ```
 
 ---
-## 2つの量の関係性: 大小の比較
-
-ばらつきの度合いも加味して判断する。
+## ばらつきの様子は大小の判断にも重要
 
 <div class="column-container" style="padding-left: 10px;">
 <div class="column" style="flex-shrink: 1.1;">
-観測値1つだけ。<br>
+観測値1つずつ。<br>
 たまたまかも。
 </div>
 <div class="column" style="flex-shrink: 1;">
@@ -206,11 +204,11 @@ df3 = dplyr::bind_rows(
   theme_classic(base_size = 20),
   theme(legend.position = "none", axis.title = element_blank()))
 
-p1 = ggplot(df1) + aes(x, y, fill = x) +
-  geom_col() +
+p1 = ggplot(df1) + aes(x, y, color = x) +
+  geom_point(shape = 16, size = 5) +
   .th
 p2 = ggplot(df2) + aes(x, y, color = x) +
-  geom_jitter(height = 0, width = 0.2, shape = 16, size = 3, alpha = 0.66) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
   .th
 cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
 ```
@@ -435,11 +433,11 @@ diamonds |>
 ---
 ## 現役データサイエンティスト2人に聞きました
 
+- 統計モデルはデータ加工など事前の手続きが多め。<br>
+  機械学習は事前の決定が少ないので楽ちん。
 - 「要因の効果はどれくらい？」<br>
   意思決定をするのは結局人間。物事を分かった上で判断したい。<br>
   **実務の人への説明**や**意思決定**の場面で解析の解釈性が重要。<br>
-- 統計モデルはデータ加工など事前の手続きが多め。<br>
-  機械学習は事前の決定が少ないので楽ちん。
 - **仮説があるなら**、それに基づいて統計モデリング。<br>
   何もないところからまず機械学習で要因抽出・仮説生成するのもあり。
 - 統計モデル縛り・実行環境縛りなどの案件もある。
@@ -472,14 +470,1175 @@ diamonds |>
 「データ解析のための統計モデリング入門」<br>
 をベースに回帰分析の概要を紹介。
 
-1. イントロ←いまここ
+1. イントロ 👈 いまここ
+1. Rの基礎を駆け足で
 1. 統計モデルの基本
-    - 確率変数・**確率分布** 👈 本日の主役
+    - 直線回帰
+    - 確率変数・**確率分布** 👈 本日後半の主役
     - 尤度・最尤推定
 1. 一般化線形モデル、混合モデル
 1. ベイズ統計、階層ベイズモデル
 
-回帰のキモは**線ではなく分布**
+<!-- 回帰のキモは**線ではなく分布** -->
+
+
+
+---
+## Rとは
+
+統計解析と作図の機能が充実したプログラミング言語・環境
+
+<figure style="float: right;">
+<a href="https://cran.r-project.org/">
+<img src="/slides/image/rstats/Rlogo.svg" height="200">
+<figcaption class="url">https://cran.r-project.org/</figcaption>
+</a>
+</figure>
+
+クロスプラットフォーム
+: Linux, Mac, Windows で動く
+
+オープンソース
+: 永久に無償で、すべての機能を使える。
+: 集合知によって常に進化している。
+
+コミュニティ
+: 相談できる人や参考になるウェブサイトがたくさん見つかる。
+
+他のプログラミング言語でもいいよ:
+[Python](https://www.python.org/)とか[Julia](https://julialang.org/)とか。
+
+
+---
+## R環境のセットアップ
+
+[R本体](https://cran.r-project.org/)
+: コマンドを解釈して実行するコア部分。
+: よく使われる関数なども標準パッケージとして同梱。
+
+[RStudio Desktop](https://posit.co/download/rstudio-desktop/)
+: Rをより快適に使うための総合開発環境 (IDE)
+: 必須じゃないけど便利なので結構みんな使ってる。
+: ライバルは [VSCode](https://code.visualstudio.com/) + [R Extention](https://marketplace.visualstudio.com/items?itemName=REditorSupport.r)
+  <small>(私はこちらを使用)</small>
+
+<img src="/slides/image/rstudio/rstudio-300x260.png">
+
+---
+## RStudioを起動してConsoleで対話しよう
+
+**Workspace (Environment)** = 一時オブジェクトの集まり
+
+<img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
+
+```{r rstudio-demo, include=FALSE, eval=FALSE}
+1 + 2
+x = 2980
+y = 1.08 * x
+y
+z = "I love beer!"
+?sum
+hist(iris$Petal.Length)
+```
+
+
+---
+## 毎回まっさらなワークスペースで始める設定
+
+<img height=22 width=22 src="https://cdn.simpleicons.org/apple"> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
+<img height=22 width=22 src="https://cdn.simpleicons.org/windows"> Tools → Global options
+
+"Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
+
+<figure style="margin: 0;">
+<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<img src="/slides/image/rstudio/preferences-workspace.png"
+     style="object-fit: cover; object-position: top; height: 420px;">
+<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+</a>
+</figure>
+
+
+---
+## "Project" を新規作成する
+
+File → New Project... → New Directory → New Project →<br>
+→ Directory name: `r-training-2022`<br>
+→ as subdirectory of: `~/project` or `C:/Users/yourname/project`
+
+<img src="/slides/image/rstudio/create-new-project.png" class="screenshot" width="90%"
+     style="object-fit: cover; object-position: top; height: 420px;">
+
+📁 ディレクトリ ＝ フォルダ。 `~/` = ホームディレクトリ
+
+---
+## Rスクリプトに書いてから実行
+
+File → New File → R script
+
+<img src="/slides/image/rstudio/newfile.png" width="100%">
+
+---
+## Rスクリプトに書いてから実行
+
+File → New File → R script
+
+<img src="/slides/image/rstudio/script-console.png" width="100%">
+
+---
+## Rスクリプトに書いてから実行
+
+Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
+Execute them with <kbd>ctrl</kbd><kbd>return</kbd>
+
+<img src="/slides/image/rstudio/101.png" width="100%">
+
+---
+## Rスクリプトを保存する
+
+- 手順
+    - File → Save <kbd>command</kbd><kbd>s</kbd>
+    - ファイル名: `hello.R`
+    - 場所: さっき作ったプロジェクト内 (デフォルトでそうなるはず)
+- **スクリプトを書いたら消さずに保存すること！**
+    - 書いたスクリプトは財産
+    - 保存しておけばまた使い回せる
+
+🔰 いろんな四則演算を試して `hello.R` に保存してみよう。<br>
+e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
+
+---
+## プロジェクト📁にファイルが溜まっていく
+
+スクリプト、データ、結果を分けて整理する例:
+
+```
+r-training-2022/           # プロジェクトの最上階
+├── r-training-2022.Rproj  # これダブルクリックでRStudioを起動
+├── hello.R
+├── transform.R            # データ整理・変形のスクリプト
+├── visualize.R            # 作図のスクリプト
+├── data/                  # 元データを置くところ
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+└── output/                # 結果の出力先
+    ├── iris-petal.png
+    └── iris-summary.tsv
+```
+
+プロジェクト最上階を作業ディレクトリとし、<br>
+ファイル読み書きの基準にする。(後で詳しく)
+
+ほんの一例です。好きな構造に決めてください。
+
+---
+## Rと接する上での心構え
+
+<figure>
+<img src="/slides/image/free/akusyu_uchuujin.png" height="200">
+</figure>
+
+エラー文を恐れない
+: 熟練プログラマでも頻繁にエラーを起こす。
+: エラーはRからのメッセージ。**意図を読み取って修正**しよう。
+: プログラミングの経験値 ≈ エラー解決の経験値
+
+困ったらウェブ検索
+: あなたの問題は全世界のRユーザーが既に通った道。
+: 日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。
+
+
+---
+## この実習の取り組み方
+
+とにかく手を動かして体感しよう！
+
+1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
+
+    ```r
+    head(iris)
+    ```
+
+1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
+    `Error` や `Warning` があったらよく読んで対処する。<br>
+    (無視していい `Warning` もたまーにあるけど)
+
+1.  🔰若葉マークの練習問題があれば解いてみる。<br>
+    そこまでのコードの**コピペ＋改変**でできるはず。
+
+疑問・困りごとがある場合は**気軽にChat欄に**書き込んでください。
+
+
+---
+## 変数/オブジェクトを作ってみよう
+
+```{r objects}
+x = 2        # Create x
+x            # What's in x?
+y = 5        # Create y
+y            # What's in y?
+```
+
+Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。<br>
+`#` 記号より右はRに無視される。コメントを書くのに便利。
+
+```{r sum}
+x + y
+```
+
+🔰 `x` と `y` の引き算、掛け算、割り算をやってみよう
+
+
+---
+## 基本的な演算
+
+`+` とか `*` のような演算子(operator)を変数の間に置く。<br>
+
+```r
+10 + 3    # addition
+10 - 3    # subtraction
+10 * 3    # multiplication
+10 / 3    # division
+10 %/% 3  # integer division
+10 %% 3   # modulus 剰余
+10 ** 3   # exponent 10^3
+```
+
+🔰 コピペして結果を確認してみよう。
+
+---
+## 関数 (function)
+
+変数を受け取って、何か仕事して、返す命令セット
+
+```{r function}
+x = seq(1, 3)  # 1と3を渡すとvectorが返ってくる
+x
+sum(x)         # vectorを渡すと足し算が返ってくる
+square = function(something) {  # 自分の関数を定義
+  something ** 2
+}
+square(x)                       # 使ってみる
+```
+
+🔰 自分の関数を何か作ってみよう。
+e.g., 2倍にする関数 `twice`
+
+
+---
+## 変数/オブジェクトを作ってみよう Part 2
+
+```{r objects2}
+x = 42       # Create x
+x            # What's in x?
+y = "24601"  # Create y
+y            # What's in y?
+```
+
+この `x` と `y` を足そうとするとエラーになる。なぜ？
+
+```{r error}
+x + y        # Error! Why?
+```
+
+---
+## 変数/オブジェクトの型
+
+```{r isas}
+class(x)
+is.numeric(x)
+is.character(x)
+as.character(x)
+```
+
+🔰 さっき作った `y` にも同じ関数を適用してみよう。
+
+---
+## 変数/オブジェクトの型
+
+- `vector`: 基本型。一次元の配列。
+    - `logical`: 論理値 (`TRUE` or `FALSE`)
+    - `numeric`: 数値 (整数 `42L` or 実数 `3.1416`)
+    - `character`: 文字列 (`"a string"`)
+    - `factor`: 因子 (文字列っぽいけど微妙に違う)
+- `array`: 多次元配列。`vector`同様、全要素が同じ型。
+    - `matrix`: 行列 = 二次元の配列。
+- `list`: 異なる型でも詰め込める太っ腹ベクトル。
+- **`data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
+  **`tibble`** とか **`tbl_df`** と呼ばれる亜種もあるけどほぼ同じ。
+
+
+---
+## vector: 一次元の配列
+
+1個の値でもベクトル扱い。<br>
+同じ長さ(または長さ1)の相手との計算が得意。
+
+```{r vector}
+x = c(1, 2, 9)  # 長さ3の数値ベクトル
+x + x           # 同じ長さ同士の計算
+y = 10          # 長さ1の数値ベクトル
+x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+x < 5           # 5より小さいか
+```
+
+🔰 この `x, y` を使っていろいろな演算を試してみよう
+
+
+---
+## vectorから部分的に抜き出す
+
+`[]` を使う。番号は1から始まる。
+
+```{r vector-index}
+letters
+letters[3]
+letters[seq(4, 6)]       # 4 5 6
+letters[seq(1, 26) < 4]  # TRUE TRUE TRUE FALSE FALSE ...
+```
+
+---
+## vectorを渡した結果は関数によって異なる
+
+各要素に適用するもの:
+```{r vector-function}
+x = c(1, 2, 9)
+y = sqrt(x)     # square root
+y
+```
+
+全要素を集約した値を返すもの:
+```{r vector-forloop}
+z = sum(x)
+z
+```
+
+🔰 `log()`, `exp()`, `length()`, `max()`, `mean()`
+にvectorを渡してみよう。
+
+
+---
+## matrix: 二次元の配列 (行列)
+
+1本のvectorを折り曲げて長方形にしたもの。<br>
+中身は全て同じ型。機械学習とか画像処理とかで使う。
+
+```{r matrix}
+v = seq(1, 8)              # c(1, 2, 3, 4, 5, 6, 7, 8)
+x = matrix(v, nrow = 2)    # 2行に畳む。列ごとに詰める
+x
+y = matrix(v, nrow = 2, byrow = TRUE)  # 行ごとに詰める
+y
+```
+
+🔰 結果を確認してみよう: `x + y`, `dim(x)`, `nrow(x)`, `ncol(x)`.
+
+
+---
+## 行 (row), 列 (column) の憶え方
+
+<div class="column-container">
+  <div class="column">
+    <figure>
+    <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
+    <img src="/slides/image/free/front-row.jpg" height="480">
+    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    </a>
+    </figure>
+  </div>
+  <div class="column">
+    <figure>
+    <a href="https://en.wikipedia.org/wiki/Rhodes">
+    <img src="/slides/image/free/apollon-columns.jpg" height="480">
+    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    </a>
+    </figure>
+  </div>
+</div>
+
+
+---
+## data.frame: 長方形のテーブル (重要!)
+
+同じ長さの列vectorを複数束ねた長方形の表。<br>
+e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
+
+```{r data.frame, echo = -1}
+iris = tibble::as_tibble(iris)
+print(iris)
+```
+
+`iris` はアヤメ属3種150個体に関する測定データ。<br>
+Rに最初から入ってて、例としてよく使われる。
+
+---
+## data.frameを眺める
+
+概要を掴む:
+```r
+head(iris, 6)   # 先頭だけ見てみる。末尾は tail()
+nrow(iris)      # 行数: Number of ROWs
+ncol(iris)      # 列数: Number of COLumns
+names(iris)     # 列名
+summary(iris)   # 要約
+View(iris)      # RStudioで閲覧
+```
+```{r str}
+str(iris)       # 構造が分かる形で表示
+```
+
+🔰 ほかのデータもいろいろ見てみよう。
+e.g., `mtcars`, `quakes`, [`data()`](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html)
+
+---
+## data.frameを眺める
+
+部分的なdata.frameを取得する:
+```r
+iris[2, ]                  # 2行目
+iris[2:5, ]                # 2行目から5行目まで
+iris[, 3:4]                # 3-4列目
+iris[2:5, 3:4]             # 2-5行目, 3-4列目
+```
+
+vectorとして取得する:
+```r
+iris[[3]]                  # 3列目
+iris$Petal.Length          # Petal.Length列
+iris[["Petal.Length"]]     # Petal.Length列
+iris[["Petal.Length"]][2]  # Petal.Length列の2番目
+```
+
+結果がdata.frameになるかvectorになるか微妙:
+```r
+iris[, 3]                  # 3列目
+iris[, "Petal.Length"]     # Petal.Length列
+iris[2, 3]                 # 2行目3列目
+iris[2, "Petal.Length"]    # 2行目Petal.Length列
+```
+
+---
+## data.frameの新規作成
+
+同じ長さの **列(column) vector** を結合して作る:
+```{r data.frame.new}
+x = c(1, 2, 3)
+y = c("A", "B", "C")
+mydata = data.frame(x, y)
+print(mydata)
+```
+
+🔰 次のようなdata.frameを作って `theDF` と名付けよう:
+```
+ i s
+24 x
+25 y
+26 z
+```
+ヒント: `c()` 無しでクリアすることも可能。
+
+
+---
+## data.frameの読み書き
+
+- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+    ```r
+    install.packages("readr") # R標準の read.table() とかは難しいので
+    library(readr)            # パッケージのやつを使うよ
+    write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = read_tsv("data/iris.tsv")  # 読み込み
+    ```
+
+あれれー、エラーが出る？
+
+```{r cannot-open, echo = FALSE}
+readr::write_tsv(iris, "data/iris.tsv")
+```
+
+---
+## ファイル読み書きでありがちなエラー
+
+- 読みたいファイル名が間違っている。
+- 読みたいファイルが作業ディレクトリとは違うところにある。
+- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
+
+冷静に、現在の作業ディレクトリとその中身を確認しよう:
+```r
+getwd()               # GET Working Directory
+list.files(".")       # List files in "." (here)
+list.files("data")    # List files in "./data"
+dir.create("data")    # Create directory
+```
+
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html)
+を読んでおきましょう。
+
+🔰 R組み込みデータや自作データを読み書きしてみよう。
+
+---
+## R package
+
+便利な関数やデータセットなどをひとまとめにしたもの。
+
+Standard Packages
+: Rの標準機能。何もしなくても使用可能。
+
+Contributed Packages
+: 有志により開発され、
+  [CRAN](https://cran.rstudio.com/web/packages/) や
+  [Bioconductor](https://www.bioconductor.org/) に公開されている。
+: 要インストール。使う前に読み込む。
+
+```r
+install.packages("readr")  # 一度やればOK
+library(readr)             # 読み込みはRを起動するたびに必要
+update.packages()          # たまには更新しよう
+```
+
+素のRも覚えきってないのにいきなりパッケージ？
+: 大丈夫。誰も覚えきってない。
+: パッケージを使わないR作業 = 火もナイフも使わない料理
+
+---
+## tidyverse: データ科学のためのパッケージ群
+
+<a href="https://www.tidyverse.org/">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+</a>
+
+```r
+install.packages("tidyverse")
+library(conflicted) # 安全のおまじない
+library(tidyverse)  # 一挙に読み込み
+```
+
+```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+cat(tidyverse_msg, sep = "\n")
+```
+
+一貫したデザインでデータ解析の様々な工程をカバー
+
+<figure style="margin-block: 0;">
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+
+
+---
+## ggplot2: tidyverseの可視化担当
+
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
+</a>
+
+- "The <strong><u>G</u></strong>rammer of <strong><u>G</u></strong>raphics" という体系に基づく設計
+- 単にいろんなグラフを「描ける」だけじゃなく<br>
+  **一貫性のある文法で合理的に描ける**
+
+<figure>
+<!--
+<a href="https://www.amazon.co.jp/dp/B00HWUVHXK/ref=as_li_ss_il?ie=UTF8&linkCode=li3&tag=heavywatal-22&linkId=d63d3627df82c09b0bb5ca8f47ee19cc&language=ja_JP" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00HWUVHXK&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=heavywatal-22&language=ja_JP" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=heavywatal-22&language=ja_JP&l=li3&o=9&a=B00HWUVHXK" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+<img src="/slides/image/nagoya/iris.png" width="24%">
+<img src="/slides/image/nagoya/binhex.png" width="24%">
+<img src="/slides/image/nagoya/faithful.png" width="24%">
+-->
+<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
+<img src="/slides/image/tumopp/param-p.png" height="200">
+<img src="/slides/image/tumopp/param-k.png" height="200"><br>
+<img src="/slides/image/tumopp/paper/Fig3.png" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
+<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
+<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+</figure>
+
+---
+## いきなりggplot2から使い始めても大丈夫
+
+R標準のやつとは根本的に違うシステムで作図する。
+
+<figure>
+<img src="/slides/image/rstats/r-graphics.svg">
+<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+</figure>
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+<img src="/slides/image/rstats/ggplot-layers.png" height = "600">
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus1, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds)             # diamondsデータでキャンバス準備
+# aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+# geom_point() +                    # 散布図を描く
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+# stat_smooth(method = lm) +        # 直線回帰を追加
+# coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+# theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus2, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
+# geom_point() +                    # 散布図を描く
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+# stat_smooth(method = lm) +        # 直線回帰を追加
+# coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+# theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus3, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+  geom_point()                      # 散布図を描く
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+# stat_smooth(method = lm) +        # 直線回帰を追加
+# coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+# theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus4, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+  geom_point() +                    # 散布図を描く
+  facet_wrap(vars(clarity))         # clarity列に応じてパネル分割
+# stat_smooth(method = lm) +        # 直線回帰を追加
+# coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+# theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus5, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+  geom_point() +                    # 散布図を描く
+  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+  stat_smooth(method = lm)          # 直線回帰を追加
+# coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+# theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus6, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+  geom_point() +                    # 散布図を描く
+  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+  stat_smooth(method = lm) +        # 直線回帰を追加
+  coord_cartesian(ylim = c(0, 2e4))   # y軸の表示範囲を狭く
+# theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus7, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+  geom_point() +                    # 散布図を描く
+  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+  stat_smooth(method = lm) +        # 直線回帰を追加
+  coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+  theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 基本的な使い方: 指示を `+` で重ねていく
+
+```{r ggplot-plus8, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
+  aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
+  geom_point() +                    # 散布図を描く
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
+# stat_smooth(method = lm) +        # 直線回帰を追加
+# coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
+  theme_classic(base_size = 20)     # クラシックなテーマで
+```
+
+---
+## 図をオブジェクトとして取っておける
+
+```{r ggplot-object, fig.show="hold", fig.height=5, fig.width=6}
+p1 = ggplot(data = diamonds)
+p2 = p1 + aes(x = carat, y = price)
+p3 = p2 + geom_point()
+p4 = p3 + facet_wrap(vars(clarity))
+print(p3)
+```
+
+
+---
+## ファイル名もサイズも再現可能な作図
+
+`width`や`height`が小さいほど、文字・点・線が相対的に大きく
+
+```r
+# 7inch x 300dpi = 2100px四方 (デフォルト)
+ggsave("dia1.png", p3) # width = 7, height = 7, dpi = 300
+# 4     x 300    = 1200  全体7/4倍ズーム
+ggsave("dia2.png", p3, width = 4, height = 4) # dpi = 300
+# 2     x 600    = 1200  全体をさらに2倍ズーム
+ggsave("dia3.png", p3, width = 2, height = 2, dpi = 600)
+# 4     x 300    = 1200  テーマを使って文字だけ拡大
+ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
+```
+
+<figure>
+<img src="../sendair2/image/dia1.png" width="24%">
+<img src="../sendair2/image/dia2.png" width="24%">
+<img src="../sendair2/image/dia3.png" width="24%">
+<img src="../sendair2/image/dia4.png" width="24%">
+</figure>
+
+
+---
+## 論文のFigureみたいに並べるのもRで
+
+別のパッケージ
+([cowplot](https://wilkelab.org/cowplot/)
+や
+[patchwork](https://patchwork.data-imaginist.com/))
+の助けを借りて
+
+```{r cowplot, fig.height=5.5, fig.width=6}
+pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
+cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
+```
+
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備
+1. データの取得、読み込み
+1. 探索的データ解析
+    - **前処理、加工** (労力の8割はここという説も)
+    - 可視化、仮説生成 (まずここを目指す！)
+    - 統計解析、仮説検証 (みんな重視しがち)
+1. 報告、発表
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 機械処理しやすい形 vs 人が読み書きしやすい形
+
+作図や解析に使えるデータ形式はほぼ決まってる
+: `ggplot(data, ...)`, `glm(..., data, ...)`, ...
+
+出発点となるデータはさまざま
+: 実験ノート、フィールドノート、データベース、...
+
+> Happy families are all alike;<br>
+> every unhappy family is unhappy in its own way<br>
+> --- Leo Tolstoy "Anna Karenina"
+
+> tidy datasets are all alike,<br>
+> but every messy dataset is messy in its own way<br>
+> --- Hadley Wickham
+
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1.png" height="550" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1.png" width="300" style="transform: translate(-14px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="580" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="420" style="transform: translate(-36px, -10px);">
+    <div style="position: absolute; top: 440px;">
+    <strong>縦1列は1つの変数</strong><br>
+    横1行は1つの観測<br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="300" style="transform: translate(-24px, 0);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    <strong>横1行は1つの観測</strong><br>
+    1セルは1つの値<br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+---
+## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.1;">
+    <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="530" style="vertical-align: top;">
+  </div>
+  <div class="column">
+    <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="300" style="transform: translate(-14px, 4px);">
+    <div style="position: absolute; top: 440px;">
+    縦1列は1つの変数<br>
+    横1行は1つの観測<br>
+    <strong>1セルは1つの値</strong><br>
+    </div>
+  </div>
+</div>
+<cite style="position: absolute; bottom: 18px; right: 24px;">
+<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+</a>
+</cite>
+
+
+---
+## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+
+- **縦1列**は1つの**変数**
+- **横1行**は1つの**観測**
+- **1セル**は1つの**値**
+
+<cite style="display: block; text-align: right;">
+<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+</cite>
+
+```{r tidy_example}
+print(ggplot2::diamonds)
+```
+
+
+---
+## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+
+x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
+
+```{r tidy-data-benefit, fig.height = 6, fig.width = 9}
+ggplot(diamonds) + aes(x = carat, y = price) +
+  geom_point(mapping = aes(color = color, size = clarity)) +
+  facet_wrap(vars(cut))
+```
+
+---
+## 前処理: 生データを下ごしらえして食べやすい形に
+
+```{r messy_example}
+print(VADeaths)
+```
+
+↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+
+```{r tidy_vadeaths, echo=FALSE}
+VADeaths %>%
+  as.data.frame() %>%
+  rownames_to_column("age") %>%
+  pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
+  separate(age, c("lbound", "ubound"), convert = TRUE)
+```
+
+
+---
+## 前処理は大きく2つに分けられる
+
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="120">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="120">
+</a><br>
+<a href="https://stringr.tidyverse.org/">
+<img src="/_img/hex-stickers/stringr.webp" width="120">
+</a>
+</div>
+
+- データ構造を対象とする処理
+    - 使いたい部分だけ抽出
+    - グループごとに特徴を要約
+    - 何かの順に並べ替え
+    - 異なるテーブルの結合
+    - 変形: 縦長 ↔ 横広
+- データ内容を対象とする処理
+    - 数値の変換: 対数、正規化
+    - 外れ値・欠損値への対処
+    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
+    - 文字列処理: 正規表現によるパターンマッチ
+
+<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></cite>
+
+
+---
+## dplyr --- data.frameの高速処理担当
+
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
+</a>
+
+シンプルな関数がたくさん。繋げて使う (piping)
+
+抽出
+: 列: `select()`,
+: 行: `filter()`, `distinct()`, `slice()`
+
+要約・集計
+: `group_by()`, `summarize()`, `count()`
+
+並べ替え
+: `arrange()`, `relocate()`
+
+列の追加・変更
+: `mutate()`, `rename()`
+
+結合
+: 行方向: `bind_rows()`
+: 列方向: `left_join()`, `inner_join()`, `full_join()`
+
+---
+## dplyr 使用例
+
+小さな関数を繋げて使う流れ作業:
+```{r dplyr-example}
+result = diamonds |>              # 生データから出発して
+  select(carat, cut, price) |>    # 列を抽出して
+  filter(carat > 1) |>            # 行を抽出して
+  group_by(cut) |>                # グループ化して
+  summarize(mean(price)) |>       # 平均を計算
+  print()                         # 表示してみる
+```
+
+この見慣れぬ記号 `|>` は何？<br>
+(`select()` など個々の関数には今日は触れません)
+
+---
+## Pipe operator (パイプ演算子) `|>`
+
+パイプの左側の変数を、右側の関数の第一引数にねじ込む:
+```r
+diamonds |> filter(carat > 1)
+filter(diamonds, carat > 1)     # これと同じ
+
+# 前処理の流れ作業に便利:
+diamonds |> filter(carat > 1) |> select(carat, price) |> ...
+potatos |> cut() |> fry() |> season("salt") |> eat()
+```
+
+🔰 パイプを使わない形に書き換え、出力を確認しよう:
+```{r letters}
+seq(1, 6) |> sum()
+letters |> toupper() |> head(3)
+```
+
+[解答例]
+```r
+sum(seq(1, 6))
+head(toupper(letters), 3)
+```
+
+---
+## パイプ演算子 `|>` を使わない方法
+
+😐 一時変数をイチイチ作る:
+```{r pipe-tmp-var}
+tmp1 = select(diamonds, carat, cut, price)   # 列を抽出して
+tmp2 = filter(tmp1, carat > 1)               # 行を抽出して
+tmp3 = group_by(tmp2, cut)                   # グループ化して
+result = summarize(tmp3, mean(price))        # 平均を計算
+```
+
+😐 同じ名前を使い回す:
+```{r pipe-recursive-assign}
+result = select(diamonds, carat, cut, price) # 列を抽出して
+result = filter(result, carat > 1)           # 行を抽出して
+result = group_by(result, cut)               # グループ化して
+result = summarize(result, mean(price))      # 平均を計算
+```
+
+どちらも悪くない。
+何度も変数名を入力するのがやや冗長。
+
+
+---
+## パイプ演算子 `|>` を使わない方法
+
+😫 一時変数を使わずに:
+```{r pipe-nest}
+result = summarize(                    # 平均を計算
+    group_by(                            # グループ化して
+      filter(                              # 行を抽出して
+        select(diamonds, carat, cut, price), # 列を抽出して
+        carat > 1),                        # 行を抽出して
+      cut),                              # グループ化して
+    mean(price))                       # 平均を計算
+```
+
+🤪 改行さえせずに:
+```{r pipe-oneliner}
+result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
+```
+
+論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
+さっきのほうがぜんぜんマシ。
+
+---
+## パイプ演算子 `|>` を使おう
+
+😁 慣れれば、論理の流れを追いやすい:
+```{r eg-pipe}
+result = diamonds |>
+  select(carat, cut, price) |>    # 列を抽出して
+  filter(carat > 1) |>            # 行を抽出して
+  group_by(cut) |>                # グループ化して
+  summarize(mean(price)) |>       # 平均を計算
+  print()                         # 表示してみる
+```
+
+tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
+使わなければならないわけではないが、読めたほうがいい。
+
+<div style="font-size: 0.8em; color: #888888;">
+
+R < 4.2 までよく使われていた `%>%` もほぼ同じ。
+
+</div>
+
+---
+## tidyr --- data.frameの変形・整形担当
+
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="120" align="right">
+</a>
+
+横広から縦長に
+: `pivot_longer()`, <del><code>gather()</code></del>
+
+縦長から横広に
+: `pivot_wider()`, <del><code>spread()</code></del>
+
+列を分離、結合
+: `separate()`, `unite()`
+
+入れ子構造をつくる、解消する
+: `nest()`, `unnest()`
+
+*etc.*
+
+- こういう変形なしでそのまま使えるデータは激レア
+- エクセルでポチポチやらず、tidyrで手続きを記述しよう
+- ちょっとハードルは高いけど、使えるようになると**強い**💪
+
+
+---
+## `pivot_longer()` 横広から縦長に
+
+複数列にまたがる値を1列にする。<br>
+そのラベルも合わせて移動。
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#longer">
+<img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="600">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#longer</figcaption>
+</a>
+</figure>
+
+```r
+table4a
+pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
+```
+
+---
+## `pivot_wider()` 縦長から横広に
+
+1列に収まっていた値を複数列の行列に変換。<br>
+そのラベルを列の名前にする。
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#wider">
+<img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="560">
+<br>
+<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
+</a>
+</figure>
+
+```r
+pivot_wider(table2, names_from = type, values_from = count)
+```
+
+---
+## [Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2022/)は別の講義で
+
+2022年9月に開講。おそらくe-なんとかで視聴可能。
+
+<iframe width="100%" height="400" src="../tmd2022/"></iframe>
+
+2023年の開講は未定...?
 
 
 ---
@@ -694,16 +1853,49 @@ ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
 
 
 ---
+## 疑問やエラーの解決方法
+
+- エラーのほとんどは凡ミス由来。よく確認しよう。
+    - エラー文をちゃんと読む: `No such file or directory`
+    - [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2022/R_training_2022_7.html)
+      をチェックする
+    - 変数の中身を確かめる: `str(iris)`, `attributes(iris)`
+- エラー文やパッケージ名をコピペしてウェブ検索<br>
+  → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
+  や個人サイトに解決策
+- Slack <img height=22 width=22 src="https://cdn.simpleicons.org/slack">
+  [r-wakalang](https://github.com/tokyor/r-wakalang)
+  で質問を投稿する。<br>
+  (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)
+- 状況再現できる小さな例
+  [(reprex)](https://reprex.tidyverse.org/)
+  を添えると回答を得やすい。<br>
+  (これを準備してるうちに問題が切り分けられて自己解決したり)
+- パッケージの公式ドキュメントをちゃんと読む
+- R(Studio)内のヘルプを読む: `?sum`, `help.start()`
+
+
+---
 ## 参考文献
 
+R for Data Science --- Hadley Wickham and Garrett Grolemund
+: <https://r4ds.had.co.nz/>,
+  [Book](https://amzn.to/2tbRmVc),
+  [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
-- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
-- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
-- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
-- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
-  (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
+
+Other versions
+: 「[Rによるデータ前処理実習](/slides/tmd2022/)」
+  東京医科歯科大 [データ関連人材育成プログラム](https://ds.tmdu.org/) (2022-09)
+: 「[統計モデリング概論 DSHC 2022](/slides/tokiomarine2022/)」
+  東京海上 [DSHC](https://tokiomarine-dshc.com/) (2022-08)
+: 「[進化学実習2022](/slides/tohoku2022r/)」
+  東北大学 理学部生物学科 (2022-04)
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
+   石川由希 2022 名古屋大学
 
 <a href="2-distribution.html" rel="next" class="readmore">
 2. 確率分布、擬似乱数生成
