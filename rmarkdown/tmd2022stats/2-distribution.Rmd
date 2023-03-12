@@ -709,8 +709,8 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ---
 ## Quarto Document として研究ノートを作る
 
-<a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="120" align="right">
+<a href="https://quarto.org/">
+<img src="/_img/hex-stickers/quarto.webp" width="120" align="right">
 </a>
 
 プログラミングからレポート作成まで一元管理できて楽ちん。
@@ -720,6 +720,10 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
   - コードだけでなく実行結果の**図**や**表**も埋め込める。
 
 <hr>
+
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="120" align="right">
+</a>
 
 Quarto Markdown (`.qmd`)
 : RやPythonのコードと図表を埋め込める**Markdown**亜種。
@@ -786,6 +790,35 @@ e.g., **Markdown**, reStructuredText, 各種Wiki記法など
 </p>
 </div>
 
+
+---
+## Quartoする環境は既に整っているはず
+
+```{r, versions}
+#| include: FALSE
+R_version = paste(R.version$major, R.version$minor, sep = ".")
+pkg_versions = installed.packages()[, "Version"]
+RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
+# quarto_version = system2("quarto", "--version", stdout = TRUE)
+```
+
+- **R (≥ `r R_version`)**: 最新版 – 0.1 くらいまでが許容範囲
+- **RStudio (≥ `r RStudio_version`)**: Quarto CLI を同梱
+- **tidyverse (≥ `r pkg_versions["tidyverse"]`)**: 次の2つを自動インストール
+  - rmarkdown (≥ `r pkg_versions["rmarkdown"]`)
+  - knitr (≥ `r pkg_versions["knitr"]`)
+
+(示してあるバージョンは最低要件ではなく私の現在の環境の)
+
+<hr>
+
+- [Quarto CLI](https://quarto.org/docs/get-started/):
+  最新版を求めるなら手動で入れる。
+- [`install.packages("quarto")`](https://github.com/quarto-dev/quarto-r):
+  多くの人には不要。
+  Quarto CLIをRコマンドで呼べるようにするだけ。
+- [pandoc](https://pandoc.org/): Quarto CLI に同梱。
+  手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。
 
 ---
 ## Markdown記法で書いてみよう
