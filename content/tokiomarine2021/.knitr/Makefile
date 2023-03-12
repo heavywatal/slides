@@ -1,22 +1,15 @@
-DECK := $(notdir ${CURDIR})
-DESTINATION := ../../content/${DECK}
+DESTINATION := ..
 SOURCES := $(wildcard *.Rmd)
 KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 
 .DEFAULT_GOAL := all
-.PHONY: all clean stan
+.PHONY: all clean
 
-all: ${KNITTED} ${NOTEBOOKS}
+all: ${KNITTED}
 	@:
 
-${DESTINATION}/%.md : %.Rmd | ${DESTINATION}
+${DESTINATION}/%.md : %.Rmd
 	Rscript --no-init-file -e "wtl::exec_knit('$<', '$@')"
-
-${DESTINATION}:
-	mkdir -p $@
 
 clean:
 	$(RM) -r ${KNITTED} cache ${DESTINATION}/figure/*-1.png
-
-stan:
-	rsync -auv stan/ ${DESTINATION}/stan/

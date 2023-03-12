@@ -1,5 +1,4 @@
-DECK := $(notdir ${CURDIR})
-DESTINATION := ../../content/${DECK}
+DESTINATION := ..
 SOURCES := $(wildcard *.Rmd)
 KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 
@@ -9,11 +8,8 @@ KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 all: ${KNITTED}
 	@:
 
-${DESTINATION}/%.md : %.Rmd | ${DESTINATION}
+${DESTINATION}/%.md : %.Rmd
 	Rscript --no-init-file -e "wtl::exec_knit('$<', '$@')"
 
-${DESTINATION}:
-	mkdir -p $@
-
 clean:
-	$(RM) ${KNITTED}
+	$(RM) -r ${KNITTED} cache ${DESTINATION}/figure/*-1.png
