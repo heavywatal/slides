@@ -894,7 +894,7 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 </span></span></code></pre></div><pre tabindex="0"><code>── Attaching core tidyverse packages ────────────────────────────────────────────────────── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.0     ✔ readr     2.1.4
 ✔ forcats   1.0.0     ✔ stringr   1.5.0
-✔ ggplot2   3.4.1     ✔ tibble    3.1.8
+✔ ggplot2   3.4.1     ✔ tibble    3.2.0
 ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
 ✔ purrr     1.0.1     
 </code></pre><p>一貫したデザインでデータ解析の様々な工程をカバー</p>
@@ -1571,10 +1571,9 @@ but every messy dataset is messy in its own way<br>
 <section>
 <h2 id="-ほかのデータでも-lm-を試してみよう">🔰 ほかのデータでも <code>lm()</code> を試してみよう</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">lm</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">hwy</span> <span class="o">~</span> <span class="n">displ</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>         term  estimate std.error statistic       p.value
-1 (Intercept) 35.697651 0.7203676  49.55477 2.123519e-125
-2       displ -3.530589 0.1945137 -18.15085  2.038974e-46
+</span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)       displ 
+  35.697651   -3.530589 
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mpg_added</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">mpg</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg_added</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
