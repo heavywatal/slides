@@ -51,12 +51,19 @@ knitr::opts_chunk$set(cache = TRUE)
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r lm-bad, echo = FALSE, fig.height = 5, fig.width = 5}
+```{r, df-pois}
+#| echo: FALSE
+set.seed(24601)
 n = 300L
 a = 3
 b = -3
-df_pois = tibble::tibble(body_mass = runif(n, 0.4, 1.7), num_seeds = rpois(n, exp(a * body_mass + b)))
-
+df_pois = tibble::tibble(
+  body_mass = runif(n, 0.4, 1.7),
+  num_seeds = rpois(n, exp(a * body_mass + b))
+)
+```
+```{r, lm-bad, echo = FALSE, fig.height = 5, fig.width = 5}
+#| dependson: df-pois
 x_breaks = c(0.5, 1.0, 1.5)
 coeff = lm(num_seeds ~ body_mass, data = df_pois)$coefficients
 df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
@@ -81,7 +88,8 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r glm-better, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "lm-bad"}
+```{r, glm-better, echo = FALSE, fig.height = 5, fig.width = 10}
+#| dependson: df-pois
 p_lm = p_pois +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), fill = "#3366ffaa", linetype = 0)
@@ -663,7 +671,8 @@ runif(6L)
 ---
 ## いろんな乱数を生成・可視化して感覚を掴もう
 
-```r
+```{r, try-prng}
+#| eval: FALSE
 n = 100
 x = sample.int(6, n, replace = TRUE)
 x = runif(n, min = 0, max = 1)
@@ -886,19 +895,9 @@ RStudio > New File > Quarto Document...<br>
 
 さっきはこんな汚いスクリプトだった:
 
-```r
-n = 100
-x = sample.int(6, n, replace = TRUE)
-x = runif(n, min = 0, max = 1)
-x = rgeom(n, prob = 0.5)
-x = rbinom(n, size = 3, prob = 0.5)
-x = rpois(n, lambda = 10)
-x = rnorm(n, mean = 50, sd = 10)
-print(x)
-
-p1 = ggplot(data.frame(x)) + aes(x)
-p1 + geom_histogram() # for continuous values
-p1 + geom_bar()       # for discrete values
+```{r, try-prng-print}
+#| ref.label: try-prng
+#| eval: FALSE
 ```
 
 1. ひとつの分布につきひとつの図を描くqmdに書き換える。
