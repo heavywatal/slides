@@ -35,15 +35,19 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R", message = NA}
+```{r, setup-global}
+#| file: "setup.R"
+#| message: !expr 'NA'
+#| include: false
 ```
 
-```{r setup-local, include=FALSE}
+```{r, setup-local}
+#| include: false
 library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 </div><!-- .titlepage -->
@@ -68,7 +72,7 @@ knitr::opts_chunk$set(cache = TRUE)
 
 往々にして複雑過ぎ、情報多すぎ、そのままでは手に負えない
 
-```{r diamonds}
+```{r, diamonds}
 print(ggplot2::diamonds)
 ```
 
@@ -79,7 +83,8 @@ print(ggplot2::diamonds)
 
 各列の**平均**とか**標準偏差**とか:
 
-```{r summary-diamonds, echo = FALSE}
+```{r, summary-diamonds}
+#| echo: false
 dia_cols = c("carat", "depth", "table", "price")
 diamonds |>
   dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
@@ -88,7 +93,8 @@ diamonds |>
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
-```{r cov-diamonds, echo = FALSE}
+```{r, cov-diamonds}
+#| echo: false
 diamonds |>
   dplyr::select(all_of(dia_cols)) |>
   scale() |>
@@ -141,7 +147,10 @@ Percentile, Quantile (四分位)
 : 小さい順にならべて上位何%にあるか。
 : 中央値 = 50th percentile = 第二四分位(Q2)
 
-```{r quantile, fig.width = 10, fig.height = 4, echo = FALSE}
+```{r, quantile}
+#| fig.width: 10
+#| fig.height: 4
+#| echo: false
 df = tibble::tibble(x = rnorm(200)) |>
   dplyr::filter(abs(x) < 2) |>
   dplyr::mutate(x = x + 3)
@@ -190,7 +199,10 @@ AとBには差がありそう。
 </div>
 </div>
 
-```{r comparison, fig.width = 11, fig.height = 4, echo = FALSE}
+```{r, comparison}
+#| fig.width: 11
+#| fig.height: 4
+#| echo: false
 n = 20
 df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
 df2 = dplyr::bind_rows(
@@ -221,7 +233,10 @@ cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
 
 同じデータでも見せ方で印象・情報量が変わる。
 
-```{r visualize-distribution, echo = FALSE, fig.width = 9, fig.height = 6}
+```{r, visualize-distribution}
+#| echo: false
+#| fig.width: 9
+#| fig.height: 6
 df = mpg |> dplyr::mutate(y = hwy)
 df_mean = df |> dplyr::summarize(y = mean(y))
 p0 = ggplot(df) + aes(y = y) +
@@ -267,7 +282,10 @@ cowplot::plot_grid(nrow = 2L,
 
 情報をうまく絞って整理 → **直感的にわかる**
 
-```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
+```{r, simplify-diamonds}
+#| echo: false
+#| fig.height: 6
+#| fig.width: 7
 diamonds |>
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price, color = clarity)) +
@@ -360,7 +378,10 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 データ生成をうまく真似できそうな仮定の数式表現。<br>
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
-```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
+```{r, lm-diamonds}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
 diamonds |>
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price)) +
@@ -531,7 +552,9 @@ diamonds |>
 
 <img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
 
-```{r rstudio-demo, include=FALSE, eval=FALSE}
+```{r, rstudio-demo}
+#| include: false
+#| eval: false
 1 + 2
 x = 2980
 y = 1.08 * x
@@ -672,7 +695,7 @@ r-training-2022/           # プロジェクトの最上階
 ---
 ## 変数/オブジェクトを作ってみよう
 
-```{r objects}
+```{r, objects}
 x = 2        # Create x
 x            # What's in x?
 y = 5        # Create y
@@ -682,7 +705,7 @@ y            # What's in y?
 Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。<br>
 `#` 記号より右はRに無視される。コメントを書くのに便利。
 
-```{r sum}
+```{r, sum}
 x + y
 ```
 
@@ -711,7 +734,7 @@ x + y
 
 変数を受け取って、何か仕事して、返す命令セット
 
-```{r function}
+```{r, function}
 x = seq(1, 3)  # 1と3を渡すとvectorが返ってくる
 x
 sum(x)         # vectorを渡すと足し算が返ってくる
@@ -728,7 +751,7 @@ e.g., 2倍にする関数 `twice`
 ---
 ## 変数/オブジェクトを作ってみよう Part 2
 
-```{r objects2}
+```{r, objects2}
 x = 42       # Create x
 x            # What's in x?
 y = "24601"  # Create y
@@ -737,14 +760,15 @@ y            # What's in y?
 
 この `x` と `y` を足そうとするとエラーになる。なぜ？
 
-```{r error}
+```{r, error}
+#| error: true
 x + y        # Error! Why?
 ```
 
 ---
 ## 変数/オブジェクトの型
 
-```{r isas}
+```{r, isas}
 class(x)
 is.numeric(x)
 is.character(x)
@@ -774,7 +798,7 @@ as.character(x)
 1個の値でもベクトル扱い。<br>
 同じ長さ(または長さ1)の相手との計算が得意。
 
-```{r vector}
+```{r, vector}
 x = c(1, 2, 9)  # 長さ3の数値ベクトル
 x + x           # 同じ長さ同士の計算
 y = 10          # 長さ1の数値ベクトル
@@ -790,7 +814,7 @@ x < 5           # 5より小さいか
 
 `[]` を使う。番号は1から始まる。
 
-```{r vector-index}
+```{r, vector-index}
 letters
 letters[3]
 letters[seq(4, 6)]       # 4 5 6
@@ -801,14 +825,14 @@ letters[seq(1, 26) < 4]  # TRUE TRUE TRUE FALSE FALSE ...
 ## vectorを渡した結果は関数によって異なる
 
 各要素に適用するもの:
-```{r vector-function}
+```{r, vector-function}
 x = c(1, 2, 9)
 y = sqrt(x)     # square root
 y
 ```
 
 全要素を集約した値を返すもの:
-```{r vector-forloop}
+```{r, vector-forloop}
 z = sum(x)
 z
 ```
@@ -823,7 +847,7 @@ z
 1本のvectorを折り曲げて長方形にしたもの。<br>
 中身は全て同じ型。機械学習とか画像処理とかで使う。
 
-```{r matrix}
+```{r, matrix}
 v = seq(1, 8)              # c(1, 2, 3, 4, 5, 6, 7, 8)
 x = matrix(v, nrow = 2)    # 2行に畳む。列ごとに詰める
 x
@@ -863,7 +887,8 @@ y
 同じ長さの列vectorを複数束ねた長方形の表。<br>
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
-```{r data.frame, echo = -1}
+```{r, dataframe}
+#| echo: -1
 iris = tibble::as_tibble(iris)
 print(iris)
 ```
@@ -883,7 +908,7 @@ names(iris)     # 列名
 summary(iris)   # 要約
 View(iris)      # RStudioで閲覧
 ```
-```{r str}
+```{r, str}
 str(iris)       # 構造が分かる形で表示
 ```
 
@@ -921,7 +946,7 @@ iris[2, "Petal.Length"]    # 2行目Petal.Length列
 ## data.frameの新規作成
 
 同じ長さの **列(column) vector** を結合して作る:
-```{r data.frame.new}
+```{r, dataframe-create}
 x = c(1, 2, 3)
 y = c("A", "B", "C")
 mydata = data.frame(x, y)
@@ -954,7 +979,9 @@ print(mydata)
 
 あれれー、エラーが出る？
 
-```{r cannot-open, echo = FALSE}
+```{r, cannot-open}
+#| error: true
+#| echo: false
 readr::write_tsv(iris, "data/iris.tsv")
 ```
 
@@ -1015,7 +1042,9 @@ library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
 
-```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
+```{r, tidyverse-messasge}
+#| echo: false
+#| cache: false
 cat(tidyverse_msg, sep = "\n")
 ```
 
@@ -1079,7 +1108,11 @@ R標準のやつとは根本的に違うシステムで作図する。
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus1, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus1}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -1092,7 +1125,11 @@ ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus2, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus2}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -1105,7 +1142,11 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus3, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus3}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point()                      # 散布図を描く
@@ -1118,7 +1159,11 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus4, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus4}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1131,7 +1176,11 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus5, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus5}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1144,7 +1193,11 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus6, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus6}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1157,7 +1210,11 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus7, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus7}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1170,7 +1227,11 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r ggplot-plus8, fig.show="hold", fig.height=5, fig.width=7, message=FALSE}
+```{r, ggplot-plus8}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1183,7 +1244,10 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ---
 ## 図をオブジェクトとして取っておける
 
-```{r ggplot-object, fig.show="hold", fig.height=5, fig.width=6}
+```{r, ggplot-object}
+#| fig.show: "hold"
+#| fig.height: 5
+#| fig.width: 6
 p1 = ggplot(data = diamonds)
 p2 = p1 + aes(x = carat, y = price)
 p3 = p2 + geom_point()
@@ -1225,7 +1289,9 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 [patchwork](https://patchwork.data-imaginist.com/))
 の助けを借りて
 
-```{r cowplot, fig.height=5.5, fig.width=6}
+```{r, cowplot}
+#| fig.height: 5.5
+#| fig.width: 6
 pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
 cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 ```
@@ -1368,7 +1434,7 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 <a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
 </cite>
 
-```{r tidy_example}
+```{r, tidy-example}
 print(ggplot2::diamonds)
 ```
 
@@ -1378,7 +1444,9 @@ print(ggplot2::diamonds)
 
 x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
 
-```{r tidy-data-benefit, fig.height = 6, fig.width = 9}
+```{r, tidy-data-benefit}
+#| fig.height: 6
+#| fig.width: 9
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
   facet_wrap(vars(cut))
@@ -1387,13 +1455,14 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 ---
 ## 前処理: 生データを下ごしらえして食べやすい形に
 
-```{r messy_example}
+```{r, messy-vadeaths}
 print(VADeaths)
 ```
 
 ↓ 下ごしらえ: 作図・解析で使いやすい整然データに
 
-```{r tidy_vadeaths, echo=FALSE}
+```{r, tidy-vadeaths}
+#| echo: false
 VADeaths %>%
   as.data.frame() %>%
   rownames_to_column("age") %>%
@@ -1464,7 +1533,7 @@ VADeaths %>%
 ## dplyr 使用例
 
 小さな関数を繋げて使う流れ作業:
-```{r dplyr-example}
+```{r, dplyr-example}
 result = diamonds |>              # 生データから出発して
   select(carat, cut, price) |>    # 列を抽出して
   filter(carat > 1) |>            # 行を抽出して
@@ -1490,7 +1559,7 @@ potatos |> cut() |> fry() |> season("salt") |> eat()
 ```
 
 🔰 パイプを使わない形に書き換え、出力を確認しよう:
-```{r letters}
+```{r, letters}
 seq(1, 6) |> sum()
 letters |> toupper() |> head(3)
 ```
@@ -1505,7 +1574,7 @@ head(toupper(letters), 3)
 ## パイプ演算子 `|>` を使わない方法
 
 😐 一時変数をイチイチ作る:
-```{r pipe-tmp-var}
+```{r, pipe-tmp-var}
 tmp1 = select(diamonds, carat, cut, price)   # 列を抽出して
 tmp2 = filter(tmp1, carat > 1)               # 行を抽出して
 tmp3 = group_by(tmp2, cut)                   # グループ化して
@@ -1513,7 +1582,7 @@ result = summarize(tmp3, mean(price))        # 平均を計算
 ```
 
 😐 同じ名前を使い回す:
-```{r pipe-recursive-assign}
+```{r, pipe-recursive-assign}
 result = select(diamonds, carat, cut, price) # 列を抽出して
 result = filter(result, carat > 1)           # 行を抽出して
 result = group_by(result, cut)               # グループ化して
@@ -1528,7 +1597,7 @@ result = summarize(result, mean(price))      # 平均を計算
 ## パイプ演算子 `|>` を使わない方法
 
 😫 一時変数を使わずに:
-```{r pipe-nest}
+```{r, pipe-nest}
 result = summarize(                    # 平均を計算
     group_by(                            # グループ化して
       filter(                              # 行を抽出して
@@ -1539,7 +1608,7 @@ result = summarize(                    # 平均を計算
 ```
 
 🤪 改行さえせずに:
-```{r pipe-oneliner}
+```{r, pipe-oneliner}
 result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
 ```
 
@@ -1550,7 +1619,7 @@ result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 
 ## パイプ演算子 `|>` を使おう
 
 😁 慣れれば、論理の流れを追いやすい:
-```{r eg-pipe}
+```{r, eg-pipe}
 result = diamonds |>
   select(carat, cut, price) |>    # 列を抽出して
   filter(carat > 1) |>            # 行を抽出して
@@ -1673,7 +1742,9 @@ pivot_wider(table2, names_from = type, values_from = count)
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 &nbsp;
 
-```{r df_weight, echo = FALSE, cache = TRUE}
+```{r, df-weight}
+#| echo: false
+#| cache: true
 set.seed(19937)
 n = 50
 df_weight = tibble::tibble(
@@ -1682,7 +1753,10 @@ df_weight = tibble::tibble(
   weight = bmi * (height**2)
 )
 ```
-```{r weight-height, echo = FALSE, fig.height = 5, fig.width = 5, dependson = "df_weight"}
+```{r, weight-height}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 5
 p_weight = ggplot(df_weight) +
   aes(height, weight) +
   geom_point(alpha = 0.5) +
@@ -1698,7 +1772,10 @@ p_weight
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 じゃあ傾き *a* と切片 *b*、どう決める？
 
-```{r weight-lines, echo = FALSE, fig.height = 5, fig.width = 5, dependson = "df_weight"}
+```{r, weight-lines}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 5
 df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
   dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
 p_weight +
@@ -1711,7 +1788,10 @@ p_weight +
 
 回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。
 
-```{r weight-residual, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "df_weight"}
+```{r, weight-residual}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
 predict_weight = function(parameters, data) {
   parameters[1] + parameters[2] * data$height
 }
@@ -1752,7 +1832,10 @@ cowplot::plot_grid(nrow = 1L,
 ランダムに試してみて、上位のものを採用。<br>
 この程度の試行回数では足りなそう。
 
-```{r weight-goodlines, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "df_weight"}
+```{r, weight-goodlines}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
 n = 200
 df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) |>
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
@@ -1776,7 +1859,10 @@ cowplot::plot_grid(p_ab, p2, nrow = 1L)
 **グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。<br>
 さっきのランダムよりはちょっとマシか。
 
-```{r weight-grid, echo = FALSE, fig.height = 5, fig.width = 10, dependson = "df_weight"}
+```{r, weight-grid}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
 df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) |>
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
 
@@ -1793,13 +1879,16 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ---
 ## これくらいなら一瞬で計算してもらえる
 
-```{r ols, dependson = "df_weight"}
+```{r, ols}
 par_init = c(intercept = 0, slope = 0)
 result = optim(par_init, fn = rss_weight, data = df_weight)
 result$par
 ```
 
-```{r weight-lm, echo = FALSE, fig.height = 3.7, fig.width = 3.7, dependson = -1}
+```{r, weight-lm}
+#| echo: false
+#| fig.height: 3.7
+#| fig.width: 3.7
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
@@ -1814,11 +1903,14 @@ p_weight +
 ## `lm()` で直線あてはめしてみる
 
 架空のデータを作る(乱数生成については後述):
-```{r df_weight_print, ref.label = "df_weight", echo = -1L, eval = FALSE}
+```{r, generate-df-weight}
+#| ref.label: "df-weight"
+#| echo: -1
+#| eval: false
 ```
 
 データと関係式(`Y ~ X` の形)を `lm()` に渡して係数を読む:
-```{r lm-demo, dependson = "df_weight"}
+```{r, lm-demo}
 fit = lm(data = df_weight, formula = weight ~ height)
 coef(fit)
 ```
@@ -1828,7 +1920,9 @@ coef(fit)
 ---
 ## `lm()` の結果をggplotする
 
-```{r lm-ggplot, fig.height = 3, fig.width = 3, dependson = -1}
+```{r, lm-ggplot}
+#| fig.height: 3
+#| fig.width: 3
 df = modelr::add_predictions(df_weight, fit, type = "response")
 head(df, 2L)
 ggplot(df) +
@@ -1840,7 +1934,9 @@ ggplot(df) +
 ---
 ## 🔰 ほかのデータでも `lm()` を試してみよう
 
-```{r lm-mpg, fig.height = 2.5, fig.width = 2.5}
+```{r, lm-mpg}
+#| fig.height: 2.5
+#| fig.width: 2.5
 fit = lm(data = mpg, formula = hwy ~ displ)
 coef(fit)
 

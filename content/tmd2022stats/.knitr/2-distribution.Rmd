@@ -36,15 +36,19 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R"}
+```{r, setup-global}
+#| file: "setup.R"
+#| message: !expr 'NA'
+#| include: false
 ```
 
-```{r setup-local, include=FALSE}
+```{r, setup-local}
+#| include: false
 library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
-knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 
@@ -62,8 +66,10 @@ df_pois = tibble::tibble(
   num_seeds = rpois(n, exp(a * body_mass + b))
 )
 ```
-```{r, lm-bad, echo = FALSE, fig.height = 5, fig.width = 5}
-#| dependson: df-pois
+```{r, lm-bad}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 5
 x_breaks = c(0.5, 1.0, 1.5)
 coeff = lm(num_seeds ~ body_mass, data = df_pois)$coefficients
 df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
@@ -88,8 +94,10 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-```{r, glm-better, echo = FALSE, fig.height = 5, fig.width = 10}
-#| dependson: df-pois
+```{r, glm-better}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
 p_lm = p_pois +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), fill = "#3366ffaa", linetype = 0)
@@ -141,7 +149,10 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 手元のデータを数えて作るのが**経験分布**<br>
 e.g., サイコロを12回投げた結果、学生1000人の身長
 
-```{r distribution, echo = FALSE, fig.height = 4, fig.width = 8}
+```{r, distribution}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 8
 p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
   ggplot() +
   aes(face) +
@@ -177,7 +188,10 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
 
-```{r dbinom, echo = FALSE, fig.height = 3, fig.width = 3}
+```{r, dbinom}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 3
 size = 3L
 p = 0.5
 tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) |>
@@ -209,7 +223,10 @@ k &\in \{0, 1, 2, \ldots, n\}
 試行2: 裏 裏 裏 → $X = 0$<br>
 試行3: **表** 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$
 
-```{r rbinom, echo = FALSE, fig.height = 3, fig.width = 11}
+```{r, rbinom}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
 size = 3L
 p = 0.5
 X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
@@ -313,7 +330,10 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 e.g., コインの表裏、サイコロの出目1–6
 
-```{r dunif, echo = FALSE, fig.height = 4, fig.width = 6}
+```{r, dunif}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
 df_coin = tibble::tibble(X = c("head", "tail"), Prob = c(0.5, 0.5), group = "Coin")
 df_dice = tibble::tibble(X = as.character(seq_len(6L)), Prob = rep(1 / 6, 6), group = "Dice")
 dplyr::bind_rows(df_coin, df_dice) |>
@@ -336,7 +356,10 @@ dplyr::bind_rows(df_coin, df_dice) |>
 
 e.g., コイントスで表が出るまでに何回裏が出るか
 
-```{r geometric, echo = FALSE, fig.height = 4, fig.width = 11}
+```{r, geometric}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
 df = purrr::map_dfr(c(0.2, 0.5, 0.9), function(p) {
   tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
 }) |>
@@ -365,7 +388,10 @@ ggplot(df) +
 
 確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
 
-```{r dbinom-n, echo = FALSE, fig.height = 4, fig.width = 11}
+```{r, dbinom-n}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
 p = 0.25
 df = purrr::map_dfr(2**seq.int(0, 4), function(n) {
   tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
@@ -395,7 +421,10 @@ ggplot(df) +
 
 e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数
 
-```{r dpoisson, echo = FALSE, fig.height = 4, fig.width = 11}
+```{r, dpoisson}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
 lambda = c(1, 5, 10)
 .arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed")
 p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
@@ -443,7 +472,10 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 
 e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔
 
-```{r dexp, echo = FALSE, fig.height = 4, fig.width = 11}
+```{r, dexp}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
 p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   dplyr::mutate(Prob = dexp(x, rate = lambda)) |>
   ggplot() +
@@ -473,7 +505,10 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 
 e.g., メッセージを2つ受信するまでの待ち時間
 
-```{r dgamma, echo = FALSE, fig.height = 4, fig.width = 11}
+```{r, dgamma}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
 p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) |>
   ggplot() +
@@ -501,7 +536,10 @@ shapeパラメータ $k = 1$ のとき指数分布と一致。
 平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
 e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):
 
-```{r gaussian, echo = FALSE, fig.height = 5, fig.width = 11}
+```{r, gaussian}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 11
 ci = qnorm(c(0.005, 0.025, 0.975, 0.995), 50, 10)
 tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
   ggplot() +
@@ -530,7 +568,10 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
 標本平均の反復(**中心極限定理**);
 e.g., 一様分布 [0, 100) から40サンプル
 
-```{r central-limit, echo = FALSE, fig.height = 3, fig.width = 11}
+```{r, central-limit}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
 n = 40L
 X = replicate(10000L, mean(runif(n, 0, 100)))
 purrr::map_dfr(c(10, 100, 1000, 10000), ~ {
@@ -549,7 +590,10 @@ purrr::map_dfr(c(10, 100, 1000, 10000), ~ {
 
 大きい$n$の二項分布
 
-```{r binom-normal, echo = FALSE, fig.height = 3, fig.width = 11}
+```{r, binom-normal}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
 purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
   tibble::tibble(X = seq(0, .x), Prob = dbinom(X, .x, 0.25), n = .x) |>
     dplyr::filter(Prob > 1e-5)
@@ -570,7 +614,10 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
 
 大きい$\lambda$のポアソン分布
 
-```{r poisson-normal, echo = FALSE, fig.height = 2.5, fig.width = 11}
+```{r, poisson-normal}
+#| echo: false
+#| fig.height: 2.5
+#| fig.width: 11
 purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
   tibble::tibble(X = seq(0, 4 * .x), Prob = dpois(X, .x), lambda = .x) |>
     dplyr::filter(Prob > 1e-5)
@@ -588,7 +635,10 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
 
 平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布
 
-```{r gamma-normal, echo = FALSE, fig.height = 4, fig.width = 11}
+```{r, gamma-normal}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
 .guide = guide_legend(reverse = TRUE, label.position = "left", label.hjust = 1)
 tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
   dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) |>
@@ -694,7 +744,8 @@ p1 + geom_bar()       # for discrete values
 🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
    全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
 
-```{r gacha, include = FALSE}
+```{r, gacha}
+#| include: false
 x = rbinom(1000000, 10, 0.01)
 p = ggplot(data.frame(x)) + aes(x) + geom_bar()
 table(x)
@@ -709,7 +760,11 @@ table(x)
 
 → **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
 
-```{r hello, results = "hold", fig.show = "hold", fig.height = 3.5, fig.width = 5}
+```{r, hello}
+#| results: "hold"
+#| fig.show: "hold"
+#| fig.height: 3.5
+#| fig.width: 5
 3 * 14
 ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ```

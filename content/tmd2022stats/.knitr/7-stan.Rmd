@@ -36,13 +36,19 @@ draft = true
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R"}
+```{r, setup-global}
+#| file: "setup.R"
+#| message: !expr 'NA'
+#| include: false
 ```
 
-```{r setup-local, include=FALSE}
+```{r, setup-local}
+#| include: false
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
+Sys.setenv(MAKEFLAGS = "-j1")
 library(cmdstanr)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
@@ -193,7 +199,10 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
   - $\nu \to \infty$ で**正規分布**。だいたいこれでいいらしい。
 - スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
 
-```{r student_t, echo = FALSE, fig.height = 4, fig.width = 9}
+```{r, studentt}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 9
 tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) |>
   dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) |>
   ggplot() + aes(x, Density, group = df) +
@@ -244,7 +253,9 @@ generated quantities {
 }
 ```
 
-```{r stan-lm-generated, include = FALSE, cache.extra = file.mtime("stan/lm-credible.stan")}
+```{r, stan-lm-generated}
+#| include: false
+#| cache.extra: !expr 'file.mtime("stan/lm-credible.stan")'
 n = 300L
 a = 3
 b = -3
@@ -266,7 +277,10 @@ df_quant = draws |>
   dplyr::mutate(x = mydata[["x_tilde"]][readr::parse_number(x)]) |>
   tidyr::pivot_wider(names_from = label, values_from = y)
 ```
-```{r stan-lm-credible, echo = FALSE, fig.height = 4.5, fig.width = 6}
+```{r, stan-lm-credible}
+#| echo: false
+#| fig.height: 4.5
+#| fig.width: 6
 ggplot(df_pois) +
   aes(x) +
   geom_point(aes(y = y), shape = 16L, alpha = 0.5) +

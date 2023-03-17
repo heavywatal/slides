@@ -36,14 +36,20 @@ draft = true
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R"}
+```{r, setup-global}
+#| file: "setup.R"
+#| message: !expr 'NA'
+#| include: false
 ```
 
-```{r setup-local, include=FALSE}
+```{r, setup-local}
+#| include: false
 library(ggplot2)
 library(tibble)
 library(dplyr)
 library(tidyr)
+# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
+Sys.setenv(MAKEFLAGS = "-j1")
 library(cmdstanr)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
@@ -71,7 +77,10 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
   </div>
   <div class="column" style="flex-shrink: 1.4;">
 
-```{r freq-vs-bayes, echo = FALSE, fig.height = 4, fig.width = 4}
+```{r, freq-vs-bayes}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 4
 tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   dplyr::filter(logLik > -1e6) |>
   ggplot() + aes(p, logLik) +
@@ -97,7 +106,10 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
 
 **最尤推定**: 推定値が真の値に近づいていく
 
-```{r coin-frequentist, echo = FALSE, fig.width = 11, fig.height = 3}
+```{r, coin-frequentist}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 3
 size = 1L
 p = 0.5
 X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
@@ -121,7 +133,10 @@ df_rbinom |>
 
 **ベイズ推定**: 確率分布がどんどん尖り、確信が強まる
 
-```{r coin-bayesian, echo = FALSE, fig.width = 11, fig.height = 3}
+```{r, coin-bayesian}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 3
 purrr::map_dfr(c(4, 20, 100, 500), ~{
   k = sum(head(X, .x))
   tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), Density = dbeta(p, k + 1, .x - k + 1))
@@ -146,7 +161,10 @@ purrr::map_dfr(c(4, 20, 100, 500), ~{
 条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率。重要。</span>
 : $\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$
 
-```{r venn, echo = FALSE, fig.width = 6, fig.height = 3}
+```{r, venn}
+#| echo: false
+#| fig.width: 6
+#| fig.height: 3
 make_circle = function(radius, center, n = 100L) {
   tibble::tibble(theta = seq(0, 2 * pi, length.out = n + 1L)[-1]) |>
     dplyr::mutate(x = radius * cos(theta) + center[1],
@@ -222,7 +240,10 @@ ggplot() + aes(x, y) +
 🔰 同様に $\text{Prob}(\lnot I \mid \lnot P)$ 陰性的中率を計算してみよう<br>
 🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう
 
-```{r infection-test, echo = FALSE, eval = FALSE, include = FALSE}
+```{r, infection-test}
+#| echo: false
+#| eval: false
+#| include: false
 sensitivity = 0.9
 specificity = 0.99
 prevalence = 0.003
@@ -271,7 +292,10 @@ devnull = tibble::tibble(
 ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
 投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:
 
-```{r prior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
+```{r, prior-beta}
+#| echo: false
+#| fig.width: 3
+#| fig.height: 3
 size = 1L
 p = 0.5
 X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
@@ -308,7 +332,10 @@ df_beta |>
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
 
-```{r likelihood-binom, echo = FALSE, fig.width = 3, fig.height = 3}
+```{r, likelihood-binom}
+#| echo: false
+#| fig.width: 3
+#| fig.height: 3
 tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
   ggplot() + aes(p, L) +
   geom_line(color = "#3366ff", linewidth = 2) +
@@ -348,7 +375,10 @@ tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r posterior-beta, echo = FALSE, fig.width = 3, fig.height = 3}
+```{r, posterior-beta}
+#| echo: false
+#| fig.width: 3
+#| fig.height: 3
 df_beta |>
   dplyr::filter(i == 4) |>
   ggplot() + aes(p, Density) +
@@ -436,7 +466,10 @@ df_beta |>
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r integrate, echo = FALSE, fig.width = 5, fig.height = 8.2}
+```{r, integrate}
+#| echo: false
+#| fig.width: 5
+#| fig.height: 8.2
 hdi_lowerbound = function(density, ci = 0.95) {
   x = sort(density, decreasing = TRUE)
   cumsum_x = cumsum(x)
@@ -603,7 +636,10 @@ e.g., 半径1の円の面積
 面積4の正方形に400個の一様乱数を打ち込んだら318個が円に乗った:<br>
 $4 \times \frac {318} {400} = 3.18$
 
-```{r circle, echo = FALSE, fig.width = 4, fig.height = 4}
+```{r, circle}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
 n = 100L
 points = tibble(x = runif(n, -1, 1), y = runif(n, -1, 1))
 theta = seq(0, 2 * pi, length.out = 100)
@@ -621,7 +657,10 @@ ggplot(points) + aes(x, y) +
 
 e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。
 
-```{r mcpdf, echo = FALSE, fig.width = 11, fig.height = 6}
+```{r, mcpdf}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 6
 n = 800
 df_point = tibble::tibble(p = runif(n, -0.2, 1.2), Density = runif(n, 0, 5)) |>
   dplyr::mutate(accepted = Density < (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2)
@@ -686,7 +725,10 @@ cowplot::plot_grid(p_pdf, p_accepted, nrow = 1L)
       確率 $r = \frac {L(\theta_\text{new})} {L(\theta)}$ で  $\theta_\text{new}$ を採択
 3.  $\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。
 
-```{r metropolis, echo = FALSE, fig.width = 11, fig.height = 3.5}
+```{r, metropolis}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 3.5
 n_head = 12
 n_total = 20
 dp = 0.02
@@ -726,7 +768,13 @@ df_point |>
 尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
 通ったパラメータ値を集めるといい感じの分布が得られる。
 
-```{r metropolis-trajectory, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.2, fig.width = 12, fig.height = 6}
+```{r, metropolis-trajectory}
+#| echo: false
+#| fig.show: "animate"
+#| animation.hook: "gifski"
+#| interval: 0.2
+#| fig.width: 12
+#| fig.height: 6
 dp = 0.05
 mh_sample = function(n, p0, n_head, n_total, dp) {
   p = p0
@@ -787,7 +835,10 @@ for (i in seq.int(50, 1000, 50)) {
 全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
 が、パラメータ1つの1次元ではご利益はわかりにくい。
 
-```{r propto-lik, echo = FALSE, fig.width = 11, fig.height = 4}
+```{r, propto-lik}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 4
 p_lik = tibble::tibble(p = seq(0, 1, 0.01), Likelihood = dbinom(n_head, n_total, p, log = FALSE)) |>
   ggplot() + aes(p, Likelihood) +
   geom_hline(yintercept = 0) +
@@ -829,7 +880,13 @@ cowplot::plot_grid(p_lik, p_dens, p_hist, nrow = 1L)
 
 e.g., 二次元正規分布。(-2, 2) からスタート。
 
-```{r gibbs, echo = FALSE, fig.show = "animate", animation.hook = "gifski", interval = 0.1, fig.width = 5, fig.height = 5}
+```{r, gibbs}
+#| echo: false
+#| fig.show: "animate"
+#| animation.hook: "gifski"
+#| interval: 0.1
+#| fig.width: 5
+#| fig.height: 5
 gibbs_sample = function(n, rho) {
   x = double(n)
   y = double(n)
@@ -874,7 +931,10 @@ for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
 
 e.g., `chains = 3` 。ほぼ同じところをうろうろ:
 
-```{r chains, echo = FALSE, fig.height = 5, fig.width = 12}
+```{r, chains}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 12
 df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) |>
   dplyr::mutate(data = purrr::map(init, ~{mh_sample(600, .x, 18, 30, dp = 0.02)})) |>
   tidyr::unnest(data) |>
@@ -910,7 +970,10 @@ cowplot::plot_grid(p_trace, p_hist, nrow = 1L, rel_widths = c(4, 1))
 
 e.g., `iter_warmup = 200, iter_sampling = 400` で灰色の部分を捨てる:
 
-```{r warmup, echo = FALSE, fig.height = 5, fig.width = 12}
+```{r, warmup}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 12
 cowplot::plot_grid(
   p_trace + annotate("ribbon", x = c(0, t_warmup), ymin = Inf, ymax = -Inf, alpha = 0.3),
   p_hist %+% (df_trace |> dplyr::mutate(init = as.factor(ifelse(t < t_warmup, NA, init)))),
@@ -927,7 +990,11 @@ cowplot::plot_grid(
 
 e.g., `thin = 5` で5回に1回だけサンプルする:
 
-```{r thin, echo = FALSE, fig.height = 5, fig.width = 7, message = FALSE}
+```{r, thin}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 7
+#| message: false
 p_trace +
   coord_cartesian(ylim = c(0, 1), xlim = c(200, 260)) +
   geom_point(data = function(.x) {dplyr::filter(.x, t %% 5 == 0)}, alpha = 0.6, size = 3, shape = 16)
@@ -974,7 +1041,8 @@ model {
 }
 ```
 
-```{r converge-template, include = FALSE}
+```{r, converge-template}
+#| include: false
 sample_size = 10L
 mydata = list(N = sample_size, x = rep(10L, sample_size))
 myplot_trace = function(stan_file, data) {
@@ -985,13 +1053,28 @@ myplot_trace = function(stan_file, data) {
   bayesplot::mcmc_trace(fit$draws("lambda")) + labs(title = label)
 }
 ```
-```{r converge-yes, echo = FALSE, dependson = -1, cache.extra = tools::md5sum("stan/converge-yes.stan"), message = FALSE, warning = FALSE, results = FALSE}
+```{r, converge-yes}
+#| echo: false
+#| dependson: -1
+#| cache.extra: !expr 'tools::md5sum("stan/converge-yes.stan")'
+#| message: false
+#| warning: false
+#| results: false
 p_yes = myplot_trace("stan/converge-yes.stan", mydata)
 ```
-```{r converge-no, echo = FALSE, dependson = -2, cache.extra = tools::md5sum("stan/converge-no.stan"), message = FALSE, warning = FALSE, results = FALSE}
+```{r, converge-no}
+#| echo: false
+#| dependson: -2
+#| cache.extra: !expr 'tools::md5sum("stan/converge-no.stan")'
+#| message: false
+#| warning: false
+#| results: false
 p_no = myplot_trace("stan/converge-no.stan", mydata)
 ```
-```{r convergence, echo = FALSE, dependson = c(-1, -2), fig.height = 3, fig.width = 11}
+```{r, convergence}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
 cowplot::plot_grid(p_yes, p_no, nrow = 1L)
 ```
 
@@ -1074,7 +1157,8 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 : [CmdStan](https://mc-stan.org/users/interfaces/cmdstan)
   を呼び出し、書き出されたCSVを読み取る。
 
-```{r cmdstanr, include = FALSE}
+```{r, cmdstanr}
+#| include: false
 if (!require(cmdstanr, quietly = TRUE)) {
   install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
   library(cmdstanr)
@@ -1107,7 +1191,7 @@ TODO: `4-bayesian.ipynb`
 表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
 この $p$ をStanで推定してみよう。
 
-```{r stan-binom}
+```{r, stan-binom}
 true_p = 0.7
 N = 40L
 mydata = list(N = N, x = rbinom(N, 1, true_p))
@@ -1161,13 +1245,16 @@ model {
 ## 説明変数なしのベイズ推定: MCMCサンプル
 
 予め実行速度の速い機械語に翻訳(コンパイル):
-```{r stan-binom-model, cache.extra = tools::md5sum("stan/coin.stan")}
+```{r, stan-binom-model}
+#| cache.extra: !expr 'tools::md5sum("stan/coin.stan")'
 model = cmdstan_model("stan/coin.stan")
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
-```{r stan-binom-sample, include = FALSE, dependson = -1L}
+```{r, stan-binom-sample}
+#| include: false
+#| dependson: "stan-binom-model"
 fit = model$sample(mydata, seed = 19937L)
 ```
 ```r
@@ -1185,7 +1272,9 @@ fit = model$sample(mydata)
 `parameters` ブロックに書いた変数の情報が出てくる。<br>
 乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
 
-```{r stan-binom-fit, dependson = -1L, echo = -1L}
+```{r, stan-binom-fit}
+#| dependson: "stan-binom-sample"
+#| echo: -1
 summary_p = fit$summary("p") |> tibble::as_tibble()
 print(fit)
 ```
@@ -1205,7 +1294,10 @@ $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。
 
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
-```{r stan-binom-traceplot, fig.width = 11, fig.height = 4}
+```{r, stan-binom-traceplot}
+#| dependson: "stan-binom-sample"
+#| fig.width: 11
+#| fig.height: 4
 draws = fit$draws()
 params = names(model$variables()$parameters)
 bayesplot::mcmc_trace(draws, pars = params)
@@ -1216,7 +1308,9 @@ bayesplot::mcmc_trace(draws, pars = params)
 
 2--3ステップくらいで自己相関がほぼ消えるので問題なし:
 
-```{r stan-binom-ac, fig.width = 4, fig.height = 4}
+```{r, stan-binom-ac}
+#| fig.width: 4
+#| fig.height: 4
 bayesplot::mcmc_acf_bar(draws, pars = params)
 ```
 
@@ -1226,7 +1320,9 @@ bayesplot::mcmc_acf_bar(draws, pars = params)
 サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
 真の$p$の値も含まれている:
 
-```{r stan-binom-hist, fig.width = 4, fig.height = 4}
+```{r, stan-binom-hist}
+#| fig.width: 4
+#| fig.height: 4
 bayesplot::mcmc_hist(draws, bins = 20, pars = params)
 ```
 

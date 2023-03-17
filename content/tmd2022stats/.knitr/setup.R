@@ -1,6 +1,7 @@
 library(conflicted)
 tidyverse_msg = utils::capture.output(library(tidyverse), type = "message")
 set.seed(24601)
+knitr::opts_chunk$set(error = FALSE)  # stop on errors
 knitr::opts_chunk$set(comment = NA)
 knitr::opts_chunk$set(dev = "ragg_png")
 knitr::opts_chunk$set(fig.retina = 100 / 72)  # change dpi without affecting out.width/height
@@ -27,5 +28,3 @@ options(
 )
 registerS3method("print", "tbl", wtl::printdf)
 registerS3method("print", "tbl_df", wtl::printdf)
-# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-Sys.setenv(MAKEFLAGS = "-j1")

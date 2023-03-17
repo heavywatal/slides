@@ -36,10 +36,14 @@ draft = true
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R"}
+```{r, setup-global}
+#| file: "setup.R"
+#| message: !expr 'NA'
+#| include: false
 ```
 
-```{r setup-local, include=FALSE}
+```{r, setup-local}
+#| include: false
 library(ggplot2)
 library(tibble)
 library(dplyr)
@@ -54,7 +58,11 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
-```{r overdispersion, echo = FALSE, fig.height = 5, fig.width = 6, warning = FALSE}
+```{r, overdispersion}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+#| warning: false
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -92,7 +100,11 @@ tidy_od |>
 「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
 i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
 
-```{r saturated-glmm, echo = FALSE, fig.height = 3, fig.width = 11, warning = FALSE}
+```{r, saturated-glmm}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
+#| warning: false
 df_od |>
   tibble::rowid_to_column("id") |>
   ggplot() + aes(id, y / 8) +
@@ -113,7 +125,11 @@ df_od |>
 その能力値は全個体共通の正規分布に従うと仮定:
 $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
-```{r sigmoid, echo = FALSE, fig.height = 4, fig.width = 11, warning = FALSE}
+```{r, sigmoid}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+#| warning: false
 # tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) |>
 z_hat = wtl::logit(p_hat)
 p_sigmoid =
@@ -148,7 +164,11 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 
 普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
 
-```{r alter-sigma, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
+```{r, alter-sigma}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 11
+#| warning: false
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
 df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) |>
@@ -197,7 +217,11 @@ p_mixed + geom_col(width = 0.4, fill = "#3366ff", alpha = 0.6)
 
 正規分布と二項分布の混ぜ合わせ......?
 
-```{r alter-sigma-z, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
+```{r, alter-sigma-z}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 11
+#| warning: false
 p_z + geom_col(aes(fill = z), width = 0.1) +
   scale_fill_viridis_b(option = "turbo", breaks = breaks)
 
@@ -210,7 +234,11 @@ p_mixed + geom_col(aes(fill = z), width = 0.4) +
 
 パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
 
-```{r before-mixing, echo = FALSE, fig.height = 3.5, fig.width = 11, warning = FALSE}
+```{r, before-mixing}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 11
+#| warning: false
 df_mixed |>
   dplyr::filter(sigma == max(sigma)) |>
   dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf))) |>
@@ -228,7 +256,11 @@ df_mixed |>
 
 <div align="center">
 
-```{r after-mixing, echo = FALSE, fig.height = 3.5, fig.width = 7, warning = FALSE}
+```{r, after-mixing}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 7
+#| warning: false
 p1 = df_mixed |>
   dplyr::filter(sigma == max(sigma)) |>
   ggplot() + aes(y, Density) +

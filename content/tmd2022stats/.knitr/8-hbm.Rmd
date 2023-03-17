@@ -36,13 +36,19 @@ draft = true
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r setup-global, include=FALSE, file = "setup.R"}
+```{r, setup-global}
+#| file: "setup.R"
+#| message: !expr 'NA'
+#| include: false
 ```
 
-```{r setup-local, include=FALSE}
+```{r, setup-local}
+#| include: false
 library(ggplot2)
 library(dplyr)
 library(tidyr)
+# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
+Sys.setenv(MAKEFLAGS = "-j1")
 library(cmdstanr)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
@@ -155,7 +161,11 @@ model {
 ---
 ## 変量効果が入った推定結果
 
-```{r stan-glmm-prep, echo=FALSE, cache.extra = file.mtime("stan/glmm.stan"), message = FALSE, result = FALSE}
+```{r, stan-glmm-prep}
+#| echo: false
+#| cache.extra: !expr 'file.mtime("stan/glmm.stan")'
+#| message: false
+#| result: false
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -176,7 +186,11 @@ draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
 #   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 ```
 
-```{r stan-glmm-print, echo = FALSE, fig.width = 4, fig.height = 3, dependson=-1}
+```{r, stan-glmm-print}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 3
+#| dependson: -1
 print(fit)
 ```
 
@@ -185,7 +199,11 @@ print(fit)
 
 データ生成の真のパラメータ値は $\hat z = 0.5,~\sigma = 3.0$ だった。
 
-```{r stan-glmm, echo = FALSE, fig.width = 11, fig.height = 7, dependson=-2}
+```{r, stan-glmm}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 7
+#| dependson: -2
 p_trace = bayesplot::mcmc_trace(draws, facet_args = list(nrow = 1L)) + coord_flip()
 p_hist = bayesplot::mcmc_hist(draws, facet_args = list(nrow = 1L), bins = 30)
 cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
@@ -210,7 +228,10 @@ TODO: `6-stan-hbm.ipynb`
 y = ae ^ {-bx} - ce ^ {-dx}
 \end{split}\]</div>
 
-```{r non-linear, echo = FALSE, fig.width = 10, fig.height = 5}
+```{r, non-linear}
+#| echo: false
+#| fig.width: 10
+#| fig.height: 5
 expo = function(x, y0, lambda) y0 * exp(- lambda * x)
 
 genfunc = function(params) {
