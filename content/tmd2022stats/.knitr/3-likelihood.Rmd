@@ -429,6 +429,57 @@ get_likelihood(0.2)
 ---
 ## 🔰 分布を当てはめる練習問題
 
+1. データの分布を描いてみる
+1. 理論分布のどれが当てはまりそうか検討する
+1. 理論分布を適当なパラメータで描いてみる
+1. 尤度を計算しつつ擦り寄せる
+
+```{r, distribution-datasets}
+#| include: false
+fs::dir_create("../data")
+
+set.seed(19937)
+n = 600L
+rate = 2.5
+df = tibble::tibble(
+  time = cumsum(rexp(n, rate)),
+  label = sample(LETTERS[1:3], n, replace = TRUE)
+)
+readr::write_tsv(df, "../data/radiation.tsv")
+
+set.seed(19937)
+n = 600L
+trials = 10
+p = 0.1
+df = tibble::tibble(
+  trials,
+  hit = rbinom(n, trials, p)
+)
+readr::write_csv(df, "../data/gacha.csv")
+```
+
+<div class="column-container">
+  <div class="column">
+
+[`radiation.tsv`](data/radiation.tsv)
+```{r, radiation-tsv}
+#| echo: false
+readr::read_tsv("../data/radiation.tsv")
+```
+
+  </div>
+  <div class="column">
+
+[`gacha.csv`](data/gacha.csv)
+```{r, gache-csv}
+#| echo: false
+readr::read_csv("../data/gacha.csv")
+```
+
+  </div>
+</div>
+
+
 
 ---
 ## 参考文献
