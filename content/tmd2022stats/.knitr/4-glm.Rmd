@@ -424,7 +424,7 @@ ggplot(df_weight) + aes(height, weight) +
 | ☔️ 雨 | | 0 | 1 |
 
 <p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
 \end{split}\]</p>
 
@@ -523,7 +523,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 | ☔️ 雨 | | 0 | 1 |
 
 <p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
 \end{split}\]</p>
 
@@ -569,7 +569,7 @@ e.g., ビール売上の温度依存性が天気によって異なる。
 | ☔️ 雨 | 0 |
 
 <p>\[\begin{split}
-y_i &= \mathcal{N}(\mu_i,\sigma^2) \\
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
 \end{split}\]</p>
 
@@ -976,9 +976,8 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
       (Kullback--Leibler情報量を使って導出するらしい)
 
 
-```py
-result = model.fit()
-result.aic
+```{r, print-llf}
+#| ref.label: llf
 ```
 
 ???
@@ -1104,7 +1103,7 @@ print(penguins)
 次の課題を解いてみよう。<br>
 (次ページ以降に解答。まずは自力で。)
 
-1. `boby_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
+1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
 1. 単回帰して、切片と傾きを求める。そして作図。
 1. `species` で色分けして作図。
 1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
