@@ -45,9 +45,6 @@ draft = false
 ```{r, setup-local}
 #| include: false
 library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
@@ -100,7 +97,8 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 #| fig.width: 10
 p_lm = p_pois +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), fill = "#3366ffaa", linetype = 0)
+  ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
+                            fill = "#3366ffaa", linetype = 0)
 # p_lm
 
 df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
@@ -110,7 +108,8 @@ df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
 
 p_poisson = p_pois +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 0.5, group = body_mass), fill = "#3366ffaa", linetype = 0)
+  ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass), df_bars,
+                            fill = "#3366ffaa", linetype = 0)
 # p_poisson
 
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)

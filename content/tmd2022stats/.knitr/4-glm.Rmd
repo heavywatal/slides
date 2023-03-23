@@ -45,9 +45,6 @@ draft = false
 ```{r, setup-local}
 #| include: false
 library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
@@ -156,7 +153,8 @@ p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
 
 p_pois +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
-  ggridges::geom_vridgeline(data = df_bars, aes(x, y, width = density * 0.5, group = x), fill = "#3366ffaa", linetype = 0)
+  ggridges::geom_vridgeline(aes(x, y, width = density * 0.5, group = x),
+    data = df_bars, fill = "#3366ffaa", linetype = 0)
 ```
 
   </div>
@@ -342,7 +340,8 @@ df_wind |>
   modelr::add_predictions(glm_bernoulli, type = "response") |>
   ggplot() + aes(max_wind, bucket_sales) +
   geom_point(alpha = 0.3, shape = 124, size = 6) +
-  ggridges::geom_vridgeline(data = df_bars, aes(x, y, width = density * 6, group = x), fill = "#3366ffaa", linetype = 0) +
+  ggridges::geom_vridgeline(aes(x, y, width = density * 6, group = x),
+    data = df_bars, fill = "#3366ffaa", linetype = 0) +
   geom_line(aes(y = pred), color = "#3366ff") +
   scale_y_continuous(breaks = c(0, 1)) +
   theme_bw(base_size = 20) +
@@ -395,7 +394,8 @@ df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
 
 ggplot(df_weight) + aes(height, weight) +
   geom_point(alpha = 0.5, shape = 16, size = 2) +
-  ggridges::geom_vridgeline(data = df_ridges, aes(width = density * 0.08, group = height), fill = "#3366ffaa", linetype = 0) +
+  ggridges::geom_vridgeline(aes(width = density * 0.08, group = height),
+    data = df_ridges, fill = "#3366ffaa", linetype = 0) +
   stat_smooth(method = lm, formula = y ~ x, se = FALSE) +
   scale_x_continuous(breaks = x_breaks) +
   theme_bw(base_size = 20) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
@@ -486,7 +486,8 @@ dfs = tibble::tribble(
 .arr = grid::arrow(length = grid::unit(0.1, "inches"))
 df_ancova |>
   ggplot() + aes(weather, beer_sales, color = weather) +
-  ggridges::geom_vridgeline(data = df_ridges, aes(width = density * 6, group = weather), fill = "#3366ffaa", linetype = 0) +
+  ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
+    data = df_ridges, fill = "#3366ffaa", linetype = 0) +
   annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#3366ffaa") +
   annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#3366ffaa") +
   annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 6, color = "#3366ffaa") +
@@ -807,7 +808,7 @@ broom::glance(fit)
 #| echo: false
 #| fig.height: 5
 #| fig.width: 9
-models = setNames(, c("gaussian", "poisson")) |> purrr::map(~{
+models = setNames(nm = c("gaussian", "poisson")) |> purrr::map(~{
   glm(num_seeds ~ body_mass, family = .x, data = df_seeds)
 })
 
@@ -829,7 +830,8 @@ p_lm = p_pois +
   labs(title = "gaussian, identity link") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), fill = "#3366ffaa", linetype = 0)
+  ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass),
+    data = df_lm, fill = "#3366ffaa", linetype = 0)
 # p_lm
 
 df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
@@ -843,7 +845,8 @@ p_poisson = p_pois +
   labs(title = "poisson, log link") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 0.5, group = body_mass), fill = "#3366ffaa", linetype = 0)
+  ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass),
+    data = df_bars, fill = "#3366ffaa", linetype = 0)
 # p_poisson
 
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
@@ -887,13 +890,16 @@ p_plant = df_plant |>
 
 p_null = p_plant +
   labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
+    label = labels[["null"]], color = "#3366ff", size = 6)
 p_x = p_plant %+% modelr::add_predictions(df_plant, models$x, type = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
+    label = labels[["x"]], color = "#3366ff", size = 6)
 p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated, type = "response") +
   labs(title = "saturated model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["saturated"]], color = "#3366ff", size = 6)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
+    label = labels[["saturated"]], color = "#3366ff", size = 6)
 
 cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ```
@@ -1072,11 +1078,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 </a>
 
 ```{r, penguins}
-#| echo: -1
 #| results: false
-if (!require(palmerpenguins, quietly = TRUE)) {
-  install.packages("palmerpenguins")
-}
 # install.packages("palmerpenguins")
 library(palmerpenguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
@@ -1261,12 +1263,12 @@ p_bill = panguins_bill_nona |>
 fit1 = glm(bill_depth_mm ~ bill_length_mm, data = panguins_bill_nona)
 fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = panguins_bill_nona)
 fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = panguins_bill_nona)
-p1 = p_bill +
-  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit1, type = "response"), linewidth = 1, color = "#3366ff")
-p2 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit2, type = "response"), linewidth = 1)
-p3 = p_bill + aes(color = species) +
-  geom_line(aes(y = pred), data = modelr::add_predictions(panguins_bill_nona, fit3, type = "response"), linewidth = 1)
+d1 = modelr::add_predictions(panguins_bill_nona, fit1, type = "response")
+d2 = modelr::add_predictions(panguins_bill_nona, fit2, type = "response")
+d3 = modelr::add_predictions(panguins_bill_nona, fit3, type = "response")
+p1 = p_bill + geom_line(aes(y = pred), d1, linewidth = 1, color = "#3366ff")
+p2 = p_bill + aes(color = species) + geom_line(aes(y = pred), d2, linewidth = 1)
+p3 = p_bill + aes(color = species) + geom_line(aes(y = pred), d3, linewidth = 1)
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),

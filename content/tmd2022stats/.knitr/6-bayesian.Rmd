@@ -4,7 +4,7 @@ title = "6. ベイズ推定とMCMC — 統計モデリング実習 2022 TMDU"
 linktitle = "ベイズ推定とMCMC"
 date = 2023-03-25T14:40:00+09:00
 type = "reveal"
-draft = true
+draft = false
 +++
 
 <link rel="stylesheet" href="style.css">
@@ -45,9 +45,6 @@ draft = true
 ```{r, setup-local}
 #| include: false
 library(ggplot2)
-library(tibble)
-library(dplyr)
-library(tidyr)
 # to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
 Sys.setenv(MAKEFLAGS = "-j1")
 library(cmdstanr)
@@ -534,15 +531,15 @@ p_point = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_line(color = "#999999", linewidth = 1) +
-  geom_vline(aes(xintercept = p), data = .map, color = .colors["map"], linewidth = 1) +
-  geom_vline(aes(xintercept = p), data = .med, color = .colors["med"], linewidth = 1) +
-  geom_vline(aes(xintercept = p), data = .eap, color = .colors["eap"], linewidth = 1) +
-  geom_point(aes(y = 0), data = .map, color = .colors["map"], size = 4, shape = 16) +
-  geom_point(aes(y = 0), data = .med, color = .colors["med"], size = 4, shape = 16) +
-  geom_point(aes(y = 0), data = .eap, color = .colors["eap"], size = 4, shape = 16) +
-  ggrepel::geom_text_repel(data = .map, aes(y = 0.25, label = "MAP"), color = .colors["map"], size = 5, nudge_x = -0.08) +
-  ggrepel::geom_text_repel(data = .med, aes(y = 0.45, label = "MED"), color = .colors["med"], size = 5, nudge_x = 0.1) +
-  ggrepel::geom_text_repel(data = .eap, aes(y = 0.25, label = "EAP"), color = .colors["eap"], size = 5, nudge_x = 0.2) +
+  geom_vline(aes(xintercept = p), .map, color = .colors["map"], linewidth = 1) +
+  geom_vline(aes(xintercept = p), .med, color = .colors["med"], linewidth = 1) +
+  geom_vline(aes(xintercept = p), .eap, color = .colors["eap"], linewidth = 1) +
+  geom_point(aes(y = 0), .map, color = .colors["map"], size = 4, shape = 16) +
+  geom_point(aes(y = 0), .med, color = .colors["med"], size = 4, shape = 16) +
+  geom_point(aes(y = 0), .eap, color = .colors["eap"], size = 4, shape = 16) +
+  ggrepel::geom_text_repel(aes(y = 0.25, label = "MAP"), .map, color = .colors["map"], size = 5, nudge_x = -0.08) +
+  ggrepel::geom_text_repel(aes(y = 0.45, label = "MED"), .med, color = .colors["med"], size = 5, nudge_x = 0.1) +
+  ggrepel::geom_text_repel(aes(y = 0.25, label = "EAP"), .eap, color = .colors["eap"], size = 5, nudge_x = 0.2) +
   labs(title = "Point Estimation", x = "Parameter") +
   .theme + theme(panel.grid = element_blank())
 cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
@@ -754,8 +751,10 @@ df_arrow = df_point |>
 .aes = aes(pbegin, lbegin, xend = pend, yend = lend)
 df_point |>
   ggplot() + aes(p, logLik) +
-  geom_segment(data = df_arrow, .aes, linejoin = "mitre", linewidth = 1, position = position_nudge(0, +0.008), arrow = .ar) +
-  geom_segment(data = df_arrow, .aes, linejoin = "mitre", linewidth = 1, position = position_nudge(0, -0.008), arrow = .ar2, alpha = 0.33) +
+  geom_segment(.aes, df_arrow, linejoin = "mitre", linewidth = 1,
+    position = position_nudge(0, +0.008), arrow = .ar) +
+  geom_segment(.aes, df_arrow, linejoin = "mitre", linewidth = 1,
+    position = position_nudge(0, -0.008), arrow = .ar2, alpha = 0.33) +
   geom_point(size = 6, alpha = 0.6, shape = 16) +
   labs(x = expression(theta)) +
   theme_bw(base_size = 18) +
@@ -1157,18 +1156,6 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 : [CmdStan](https://mc-stan.org/users/interfaces/cmdstan)
   を呼び出し、書き出されたCSVを読み取る。
 
-```{r, cmdstanr}
-#| include: false
-if (!require(cmdstanr, quietly = TRUE)) {
-  install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-  library(cmdstanr)
-  install_cmdstan()
-}
-if (!require(bayesplot, quietly = TRUE)) {
-  install.packages("bayesplot")
-  library(bayesplot)
-}
-```
 
 ---
 ## 🔰 とりあえずStanを動かしてみよう
