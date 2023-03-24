@@ -48,11 +48,106 @@ library(ggplot2)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
+
+---
+## ちょっとずつ線形モデルを発展させていく
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="300" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
+をベースに回帰分析の概要を紹介。
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+
+---
+## 有名な確率分布対応関係ふりかえり
+
+<figure style="float: right;">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="270">
+</figure>
+
+離散一様分布
+: コインの表裏、サイコロの出目1–6
+
+幾何分布
+: 成功率pの試行が初めて成功するまでの失敗回数
+
+二項分布
+: 成功率p、試行回数nのうちの成功回数
+
+ポアソン分布
+: 単位時間あたり平均$\lambda$回起こる事象の発生回数
+
+ガンマ分布
+: ポアソン過程でk回起こるまでの待ち時間
+: (k = 1のとき**指数分布**と呼ばれる)
+
+正規分布
+: 確率変数の和、平均値。使い勝手が良く、よく登場する。
+
+
+
+---
+## 何でもかんでも直線あてはめではよろしくない
+
+<img src="./figure/glm-better-1.png" alt="plot of chunk glm-better" width="720" />
+
+- 観察データは常に**正の値**なのに予測が負に突入してない？
+- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
+- **データに合わせた統計モデルを使うとマシ**
+
+
+---
+## ちょっとずつ線形モデルを発展させていく
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="300" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
+をベースに回帰分析の概要を紹介。
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな**確率分布**を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span class="fragment highlight-blue custom bold">個体差</span>などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+
 ---
 ## n個のうちy個生存。二項分布に従......わない！
 
 植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+親1個体あたりの生存数は<span style="color: #0057b7;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
 ```{r, overdispersion}
@@ -60,6 +155,7 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 #| fig.height: 5
 #| fig.width: 6
 #| warning: false
+set.seed(24601)
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3
@@ -79,9 +175,9 @@ label = bquote(hat(p) == .(paste(sprintf("%d/800 = %.2f", sum_y, p_hat))))
 tidy_od |>
   ggplot() + aes(y, count) +
   geom_col(aes(fill = key, width = width, alpha = alpha), position = "identity") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 6) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = oi$skyblue, size = 6) +
   scale_alpha_identity() +
-  scale_fill_manual(values = c(observed = "#333333", expected = "#3366ff")) +
+  scale_fill_manual(values = c(observed = "#333333", expected = oi$skyblue)) +
   coord_cartesian(xlim = c(0, 8)) +
   labs(x = "# survived seeds") +
   theme_bw(base_size = 20) +
@@ -102,10 +198,11 @@ i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個
 #| fig.height: 3
 #| fig.width: 11
 #| warning: false
+color_z = oi$orange
 df_od |>
   tibble::rowid_to_column("id") |>
   ggplot() + aes(id, y / 8) +
-  geom_col(width = 0.6, fill = "#3366ff", alpha = 0.66) +
+  geom_col(width = 0.6, fill = color_z, alpha = 0.66) +
   labs(y = expression(italic(p[i]))) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(),
@@ -129,25 +226,23 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 #| warning: false
 # tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) |>
 z_hat = wtl::logit(p_hat)
-p_sigmoid =
-df_od |>
+p_sigmoid = df_od |>
   ggplot() + aes(z, p) +
-  geom_line(linewidth = 2, alpha = 0.6, color = "#3366ff") +
-  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#3366ff") +
-  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = "#3366ff") +
+  geom_line(linewidth = 2, alpha = 0.6, color = color_z) +
+  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = color_z) +
+  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = color_z) +
   scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
   labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
-p_normal =
-tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 100), Density = dnorm(z, z_hat, sd_ind)) |>
+p_normal = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 100), Density = dnorm(z, z_hat, sd_ind)) |>
   ggplot() + aes(z, Density) +
-  geom_area(fill = "#3366ff", alpha = 0.5) +
-  geom_vline(xintercept = z_hat, color = "#3366ff") +
+  geom_area(fill = color_z, alpha = 0.5) +
+  geom_vline(xintercept = z_hat, color = color_z) +
   scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
   labs(x = expression(italic(z))) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 
 cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 ```
@@ -168,6 +263,7 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 #| warning: false
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
+scale_fill_z = scale_fill_viridis_b(option = "turbo", begin = 0.05, end = 0.95, breaks = breaks)
 df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) |>
   dplyr::mutate(Density = dnorm(z, z_hat, sigma))
 
@@ -177,9 +273,10 @@ p_z = df_z |>
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
   labs(x = expression(italic(z))) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
 
-p_z + geom_col(width = 0.1, fill = "#3366ff", alpha = 0.6)
+p_z + geom_col(width = 0.1, fill = color_z, alpha = 0.6)
 
 df_unmixed = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 20)) |>
   dplyr::mutate(p = wtl::sigmoid(z)) |>
@@ -200,13 +297,14 @@ df_binom = tidyr::crossing(y = seq.int(0, 8)) |> dplyr::mutate(Density = dbinom(
 
 p_mixed = df_mixed |>
   ggplot() + aes(y, Density) +
-  geom_col(data = df_binom, alpha = 0.5) +
+  geom_col(data = df_binom, fill = oi$skyblue, alpha = 0.33) +
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
   labs(x = "# survived seeds") +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
 
-p_mixed + geom_col(width = 0.4, fill = "#3366ff", alpha = 0.6)
+p_mixed + geom_col(width = 0.4, fill = color_z, alpha = 0.66)
 ```
 
 ---
@@ -219,11 +317,8 @@ p_mixed + geom_col(width = 0.4, fill = "#3366ff", alpha = 0.6)
 #| fig.height: 3.5
 #| fig.width: 11
 #| warning: false
-p_z + geom_col(aes(fill = z), width = 0.1) +
-  scale_fill_viridis_b(option = "turbo", breaks = breaks)
-
-p_mixed + geom_col(aes(fill = z), width = 0.4) +
-  scale_fill_viridis_b(option = "turbo", breaks = breaks)
+p_z + geom_col(aes(fill = z)) + scale_fill_z
+p_mixed + geom_col(aes(fill = z), width = 0.4) + scale_fill_z
 ```
 
 ---
@@ -244,11 +339,12 @@ df_mixed |>
   dplyr::ungroup() |>
   ggplot() + aes(y, Density) +
   geom_col(aes(fill = z)) +
-  scale_fill_viridis_b(option = "turbo", breaks = breaks) +
+  scale_fill_z +
   facet_wrap(vars(Z), nrow = 1, labeller = label_both) +
   labs(x = "# survived seeds") +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
 ```
 
 <div align="center">
@@ -262,10 +358,11 @@ p1 = df_mixed |>
   dplyr::filter(sigma == max(sigma)) |>
   ggplot() + aes(y, Density) +
   geom_col(aes(fill = z)) +
-  scale_fill_viridis_b(option = "turbo", breaks = breaks) +
+  scale_fill_z +
   labs(x = "# survived seeds", title = "expected") +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
 
 p2 = tidy_od |>
   dplyr::filter(key == "observed") |>
@@ -273,7 +370,7 @@ p2 = tidy_od |>
   geom_col() +
   labs(x = "# survived seeds", title = "observed") +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         legend.title = element_blank(), legend.position = "top")
 
 cowplot::plot_grid(p1, p2, nrow = 1L)

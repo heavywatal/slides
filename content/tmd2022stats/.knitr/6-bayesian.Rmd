@@ -82,14 +82,14 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   dplyr::filter(logLik > -1e6) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#3366ff") +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#3366ff") +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = oi$skyblue) +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = oi$skyblue) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = "#3366ff", alpha = 0.5) +
+  geom_area(fill = oi$skyblue, alpha = 0.5) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
@@ -121,8 +121,8 @@ df_rbinom |>
   group_by(label) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#3366ff") +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#3366ff") +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = oi$skyblue) +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = oi$skyblue) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -140,7 +140,7 @@ purrr::map_dfr(c(4, 20, 100, 500), ~{
 }) |>
   dplyr::mutate(label = factor(label, levels = unique(label))) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = "#3366ff", alpha = 0.5) +
+  geom_area(fill = oi$skyblue, alpha = 0.5) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -189,7 +189,7 @@ ggplot() + aes(x, y) +
 : $\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$
 : かなり低い確率。Awesomeなビールはほかにもたっくさんある。
 
-<img src="figure/venn-1.png" alt="plot of chunk venn">
+<img src="./figure/venn-1.png" alt="plot of chunk venn" width="432">
 
 
 ---
@@ -309,7 +309,7 @@ df_beta = purrr::map_dfr(c(0, 1, 2, 3, 4, 20, 100, 500), ~{
 df_beta |>
   dplyr::filter(i == 0) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = "#3366ff", alpha = 0.5) +
+  geom_area(fill = oi$skyblue, alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
   labs(title = "Prior") +
   theme_bw(base_size = 18) +
@@ -335,7 +335,7 @@ df_beta |>
 #| fig.height: 3
 tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
   ggplot() + aes(p, L) +
-  geom_line(color = "#3366ff", linewidth = 2) +
+  geom_line(color = oi$skyblue, linewidth = 2) +
   labs(title = "Likelihood") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -346,9 +346,7 @@ tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
   ⨉
   </div>
   <div class="column" style="flex-shrink: 1.0;">
-<p>
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
-</p>
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216">
   </div>
 </div>
 
@@ -379,7 +377,7 @@ tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
 df_beta |>
   dplyr::filter(i == 4) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = "#3366ff", alpha = 0.5) +
+  geom_area(fill = oi$skyblue, alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
   labs(title = "Posterior") +
   theme_bw(base_size = 18) +
@@ -390,17 +388,13 @@ df_beta |>
   $\propto$
   </div>
   <div class="column" style="flex-shrink: 1.0">
-<p>
-<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom">
-</p>
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216">
   </div>
   <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
   ⨉
   </div>
   <div class="column" style="flex-shrink: 1.0;">
-<p>
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta">
-</p>
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216">
   </div>
 </div>
 
@@ -423,7 +417,7 @@ df_beta |>
 
 データを加えるたびに更新していける:
 
-<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian" width="85%">
 
 
 ---
@@ -493,13 +487,13 @@ p_eti = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_line(color = "#999999", linewidth = 1) +
-  geom_area(data = .f, fill = "#3366ff", alpha = 0.5) +
+  geom_area(data = .f, fill = oi$skyblue, alpha = 0.5) +
   geom_area(data = .g, fill = "#333333", alpha = 0.8) +
   annotate("text", x = bound[1], y = 0.7, label = "2.5%", color = "#333333", hjust = 1) +
   annotate("text", x = bound[2], y = 0.7, label = "2.5%", color = "#333333", hjust = 0) +
   scale_x_continuous(breaks = bound, labels = round(bound, 2)) +
   labs(title = "Equal-Tailed Interval (ETI)", x = "Parameter") +
-  .theme + theme(panel.grid.major = element_line(color = "#3366ff"))
+  .theme + theme(panel.grid.major = element_line(color = oi$skyblue))
 
 hdi_lb = hdi_lowerbound(df_density$Density)
 df_hdi = df_density |> dplyr::filter(Density >= hdi_lb)
@@ -507,12 +501,12 @@ range_hdi = df_hdi |> dplyr::reframe(p = range(p)) |> dplyr::pull(p)
 p_hdi = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_area(data = df_hdi, fill = "#3366ff", alpha = 0.5) +
+  geom_area(data = df_hdi, fill = oi$skyblue, alpha = 0.5) +
   geom_line(color = "#999999", linewidth = 1) +
   geom_hline(aes(yintercept = hdi_lb), color = "#444444", linewidth = 1, linetype = "dashed") +
   scale_x_continuous(breaks = range_hdi, labels = round(range_hdi, 2)) +
   labs(title = "Highest Density Interval (HDI)", x = "Parameter") +
-  .theme + theme(panel.grid.major = element_line(color = "#3366ff"))
+  .theme + theme(panel.grid.major = element_line(color = oi$skyblue))
 
 .map = function(.x) {dplyr::slice_max(.x, Density)}
 .med = function(.x) {
@@ -576,8 +570,6 @@ cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
 
 実践的なモデル・事後分布はもっと複雑。<br>
 → コンピュータに頼って数値計算: MCMC
-
-☕️ 休憩 + 質疑応答
 
 
 ---
@@ -643,7 +635,7 @@ theta = seq(0, 2 * pi, length.out = 100)
 ggplot(points) + aes(x, y) +
   annotate("polygon", x = cos(theta), y = sin(theta), fill = "#888888", alpha = 0.5) +
   geom_point(shape = 16, alpha = 0.5, size = 2) +
-  geom_point(data = function(.x) dplyr::filter(.x, x ^ 2 + y ^ 2 < 1), color = "#3366ff", shape = 16, size = 2) +
+  geom_point(data = function(.x) dplyr::filter(.x, x ^ 2 + y ^ 2 < 1), color = oi$skyblue, shape = 16, size = 2) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1), expand = FALSE)  +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -666,7 +658,7 @@ p_pdf = tibble::tibble(p = seq(0, 1, 0.01), Density = (dbeta(p, 4, 6) + dbeta(p,
   geom_hline(yintercept = 0) +
   geom_area(fill = "#000000", alpha = 0.4) +
   geom_point(data = df_point |> filter(!accepted), shape = 16, alpha = 0.5) +
-  geom_point(data = df_point |> filter(accepted), color = "#3366ff", shape = 16, size = 2, alpha = 1) +
+  geom_point(data = df_point |> filter(accepted), color = oi$skyblue, shape = 16, size = 2, alpha = 1) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
@@ -678,7 +670,7 @@ p_accepted = tibble::tibble(p = runif(n), th = dbeta(p, 4, 6) + dbeta(p, 70, 30)
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
   coord_cartesian(xlim = c(-0.2, 1.2)) +
-  geom_histogram(bins = 20, center = 0.5, fill = "#3366ff", alpha = 0.5) +
+  geom_histogram(bins = 20, center = 0.5, fill = oi$skyblue, alpha = 0.5) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
@@ -916,8 +908,8 @@ p_tile = tidyr::crossing(x = seq(-3, 3, 0.05), y = x) |>
 for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
   df_i = head(df_gibbs, i)
   p = p_tile +
-    geom_path(data = df_i, color = "#3366ff", alpha = 0.5, size = 1) +
-    geom_point(data = df_i, color = "#3366ff", alpha = 0.5, shape = 16)
+    geom_path(data = df_i, color = oi$skyblue, alpha = 0.5, size = 1) +
+    geom_point(data = df_i, color = oi$skyblue, alpha = 0.5, shape = 16)
   print(p)
 }
 ```
@@ -1167,9 +1159,6 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 1. モデルをコンパイルして機械語に翻訳 → 実行ファイル
 1. 実行ファイルにデータを渡してMCMCサンプリング
 1. 結果を見る
-
-TODO: `4-bayesian.ipynb`
-を開き、スライド説明に沿って実行しよう。
 
 
 ---

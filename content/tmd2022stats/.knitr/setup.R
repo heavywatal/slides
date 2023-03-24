@@ -6,6 +6,8 @@ knitr::opts_chunk$set(comment = NA)
 knitr::opts_chunk$set(dev = "ragg_png")
 knitr::opts_chunk$set(fig.retina = 100 / 72)  # change dpi without affecting out.width/height
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
+okabeito = grDevices::palette.colors(palette = "Okabe-Ito")[-1]
+oi = as.list(okabeito)
 options(
   devtools.install.args = c("--no-multiarch", "--no-test-load"),
   repos = c(CRAN = "https://cloud.r-project.org/"),
@@ -23,8 +25,8 @@ options(
   readr.show_col_types = FALSE,
   ggplot2.continuous.colour = "viridis",
   ggplot2.continuous.fill = "viridis",
-  ggplot2.discrete.colour = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1]),
-  ggplot2.discrete.fill = as.vector(grDevices::palette.colors(palette = "Okabe-Ito")[-1])
+  ggplot2.discrete.colour = as.vector(okabeito),
+  ggplot2.discrete.fill = as.vector(okabeito)
 )
 registerS3method("print", "tbl", wtl::printdf)
 registerS3method("print", "tbl_df", wtl::printdf)
