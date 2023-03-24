@@ -84,7 +84,9 @@ if (!doNotTrack) {
 2023-03-25 東京医科歯科大学
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
-
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ls</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;input&#34;         &#34;output&#34;        &#34;tidyverse_msg&#34;
+</code></pre>
 </section>
 <section>
 <h2 id="コイントス4回たまたま表が1回だったら">コイントス4回、たまたま表が1回だったら</h2>
@@ -214,7 +216,14 @@ p = 0.6 とかである可能性もまあある。
 <p>分布の形は $a,~b$ によって決まる。<br>
 ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
 投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:</p>
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" />
+<div class="column-container">
+  <div class="column"></div>
+  <div class="column"></div>
+  <div class="column">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+  </div>
+</div>
+
 </section>
 <section>
 <h2 id="表が出る確率のベイズ推定-2-尤度関数">表が出る確率のベイズ推定: 2. 尤度関数</h2>
@@ -224,14 +233,13 @@ p = 0.6 とかである可能性もまあある。
 \end{split}\]</div>
 <p>これに事前分布を掛けて正規化したら事後分布になるはず。</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" />
+  <div class="column"></div>
+  <div class="column">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+&ensp;⨉
   </div>
-  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
-  ⨉
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216">
+  <div class="column">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -249,20 +257,16 @@ p = 0.6 とかである可能性もまあある。
 \end{split}\]</div>
 <p>ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" width="216" />
+  <div class="column">
+<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" width="216" style="vertical-align: middle;">
+&ensp;$\propto$
   </div>
-  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
-  $\propto$
+  <div class="column">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+&ensp;⨉
   </div>
-  <div class="column" style="flex-shrink: 1.0">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216">
-  </div>
-  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
-  ⨉
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216">
+  <div class="column">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -310,7 +314,7 @@ p = 0.6 とかである可能性もまあある。
 </tr>
 </tbody>
 </table>
-<p>共役事前分布を使うことが常に正しいとも限らない。<br>
+<p>共役事前分布を使うことが常に最善とは限らない。<br>
 計算コストがかかっても<strong>無情報事前分布</strong>を使う風潮。</p>
 
 </section>
@@ -328,8 +332,8 @@ p = 0.6 とかである可能性もまあある。
 <dd>値を1点だけ提示</dd>
 <dd>e.g.,<br>
 事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori)<br>
-事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)<br>
-事後中央値 (Posterior <u>Med</u>ian)
+事後中央値 (Posterior <u>Med</u>ian)<br>
+事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)
 </div>
 <div class="column" style="flex-shrink: 1.3;">
 </dd>
@@ -392,7 +396,11 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <section>
 <h2 id="変な分布もモンテカルロ法で扱えそう">変な分布もモンテカルロ法で扱えそう</h2>
 <p>e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。</p>
-<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" width="792" />
+<div>
+<img src="./figure/mcpdf-2.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+$\;\sim\;$
+<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+</div>
 <p>でも、ハズレの値もけっこう引いてしまう。</p>
 
 </section>
@@ -438,7 +446,13 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <h2 id="尤度に比例する事後分布からサンプルしたのと等価">尤度に比例する事後分布からサンプルしたのと等価</h2>
 <p>全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
 が、パラメータ1つの1次元ではご利益はわかりにくい。</p>
-<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" width="792" />
+<div>
+<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+$\;\sim\;$
+<img src="./figure/propto-lik-2.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+$\;\propto\;$
+<img src="./figure/propto-lik-3.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+</div>
 <p>パラメータが複数ある場合は？</p>
 
 </section>
@@ -460,7 +474,7 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <section>
 <h2 id="初期値の影響が消えるまでウォーミングアップ">初期値の影響が消えるまでウォーミングアップ</h2>
 <p>定常分布の山に到達してからが本番。</p>
-<p>e.g., <code>iter_warmup = 200, iter_sampling = 400</code> で灰色の部分を捨てる:</p>
+<p>e.g., <code>iter_warmup = 200, iter_sampling = 600</code> で灰色の部分を捨てる:</p>
 <img src="./figure/warmup-1.png" alt="plot of chunk warmup" width="864" />
 <p>どれくらい長く捨てるべきかは場合による。</p>
 
@@ -480,7 +494,7 @@ $4 \times \frac {318} {400} = 3.18$</p>
 <li>Gelman-Rubin統計量 $\hat R &lt; 1.05$</li>
 <li>Effective Sample Size (ESS) $N_\text{eff} &gt; 100$ per chain</li>
 </ul>
-<img src="./figure/convergence-1.png" alt="plot of chunk convergence" width="792" />
+<img src="./figure/convergence-1.png" alt="plot of chunk convergence" width="864" />
 <p><a href="https://mc-stan.org/docs/cmdstan-guide/diagnose.html"><code>diagnose()</code></a>
 みたいな機能が提供されていれば利用する。</p>
 <p>実行時に<a href="https://mc-stan.org/misc/warnings.html">警告してもらえること</a>もある。</p>
@@ -588,8 +602,42 @@ $4 \times \frac {318} {400} = 3.18$</p>
 
 </section>
 <section>
+<h2 id="cmdstanr-インストールがちょっと特殊">CmdStanR: インストールがちょっと特殊</h2>
+<p>実行の前後にRを再起動してまっさらにすることを推奨。</p>
+<ol>
+<li>C++言語を扱うためのツールを用意。
+<ul>
+<li><img height=22 width=22 src="https://cdn.simpleicons.org/apple"></img>
+macOS: Command Line Tools (<code>xcode-select --install</code>)</li>
+<li><img height=22 width=22 src="https://cdn.simpleicons.org/windows"></img>
+Windows: <a href="https://cran.r-project.org/bin/windows/Rtools/">RTools</a>
+(Rのバージョンに合わせる)</li>
+</ul>
+</li>
+<li><a href="https://mc-stan.org/cmdstanr/">CmdStanR</a>パッケージをインストール。
+(まだCRANに登録されていない):
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;cmdstanr&#34;</span><span class="p">,</span> <span class="n">repos</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;https://mc-stan.org/r-packages/&#34;</span><span class="p">,</span> <span class="nf">getOption</span><span class="p">(</span><span class="s">&#34;repos&#34;</span><span class="p">)))</span>
+</span></span></code></pre></div></li>
+<li>CmdStan本体と可視化パッケージのインストール:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">cmdstanr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">check_cmdstan_toolchain</span><span class="p">(</span><span class="n">fix</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">install_cmdstan</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;bayesplot&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></li>
+</ol>
+<p><a href="https://mc-stan.org/cmdstanr/articles/cmdstanr.html">https://mc-stan.org/cmdstanr/articles/cmdstanr.html</a></p>
+
+</section>
+<section>
 <h2 id="-とりあえずstanを動かしてみよう">🔰 とりあえずStanを動かしてみよう</h2>
-<p>おおまかな流れ:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">cmdstanr</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">bayesplot</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>This is cmdstanr version 0.5.3
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /Users/watal/.cmdstan/cmdstan-2.31.0
+- CmdStan version: 2.31.0
+</code></pre><pre tabindex="0"><code>This is bayesplot version 1.10.0
+</code></pre><p>おおまかな流れ:</p>
 <ol>
 <li>データ準備</li>
 <li>Stan言語でモデルを書く</li>
@@ -605,13 +653,13 @@ $4 \times \frac {318} {400} = 3.18$</p>
 この $p$ をStanで推定してみよう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">true_p</span> <span class="o">=</span> <span class="m">0.7</span>
 </span></span><span class="line"><span class="cl"><span class="n">N</span> <span class="o">=</span> <span class="m">40L</span>
-</span></span><span class="line"><span class="cl"><span class="n">mydata</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">coin_data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">coin_data</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>$N
 [1] 40
 
 $x
- [1] 1 1 0 1 1 0 1 1 1 0 0 1 1 1 1 1 0 1 1 1 1 0 1 0 1 1 0 1 1 1 0 0 1 1 1 0 1 1 0 0
+ [1] 1 0 0 1 1 1 1 0 1 0 1 1 0 1 1 0 1 1 1 1 0 0 1 1 1 1 1 1 1 0 1 1 0 1 1 0 1 1 1 1
 </code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
 
 </section>
@@ -657,7 +705,7 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 <p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/coin.stan&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">mydata</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">coin_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">24601L</span><span class="p">)</span>
 </span></span></code></pre></div><p>いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
 <code>chains</code>, <code>inits</code>, <code>iter_warmup</code>, <code>iter_samples</code>, <code>thin</code>, &hellip;</p>
 <p>問題があったら警告してくれるので<strong>ちゃんと読む</strong>。</p>
@@ -669,11 +717,11 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code> variable   mean median   sd  mad     q5    q95 rhat ess_bulk ess_tail
-     lp__ -27.25 -26.96 0.72 0.32 -28.73 -26.74 1.00     1794     2226
-     p      0.67   0.67 0.07 0.07   0.55   0.79 1.00     1419     1993
+     lp__ -25.62 -25.35 0.70 0.30 -27.00 -25.13 1.00     1949     2646
+     p      0.72   0.72 0.07 0.07   0.60   0.82 1.00     1586     2132
 </code></pre><p>真の値に近い $p \approx 0.7$ が得られた
-(0.55 から
-0.79 である確率が90%)。<br>
+(0.6 から
+0.82 である確率が90%)。<br>
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
 <p><code>lp__</code> はlog posterior(対数事後確率)。後述。</p>
 <p>念のため trace plot も確認しておこう→</p>
@@ -691,7 +739,7 @@ $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
 <h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
 <p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_acf_bar</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
-</span></span></code></pre></div><img src="./figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac" width="288" />
+</span></span></code></pre></div><img src="./figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac" width="432" />
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
