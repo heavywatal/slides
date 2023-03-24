@@ -51,6 +51,11 @@ library(cmdstanr)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
+```{r}
+#| label: label
+ls()
+```
+
 ---
 ## コイントス4回、たまたま表が1回だったら
 
@@ -82,14 +87,14 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   dplyr::filter(logLik > -1e6) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = oi$skyblue) +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = oi$skyblue) +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = palette()[3]) +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = palette()[3]) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = oi$skyblue, alpha = 0.5) +
+  geom_area(fill = palette()[3], alpha = 0.5) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
@@ -103,26 +108,34 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
 
 **最尤推定**: 推定値が真の値に近づいていく
 
+```{r, df-coin-beta}
+#| echo: false
+set.seed(24601)
+coin_X = c(0L, 0L, 0L, 1L, rbinom(496L, 1L, 0.5))
+coin_show = c(4, 20, 100, 500)
+df_coin = purrr::map_dfr(c(0, 1, 2, 3, coin_show), ~{
+  k = sum(head(coin_X, .x))
+  tibble::tibble(
+    i = .x,
+    label = sprintf("%d / %d", k, .x),
+    p = seq(0, 1, 0.01),
+    logLik = dbinom(k, .x, p, log = TRUE),
+    Density = dbeta(p, k + 1, .x - k + 1))
+}) |>
+  dplyr::mutate(label = factor(label, levels = unique(label)))
+```
 ```{r, coin-frequentist}
 #| echo: false
 #| fig.width: 11
 #| fig.height: 3
-size = 1L
-p = 0.5
-X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
-df_rbinom = purrr::map_dfr(c(4, 20, 100, 500), ~{
-  k = sum(head(X, .x))
-  tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), logLik = dbinom(k, .x, p, log = TRUE))
-}) |>
-  # dplyr::bind_rows(tibble(p = seq(0, 1, 0.01), logLik = dbinom(sum(head(X, .x)), .x, p, log = TRUE), Repl = Inf))
+df_coin |>
+  dplyr::filter(i %in% coin_show) |>
   dplyr::filter(logLik > -20) |>
-  dplyr::mutate(label = factor(label, levels = unique(label)))
-df_rbinom |>
   group_by(label) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = oi$skyblue) +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = oi$skyblue) +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = palette()[3]) +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = palette()[3]) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -134,13 +147,10 @@ df_rbinom |>
 #| echo: false
 #| fig.width: 11
 #| fig.height: 3
-purrr::map_dfr(c(4, 20, 100, 500), ~{
-  k = sum(head(X, .x))
-  tibble::tibble(label = sprintf("%d / %d", k, .x), p = seq(0, 1, 0.01), Density = dbeta(p, k + 1, .x - k + 1))
-}) |>
-  dplyr::mutate(label = factor(label, levels = unique(label))) |>
+df_coin |>
+  dplyr::filter(i %in% coin_show) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = oi$skyblue, alpha = 0.5) +
+  geom_area(fill = palette()[3], alpha = 0.5) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -167,7 +177,6 @@ make_circle = function(radius, center, n = 100L) {
     dplyr::mutate(x = radius * cos(theta) + center[1],
                   y = radius * sin(theta) + center[2])
 }
-#grDevices::palette.colors(palette = "Okabe-Ito")
 ggplot() + aes(x, y) +
   geom_polygon(data = make_circle(5, c(0, 0)), fill = "#E69F00", alpha = 0.5) +
   geom_polygon(data = make_circle(1, c(4.3, 0)), fill = "#0072B2", alpha = 0.5) +
@@ -238,7 +247,6 @@ ggplot() + aes(x, y) +
 🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう
 
 ```{r, infection-test}
-#| echo: false
 #| eval: false
 #| include: false
 sensitivity = 0.9
@@ -290,31 +298,49 @@ devnull = tibble::tibble(
 投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:
 
 ```{r, prior-beta}
-#| echo: false
+#| include: false
 #| fig.width: 3
 #| fig.height: 3
-size = 1L
-p = 0.5
-X = c(0L, 0L, 0L, 1L, rbinom(496L, size, p))
-df_beta = purrr::map_dfr(c(0, 1, 2, 3, 4, 20, 100, 500), ~{
-  k = sum(head(X, .x))
-  tibble::tibble(
-    i = .x,
-    label = sprintf("%d / %d", k, .x),
-    p = seq(0, 1, 0.01),
-    Density = dbeta(p, k + 1, .x - k + 1))
-}) |>
-  dplyr::mutate(label = factor(label, levels = unique(label)))
-
-df_beta |>
+prior_beta = df_coin |>
   dplyr::filter(i == 0) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = oi$skyblue, alpha = 0.5) +
+  geom_area(fill = palette()[3], alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
-  labs(title = "Prior") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+prior_beta + labs(title = "Prior")
+```
+```{r, likelihood-binom}
+#| include: false
+#| fig.width: 3
+#| fig.height: 3
+df_coin |>
+  dplyr::filter(i == 4) |>
+  dplyr::mutate(Lik = exp(logLik)) |>
+  ggplot() + aes(p, Lik) +
+  geom_line(color = palette()[3], linewidth = 2) +
+  labs(title = "Likelihood") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
+```{r, posterior-beta}
+#| include: false
+#| fig.width: 3
+#| fig.height: 3
+prior_beta %+%
+  (df_coin |> dplyr::filter(i == 4)) +
+  labs(title = "Posterior")
+```
+
+
+<div class="column-container">
+  <div class="column"></div>
+  <div class="column"></div>
+  <div class="column">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+  </div>
+</div>
+
 
 ---
 ## 表が出る確率のベイズ推定: 2. 尤度関数
@@ -327,26 +353,13 @@ df_beta |>
 これに事前分布を掛けて正規化したら事後分布になるはず。
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
-
-```{r, likelihood-binom}
-#| echo: false
-#| fig.width: 3
-#| fig.height: 3
-tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
-  ggplot() + aes(p, L) +
-  geom_line(color = oi$skyblue, linewidth = 2) +
-  labs(title = "Likelihood") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
-```
-
+  <div class="column"></div>
+  <div class="column">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+&ensp;⨉
   </div>
-  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
-  ⨉
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216">
+  <div class="column">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -368,33 +381,16 @@ tibble::tibble(p = seq(0, 1, 0.02), L = dbinom(1, 4, p)) |>
 ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
-
-```{r, posterior-beta}
-#| echo: false
-#| fig.width: 3
-#| fig.height: 3
-df_beta |>
-  dplyr::filter(i == 4) |>
-  ggplot() + aes(p, Density) +
-  geom_area(fill = oi$skyblue, alpha = 0.5) +
-  coord_cartesian(ylim = c(0, 3)) +
-  labs(title = "Posterior") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
-```
+  <div class="column">
+<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" width="216" style="vertical-align: middle;">
+&ensp;$\propto$
   </div>
-  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
-  $\propto$
+  <div class="column">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+&ensp;⨉
   </div>
-  <div class="column" style="flex-shrink: 1.0">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216">
-  </div>
-  <div class="column" style="flex-shrink: 4.0; padding-top: 3rem;">
-  ⨉
-  </div>
-  <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216">
+  <div class="column">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -432,7 +428,7 @@ df_beta |>
 | 正規分布 | ガンマ分布 |
 | 正規分布 (分散既知) | 正規分布 |
 
-共役事前分布を使うことが常に正しいとも限らない。<br>
+共役事前分布を使うことが常に最善とは限らない。<br>
 計算コストがかかっても**無情報事前分布**を使う風潮。
 
 ---
@@ -451,8 +447,8 @@ df_beta |>
 : 値を1点だけ提示
 : e.g.,<br>
   事後確率最大値 (<u>M</u>aximum <u>A</u> <u>P</u>osteriori)<br>
-  事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)<br>
-  事後中央値 (Posterior <u>Med</u>ian)
+  事後中央値 (Posterior <u>Med</u>ian)<br>
+  事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)
 
   </div>
   <div class="column" style="flex-shrink: 1.3;">
@@ -461,6 +457,7 @@ df_beta |>
 #| echo: false
 #| fig.width: 5
 #| fig.height: 8.2
+#| cache-globals: false
 hdi_lowerbound = function(density, ci = 0.95) {
   x = sort(density, decreasing = TRUE)
   cumsum_x = cumsum(x)
@@ -487,13 +484,13 @@ p_eti = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_line(color = "#999999", linewidth = 1) +
-  geom_area(data = .f, fill = oi$skyblue, alpha = 0.5) +
+  geom_area(data = .f, fill = palette()[3], alpha = 0.5) +
   geom_area(data = .g, fill = "#333333", alpha = 0.8) +
   annotate("text", x = bound[1], y = 0.7, label = "2.5%", color = "#333333", hjust = 1) +
   annotate("text", x = bound[2], y = 0.7, label = "2.5%", color = "#333333", hjust = 0) +
-  scale_x_continuous(breaks = bound, labels = round(bound, 2)) +
+  scale_x_continuous(breaks = bound) +
   labs(title = "Equal-Tailed Interval (ETI)", x = "Parameter") +
-  .theme + theme(panel.grid.major = element_line(color = oi$skyblue))
+  .theme + theme(panel.grid.major = element_line(color = palette()[3]))
 
 hdi_lb = hdi_lowerbound(df_density$Density)
 df_hdi = df_density |> dplyr::filter(Density >= hdi_lb)
@@ -501,12 +498,12 @@ range_hdi = df_hdi |> dplyr::reframe(p = range(p)) |> dplyr::pull(p)
 p_hdi = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_area(data = df_hdi, fill = oi$skyblue, alpha = 0.5) +
+  geom_area(data = df_hdi, fill = palette()[3], alpha = 0.5) +
   geom_line(color = "#999999", linewidth = 1) +
   geom_hline(aes(yintercept = hdi_lb), color = "#444444", linewidth = 1, linetype = "dashed") +
-  scale_x_continuous(breaks = range_hdi, labels = round(range_hdi, 2)) +
+  scale_x_continuous(breaks = range_hdi) +
   labs(title = "Highest Density Interval (HDI)", x = "Parameter") +
-  .theme + theme(panel.grid.major = element_line(color = oi$skyblue))
+  .theme + theme(panel.grid.major = element_line(color = palette()[3]))
 
 .map = function(.x) {dplyr::slice_max(.x, Density)}
 .med = function(.x) {
@@ -520,7 +517,7 @@ p_hdi = df_density |>
     dplyr::mutate(diff = abs(.data$p - sum(p * Density) / sum(Density))) |>
     dplyr::slice_min(diff)
 }
-.colors = setNames(scales::viridis_pal(end = 0.92, option = "viridis")(3), c("map", "med", "eap"))
+.colors = setNames(palette()[2:4], c("map", "med", "eap"))
 p_point = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
@@ -629,13 +626,15 @@ $4 \times \frac {318} {400} = 3.18$
 #| echo: false
 #| fig.width: 4
 #| fig.height: 4
-n = 100L
-points = tibble(x = runif(n, -1, 1), y = runif(n, -1, 1))
-theta = seq(0, 2 * pi, length.out = 100)
-ggplot(points) + aes(x, y) +
-  annotate("polygon", x = cos(theta), y = sin(theta), fill = "#888888", alpha = 0.5) +
-  geom_point(shape = 16, alpha = 0.5, size = 2) +
-  geom_point(data = function(.x) dplyr::filter(.x, x ^ 2 + y ^ 2 < 1), color = oi$skyblue, shape = 16, size = 2) +
+set.seed(19937)
+.n = 200L
+.theta = seq(0, 2 * pi, length.out = 100)
+tibble(x = runif(.n, -1, 1), y = runif(.n, -1, 1)) |>
+  dplyr::mutate(accepted = x ^ 2 + y ^ 2 < 1) |>
+  ggplot() + aes(x, y) +
+  annotate("polygon", x = cos(.theta), y = sin(.theta), fill = "#888888", alpha = 0.4) +
+  geom_point(data = \(x) dplyr::filter(x, !accepted), shape = 16, alpha = 0.5, size = 2) +
+  geom_point(data = \(x) dplyr::filter(x, accepted), color = palette()[3], shape = 16, size = 2) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1), expand = FALSE)  +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -647,18 +646,19 @@ ggplot(points) + aes(x, y) +
 e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。
 
 ```{r, mcpdf}
-#| echo: false
-#| fig.width: 11
-#| fig.height: 6
+#| include: false
+#| fig.width: 5
+#| fig.height: 5
+set.seed(24601)
 n = 800
 df_point = tibble::tibble(p = runif(n, -0.2, 1.2), Density = runif(n, 0, 5)) |>
   dplyr::mutate(accepted = Density < (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2)
 p_pdf = tibble::tibble(p = seq(0, 1, 0.01), Density = (dbeta(p, 4, 6) + dbeta(p, 70, 30)) / 2) |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_area(fill = "#000000", alpha = 0.4) +
-  geom_point(data = df_point |> filter(!accepted), shape = 16, alpha = 0.5) +
-  geom_point(data = df_point |> filter(accepted), color = oi$skyblue, shape = 16, size = 2, alpha = 1) +
+  geom_area(fill = "#000000", alpha = 0.33) +
+  geom_point(data = df_point |> dplyr::filter(!accepted), shape = 16, alpha = 0.5) +
+  geom_point(data = df_point |> dplyr::filter(accepted), color = palette()[3], shape = 16, size = 2, alpha = 1) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
@@ -670,15 +670,22 @@ p_accepted = tibble::tibble(p = runif(n), th = dbeta(p, 4, 6) + dbeta(p, 70, 30)
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
   coord_cartesian(xlim = c(-0.2, 1.2)) +
-  geom_histogram(bins = 20, center = 0.5, fill = oi$skyblue, alpha = 0.5) +
+  geom_histogram(bins = 20, center = 0.5, fill = palette()[3], alpha = 0.66) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(), panel.border = element_blank(),
         axis.text = element_blank())
 
-cowplot::plot_grid(p_pdf, p_accepted, nrow = 1L)
+print(p_pdf)
+print(p_accepted)
 ```
+
+<div>
+<img src="./figure/mcpdf-2.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+$\;\sim\;$
+<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+</div>
 
 でも、ハズレの値もけっこう引いてしまう。
 
@@ -714,22 +721,25 @@ cowplot::plot_grid(p_pdf, p_accepted, nrow = 1L)
       確率 $r = \frac {L(\theta_\text{new})} {L(\theta)}$ で  $\theta_\text{new}$ を採択
 3.  $\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。
 
+```{r, metropolis-globals}
+#| include: false
+n_head = 12
+n_total = 20
+```
 ```{r, metropolis}
 #| echo: false
 #| fig.width: 11
 #| fig.height: 3.5
-n_head = 12
-n_total = 20
-dp = 0.02
-df_point = tibble::tibble(p = seq(0.48, 0.64, dp), logLik = dbinom(n_head, n_total, p, log = TRUE))
-offset = 0.005
+.logLik = function(p) dbinom(n_head, n_total, p, log = TRUE)
+.delta = 0.02
+df_point = tibble::tibble(p = seq(0.48, 0.64, .delta), logLik = .logLik(p))
 df_arrow = df_point |>
   dplyr::group_by(p) |>
   dplyr::mutate(data = purrr::map_dfr(p, ~{
-    pl = p + offset
-    pr = p + dp - offset
-    ll = dbinom(n_head, n_total, pl, log = TRUE)
-    lr = dbinom(n_head, n_total, pr, log = TRUE)
+    pl = p + 0.005
+    pr = p + .delta - 0.005
+    ll = .logLik(pl)
+    lr = .logLik(pr)
     if (ll < lr) {
       data.frame(pbegin = pl, pend = pr, lbegin = ll, lend = lr)
     } else {
@@ -744,9 +754,9 @@ df_arrow = df_point |>
 df_point |>
   ggplot() + aes(p, logLik) +
   geom_segment(.aes, df_arrow, linejoin = "mitre", linewidth = 1,
-    position = position_nudge(0, +0.008), arrow = .ar) +
+    position = position_nudge(0, +0.009), arrow = .ar) +
   geom_segment(.aes, df_arrow, linejoin = "mitre", linewidth = 1,
-    position = position_nudge(0, -0.008), arrow = .ar2, alpha = 0.33) +
+    position = position_nudge(0, -0.009), arrow = .ar2, alpha = 0.33) +
   geom_point(size = 6, alpha = 0.6, shape = 16) +
   labs(x = expression(theta)) +
   theme_bw(base_size = 18) +
@@ -766,13 +776,12 @@ df_point |>
 #| interval: 0.2
 #| fig.width: 12
 #| fig.height: 6
-dp = 0.05
-mh_sample = function(n, p0, n_head, n_total, dp) {
+mh_sample = function(n, p0, n_head, n_total, delta) {
   p = p0
   lp = dbinom(n_head, n_total, p, log = FALSE)
   posterior = p
   for (i in seq.int(2L, n)) {
-    p_new = p + sample(c(-dp, dp), 1)
+    p_new = p + sample(c(-delta, delta), 1)
     lp_new = suppressWarnings(dbinom(n_head, n_total, p_new, log = FALSE))
     if (is.nan(lp_new)) next
     if (lp_new > lp) {
@@ -786,22 +795,27 @@ mh_sample = function(n, p0, n_head, n_total, dp) {
     }
     posterior = c(posterior, p)
   }
-  tibble::tibble(p = posterior) |> tibble::rowid_to_column("t")
+  tibble::tibble(p = round(posterior, 6)) |> tibble::rowid_to_column("t")
 }
-n = 1000
-df_traj = mh_sample(n, 0.1, n_head, n_total, dp = dp)
+.n = 800
+.dp = 0.04
+df_trace = tibble::tibble(init = c(0.06, 0.5, 0.94)) |>
+  dplyr::mutate(data = purrr::map(init, ~{mh_sample(.n, .x, n_head, n_total, delta = .dp)})) |>
+  tidyr::unnest(data)
+
+df_traj = df_trace |> dplyr::filter(init == min(init)) |> dplyr::select(!init)
 
 p_traj = df_traj |>
   ggplot() + aes(t, p) +
-  geom_line() +
-  coord_cartesian(xlim = c(0, n), ylim = c(0, 1)) +
+  geom_line(linewidth = 0.8, alpha = 0.66) +
+  coord_cartesian(xlim = c(0, .n), ylim = c(0, 1)) +
   labs(title = "traceplot", y = expression(theta), x = "iterations") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 p_hist = df_traj |>
   ggplot() + aes(p) +
-  geom_bar(width = 0.6 * dp) +
+  geom_bar() +
   coord_flip(xlim = c(0, 1)) +
   labs(title = "MCMC samples") +
   theme_bw(base_size = 18) +
@@ -810,7 +824,7 @@ p_hist = df_traj |>
 
 ymax = max(ggplot_build(p_hist)$data[[1]]$count)
 
-for (i in seq.int(50, 1000, 50)) {
+for (i in seq.int(40, .n, 40)) {
   df_traj_head = df_traj |> head(i)
   p1 = p_traj %+% df_traj_head
   p2 = p_hist %+% df_traj_head + ylim(c(0, ymax))
@@ -827,39 +841,47 @@ for (i in seq.int(50, 1000, 50)) {
 が、パラメータ1つの1次元ではご利益はわかりにくい。
 
 ```{r, propto-lik}
-#| echo: false
-#| fig.width: 11
-#| fig.height: 4
-p_lik = tibble::tibble(p = seq(0, 1, 0.01), Likelihood = dbinom(n_head, n_total, p, log = FALSE)) |>
-  ggplot() + aes(p, Likelihood) +
+#| include: false
+#| fig.width: 3.5
+#| fig.height: 3.5
+.theme = theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank(), panel.border = element_blank())
+
+p_lik = tibble::tibble(p = seq(0, 1, 0.01), Lik = dbinom(n_head, n_total, p, log = FALSE)) |>
+  ggplot() + aes(p, Lik) +
   geom_hline(yintercept = 0) +
   geom_line(linewidth = 2) +
   labs(title = "Likelihood", x = expression(theta)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
-        panel.grid.major.y = element_blank(), panel.border = element_blank())
+  .theme
 
 p_dens = tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total - n_head)) |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_area(alpha = 0.5) +
   labs(title = "Posterior", x = expression(theta)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
-        panel.grid.major.y = element_blank(), panel.border = element_blank())
+  .theme
 
 p_hist = df_traj |> tail(-100) |>
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
-  geom_bar(width = 0.6 * dp) +
+  geom_bar() +
   coord_cartesian(xlim = c(0, 1)) +
   labs(title = "MCMC samples", x = expression(theta), y = "Count") +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
-        panel.grid.major.y = element_blank(), panel.border = element_blank())
+  .theme
 
-cowplot::plot_grid(p_lik, p_dens, p_hist, nrow = 1L)
+print(p_hist)
+print(p_dens)
+print(p_lik)
 ```
+
+<div>
+<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+$\;\sim\;$
+<img src="./figure/propto-lik-2.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+$\;\propto\;$
+<img src="./figure/propto-lik-3.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+</div>
 
 パラメータが複数ある場合は？
 
@@ -908,8 +930,8 @@ p_tile = tidyr::crossing(x = seq(-3, 3, 0.05), y = x) |>
 for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
   df_i = head(df_gibbs, i)
   p = p_tile +
-    geom_path(data = df_i, color = oi$skyblue, alpha = 0.5, size = 1) +
-    geom_point(data = df_i, color = oi$skyblue, alpha = 0.5, shape = 16)
+    geom_path(data = df_i, color = palette()[3], alpha = 0.66, linewidth = 1) +
+    geom_point(data = df_i, color = palette()[3], alpha = 0.66, shape = 16)
   print(p)
 }
 ```
@@ -926,13 +948,9 @@ e.g., `chains = 3` 。ほぼ同じところをうろうろ:
 #| echo: false
 #| fig.height: 5
 #| fig.width: 12
-df_trace = tibble::tibble(init = c(0.1, 0.5, 0.9)) |>
-  dplyr::mutate(data = purrr::map(init, ~{mh_sample(600, .x, 18, 30, dp = 0.02)})) |>
-  tidyr::unnest(data) |>
-  dplyr::mutate(p = round(p, 2))
 t_warmup = 200
 p_trace = ggplot(df_trace) + aes(t, p, group = init) +
-  geom_path(aes(color = as.factor(init)), size = 1) +
+  geom_path(aes(color = as.factor(init)), linewidth = 0.8) +
   scale_color_discrete(guide = NULL) +
   labs(title = "traceplot", y = expression(theta), x = "iterations") +
   coord_cartesian(ylim = c(0, 1)) +
@@ -959,7 +977,7 @@ cowplot::plot_grid(p_trace, p_hist, nrow = 1L, rel_widths = c(4, 1))
 
 定常分布の山に到達してからが本番。
 
-e.g., `iter_warmup = 200, iter_sampling = 400` で灰色の部分を捨てる:
+e.g., `iter_warmup = 200, iter_sampling = 600` で灰色の部分を捨てる:
 
 ```{r, warmup}
 #| echo: false
@@ -1034,38 +1052,40 @@ model {
 
 ```{r, converge-template}
 #| include: false
-sample_size = 10L
-mydata = list(N = sample_size, x = rep(10L, sample_size))
+convdata = tibble::lst(N = 10L, x = rep(10L, N))
 myplot_trace = function(stan_file, data) {
   model = cmdstan_model(stan_file)
-  fit = model$sample(data = data, show_messages = FALSE, refresh = 0)
+  fit = model$sample(data = data, seed = 24601L, show_messages = FALSE, refresh = 0)
   s = fit$summary(variables = "lambda")
-  label = sprintf("Rhat = %.4f, n_eff = %.1f", s[["rhat"]], s[["ess_bulk"]])
-  bayesplot::mcmc_trace(fit$draws("lambda")) + labs(title = label)
+  stats = sprintf("Rhat = %.4f, N_eff = %.1f", s[["rhat"]], s[["ess_bulk"]])
+  bayesplot::mcmc_trace(fit$draws("lambda")) +
+    scale_color_discrete(guide = "none") +
+    labs(title = ifelse(s[["rhat"]] < 1.05, "Good", "Bad"), subtitle = stats) +
+    theme_bw(base_size = 16) +
+    theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+      axis.title.y = element_blank(), axis.text.y = element_blank())
 }
 ```
 ```{r, converge-yes}
 #| echo: false
-#| dependson: -1
 #| cache.extra: !expr 'tools::md5sum("stan/converge-yes.stan")'
 #| message: false
 #| warning: false
 #| results: false
-p_yes = myplot_trace("stan/converge-yes.stan", mydata)
+p_yes = myplot_trace("stan/converge-yes.stan", convdata)
 ```
 ```{r, converge-no}
 #| echo: false
-#| dependson: -2
 #| cache.extra: !expr 'tools::md5sum("stan/converge-no.stan")'
 #| message: false
 #| warning: false
 #| results: false
-p_no = myplot_trace("stan/converge-no.stan", mydata)
+p_no = myplot_trace("stan/converge-no.stan", convdata)
 ```
 ```{r, convergence}
 #| echo: false
-#| fig.height: 3
-#| fig.width: 11
+#| fig.height: 4
+#| fig.width: 12
 cowplot::plot_grid(p_yes, p_no, nrow = 1L)
 ```
 
@@ -1150,7 +1170,44 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 
 
 ---
+## CmdStanR: インストールがちょっと特殊
+
+実行の前後にRを再起動してまっさらにすることを推奨。
+
+1. C++言語を扱うためのツールを用意。
+    - <img height=22 width=22 src="https://cdn.simpleicons.org/apple"></img>
+      macOS: Command Line Tools (`xcode-select --install`)
+    - <img height=22 width=22 src="https://cdn.simpleicons.org/windows"></img>
+      Windows: [RTools](https://cran.r-project.org/bin/windows/Rtools/)
+      (Rのバージョンに合わせる)
+1. [CmdStanR](https://mc-stan.org/cmdstanr/)パッケージをインストール。
+   (まだCRANに登録されていない):
+    ```r
+    install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+    ```
+1. CmdStan本体と可視化パッケージのインストール:
+    ```r
+    library(cmdstanr)
+    check_cmdstan_toolchain(fix = TRUE)
+    install_cmdstan()
+    install.packages("bayesplot")
+    ```
+
+<https://mc-stan.org/cmdstanr/articles/cmdstanr.html>
+
+---
 ## 🔰 とりあえずStanを動かしてみよう
+
+```r
+library(cmdstanr)
+library(bayesplot)
+```
+```{r, library-bayesplot, message = NA, echo = FALSE}
+cmdstanr_msg = utils::capture.output(cmdstanr:::startup_messages(), type = "message")
+cat(cmdstanr_msg, sep = "\n")
+bayesplot_msg = utils::capture.output(bayesplot:::.onAttach(), type = "message")
+cat(bayesplot_msg[1], sep = "\n")
+```
 
 おおまかな流れ:
 
@@ -1168,10 +1225,12 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 この $p$ をStanで推定してみよう。
 
 ```{r, stan-binom}
+#| echo: -1
+set.seed(19937)
 true_p = 0.7
 N = 40L
-mydata = list(N = N, x = rbinom(N, 1, true_p))
-print(mydata)
+coin_data = list(N = N, x = rbinom(N, 1, true_p))
+print(coin_data)
 ```
 
 Rならlist型、Pythonならdict型にまとめてStanに渡す。
@@ -1229,12 +1288,8 @@ model = cmdstan_model("stan/coin.stan")
 モデルとデータを使ってMCMCサンプリング:
 
 ```{r, stan-binom-sample}
-#| include: false
-#| dependson: "stan-binom-model"
-fit = model$sample(mydata, seed = 19937L)
-```
-```r
-fit = model$sample(mydata)
+#| results: false
+fit = model$sample(coin_data, seed = 24601L)
 ```
 
 いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
@@ -1249,13 +1304,12 @@ fit = model$sample(mydata)
 乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
 
 ```{r, stan-binom-fit}
-#| dependson: "stan-binom-sample"
 #| echo: -1
 summary_p = fit$summary("p") |> tibble::as_tibble()
 print(fit)
 ```
 
-真の値に近い $p \approx 0.7$ が得られた
+真の値に近い $p \approx `r true_p`$ が得られた
 (`r round(summary_p[["q5"]], 2)` から
 `r round(summary_p[["q95"]], 2)` である確率が90%)。<br>
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。
@@ -1271,7 +1325,6 @@ $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。
 どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
 
 ```{r, stan-binom-traceplot}
-#| dependson: "stan-binom-sample"
 #| fig.width: 11
 #| fig.height: 4
 draws = fit$draws()
@@ -1285,8 +1338,8 @@ bayesplot::mcmc_trace(draws, pars = params)
 2--3ステップくらいで自己相関がほぼ消えるので問題なし:
 
 ```{r, stan-binom-ac}
-#| fig.width: 4
-#| fig.height: 4
+#| fig.width: 6
+#| fig.height: 5
 bayesplot::mcmc_acf_bar(draws, pars = params)
 ```
 

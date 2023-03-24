@@ -64,7 +64,7 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: `r palette()[3]`;">確率分布</span>を扱いたい</span>
 
 **一般化線形モデル GLM**
 
@@ -134,7 +134,7 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 
 **一般化線形モデル GLM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ <span class="fragment highlight-blue custom bold">個体差</span>などの変量効果を扱いたい</span>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: `r palette()[2]`;">個体差</span>などの変量効果を扱いたい</span>
 
 **一般化線形混合モデル GLMM**
 
@@ -147,7 +147,7 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ## n個のうちy個生存。二項分布に従......わない！
 
 植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #0057b7;">n=8の二項分布</span>になるはずだけど、<br>
+親1個体あたりの生存数は<span style="color: `r palette()[3]`;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
 ```{r, overdispersion}
@@ -170,14 +170,14 @@ tidy_od = df_od |>
   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) |>
   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") |>
   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
-# label = expression(hat(p) == paste(sprintf("%d/800 = %.2f", sum_y, p_hat)))
 label = bquote(hat(p) == .(paste(sprintf("%d/800 = %.2f", sum_y, p_hat))))
+# Warning: unknown aesthetics: width
 tidy_od |>
   ggplot() + aes(y, count) +
   geom_col(aes(fill = key, width = width, alpha = alpha), position = "identity") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = oi$skyblue, size = 6) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = palette()[3], size = 6) +
   scale_alpha_identity() +
-  scale_fill_manual(values = c(observed = "#333333", expected = oi$skyblue)) +
+  scale_fill_manual(values = c(observed = "#333333", expected = palette()[3])) +
   coord_cartesian(xlim = c(0, 8)) +
   labs(x = "# survived seeds") +
   theme_bw(base_size = 20) +
@@ -197,8 +197,7 @@ i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個
 #| echo: false
 #| fig.height: 3
 #| fig.width: 11
-#| warning: false
-color_z = oi$orange
+color_z = palette()[2]
 df_od |>
   tibble::rowid_to_column("id") |>
   ggplot() + aes(id, y / 8) +
@@ -224,7 +223,6 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 #| fig.height: 4
 #| fig.width: 11
 #| warning: false
-# tibble::tibble(z = seq(-6, 6, 0.1), p = wtl::sigmoid(z)) |>
 z_hat = wtl::logit(p_hat)
 p_sigmoid = df_od |>
   ggplot() + aes(z, p) +
@@ -264,10 +262,13 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
 scale_fill_z = scale_fill_viridis_b(option = "turbo", begin = 0.05, end = 0.95, breaks = breaks)
-df_z = tidyr::crossing(z = seq(min(df_od$z), max(df_od$z), 0.1), sigma) |>
-  dplyr::mutate(Density = dnorm(z, z_hat, sigma))
+.z = seq(min(df_od$z), max(df_od$z), 0.1)
+df_z = tidyr::crossing(sigma, z = .z) |>
+  dplyr::mutate(Density = dnorm(z, z_hat, sigma)) |>
+  dplyr::mutate(sigma = ifelse(sigma > 0.1, sigma, 0))
 
 p_z = df_z |>
+  dplyr::bind_rows(tibble::tibble(sigma = 0, z = .z, Density = ifelse(abs(z - z_hat) < 0.2, Inf, 0))) |>
   ggplot() + aes(z, Density) +
   scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
@@ -276,35 +277,41 @@ p_z = df_z |>
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         legend.position = "none")
 
-p_z + geom_col(width = 0.1, fill = color_z, alpha = 0.6)
+p_z + geom_col(aes(fill = sigma == 0), width = 0.1, alpha = 0.6)
 
 df_unmixed = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 20)) |>
   dplyr::mutate(p = wtl::sigmoid(z)) |>
-  purrr::pmap_dfr(function(z, p) {
+  purrr::pmap(function(z, p) {
     tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))
   }) |>
+  purrr::list_rbind() |>
   dplyr::arrange(y)
 
+df_binom = tibble::tibble(
+  sigma = 0,
+  y = seq.int(0, 8),
+  z = z_hat,
+  Density = dbinom(y, 8, p_hat)
+)
+
 df_mixed = tibble::tibble(sigma) |>
-  dplyr::mutate(data = purrr::map(sigma, ~{
+  dplyr::mutate(data = purrr::map(sigma, \(s) {
     df_unmixed |>
-      dplyr::mutate(w = dnorm(z, z_hat, .x), Density = w * Density) |>
+      dplyr::mutate(w = dnorm(z, z_hat, s), Density = w * Density) |>
       dplyr::mutate(Density = Density / sum(Density))
   })) |>
-  tidyr::unnest(data)
-
-df_binom = tidyr::crossing(y = seq.int(0, 8)) |> dplyr::mutate(Density = dbinom(y, 8, p_hat))
+  tidyr::unnest(data) |>
+  dplyr::bind_rows(df_binom)
 
 p_mixed = df_mixed |>
   ggplot() + aes(y, Density) +
-  geom_col(data = df_binom, fill = oi$skyblue, alpha = 0.33) +
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
   labs(x = "# survived seeds") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         legend.position = "none")
 
-p_mixed + geom_col(width = 0.4, fill = color_z, alpha = 0.66)
+p_mixed + geom_col(aes(fill = sigma == 0), width = 0.4, alpha = 0.66)
 ```
 
 ---
