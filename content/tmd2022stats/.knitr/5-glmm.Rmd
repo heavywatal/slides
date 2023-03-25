@@ -26,7 +26,7 @@ draft = false
 <li><a href="3-likelihood.html">尤度、最尤推定</a>
 <li><a href="4-glm.html">一般化線形モデル (GLM)</a>
 <li class="current-deck"><a href="5-glmm.html">個体差、一般化線形混合モデル (GLMM)</a>
-<li><a href="6-bayesian.html">ベイズ推定とMCMC</a>
+<li><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
 <li><a href="7-stan.html">StanでGLM</a>
 <li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
 </ol>
@@ -386,6 +386,99 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 </div>
 
 ---
+## 🔰 乱数生成で混合分布を実感してみよう
+
+1. Quarto Markdown を用意する
+1. 100個体の能力値zを正規乱数で生成。分布を描く。
+1. 各個体の種子生存率pをシグモイド関数で計算。分布を描く。
+   ```r
+   sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
+   ```
+1. そのpを使って実際の生存種子数を二項分布(n = 8)から生成。分布を描く。
+1. 能力の平均や分散の値を変えたらどうなるか見てみる。
+
+
+---
+## ビールの注文数、再び
+
+```{r, beer-overdispersion-data}
+#| echo: false
+set.seed(24601)
+samplesize = 300L
+lambda = 3
+overdisp = 4
+.n = lambda / (overdisp - 1)
+.p = 1 / overdisp
+df_beer_od = tibble::tibble(X = rnbinom(samplesize, size = .n, prob = .p))
+lambda_obs = mean(df_beer_od$X)
+df_beer_od_exp = tibble::tibble(
+  X = seq.int(0L, 15L),
+  prop = dpois(X, lambda_obs),
+  freq = samplesize * prop
+)
+```
+
+お客さんたちが注文したビールの杯数X。平均`r lambda_obs`杯。<br>
+はいはい、<span style="color: `r palette()[3]`;">ポアソン分布</span>でしょ......
+いや、分散が大きいぞ。
+
+```{r, beer-overdispersion}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
+df_beer_od |>
+  dplyr::count(X, name = "freq") |>
+  ggplot() +
+  aes(X, freq) +
+  geom_col(data = df_beer_od_exp, fill = palette()[3], alpha = 0.66) +
+  geom_col(width = 0.5) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank(), legend.position = "none"
+  )
+```
+
+全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。<br>
+
+🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。
+
+
+---
+## 負の二項分布 $~\text{NB}(n, p)$
+
+成功率pの試行がn回成功するまでの失敗回数X。
+n = 1 のとき幾何分布と一致。
+
+```{r, nbinom}
+#| echo: false
+#| fig.height: 3.8
+#| fig.width: 11
+p = 0.5
+df = purrr::map(seq.int(1, 3), function(n) {
+  tibble::tibble(X = seq.int(0, 10), Prob = dnbinom(X, n, p), n = n)
+}) |>  purrr::list_rbind()
+ggplot(df) +
+  aes(X, Prob) +
+  scale_x_continuous(breaks = df[["X"]]) +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  geom_col() +
+  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
+  labs(title = paste0("p = ", p)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+\\[
+\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\\]
+
+失敗回数ではなく試行回数を変数とする定義もある。
+
+平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+($k \to \infty$でポアソン分布と一致)
+
+---
 ## 一般化線形混合モデル GLMM
 
 **固定効果(fixed effects)** のみ扱っていたGLMを拡張して、<br>
@@ -470,5 +563,5 @@ e.g.,<br>
     - 階層ベイズモデルとして扱うほうが楽
 
 <a href="6-bayesian.html" rel="next" class="readmore">
-6. ベイズ推定、MCMC
+6. ベイズの定理、事後分布、MCMC
 </a>
