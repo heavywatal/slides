@@ -203,6 +203,42 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 </div>
 </section>
 <section>
+<h2 id="-乱数生成で混合分布を実感してみよう">🔰 乱数生成で混合分布を実感してみよう</h2>
+<ol>
+<li>Quarto Markdown を用意する</li>
+<li>100個体の能力値zを正規乱数で生成。分布を描く。</li>
+<li>各個体の種子生存率pをシグモイド関数で計算。分布を描く。
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sigmoid</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gain</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gain</span> <span class="o">*</span> <span class="n">x</span><span class="p">))}</span>
+</span></span></code></pre></div></li>
+<li>そのpを使って実際の生存種子数を二項分布(n = 8)から生成。分布を描く。</li>
+<li>能力の平均や分散の値を変えたらどうなるか見てみる。</li>
+</ol>
+
+</section>
+<section>
+<h2 id="ビールの注文数再び">ビールの注文数、再び</h2>
+<p>お客さんたちが注文したビールの杯数X。平均2.74杯。<br>
+はいはい、<span style="color: #56B4E9;">ポアソン分布</span>でしょ&hellip;&hellip;
+いや、分散が大きいぞ。</p>
+<img src="./figure/beer-overdispersion-1.png" alt="plot of chunk beer-overdispersion" width="432" />
+<p>全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。<br></p>
+<p>🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。</p>
+
+</section>
+<section>
+<h2 id="負の二項分布-textnbn-p">負の二項分布 $~\text{NB}(n, p)$</h2>
+<p>成功率pの試行がn回成功するまでの失敗回数X。
+n = 1 のとき幾何分布と一致。</p>
+<img src="./figure/nbinom-1.png" alt="plot of chunk nbinom" width="792" />
+<p>\[
+\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\]</p>
+<p>失敗回数ではなく試行回数を変数とする定義もある。</p>
+<p>平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+($k \to \infty$でポアソン分布と一致)</p>
+
+</section>
+<section>
 <h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
 <p><strong>固定効果(fixed effects)</strong> のみ扱っていたGLMを拡張して、<br>
 <strong>変量効果(random effect)</strong> を混合したモデル。<br>
