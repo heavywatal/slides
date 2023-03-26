@@ -36,24 +36,16 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r, setup-global}
+```{r, setup-common}
 #| file: "setup.R"
-#| message: !expr 'NA'
 #| include: false
 ```
 
 ```{r, setup-local}
 #| include: false
-library(ggplot2)
 # to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-Sys.setenv(MAKEFLAGS = "-j1")
-library(cmdstanr)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
-```
-
-```{r}
-#| label: label
-ls()
+withr::local_envvar(MAKEFLAGS = "-j1")
+withr::local_package("cmdstanr")
 ```
 
 ---
@@ -131,7 +123,7 @@ df_coin = purrr::map_dfr(c(0, 1, 2, 3, coin_show), ~{
 df_coin |>
   dplyr::filter(i %in% coin_show) |>
   dplyr::filter(logLik > -20) |>
-  group_by(label) |>
+  dplyr::group_by(label) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = palette()[3]) +
@@ -1202,11 +1194,15 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 library(cmdstanr)
 library(bayesplot)
 ```
-```{r, library-bayesplot, message = NA, echo = FALSE}
-cmdstanr_msg = utils::capture.output(cmdstanr:::startup_messages(), type = "message")
-cat(cmdstanr_msg, sep = "\n")
-bayesplot_msg = utils::capture.output(bayesplot:::.onAttach(), type = "message")
-cat(bayesplot_msg[1], sep = "\n")
+```{r, library-bayesplot}
+#| message: !expr 'NA'
+#| echo: false
+withr::with_namespace("cmdstanr", {
+  utils::capture.output(startup_messages(), type = "message") |> cat(sep = "\n")
+})
+withr::with_namespace("bayesplot", {
+  utils::capture.output(.onAttach(), type = "message")[1] |> cat(sep = "\n")
+})
 ```
 
 おおまかな流れ:

@@ -36,19 +36,16 @@ draft = true
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r, setup-global}
+```{r, setup-common}
 #| file: "setup.R"
-#| message: !expr 'NA'
 #| include: false
 ```
 
 ```{r, setup-local}
 #| include: false
-library(ggplot2)
 # to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-Sys.setenv(MAKEFLAGS = "-j1")
-library(cmdstanr)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
+withr::local_envvar(MAKEFLAGS = "-j1")
+withr::local_package("cmdstanr")
 ```
 
 ---
@@ -269,7 +266,7 @@ draws = fit$draws(format = "draws_df") |> print()
 
 .probs = c(lower = 0.025, median = 0.5, upper = 0.975)
 df_quant = draws |>
-  dplyr::summarize(across(starts_with("y_tilde"), quantile, probs = .probs)) |>
+  dplyr::summarize(dplyr::across(starts_with("y_tilde"), quantile, probs = .probs)) |>
   dplyr::mutate(label = names(.probs)) |>
   tidyr::pivot_longer(!label, names_to = "x", values_to = "y") |>
   dplyr::mutate(x = mydata[["x_tilde"]][readr::parse_number(x)]) |>

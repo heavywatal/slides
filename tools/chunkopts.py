@@ -8,6 +8,7 @@ from pathlib import Path
 from wtl import cli
 
 _log = logging.getLogger(__name__)
+used: set[str] = set()
 
 
 def main():
@@ -23,27 +24,41 @@ def main():
 
 
 def sub(line: str):
-    if mobj := re.match(r"^```{r[, ]+([^ ,]+)[ ,]*(.*)}$", line):
-        _log.debug(line)
+    if mobj := re.match(r"^```{(\w+)[, ]*([^,]*)[, ]*(.*)}$", line):
         if (new := repl(mobj)) != line:
-            _log.info(f"\033[31m{line}\033[0m")
-            _log.info(f"\033[32m{new}\033[0m")
+            print(f"\033[31m{line}\033[0m")
+            print(f"\033[32m{new}\033[0m")
+        else:
+            _log.info(line)
         return new
     else:
         return line
 
 
 def repl(mobj: re.Match[str]):
-    label = mobj.group(1)
-    if "_" in label or "." in label:
-        _log.warning(f"chunk label with . or _: {label}")
-    options = to_yaml(mobj.group(2))
-    return f"```{{r, {label}}}{options}"
+    global used
+    header = mobj.group(1).lower()
+    label = mobj.group(2)
+    options = mobj.group(3)
+    if "=" in label:
+        options = (label + ", " + options).strip(", ")
+        label = ""
+    elif re.search(r"[^\w-]", label):
+        _log.warning(f"use-hyphen: {label}")
+    if label:
+        if label in used:
+            _log.warning(f"duplicated: {label}")
+        else:
+            used.add(label)
+        header += f", {label}"
+    else:
+        _log.warning(f"unnamed: {mobj.group(0)}")
+    options = to_yaml(options)
+    return f"```{{{header}}}{options}"
 
 
 def to_yaml(comma_sep_r: str):
-    yaml = re.sub(r"([\w.]+) *= *", r"\n#| \1: ", comma_sep_r)
-    yaml = re.sub(r", *$", "", yaml, flags=re.M)
+    yaml = re.sub(r"[, ]*([\w.]+) *= *", r"\n#| \1: ", comma_sep_r)
     yaml = re.sub(r": (FALSE|TRUE)", lambda m: m.group(0).lower(), yaml)
     yaml = re.sub(r"(?<=: )(-?\d+)L", r"\1", yaml)
     yaml = add_expr(yaml)

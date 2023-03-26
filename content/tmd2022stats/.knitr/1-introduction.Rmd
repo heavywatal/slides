@@ -35,16 +35,13 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r, setup-global}
+```{r, setup-common}
 #| file: "setup.R"
-#| message: !expr 'NA'
 #| include: false
 ```
 
 ```{r, setup-local}
 #| include: false
-library(ggplot2)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 </div><!-- .titlepage -->
@@ -84,9 +81,9 @@ print(ggplot2::diamonds)
 #| echo: false
 dia_cols = c("carat", "depth", "table", "price")
 diamonds |>
-  dplyr::summarize(across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
+  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
   tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
-  dplyr::mutate(across(where(is.numeric), round, digits = 2))
+  dplyr::mutate(dplyr::across(where(is.numeric), round, digits = 2))
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
@@ -151,7 +148,7 @@ Percentile, Quantile (四分位)
 df = tibble::tibble(x = rnorm(200)) |>
   dplyr::filter(abs(x) < 2) |>
   dplyr::mutate(x = x + 3)
-dfq = df |> summarize(
+dfq = df |> dplyr::summarize(
   min = min(x),
   Q1 = quantile(x, 0.25),
   Q2 = quantile(x, 0.50),
@@ -1040,11 +1037,11 @@ install.packages("tidyverse")
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
-
 ```{r, tidyverse-messasge}
 #| echo: false
-#| cache: false
-cat(tidyverse_msg, sep = "\n")
+withr::with_namespace("tidyverse", {
+  cat(tidyverse_attach_message(core), sep = "\n")
+})
 ```
 
 一貫したデザインでデータ解析の様々な工程をカバー
@@ -1464,9 +1461,9 @@ print(VADeaths)
 #| echo: false
 VADeaths |>
   as.data.frame() |>
-  rownames_to_column("age") |>
-  pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") |>
-  separate(age, c("lbound", "ubound"), convert = TRUE)
+  tibble::rownames_to_column("age") |>
+  tidyr::pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") |>
+  tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
 ```
 
 
@@ -1527,6 +1524,11 @@ VADeaths |>
 結合
 : 行方向: `bind_rows()`
 : 列方向: `left_join()`, `inner_join()`, `full_join()`
+
+```{r, library-dplyr}
+#| include: false
+withr::local_package("dplyr")
+```
 
 ---
 ## dplyr 使用例
@@ -1741,7 +1743,7 @@ pivot_wider(table2, names_from = type, values_from = count)
 なんとなく $y = a x + b$ でいい線が引けそう<br>
 &nbsp;
 
-```{r, df-weight}
+```{r, df-linear}
 #| echo: false
 #| cache: true
 set.seed(19937)
@@ -1908,8 +1910,8 @@ p_weight +
 ## `lm()` で直線あてはめしてみる
 
 架空のデータを作る(乱数生成については後述):
-```{r, generate-df-weight}
-#| ref.label: "df-weight"
+```{r, generate-df-linear}
+#| ref.label: df-linear
 #| echo: -1
 #| eval: false
 ```

@@ -36,16 +36,13 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r, setup-global}
+```{r, setup-common}
 #| file: "setup.R"
-#| message: !expr 'NA'
 #| include: false
 ```
 
 ```{r, setup-local}
 #| include: false
-library(ggplot2)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 ---
@@ -61,7 +58,7 @@ X \sim \text{Poisson}(\lambda)
 \end{split}\]</div>
 
 ```{r, df-poisson-playback}
-#| echo: FALSE
+#| echo: false
 set.seed(24601)
 df_rpois = tibble::tibble(X = rpois(50L, 3))
 max_x = 11L
@@ -125,7 +122,8 @@ p_pois +
   <div class="column" style="flex-shrink: 1.0;">
 
 ```{r, df-seeds}
-#| echo: FALSE
+#| include: false
+#| cache.vars: [df_seeds, a, b]
 set.seed(24601)
 n = 300L
 a = 3
@@ -133,10 +131,12 @@ b = -3
 df_seeds = tibble::tibble(
   body_mass = runif(n, 0.4, 1.7),
   num_seeds = rpois(n, exp(a * body_mass + b))
-)
+) |>
+  print()
 ```
 ```{r, glm-poisson}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 5
 #| fig.width: 5
 x_breaks = c(0.5, 1.0, 1.5)
@@ -174,7 +174,8 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 気温も湿度も高いほどビールが売れる架空データ:
 
 ```{r, df-beer}
-#| echo: FALSE
+#| include: false
+#| cache.vars: df_beer
 set.seed(24601)
 n = 200L
 true_coef = c(3, 0.05, 0.006)
@@ -182,10 +183,12 @@ df_beer = tibble::tibble(
   temperature = runif(n, 8, 32),
   humidity = runif(n, 20, 80),
   beer_sales = rpois(n, exp(true_coef[1] + true_coef[2] * temperature + true_coef[3] * humidity))
-)
+) |>
+  print()
 ```
 ```{r, multiple-regression}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 5
 #| fig.width: 10
 glm_multi = glm(beer_sales ~ temperature + humidity, family = poisson, data = df_beer)
@@ -240,7 +243,8 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   <div class="column" style="flex-shrink: 1.0;">
 
 ```{r, df-logistic}
-#| echo: FALSE
+#| include: false
+#| cache.vars: df_logistic
 set.seed(24601)
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
 nrep = 200L
@@ -251,10 +255,12 @@ df_logistic = tibble::tibble(
   p = sigmoid(logit_p),
   y = rbinom(nrep, n, p),
   response = matrix(c(y, n - y), ncol = 2)
-)
+) |>
+  print()
 ```
 ```{r, glm-logistic}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 5
 #| fig.width: 5
 glm_logistic = glm(response ~ x, df_logistic, family = binomial)
@@ -316,15 +322,18 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   <div class="column" style="flex-shrink: 1.0;">
 
 ```{r, df-wind}
-#| echo: FALSE
+#| include: false
+#| cache.vars: df_wind
 set.seed(24601)
 n = 200
 df_wind = tibble::tibble(
   max_wind = runif(n, 0, 40),
-  bucket_sales = rbinom(n, 1L, sigmoid(max_wind - 20, 0.2)) + 0L)
+  bucket_sales = rbinom(n, 1L, sigmoid(max_wind - 20, 0.2)) + 0L) |>
+  print()
 ```
 ```{r, wind}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 4
 #| fig.width: 5
 glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = "binomial")
@@ -370,18 +379,20 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
   <div class="column" style="flex-shrink: 1.0;">
 
 ```{r, df-weight}
-#| echo: FALSE
+#| include: false
+#| cache.vars: df_weight
 set.seed(19937)
 n = 50
 df_weight = tibble::tibble(
   height = rnorm(n, 1.70, 0.05),
   bmi = rnorm(n, 22, 1),
   weight = bmi * (height**2)
-)
+) |>
+  print()
 ```
-
 ```{r, glm-weight}
-#| echo: FALSE
+#| echo: false
+#| cache.vars: []
 #| fig.height: 4
 #| fig.width: 4
 fit = lm(weight ~ height, df_weight)
@@ -432,10 +443,11 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
   <div class="column" style="flex-shrink: 1.3;">
 
 ```{r, df-ancova}
-#| echo: FALSE
+#| include: false
+#| cache.vars: [df_ancova, weather_levels]
 set.seed(19937)
 n = 200L
-true_coef = c(70, 3, 20, -20)
+b = c(70, 3, 20, -20)  # true coef
 weather_levels = c("sunny", "cloudy", "rainy")
 df_ancova = tibble::tibble(
     temperature = runif(n, 8, 32),
@@ -444,11 +456,15 @@ df_ancova = tibble::tibble(
   dplyr::mutate(name = weather, value = 1L) |>
   tidyr::pivot_wider(values_fill = 0L) |>
   dplyr::select(!cloudy) |>
-  dplyr::mutate(beer_sales = rnorm(n, true_coef[1] + true_coef[2] * temperature + true_coef[3] * sunny + true_coef[4] * rainy, 10))
+  dplyr::mutate(mu = b[1] + b[2] * temperature + b[3] * sunny + b[4] * rainy) |>
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10)
+) |>
+  print()
 ```
 
 ```{r, glm-anova}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 4.5
 #| fig.width: 4.5
 lm_anova = lm(beer_sales ~ weather, df_ancova)
@@ -534,6 +550,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 ```{r, glm-ancova}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 4.5
 #| fig.width: 4.5
 lm_ancova = lm(beer_sales ~ temperature + weather, df_ancova)
@@ -581,10 +598,11 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
   <div class="column" style="flex-shrink: 1.3;">
 
 ```{r, df-interact}
-#| echo: FALSE
+#| include: false
+#| cache.vars: [df_interact, weather_levels]
 set.seed(19937)
 n = 200L
-true_coef = c(70, 3, 100, -2)
+b = c(70, 3, 100, -2)  # true coef
 weather_levels = c("sunny", "rainy")
 df_interact = tibble::tibble(
     temperature = runif(n, 8, 32),
@@ -592,11 +610,13 @@ df_interact = tibble::tibble(
   ) |>
   dplyr::mutate(name = weather, value = 1L) |>
   tidyr::pivot_wider(values_fill = 0L) |>
-  dplyr::mutate(mu = true_coef[1] * sunny + true_coef[2] * temperature + true_coef[3] * rainy + true_coef[4] * temperature * rainy) |>
-  dplyr::mutate(beer_sales = rnorm(n, mu, 10))
+  dplyr::mutate(mu = b[1] * sunny + b[2] * temperature + b[3] * rainy + b[4] * temperature * rainy) |>
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10)) |>
+  print()
 ```
 ```{r, interaction}
 #| echo: false
+#| cache.vars: []
 #| fig.height: 4.5
 #| fig.width: 4.5
 lm_int = lm(beer_sales ~ temperature * weather, df_interact)
@@ -690,10 +710,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ```{r, generate-df-weight}
 #| ref.label: df-weight
 #| echo: -1
-```
-```{r, print-df-weight}
-#| echo: FALSE
-print(df_weight)
+#| cache.vars: []
 ```
 
 ---
@@ -702,10 +719,7 @@ print(df_weight)
 ```{r, generate-df-seeds}
 #| ref.label: df-seeds
 #| echo: -1
-```
-```{r, print-df-seeds}
-#| echo: FALSE
-print(df_seeds)
+#| cache.vars: []
 ```
 
 ---
@@ -714,10 +728,7 @@ print(df_seeds)
 ```{r, generate-df-beer}
 #| ref.label: df-beer
 #| echo: -1
-```
-```{r, print-df-beer}
-#| echo: FALSE
-print(df_beer)
+#| cache.vars: []
 ```
 
 ---
@@ -726,10 +737,7 @@ print(df_beer)
 ```{r, generate-df-logistic}
 #| ref.label: df-logistic
 #| echo: -1
-```
-```{r, print-df-logistic}
-#| echo: FALSE
-print(df_logistic)
+#| cache.vars: []
 ```
 
 ---
@@ -740,10 +748,7 @@ print(df_logistic)
 ```{r, generate-df-ancova}
 #| ref.label: df-ancova
 #| echo: -1
-```
-```{r, print-df-ancova}
-#| echo: FALSE
-print(df_ancova)
+#| cache.vars: []
 ```
 
 ---
@@ -753,10 +758,7 @@ print(df_ancova)
 ```{r, generate-df-interact}
 #| ref.label: df-interact
 #| echo: -1
-```
-```{r, print-df-interact}
-#| echo: FALSE
-print(df_interact)
+#| cache.vars: []
 ```
 
 ---
@@ -865,6 +867,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
+#| cache.vars: []
 n = 16L
 true_coef = c(0.1, 0.2)
 df_plant = tibble::tibble(
@@ -918,6 +921,7 @@ cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 #| echo: false
 #| fig.height: 7
 #| fig.width: 7
+#| cache.vars: [df_plant, models, p_plant]
 set.seed(24601)
 n = 120L
 true_coef = c(1, 0.12, 0)
@@ -1077,12 +1081,16 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{r, penguins}
-#| results: false
-# install.packages("palmerpenguins")
+```r
+install.packages("palmerpenguins")
 library(palmerpenguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 print(penguins)
+```
+```{r, penguins}
+#| include: false
+withr::local_package("palmerpenguins")
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 ```
 
 ---
@@ -1250,7 +1258,8 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
-panguins_bill_nona = penguins |> drop_na(bill_length_mm, bill_depth_mm)
+#| cache.vars: []
+panguins_bill_nona = penguins |> tidyr::drop_na(bill_length_mm, bill_depth_mm)
 p_bill = panguins_bill_nona |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +

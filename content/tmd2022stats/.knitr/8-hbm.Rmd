@@ -36,19 +36,16 @@ draft = true
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r, setup-global}
+```{r, setup-common}
 #| file: "setup.R"
-#| message: !expr 'NA'
 #| include: false
 ```
 
 ```{r, setup-local}
 #| include: false
-library(ggplot2)
 # to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-Sys.setenv(MAKEFLAGS = "-j1")
-library(cmdstanr)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
+withr::local_envvar(MAKEFLAGS = "-j1")
+withr::local_package("cmdstanr")
 ```
 
 ---
@@ -163,7 +160,7 @@ model {
 #| echo: false
 #| cache.extra: !expr 'file.mtime("stan/glmm.stan")'
 #| message: false
-#| result: false
+#| results: false
 ninds = 100L
 mu_ind = 0.5
 sd_ind = 3

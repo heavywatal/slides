@@ -36,16 +36,13 @@ draft = false
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
-```{r, setup-global}
+```{r, setup-common}
 #| file: "setup.R"
-#| message: !expr 'NA'
 #| include: false
 ```
 
 ```{r, setup-local}
 #| include: false
-library(ggplot2)
-knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ```
 
 
@@ -53,7 +50,7 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 ## 何でもかんでも直線あてはめではよろしくない
 
 ```{r, df-pois}
-#| echo: FALSE
+#| echo: false
 set.seed(24601)
 n = 300L
 a = 3
@@ -721,7 +718,7 @@ runif(6L)
 ## いろんな乱数を生成・可視化して感覚を掴もう
 
 ```{r, try-prng}
-#| eval: FALSE
+#| eval: false
 n = 100
 x = sample.int(6, n, replace = TRUE)
 x = runif(n, min = 0, max = 1)
@@ -743,7 +740,7 @@ p1 + geom_bar()       # for discrete values
 🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
    全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
 
-```{r, gacha}
+```{r, hidden-gacha}
 #| include: false
 x = rbinom(1000000, 10, 0.01)
 p = ggplot(data.frame(x)) + aes(x) + geom_bar()
@@ -858,7 +855,7 @@ e.g., **Markdown**, reStructuredText, 各種Wiki記法など
 ## Quartoする環境は既に整っているはず
 
 ```{r, versions}
-#| include: FALSE
+#| include: false
 R_version = paste(R.version$major, R.version$minor, sep = ".")
 pkg_versions = installed.packages()[, "Version"]
 RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
@@ -915,9 +912,9 @@ RStudio > New File > Quarto Document...<br>
 : `` ```{r} `` のように始まるブロック。
 : コードの実行結果を最終産物に埋め込める。
 : [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
-  - `echo: FALSE`: コードを非表示。結果は表示。
-  - `eval: FALSE`: コードを実行せず表示だけ。
-  - `include: FALSE`: コードも結果も表示せず、実行だけする。
+  - `echo: false`: コードを非表示。結果は表示。
+  - `eval: false`: コードを実行せず表示だけ。
+  - `include: false`: コードも結果も表示せず、実行だけする。
   - `fig.width: 7, fig.height: 7`: 図の大きさを制御。
 
 まあ細かいことは必要になってから調べるとして...
@@ -951,7 +948,7 @@ RStudio > New File > Quarto Document...<br>
 
 ```{r, try-prng-print}
 #| ref.label: try-prng
-#| eval: FALSE
+#| eval: false
 ```
 
 1. ひとつの分布につきひとつの図を描くqmdに書き換える。
