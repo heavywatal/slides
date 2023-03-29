@@ -22,7 +22,41 @@ registerS3method("print", "tbl", wtl::printdf)
 registerS3method("print", "tbl_df", wtl::printdf)
 knitr::opts_chunk$set(comment = "")
 knitr::opts_chunk$set(dev = "ragg_png")
-knitr::opts_chunk$set(fig.retina = 100 / 72)  # change dpi without affecting out.width/height
+knitr::opts_chunk$set(dpi = 100)
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 set.seed(24601)
+
+.meta = list()
+.meta$course = "統計モデリング実習 2022 TMDU"
+.meta$prefix = normalizePath("..") |> basename()
+.meta$data = "metadata.csv" |>
+  readr::read_csv(locale = readr::locale(tz = "Asia/Tokyo")) |>
+  tibble::rowid_to_column("id") |>
+  dplyr::mutate(
+    infile = fs::dir_ls(glob = "*.Rmd"),
+    outfile = fs::path_ext_set(infile, ".html"),
+    url = file.path(.meta$prefix, outfile),
+    title = stringr::str_glue("{id}. {linktitle} — {.meta$course}"),
+    this = (infile == knitr::current_input()),
+    attr = ifelse(this, " class=\"current-deck\"", ""),
+    li = stringr::str_glue("<li{attr}><a href=\"{outfile}\">{linktitle}</a>")
+  )
+.meta$toc = paste(c("<ol>", .meta$data$li, "</ol>"), collapse = "\n")
+.meta$footnote = .meta$data |> dplyr::filter(this) |>
+  dplyr::pull(date) |> as.Date() |>
+  paste0(" 東京医科歯科大学<br>")
+.meta$next_link = '<a href="{outfile}" class="readmore">\n{id}. {linktitle}\n</a>' |>
+  stringr::str_glue(.envir = dplyr::filter(.meta$data, id == id[this] + 1))
+.meta$front_matter = .meta$data |>
+  dplyr::filter(this) |>
+  dplyr::select(url, linktitle, title, date, draft) |>
+  dplyr::mutate(
+    css = "style.css",
+    dpi = knitr::opts_chunk$get("dpi") |> as.integer() |> dplyr::na_if(72L)
+  ) |>
+  wtl::toTOML()
+
+readr::read_file("header.md") |>
+  stringr::str_glue(.envir = .meta) |>
+  cat()

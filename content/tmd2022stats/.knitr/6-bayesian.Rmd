@@ -1,46 +1,8 @@
-+++
-url = "tmd2022stats/6-bayesian.html"
-title = "6. ベイズの定理、事後分布、MCMC — 統計モデリング実習 2022 TMDU"
-linktitle = "ベイズの定理、事後分布、MCMC"
-date = 2023-03-25T14:40:00+09:00
-type = "reveal"
-draft = false
-+++
-
-<link rel="stylesheet" href="style.css">
-
-# [統計モデリング実習 2022 TMDU](.)
-
-<div class="author">
-岩嵜 航 (Watal M. Iwasaki, PhD)
-</div>
-
-<div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
-(Graduate School of Life Sciences, Tohoku University)
-</div>
-
-<ol>
-<li><a href="1-introduction.html">導入、直線回帰</a>
-<li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
-<li><a href="3-likelihood.html">尤度、最尤推定</a>
-<li><a href="4-glm.html">一般化線形モデル (GLM)</a>
-<li><a href="5-glmm.html">個体差、一般化線形混合モデル (GLMM)</a>
-<li class="current-deck"><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
-<li><a href="7-stan.html">StanでGLM</a>
-<li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
-</ol>
-
-<div class="footnote">
-2023-03-25 東京医科歯科大学
-<a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
-</div>
-
 ```{r, setup-common}
 #| file: "setup.R"
-#| include: false
+#| echo: false
+#| results: asis
 ```
-
 ```{r, setup-local}
 #| include: false
 # to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
@@ -190,7 +152,7 @@ ggplot() + aes(x, y) +
 : $\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$
 : かなり低い確率。Awesomeなビールはほかにもたっくさんある。
 
-<img src="./figure/venn-1.png" alt="plot of chunk venn" width="432">
+<img src="./figure/venn-1.png" alt="plot of chunk venn">
 
 
 ---
@@ -329,7 +291,7 @@ prior_beta %+%
   <div class="column"></div>
   <div class="column"></div>
   <div class="column">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -347,11 +309,11 @@ prior_beta %+%
 <div class="column-container">
   <div class="column"></div>
   <div class="column">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
 &ensp;⨉
   </div>
   <div class="column">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -374,15 +336,15 @@ prior_beta %+%
 
 <div class="column-container">
   <div class="column">
-<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
 &ensp;$\propto$
   </div>
   <div class="column">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
 &ensp;⨉
   </div>
   <div class="column">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -674,9 +636,9 @@ print(p_accepted)
 ```
 
 <div>
-<img src="./figure/mcpdf-2.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+<img src="./figure/mcpdf-2.png" alt="plot of chunk mcpdf" style="vertical-align: middle;">
 $\;\sim\;$
-<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" style="vertical-align: middle;">
 </div>
 
 でも、ハズレの値もけっこう引いてしまう。
@@ -687,7 +649,7 @@ $\;\sim\;$
 
 (N次元球の体積 / N次元の立方体) はゼロに近づいていく。
 
-<img src="figure/circle-1.png" width="210" align="right">
+<img src="figure/circle-1.png" align="right">
 
 - 2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$
 - 3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$
@@ -868,11 +830,11 @@ print(p_lik)
 ```
 
 <div>
-<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
 $\;\sim\;$
-<img src="./figure/propto-lik-2.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+<img src="./figure/propto-lik-2.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
 $\;\propto\;$
-<img src="./figure/propto-lik-3.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+<img src="./figure/propto-lik-3.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
 </div>
 
 パラメータが複数ある場合は？
@@ -1012,7 +974,9 @@ p_trace +
 - Gelman-Rubin統計量 $\hat R < 1.05$
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
-```{cat, engine.opts = list(file = "stan/converge-yes.stan"), cache.rebuild = !file.exists("stan/converge-yes.stan")}
+```{cat, converge-yes-stan}
+#| engine.opts: !expr 'list(file = "stan/converge-yes.stan")'
+#| cache.rebuild: !expr '!file.exists("stan/converge-yes.stan")'
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1026,7 +990,9 @@ model {
   x ~ poisson(lambda);
 }
 ```
-```{cat, engine.opts = list(file = "stan/converge-no.stan"), cache.rebuild = !file.exists("stan/converge-no.stan")}
+```{cat, converge-no-stan}
+#| engine.opts: !expr 'list(file = "stan/converge-no.stan")'
+#| cache.rebuild: !expr '!file.exists("stan/converge-no.stan")'
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1059,19 +1025,13 @@ myplot_trace = function(stan_file, data) {
 }
 ```
 ```{r, converge-yes}
-#| echo: false
+#| include: false
 #| cache.extra: !expr 'tools::md5sum("stan/converge-yes.stan")'
-#| message: false
-#| warning: false
-#| results: false
 p_yes = myplot_trace("stan/converge-yes.stan", convdata)
 ```
 ```{r, converge-no}
-#| echo: false
+#| include: false
 #| cache.extra: !expr 'tools::md5sum("stan/converge-no.stan")'
-#| message: false
-#| warning: false
-#| results: false
 p_no = myplot_trace("stan/converge-no.stan", convdata)
 ```
 ```{r, convergence}
@@ -1238,7 +1198,10 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 別ファイルに書いておく。
 e.g., `coin.stan`:
 
-```{cat, engine.opts = list(file = "stan/coin.stan"), class.source = "stan"}
+```{cat, coin-stan}
+#| engine.opts: !expr 'list(file = "stan/coin.stan")'
+#| cache.rebuild: !expr '!file.exists("stan/coin.stan")'
+#| lang: stan
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1400,7 +1363,4 @@ target += normal_lpdf(x | theta, 1.0);    // likelihood
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
 
-
-<a href="7-stan.html" rel="next" class="readmore">
-7. StanでGLM
-</a>
+`r .meta$next_link`

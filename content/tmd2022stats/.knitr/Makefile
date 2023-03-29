@@ -8,7 +8,7 @@ KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 all: ${KNITTED}
 	@:
 
-${DESTINATION}/%.md : %.Rmd
+${DESTINATION}/%.md: %.Rmd setup.R metadata.csv header.md
 	Rscript --no-init-file -e "wtl::exec_knit('$<', '$@')"
 
 clean:
