@@ -3,15 +3,9 @@
 <head prefix="og: http://ogp.me/ns#">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<title>5. 一般化線形混合モデルGLMM — 統計モデリング実習 2022 TMDU</title>
-<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
-<script defer src="/slides/lib/reveal.js/reveal.js"></script>
-<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
-<script defer src="/slides/lib/reveal-initialize.js"></script>
-<link rel="stylesheet" href="/slides/css/theme-reveal.css">
-<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<title>5. 個体差、一般化線形混合モデル (GLMM) — 統計モデリング実習 2022 TMDU</title>
 <meta name="author" content="Watal M. Iwasaki">
-<meta property="og:title" content="5. 一般化線形混合モデルGLMM — 統計モデリング実習 2022 TMDU">
+<meta property="og:title" content="5. 個体差、一般化線形混合モデル (GLMM) — 統計モデリング実習 2022 TMDU">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://heavywatal.github.io/slides/tmd2022stats/5-glmm.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
@@ -44,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 </style>
 
-
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
 <script>
 var doNotTrack = false;
@@ -55,13 +48,24 @@ if (!doNotTrack) {
 	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
 }
 </script>
-
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="reveal">
 <div class="slides">
 <section>
-<link rel="stylesheet" href="style.css">
 <h1 id="統計モデリング実習-2022-tmdu"><a href=".">統計モデリング実習 2022 TMDU</a></h1>
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -81,7 +85,7 @@ if (!doNotTrack) {
 <li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
 </ol>
 <div class="footnote">
-2023-03-18 東京医科歯科大学
+2023-03-25 東京医科歯科大学<br>
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
@@ -129,7 +133,7 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
-<img src="./figure/glm-better-1.png" alt="plot of chunk glm-better" width="720" />
+<img src="./figure/glm-better-1.png" alt="plot of chunk glm-better">
 <ul>
 <li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
 <li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
@@ -161,14 +165,15 @@ if (!doNotTrack) {
 <p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
 親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？</p>
-<img src="./figure/overdispersion-1.png" alt="plot of chunk overdispersion" width="432" />
+<p><img src="./figure/overdispersion-1.png" alt="plot of chunk overdispersion"></p>
+
 </section>
 <section>
 <h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
 <p>各個体の生存率$p_i$をそのままパラメータにすると<strong>過剰適合</strong>。<br>
 「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
 i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから&hellip;&hellip;</p>
-<img src="./figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm" width="792" />
+<p><img src="./figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm"></p>
 <p>個体の生存能力をもっと少ないパラメータで表現できないか？</p>
 
 </section>
@@ -177,7 +182,7 @@ i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個
 <p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
 その能力値は全個体共通の正規分布に従うと仮定:
 $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
-<img src="./figure/sigmoid-1.png" alt="plot of chunk sigmoid" width="792" />
+<p><img src="./figure/sigmoid-1.png" alt="plot of chunk sigmoid"></p>
 <p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
 <p>前者は標本平均 $\hat p$ から求まるとして、後者どうする？</p>
 
@@ -185,21 +190,21 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 <section>
 <h2 id="個体能力のばらつき-sigma-が大きいと両端が増える">個体能力のばらつき $\sigma$ が大きいと両端が増える</h2>
 <p>普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。</p>
-<p><img src="./figure/alter-sigma-1.png" alt="plot of chunk alter-sigma" width="792" /><img src="./figure/alter-sigma-2.png" alt="plot of chunk alter-sigma" width="792" /></p>
+<p><img src="./figure/alter-sigma-1.png" alt="plot of chunk alter-sigma"><img src="./figure/alter-sigma-2.png" alt="plot of chunk alter-sigma"></p>
 
 </section>
 <section>
 <h2 id="zの値で色分けしてみると想像しやすい">zの値で色分けしてみると想像しやすい</h2>
 <p>正規分布と二項分布の混ぜ合わせ&hellip;&hellip;?</p>
-<p><img src="./figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z" width="792" /><img src="./figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z" width="792" /></p>
+<p><img src="./figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z"><img src="./figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z"></p>
 
 </section>
 <section>
 <h2 id="混合分布ただの二項分布よりも良いあてはまり">混合分布。ただの二項分布よりも良いあてはまり。</h2>
 <p>パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。</p>
-<img src="./figure/before-mixing-1.png" alt="plot of chunk before-mixing" width="792" />
+<p><img src="./figure/before-mixing-1.png" alt="plot of chunk before-mixing"></p>
 <div align="center">
-<img src="./figure/after-mixing-1.png" alt="plot of chunk after-mixing" width="504" />
+<p><img src="./figure/after-mixing-1.png" alt="plot of chunk after-mixing"></p>
 </div>
 </section>
 <section>
@@ -220,7 +225,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 <p>お客さんたちが注文したビールの杯数X。平均2.74杯。<br>
 はいはい、<span style="color: #56B4E9;">ポアソン分布</span>でしょ&hellip;&hellip;
 いや、分散が大きいぞ。</p>
-<img src="./figure/beer-overdispersion-1.png" alt="plot of chunk beer-overdispersion" width="432" />
+<p><img src="./figure/beer-overdispersion-1.png" alt="plot of chunk beer-overdispersion"></p>
 <p>全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。<br></p>
 <p>🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。</p>
 
@@ -229,7 +234,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 <h2 id="負の二項分布-textnbn-p">負の二項分布 $~\text{NB}(n, p)$</h2>
 <p>成功率pの試行がn回成功するまでの失敗回数X。
 n = 1 のとき幾何分布と一致。</p>
-<img src="./figure/nbinom-1.png" alt="plot of chunk nbinom" width="792" />
+<p><img src="./figure/nbinom-1.png" alt="plot of chunk nbinom"></p>
 <p>\[
 \text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \]</p>
@@ -375,7 +380,7 @@ Aさんの固定効果を推定できても、Zさんの予測には使えない
 </ul>
 </li>
 </ul>
-<a href="6-bayesian.html" rel="next" class="readmore">
+<a href="6-bayesian.html" class="readmore">
 6. ベイズの定理、事後分布、MCMC
 </a>
 

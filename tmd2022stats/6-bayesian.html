@@ -4,12 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <title>6. ベイズの定理、事後分布、MCMC — 統計モデリング実習 2022 TMDU</title>
-<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
-<script defer src="/slides/lib/reveal.js/reveal.js"></script>
-<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
-<script defer src="/slides/lib/reveal-initialize.js"></script>
-<link rel="stylesheet" href="/slides/css/theme-reveal.css">
-<script defer src="/slides/lib/reload-img-onclick.js"></script>
 <meta name="author" content="Watal M. Iwasaki">
 <meta property="og:title" content="6. ベイズの定理、事後分布、MCMC — 統計モデリング実習 2022 TMDU">
 <meta property="og:type" content="article">
@@ -44,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 </style>
 
-
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
 <script>
 var doNotTrack = false;
@@ -55,13 +48,24 @@ if (!doNotTrack) {
 	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
 }
 </script>
-
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="reveal">
 <div class="slides">
 <section>
-<link rel="stylesheet" href="style.css">
 <h1 id="統計モデリング実習-2022-tmdu"><a href=".">統計モデリング実習 2022 TMDU</a></h1>
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -81,7 +85,7 @@ if (!doNotTrack) {
 <li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
 </ol>
 <div class="footnote">
-2023-03-25 東京医科歯科大学
+2023-03-25 東京医科歯科大学<br>
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
@@ -108,7 +112,7 @@ p = 0.6 とかである可能性もまあある。
 <div class="column" style="flex-shrink: 1.4;">
 </dd>
 </dl>
-<p><img src="./figure/freq-vs-bayes-1.png" alt="plot of chunk freq-vs-bayes" width="288" /><img src="./figure/freq-vs-bayes-2.png" alt="plot of chunk freq-vs-bayes" width="288" /></p>
+<p><img src="./figure/freq-vs-bayes-1.png" alt="plot of chunk freq-vs-bayes"><img src="./figure/freq-vs-bayes-2.png" alt="plot of chunk freq-vs-bayes"></p>
   </div>
 </div>
 
@@ -116,9 +120,10 @@ p = 0.6 とかである可能性もまあある。
 <section>
 <h2 id="コイントスの回数が増えていったら">コイントスの回数が増えていったら</h2>
 <p><strong>最尤推定</strong>: 推定値が真の値に近づいていく</p>
-<img src="./figure/coin-frequentist-1.png" alt="plot of chunk coin-frequentist" width="792" />
+<p><img src="./figure/coin-frequentist-1.png" alt="plot of chunk coin-frequentist"></p>
 <p><strong>ベイズ推定</strong>: 確率分布がどんどん尖り、確信が強まる</p>
-<img src="./figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian" width="792" />
+<p><img src="./figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian"></p>
+
 </section>
 <section>
 <h2 id="確率おさらい">確率おさらい</h2>
@@ -130,8 +135,7 @@ p = 0.6 とかである可能性もまあある。
 <dt>条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率。重要。</span></dt>
 <dd>$\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$</dd>
 </dl>
-<img src="./figure/venn-1.png" alt="plot of chunk venn" width="432" />
-
+<p><img src="./figure/venn-1.png" alt="plot of chunk venn">
 </section>
 <section>
 <h2 id="条件付き確率がよくわかる具体例">条件付き確率がよくわかる具体例</h2>
@@ -143,7 +147,7 @@ p = 0.6 とかである可能性もまあある。
 <dd>$\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$</dd>
 <dd>かなり低い確率。Awesomeなビールはほかにもたっくさんある。</dd>
 </dl>
-<img src="./figure/venn-1.png" alt="plot of chunk venn" width="432">
+<img src="./figure/venn-1.png" alt="plot of chunk venn">
 
 </section>
 <section>
@@ -218,7 +222,7 @@ p = 0.6 とかである可能性もまあある。
   <div class="column"></div>
   <div class="column"></div>
   <div class="column">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -233,11 +237,11 @@ p = 0.6 とかである可能性もまあある。
 <div class="column-container">
   <div class="column"></div>
   <div class="column">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
 &ensp;⨉
   </div>
   <div class="column">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -256,15 +260,15 @@ p = 0.6 とかである可能性もまあある。
 <p>ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。</p>
 <div class="column-container">
   <div class="column">
-<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
 &ensp;$\propto$
   </div>
   <div class="column">
-<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" width="216" style="vertical-align: middle;">
+<img src="./figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
 &ensp;⨉
   </div>
   <div class="column">
-<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" width="216" style="vertical-align: middle;">
+<img src="./figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
 
@@ -336,7 +340,7 @@ p = 0.6 とかである可能性もまあある。
 <div class="column" style="flex-shrink: 1.3;">
 </dd>
 </dl>
-<img src="./figure/integrate-1.png" alt="plot of chunk integrate" width="360" />
+<p><img src="./figure/integrate-1.png" alt="plot of chunk integrate"></p>
   </div>
 </div>
 
@@ -389,15 +393,16 @@ p = 0.6 とかである可能性もまあある。
 <p>数学を知っていれば $\pi r ^ 2 \approx 3.14159$</p>
 <p>面積4の正方形に400個の一様乱数を打ち込んだら318個が円に乗った:<br>
 $4 \times \frac {318} {400} = 3.18$</p>
-<img src="./figure/circle-1.png" alt="plot of chunk circle" width="288" />
+<p><img src="./figure/circle-1.png" alt="plot of chunk circle"></p>
+
 </section>
 <section>
 <h2 id="変な分布もモンテカルロ法で扱えそう">変な分布もモンテカルロ法で扱えそう</h2>
 <p>e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング)。</p>
 <div>
-<img src="./figure/mcpdf-2.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+<img src="./figure/mcpdf-2.png" alt="plot of chunk mcpdf" style="vertical-align: middle;">
 $\;\sim\;$
-<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" width="360" style="vertical-align: middle;">
+<img src="./figure/mcpdf-1.png" alt="plot of chunk mcpdf" style="vertical-align: middle;">
 </div>
 <p>でも、ハズレの値もけっこう引いてしまう。</p>
 
@@ -405,7 +410,7 @@ $\;\sim\;$
 <section>
 <h2 id="次元の呪い-高次元になるほど当たりにくくなる">次元の呪い: 高次元になるほど当たりにくくなる</h2>
 <p>(N次元球の体積 / N次元の立方体) はゼロに近づいていく。</p>
-<img src="figure/circle-1.png" width="210" align="right">
+<img src="figure/circle-1.png" align="right">
 <ul>
 <li>2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$</li>
 <li>3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$</li>
@@ -432,24 +437,25 @@ $\;\sim\;$
 </li>
 <li>$\theta_\text{new}$ が採択されたら $\theta$ を更新。手順1に戻る。</li>
 </ol>
-<img src="./figure/metropolis-1.png" alt="plot of chunk metropolis" width="792" />
+<p><img src="./figure/metropolis-1.png" alt="plot of chunk metropolis">
 </section>
 <section>
 <h2 id="採択されたパラメータ値の軌跡">採択されたパラメータ値の軌跡</h2>
 <p>尤度が高い方にただ向かうだけでなく、結構うろつく。<br>
 通ったパラメータ値を集めるといい感じの分布が得られる。</p>
-<img src="./figure/metropolis-trajectory-.gif" alt="plot of chunk metropolis-trajectory" width="864" />
+<p><img src="./figure/metropolis-trajectory-.gif" alt="plot of chunk metropolis-trajectory"></p>
+
 </section>
 <section>
 <h2 id="尤度に比例する事後分布からサンプルしたのと等価">尤度に比例する事後分布からサンプルしたのと等価</h2>
 <p>全体にばら撒く棄却サンプリングよりも効率よく集められる。<br>
 が、パラメータ1つの1次元ではご利益はわかりにくい。</p>
 <div>
-<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+<img src="./figure/propto-lik-1.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
 $\;\sim\;$
-<img src="./figure/propto-lik-2.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+<img src="./figure/propto-lik-2.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
 $\;\propto\;$
-<img src="./figure/propto-lik-3.png" alt="plot of chunk propto-lik" width="240" style="vertical-align: middle;">
+<img src="./figure/propto-lik-3.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
 </div>
 <p>パラメータが複数ある場合は？</p>
 
@@ -458,14 +464,14 @@ $\;\propto\;$
 <h2 id="gibbs-sampling">Gibbs Sampling</h2>
 <p>パラメータが複数の場合「ほかを固定してひとつ更新」を繰り返す。</p>
 <p>e.g., 二次元正規分布。(-2, 2) からスタート。</p>
-<img src="./figure/gibbs-.gif" alt="plot of chunk gibbs" width="360" />
+<p><img src="./figure/gibbs-.gif" alt="plot of chunk gibbs"></p>
 
 </section>
 <section>
 <h2 id="何回やっても似たような結果になってほしい">何回やっても似たような結果になってほしい</h2>
 <p>乱数や初期値によって偶々、じゃないことを確認したい。</p>
 <p>e.g., <code>chains = 3</code> 。ほぼ同じところをうろうろ:</p>
-<img src="./figure/chains-1.png" alt="plot of chunk chains" width="864" />
+<p><img src="./figure/chains-1.png" alt="plot of chunk chains"></p>
 <p>収束(convergence)の判定については後ほど。</p>
 
 </section>
@@ -473,7 +479,7 @@ $\;\propto\;$
 <h2 id="初期値の影響が消えるまでウォーミングアップ">初期値の影響が消えるまでウォーミングアップ</h2>
 <p>定常分布の山に到達してからが本番。</p>
 <p>e.g., <code>iter_warmup = 200, iter_sampling = 600</code> で灰色の部分を捨てる:</p>
-<img src="./figure/warmup-1.png" alt="plot of chunk warmup" width="864" />
+<p><img src="./figure/warmup-1.png" alt="plot of chunk warmup"></p>
 <p>どれくらい長く捨てるべきかは場合による。</p>
 
 </section>
@@ -481,7 +487,7 @@ $\;\propto\;$
 <h2 id="適度に間引いて自己相関を軽減したい">適度に間引いて自己相関を軽減したい</h2>
 <p>直前の値と似すぎていたら独立サンプルとして扱えないので。</p>
 <p>e.g., <code>thin = 5</code> で5回に1回だけサンプルする:</p>
-<img src="./figure/thin-1.png" alt="plot of chunk thin" width="504" />
+<p><img src="./figure/thin-1.png" alt="plot of chunk thin"></p>
 <p>間引かなくても大丈夫な場合も、間引いても解決しない場合もある。</p>
 
 </section>
@@ -492,7 +498,7 @@ $\;\propto\;$
 <li>Gelman-Rubin統計量 $\hat R &lt; 1.05$</li>
 <li>Effective Sample Size (ESS) $N_\text{eff} &gt; 100$ per chain</li>
 </ul>
-<img src="./figure/convergence-1.png" alt="plot of chunk convergence" width="864" />
+<p><img src="./figure/convergence-1.png" alt="plot of chunk convergence"></p>
 <p><a href="https://mc-stan.org/docs/cmdstan-guide/diagnose.html"><code>diagnose()</code></a>
 みたいな機能が提供されていれば利用する。</p>
 <p>実行時に<a href="https://mc-stan.org/misc/warnings.html">警告してもらえること</a>もある。</p>
@@ -665,7 +671,7 @@ $x
 <h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
 <p>別ファイルに書いておく。
 e.g., <code>coin.stan</code>:</p>
-<pre tabindex="0"><code>data {
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
   int&lt;lower=0&gt; N;
   array[N] int x;
 }
@@ -731,13 +737,15 @@ $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
 </span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
-</span></span></code></pre></div><img src="./figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot" width="792" />
+</span></span></code></pre></div><p><img src="./figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
+
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
 <p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_acf_bar</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
-</span></span></code></pre></div><img src="./figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac" width="432" />
+</span></span></code></pre></div><p><img src="./figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
+
 </section>
 <section>
 <h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
@@ -747,7 +755,7 @@ $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
 </span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
 </code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with
 `binwidth`.
-</code></pre><img src="./figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist" width="288" />
+</code></pre><p><img src="./figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
 
 </section>
 <section>
@@ -797,7 +805,7 @@ target += normal_lpdf(x | theta, 1.0);    // likelihood
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
-<a href="7-stan.html" rel="next" class="readmore">
+<a href="7-stan.html" class="readmore">
 7. StanでGLM
 </a>
 

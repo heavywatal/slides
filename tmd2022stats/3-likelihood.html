@@ -4,12 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <title>3. 尤度、最尤推定 — 統計モデリング実習 2022 TMDU</title>
-<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
-<script defer src="/slides/lib/reveal.js/reveal.js"></script>
-<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
-<script defer src="/slides/lib/reveal-initialize.js"></script>
-<link rel="stylesheet" href="/slides/css/theme-reveal.css">
-<script defer src="/slides/lib/reload-img-onclick.js"></script>
 <meta name="author" content="Watal M. Iwasaki">
 <meta property="og:title" content="3. 尤度、最尤推定 — 統計モデリング実習 2022 TMDU">
 <meta property="og:type" content="article">
@@ -44,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 </style>
 
-
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
 <script>
 var doNotTrack = false;
@@ -55,13 +48,24 @@ if (!doNotTrack) {
 	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
 }
 </script>
-
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="reveal">
 <div class="slides">
 <section>
-<link rel="stylesheet" href="style.css">
 <h1 id="統計モデリング実習-2022-tmdu"><a href=".">統計モデリング実習 2022 TMDU</a></h1>
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -81,7 +85,7 @@ if (!doNotTrack) {
 <li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
 </ol>
 <div class="footnote">
-2023-03-18 東京医科歯科大学
+2023-03-18 東京医科歯科大学<br>
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
@@ -138,7 +142,7 @@ if (!doNotTrack) {
 <h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
 <p>ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
 個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。</p>
-<img src="./figure/poisson-seed-1.png" alt="plot of chunk poisson-seed" width="288" />
+<p><img src="./figure/poisson-seed-1.png" alt="plot of chunk poisson-seed"></p>
 <p>カウントデータだから<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？</p>
 
@@ -147,7 +151,7 @@ if (!doNotTrack) {
 <h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
 <p>ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
 個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。</p>
-<img src="./figure/poisson-seed-lambda-1.png" alt="plot of chunk poisson-seed-lambda" width="792" />
+<p><img src="./figure/poisson-seed-lambda-1.png" alt="plot of chunk poisson-seed-lambda"></p>
 <p>カウントデータだからポアソン分布っぽい。<br>
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？</p>
 <p>黒が観察データ。<span style="color: #3366ff;">青がポアソン分布</span>。
@@ -194,7 +198,7 @@ L(\lambda \mid D)
   = \prod _i ^n \text{Prob}(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
-<img src="./figure/poisson-seed-likelihood-1.png" alt="plot of chunk poisson-seed-likelihood" width="792" />
+<p><img src="./figure/poisson-seed-likelihood-1.png" alt="plot of chunk poisson-seed-likelihood"></p>
 <p>この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。</p>
 
 </section>
@@ -209,13 +213,14 @@ L(\lambda \mid D)
   &= \frac 1 \lambda \sum _i ^n X_i - n = 0 \\
 \hat \lambda &= \frac 1 n \sum _i ^n X_i
 \end{split}\]</div>
-<img src="./figure/poisson-mle-1.png" alt="plot of chunk poisson-mle" width="720" />
+<p><img src="./figure/poisson-mle-1.png" alt="plot of chunk poisson-mle"></p>
+
 </section>
 <section>
 <h2 id="最尤推定を使っても真のλは得られない">最尤推定を使っても“真のλ”は得られない</h2>
 <p>今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
 「50個体サンプル→最尤推定」を1,000回繰り返してみると:</p>
-<img src="./figure/poisson-mle-repl-1.png" alt="plot of chunk poisson-mle-repl" width="792" />
+<p><img src="./figure/poisson-mle-repl-1.png" alt="plot of chunk poisson-mle-repl"></p>
 <p>サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
 (標本データへのあてはまりはかなり良く見えるのに！)</p>
 
@@ -223,7 +228,7 @@ L(\lambda \mid D)
 <section>
 <h2 id="サンプルサイズを増やすほどマシにはなる">サンプルサイズを増やすほどマシにはなる</h2>
 <p>“$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:</p>
-<img src="./figure/poisson-mle-nsam-1.png" alt="plot of chunk poisson-mle-nsam" width="792" />
+<p><img src="./figure/poisson-mle-nsam-1.png" alt="plot of chunk poisson-mle-nsam"></p>
 <p>Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
 A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 
@@ -326,8 +331,8 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
-<a href="4-glm.html" rel="next" class="readmore">
-4. 一般化線形モデルGLM
+<a href="4-glm.html" class="readmore">
+4. 一般化線形モデル (GLM)
 </a>
 
 </section>

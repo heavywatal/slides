@@ -4,12 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 <title>2. 確率分布、擬似乱数生成 — 統計モデリング実習 2022 TMDU</title>
-<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
-<script defer src="/slides/lib/reveal.js/reveal.js"></script>
-<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
-<script defer src="/slides/lib/reveal-initialize.js"></script>
-<link rel="stylesheet" href="/slides/css/theme-reveal.css">
-<script defer src="/slides/lib/reload-img-onclick.js"></script>
 <meta name="author" content="Watal M. Iwasaki">
 <meta property="og:title" content="2. 確率分布、擬似乱数生成 — 統計モデリング実習 2022 TMDU">
 <meta property="og:type" content="article">
@@ -44,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 </style>
 
-
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
 <script>
 var doNotTrack = false;
@@ -55,13 +48,24 @@ if (!doNotTrack) {
 	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
 }
 </script>
-
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="reveal">
 <div class="slides">
 <section>
-<link rel="stylesheet" href="style.css">
 <h1 id="統計モデリング実習-2022-tmdu"><a href=".">統計モデリング実習 2022 TMDU</a></h1>
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -81,14 +85,14 @@ if (!doNotTrack) {
 <li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
 </ol>
 <div class="footnote">
-2023-03-11 東京医科歯科大学
+2023-03-11 東京医科歯科大学<br>
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
 </section>
 <section>
 <h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
-<img src="./figure/lm-bad-1.png" alt="plot of chunk lm-bad" width="360" />
+<p><img src="./figure/lm-bad-1.png" alt="plot of chunk lm-bad"></p>
 <ul>
 <li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
 <li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
@@ -97,7 +101,7 @@ if (!doNotTrack) {
 </section>
 <section>
 <h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
-<img src="./figure/glm-better-1.png" alt="plot of chunk glm-better" width="720" />
+<p><img src="./figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
 <ul>
 <li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
 <li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
@@ -122,7 +126,7 @@ if (!doNotTrack) {
 <p>発生する事象(値)と頻度の関係。</p>
 <p>手元のデータを数えて作るのが<strong>経験分布</strong><br>
 e.g., サイコロを12回投げた結果、学生1000人の身長</p>
-<img src="./figure/distribution-1.png" alt="plot of chunk distribution" width="576" />
+<p><img src="./figure/distribution-1.png" alt="plot of chunk distribution"></p>
 <p>一方、少数のパラメータと数式で作るのが<strong>理論分布</strong>。<br>
 (こちらを単に「確率分布」と呼ぶことが多い印象）</p>
 
@@ -135,7 +139,7 @@ e.g., サイコロを12回投げた結果、学生1000人の身長</p>
 $X \sim \text{Binomial}(n = 3, p = 0.5)$</p>
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
-<img src="./figure/dbinom-1.png" alt="plot of chunk dbinom" width="216" />
+<p><img src="./figure/dbinom-1.png" alt="plot of chunk dbinom"></p>
   </div>
   <div class="column" style="padding-top: 10px;">
 \[\begin{split}
@@ -153,7 +157,7 @@ k &\in \{0, 1, 2, \ldots, n\}
 <p>試行1: <strong>表</strong> 裏 <strong>表</strong> → $X = 2$<br>
 試行2: 裏 裏 裏 → $X = 0$<br>
 試行3: <strong>表</strong> 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$</p>
-<img src="./figure/rbinom-1.png" alt="plot of chunk rbinom" width="792" />
+<p><img src="./figure/rbinom-1.png" alt="plot of chunk rbinom"></p>
 <div style="text-align: right;">
 試行回数を増やすほど<b>二項分布</b>の形に近づく。<br>
 0と3はレア。1と2が3倍ほど出やすいらしい。
@@ -167,7 +171,7 @@ k &\in \{0, 1, 2, \ldots, n\}
 </ul>
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
-<img src="./figure/dbinom-1.png" alt="plot of chunk dbinom" width="216" />
+<img src="./figure/dbinom-1.png" alt="plot of chunk dbinom">
   </div>
   <div class="column" style="padding-top: 10px;">
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
@@ -217,7 +221,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <h2 id="離散一様分布">離散一様分布</h2>
 <p>同じ確率で起こるn通りの事象のうちXが起こる確率</p>
 <p>e.g., コインの表裏、サイコロの出目1–6</p>
-<img src="./figure/dunif-1.png" alt="plot of chunk dunif" width="432" />
+<p><img src="./figure/dunif-1.png" alt="plot of chunk dunif"></p>
 <p>🔰 一様分布になりそうな例を考えてみよう</p>
 
 </section>
@@ -225,7 +229,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <h2 id="幾何分布-textgeomp">幾何分布 $~\text{Geom}(p)$</h2>
 <p>成功率pの試行が初めて成功するまでの失敗回数</p>
 <p>e.g., コイントスで表が出るまでに何回裏が出るか</p>
-<img src="./figure/geometric-1.png" alt="plot of chunk geometric" width="792" />
+<p><img src="./figure/geometric-1.png" alt="plot of chunk geometric"></p>
 <p>\[
 \text{Prob}(X = k \mid p) = p (1 - p)^k
 \]</p>
@@ -236,7 +240,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <section>
 <h2 id="二項分布-textbinomialnp">二項分布 $~\text{Binomial}(n,~p)$</h2>
 <p>確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。</p>
-<img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n" width="792" />
+<p><img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
 <p>\[
 \text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \]</p>
@@ -247,7 +251,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <h2 id="ポアソン分布-textpoissonlambda">ポアソン分布 $~\text{Poisson}(\lambda)$</h2>
 <p>平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。</p>
 <p>e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数</p>
-<img src="./figure/dpoisson-1.png" alt="plot of chunk dpoisson" width="792" />
+<p><img src="./figure/dpoisson-1.png" alt="plot of chunk dpoisson"></p>
 <p>\[
 \text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \]</p>
@@ -259,7 +263,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <h2 id="指数分布-textexplambda">指数分布 $~\text{Exp}(\lambda)$</h2>
 <p>ポアソン過程の事象の発生間隔。平均は $1 / \lambda$ 。</p>
 <p>e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔</p>
-<img src="./figure/dexp-1.png" alt="plot of chunk dexp" width="792" />
+<p><img src="./figure/dexp-1.png" alt="plot of chunk dexp"></p>
 <p>\[
 \text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
 \]</p>
@@ -271,7 +275,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <h2 id="ガンマ分布-textgammaklambda">ガンマ分布 $~\text{Gamma}(k,~\lambda)$</h2>
 <p>ポアソン過程の事象k回発生までの待ち時間</p>
 <p>e.g., メッセージを2つ受信するまでの待ち時間</p>
-<img src="./figure/dgamma-1.png" alt="plot of chunk dgamma" width="792" />
+<p><img src="./figure/dgamma-1.png" alt="plot of chunk dgamma"></p>
 <p>\[
 \text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \]</p>
@@ -283,7 +287,7 @@ shapeパラメータ $k = 1$ のとき指数分布と一致。</p>
 <h2 id="正規分布-mathcalnmusigma">正規分布 $~\mathcal{N}(\mu,~\sigma)$</h2>
 <p>平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
 e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):</p>
-<img src="./figure/gaussian-1.png" alt="plot of chunk gaussian" width="792" />
+<p><img src="./figure/gaussian-1.png" alt="plot of chunk gaussian"></p>
 <p>\[
 \text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
 \]</p>
@@ -293,16 +297,17 @@ e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれ�
 <h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
 <p>標本平均の反復(<strong>中心極限定理</strong>);
 e.g., 一様分布 [0, 100) から40サンプル</p>
-<img src="./figure/central-limit-1.png" alt="plot of chunk central-limit" width="792" />
+<p><img src="./figure/central-limit-1.png" alt="plot of chunk central-limit"></p>
 <p>大きい$n$の二項分布</p>
-<img src="./figure/binom-normal-1.png" alt="plot of chunk binom-normal" width="792" />
+<p><img src="./figure/binom-normal-1.png" alt="plot of chunk binom-normal"></p>
+
 </section>
 <section>
 <h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
 <p>大きい$\lambda$のポアソン分布</p>
-<img src="./figure/poisson-normal-1.png" alt="plot of chunk poisson-normal" width="792" />
+<p><img src="./figure/poisson-normal-1.png" alt="plot of chunk poisson-normal"></p>
 <p>平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布</p>
-<img src="./figure/gamma-normal-1.png" alt="plot of chunk gamma-normal" width="792" />
+<p><img src="./figure/gamma-normal-1.png" alt="plot of chunk gamma-normal"></p>
 
 </section>
 <section>
@@ -332,7 +337,7 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
 親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。</p>
-<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion" width=400>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
 <p>「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
 <strong>「普通はこれに従うはず」を理解してこそ</strong>できる思考。</p>
 
@@ -383,7 +388,7 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="m">3</span> <span class="o">*</span> <span class="m">14</span>
 </span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">drv</span><span class="p">))</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 42
-</code></pre><img src="./figure/hello-1.png" alt="plot of chunk hello" width="360" />
+</code></pre><p><img src="./figure/hello-1.png" alt="plot of chunk hello"></p>
 
 </section>
 <section>
@@ -609,7 +614,7 @@ e.g., <code>report.qmd</code></li>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
-<a href="3-likelihood.html" rel="next" class="readmore">
+<a href="3-likelihood.html" class="readmore">
 3. 尤度、最尤推定
 </a>
 

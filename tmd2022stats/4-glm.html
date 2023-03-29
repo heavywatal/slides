@@ -3,15 +3,9 @@
 <head prefix="og: http://ogp.me/ns#">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<title>4. 一般化線形モデルGLM — 統計モデリング実習 2022 TMDU</title>
-<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
-<script defer src="/slides/lib/reveal.js/reveal.js"></script>
-<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
-<script defer src="/slides/lib/reveal-initialize.js"></script>
-<link rel="stylesheet" href="/slides/css/theme-reveal.css">
-<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<title>4. 一般化線形モデル (GLM) — 統計モデリング実習 2022 TMDU</title>
 <meta name="author" content="Watal M. Iwasaki">
-<meta property="og:title" content="4. 一般化線形モデルGLM — 統計モデリング実習 2022 TMDU">
+<meta property="og:title" content="4. 一般化線形モデル (GLM) — 統計モデリング実習 2022 TMDU">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://heavywatal.github.io/slides/tmd2022stats/4-glm.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
@@ -44,7 +38,6 @@ document.addEventListener("DOMContentLoaded", function() {
 }
 </style>
 
-
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
 <script>
 var doNotTrack = false;
@@ -55,13 +48,24 @@ if (!doNotTrack) {
 	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
 }
 </script>
-
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <div class="reveal">
 <div class="slides">
 <section>
-<link rel="stylesheet" href="style.css">
 <h1 id="統計モデリング実習-2022-tmdu"><a href=".">統計モデリング実習 2022 TMDU</a></h1>
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki, PhD)
@@ -81,7 +85,7 @@ if (!doNotTrack) {
 <li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
 </ol>
 <div class="footnote">
-2023-03-18 東京医科歯科大学
+2023-03-18 東京医科歯科大学<br>
 <a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
 </div>
 
@@ -94,7 +98,7 @@ $X \sim f(\theta) $</p>
 <div>\[\begin{split}
 X \sim \text{Poisson}(\lambda)
 \end{split}\]</div>
-<img src="./figure/only-dist-1.png" alt="plot of chunk only-dist" width="288" />
+<p><img src="./figure/only-dist-1.png" alt="plot of chunk only-dist"></p>
 <p>これを一般化線形モデル(GLM)として見ることもできる。</p>
 
 </section>
@@ -106,7 +110,7 @@ X \sim \text{Poisson}(\lambda)
 y_i &\sim \text{Poisson}(\lambda_i) \\
 \lambda_i &= \beta_0
 \end{split}\]</div>
-<img src="./figure/glm-without-x-1.png" alt="plot of chunk glm-without-x" width="288" />
+<p><img src="./figure/glm-without-x-1.png" alt="plot of chunk glm-without-x"></p>
 <p>種子数をY軸にして、式を2つに分けただけ&hellip;?<br>
 <strong>説明変数</strong>を含むモデルを見ればご利益が分かるかも。</p>
 
@@ -122,7 +126,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 </figure>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/glm-poisson-1.png" alt="plot of chunk glm-poisson" width="360" />
+<p><img src="./figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
   </div>
 </div>
 <p>この場合は<strong>単回帰</strong>。説明変数が複数あると<strong>重回帰</strong>。</p>
@@ -135,7 +139,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 \log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
 \end{split}\]</p>
 <p>気温も湿度も高いほどビールが売れる架空データ:</p>
-<img src="./figure/multiple-regression-1.png" alt="plot of chunk multiple-regression" width="720" />
+<p><img src="./figure/multiple-regression-1.png" alt="plot of chunk multiple-regression"></p>
 <p>ほかの<strong>確率分布</strong>と<strong>リンク関数</strong>を使う例を見てみよう。</p>
 
 </section>
@@ -158,7 +162,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 <p>ロジスティック関数↑</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/glm-logistic-1.png" alt="plot of chunk glm-logistic" width="360" />
+<p><img src="./figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
   </div>
 </div>
 
@@ -182,7 +186,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 <p>ロジスティック関数↑</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/wind-1.png" alt="plot of chunk wind" width="360" />
+<p><img src="./figure/wind-1.png" alt="plot of chunk wind"></p>
   </div>
 </div>
 
@@ -201,7 +205,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 \end{split}\]</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
-<img src="./figure/glm-weight-1.png" alt="plot of chunk glm-weight" width="288" />
+<p><img src="./figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
   </div>
 </div>
 <p>最小二乗法の直線あてはめと結果的に同じになる。</p>
@@ -250,7 +254,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \end{split}\]</p>
   </div>
   <div class="column" style="flex-shrink: 1.3;">
-<img src="./figure/glm-anova-1.png" alt="plot of chunk glm-anova" width="324" />
+<p><img src="./figure/glm-anova-1.png" alt="plot of chunk glm-anova"></p>
   </div>
 </div>
 <p>くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。</p>
@@ -299,7 +303,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \end{split}\]</p>
   </div>
   <div class="column" style="flex-shrink: 1.3;">
-<img src="./figure/glm-ancova-1.png" alt="plot of chunk glm-ancova" width="324" />
+<p><img src="./figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
   </div>
 </div>
 <p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
@@ -337,7 +341,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
   </div>
   <div class="column" style="flex-shrink: 1.3;">
-<img src="./figure/interaction-1.png" alt="plot of chunk interaction" width="324" />
+<p><img src="./figure/interaction-1.png" alt="plot of chunk interaction"></p>
   </div>
 </div>
 <p>解釈が一気に難しくなるのでむやみに使わない。</p>
@@ -617,7 +621,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <section>
 <h2 id="たしかに尤度はあてはまりの良さを表してそう">たしかに尤度はあてはまりの良さを表してそう</h2>
 <p>この場合は直線回帰よりもポアソン回帰が良さそう:</p>
-<img src="./figure/compare-loglik-1.png" alt="plot of chunk compare-loglik" width="648" />
+<p><img src="./figure/compare-loglik-1.png" alt="plot of chunk compare-loglik"></p>
 <p>この調子で、より尤度の高いモデルを探していけばいいだろうか？</p>
 
 </section>
@@ -628,15 +632,17 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <dd>パラメータを増やせば<strong>現データへの</strong>適合度・尤度を高くできるが、<br>
 予測・理解の役には立たなくなる。</dd>
 </dl>
-<img src="./figure/saturated-model-1.png" alt="plot of chunk saturated-model" width="792" />
+<p><img src="./figure/saturated-model-1.png" alt="plot of chunk saturated-model"></p>
 <p><strong>帰無モデル</strong>: 説明変数なし。切片のみ。<br>
-<strong>飽和モデル</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
+<strong>飽和モデル</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル</p>
+
 </section>
 <section>
 <h2 id="無駄な説明変数を加えても尤度は上がる">無駄な説明変数を加えても尤度は上がる</h2>
 <p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
 観察時に着てた服の色 $x_2$ を追加すると尤度が上がる&hellip;&hellip;?</p>
-<img src="./figure/many-models-1.png" alt="plot of chunk many-models" width="504" />
+<p><img src="./figure/many-models-1.png" alt="plot of chunk many-models"></p>
+
 </section>
 <section>
 <h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
@@ -668,7 +674,8 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <h2 id="無駄な説明変数の追加でaic増加">無駄な説明変数の追加でAIC増加</h2>
 <p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
 観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。</p>
-<img src="./figure/many-models-aic-1.png" alt="plot of chunk many-models-aic" width="504" />
+<p><img src="./figure/many-models-aic-1.png" alt="plot of chunk many-models-aic"></p>
+
 </section>
 <section>
 <h2 id="ほかの情報量基準">ほかの情報量基準</h2>
@@ -789,7 +796,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">theme</span><span class="p">(</span><span class="n">panel.grid.minor</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">())</span>
 </span></span><span class="line"><span class="cl"><span class="n">p_penweight</span>
-</span></span></code></pre></div><img src="./figure/penguins-weight-1.png" alt="plot of chunk penguins-weight" width="324" />
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-1.png" alt="plot of chunk penguins-weight"></p>
 
 </section>
 <section>
@@ -813,7 +820,8 @@ $y = 136.7 + 0.0153 x$</p>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added1</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span>
-</span></span></code></pre></div><img src="./figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm" width="360" />
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm"></p>
+
 </section>
 <section>
 <h2 id="重回帰の練習-1-まず作図">重回帰の練習: 1. まず作図</h2>
@@ -821,7 +829,7 @@ $y = 136.7 + 0.0153 x$</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight_color</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p_penweight_color</span>
-</span></span></code></pre></div><img src="./figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp" width="504" />
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp"></p>
 
 </section>
 <section>
@@ -846,7 +854,7 @@ $y = 136.7 + 0.0153 x$</p>
 </span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added2</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p2</span>
-</span></span></code></pre></div><img src="./figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm" width="504" />
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm"></p>
 <p><strong>傾き</strong>も種によって違うかも。<strong>交互作用</strong>を入れてみたい。</p>
 
 </section>
@@ -874,7 +882,8 @@ $y = 136.7 + 0.0153 x$</p>
 </span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added3</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p3</span>
-</span></span></code></pre></div><img src="./figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction" width="504" />
+</span></span></code></pre></div><p><img src="./figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction"></p>
+
 </section>
 <section>
 <h2 id="ここまでの3つのモデルでどれがいいか">ここまでの3つのモデルでどれがいいか？</h2>
@@ -883,13 +892,13 @@ $y = 136.7 + 0.0153 x$</p>
 </span></span><span class="line"><span class="cl"><span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">p1</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[1]</span><span class="p">),</span>
 </span></span><span class="line"><span class="cl">                   <span class="n">p2</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[2]</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span> <span class="o">=</span> <span class="s">&#34;none&#34;</span><span class="p">),</span>
 </span></span><span class="line"><span class="cl">                   <span class="n">p3</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[3]</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span> <span class="o">=</span> <span class="s">&#34;none&#34;</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
-</span></span></code></pre></div><img src="./figure/penguins-aic-1.png" alt="plot of chunk penguins-aic" width="792" />
+</span></span></code></pre></div><p><img src="./figure/penguins-aic-1.png" alt="plot of chunk penguins-aic"></p>
 
 </section>
 <section>
 <h2 id="余裕があったら追加の練習">余裕があったら追加の練習</h2>
 <p>🔰クチバシの長さと深さで同じ解析をやってみよう。</p>
-<img src="./figure/penguins-bill-1.png" alt="plot of chunk penguins-bill" width="792" />
+<p><img src="./figure/penguins-bill-1.png" alt="plot of chunk penguins-bill"></p>
 <p>🔰余裕があったら性別や年なども説明変数に入れてみよう。</p>
 <!-- TODO: 練習に適した課題データ -->
 
@@ -904,8 +913,8 @@ $y = 136.7 + 0.0153 x$</p>
 <li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
 <li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
 </ul>
-<a href="5-glmm.html" rel="next" class="readmore">
-5. 一般化線形混合モデル GLMM
+<a href="5-glmm.html" class="readmore">
+5. 個体差、一般化線形混合モデル (GLMM)
 </a>
 
 </section>
