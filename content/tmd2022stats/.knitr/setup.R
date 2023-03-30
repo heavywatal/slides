@@ -28,6 +28,11 @@ knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 wtl::knit_engines_set_cache_stan("stan/")
 set.seed(24601)
 
+src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
+  src = knitr::fig_chunk(label, ext, number)
+  paste0('src="', src, '" alt="plot of chunk ', label, '"')
+}
+
 .meta = list()
 .meta$course = "統計モデリング実習 2022 TMDU"
 .meta$prefix = normalizePath("..") |> basename()
