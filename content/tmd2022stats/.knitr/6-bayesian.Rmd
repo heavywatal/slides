@@ -974,9 +974,9 @@ p_trace +
 - Gelman-Rubin統計量 $\hat R < 1.05$
 - Effective Sample Size (ESS) $N_\text{eff} > 100$ per chain
 
-```{cat, converge-yes-stan}
-#| engine.opts: !expr 'list(file = "stan/converge-yes.stan")'
-#| cache.rebuild: !expr '!file.exists("stan/converge-yes.stan")'
+```{stan, converge-yes}
+#| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   array[N] int x;
@@ -990,9 +990,9 @@ model {
   x ~ poisson(lambda);
 }
 ```
-```{cat, converge-no-stan}
-#| engine.opts: !expr 'list(file = "stan/converge-no.stan")'
-#| cache.rebuild: !expr '!file.exists("stan/converge-no.stan")'
+```{stan, converge-no}
+#| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1024,14 +1024,14 @@ myplot_trace = function(stan_file, data) {
       axis.title.y = element_blank(), axis.text.y = element_blank())
 }
 ```
-```{r, converge-yes}
+```{r, converge-yes-plot}
 #| include: false
-#| cache.extra: !expr 'tools::md5sum("stan/converge-yes.stan")'
+#| cache_stan: converge-yes
 p_yes = myplot_trace("stan/converge-yes.stan", convdata)
 ```
-```{r, converge-no}
+```{r, converge-no-plot}
 #| include: false
-#| cache.extra: !expr 'tools::md5sum("stan/converge-no.stan")'
+#| cache_stan: converge-no
 p_no = myplot_trace("stan/converge-no.stan", convdata)
 ```
 ```{r, convergence}
@@ -1198,10 +1198,8 @@ Rならlist型、Pythonならdict型にまとめてStanに渡す。
 別ファイルに書いておく。
 e.g., `coin.stan`:
 
-```{cat, coin-stan}
-#| engine.opts: !expr 'list(file = "stan/coin.stan")'
-#| cache.rebuild: !expr '!file.exists("stan/coin.stan")'
-#| lang: stan
+```{stan, coin}
+#| cache_stan: true
 data {
   int<lower=0> N;
   array[N] int x;
@@ -1240,7 +1238,7 @@ model {
 
 予め実行速度の速い機械語に翻訳(コンパイル):
 ```{r, stan-binom-model}
-#| cache.extra: !expr 'tools::md5sum("stan/coin.stan")'
+#| cache_stan: coin
 model = cmdstan_model("stan/coin.stan")
 ```
 

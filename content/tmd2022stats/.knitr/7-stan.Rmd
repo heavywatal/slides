@@ -32,7 +32,8 @@ withr::local_package("cmdstanr")
 
 `slope * x` のようなベクトル演算ができる。
 
-```{cat, engine.opts = list(file = "stan/lm.stan"), class.source = "stan"}
+```{stan, lm}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -186,7 +187,8 @@ generated quantities {
 }
 ```
 
-```{cat, engine.opts = list(file = "stan/lm-credible.stan"), cache.rebuild = !file.exists("stan/lm-credible.stan")}
+```{stan, lm-credible}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -212,7 +214,7 @@ generated quantities {
 
 ```{r, stan-lm-generated}
 #| include: false
-#| cache.extra: !expr 'file.mtime("stan/lm-credible.stan")'
+#| cache_stan: lm-credible
 n = 300L
 a = 3
 b = -3
@@ -276,7 +278,8 @@ TODO: `5-stan-glm.ipynb`
 </div>
 
 
-```{cat, engine.opts = list(file = "stan/poisson.stan"), cache.rebuild = !file.exists("stan/poisson.stan")}
+```{stan, poisson}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -295,7 +298,8 @@ model {
 ```
 
 
-```{cat, engine.opts = list(file = "stan/multiple.stan"), cache.rebuild = !file.exists("stan/multiple.stan")}
+```{stan, multiple}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector[N] temperature;
@@ -316,7 +320,8 @@ model {
 ```
 
 
-```{cat, engine.opts = list(file = "stan/logistic.stan"), cache.rebuild = !file.exists("stan/logistic.stan")}
+```{stan, logistic}
+#| cache_stan: true
 data {
   int<lower=0> N;
   int<lower=0> n_trials;
@@ -335,7 +340,8 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "stan/anova.stan"), cache.rebuild = !file.exists("stan/anova.stan")}
+```{stan, anova}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -356,7 +362,8 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "stan/ancova.stan"), cache.rebuild = !file.exists("stan/ancova.stan")}
+```{stan, ancova}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -410,7 +417,8 @@ penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
 penguins_dropna = penguins.dropna()
 ```
 
-```{cat, engine.opts = list(file = "stan/penguins-lm.stan"), cache.rebuild = !file.exists("stan/penguins-lm.stan")}
+```{stan, penguins-lm}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;
@@ -428,7 +436,8 @@ model {
 }
 ```
 
-```{cat, engine.opts = list(file = "stan/penguins-multiple.stan"), cache.rebuild = !file.exists("stan/penguins-multiple.stan")}
+```{stan, penguins-multiple}
+#| cache_stan: true
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;

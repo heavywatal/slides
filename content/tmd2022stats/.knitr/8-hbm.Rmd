@@ -90,7 +90,8 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
 `10` とか `3` とか、エイヤっと決めてるやつが超パラメータ。
 
-```{cat, engine.opts = list(file = "stan/glmm.stan"), cache.rebuild = !file.exists("stan/glmm.stan"), class.source = "stan"}
+```{stan, glmm}
+#| cache_stan: true
 data {
   int<lower=0> N;
   array[N] int<lower=0> y;
@@ -119,8 +120,8 @@ model {
 ## 変量効果が入った推定結果
 
 ```{r, stan-glmm-prep}
+#| cache_stan: glmm
 #| echo: false
-#| cache.extra: !expr 'file.mtime("stan/glmm.stan")'
 #| message: false
 #| results: false
 ninds = 100L

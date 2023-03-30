@@ -25,6 +25,7 @@ knitr::opts_chunk$set(dev = "ragg_png")
 knitr::opts_chunk$set(dpi = 100)
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
+wtl::knit_engines_set_cache_stan("stan/")
 set.seed(24601)
 
 .meta = list()
