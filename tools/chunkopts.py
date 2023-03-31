@@ -7,7 +7,7 @@ from pathlib import Path
 
 from wtl import cli
 
-_log = logging.getLogger(__name__)
+_log = logging.getLogger(__name__.removeprefix("__main_"))
 used: set[str] = set()
 
 
@@ -15,17 +15,20 @@ def main():
     parser = cli.ArgumentParser()
     parser.add_argument("infile", nargs="*", type=Path)
     args = parser.parse_args()
+    global _log
+    _log_module = _log
     for infile in args.infile:
+        _log = _log_module.getChild(infile.name)
         with open(infile) as fin:
-            lines = [sub(line.rstrip()) for line in fin]
+            lines = [sub(line.rstrip(), i) for i, line in enumerate(fin)]
         if not cli.dry_run:
             with open(infile, "w") as fout:
                 fout.write("\n".join(lines))
 
 
-def sub(line: str):
+def sub(line: str, i: int):
     if mobj := re.match(r"^```{(\w+)[, ]*([^,]*)[, ]*(.*)}$", line):
-        if (new := repl(mobj)) != line:
+        if (new := repl(mobj, i)) != line:
             print(f"\033[31m{line}\033[0m")
             print(f"\033[32m{new}\033[0m")
         else:
@@ -35,7 +38,7 @@ def sub(line: str):
         return line
 
 
-def repl(mobj: re.Match[str]):
+def repl(mobj: re.Match[str], i: int):
     global used
     header = mobj.group(1).lower()
     label = mobj.group(2)
@@ -44,15 +47,15 @@ def repl(mobj: re.Match[str]):
         options = (label + ", " + options).strip(", ")
         label = ""
     elif re.search(r"[^\w-]", label):
-        _log.warning(f"use-hyphen: {label}")
+        _log.warning(f"{i}:use-hyphen: {label}")
     if label:
         if label in used:
-            _log.warning(f"duplicated: {label}")
+            _log.warning(f"{i}:duplicated: {label}")
         else:
             used.add(label)
         header += f", {label}"
     else:
-        _log.warning(f"unnamed: {mobj.group(0)}")
+        _log.warning(f"{i}:unnamed: {mobj.group(0)}")
     options = to_yaml(options)
     return f"```{{{header}}}{options}"
 
