@@ -15,7 +15,7 @@ withr::local_package("cmdstanr")
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="1000">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>
@@ -81,7 +81,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ
 
 <figure>
-<img src="../tokiomarine2022/hbm.drawio.svg">
+<img src="../tokiomarine2022/hbm.drawio.svg" width="800">
 </figure>
 
 
@@ -119,36 +119,29 @@ model {
 ---
 ## 変量効果が入った推定結果
 
+```{r, df-seeds}
+#| echo: false
+set.seed(24601)
+samplesize = 100L
+df_seeds = tibble::tibble(
+  z = rnorm(samplesize, 0.5, 3),
+  p = wtl::sigmoid(z),
+  y = rbinom(samplesize, 8L, p))
+```
+
 ```{r, stan-glmm-prep}
 #| cache_stan: glmm
-#| echo: false
 #| message: false
 #| results: false
-ninds = 100L
-mu_ind = 0.5
-sd_ind = 3
-df_od = tibble::tibble(
-  z = rnorm(ninds, mu_ind, sd_ind),
-  p = wtl::sigmoid(z),
-  y = rbinom(ninds, 8L, p))
-mydata = list(y = df_od$y, N = ninds)
+seeds_data = list(y = df_seeds$y, N = samplesize)
 model = cmdstan_model("stan/glmm.stan")
-fit = model$sample(data = mydata, step_size = 0.1, refresh = 0)
+fit = model$sample(data = seeds_data, seed = 19937L, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
-# sum_y = sum(df_od$y)
-# p_hat = sum_y / 800
-# tidy_od = df_od |>
-#   dplyr::count(y, name = "observed") |>
-#   dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) |>
-#   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") |>
-#   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 ```
 
 ```{r, stan-glmm-print}
 #| echo: false
-#| fig.width: 4
-#| fig.height: 3
-#| dependson: -1
+#| cache.globals: fit
 print(fit)
 ```
 
@@ -160,8 +153,7 @@ print(fit)
 ```{r, stan-glmm}
 #| echo: false
 #| fig.width: 11
-#| fig.height: 7
-#| dependson: -2
+#| fig.height: 6
 p_trace = bayesplot::mcmc_trace(draws, facet_args = list(nrow = 1L)) + coord_flip()
 p_hist = bayesplot::mcmc_hist(draws, facet_args = list(nrow = 1L), bins = 30)
 cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
@@ -169,11 +161,36 @@ cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 
 
 ---
-## 🔰 階層ベイズモデルの練習問題
+## 🔰 階層ベイズモデルの練習問題: 種の数
 
-TODO: `6-stan-hbm.ipynb`
+100個体の植物から8つずつ種を取った、のデータでやってみよう。
 
+```{r, df-seeds-generate}
+#| ref.label: df-seeds
+#| echo: -1
+```
+
+<img `r src_alt_fig_chunk("overdispersion")`>
+
+
+---
+## 🔰 階層ベイズモデルの練習問題: ビール注文数
 <!-- TODO: 時間が余った場合の練習問題 -->
+
+```{r, beer-overdispersion-data-re}
+#| echo: -1
+set.seed(24601)
+samplesize = 300L
+lambda = 3
+overdisp = 4
+.n = lambda / (overdisp - 1)
+.p = 1 / overdisp
+df_beer_od = tibble::tibble(
+  X = rnbinom(samplesize, size = .n, prob = .p)
+)
+```
+
+<img `r src_alt_fig_chunk("beer-overdispersion")`>
 
 
 ---
@@ -190,6 +207,7 @@ y = ae ^ {-bx} - ce ^ {-dx}
 #| echo: false
 #| fig.width: 10
 #| fig.height: 5
+set.seed(19937L)
 expo = function(x, y0, lambda) y0 * exp(- lambda * x)
 
 genfunc = function(params) {

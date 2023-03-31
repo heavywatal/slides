@@ -11,6 +11,58 @@ withr::local_package("cmdstanr")
 ```
 
 ---
+## ちょっとずつ線形モデルを発展させていく
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
+をベースに回帰分析の概要を紹介。
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: `r palette()[3]`;">確率分布</span>を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: `r palette()[2]`;">個体差</span>などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+---
+## MCMCで良さげなパラメータを効率よくサンプルする
+
+乱数を使って（モンテカルロ法）、<br>
+前の値から次の値に飛ぶ（マルコフ連鎖）
+
+<img `r src_alt_fig_chunk("metropolis-trajectory", "gif", number="")`>
+
+
+---
+## 推定結果は分布
+
+<div>
+<img `r src_alt_fig_chunk("propto-lik")` style="vertical-align: middle;">
+$\;\sim\;$
+<img `r src_alt_fig_chunk("propto-lik", number = 2)` style="vertical-align: middle;">
+$\;\propto\;$
+<img `r src_alt_fig_chunk("propto-lik", number = 3)` style="vertical-align: middle;">
+</div>
+
+- 広がり具合によって不確実性も表現できる。
+- データが増えると逐次学習で尖っていき、確信が強まる。
+
+<img `r src_alt_fig_chunk("coin-bayesian")`>
+
+---
 ## Stan
 
 <a href="https://mc-stan.org/">
@@ -18,8 +70,9 @@ withr::local_package("cmdstanr")
 </a>
 
 - Stan言語で**モデルを柔軟に記述**できる。
-- C++で書かれていて高速に動作。
+- C++で書かれていて**高速に動作**。
 - RやPythonなどから呼び出して使うのが便利。
+  - RStanと[**CmdStanR**](https://mc-stan.org/cmdstanr/)の2つあるけど後者を使う。
 
 前回、回帰ではないパラメータ推定をやった。
 
@@ -30,7 +83,7 @@ withr::local_package("cmdstanr")
 ---
 ## 直線回帰するStanコードの例
 
-`slope * x` のようなベクトル演算ができる。
+Rと同様、 `slope * x` のようなベクトル演算ができる。
 
 ```{stan, lm}
 #| cache_stan: true
@@ -189,6 +242,7 @@ generated quantities {
 
 ```{stan, lm-credible}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -215,6 +269,7 @@ generated quantities {
 ```{r, stan-lm-generated}
 #| include: false
 #| cache_stan: lm-credible
+set.seed(24601)
 n = 300L
 a = 3
 b = -3
@@ -225,7 +280,7 @@ mydata[["x_tilde"]] = seq(0.4, 1.7, 0.1)
 mydata[["N_tilde"]] = length(mydata[["x_tilde"]])
 
 model = cmdstan_model("stan/lm-credible.stan")
-fit = model$sample(mydata, show_messages = FALSE, refresh = 0)
+fit = model$sample(mydata, seed = 19937L, show_messages = FALSE, refresh = 0)
 draws = fit$draws(format = "draws_df") |> print()
 
 .probs = c(lower = 0.025, median = 0.5, upper = 0.975)
@@ -236,6 +291,7 @@ df_quant = draws |>
   dplyr::mutate(x = mydata[["x_tilde"]][readr::parse_number(x)]) |>
   tidyr::pivot_wider(names_from = label, values_from = y)
 ```
+
 ```{r, stan-lm-credible}
 #| echo: false
 #| fig.height: 4.5
@@ -251,8 +307,7 @@ ggplot(df_pois) +
 ---
 ## 🔰 Stanで一般化線形モデル
 
-TODO: `5-stan-glm.ipynb`
-を開いて実行していこう。
+[GLM回のデータ](4-glm.html#/15)をStanでモデリングしてみよう。
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
@@ -280,6 +335,7 @@ TODO: `5-stan-glm.ipynb`
 
 ```{stan, poisson}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector<lower=0>[N] x;
@@ -300,6 +356,7 @@ model {
 
 ```{stan, multiple}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector[N] temperature;
@@ -322,6 +379,7 @@ model {
 
 ```{stan, logistic}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   int<lower=0> n_trials;
@@ -342,6 +400,7 @@ model {
 
 ```{stan, anova}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -364,6 +423,7 @@ model {
 
 ```{stan, ancova}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector<lower=0,upper=1>[N] sunny;
@@ -399,7 +459,9 @@ model {
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-<img `r src_alt_fig_chunk("penguins-interaction-1.png")` height="300">
+<img `r src_alt_fig_chunk("penguins-interaction")` height="300">
+
+[第4回GLM回](4-glm.html#/32)を参照。
 
 ---
 ## 🔰 Stanでpenguinsの回帰分析をしてみよう
@@ -412,13 +474,20 @@ model {
 
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
-```python
-penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
-penguins_dropna = penguins.dropna()
+```{r, penguins}
+#| include: false
+```
+
+```{r, penguins-dropna}
+#| echo: 3
+withr::local_package("palmerpenguins")
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+penguins_dropna = penguins |> tidyr::drop_na()
 ```
 
 ```{stan, penguins-lm}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;
@@ -438,6 +507,7 @@ model {
 
 ```{stan, penguins-multiple}
 #| cache_stan: true
+#| echo: false
 data {
   int<lower=0> N;
   vector<lower=0>[N] body_mass_g;
