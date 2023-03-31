@@ -176,7 +176,7 @@ model {
 </section>
 <section>
 <h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">seeds_data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">df_seeds</span><span class="o">$</span><span class="n">y</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">samplesize</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">seeds_data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">df_seeds_od</span><span class="o">$</span><span class="n">y</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">samplesize</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/glmm.stan&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">seeds_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">19937L</span><span class="p">,</span> <span class="n">step_size</span> <span class="o">=</span> <span class="m">0.1</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&#34;z_hat&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">,</span> <span class="s">&#34;r[1]&#34;</span><span class="p">,</span> <span class="s">&#34;r[2]&#34;</span><span class="p">))</span>
@@ -198,8 +198,7 @@ model {
 <section>
 <h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
 <p>データ生成の真のパラメータ値は $\hat z = 0.5,~\sigma = 3.0$ だった。</p>
-<pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
-</code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with
+<pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with
 `binwidth`.
 </code></pre><p><img src="./figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
 
@@ -207,10 +206,11 @@ model {
 <section>
 <h2 id="-階層ベイズモデルの練習問題-種の数">🔰 階層ベイズモデルの練習問題: 種の数</h2>
 <p>100個体の植物から8つずつ種を取った、のデータでやってみよう。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">samplesize</span> <span class="o">=</span> <span class="m">100L</span>
-</span></span><span class="line"><span class="cl"><span class="n">df_seeds</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sigmoid</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gain</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gain</span> <span class="o">*</span> <span class="n">x</span><span class="p">))}</span>
+</span></span><span class="line"><span class="cl"><span class="n">samplesize</span> <span class="o">=</span> <span class="m">100L</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_seeds_od</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
 </span></span><span class="line"><span class="cl">  <span class="n">z</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">samplesize</span><span class="p">,</span> <span class="m">0.5</span><span class="p">,</span> <span class="m">3</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="n">wtl</span><span class="o">::</span><span class="nf">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">z</span><span class="p">),</span>
 </span></span><span class="line"><span class="cl">  <span class="n">y</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">samplesize</span><span class="p">,</span> <span class="m">8L</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
 </span></span></code></pre></div><img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
 
