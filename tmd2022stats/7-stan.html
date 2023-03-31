@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>7. StanでGLM — 統計モデリング実習 2022 TMDU</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="7. StanでGLM — 統計モデリング実習 2022 TMDU">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tmd2022stats/7-stan.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes/notes.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/search/search.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="統計モデリング実習-2022-tmdu"><a href=".">統計モデリング実習 2022 TMDU</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入、直線回帰</a>
+<li><a href="2-distribution.html">確率分布、擬似乱数生成</a>
+<li><a href="3-likelihood.html">尤度、最尤推定</a>
+<li><a href="4-glm.html">一般化線形モデル (GLM)</a>
+<li><a href="5-glmm.html">個体差、一般化線形混合モデル (GLMM)</a>
+<li><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
+<li class="current-deck"><a href="7-stan.html">StanでGLM</a>
+<li><a href="8-hbm.html">階層ベイズモデル (HBM)</a>
+</ol>
+<div class="footnote">
+2023-04-01 東京医科歯科大学<br>
+<a href="https://heavywatal.github.io/slides/tmd2022stats/">https://heavywatal.github.io/slides/tmd2022stats/</a>
+</div>
+
+</section>
+<section>
+<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">データ解析のための統計モデリング入門</a>」<br>
+をベースに回帰分析の概要を紹介。</p>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p><span style="color: #888888;">    ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span></p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p><span style="color: #888888;">    ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span></p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p><span style="color: #888888;">    ↓ もっと自由なモデリングを！</span></p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+
+</section>
+<section>
+<h2 id="mcmcで良さげなパラメータを効率よくサンプルする">MCMCで良さげなパラメータを効率よくサンプルする</h2>
+<p>乱数を使って（モンテカルロ法）、<br>
+前の値から次の値に飛ぶ（マルコフ連鎖）</p>
+<img src="figure/metropolis-trajectory-.gif" alt="plot of chunk metropolis-trajectory">
+</section>
+<section>
+<h2 id="推定結果は分布">推定結果は分布</h2>
+<div>
+<img src="figure/propto-lik-1.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
+$\;\sim\;$
+<img src="figure/propto-lik-2.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
+$\;\propto\;$
+<img src="figure/propto-lik-3.png" alt="plot of chunk propto-lik" style="vertical-align: middle;">
+</div>
+<ul>
+<li>広がり具合によって不確実性も表現できる。</li>
+<li>データが増えると逐次学習で尖っていき、確信が強まる。</li>
+</ul>
+<img src="figure/coin-bayesian-1.png" alt="plot of chunk coin-bayesian">
+</section>
+<section>
+<h2 id="stan">Stan</h2>
+<a href="https://mc-stan.org/">
+<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+</a>
+<ul>
+<li>Stan言語で<strong>モデルを柔軟に記述</strong>できる。</li>
+<li>C++で書かれていて<strong>高速に動作</strong>。</li>
+<li>RやPythonなどから呼び出して使うのが便利。
+<ul>
+<li>RStanと<a href="https://mc-stan.org/cmdstanr/"><strong>CmdStanR</strong></a>の2つあるけど後者を使う。</li>
+</ul>
+</li>
+</ul>
+<p>前回、回帰ではないパラメータ推定をやった。</p>
+<hr>
+<p>次に、回帰分析をStanでやってみる。</p>
+
+</section>
+<section>
+<h2 id="直線回帰するstanコードの例">直線回帰するStanコードの例</h2>
+<p>Rと同様、 <code>slope * x</code> のようなベクトル演算ができる。</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=0&gt; N;
+  vector&lt;lower=0&gt;[N] x;
+  vector[N] y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real&lt;lower=0&gt; sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="変数の型-vector-vs-array">変数の型: <code>vector</code> vs <code>array</code></h2>
+<p><code>vector</code>, <code>row_vector</code>, <code>matrix</code> は実数 <code>real</code> のみで、行列演算できる:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">real x;
+vector[3] v;
+row_vector[3] r;
+matrix[3, 3] m;
+
+x * v  // vector[3]
+r * v  // real
+v * r  // matrix[3, 3]
+m * v  // vector[3]
+m * m  // matrix[3, 3]
+m[1]   // row_vector[3]
+</code></pre><p><code>array</code> に型の制約は無いが、行列演算はできないので自力forループ:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">array[3] int a;
+array[3] int b;
+for (i in 1:3) {
+  b[i] = 2 * a[i] + 1
+}
+</code></pre>
+</section>
+<section>
+<h2 id="変数をうまく使って可読性アップ">変数をうまく使って可読性アップ</h2>
+<p>途中計算に名前をつけることでモデルが読みやすくなる:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">model {
+  vector[N] mu = intercept + slope * x;
+  y ~ normal(mu, sigma);
+}
+</code></pre><p><code>transformed parameters</code> に書くと<br>
+<code>parameters</code> と同様にMCMCサンプルが記録される:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+
+model {
+  y ~ normal(mu, sigma);
+}
+</code></pre><p>コードの見通しは良くなるが、結果の閲覧はちょっとやりづらくなる。</p>
+
+</section>
+<section>
+<h2 id="パラメータの事前分布を明示的に設定できる">パラメータの事前分布を明示的に設定できる</h2>
+<p>が、省略してもStanがデフォルトでうまくやってくれる。<br>
+そのせいで収束が悪いかも、となってから考えても遅くない。</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">parameters {
+  real intercept;
+  real slope;
+  real&lt;lower=0&gt; sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  sigma ~ student_t(3, 0, 10);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="事前分布の選別">事前分布の選別</h2>
+<ol>
+<li>
+<p>とりあえず<strong>無情報事前分布</strong> $[-\infty, \infty]$。Stanのデフォルト。</p>
+</li>
+<li>
+<p>収束が悪かったら<strong>弱情報事前分布</strong>を試す。<br>
+事後分布を更新していったとき<strong>事前分布っぽさが残らない</strong>のが良い。</p>
+<ul>
+<li>取りうる値を逃すような狭すぎる分布はダメ。</li>
+<li>狭すぎるよりはマシだが、広すぎても良くない。</li>
+<li>一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。</li>
+</ul>
+<p>おすすめ: <a href="https://mc-stan.org/docs/functions-reference/student-t-distribution.html"><strong>Student&rsquo;s t分布</strong></a>
+or <a href="https://mc-stan.org/docs/functions-reference/normal-distribution.html"><strong>正規分布</strong></a></p>
+</li>
+</ol>
+<p><cite><a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></cite></p>
+
+</section>
+<section>
+<h2 id="stanおすすめ弱情報事前分布-students-t分布">Stanおすすめ弱情報事前分布: Student&rsquo;s t分布</h2>
+<p>Student&rsquo;s $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$</p>
+<ul>
+<li>自由度 $3 \le \nu_0 \le 7 $ で適当に固定。
+<ul>
+<li>$\nu = 1$ でコーシー分布。裾野が広すぎて良くないらしい。</li>
+<li>$\nu \to \infty$ で<strong>正規分布</strong>。だいたいこれでいいらしい。</li>
+</ul>
+</li>
+<li>スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。</li>
+</ul>
+<p><img src="./figure/studentt-1.png" alt="plot of chunk studentt"></p>
+
+</section>
+<section>
+<h2 id="mcmcサンプルを使ってベイズ確信区間を作図">MCMCサンプルを使ってベイズ確信区間を作図</h2>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  // ...
+  int&lt;lower=0&gt; N_tilde
+  vector[N_tilde] x_tilde;
+}
+// ...
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+</code></pre><p><img src="./figure/stan-lm-credible-1.png" alt="plot of chunk stan-lm-credible"></p>
+
+</section>
+<section>
+<h2 id="-stanで一般化線形モデル">🔰 Stanで一般化線形モデル</h2>
+<p><a href="4-glm.html#/15">GLM回のデータ</a>をStanでモデリングしてみよう。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<ul>
+<li>
+<p>直線回帰</p>
+</li>
+<li>
+<p>ポアソン回帰</p>
+</li>
+<li>
+<p>ロジスティック回帰</p>
+</li>
+<li>
+<p>重回帰</p>
+</li>
+<li>
+<p>分散分析</p>
+</li>
+<li>
+<p>共分散分析</p>
+</div>
+<div class="column" style="flex-shrink: 1.0;">
+</li>
+</ul>
+<figure>
+<img src="figure/lm-bad-1.png" alt="plot of chunk lm-bad" height=200>
+<img src="figure/glm-poisson-1.png" alt="plot of chunk glm-poisson" height=200>
+<img src="figure/glm-logistic-1.png" alt="plot of chunk glm-logistic" height=200>
+<img src="figure/multiple-regression-1.png" alt="plot of chunk multiple-regression" height=200>
+<img src="figure/glm-anova-1.png" alt="plot of chunk glm-anova" height=200>
+<img src="figure/glm-ancova-1.png" alt="plot of chunk glm-ancova" height=200>
+</figure>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="-stanでpenguinsの回帰分析をしてみよう">🔰 Stanでpenguinsの回帰分析をしてみよう</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction" height="300">
+<p><a href="4-glm.html#/32">第4回GLM回</a>を参照。
+</section>
+<section>
+<h2 id="-stanでpenguinsの回帰分析をしてみよう">🔰 Stanでpenguinsの回帰分析をしてみよう</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<p><code>Stan does not support NA</code> と怒られるので欠損値を取り除いておく:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">()</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="8-hbm.html" class="readmore">
+8. 階層ベイズモデル (HBM)
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>
