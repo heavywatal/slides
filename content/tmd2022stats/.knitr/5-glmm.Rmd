@@ -108,24 +108,25 @@
 親1個体あたりの生存数は<span style="color: `r palette()[3]`;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
+```{r, df-seeds-od}
+#| echo: false
+set.seed(24601)
+samplesize = 100L
+df_seeds_od = tibble::tibble(
+  z = rnorm(samplesize, 0.5, 3),
+  p = wtl::sigmoid(z),
+  y = rbinom(samplesize, 8L, p))
+```
 ```{r, overdispersion}
 #| echo: false
 #| fig.height: 5
 #| fig.width: 6
 #| warning: false
-set.seed(24601)
-ninds = 100L
-mu_ind = 0.5
-sd_ind = 3
-df_od = tibble::tibble(
-  z = rnorm(ninds, mu_ind, sd_ind),
-  p = wtl::sigmoid(z),
-  y = rbinom(ninds, 8L, p))
-sum_y = sum(df_od$y)
+sum_y = sum(df_seeds_od$y)
 p_hat = sum_y / 800
-tidy_od = df_od |>
+tidy_od = df_seeds_od |>
   dplyr::count(y, name = "observed") |>
-  dplyr::mutate(expected = ninds * dbinom(y, 8, p_hat)) |>
+  dplyr::mutate(expected = samplesize * dbinom(y, 8, p_hat)) |>
   tidyr::pivot_longer(!y, names_to = "key", values_to = "count") |>
   dplyr::mutate(width = ifelse(key == "expected", 0.8, 0.4), alpha = ifelse(key == "expected", 0.5, 1))
 label = bquote(hat(p) == .(paste(sprintf("%d/800 = %.2f", sum_y, p_hat))))
@@ -156,7 +157,7 @@ i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個
 #| fig.height: 3
 #| fig.width: 11
 color_z = palette()[2]
-df_od |>
+df_seeds_od |>
   tibble::rowid_to_column("id") |>
   ggplot() + aes(id, y / 8) +
   geom_col(width = 0.6, fill = color_z, alpha = 0.66) +
@@ -182,20 +183,23 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 #| fig.width: 11
 #| warning: false
 z_hat = wtl::logit(p_hat)
-p_sigmoid = df_od |>
+p_sigmoid = df_seeds_od |>
   ggplot() + aes(z, p) +
   geom_line(linewidth = 2, alpha = 0.6, color = color_z) +
   annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = color_z) +
   annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = color_z) +
-  scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
+  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
   labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
-p_normal = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 100), Density = dnorm(z, z_hat, sd_ind)) |>
+p_normal = tibble::tibble(
+    z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 100),
+    Density = dnorm(z, z_hat, 3)
+  ) |>
   ggplot() + aes(z, Density) +
   geom_area(fill = color_z, alpha = 0.5) +
   geom_vline(xintercept = z_hat, color = color_z) +
-  scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
+  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
   labs(x = expression(italic(z))) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
@@ -220,7 +224,7 @@ cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
 sigma = c(0.5, 1.5, 3)
 breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
 scale_fill_z = scale_fill_viridis_b(option = "turbo", begin = 0.05, end = 0.95, breaks = breaks)
-.z = seq(min(df_od$z), max(df_od$z), 0.1)
+.z = seq(min(df_seeds_od$z), max(df_seeds_od$z), 0.1)
 df_z = tidyr::crossing(sigma, z = .z) |>
   dplyr::mutate(Density = dnorm(z, z_hat, sigma)) |>
   dplyr::mutate(sigma = ifelse(sigma > 0.1, sigma, 0))
@@ -228,7 +232,7 @@ df_z = tidyr::crossing(sigma, z = .z) |>
 p_z = df_z |>
   dplyr::bind_rows(tibble::tibble(sigma = 0, z = .z, Density = ifelse(abs(z - z_hat) < 0.2, Inf, 0))) |>
   ggplot() + aes(z, Density) +
-  scale_x_continuous(limits = range(df_od$z), expand = c(0, 0)) +
+  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
   facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
   labs(x = expression(italic(z))) +
   theme_bw(base_size = 20) +
@@ -237,7 +241,7 @@ p_z = df_z |>
 
 p_z + geom_col(aes(fill = sigma == 0), width = 0.1, alpha = 0.6)
 
-df_unmixed = tibble::tibble(z = seq(min(df_od$z), max(df_od$z), length.out = 20)) |>
+df_unmixed = tibble::tibble(z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 20)) |>
   dplyr::mutate(p = wtl::sigmoid(z)) |>
   purrr::pmap(function(z, p) {
     tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))

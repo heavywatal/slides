@@ -1010,9 +1010,7 @@ model {
 ```{r, converge-template}
 #| include: false
 convdata = tibble::lst(N = 10L, x = rep(10L, N))
-myplot_trace = function(stan_file, data) {
-  model = cmdstan_model(stan_file)
-  fit = model$sample(data = data, seed = 24601L, show_messages = FALSE, refresh = 0)
+myplot_trace = function(fit) {
   s = fit$summary(variables = "lambda")
   stats = sprintf("Rhat = %.4f, N_eff = %.1f", s[["rhat"]], s[["ess_bulk"]])
   bayesplot::mcmc_trace(fit$draws("lambda")) +
@@ -1026,12 +1024,18 @@ myplot_trace = function(stan_file, data) {
 ```{r, converge-yes-plot}
 #| include: false
 #| cache_stan: converge-yes
-p_yes = myplot_trace("stan/converge-yes.stan", convdata)
+#| stan_save_output_files: fit_yes
+mod_yes = cmdstan_model("stan/converge-yes.stan", pedantic = TRUE)
+fit_yes = mod_yes$sample(data = convdata, seed = 24601L, refresh = 0)
+p_yes = myplot_trace(fit_yes)
 ```
 ```{r, converge-no-plot}
 #| include: false
 #| cache_stan: converge-no
-p_no = myplot_trace("stan/converge-no.stan", convdata)
+#| stan_save_output_files: fit_no
+mod_no = cmdstan_model("stan/converge-no.stan", pedantic = TRUE)
+fit_no = mod_no$sample(data = convdata, seed = 24601L, refresh = 0)
+p_no = myplot_trace(fit_no)
 ```
 ```{r, convergence}
 #| echo: false
@@ -1245,6 +1249,7 @@ model = cmdstan_model("stan/coin.stan")
 
 ```{r, stan-binom-sample}
 #| results: false
+#| stan_save_output_files: "fit"
 fit = model$sample(coin_data, seed = 24601L)
 ```
 

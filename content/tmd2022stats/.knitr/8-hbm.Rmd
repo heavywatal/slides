@@ -119,21 +119,22 @@ model {
 ---
 ## 変量効果が入った推定結果
 
-```{r, df-seeds}
+```{r, df-seeds-od-8}
 #| echo: false
 set.seed(24601)
+sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
 samplesize = 100L
-df_seeds = tibble::tibble(
+df_seeds_od = tibble::tibble(
   z = rnorm(samplesize, 0.5, 3),
-  p = wtl::sigmoid(z),
+  p = sigmoid(z),
   y = rbinom(samplesize, 8L, p))
 ```
-
 ```{r, stan-glmm-prep}
 #| cache_stan: glmm
+#| stan_save_output_files: fit
 #| message: false
 #| results: false
-seeds_data = list(y = df_seeds$y, N = samplesize)
+seeds_data = list(y = df_seeds_od$y, N = samplesize)
 model = cmdstan_model("stan/glmm.stan")
 fit = model$sample(data = seeds_data, seed = 19937L, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
@@ -152,6 +153,7 @@ print(fit)
 
 ```{r, stan-glmm}
 #| echo: false
+#| warning: false
 #| fig.width: 11
 #| fig.height: 6
 p_trace = bayesplot::mcmc_trace(draws, facet_args = list(nrow = 1L)) + coord_flip()
@@ -166,7 +168,7 @@ cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 100個体の植物から8つずつ種を取った、のデータでやってみよう。
 
 ```{r, df-seeds-generate}
-#| ref.label: df-seeds
+#| ref.label: df-seeds-od-8
 #| echo: -1
 ```
 
@@ -240,6 +242,8 @@ p_base
 ---
 ## 非線形回帰の例: Stanコード
 
+さっきの数式を `model` ブロックに書く。
+
 ```stan
 data {
   int<lower=1> N;
@@ -290,6 +294,7 @@ model {
 - 推定結果は分布そのもの。
     - そこから点推定も区間推定も可能。
 - 解析的に解けない問題は計算機に乱数を振らせて解く。
+    - MCMCサンプル $\sim$ 解きにくい事後分布
     - 理論・技術の進歩が目覚ましい。
 
 
@@ -300,7 +305,7 @@ model {
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="1000">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>
@@ -316,6 +321,9 @@ model {
 - **確率分布**とその背後にある**確率過程**の理解が重要。
     - 乱数生成→作図を繰り返してイメージを掴もう。
     - MCMCサンプリングも事後分布からの乱数生成。
+- 本講義で「統計モデリングを完全に理解した」とは言えない。
+    - 理論も実践もほとんど説明していない。
+    - 本を読む準備ができた、くらいの気持ち？
 
 
 ---
