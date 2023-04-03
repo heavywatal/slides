@@ -24,6 +24,7 @@ def main():
         if not cli.dry_run:
             with open(infile, "w") as fout:
                 fout.write("\n".join(lines))
+                fout.write("\n")
 
 
 def sub(line: str, i: int):
@@ -46,11 +47,14 @@ def repl(mobj: re.Match[str], i: int):
     if "=" in label:
         options = (label + ", " + options).strip(", ")
         label = ""
-    elif re.search(r"[^\w-]", label):
+    elif re.search(r"[^a-zA-Z0-9-]", label):
         _log.warning(f"{i}:use-hyphen: {label}")
     if label:
         if label in used:
-            _log.warning(f"{i}:duplicated: {label}")
+            if label.startswith("setup-") and i < 10:
+                _log.info(f"{i}:duplicated: {label}")
+            else:
+                _log.warning(f"{i}:duplicated: {label}")
         else:
             used.add(label)
         header += f", {label}"

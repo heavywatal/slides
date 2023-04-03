@@ -106,7 +106,7 @@ model {
 ```
 
 Rからデータを渡して走らせる:
-```{r, stan-binom}
+```{r, stan-coin-binom}
 #| cache_stan: "binom"
 #| results: "hide"
 #| stan_save_output_files: "coin_fit"
@@ -224,7 +224,7 @@ lm_draws = lm_fit$draws(format = "df") |> print()
 
 実体はCmdStanが書き出したCSVファイル:
 
-```{r, fit_output_files}
+```{r, fit-output-files}
 #| results: "hide"
 lm_fit$output_files()
 ```
@@ -756,11 +756,9 @@ model {
 
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
-```{r, penguins}
-#| include: false
-```
 
-```{r, penguins-dropna}
+
+```{r, penguins-dropna-stan}
 #| echo: 3
 withr::local_package("palmerpenguins")
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
