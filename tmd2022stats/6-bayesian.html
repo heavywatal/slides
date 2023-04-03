@@ -707,7 +707,7 @@ R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code
 <section>
 <h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
 <p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/coin.stan&#34;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/coin.stan&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">coin_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">24601L</span><span class="p">)</span>
 </span></span></code></pre></div><p>いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
@@ -752,10 +752,7 @@ $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
 <p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
 真の$p$の値も含まれている:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">20</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
-</code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with
-`binwidth`.
-</code></pre><p><img src="./figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+</span></span></code></pre></div><p><img src="./figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
 
 </section>
 <section>

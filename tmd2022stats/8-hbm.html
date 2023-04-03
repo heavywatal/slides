@@ -104,7 +104,7 @@ window.addEventListener('DOMContentLoaded', function() {
 <section>
 <h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
 <p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？</p>
 <img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
 </section>
@@ -177,7 +177,7 @@ model {
 <section>
 <h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">seeds_data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">df_seeds_od</span><span class="o">$</span><span class="n">y</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">samplesize</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/glmm.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/glmm.stan&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">seeds_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">19937L</span><span class="p">,</span> <span class="n">step_size</span> <span class="o">=</span> <span class="m">0.1</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&#34;z_hat&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">,</span> <span class="s">&#34;r[1]&#34;</span><span class="p">,</span> <span class="s">&#34;r[2]&#34;</span><span class="p">))</span>
 </span></span></code></pre></div><pre tabindex="0"><code> variable    mean  median   sd  mad      q5     q95 rhat ess_bulk ess_tail
@@ -198,9 +198,7 @@ model {
 <section>
 <h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
 <p>データ生成の真のパラメータ値は $\hat z = 0.5,~\sigma = 3.0$ だった。</p>
-<pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with
-`binwidth`.
-</code></pre><p><img src="./figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
+<p><img src="./figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
 
 </section>
 <section>

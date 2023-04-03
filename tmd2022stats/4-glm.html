@@ -776,6 +776,25 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </code></pre>
 </section>
 <section>
+<h2 id="欠損値のある行を取り除いておく">欠損値のある行を取り除いておく</h2>
+<p>性別はとりあえず使わないので、体長関連だけでも。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">if_any</span><span class="p">(</span><span class="nf">everything</span><span class="p">(),</span> <span class="n">is.na</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex year
+ 1  Adelie Torgersen             NA            NA                NA          NA  NA 2007
+ 2  Adelie Torgersen           34.1          18.1               193        3475  NA 2007
+ 3  Adelie Torgersen           42.0          20.2               190        4250  NA 2007
+ 4  Adelie Torgersen           37.8          17.1               186        3300  NA 2007
+--                                                                                      
+ 8  Gentoo    Biscoe           46.2          14.4               214        4650  NA 2008
+ 9  Gentoo    Biscoe           47.3          13.8               216        4725  NA 2009
+10  Gentoo    Biscoe           44.5          15.7               217        4875  NA 2009
+11  Gentoo    Biscoe             NA            NA                NA          NA  NA 2009
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">dim</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 342   8
+</code></pre>
+</section>
+<section>
 <h2 id="-penguinsでglmの練習">🔰 penguinsでGLMの練習</h2>
 <p>次の課題を解いてみよう。<br>
 (次ページ以降に解答。まずは自力で。)</p>
@@ -791,7 +810,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <section>
 <h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
 <p>どうやら、重いペンギンほど翼長も長い。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span> <span class="o">+</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">,</span> <span class="n">flipper_length_mm</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.66</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span>
@@ -804,7 +823,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
 <p>とりあえずデフォルトの正規分布・恒等リンク。
 $y = 136.7 + 0.0153 x$</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>         term     estimate   std.error statistic       p.value
 1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
@@ -817,7 +836,7 @@ $y = 136.7 + 0.0153 x$</p>
 <section>
 <h2 id="単回帰の練習-3-フィッティング結果を作図">単回帰の練習: 3. フィッティング結果を作図</h2>
 <p>結果とデータから予測値を作って回帰線を引く。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added1</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit1</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added1</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit1</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added1</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span>
@@ -837,7 +856,7 @@ $y = 136.7 + 0.0153 x$</p>
 <h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
 <p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
 1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
@@ -851,7 +870,7 @@ $y = 136.7 + 0.0153 x$</p>
 </section>
 <section>
 <h2 id="重回帰の練習-3-フィッティング結果を作図">重回帰の練習: 3. フィッティング結果を作図</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added2</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added2</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added2</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p2</span>
@@ -863,7 +882,7 @@ $y = 136.7 + 0.0153 x$</p>
 <h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
 <p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>                          term      estimate    std.error statistic       p.value
 1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
@@ -879,7 +898,7 @@ $y = 136.7 + 0.0153 x$</p>
 </section>
 <section>
 <h2 id="交互作用の練習-フィッティング結果を作図">交互作用の練習: フィッティング結果を作図</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added3</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins</span><span class="p">,</span> <span class="n">fit3</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added3</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit3</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added3</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p3</span>

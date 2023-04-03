@@ -168,7 +168,7 @@ model {
 }
 </code></pre><p>Rからデータを渡して走らせる:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">coin_data</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">lst</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="m">50L</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0.7</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="n">coin_model</span> <span class="o">=</span> <span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/coin.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">coin_model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/binom.stan&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">coin_fit</span> <span class="o">=</span> <span class="n">coin_model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">coin_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">24601L</span><span class="p">)</span>
 </span></span></code></pre></div>
 </section>
@@ -327,10 +327,7 @@ iteration   1   2   3   4
 <section>
 <h2 id="各パラメータの事後分布">各パラメータの事後分布</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">lm_draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Warning: The following arguments were unrecognized and ignored: bins
-</code></pre><pre tabindex="0"><code>`stat_bin()` using `bins = 30`. Pick better value with
-`binwidth`.
-</code></pre><p><img src="./figure/stan-lm-hist-1.png" alt="plot of chunk stan-lm-hist"></p>
+</span></span></code></pre></div><p><img src="./figure/stan-lm-hist-1.png" alt="plot of chunk stan-lm-hist"></p>
 
 </section>
 <section>
@@ -570,7 +567,7 @@ or <a href="https://mc-stan.org/docs/functions-reference/student-t-distribution.
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 <p><code>Stan does not support NA</code> と怒られるので欠損値を取り除いておく:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">()</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">)</span>
 </span></span></code></pre></div>
 </section>
 <section>
