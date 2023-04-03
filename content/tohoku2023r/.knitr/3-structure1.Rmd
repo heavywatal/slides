@@ -1,38 +1,12 @@
-+++
-url = "tohoku2022r/3-structure1.html"
-title = "3. データ構造の処理1: 抽出、集約など — 進化学実習 2022 牧野研"
-linktitle = "データ構造の処理1: 抽出、集約など。"
-date = 2022-04-12T14:30:00+09:00
-type = "reveal"
-draft = false
-+++
-
-<link rel="stylesheet" href="style.css">
-
-# [進化学実習 2022 牧野研](.)
-
-### 3. データ構造の処理1: 抽出、集約など。
-
-<div class="author">
-岩嵜航
-</div>
-
-<div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
-</div>
-
-<div class="footnote">
-2022-04-11 東北大学 理学部生物学科 進化学実習
-<a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
-</div>
-
-```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
 ```
-
-```{r setup-local, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
+```{r, setup-local}
+#| include: false
+#| cache: false
 ```
-
 
 ---
 ## この実習の目標
@@ -66,7 +40,7 @@ knitr::opts_chunk$set(cache = TRUE)
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -79,7 +53,7 @@ knitr::opts_chunk$set(cache = TRUE)
 
 <figure>
 <a href="https://r4ds.had.co.nz/explore-intro.html">
-<img src="/slides/image/r4ds/data-science-explore.png">
+<img src="/slides/image/r4ds/data-science-explore.png" width="720">
 <figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
 </a>
 </figure>
@@ -205,7 +179,7 @@ knitr::opts_chunk$set(cache = TRUE)
 <a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
 </cite>
 
-```{r tidy_example}
+```{r, diamonds-is-tidy}
 print(ggplot2::diamonds)
 ```
 
@@ -214,29 +188,30 @@ print(ggplot2::diamonds)
 
 x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
 
-```r
+```{r, tidy-data-benefit}
+#| fig.height: 5.5
+#| fig.width: 9
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
   facet_wrap(vars(cut))
 ```
 
-<img src="figure/tidy-data-benefit-1.png" alt="plot of chunk tidy-data-benefit">
-
 ---
 ## 目標: 生データを下ごしらえして食べやすい形に
 
-```{r messy_example}
+```{r, before-tidy}
 print(VADeaths)
 ```
 
 ↓ 下ごしらえ: 作図・解析で使いやすい整然データに
 
-```{r tidy_vadeaths, echo=FALSE}
-VADeaths %>%
-  as.data.frame() %>%
-  rownames_to_column("age") %>%
-  pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") %>%
-  separate(age, c("lbound", "ubound"), convert = TRUE)
+```{r, after-tidy}
+#| echo: false
+VADeaths |>
+  as.data.frame() |>
+  tibble::rownames_to_column("age") |>
+  tidyr::pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") |>
+  tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
 ```
 
 
@@ -263,19 +238,29 @@ VADeaths %>%
 ## tidyverse: データ科学のためのパッケージ群
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
 </a>
 
-- 統一的な使い勝手
-- シンプルな関数を繋げて使うデザイン
-
 ```r
-# install.packages("tidyverse")
-library(tidyverse)  # パッケージ読み込み
+install.packages("tidyverse")
+library(conflicted) # 安全のおまじない
+library(tidyverse)  # 一挙に読み込み
 ```
-```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
-cat(tidyverse_msg, sep = "\n")
+```{r, tidyverse-messasge}
+#| echo: false
+withr::with_namespace("tidyverse", {
+  cat(tidyverse_attach_message(core), sep = "\n")
+})
 ```
+
+一貫したデザインでデータ解析の様々な工程をカバー
+
+<figure style="margin-block: 0;">
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
 
 **dplyr ≥1.0.7** と **tidyr ≥1.2.0** を使いたいので古かったら更新:
 ```r
@@ -287,7 +272,7 @@ update.packages(ask = "no", type = "binary")
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
 </a>
 
 シンプルな関数がたくさん。繋げて使う (piping)
@@ -321,46 +306,51 @@ print(diamonds)
 View(diamonds)  # RStudio
 ```
 
-```{r dplyr-diamonds, echo=FALSE}
+```{r, dplyr-diamonds}
+#| echo: false
 print(diamonds)
 ```
 
 🔰 `starwars` データも眺めてみよう
 
+```{r, library-dplyr}
+#| include: false
+withr::local_package("dplyr")
+```
 
 ---
 ## dplyr 使用例
 
 小さな関数を繋げて使う流れ作業:
-```{r dplyr-example}
-result = diamonds %>%              # 生データから出発して
-  select(carat, cut, price) %>%    # 列を抽出して
-  filter(carat > 1) %>%            # 行を抽出して
-  group_by(cut) %>%                # グループ化して
-  summarize(mean(price)) %>%       # 平均を計算
-  print()                          # 表示してみる
+```{r, dplyr-example}
+result = diamonds |>              # 生データから出発して
+  select(carat, cut, price) |>    # 列を抽出して
+  filter(carat > 1) |>            # 行を抽出して
+  group_by(cut) |>                # グループ化して
+  summarize(mean(price)) |>       # 平均を計算
+  print()                         # 表示してみる
 ```
 
-この見慣れぬ記号 `%>%` は何？<br>
+この見慣れぬ記号 `|>` は何？<br>
 (`select()` など個々の関数は後で触れるとして)
 
 ---
-## Pipe operator (パイプ演算子) `%>%`
+## Pipe operator (パイプ演算子) `|>`
 
 パイプの左側の変数を、右側の関数の第一引数にねじ込む:
 ```r
-diamonds %>% filter(carat > 1)
+diamonds |> filter(carat > 1)
 filter(diamonds, carat > 1)     # これと同じ
 
 # 前処理の流れ作業に便利:
-diamonds %>% filter(carat > 1) %>% select(carat, price) %>% ...
-potatos %>% cut() %>% fry() %>% season() %>% eat()
+diamonds |> filter(carat > 1) |> select(carat, price) |> ...
+potatos |> cut() |> fry() |> season("salt") |> eat()
 ```
 
 🔰 パイプを使わない形に書き換え、出力を確認しよう:
-```{r letters}
-seq(1, 6) %>% sum()
-letters %>% toupper() %>% head(3)
+```{r, letters}
+seq(1, 6) |> sum()
+letters |> toupper() |> head(3)
 ```
 
 [解答例]
@@ -370,10 +360,10 @@ head(toupper(letters), 3)
 ```
 
 ---
-## パイプ演算子 `%>%` を使わない方法
+## パイプ演算子 `|>` を使わない方法
 
 😐 一時変数をイチイチ作る:
-```{r pipe-tmp-var}
+```{r, pipe-tmp-var}
 tmp1 = select(diamonds, carat, cut, price)   # 列を抽出して
 tmp2 = filter(tmp1, carat > 1)               # 行を抽出して
 tmp3 = group_by(tmp2, cut)                   # グループ化して
@@ -381,7 +371,7 @@ result = summarize(tmp3, mean(price))        # 平均を計算
 ```
 
 😐 同じ名前を使い回す:
-```{r pipe-recursive-assign}
+```{r, pipe-recursive-assign}
 result = select(diamonds, carat, cut, price) # 列を抽出して
 result = filter(result, carat > 1)           # 行を抽出して
 result = group_by(result, cut)               # グループ化して
@@ -393,10 +383,10 @@ result = summarize(result, mean(price))      # 平均を計算
 
 
 ---
-## パイプ演算子 `%>%` を使わない方法
+## パイプ演算子 `|>` を使わない方法
 
 😫 一時変数を使わずに:
-```{r pipe-nest}
+```{r, pipe-nest}
 result = summarize(                    # 平均を計算
     group_by(                            # グループ化して
       filter(                              # 行を抽出して
@@ -407,7 +397,7 @@ result = summarize(                    # 平均を計算
 ```
 
 🤪 改行さえせずに:
-```{r pipe-oneliner}
+```{r, pipe-oneliner}
 result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
 ```
 
@@ -415,33 +405,39 @@ result = summarize(group_by(filter(select(diamonds, carat, cut, price), carat > 
 さっきのほうがぜんぜんマシ。
 
 ---
-## パイプ演算子 `%>%` を使おう
+## パイプ演算子 `|>` を使おう
 
 😁 慣れれば、論理の流れを追いやすい:
-```{r eg-pipe}
-result = diamonds %>%
-  select(carat, cut, price) %>%    # 列を抽出して
-  filter(carat > 1) %>%            # 行を抽出して
-  group_by(cut) %>%                # グループ化して
-  summarize(mean(price)) %>%       # 平均を計算
-  print()                          # 表示してみる
+```{r, eg-pipe}
+result = diamonds |>
+  select(carat, cut, price) |>    # 列を抽出して
+  filter(carat > 1) |>            # 行を抽出して
+  group_by(cut) |>                # グループ化して
+  summarize(mean(price)) |>       # 平均を計算
+  print()                         # 表示してみる
 ```
 
-慣れるまではちょっと大変かも。
-無理して使わなくても大丈夫。
+tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
+使わなければならないわけではないが、読めたほうがいい。
+
+<div style="font-size: 0.8em; color: #888888;">
+
+R < 4.2 までよく使われていた `%>%` もほぼ同じ。
+
+</div>
 
 
 ---
 ## 列の抽出: `select()`
 
 **列の番号**で指定:
-```{r select-number}
-result = diamonds %>%
-  select(1, 2, 7) %>%
+```{r, select-number}
+result = diamonds |>
+  select(1, 2, 7) |>
   print()
 ```
 
-別解: `%>% select(c(1, 2, 7))`, `diamonds[, c(1, 2, 7)]`
+別解: `|> select(c(1, 2, 7))`, `diamonds[, c(1, 2, 7)]`
 
 🔰 `starwars` の 1, 10, 11 列目を3通りの方法で抽出してみよう
 
@@ -449,13 +445,13 @@ result = diamonds %>%
 ## 列の抽出: `select()`
 
 **列の名前**で指定:
-```{r select-name}
-result = diamonds %>%
-  select(carat, cut, price) %>%
+```{r, select-name}
+result = diamonds |>
+  select(carat, cut, price) |>
   print()
 ```
 
-別解: `diamonds %>% select(c("carat", "cut", "price"))`
+別解: `diamonds |> select(c("carat", "cut", "price"))`
 
 🔰 `starwars` の 1, 10, 11 列目を**列名で**抽出してみよう
 
@@ -464,13 +460,13 @@ result = diamonds %>%
 ## 列の抽出: `select()`
 
 **捨てる列**を反転指定:
-```{r select-negative}
-result = diamonds %>%
-  select(!c(carat, cut, price)) %>%
+```{r, select-negative}
+result = diamonds |>
+  select(!c(carat, cut, price)) |>
   print()
 ```
 
-別解: `diamonds %>% select(!c("carat", "cut", "price"))`
+別解: `diamonds |> select(!c("carat", "cut", "price"))`
 
 🔰 `starwars` の **1, 10, 11 列目を除外**してみよう
 
@@ -478,9 +474,9 @@ result = diamonds %>%
 ## 列の抽出: `select()`
 
 名前の**部分一致**で指定:
-```{r select-matches}
-result = diamonds %>%
-  select(starts_with("c")) %>%
+```{r, select-matches}
+result = diamonds |>
+  select(starts_with("c")) |>
   print()
 ```
 
@@ -492,9 +488,9 @@ See `?dplyr_tidy_select` or [selection helpers](https://tidyselect.r-lib.org/ref
 ## 列の抽出: `select()`
 
 **列の型**で指定:
-```{r select-where}
-result = diamonds %>%
-  select(where(is.numeric)) %>%
+```{r, select-where}
+result = diamonds |>
+  select(where(is.numeric)) |>
   print()
 ```
 
@@ -506,9 +502,9 @@ See `?dplyr_tidy_select` or [`tidyselect::where`](https://tidyselect.r-lib.org/r
 ## 行の抽出: `filter()`
 
 等号 `==` で**完全一致する行**のみ残す:
-```{r filter-exact}
-result = diamonds %>%
-  filter(cut == "Ideal") %>%
+```{r, filter-exact}
+result = diamonds |>
+  filter(cut == "Ideal") |>
   print()
 ```
 
@@ -520,9 +516,9 @@ result = diamonds %>%
 ## 行の抽出: `filter()`
 
 不等号 `!=`, `<`, `<=`, `>`, `>=` を満たす行のみ残す:
-```{r filter-unequal}
-result = diamonds %>%
-  filter(cut != "Ideal") %>%
+```{r, filter-unequal}
+result = diamonds |>
+  filter(cut != "Ideal") |>
   print()
 ```
 
@@ -532,9 +528,9 @@ result = diamonds %>%
 ## 行の抽出: `filter()`
 
 複数の値のうち**どれかに一致する行**のみ残す:
-```{r filter-in}
-result = diamonds %>%
-  filter(cut %in% c("Ideal", "Good")) %>%
+```{r, filter-in}
+result = diamonds |>
+  filter(cut %in% c("Ideal", "Good")) |>
   print()
 ```
 
@@ -544,9 +540,9 @@ result = diamonds %>%
 ## 行の抽出: `filter()`
 
 2つの条件を**両方満たす行**のみ残す (AND):
-```{r filter-and}
-result = diamonds %>%
-  filter(carat > 2 & price < 14000) %>%
+```{r, filter-and}
+result = diamonds |>
+  filter(carat > 2 & price < 14000) |>
   print()
 ```
 
@@ -557,9 +553,9 @@ result = diamonds %>%
 ## 行の抽出: `filter()`
 
 2つの条件の**いずれかを満たす行**のみ残す (OR):
-```{r filter-or}
-result = diamonds %>%
-  filter(carat > 2 | price < 14000) %>%
+```{r, filter-or}
+result = diamonds |>
+  filter(carat > 2 | price < 14000) |>
   print()
 ```
 
@@ -569,9 +565,9 @@ result = diamonds %>%
 ## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
 
 指定した列の値が**大きい順**に `n` 行または割合 `prop` で抽出:
-```{r slice_max}
-result = diamonds %>%
-  slice_max(price, n = 5L) %>%
+```{r, slice-max}
+result = diamonds |>
+  slice_max(price, n = 5L) |>
   print()
 ```
 
@@ -584,10 +580,10 @@ result = diamonds %>%
 ## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
 
 指定した列の値が**大きい順**に**各グループから**抽出:
-```{r group_slice_max}
-result = diamonds %>%
-  group_by(cut) %>%
-  slice_max(price, n = 2L) %>%
+```{r, group-slice-max}
+result = diamonds |>
+  group_by(cut) |>
+  slice_max(price, n = 2L) |>
   print()
 ```
 
@@ -597,10 +593,10 @@ result = diamonds %>%
 ## 先頭/末尾の行の抽出: `slice_head()`, `slice_tail()`
 
 **各グループの先頭**を `n` 行または割合 `prop` で抽出:
-```{r group_slice_head}
-result = diamonds %>%
-  group_by(cut) %>%
-  slice_head(n = 3L) %>%
+```{r, group-slice-head}
+result = diamonds |>
+  group_by(cut) |>
+  slice_head(n = 3L) |>
   print()
 ```
 
@@ -611,10 +607,10 @@ result = diamonds %>%
 ## ランダムに行の抽出: `slice_sample()`
 
 **ランダムに** `n` 行または割合 `prop` でサンプル:
-```{r slice_sample}
-result = diamonds %>%
-  group_by(cut) %>%
-  slice_sample(n = 3L, replace = FALSE) %>%
+```{r, slice-sample}
+result = diamonds |>
+  group_by(cut) |>
+  slice_sample(n = 3L, replace = FALSE) |>
   print()
 ```
 
@@ -625,10 +621,10 @@ result = diamonds %>%
 ## X番目の行の抽出: `slice()`
 
 **各グループのX番目の行**を抽出:
-```{r group_slice}
-result = diamonds %>%
-  group_by(cut) %>%
-  slice(c(1, 2, 9)) %>%
+```{r, group-slice}
+result = diamonds |>
+  group_by(cut) |>
+  slice(c(1, 2, 9)) |>
   print()
 ```
 
@@ -637,9 +633,9 @@ result = diamonds %>%
 ## 要約・集計: `summarize()`
 
 列の**合計、平均、最大**などを求める:
-```{r summarize}
-result = diamonds %>%
-  summarize(sum(carat), mean(carat), max(price)) %>%
+```{r, summarize}
+result = diamonds |>
+  summarize(sum(carat), mean(carat), max(price)) |>
   print()
 ```
 
@@ -652,11 +648,11 @@ vectorを受け取って1つの値を返す集約関数:<br>
 ## 要約・集計: `summarize()`
 
 列の値を**グループごとに**集計する:
-```{r group_summarize}
-result = diamonds %>%
-  group_by(cut) %>%
+```{r, group-summarize}
+result = diamonds |>
+  group_by(cut) |>
   summarize(avg_carat = mean(carat),
-            max_price = max(price)) %>%
+            max_price = max(price)) |>
   print()
 ```
 
@@ -667,10 +663,10 @@ result = diamonds %>%
 ## 要約・集計: `summarize()` 発展編
 
 複数の列の複数の値を柔軟に集計する:
-```{r group_summarize_across}
-result = diamonds %>%
-  group_by(cut) %>%
-  summarize(across(where(is.numeric), range)) %>%
+```{r, group-summarize-across}
+result = diamonds |>
+  group_by(cut) |>
+  summarize(across(where(is.numeric), range)) |>
   print()
 ```
 
@@ -680,9 +676,9 @@ result = diamonds %>%
 ## 要約・集計: `count()`
 
 指定した列の組み合わせ出現数を数える:
-```{r count}
-result = diamonds %>%
-  count(cut, color) %>%
+```{r, count}
+result = diamonds |>
+  count(cut, color) |>
   print()
 ```
 
@@ -693,9 +689,9 @@ result = diamonds %>%
 ## 重複行の除去: `distinct()`
 
 指定した列に関してユニークな行のみ残す:
-```{r distinct}
-result = diamonds %>%
-  distinct(cut, color) %>%
+```{r, distinct}
+result = diamonds |>
+  distinct(cut, color) |>
   print()
 ```
 
@@ -709,9 +705,9 @@ result = diamonds %>%
 ## 行の並べ替え: `arrange()`
 
 指定した列の**昇順(または降順 `desc()`)で**行を並べ替える:
-```{r arrange}
-result = diamonds %>%
-  arrange(color, desc(carat)) %>%  # 色の昇順。色が同じなら大きさ降順
+```{r, arrange}
+result = diamonds |>
+  arrange(color, desc(carat)) |>  # 色の昇順。色が同じなら大きさ降順
   print()
 ```
 
@@ -721,9 +717,9 @@ result = diamonds %>%
 ## 列の並べ替え: `relocate()`
 
 指定した列を左端に移動:
-```{r relocate}
-result = diamonds %>%
-  relocate(carat, price, clarity) %>%
+```{r, relocate}
+result = diamonds |>
+  relocate(carat, price, clarity) |>
   print()
 ```
 
@@ -736,10 +732,10 @@ result = diamonds %>%
 ## 列の追加・変更: `mutate()`
 
 既存の列名を指定すると上書き:
-```{r mutate}
-result = diamonds %>%
+```{r, mutate}
+result = diamonds |>
   mutate(ratio = price / carat,
-         price = 105.59 * price) %>%
+         price = 105.59 * price) |>
   print()
 ```
 
@@ -750,9 +746,9 @@ result = diamonds %>%
 ## 列名の変更: `rename()`
 
 `new = old` の形で指定する:
-```{r rename}
-result = diamonds %>%
-  rename(size = carat) %>%
+```{r, rename}
+result = diamonds |>
+  rename(size = carat) |>
   print()
 ```
 
@@ -816,6 +812,4 @@ Older versions
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2021/)」
    石川由希 2021 名古屋大学
 
-<a href="4-structure2.html" rel="next" class="readmore">
-4. データ構造の処理2: 結合、変形など。
-</a>
+`r .meta$next_link`

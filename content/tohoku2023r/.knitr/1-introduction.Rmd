@@ -1,36 +1,11 @@
-+++
-url = "tohoku2022r/1-introduction.html"
-title = "1. 導入: データ解析の全体像。Rを使うメリット。Rの基本 — 進化学実習 2022 牧野研"
-linktitle = "導入: データ解析の全体像。Rを使うメリット。Rの基本。"
-date = 2022-04-11T13:00:00+09:00
-type = "reveal"
-draft = false
-+++
-
-<link rel="stylesheet" href="style.css">
-
-# [進化学実習 2022 牧野研](.)
-
-### 1. 導入: データ解析の全体像。Rを使うメリット。Rの基本。
-
-<div class="author">
-岩嵜航
-</div>
-
-<div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
-</div>
-
-<div class="footnote">
-2022-04-11 東北大学 理学部生物学科 進化学実習
-<a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
-</div>
-
-```{r setup-global, include=FALSE, file = "setup.R", message = FALSE}
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
 ```
-
-```{r setup-local, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
+```{r, setup-local}
+#| include: false
+#| cache: false
 ```
 
 ---
@@ -83,63 +58,238 @@ knitr::opts_chunk$set(cache = TRUE)
 
 生のままでは複雑過ぎ、情報多すぎ、何もわからない。
 
-```{r diamonds}
+```{r, diamonds}
 print(ggplot2::diamonds)
 ```
 
 ダイヤモンド53,940個について10項目の値を持つデータセット
+
 
 ---
 ## 要約統計量を見てみよう
 
 各列の**平均**とか**標準偏差**とか:
 
-```{r summary-diamonds, echo = FALSE}
-diamonds %>%
-  dplyr::summarize(across(where(is.numeric), list(mean = mean, sd = sd, max = max))) %>%
-  dplyr::mutate(across(where(is.numeric), round, digits = 2)) %>%
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_")
+```{r, summary-diamonds}
+#| echo: false
+dia_cols = c("carat", "depth", "table", "price")
+diamonds |>
+  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
+  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
 ```
 
-大きさ `carat` と価格 `price` の**相関係数**は 0.92 (かなり高い)。
-```{r cor-diamonds, eval = FALSE, include = FALSE}
-cor(diamonds$carat, diamonds$price)
-# [1] 0.9215913
+大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+```{r, cov-diamonds}
+#| echo: false
+diamonds |>
+  dplyr::select(all_of(dia_cols)) |>
+  scale() |>
+  cov() |>
+  wtl::printmat("%.2f", upper = FALSE)
 ```
+
+<hr>
 
 **生のままよりは把握しやすい**かも。
 
-しかし要注意...
+---
+## 分布を特徴づける代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  </a>
+  </div>
+</div>
+
+目的や状況に応じて使い分けよう。
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
 
 ---
-## 平均値ばかり見て可視化を怠ると構造を見逃す
+## ばらつきを捉える記述統計量
+
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r, quantile}
+#| fig.width: 10
+#| fig.height: 4
+#| echo: false
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
+  dplyr::mutate(x = x + 3)
+dfq = df |> dplyr::summarize(
+  min = min(x),
+  Q1 = quantile(x, 0.25),
+  Q2 = quantile(x, 0.50),
+  Q3 = quantile(x, 0.75),
+  max = max(x)
+) |>
+  tidyr::pivot_longer(everything(), values_to = "x") |>
+  dplyr::mutate(percent = paste0(c(0, 25, 50, 75, 100), "%"))
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
+  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
+  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
+  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
+---
+## ばらつきの様子は大小の判断にも重要
+
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
+観測値1つずつ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき大きい。<br>
+Bが高いのもたまたま?
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+
+```{r, comparison}
+#| fig.width: 11
+#| fig.height: 4
+#| echo: false
+n = 20
+df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
+df2 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
+  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
+df3 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
+  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
+.lim = c(0, max(df2$y, df3$y))
+.th = list(coord_cartesian(ylim = .lim),
+  theme_classic(base_size = 20),
+  theme(legend.position = "none", axis.title = element_blank()))
+
+p1 = ggplot(df1) + aes(x, y, color = x) +
+  geom_point(shape = 16, size = 5) +
+  .th
+p2 = ggplot(df2) + aes(x, y, color = x) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
+  .th
+cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
+```
+
+「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが**統計的仮説検定**。
+
+---
+## 記述統計量に頼りすぎず分布を可視化する
+
+同じデータでも見せ方で印象・情報量が変わる。
+
+```{r, visualize-distribution}
+#| echo: false
+#| fig.width: 9
+#| fig.height: 6
+df = mpg |> dplyr::mutate(y = hwy)
+df_mean = df |> dplyr::summarize(y = mean(y))
+p0 = ggplot(df) + aes(y = y) +
+  theme_classic() +
+  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+ylim = c(0, max(df$y))
+coord_y = coord_cartesian(ylim = ylim)
+coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
+
+pcol = p0 + aes(x = 0) +
+  geom_col(data = df_mean, fill = "#999999") +
+  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
+
+cowplot::plot_grid(nrow = 2L,
+  pcol + coord_one,
+  p0 + geom_boxplot() + coord_one,
+  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
+  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66) + coord_y
+)
+```
+
+
+---
+## 代表値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
 <a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="800">
+<img src="/slides/image/rstats/datasaurus.png" width="95%">
 <figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
 </a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
 </figure>
 
 
 ---
-## 作図してみると全体像・構造が見やすい
+## データ可視化は理解の第一歩
 
 情報をうまく絞って整理 → **直感的にわかる**
 
-```{r simplify-diamonds, echo = FALSE, fig.height = 6, fig.width = 7}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
+```{r, simplify-diamonds}
+#| echo: false
+#| fig.height: 6
+#| fig.width: 7
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price, color = clarity)) +
   geom_point(alpha = 0.4, size = 3) +
   scale_color_viridis_d(
     guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
   ) +
   labs(title = "Diamonds") +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank())
+  theme_gray(base_size = 22) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "#bbbbbb"),
+    legend.key = element_rect(fill = "#bbbbbb"),
+    axis.ticks = element_blank()
+  )
 ```
 
 `carat` が大きいほど `price` も高いらしい。<br>
@@ -165,17 +315,17 @@ diamonds %>%
 
 対象システムを単純化・理想化して扱いやすくしたもの
 
-Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="150" align="right" style="margin: 0 -5px;">
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" align="right" style="margin: 0 -5px;">
 : 数学的な方程式として記述されるもの。
 : e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
 : <br>
 
-Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="140" align="right">
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" align="right">
 : 数値計算の手続きとして記述されるもの。
 : e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
 : <br>
 
-Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="260" align="right">
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" align="right">
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
@@ -217,7 +367,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 &nbsp;
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1100"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -236,9 +386,12 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 データ生成をうまく真似できそうな仮定の数式表現。<br>
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
-```{r lm-diamonds, echo = FALSE, fig.height = 5, fig.width = 6}
-diamonds %>%
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) %>%
+```{r, lm-diamonds}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price)) +
   geom_point(alpha = 0.3, size = 3) +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
@@ -254,9 +407,9 @@ diamonds %>%
 ---
 ## 科学の営み = 巨人の肩に立つ
 
-<figure style="position: absolute; top: 32px; right: 40px;">
+<figure style="position: absolute; top: 2em; right: 1.5em;">
 <a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
-<img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
+<img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="320">
 <figcaption class="url">
 https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figcaption>
@@ -286,7 +439,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 それらを決める要因は何か。膨大な観察データに基づく超大作卒論。
 
 <figure>
-<img src="/slides/image/messy/thesis.png" width="800">
+<img src="/slides/image/messy/thesis.png" width="1200">
 </figure>
 
 ---
@@ -296,8 +449,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
 <figure style="position: relative; margin: 20px 0;">
-<img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
-<img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
+<img src="/slides/image/messy/dir-0826.png" class="screenshot" height="750">
+<img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="660"
      style="position: absolute; left: 270px; top: 50px;">
 </figure>
 
@@ -307,9 +460,9 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ちゃんと合ってるのかな... ファイルもタブもたくさん...
 
 <figure style="position: relative;">
-<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="800"
      style="position: absolute; z-index: 100;">
-<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="720"
      style="position: absolute; left: 250px; top: 50px;">
 </figure>
 
@@ -319,13 +472,13 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ちゃんと合ってるのかな... ファイルもタブもたくさん...
 
 <figure style="position: relative;">
-<img src="/slides/image/messy/dir-z.png" class="screenshot" height="550"
+<img src="/slides/image/messy/dir-z.png" class="screenshot" height="800"
      style="position: absolute; z-index: 100;">
-<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-book1.png" class="screenshot" height="720"
      style="position: absolute; left: 250px; top: 50px;">
-<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-z-behavior-z1e.png" class="screenshot" height="720"
      style="position: absolute; left: 30px; top: 20px; z-index: 200;">
-<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="480"
+<img src="/slides/image/messy/file-z-z-behavior-z1p.png" class="screenshot" height="720"
      style="position: absolute; left: 260px; top: 40px; z-index: 300;">
 </figure>
 
@@ -334,20 +487,20 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 泣きながら何十枚も...。無料期間が終わって今は使えない...。
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative; margin: 1em 0;">
 <img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
-<img src="/slides/image/messy/photoshop.jpg" width="530"
+<img src="/slides/image/messy/photoshop.jpg" width="780"
      style="position: absolute; left: 200px; top: -10px;">
 </figure>
-<img src="/slides/image/messy/zebra_AM.jpg" width="300">
-<img src="/slides/image/messy/zebra_PM.jpg" width="300">
+<img src="/slides/image/messy/zebra_AM.jpg" width="450">
+<img src="/slides/image/messy/zebra_PM.jpg" width="450">
 
 ---
 ## 目作業・手作業 ＝ シーシュポスの岩
 
 <figure style="float: right; margin: 0.7rem 0 0;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
-<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="290">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="420">
 <figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
 </a>
 </figure>
@@ -368,8 +521,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 先の例に負けず生データはどっさり。でも頑張るのは機械。
 
 <figure>
-<img src="/slides/image/tek/finder.png" height="420">
-<img src="/slides/image/tek/fig5.png" height="420">
+<img src="/slides/image/tek/finder.png" height="630">
+<img src="/slides/image/tek/fig5.png" height="630">
 <figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
 </figure>
 
@@ -377,18 +530,14 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ## こんな感じの図もRでラクラク描けるよ
 
 <figure>
-<img src="/slides/image/tumopp/paper/Fig1.png" height="200">
-<img src="/slides/image/tumopp/neighborhood.png" height="200">
-<img src="/slides/image/tumopp/param-p.png" height="200">
-<img src="/slides/image/tumopp/paper/Fig3.png" height="200">
-<img src="/slides/image/tumopp/param-k.png" height="200">
-<img src="/slides/image/tumopp/driver.gif" height="200"><br>
-<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="100">
-<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="100">
-<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="100">
-<img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
-<img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
-<img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
+<img src="/slides/image/tumopp/paper/Fig1.png" height="360">
+<img src="/slides/image/tumopp/param-p.png" height="360">
+<img src="/slides/image/tumopp/param-k.png" height="360"><br>
+<img src="/slides/image/tumopp/paper/Fig3.png" height="180">
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="180">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="180">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="180">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="180">
 <figcaption class="url">Iwasaki and Innan (2017)</figcaption>
 </figure>
 
@@ -405,7 +554,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -417,7 +566,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
-<img src="/slides/image/rstats/Rlogo.svg" height="200">
+<img src="/slides/image/rstats/Rlogo.svg" height="300">
 <figcaption class="url">https://cran.r-project.org/</figcaption>
 </a>
 </figure>
@@ -511,7 +660,9 @@ See https://support.apple.com/HT201236
 
 <img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
 
-```{r rstudio-demo, include=FALSE, eval=FALSE}
+```{r, rstudio-demo}
+#| include: false
+#| eval: false
 1 + 2
 x = 2980
 y = 1.08 * x
@@ -533,7 +684,7 @@ hist(iris$Petal.Length)
 <figure style="margin: 0;">
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
-     style="object-fit: cover; object-position: top; height: 420px;">
+  style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
 <figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
 </a>
 </figure>
@@ -546,8 +697,8 @@ File → New Project... → New Directory → New Project →<br>
 → Directory name: `r-training-2022`<br>
 → as subdirectory of: `~/project` or `C:/Users/yourname/project`
 
-<img src="/slides/image/rstudio/create-new-project.png" class="screenshot" width="90%"
-     style="object-fit: cover; object-position: top; height: 420px;">
+<img src="/slides/image/rstudio/create-new-project.png" class="screenshot"
+  width="90%" style="object-fit: cover; object-position: top; height: 16em;">
 
 📁 ディレクトリ ＝ フォルダ。 `~/` = ホームディレクトリ
 
@@ -653,7 +804,7 @@ r-training-2022/           # プロジェクトの最上階
 ---
 ## 変数/オブジェクトを作ってみよう
 
-```{r objects}
+```{r, objects}
 x = 2        # Create x
 x            # What's in x?
 y = 5        # Create y
@@ -663,7 +814,7 @@ y            # What's in y?
 Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。<br>
 `#` 記号より右はRに無視される。コメントを書くのに便利。
 
-```{r sum}
+```{r, sum}
 x + y
 ```
 
@@ -692,7 +843,7 @@ x + y
 
 変数を受け取って、何か仕事して、返す命令セット
 
-```{r function}
+```{r, function}
 x = seq(1, 3)  # 1と3を渡すとvectorが返ってくる
 x
 sum(x)         # vectorを渡すと足し算が返ってくる
@@ -709,7 +860,7 @@ e.g., 2倍にする関数 `twice`
 ---
 ## 変数/オブジェクトを作ってみよう Part 2
 
-```{r objects2}
+```{r, objects2}
 x = 42       # Create x
 x            # What's in x?
 y = "24601"  # Create y
@@ -718,14 +869,15 @@ y            # What's in y?
 
 この `x` と `y` を足そうとするとエラーになる。なぜ？
 
-```{r error}
+```{r, error}
+#| error: true
 x + y        # Error! Why?
 ```
 
 ---
 ## 変数/オブジェクトの型
 
-```{r isas}
+```{r, isas}
 class(x)
 is.numeric(x)
 is.character(x)
@@ -755,7 +907,7 @@ as.character(x)
 1個の値でもベクトル扱い。<br>
 同じ長さ(または長さ1)の相手との計算が得意。
 
-```{r vector}
+```{r, vector}
 x = c(1, 2, 9)  # 長さ3の数値ベクトル
 x + x           # 同じ長さ同士の計算
 y = 10          # 長さ1の数値ベクトル
@@ -771,7 +923,7 @@ x < 5           # 5より小さいか
 
 `[]` を使う。番号は1から始まる。
 
-```{r vector-index}
+```{r, vector-index}
 letters
 letters[3]
 letters[seq(4, 6)]       # 4 5 6
@@ -782,14 +934,14 @@ letters[seq(1, 26) < 4]  # TRUE TRUE TRUE FALSE FALSE ...
 ## vectorを渡した結果は関数によって異なる
 
 各要素に適用するもの:
-```{r vector-function}
+```{r, vector-function}
 x = c(1, 2, 9)
 y = sqrt(x)     # square root
 y
 ```
 
 全要素を集約した値を返すもの:
-```{r vector-forloop}
+```{r, vector-forloop}
 z = sum(x)
 z
 ```
@@ -804,7 +956,7 @@ z
 1本のvectorを折り曲げて長方形にしたもの。<br>
 中身は全て同じ型。機械学習とか画像処理とかで使う。
 
-```{r matrix}
+```{r, matrix}
 v = seq(1, 8)              # c(1, 2, 3, 4, 5, 6, 7, 8)
 x = matrix(v, nrow = 2)    # 2行に畳む。列ごとに詰める
 x
@@ -822,7 +974,7 @@ y
   <div class="column">
     <figure>
     <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
-    <img src="/slides/image/free/front-row.jpg" height="480">
+    <img src="/slides/image/free/front-row.jpg" height="720">
     <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
     </a>
     </figure>
@@ -830,7 +982,7 @@ y
   <div class="column">
     <figure>
     <a href="https://en.wikipedia.org/wiki/Rhodes">
-    <img src="/slides/image/free/apollon-columns.jpg" height="480">
+    <img src="/slides/image/free/apollon-columns.jpg" height="720">
     <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
     </a>
     </figure>
@@ -844,7 +996,8 @@ y
 同じ長さの列vectorを複数束ねた長方形の表。<br>
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
-```{r data.frame, echo = -1}
+```{r, dataframe}
+#| echo: -1
 iris = tibble::as_tibble(iris)
 print(iris)
 ```
@@ -864,7 +1017,7 @@ names(iris)     # 列名
 summary(iris)   # 要約
 View(iris)      # RStudioで閲覧
 ```
-```{r str}
+```{r, str}
 str(iris)       # 構造が分かる形で表示
 ```
 
@@ -902,7 +1055,7 @@ iris[2, "Petal.Length"]    # 2行目Petal.Length列
 ## data.frameの新規作成
 
 同じ長さの **列(column) vector** を結合して作る:
-```{r data.frame.new}
+```{r, dataframe-new}
 x = c(1, 2, 3)
 y = c("A", "B", "C")
 mydata = data.frame(x, y)
@@ -935,7 +1088,9 @@ print(mydata)
 
 あれれー、エラーが出る？
 
-```{r cannot-open, echo = FALSE}
+```{r, cannot-open}
+#| error: true
+#| echo: false
 readr::write_tsv(iris, "data/iris.tsv")
 ```
 
@@ -985,53 +1140,32 @@ update.packages()          # たまには更新しよう
 : パッケージを使わないR作業 = 火もナイフも使わない料理
 
 ---
-## tidyverse
+## tidyverse: データ科学のためのパッケージ群
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
 </a>
-
-Rでデータを上手に扱うためのパッケージ群
 
 ```r
 install.packages("tidyverse")
-library(tidyverse)
-# 関連パッケージが一挙に読み込まれる
+library(conflicted) # 安全のおまじない
+library(tidyverse)  # 一挙に読み込み
+```
+```{r, tidyverse-messasge}
+#| echo: false
+withr::with_namespace("tidyverse", {
+  cat(tidyverse_attach_message(core), sep = "\n")
+})
 ```
 
-- 統一的な使い勝手
-- 暗黙の処理をなるべくしない安全設計
-- シンプルな関数を繋げて使うデザイン
+一貫したデザインでデータ解析の様々な工程をカバー
 
-<figure>
+<figure style="margin-block: 0;">
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png" width="800">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
-
----
-## tidyverse
-
-<a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
-</a>
-
-Rでデータを上手に扱うためのパッケージ群
-
-```r
-install.packages("tidyverse")
-library(tidyverse)
-# 関連パッケージが一挙に読み込まれる
-```
-
-```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
-cat(tidyverse_msg, sep = "\n")
-```
-
-`Conflicts ❌` とか表示されて不安だけど ↑ これは大丈夫なやつ
-
-次回からはこれらを使って解説
 
 
 ---
@@ -1092,7 +1226,7 @@ cat(tidyverse_msg, sep = "\n")
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -1146,6 +1280,4 @@ Other versions
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2021/)」
    石川由希 2021 名古屋大学
 
-<a href="2-visualization.html" rel="next" class="readmore">
-2. データの可視化。
-</a>
+`r .meta$next_link`

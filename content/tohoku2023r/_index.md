@@ -1,15 +1,14 @@
 +++
-title = "進化学実習 2022 牧野研"
-date = 2022-04-11T08:45:00+13:00
+title = "進化学実習 2023 牧野研 東北大学"
+date = 2023-04-10T12:00:00+09:00
 draft = false
-unlisted = false
 +++
 
 ## 概要
 
 -   講師: 岩嵜航 (東北大学 生命科学研究科 進化ゲノミクス分野 牧野研)
 -   科目: 東北大学 理学部生物学科 進化学実習
--   日程: 2022年4月11, 12, 13, 14, 18日
+-   日程: 2023年4月10, 11, 12, 13, 17日
 -   場所: 東北大学 / zoom.us
 -   概要:<br>
     理学部生物学科における研究とは、大雑把に言うと
@@ -40,7 +39,7 @@ unlisted = false
     8. データ解釈の基礎知識、レポート作成方法
     9. 実践・発表
 
-    | 時間  | 4/11 Mon | 4/12 Tue | 4/13 Wed | 4/14 Thu | 4/18 Mon |
+    | 時間  | 4/10 Mon | 4/11 Tue | 4/12 Wed | 4/13 Thu | 4/17 Mon |
     | ----- | -------- | -------- | -------- | -------- | -------- |
     | 13:00 | **導入** | 課題解答 | 課題解答 | 課題解答 | グループ作業 |
     | 14:30 | **可視化** | **構造処理1** | **内容処理** | **モデリング2** | 発表会 |
@@ -54,7 +53,7 @@ unlisted = false
     - [江崎貴裕「分析者のためのデータ解釈学入門」](https://amzn.to/3uznzCK) 2020
     - [Hadley Wickham, Garrett Grolemund "R for Data Science"](https://r4ds.had.co.nz/)
     - [本橋智光「前処理大全」](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)
--   講義資料置き場: <https://heavywatal.github.io/slides/tohoku2022r/>
+-   講義資料置き場: <https://heavywatal.github.io/slides/tohoku2023r/>
 
 
 ## 実習環境の設定
@@ -77,10 +76,10 @@ unlisted = false
     [矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
     の情報を参照しつつOneDrive問題に対処する。
 1.  <https://cran.r-project.org/>
-    から最新版の **R本体(≥4.1.3)** をダウンロードしてインストール。
+    から最新版の **R本体(≥4.2.3)** をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
 1.  <https://rstudio.com/products/rstudio/download/#download>
-    から最新版の **RStudio(≥2022.02.1)** をダウンロードしてインストール。
+    から最新版の **RStudio(≥2023.03.0)** をダウンロードしてインストール。
     既にインストールしてある場合はバージョンを確認。
 1.  Windowsの場合、念のため **Rtools** をインストール。次のページに従って設定:<br>
     <https://cran.r-project.org/bin/windows/Rtools/>

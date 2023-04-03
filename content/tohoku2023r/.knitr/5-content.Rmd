@@ -1,36 +1,13 @@
-+++
-url = "tohoku2022r/5-content.html"
-title = "5. データ内容の処理: 数値、文字列、日時など — 進化学実習 2022 牧野研"
-linktitle = "データ内容の処理: 数値、文字列、日時など。"
-date = 2022-04-13T14:30:00+09:00
-type = "reveal"
-draft = false
-+++
-
-<link rel="stylesheet" href="style.css">
-
-# [進化学実習 2022 牧野研](.)
-
-### 5. データ内容の処理: 数値、文字列、日時など。
-
-<div class="author">
-岩嵜航
-</div>
-
-<div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
-</div>
-
-<div class="footnote">
-2022-04-11 東北大学 理学部生物学科 進化学実習
-<a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
-</div>
-
-```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
 ```
-
-```{r setup-local, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
+```{r, setup-local}
+#| include: false
+#| cache: false
+data(starwars, package = "dplyr")
+data(fruit, package = "stringr")
 ```
 
 ---
@@ -62,7 +39,7 @@ knitr::opts_chunk$set(cache = TRUE)
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -72,10 +49,10 @@ knitr::opts_chunk$set(cache = TRUE)
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="120">
+<img src="/_img/hex-stickers/dplyr.webp" width="180">
 </a><br>
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="120">
+<img src="/_img/hex-stickers/tidyr.webp" width="180">
 </a>
 </div>
 
@@ -98,20 +75,30 @@ knitr::opts_chunk$set(cache = TRUE)
 ---
 ## tidyverse: データ科学のためのパッケージ群
 
-- 統一的な使い勝手
-- シンプルな関数を繋げて使うデザイン
-
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="320" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
 </a>
 
 ```r
-# install.packages("tidyverse")
-library(tidyverse)  # パッケージ読み込み
+install.packages("tidyverse")
+library(conflicted) # 安全のおまじない
+library(tidyverse)  # 一挙に読み込み
 ```
-```{r tidyverse-messasge, echo = FALSE, cache = FALSE}
-cat(tidyverse_msg, sep = "\n")
+```{r, tidyverse-messasge}
+#| echo: false
+withr::with_namespace("tidyverse", {
+  cat(tidyverse_attach_message(core), sep = "\n")
+})
 ```
+
+一貫したデザインでデータ解析の様々な工程をカバー
+
+<figure style="margin-block: 0;">
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
 
 たまには更新しよう:
 ```r
@@ -140,7 +127,7 @@ update.packages(ask = "no", type = "binary")
 1個の値でもベクトル扱い。<br>
 ベクトルの各要素に一気に計算を適用できる。
 
-```{r vector}
+```{r, vector}
 x = c(1, 2, 9)  # 長さ3の数値ベクトル
 x + x           # 同じ長さ同士の計算
 y = 10          # 長さ1の数値ベクトル
@@ -153,14 +140,14 @@ sqrt(x)         # square root
 
 普通は倍精度浮動小数点型 `double` として扱われる:
 
-```{r numeric}
+```{r, numeric}
 answer = 42
 typeof(answer)
 ```
 
 明示的に変換したり末尾にLを付けることで整数扱いもできる:
 
-```{r integer}
+```{r, integer}
 typeof(as.integer(answer))
 whoami = 24601L
 typeof(whoami)
@@ -171,7 +158,7 @@ typeof(whoami)
 
 ベクトルを受け取り、それぞれの要素に適用
 
-```{r math}
+```{r, math}
 x = c(1, 2, 3)
 sqrt(x)
 log(x)
@@ -189,7 +176,7 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 内容を変更する方法はいくつかある。<br>
 `diamonds` の `price` 列をドルから円に変換する例:
 
-```{r dfcolumn}
+```{r, dfcolumn}
 dia = diamonds    # 別名コピー
 
 # dollar演算子 $ で指定
@@ -199,8 +186,8 @@ dia$price = 105.59 * dia$price
 dia[["price"]] = 105.59 * dia[["price"]]
 
 # dplyr::mutate with pipe
-dia = diamonds %>%
-  mutate(price = 105.59 * price)
+dia = diamonds |>
+  dplyr::mutate(price = 105.59 * price)
 ```
 
 1発ならどれでもいい。流れ作業には `mutate()` が便利。
@@ -210,9 +197,9 @@ dia = diamonds %>%
 
 最小=0、最大=1、になるように:
 
-```{r normalize-min-max}
-normalized_minmax = diamonds %>%
-  mutate(price = (price - min(price)) / (max(price) - min(price))) %>%
+```{r, normalize-min-max}
+normalized_minmax = diamonds |>
+  dplyr::mutate(price = (price - min(price)) / (max(price) - min(price))) |>
   print()
 ```
 
@@ -224,9 +211,9 @@ normalized_minmax = diamonds %>%
 
 平均=0、標準偏差=1、になるように:
 
-```{r normalize-z-score}
-normalized_z = diamonds %>%
-  mutate(price = (price - mean(price)) / sd(price)) %>%
+```{r, normalize-z-score}
+normalized_z = diamonds |>
+  dplyr::mutate(price = (price - mean(price)) / sd(price)) |>
   print()
 ```
 
@@ -241,10 +228,13 @@ normalized_z = diamonds %>%
 
 z-scoreは正規分布前提。これだけ非対称だと使いにくい。
 
-```{r normalize-plot, echo = FALSE, fig.width = 8, fig.height = 6}
-dplyr::bind_rows(diamonds %>% dplyr::mutate(normalize = "-"),
-  normalized_minmax %>% dplyr::mutate(normalize = "min-max"),
-  normalized_z %>% dplyr::mutate(normalize = "z")) %>%
+```{r, normalize-plot}
+#| echo: false
+#| fig.width: 8
+#| fig.height: 6
+dplyr::bind_rows(diamonds |> dplyr::mutate(normalize = "-"),
+  normalized_minmax |> dplyr::mutate(normalize = "min-max"),
+  normalized_z |> dplyr::mutate(normalize = "z")) |>
   ggplot() +
   aes(price) +
   geom_density(fill = "#999999", color = NA) +
@@ -258,9 +248,9 @@ dplyr::bind_rows(diamonds %>% dplyr::mutate(normalize = "-"),
 
 平均値から標準偏差の3倍以上離れているもの($\lvert z \rvert \ge 3$)を取り除く例:
 
-```{r outlier}
-result = diamonds %>%
-  filter(abs(price - mean(price)) / sd(price) < 3) %>%
+```{r, outlier}
+result = diamonds |>
+  dplyr::filter(abs(price - mean(price)) / sd(price) < 3) |>
   print()
 ```
 
@@ -272,14 +262,15 @@ result = diamonds %>%
 
 (指定した列に) `NA` が含まれてる行を削除する。
 
-```{r drop_na}
-df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
-df %>% drop_na()
+```{r, drop-na}
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df |> tidyr::drop_na()
 ```
 
 🔰 `starwars` で**身長体重データのある行だけ抽出**してみよう
 
-```{r starwars-drop, echo=FALSE}
+```{r, starwars-drop}
+#| echo: false
 starwars
 ```
 
@@ -288,14 +279,15 @@ starwars
 
 欠損値 `NA` を任意の値で置き換える。
 
-```{r replace_na}
-df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
-df %>% replace_na(list(x = 0, y = "unknown"))
+```{r, replace-na}
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df |> tidyr::replace_na(list(x = 0, y = "unknown"))
 ```
 
 🔰 `starwars` で**髪や目の色が不明の部分を"UNKNOWN"に置換**しよう
 
-```{r starwars-replace_na, echo=FALSE}
+```{r, starwars-replacena}
+#| echo: false
 starwars
 ```
 
@@ -304,14 +296,15 @@ starwars
 
 特定の値を `NA` に置き換える:
 
-```{r na_if}
-df %>%
-  mutate(x = na_if(x, 1), y = na_if(y, "a"))
+```{r, na-if}
+df |>
+  dplyr::mutate(x = dplyr::na_if(x, 1), y = dplyr::na_if(y, "a"))
 ```
 
 🔰 `starwars` の**性別"none"を欠損値に**しよう
 
-```{r starwars-na_if, echo=FALSE}
+```{r, starwars-na-if}
+#| echo: false
 starwars
 ```
 
@@ -320,16 +313,17 @@ starwars
 
 先に指定した列が `NA` なら次の列の値を採用:
 
-```{r coalesce}
+```{r, coalesce}
 y = c(1, 2, NA, NA, 5)
 z = c(NA, NA, 3, 4, 5)
-coalesce(y, z)
+dplyr::coalesce(y, z)
 ```
 
 異なる型を混ぜると怒られる:
-```{r coalesce-type}
-df = tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
-df %>% mutate(z = coalesce(x, y))
+```{r, coalesce-type}
+#| error: true
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df |> dplyr::mutate(z = dplyr::coalesce(x, y))
 ```
 
 🔰 `starwars` で**髪色の欠損値を肌色で補おう**
@@ -339,17 +333,18 @@ df %>% mutate(z = coalesce(x, y))
 
 普通の `if`, `else` とは違ってvector演算なのが特徴:
 
-```{r ifelse}
+```{r, ifelse}
 condition = c(TRUE, TRUE, FALSE)
 x = c(1, 2, 3)
 y = c(100, 200, 300)
-if_else(condition, x, y)
+dplyr::if_else(condition, x, y)
 ```
 
 🔰 `starwars` で**種族がドロイドの行だけ身長を100倍**してみよう
 
 
-```{r starwars-ifelse, echo=FALSE}
+```{r, starwars-ifelse}
+#| echo: false
 starwars
 ```
 
@@ -358,7 +353,7 @@ starwars
 
 ダブルクォートで囲む。シングルクォートも使える。
 
-```{r string}
+```{r, string}
 x = "This is a string"
 y = 'If I want to include a "quote" inside a string, I use single quotes'
 ```
@@ -397,12 +392,8 @@ https://r4ds.had.co.nz/strings.html
 ## stringr --- 文字列処理パッケージ
 
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/stringr.webp" width="180" align="right">
 </a>
-
-```{r stringr, include = FALSE, cache = FALSE}
-library(stringr)
-```
 
 -   tidyverseの一部
 -   何をやる関数なのか名前から分かりやすい
@@ -428,11 +419,11 @@ library(stringr)
 ---
 ## 文字列の基本操作
 
-```{r str_length}
-fruit4 = head(fruit, 4L) %>% print()
-str_length(fruit4)            # 長さ
-str_sub(fruit4, 2, 4)         # 部分抽出
-str_c(1:4, " ", fruit4, "!")  # 結合
+```{r, str-length}
+fruit4 = head(fruit, 4L) |> print()
+stringr::str_length(fruit4)            # 長さ
+stringr::str_sub(fruit4, 2, 4)         # 部分抽出
+stringr::str_c(1:4, " ", fruit4, "!")  # 結合
 ```
 
 🔰 `fruit` や `words` の一部を抜き出して上記の関数を試してみよう
@@ -443,15 +434,15 @@ str_c(1:4, " ", fruit4, "!")  # 結合
 
 単純な一致だけじゃなく、いろんな条件でマッチングできる:
 
-```{r pattern}
+```{r, pattern}
 # aで始まる
-str_subset(fruit, "^a")
+stringr::str_subset(fruit, "^a")
 
 # rで終わる
-str_subset(fruit, "r$")
+stringr::str_subset(fruit, "r$")
 
 # 英数字3-4文字
-str_subset(fruit, "^\\w{3,4}$")
+stringr::str_subset(fruit, "^\\w{3,4}$")
 ```
 
 この `^` とか `$` って何者？
@@ -493,28 +484,34 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 ---
 ## 正規表現: 練習問題
 
-🔰 `str_subset()`, `fruit`, `words` でパターンマッチを身に着けよう
+🔰 `str_subset()` と `fruit` でパターンマッチを身に着けよう:
 
+- "o" を含むもの
 - "o" で始まるもの
 - "berry" で終わるもの
 - "c" で始まり "r" で終わるもの
 - 空白を含むもの、含まないもの
+
+🔰 `starnames = starwars[["name"]]` として次のマッチにも挑戦:
+
 - 数字を含むもの、含まないもの
-- そのほか自分で適当に考えてみる
+- 3語以上のもの
+- 小文字アルファベットを含まないもの
 
 
 ---
 ## 検出 `str_detect()`
 
 マッチするかどうか `TRUE`/`FALSE` を返す。
-```{r str_detect}
+```{r, str-detect}
 fruit4 = head(fruit, 4L)
-str_detect(fruit4, "^a")
+stringr::str_detect(fruit4, "^a")
 ```
 
 🔰 `starwars` から `name` 列に空白を含まない行を抽出しよう
 
-```{r starwars-detect, echo=FALSE}
+```{r, starwars-detect}
+#| echo: false
 starwars
 ```
 
@@ -522,14 +519,15 @@ starwars
 ## 抽出 `str_extract()`
 
 マッチした部分文字列を取り出す。しなかった要素には `NA`。
-```{r str_extract}
+```{r, str-extract}
 fruit4 = head(fruit, 4L)
-str_extract(fruit4, "^a..")
+stringr::str_extract(fruit4, "^a..")
 ```
 
 🔰 `diamonds` の `clarity` 列を数字なしにしてみよう
 
-```{r diamonds-extract, echo=FALSE}
+```{r, diamonds-extract}
+#| echo: false
 diamonds
 ```
 
@@ -538,15 +536,16 @@ diamonds
 ## 置換 `str_replace()`, `str_replace_all()`
 
 カッコ `()` で囲んだマッチングは後で参照できる:
-```{r str_replace}
+```{r, str-replace}
 fruit4 = head(fruit, 4L)
-str_replace(fruit4, "..$", "!!")
-str_replace(fruit4, "(..)$", "_\\1_")
+stringr::str_replace(fruit4, "..$", "!!")
+stringr::str_replace(fruit4, "(..)$", "_\\1_")
 ```
 
 🔰 `starwars` の `name` 列の数字を全部ゼロにしてみよう
 
-```{r starwars-replace, echo=FALSE}
+```{r, starwars-replace}
+#| echo: false
 wtl::printdf(starwars, n = 6L)
 ```
 
@@ -556,10 +555,10 @@ wtl::printdf(starwars, n = 6L)
 `matches()` があれば `starts_with()`/`ends_with()` は不要:
 
 ```r
-diamonds %>% select(matches("^c"))   # starts_with("c")
-starwars %>% select(matches("s$"))   # ends_with("s")
-world_bank_pop %>%
-  pivot_longer(matches("^\\d+$"), names_to = "year")
+diamonds |> dplyr::select(matches("^c"))   # starts_with("c")
+starwars |> dplyr::select(matches("s$"))   # ends_with("s")
+world_bank_pop |>
+  tidyr::pivot_longer(matches("^\\d+$"), names_to = "year")
 ```
 
 See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) for more details.
@@ -568,14 +567,14 @@ See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) fo
 ---
 ## 形式を変える・整える
 
-```{r upperlower}
+```{r, upperlower}
 fruit4 = head(fruit, 4L)
-str_to_upper(fruit4)              # 大文字に
-str_pad(fruit4, 8, "left", "_")   # 幅を埋めて指定幅に
+stringr::str_to_upper(fruit4)              # 大文字に
+stringr::str_pad(fruit4, 8, "left", "_")   # 幅を埋めて指定幅に
 ```
 
 [`stringi`](http://www.gagolewski.com/software/stringi/) パッケージはさらに多機能
-```{r stringi}
+```{r, stringi}
 stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角数字に対処
 ```
 
@@ -585,20 +584,16 @@ stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角�
 ## 文字列から別の型に
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
 </a>
-
-```{r readr, include = FALSE}
-library(readr)
-```
 
 これはstringrではなくreadrの担当:
 
-```{r parse-character}
-parse_number(c("p = 0.02 *", "N_A = 6e23"))
-parse_double(c("0.02", "6e+23"))
-parse_logical(c("1", "true", "0", "false"))
-parse_date("2020-06-03")
+```{r, parse-character}
+readr::parse_number(c("p = 0.02 *", "N_A = 6e23"))
+readr::parse_double(c("0.02", "6e+23"))
+readr::parse_logical(c("1", "true", "0", "false"))
+readr::parse_date("2020-06-03")
 ```
 
 `6e+23` は $6 \times 10 ^ {23}$ のプログラミング的表現。
@@ -609,7 +604,7 @@ $6e^{23}$ ではない。
 
 **カテゴリカル変数**(質的変数)を扱うための型。文字列っぽいけど**実体は整数**。
 
-```{r factor}
+```{r, factor}
 month_levels = c(                       # 取りうる値
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -633,13 +628,13 @@ https://r4ds.had.co.nz/factors.html
 
 typoなどによりlevels外になると `NA` 扱い。
 
-```{r factor-levels}
+```{r, factor-levels}
 x2 = c("Dec", "Apr", "Jam", "Mar")
 factor(x2, levels = month_levels)
 ```
 
 元の文字列vectorに全てのlevelsが含まれてるなら簡単に変換可能:
-```{r as_factor}
+```{r, as-factor}
 as.factor(starwars[["gender"]])
 ```
 
@@ -648,7 +643,7 @@ as.factor(starwars[["gender"]])
 
 アルファベット順じゃない順序がある:
 
-```{r factor-sort}
+```{r, factor-sort}
 x1 = c("Dec", "Apr", "Jan", "Mar")
 sort(x1)     # 文字列としてソートするとアルファベット順
 y1 = factor(x1, levels = month_levels)
@@ -660,13 +655,16 @@ sort(y1)     # 因子としてソートするとlevels順
 
 文字列だと勝手にアルファベット順。因子型なら任意指定可能:
 
-```{r factor-mpg}
-mpg_fct = mpg %>%
-  mutate(drv = factor(drv, levels = c("f", "r", "4")))
+```{r, factor-mpg}
+mpg_fct = mpg |>
+  dplyr::mutate(drv = factor(drv, levels = c("f", "r", "4")))
 ```
 
-```{r factor-plot, fig.width = 7, fig.height = 5, echo = FALSE}
-p1 = mpg %>%
+```{r, factor-plot}
+#| fig.width: 7
+#| fig.height: 5
+#| echo: false
+p1 = mpg |>
   ggplot() +
   aes(drv, hwy) +
   geom_boxplot(aes(fill = drv), outlier.alpha = 0) +
@@ -682,7 +680,7 @@ cowplot::plot_grid(p1 + ggtitle("mpg"), p1 %+% mpg_fct + ggtitle("mpg_fct"), nro
 
 大小の比較ができる。
 
-```{r ordered}
+```{r, ordered}
 x1 = c("Dec", "Apr", "Jan", "Mar")
 y3 = factor(x1, levels = month_levels, ordered = TRUE)
 class(y3)
@@ -697,30 +695,29 @@ y3 < "Sep"
 ## tidyverse の因子型担当は forcats
 
 <a href="https://forcats.tidyverse.org/">
-<img src="/_img/hex-stickers/forcats.webp" width="120" align="right">
+<img src="/_img/hex-stickers/forcats.webp" width="180" align="right">
 </a>
-
-```{r forcats, include = FALSE}
-library(forcats)
-```
 
 - `fct_relevel()`: 手動で順序設定
 - `fct_reorder()`: 別の変数に応じて順序を並べ替え
 - `fct_infreq()`: 頻度に応じて順序を並べ替え
 - `fct_lump()`: 少なすぎるカテゴリを"その他"としてまとめる
 
-```{r fct_infreq_data}
-diamonds_fct = diamonds %>%
-  mutate(color = fct_infreq(color))
-mpg_fct = mpg %>%
-  mutate(fl = fct_lump(fl, n = 2))
+```{r, fct-infreq-data}
+diamonds_fct = diamonds |>
+  dplyr::mutate(color = forcats::fct_infreq(color))
+mpg_fct = mpg |>
+  dplyr::mutate(fl = forcats::fct_lump(fl, n = 2))
 ```
 
-```{r fct_infreq, fig.width = 8, fig.height = 3, echo = FALSE}
-p1 = diamonds_fct %>%
+```{r, fct-infreq}
+#| fig.width: 8
+#| fig.height: 3
+#| echo: false
+p1 = diamonds_fct |>
   ggplot() + aes(x = color) + geom_bar() + coord_flip() +
   theme_minimal(base_size = 16)
-p2 = mpg_fct %>%
+p2 = mpg_fct |>
   ggplot() + aes(fl, cty, fill = fl) +
   geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.5, stroke = 0) +
   theme_minimal(base_size = 16) +
@@ -733,10 +730,13 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 
 🔰 `mpg` で次のような図を描いてみよう
 
-```{r plot-factor, echo = FALSE, fig.width = 5, fig.height = 5}
-mpg %>%
-  mutate(drv = fct_relevel(drv, "f", "r", "4")) %>%
-  mutate(class = fct_rev(fct_infreq(class))) %>%
+```{r, plot-factor}
+#| echo: false
+#| fig.width: 5
+#| fig.height: 5
+mpg |>
+  dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
+  dplyr::mutate(class = forcats::fct_rev(forcats::fct_infreq(class))) |>
   ggplot() +
   aes(class) +
   geom_bar(aes(fill = drv)) +
@@ -752,10 +752,10 @@ mpg %>%
 
 イチゼロの値を持たせて横広に変形するのと等価。
 
-```{r dummy}
-iris %>% rowid_to_column() %>%
-  mutate(value = 1L) %>%
-  pivot_wider(names_from = Species,
+```{r, dummy}
+iris |> tibble::rowid_to_column() |>
+  dplyr::mutate(value = 1L) |>
+  tidyr::pivot_wider(names_from = Species,
               values_from = value, values_fill = 0L)
 ```
 
@@ -768,12 +768,12 @@ iris %>% rowid_to_column() %>%
 - POSIXct: エポックからの経過秒数。比較や差分などを取りやすい。
 - POSIXlt: list(秒, 分, 時, 日, 月, 年, ...)。単位ごとに抜き出しやすい。
 
-```{r datetime}
+```{r, datetime}
 now = "2021-09-15 11:00:00"
 ct = as.POSIXct(now)
 unclass(ct)
 lt = as.POSIXlt(now)
-unclass(lt) %>% as_tibble()
+unclass(lt) |> as_tibble()
 ```
 
 素のRでも扱えるけど lubridate パッケージを使うともっと楽に。
@@ -782,23 +782,19 @@ unclass(lt) %>% as_tibble()
 ## lubridate --- 日時型処理パッケージ
 
 <a href="https://lubridate.tidyverse.org/">
-<img src="/_img/hex-stickers/lubridate.webp" width="120" align="right">
+<img src="/_img/hex-stickers/lubridate.webp" width="180" align="right">
 </a>
 
-```{r lubridate, include = FALSE}
-library(lubridate)
-```
-
 日時型への変換:
-```{r lubridate-parse}
-ymd(c("20201017", "2020-10-17", "20/10/17"))
+```{r, lubridate-parse}
+lubridate::ymd(c("20201017", "2020-10-17", "20/10/17"))
 ```
 
 日時型から単位ごとに値を取得:
-```{r lubridate-get}
-today = ymd(20201017)
-month(today)
-wday(today, label = TRUE)
+```{r, lubridate-get}
+today = lubridate::ymd(20201017)
+lubridate::month(today)
+lubridate::wday(today, label = TRUE)
 ```
 
 🔰 [公式ドキュメント](https://lubridate.tidyverse.org/)などを見ていろいろな変換・抽出を試してみよう
@@ -808,13 +804,13 @@ wday(today, label = TRUE)
 
 <div style="float: right;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="120">
+<img src="/_img/hex-stickers/stringr.webp" width="180">
 </a><br>
 <a href="https://forcats.tidyverse.org/">
-<img src="/_img/hex-stickers/forcats.webp" width="120">
+<img src="/_img/hex-stickers/forcats.webp" width="180">
 </a><br>
 <a href="https://lubridate.tidyverse.org/">
-<img src="/_img/hex-stickers/lubridate.webp" width="120">
+<img src="/_img/hex-stickers/lubridate.webp" width="180">
 </a><br>
 </div>
 
@@ -834,13 +830,13 @@ wday(today, label = TRUE)
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="120">
+<img src="/_img/hex-stickers/dplyr.webp" width="180">
 </a><br>
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="120">
+<img src="/_img/hex-stickers/tidyr.webp" width="180">
 </a><br>
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="120">
+<img src="/_img/hex-stickers/stringr.webp" width="180">
 </a>
 </div>
 
@@ -874,7 +870,7 @@ wday(today, label = TRUE)
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png">
+<img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -903,7 +899,8 @@ wday(today, label = TRUE)
 [町丁別・年齢別・男女別人口...](https://data.bodik.jp/organization/968e265c-d998-4475-8abf-7e8a53f81595?res_format=CSV&groups=gr_0200)
 の最新CSVをダウンロード、読み込み
 
-```{r meguro_read, echo = -1}
+```{r, meguro-read}
+#| echo: -1
 if (!fs::file_exists("131105_population_20211001.csv")) {
   infile = "https://data.bodik.jp/dataset/98331303-9277-4266-bac6-a637ab5e47a5/resource/8019010f-a2b1-4313-bcd8-45ade27d2a3d/download/131105_population_20211001.csv"
   raw_meguro = readr::read_csv(infile)
@@ -919,18 +916,18 @@ print(raw_meguro)
 
 ggplotしたくなる形に変形。1行ずつ経過を確認しよう。
 
-```{r meguro_tidy, cache = FALSE}
-tidy_meguro = raw_meguro %>%
-  select("地域名", matches("の.+性$")) %>%
-  rename(place = 地域名) %>%
-  mutate(place = str_remove(place, "\\S丁目")) %>%
-  group_by(place) %>%
-  summarize(across(everything(), sum)) %>%
-  ungroup() %>%
-  pivot_longer(!place, names_to = "category", values_to = "count") %>%
-  separate(category, c("age", "sex"), sep = "の") %>%
-  mutate(age = as.integer(str_extract(age, "^\\d+"))) %>%
-  filter(!is.na(age)) %>%
+```{r, meguro-tidy}
+tidy_meguro = raw_meguro |>
+  dplyr::select("地域名", matches("の.+性$")) |>
+  dplyr::rename(place = 地域名) |>
+  dplyr::mutate(place = stringr::str_remove(place, "\\S丁目")) |>
+  dplyr::group_by(place) |>
+  dplyr::summarize(across(everything(), sum)) |>
+  dplyr::ungroup() |>
+  tidyr::pivot_longer(!place, names_to = "category", values_to = "count") |>
+  tidyr::separate(category, c("age", "sex"), sep = "の") |>
+  dplyr::mutate(age = as.integer(stringr::str_extract(age, "^\\d+"))) |>
+  dplyr::filter(!is.na(age)) |>
   print()
 ```
 
@@ -939,7 +936,9 @@ tidy_meguro = raw_meguro %>%
 
 作図してみる
 
-```{r meguro_plot, fig.height = 4.5, fig.width = 10}
+```{r, meguro-plot}
+#| fig.height: 4.5
+#| fig.width: 10
 ggplot(tidy_meguro) +
   aes(age, count) +
   geom_col(aes(fill = sex)) +
@@ -952,15 +951,14 @@ ggplot(tidy_meguro) +
 
 文字コードが古い。列名が2行にまたがってる。数値の列に変な文字。
 
-```{r estat_read, echo = -1}
-options(readr.show_col_types = FALSE)
+```{r, estat-read}
 infile = "tblT000849C04.txt"
-sjis = locale(encoding = "SJIS")
+sjis = readr::locale(encoding = "SJIS")
 # readr::read_csv(infile, locale = sjis)
-miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) %>%
+miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
   dplyr::slice(-1)
 miyagi_R = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7), skip = 1L, na = c("-", "X"), name_repair = "minimal")
-raw_miyagi = bind_cols(miyagi_L, miyagi_R) %>% print()
+raw_miyagi = dplyr::bind_cols(miyagi_L, miyagi_R) |> print()
 ```
 
 ---
@@ -968,33 +966,36 @@ raw_miyagi = bind_cols(miyagi_L, miyagi_R) %>% print()
 
 まだ罠がたくさん: 列名の頭にスペース。全角数字。変な区分。
 
-```{r estat_tidy}
-tidy_miyagi = raw_miyagi %>%
-  dplyr::filter(HYOSYO == 1) %>%
-  dplyr::select(CITYNAME, matches("[男女].+[歳上]$")) %>%
-  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") %>%
-  dplyr::mutate(category = str_trim(category)) %>%
-  tidyr::separate(category, c("sex", "age"), 1) %>%
-  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) %>%
-  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") %>%
-  dplyr::mutate(lower = parse_number(lower), upper = parse_number(upper)) %>%
-  dplyr::filter((upper - lower) < 5 | lower == 75) %>%
-  dplyr::rename(age = lower) %>%
+```{r, estat-tidy}
+tidy_miyagi = raw_miyagi |>
+  dplyr::filter(HYOSYO == 1) |>
+  dplyr::select(CITYNAME, matches("[男女].+[歳上]$")) |>
+  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
+  dplyr::mutate(category = stringr::str_trim(category)) |>
+  tidyr::separate(category, c("sex", "age"), 1) |>
+  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
+  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  dplyr::mutate(lower = readr::parse_number(lower), upper = readr::parse_number(upper)) |>
+  dplyr::filter((upper - lower) < 5 | lower == 75) |>
+  dplyr::rename(age = lower) |>
   print()
 ```
 
 ---
 ## 実演: e-Stat 国勢調査2015 (宮城県)
 
-```{r estat_factor, include = FALSE}
-total_miyagi = tidy_miyagi %>%
-  dplyr::count(CITYNAME, wt = count, name = "count") %>%
+```{r, estat-factor}
+#| include: false
+total_miyagi = tidy_miyagi |>
+  dplyr::count(CITYNAME, wt = count, name = "count") |>
   dplyr::arrange(desc(count))
-tidy_miyagi = tidy_miyagi %>%
+tidy_miyagi = tidy_miyagi |>
   dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
 ```
 
-```{r estat_plot, fig.height = 6, fig.width = 11}
+```{r, estat-plot}
+#| fig.height: 6
+#| fig.width: 11
 ggplot(tidy_miyagi) +
   aes(age, count) +
   geom_col(aes(fill = sex)) +
@@ -1030,6 +1031,4 @@ Older versions
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2021/)」
    石川由希 2021 名古屋大学
 
-<a href="6-distribution.html" rel="next" class="readmore">
-6. 統計モデリング1: 確率分布、尤度
-</a>
+`r .meta$next_link`

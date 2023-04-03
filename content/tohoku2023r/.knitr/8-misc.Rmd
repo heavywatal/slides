@@ -1,36 +1,11 @@
-+++
-url = "tohoku2022r/8-misc.html"
-title = "8. データ解釈の基礎知識、レポート作成 — 進化学実習 2022 牧野研"
-linktitle = "データ解釈の基礎知識、レポート作成"
-date = 2022-04-14T16:00:00+09:00
-type = "reveal"
-draft = false
-+++
-
-<link rel="stylesheet" href="style.css">
-
-# [進化学実習 2022 牧野研](.)
-
-### 8. データ解釈の基礎知識、レポート作成
-
-<div class="author">
-岩嵜航
-</div>
-
-<div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野 牧野研
-</div>
-
-<div class="footnote">
-2022-04-11 東北大学 理学部生物学科 進化学実習
-<a href="https://heavywatal.github.io/slides/tohoku2022r/">https://heavywatal.github.io/slides/tohoku2022r/</a>
-</div>
-
-```{r setup-global, include=FALSE, code=readLines("setup.R"), message = FALSE}
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
 ```
-
-```{r setup-local, include=FALSE}
-knitr::opts_chunk$set(cache = TRUE)
+```{r, setup-local}
+#| include: false
+#| cache: false
 ```
 
 ---
@@ -68,7 +43,7 @@ knitr::opts_chunk$set(cache = TRUE)
 どんなに素晴らしい統計処理をしようとも、データがゴミなら結論もゴミ。
 
 <figure>
-<img src="image/garbage-in-garbage-out.drawio.svg">
+<img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg">
 </figure>
 
 - 目的に応じてちゃんとデータを採ることが重要！
@@ -83,7 +58,7 @@ knitr::opts_chunk$set(cache = TRUE)
 : 量的な問題 → 一部の標本を抽出して測るしかない
 
 <figure>
-<img src="image/math-model-biased.drawio.svg"><br>
+<img src="../tohoku2022r/image/math-model-biased.drawio.svg"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -100,7 +75,7 @@ knitr::opts_chunk$set(cache = TRUE)
 e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
 
 <figure>
-<img src="image/error-random-systematic.drawio.svg" width="420"><br>
+<img src="../tohoku2022r/image/error-random-systematic.drawio.svg" width="420"><br>
 <figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -157,16 +132,19 @@ e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
 「偶数の裏は必ずA、という法則があるか？」<br>
 これを確かめるには次の4枚のうちどれを裏返せばいいか？
 
-```{r four-cards, echo = FALSE, fig.width = 6, fig.height = 2}
+```{r, four-cards}
+#| echo: false
+#| fig.width: 6
+#| fig.height: 2
 n = 20
 g = (1 + sqrt(5)) / 2
 card = tibble::tibble(x = c(0, 1, 1, 0), y = c(0, 0, g, g))
 dplyr::bind_rows(
-  card %>% dplyr::mutate(id = 0),
-  card %>% dplyr::mutate(id = 1, x = x + 1.1),
-  card %>% dplyr::mutate(id = 2, x = x + 2.2),
-  card %>% dplyr::mutate(id = 3, x = x + 3.3),
-) %>%
+  card |> dplyr::mutate(id = 0),
+  card |> dplyr::mutate(id = 1, x = x + 1.1),
+  card |> dplyr::mutate(id = 2, x = x + 2.2),
+  card |> dplyr::mutate(id = 3, x = x + 3.3)
+) |>
   ggplot() + aes(x, y) +
   geom_polygon(aes(group = id), fill = NA, color = "#333333") +
   scale_fill_identity() +
@@ -189,9 +167,12 @@ dplyr::bind_rows(
 ギャンブラーの誤謬
 : N回も連続で裏が出たら、次は表が出やすいと思いがち
 
-```{r random-pattern, echo = FALSE, fig.width = 4, fig.height = 4}
+```{r, random-pattern}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
 n = 20
-tibble::tibble(x = runif(n), y = runif(n)) %>%
+tibble::tibble(x = runif(n), y = runif(n)) |>
   ggplot() + aes(x, y) +
   geom_point(shape = 16, size = 3, alpha = 0.66) +
   coord_fixed(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
@@ -250,7 +231,7 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
   </div>
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
-  <img src="image/hist-income-japan-2019.png" width="100%" style="">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
   <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
   </a>
   </div>
@@ -273,29 +254,37 @@ Percentile, Quantile (四分位)
 : 小さい順にならべて上位何%にあるか。
 : 中央値 = 50th percentile = 第二四分位(Q2)
 
-```{r quantile, fig.width = 10, fig.height = 4, echo = FALSE}
-df = tibble::tibble(x = rnorm(200)) %>%
-  dplyr::filter(abs(x) < 2) %>%
+```{r, quantile}
+#| fig.width: 10
+#| fig.height: 4
+#| echo: false
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
   dplyr::mutate(x = x + 3)
-dfq = df %>% summarize(
+dfq = df |> dplyr::summarize(
   min = min(x),
   Q1 = quantile(x, 0.25),
   Q2 = quantile(x, 0.50),
   Q3 = quantile(x, 0.75),
   max = max(x)
-) %>%
-  tidyr::pivot_longer(everything(), values_to = "x") %>%
+) |>
+  tidyr::pivot_longer(everything(), values_to = "x") |>
   dplyr::mutate(percent = paste0(c(0, 25, 50, 75, 100), "%"))
-p_hist = ggplot(df) + aes(x) + geom_histogram(bins = 30) +
-  theme_void(base_size = 18)
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
 p_box = ggplot(df) + aes(x) +
   geom_boxplot() +
-  geom_rug(length = unit(0.06, "npc"), alpha = 0.7) +
+  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
   geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
   geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
   geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
-  coord_cartesian(ylim = c(-1.2, 0.4)) +
-  theme_void(base_size = 18)
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
 cowplot::plot_grid(p_hist, p_box, ncol = 1L)
 ```
 
@@ -306,20 +295,35 @@ cowplot::plot_grid(p_hist, p_box, ncol = 1L)
 
 同じデータでも見せ方で印象・情報量が変わる。
 
-```{r visualize-distribution, echo = FALSE, fig.width = 9, fig.height = 6}
-df = mpg %>% dplyr::mutate(y = hwy)
+```{r, visualize-distribution}
+#| echo: false
+#| fig.width: 9
+#| fig.height: 6
+df = mpg |> dplyr::mutate(y = hwy)
+df_mean = df |> dplyr::summarize(y = mean(y))
 p0 = ggplot(df) + aes(y = y) +
   theme_classic() +
-  theme(axis.title.x = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+ylim = c(0, max(df$y))
+coord_y = coord_cartesian(ylim = ylim)
+coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
+
+pcol = p0 + aes(x = 0) +
+  geom_col(data = df_mean, fill = "#999999") +
+  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
 
 cowplot::plot_grid(nrow = 2L,
-  p0 + geom_point(aes(x = 0), shape = 16, alpha = 0.2),
-  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3) + coord_cartesian(xlim = c(-1, 1)),
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1),
-  p0 + geom_histogram(fill = "#999999", bins = 30L),
-  p0 + geom_density(fill = "#999999", color = NA),
-  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_cartesian(xlim = c(-1, 1)),
-  p0 + geom_boxplot() + coord_cartesian(xlim = c(-1, 1))
+  pcol + coord_one,
+  p0 + geom_boxplot() + coord_one,
+  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
+  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66) + coord_y
 )
 ```
 
@@ -344,7 +348,10 @@ AとBには差がありそう。
 </div>
 </div>
 
-```{r comparison, fig.width = 11, fig.height = 4, echo = FALSE}
+```{r, comparison}
+#| fig.width: 11
+#| fig.height: 4
+#| echo: false
 n = 20
 df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
 df2 = dplyr::bind_rows(
@@ -406,8 +413,11 @@ p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6
    (大概 $\alpha$ = 0.05 とか 0.01 とか。予め決めておく。)
 1. 対立仮説を採択。6の目の出る確率は1/6と**有意に異なる**。
 
-```{r test-dice-hidden, include = FALSE}
-n = 10; k = 9; p = 1 / 6
+```{r, test-dice-hidden}
+#| include: false
+n = 10
+k = 9
+p = 1 / 6
 pbinom(k - 1, n, p, lower.tail = FALSE)
 x = seq(k, n)
 stopifnot(all.equal(dbinom(x, n, p), choose(n, x) * p ** x * (1 - p) ** (n - x)))
@@ -424,11 +434,14 @@ stopifnot(all.equal(sum(dbinom(x, n, p)), pbinom(k - 1, n, p, lower.tail = FALSE
 
 帰無仮説を棄却できず。6の目の出る確率が1/6と**有意に異なるとは言えない**。
 
-```{r test-dice, echo = FALSE, fig.height = 4, fig.width = 6}
+```{r, test-dice}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
 X = 4L
 n = 12L
-tibble::tibble(x = seq.int(0L, n), Probability = dbinom(x, n, 1 / 6)) %>%
-  dplyr::mutate(color = ifelse(x >= X, "#990000", "#666666")) %>%
+tibble::tibble(x = seq.int(0L, n), Probability = dbinom(x, n, 1 / 6)) |>
+  dplyr::mutate(color = ifelse(x >= X, "#990000", "#666666")) |>
   ggplot() + aes(x, Probability, fill = color) +
   geom_col() +
   scale_fill_identity() +
@@ -447,20 +460,23 @@ tibble::tibble(x = seq.int(0L, n), Probability = dbinom(x, n, 1 / 6)) %>%
 同様の検定を10回やると、そのうち少なくとも1つで偽陽性になる確率は<br>
 $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 
-```{r multiple-tests, fig.width = 11, fig.height = 4.2, echo = FALSE}
+```{r, multiple-tests}
+#| fig.width: 11
+#| fig.height: 4.2
+#| echo: false
 # 1 - (1 - 0.05) ** 10
 nsam = 10L
 nrep = 20L
 y = split(rnorm(nsam * nrep * 2), ceiling(seq_len(nsam * nrep * 2) / nsam))
-df = tidyr::crossing(repl = seq_len(nrep), x = c("A", "B")) %>%
-  dplyr::mutate(y = y) %>%
+df = tidyr::crossing(repl = seq_len(nrep), x = c("A", "B")) |>
+  dplyr::mutate(y = y) |>
   tidyr::unnest(y)
-dfp = df %>%
-  tidyr::nest(data = !repl) %>%
-  dplyr::mutate(p = purrr::map_dbl(data, ~ t.test(y ~ x, data = .x)$p.value)) %>%
-  dplyr::select(!data) %>%
+dfp = df |>
+  tidyr::nest(data = !repl) |>
+  dplyr::mutate(p = purrr::map_dbl(data, ~ t.test(y ~ x, data = .x)$p.value)) |>
+  dplyr::select(!data) |>
   dplyr::mutate(x = 1.5, y = Inf, label = ifelse(p < 0.05, sprintf("p = %.3f", p), ""))
-df %>%
+df |>
   ggplot() + aes(x, y) +
   geom_boxplot(aes(fill = x)) +
   geom_text(data = dfp, aes(label = label), hjust = 0.5, vjust = 1.2) +
@@ -518,11 +534,14 @@ df %>%
 </div>
 <div class="column" style="flex-shrink: 1.8;">
 
-```{r causal-relationship, echo=FALSE, fig.width = 3.2, fig.height = 3.2}
+```{r, causal-relationship}
+#| echo: false
+#| fig.width: 3.2
+#| fig.height: 3.2
 n = 40L
 tibble::tibble(
   study_time = runif(n, 0, 40),
-  score = pmin(rnorm(n, 3 * study_time, 10), 100)) %>%
+  score = pmin(rnorm(n, 3 * study_time, 10), 100)) |>
   ggplot() +
   aes(study_time, score) +
   geom_point(shape = 16, alpha = 0.66, size = 3) +
@@ -551,12 +570,15 @@ tibble::tibble(
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.2;">
 
-```{r confounding-factor, echo=FALSE, fig.width = 4, fig.height = 4}
+```{r, confounding-factor}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
 n = 40L
 tibble::tibble(
   temperature = runif(n, 0, 40),
   beer_sales = rpois(n, temperature * 1.3),
-  icecream_sales = rpois(n, temperature)) %>%
+  icecream_sales = rpois(n, temperature)) |>
   ggplot() +
   aes(icecream_sales, beer_sales) +
   geom_point(shape = 16, alpha = 0.66, size = 3) +
@@ -569,7 +591,7 @@ tibble::tibble(
 <div class="column" style="flex-shrink: 1;">
 
 <figure>
-<img src="image/hermeneutics-4-1-3.drawio.svg" width="500">
+<img src="../tohoku2022r/image/hermeneutics-4-1-3.drawio.svg" width="500">
 </figure>
 
 </div>
@@ -589,11 +611,14 @@ tibble::tibble(
 
 (x + y) が一定の幅に収まるようなペアだけを集めてしまうとか
 
-```{r spurious-correlation-selection-bias, echo=FALSE, fig.width = 4, fig.height = 4}
+```{r, spurious-correlation-selection-bias}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
 n = 256
-tibble::tibble(x = runif(n), y = runif(n)) %>%
-  dplyr::mutate(sampled = abs(x + y - 1) < 0.2) %>%
-  dplyr::mutate(color = ifelse(sampled, "#fde725", "#aaaaaa")) %>%
+tibble::tibble(x = runif(n), y = runif(n)) |>
+  dplyr::mutate(sampled = abs(x + y - 1) < 0.2) |>
+  dplyr::mutate(color = ifelse(sampled, "#fde725", "#aaaaaa")) |>
   ggplot() +
   aes(x, y) +
   geom_point(aes(color = color), shape = 16, size = 3, alpha = 1) +
@@ -609,11 +634,14 @@ tibble::tibble(x = runif(n), y = runif(n)) %>%
 
 **少数の外れ値**や**グループ構造**によって相関係数rが跳ね上がりうる。
 
-```{r correlation-lies, echo = FALSE, fig.width = 11, fig.height = 3.6}
+```{r, correlation-lies}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 3.6
 n = 32
 df = tibble::tibble(x = rnorm(n), y = rnorm(n))
-df_outlier = df %>% dplyr::bind_rows(data.frame(x = 10, y = 10))
-df_subgroups = df %>% dplyr::bind_rows(df + 8)
+df_outlier = df |> dplyr::bind_rows(data.frame(x = 10, y = 10))
+df_subgroups = df |> dplyr::bind_rows(df + 8)
 .lim = range(df_outlier, df_subgroups)
 
 .make_label_cor = function(df) {
@@ -647,7 +675,7 @@ cowplot::plot_grid(
 ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？
 
 <figure>
-<img src="image/nicholas-cage-drowned.svg" width="100%">
+<img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="100%">
 <figcaption><cite>
 <a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
 </cite></figcaption>
@@ -660,7 +688,7 @@ cowplot::plot_grid(
 ## 変数間の関係性まとめ
 
 <figure>
-<img src="image/hermeneutics-4-1-5.drawio.svg" width="700">
+<img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="700">
 <figcaption><cite>
 <a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
 </cite></figcaption>
@@ -956,7 +984,7 @@ SEPT1,4-14
 ## R Markdown 形式でレポートを書く
 
 <a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="120" align="right">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="180" align="right">
 </a>
 
 解析からレポート作成まで一元管理できて楽ちん。
@@ -1092,8 +1120,8 @@ RStudio > New File > R Markdown...<br>
 左のようなRmdを作って🧶Knitし、右のようなHTMLファイルを提出。
 
 <div>
-<img src="image/report-example.webp" width="52%"></img>
-<img src="image/report-example-html.webp" width="47%" style="vertical-align: top"></img>
+<img src="../tohoku2022r/image/report-example.webp" width="52%"></img>
+<img src="../tohoku2022r/image/report-example-html.webp" width="47%" style="vertical-align: top"></img>
 </div>
 
 ---
@@ -1148,6 +1176,4 @@ RStudio > New File > R Markdown...<br>
   - [R for Data Science --- R Markdown](https://r4ds.had.co.nz/r-markdown.html)
   - [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
 
-<a href="9-report.html" rel="next" class="readmore">
-9. 発表会
-</a>
+`r .meta$next_link`
