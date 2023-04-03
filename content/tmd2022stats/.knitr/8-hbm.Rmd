@@ -1,13 +1,12 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
-# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-withr::local_envvar(MAKEFLAGS = "-j1")
-withr::local_package("cmdstanr")
+#| cache: false
+wtl::knit_engines_set_cache_stan("stan/")
 ```
 
 ---
@@ -25,7 +24,7 @@ withr::local_package("cmdstanr")
 ## GLMMで登場した個体差を階層ベイズモデルで
 
 植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
 <img `r src_alt_fig_chunk("overdispersion")`>
@@ -130,19 +129,18 @@ df_seeds_od = tibble::tibble(
   y = rbinom(samplesize, 8L, p))
 ```
 ```{r, stan-glmm-prep}
-#| cache_stan: glmm
-#| stan_save_output_files: fit
-#| message: false
-#| results: false
+#| cache_stan: "glmm"
+#| stan_save_output_files: "fit"
+#| results: "hide"
 seeds_data = list(y = df_seeds_od$y, N = samplesize)
-model = cmdstan_model("stan/glmm.stan")
+model = cmdstanr::cmdstan_model("stan/glmm.stan")
 fit = model$sample(data = seeds_data, seed = 19937L, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
 ```
 
 ```{r, stan-glmm-print}
 #| echo: false
-#| cache.globals: fit
+#| cache.globals: "fit"
 print(fit)
 ```
 
@@ -153,7 +151,6 @@ print(fit)
 
 ```{r, stan-glmm}
 #| echo: false
-#| warning: false
 #| fig.width: 11
 #| fig.height: 6
 p_trace = bayesplot::mcmc_trace(draws, facet_args = list(nrow = 1L)) + coord_flip()
@@ -168,7 +165,7 @@ cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 100個体の植物から8つずつ種を取った、のデータでやってみよう。
 
 ```{r, df-seeds-generate}
-#| ref.label: df-seeds-od-8
+#| ref.label: "df-seeds-od-8"
 #| echo: -1
 ```
 

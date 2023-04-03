@@ -1,7 +1,7 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
@@ -33,7 +33,7 @@ df_dpois = tibble(X = seq(0, max_x), Prob = dpois(X, mean(df_rpois$X)))
 #| fig.width: 4
 p_pois = ggplot(df_rpois) + aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.3) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   theme_bw(base_size = 18)
 p_pois +
   theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
@@ -85,7 +85,7 @@ p_pois +
 
 ```{r, df-seeds}
 #| include: false
-#| cache.vars: [df_seeds, a, b]
+#| cache.vars: ["df_seeds", "a", "b"]
 set.seed(24601)
 n = 300L
 a = 3
@@ -116,7 +116,7 @@ p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
 p_pois +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
   ggridges::geom_vridgeline(aes(x, y, width = density * 0.5, group = x),
-    data = df_bars, fill = "#3366ffaa", linetype = 0)
+    data = df_bars, fill = "#56B4E9AA", linetype = 0)
 ```
 
   </div>
@@ -137,7 +137,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 ```{r, df-beer}
 #| include: false
-#| cache.vars: df_beer
+#| cache.vars: "df_beer"
 set.seed(24601)
 n = 200L
 true_coef = c(3, 0.05, 0.006)
@@ -206,7 +206,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 
 ```{r, df-logistic}
 #| include: false
-#| cache.vars: df_logistic
+#| cache.vars: ["df_logistic", "n"]
 set.seed(24601)
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
 nrep = 200L
@@ -240,7 +240,7 @@ df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 ggplot(df_pred) + aes(x, y) +
   geom_point(alpha = 0.5, shape = 16) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 6, group = x), fill = "#3366ffaa", linetype = 0) +
+  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 6, group = x), fill = "#56B4E9AA", linetype = 0) +
   geom_line(aes(y = pred), linewidth = 2, color = "#3366ff") +
   scale_x_continuous(breaks = x_breaks) +
   scale_y_continuous(breaks = seq.int(0, 10)) +
@@ -285,7 +285,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 
 ```{r, df-wind}
 #| include: false
-#| cache.vars: df_wind
+#| cache.vars: "df_wind"
 set.seed(24601)
 n = 200
 df_wind = tibble::tibble(
@@ -312,7 +312,7 @@ df_wind |>
   ggplot() + aes(max_wind, bucket_sales) +
   geom_point(alpha = 0.3, shape = 124, size = 6) +
   ggridges::geom_vridgeline(aes(x, y, width = density * 6, group = x),
-    data = df_bars, fill = "#3366ffaa", linetype = 0) +
+    data = df_bars, fill = "#56B4E9AA", linetype = 0) +
   geom_line(aes(y = pred), color = "#3366ff") +
   scale_y_continuous(breaks = c(0, 1)) +
   theme_bw(base_size = 20) +
@@ -342,7 +342,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 
 ```{r, df-weight}
 #| include: false
-#| cache.vars: df_weight
+#| cache.vars: "df_weight"
 set.seed(19937)
 n = 50
 df_weight = tibble::tibble(
@@ -368,7 +368,7 @@ df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
 ggplot(df_weight) + aes(height, weight) +
   geom_point(alpha = 0.5, shape = 16, size = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.08, group = height),
-    data = df_ridges, fill = "#3366ffaa", linetype = 0) +
+    data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
   stat_smooth(method = lm, formula = y ~ x, se = FALSE) +
   scale_x_continuous(breaks = x_breaks) +
   theme_bw(base_size = 20) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
@@ -406,7 +406,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 ```{r, df-ancova}
 #| include: false
-#| cache.vars: [df_ancova, weather_levels]
+#| cache.vars: ["df_ancova", "weather_levels"]
 set.seed(19937)
 n = 200L
 b = c(70, 3, 20, -20)  # true coef
@@ -465,10 +465,10 @@ dfs = tibble::tribble(
 df_ancova |>
   ggplot() + aes(weather, beer_sales, color = weather) +
   ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
-    data = df_ridges, fill = "#3366ffaa", linetype = 0) +
-  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#3366ffaa") +
-  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#3366ffaa") +
-  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 6, color = "#3366ffaa") +
+    data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
+  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#56B4E9AA") +
+  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#56B4E9AA") +
+  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 6, color = "#56B4E9AA") +
   geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
   scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
   scale_x_discrete(limits = c("cloudy", "sunny", "rainy")) +
@@ -561,7 +561,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 ```{r, df-interact}
 #| include: false
-#| cache.vars: [df_interact, weather_levels]
+#| cache.vars: ["df_interact", "weather_levels"]
 set.seed(19937)
 n = 200L
 b = c(70, 3, 100, -2)  # true coef
@@ -670,7 +670,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 結果の解釈やモデルの評価はこの後。
 
 ```{r, generate-df-weight}
-#| ref.label: df-weight
+#| ref.label: "df-weight"
 #| echo: -1
 #| cache.vars: []
 ```
@@ -679,7 +679,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ## 🔰 ポアソン回帰
 
 ```{r, generate-df-seeds}
-#| ref.label: df-seeds
+#| ref.label: "df-seeds"
 #| echo: -1
 #| cache.vars: []
 ```
@@ -688,7 +688,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ## 🔰 重回帰
 
 ```{r, generate-df-beer}
-#| ref.label: df-beer
+#| ref.label: "df-beer"
 #| echo: -1
 #| cache.vars: []
 ```
@@ -697,7 +697,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ## 🔰 ロジスティック回帰
 
 ```{r, generate-df-logistic}
-#| ref.label: df-logistic
+#| ref.label: "df-logistic"
 #| echo: -1
 #| cache.vars: []
 ```
@@ -708,7 +708,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
 
 ```{r, generate-df-ancova}
-#| ref.label: df-ancova
+#| ref.label: "df-ancova"
 #| echo: -1
 #| cache.vars: []
 ```
@@ -718,7 +718,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 
 
 ```{r, generate-df-interact}
-#| ref.label: df-interact
+#| ref.label: "df-interact"
 #| echo: -1
 #| cache.vars: []
 ```
@@ -795,7 +795,7 @@ p_lm = p_pois +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass),
-    data = df_lm, fill = "#3366ffaa", linetype = 0)
+    data = df_lm, fill = "#56B4E9AA", linetype = 0)
 # p_lm
 
 df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
@@ -810,7 +810,7 @@ p_poisson = p_pois +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
   ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass),
-    data = df_bars, fill = "#3366ffaa", linetype = 0)
+    data = df_bars, fill = "#56B4E9AA", linetype = 0)
 # p_poisson
 
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
@@ -883,7 +883,7 @@ cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 #| echo: false
 #| fig.height: 7
 #| fig.width: 7
-#| cache.vars: [df_plant, models, p_plant]
+#| cache.vars: ["df_plant", "models", "p_plant"]
 set.seed(24601)
 n = 120L
 true_coef = c(1, 0.12, 0)
@@ -949,7 +949,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 
 
 ```{r, print-llf}
-#| ref.label: llf
+#| ref.label: "llf"
 ```
 
 ???
@@ -1070,6 +1070,17 @@ print(penguins)
 ```
 
 ---
+## 欠損値のある行を取り除いておく
+
+性別はとりあえず使わないので、体長関連だけでも。
+
+```{r, penguins-dropna}
+penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
+penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+dim(penguins_dropna)
+```
+
+---
 ## 🔰 penguinsでGLMの練習
 
 次の課題を解いてみよう。<br>
@@ -1090,8 +1101,7 @@ print(penguins)
 ```{r, penguins-weight}
 #| fig.height: 4.5
 #| fig.width: 4.5
-#| warning: false
-p_penweight = ggplot(penguins) +
+p_penweight = ggplot(penguins_dropna) +
   aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +
   theme_bw(base_size = 20) +
@@ -1107,7 +1117,7 @@ p_penweight
 $y = 136.7 + 0.0153 x$
 
 ```{r, penguins-fit1}
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins)
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
 broom::tidy(fit1)
 broom::glance(fit1)
 ```
@@ -1120,8 +1130,7 @@ broom::glance(fit1)
 ```{r, penguins-weight-glm}
 #| fig.height: 5
 #| fig.width: 5
-#| warning: false
-added1 = modelr::add_predictions(penguins, fit1, type = "response")
+added1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
 p1 = p_penweight +
   geom_line(aes(y = pred), data = added1, linewidth = 1, color = "#3366ff")
 p1
@@ -1135,7 +1144,6 @@ p1
 ```{r, penguins-weight-sp}
 #| fig.height: 5
 #| fig.width: 7
-#| warning: false
 p_penweight_color = p_penweight + aes(color = species) +
   scale_color_manual(values = penguins_colors)
 p_penweight_color
@@ -1149,7 +1157,7 @@ Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。
 
 ```{r, penguins-fit2}
-fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins)
+fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
 broom::tidy(fit2)
 broom::glance(fit2)
 ```
@@ -1160,8 +1168,7 @@ broom::glance(fit2)
 ```{r, penguins-weight-sp-glm}
 #| fig.height: 5
 #| fig.width: 7
-#| warning: false
-added2 = modelr::add_predictions(penguins, fit2, type = "response")
+added2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
 p2 = p_penweight_color +
   geom_line(aes(y = pred), data = added2, linewidth = 1)
 p2
@@ -1177,7 +1184,7 @@ Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
 ```{r, penguins-fit3}
-fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins)
+fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
 broom::tidy(fit3)
 broom::glance(fit3)
 ```
@@ -1188,8 +1195,7 @@ broom::glance(fit3)
 ```{r, penguins-interaction}
 #| fig.height: 5
 #| fig.width: 7
-#| warning: false
-added3 = modelr::add_predictions(penguins, fit3, type = "response")
+added3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
 p3 = p_penweight_color +
   geom_line(aes(y = pred), data = added3, linewidth = 1)
 p3
@@ -1203,7 +1209,6 @@ AICで選ぶなら交互作用入り重回帰が良さそう。
 ```{r, penguins-aic}
 #| fig.height: 4
 #| fig.width: 11
-#| warning: false
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
@@ -1221,22 +1226,19 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| fig.height: 4
 #| fig.width: 11
 #| cache.vars: []
-panguins_bill_nona = penguins |> tidyr::drop_na(bill_length_mm, bill_depth_mm)
-p_bill = panguins_bill_nona |>
+p_bill = penguins_dropna |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 
-# penguins |> filter(is.na(bill_length_mm) | is.na(bill_depth_mm))
-
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = panguins_bill_nona)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = panguins_bill_nona)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = panguins_bill_nona)
-d1 = modelr::add_predictions(panguins_bill_nona, fit1, type = "response")
-d2 = modelr::add_predictions(panguins_bill_nona, fit2, type = "response")
-d3 = modelr::add_predictions(panguins_bill_nona, fit3, type = "response")
+fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
+fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
+fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
+d1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
+d2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
+d3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
 p1 = p_bill + geom_line(aes(y = pred), d1, linewidth = 1, color = "#3366ff")
 p2 = p_bill + aes(color = species) + geom_line(aes(y = pred), d2, linewidth = 1)
 p3 = p_bill + aes(color = species) + geom_line(aes(y = pred), d3, linewidth = 1)

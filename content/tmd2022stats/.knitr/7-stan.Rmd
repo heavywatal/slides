@@ -1,14 +1,12 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
 #| cache: false
-# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-withr::local_envvar(MAKEFLAGS = "-j1")
-withr::local_package("cmdstanr")
+wtl::knit_engines_set_cache_stan("stan/")
 ```
 
 ---
@@ -26,11 +24,11 @@ withr::local_package("cmdstanr")
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: `r palette()[3]`;">確率分布</span>を扱いたい</span>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span>
 
 **一般化線形モデル GLM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: `r palette()[2]`;">個体差</span>などの変量効果を扱いたい</span>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span>
 
 **一般化線形混合モデル GLMM**
 
@@ -93,16 +91,27 @@ library(bayesplot)
 別ファイルに書いておく。
 e.g., `coin.stan`:
 
-```{embed, read-coin-stan}
-#| file: "stan/coin.stan"
+```{stan, binom}
+#| cache_stan: true
+data {
+  int<lower=0> N;
+  array[N] int x;
+}
+parameters {
+  real<lower=0,upper=1> p;
+}
+model {
+  x ~ binomial(1, p);
+}
 ```
 
 Rからデータを渡して走らせる:
-```{r, stan-coin-review}
-#| results: hide
-#| stan_save_output_files: coin_fit
+```{r, stan-binom}
+#| cache_stan: "binom"
+#| results: "hide"
+#| stan_save_output_files: "coin_fit"
 coin_data = tibble::lst(N = 50L, x = rbinom(N, 1, 0.7))
-coin_model = cmdstan_model("stan/coin.stan")
+coin_model = cmdstanr::cmdstan_model("stan/binom.stan")
 coin_fit = coin_model$sample(coin_data, seed = 24601L)
 ```
 
@@ -157,7 +166,6 @@ df_lm = tibble::tibble(
 ```{r, stan-lm}
 #| cache_stan: "lm"
 #| stan_save_output_files: "lm_fit"
-#| warning: false
 #| results: "hide"
 # リストに入れて渡す:
 lm_data = as.list(df_lm)
@@ -179,7 +187,7 @@ $\hat R$ や $N_{eff}$ も良さそう。
 ## CmdStanによる診断
 
 ```{r, cmdstan-diagnose}
-#| results: hide
+#| results: "hide"
 lm_fit$cmdstan_diagnose()
 ```
 
@@ -217,7 +225,7 @@ lm_draws = lm_fit$draws(format = "df") |> print()
 実体はCmdStanが書き出したCSVファイル:
 
 ```{r, fit_output_files}
-#| results: hide
+#| results: "hide"
 lm_fit$output_files()
 ```
 ```
@@ -325,7 +333,6 @@ model {
 ```{r, stan-lmtr}
 #| cache_stan: "lm-transformed"
 #| stan_save_output_files: "lmtr_fit"
-#| warning: false
 #| results: "hide"
 lmtr_model = cmdstanr::cmdstan_model("stan/lm-transformed.stan")
 lmtr_fit = lmtr_model$sample(lm_data, seed = 19937L, refresh = 0)
@@ -386,8 +393,6 @@ generated quantities {
 ```{r, stan-lm-generated}
 #| cache_stan: "lm-generated"
 #| stan_save_output_files: "lmgen_fit"
-#| warning: false
-#| message: false
 #| results: "hide"
 lmgen_model = cmdstanr::cmdstan_model("stan/lm-generated.stan")
 lmgen_fit = lmgen_model$sample(lm_data, seed = 19937L, refresh = 0)
@@ -447,8 +452,8 @@ generated quantities {
 
 ```{r, stan-lm-credible-prep}
 #| include: false
-#| cache_stan: lm-credible
-#| stan_save_output_files: fit_cred
+#| cache_stan: "lm-credible"
+#| stan_save_output_files: "fit_cred"
 set.seed(24601)
 n = 300L
 a = 3
@@ -459,13 +464,13 @@ data_cred[["N"]] = n
 data_cred[["x_tilde"]] = seq(0.4, 1.7, 0.1)
 data_cred[["N_tilde"]] = length(data_cred[["x_tilde"]])
 
-model_cred = cmdstan_model("stan/lm-credible.stan")
-fit_cred = model_cred$sample(data_cred, seed = 19937L, refresh = 0)
+model_cred = cmdstanr::cmdstan_model("stan/lm-credible.stan")
+fit_cred = model_cred$sample(data_cred, seed = 19937L, refresh = 0, step_size = 0.1)
 draws_cred = fit_cred$draws(format = "df") |> print()
 
 .probs = c(lower = 0.025, median = 0.5, upper = 0.975)
 df_quant = draws_cred |>
-  dplyr::summarize(dplyr::across(starts_with("y_tilde"), quantile, probs = .probs)) |>
+  dplyr::reframe(dplyr::across(starts_with("y_tilde"), quantile, probs = .probs)) |>
   dplyr::mutate(label = names(.probs)) |>
   tidyr::pivot_longer(!label, names_to = "x", values_to = "y") |>
   dplyr::mutate(x = data_cred[["x_tilde"]][readr::parse_number(x)]) |>
@@ -759,7 +764,7 @@ model {
 #| echo: 3
 withr::local_package("palmerpenguins")
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
-penguins_dropna = penguins |> tidyr::drop_na()
+penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
 ```
 
 ```{stan, penguins-lm}

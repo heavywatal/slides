@@ -21,11 +21,12 @@ withr::local_package("ggplot2")
 registerS3method("print", "tbl", wtl::printdf)
 registerS3method("print", "tbl_df", wtl::printdf)
 knitr::opts_chunk$set(comment = "")
+knitr::opts_chunk$set(message = NA)
+knitr::opts_chunk$set(warning = NA)
 knitr::opts_chunk$set(dev = "ragg_png")
 knitr::opts_chunk$set(dpi = 100)
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
-wtl::knit_engines_set_cache_stan("stan/")
 set.seed(24601)
 
 src_alt_fig_chunk = function(label, ext = "png", number = 1L) {

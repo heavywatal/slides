@@ -1,7 +1,7 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
@@ -1069,7 +1069,6 @@ R標準のやつとは根本的に違うシステムで作図する。
 #| fig.show: "hold"
 #| fig.height: 5
 #| fig.width: 7
-#| message: false
 ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -1086,7 +1085,6 @@ ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 #| fig.show: "hold"
 #| fig.height: 5
 #| fig.width: 7
-#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -1103,7 +1101,6 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 #| fig.show: "hold"
 #| fig.height: 5
 #| fig.width: 7
-#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point()                      # 散布図を描く
@@ -1120,7 +1117,6 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 #| fig.show: "hold"
 #| fig.height: 5
 #| fig.width: 7
-#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1188,7 +1184,6 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 #| fig.show: "hold"
 #| fig.height: 5
 #| fig.width: 7
-#| message: false
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -1747,7 +1742,7 @@ p_weight +
 ---
 ## 最小二乗法 (Ordinary Least Square: OLS)
 
-回帰直線からの<strong style="color: #3366ff">残差</strong>平方和(RSS)を最小化する。
+<span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。
 
 ```{r, weight-residual}
 #| echo: false
@@ -1776,8 +1771,8 @@ stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
 
 p1 = p_weight %+%
   add_pred_weight(df_weight, param1) +
-  geom_line(aes(y = pred)) +
-  geom_linerange(aes(ymin = weight, ymax = pred), color = "#3366ff")
+  geom_line(aes(y = pred), color = "#3366ff") +
+  geom_linerange(aes(ymin = weight, ymax = pred), color = "#E69F00")
 p2 = p1 %+%
   (df_weight |> modelr::add_predictions(lm_weight))
 cowplot::plot_grid(nrow = 1L,
@@ -1871,7 +1866,7 @@ p_weight +
 
 架空のデータを作る(乱数生成については後述):
 ```{r, generate-df-linear}
-#| ref.label: df-linear
+#| ref.label: "df-linear"
 #| echo: -1
 #| eval: false
 ```

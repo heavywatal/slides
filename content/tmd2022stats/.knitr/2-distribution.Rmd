@@ -1,7 +1,7 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
@@ -56,7 +56,7 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 p_lm = p_pois +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
-                            fill = "#3366ffaa", linetype = 0)
+                            fill = "#56B4E9AA", linetype = 0)
 # p_lm
 
 df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
@@ -67,7 +67,7 @@ df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
 p_poisson = p_pois +
   stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
   ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass), df_bars,
-                            fill = "#3366ffaa", linetype = 0)
+                            fill = "#56B4E9AA", linetype = 0)
 # p_poisson
 
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
@@ -643,7 +643,7 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 ## 現実には、確率分布に「従わない」ことが多い
 
 植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #3366ff;">n=8の二項分布</span>になるはずだけど、<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。
 
 <img `r src_alt_fig_chunk("overdispersion")`>
@@ -908,7 +908,7 @@ RStudio > New File > Quarto Document...<br>
 さっきはこんな汚いスクリプトだった:
 
 ```{r, try-prng-print}
-#| ref.label: try-prng
+#| ref.label: "try-prng"
 #| eval: false
 ```
 

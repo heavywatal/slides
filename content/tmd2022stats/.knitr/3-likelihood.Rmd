@@ -1,7 +1,7 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
@@ -106,7 +106,7 @@ ggplot(df_rpois) +
 p_pois = ggplot(df_rpois) +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), nrow = 1L, labeller = label_both) +
   theme_bw(base_size = 18) +
   theme(
@@ -119,7 +119,7 @@ p_pois
 カウントデータだからポアソン分布っぽい。<br>
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？
 
-黒が観察データ。<span style="color: #3366ff;">青がポアソン分布</span>。
+黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
 よく重なるのは $\lambda \approx 3$ くらいか。
 
 
@@ -186,7 +186,7 @@ df_likelihood = df_rpois |>
   dplyr::summarize(L = prod(Prob)) |>
   dplyr::mutate(logL = log(L), label = sprintf("L(%.0f|D) = %.1e", lambda, L))
 p_pois +
-  geom_text(data = df_likelihood, aes(label = label), color = "#3366ff",
+  geom_text(data = df_likelihood, aes(label = label), color = "#56B4E9",
             x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 6)
 ```
 
@@ -222,9 +222,9 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
   ggplot() +
   aes(lambda, logL) +
   geom_line() +
-  geom_vline(xintercept = X_mle, color = "#3366ff") +
-  annotate("point", x = X_mle, y = log(L_mle), size = 3, color = "#3366ff") +
-  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#3366ff",
+  geom_vline(xintercept = X_mle, color = "#56B4E9") +
+  annotate("point", x = X_mle, y = log(L_mle), size = 3, color = "#56B4E9") +
+  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
            x = Inf, y = Inf, hjust = 1.1, vjust = 1.2, size = 5) +
   labs(y = "log L") +
   theme_bw(base_size = 18) +
@@ -237,7 +237,7 @@ df_dpois = tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
 p_pois = ggplot(df_rpois) +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   theme_bw(base_size = 18) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
@@ -268,7 +268,7 @@ p_repl = df_sum |>
   ggplot() +
   aes(lambda) +
   geom_histogram(bins = 25, center = 3) +
-  annotate("point", x = df_minmax$lambda, y = 0, color = "#3366ff", size = 8, alpha = 0.5) +
+  annotate("point", x = df_minmax$lambda, y = 0, color = "#56B4E9", size = 8, alpha = 0.5) +
   labs(x = "estimated_lambda") +
   theme_bw(base_size = 18) +
   theme(
@@ -284,7 +284,7 @@ p_minmax = df_repl |>
   ggplot() +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#3366ff") +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
   theme_bw(base_size = 18) +
   theme(

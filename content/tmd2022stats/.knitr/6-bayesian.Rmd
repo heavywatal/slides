@@ -1,13 +1,12 @@
 ```{r, setup-common}
 #| file: "setup.R"
 #| echo: false
-#| results: asis
+#| results: "asis"
 ```
 ```{r, setup-local}
 #| include: false
-# to suppress "warning: jobserver unavailable: using -j1" from cmdstanr
-withr::local_envvar(MAKEFLAGS = "-j1")
-withr::local_package("cmdstanr")
+#| cache: false
+wtl::knit_engines_set_cache_stan("stan/")
 ```
 
 ---
@@ -41,14 +40,14 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   dplyr::filter(logLik > -1e6) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = palette()[3]) +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = palette()[3]) +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#56B4E9") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = palette()[3], alpha = 0.5) +
+  geom_area(fill = "#56B4E9", alpha = 0.5) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
@@ -88,8 +87,8 @@ df_coin |>
   dplyr::group_by(label) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = palette()[3]) +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = palette()[3]) +
+  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#56B4E9") +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -104,7 +103,7 @@ df_coin |>
 df_coin |>
   dplyr::filter(i %in% coin_show) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = palette()[3], alpha = 0.5) +
+  geom_area(fill = "#56B4E9", alpha = 0.5) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -258,7 +257,7 @@ devnull = tibble::tibble(
 prior_beta = df_coin |>
   dplyr::filter(i == 0) |>
   ggplot() + aes(p, Density) +
-  geom_area(fill = palette()[3], alpha = 0.5) +
+  geom_area(fill = "#56B4E9", alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -272,7 +271,7 @@ df_coin |>
   dplyr::filter(i == 4) |>
   dplyr::mutate(Lik = exp(logLik)) |>
   ggplot() + aes(p, Lik) +
-  geom_line(color = palette()[3], linewidth = 2) +
+  geom_line(color = "#56B4E9", linewidth = 2) +
   labs(title = "Likelihood") +
   theme_bw(base_size = 18) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -437,13 +436,13 @@ p_eti = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_line(color = "#999999", linewidth = 1) +
-  geom_area(data = .f, fill = palette()[3], alpha = 0.5) +
+  geom_area(data = .f, fill = "#56B4E9", alpha = 0.5) +
   geom_area(data = .g, fill = "#333333", alpha = 0.8) +
   annotate("text", x = bound[1], y = 0.7, label = "2.5%", color = "#333333", hjust = 1) +
   annotate("text", x = bound[2], y = 0.7, label = "2.5%", color = "#333333", hjust = 0) +
   scale_x_continuous(breaks = bound) +
   labs(title = "Equal-Tailed Interval (ETI)", x = "Parameter") +
-  .theme + theme(panel.grid.major = element_line(color = palette()[3]))
+  .theme + theme(panel.grid.major = element_line(color = "#56B4E9"))
 
 hdi_lb = hdi_lowerbound(df_density$Density)
 df_hdi = df_density |> dplyr::filter(Density >= hdi_lb)
@@ -451,12 +450,12 @@ range_hdi = df_hdi |> dplyr::reframe(p = range(p)) |> dplyr::pull(p)
 p_hdi = df_density |>
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
-  geom_area(data = df_hdi, fill = palette()[3], alpha = 0.5) +
+  geom_area(data = df_hdi, fill = "#56B4E9", alpha = 0.5) +
   geom_line(color = "#999999", linewidth = 1) +
   geom_hline(aes(yintercept = hdi_lb), color = "#444444", linewidth = 1, linetype = "dashed") +
   scale_x_continuous(breaks = range_hdi) +
   labs(title = "Highest Density Interval (HDI)", x = "Parameter") +
-  .theme + theme(panel.grid.major = element_line(color = palette()[3]))
+  .theme + theme(panel.grid.major = element_line(color = "#56B4E9"))
 
 .map = function(.x) {dplyr::slice_max(.x, Density)}
 .med = function(.x) {
@@ -587,7 +586,7 @@ tibble(x = runif(.n, -1, 1), y = runif(.n, -1, 1)) |>
   ggplot() + aes(x, y) +
   annotate("polygon", x = cos(.theta), y = sin(.theta), fill = "#888888", alpha = 0.4) +
   geom_point(data = \(x) dplyr::filter(x, !accepted), shape = 16, alpha = 0.5, size = 2) +
-  geom_point(data = \(x) dplyr::filter(x, accepted), color = palette()[3], shape = 16, size = 2) +
+  geom_point(data = \(x) dplyr::filter(x, accepted), color = "#56B4E9", shape = 16, size = 2) +
   coord_fixed(xlim = c(-1, 1), ylim = c(-1, 1), expand = FALSE)  +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -611,7 +610,7 @@ p_pdf = tibble::tibble(p = seq(0, 1, 0.01), Density = (dbeta(p, 4, 6) + dbeta(p,
   geom_hline(yintercept = 0) +
   geom_area(fill = "#000000", alpha = 0.33) +
   geom_point(data = df_point |> dplyr::filter(!accepted), shape = 16, alpha = 0.5) +
-  geom_point(data = df_point |> dplyr::filter(accepted), color = palette()[3], shape = 16, size = 2, alpha = 1) +
+  geom_point(data = df_point |> dplyr::filter(accepted), color = "#56B4E9", shape = 16, size = 2, alpha = 1) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
@@ -623,7 +622,7 @@ p_accepted = tibble::tibble(p = runif(n), th = dbeta(p, 4, 6) + dbeta(p, 70, 30)
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
   coord_cartesian(xlim = c(-0.2, 1.2)) +
-  geom_histogram(bins = 20, center = 0.5, fill = palette()[3], alpha = 0.66) +
+  geom_histogram(bins = 20, center = 0.5, fill = "#56B4E9", alpha = 0.66) +
   labs(x = "X") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
@@ -883,8 +882,8 @@ p_tile = tidyr::crossing(x = seq(-3, 3, 0.05), y = x) |>
 for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
   df_i = head(df_gibbs, i)
   p = p_tile +
-    geom_path(data = df_i, color = palette()[3], alpha = 0.66, linewidth = 1) +
-    geom_point(data = df_i, color = palette()[3], alpha = 0.66, shape = 16)
+    geom_path(data = df_i, color = "#56B4E9", alpha = 0.66, linewidth = 1) +
+    geom_point(data = df_i, color = "#56B4E9", alpha = 0.66, shape = 16)
   print(p)
 }
 ```
@@ -956,7 +955,6 @@ e.g., `thin = 5` で5回に1回だけサンプルする:
 #| echo: false
 #| fig.height: 5
 #| fig.width: 7
-#| message: false
 p_trace +
   coord_cartesian(ylim = c(0, 1), xlim = c(200, 260)) +
   geom_point(data = function(.x) {dplyr::filter(.x, t %% 5 == 0)}, alpha = 0.6, size = 3, shape = 16)
@@ -1023,18 +1021,18 @@ myplot_trace = function(fit) {
 ```
 ```{r, converge-yes-plot}
 #| include: false
-#| cache_stan: converge-yes
-#| stan_save_output_files: fit_yes
-mod_yes = cmdstan_model("stan/converge-yes.stan", pedantic = TRUE)
+#| cache_stan: "converge-yes"
+#| stan_save_output_files: "fit_yes"
+mod_yes = cmdstanr::cmdstan_model("stan/converge-yes.stan")
 fit_yes = mod_yes$sample(data = convdata, seed = 24601L, refresh = 0)
 p_yes = myplot_trace(fit_yes)
 ```
 ```{r, converge-no-plot}
 #| include: false
-#| cache_stan: converge-no
-#| stan_save_output_files: fit_no
-mod_no = cmdstan_model("stan/converge-no.stan", pedantic = TRUE)
-fit_no = mod_no$sample(data = convdata, seed = 24601L, refresh = 0)
+#| cache_stan: "converge-no"
+#| stan_save_output_files: "fit_no"
+mod_no = cmdstanr::cmdstan_model("stan/converge-no.stan")
+fit_no = mod_no$sample(data = convdata, seed = 24601L, refresh = 0, show_messages = FALSE)
 p_no = myplot_trace(fit_no)
 ```
 ```{r, convergence}
@@ -1241,14 +1239,15 @@ model {
 
 予め実行速度の速い機械語に翻訳(コンパイル):
 ```{r, stan-binom-model}
-#| cache_stan: coin
-model = cmdstan_model("stan/coin.stan")
+#| cache_stan: "coin"
+model = cmdstanr::cmdstan_model("stan/coin.stan")
 ```
 
 モデルとデータを使ってMCMCサンプリング:
 
 ```{r, stan-binom-sample}
-#| results: false
+#| cache_stan: "coin"
+#| results: "hide"
 #| stan_save_output_files: "fit"
 fit = model$sample(coin_data, seed = 24601L)
 ```
