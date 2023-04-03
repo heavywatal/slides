@@ -187,11 +187,12 @@ k &\in \{0, 1, 2, \ldots, n\}
 size = 3L
 p = 0.5
 X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
-df_rbinom = purrr::map_dfr(c(1, 2, 3, 10, 100), ~ {
-  tibble::tibble(X = head(X, .x)) |>
-    dplyr::count(X) |>
-    dplyr::mutate(Freq = n / .x, Repl = .x)
+df_rbinom = purrr::map(c(1, 2, 3, 10, 100), \(n) {
+  tibble::tibble(X = head(X, n)) |>
+    dplyr::count(X, name = "k") |>
+    dplyr::mutate(Freq = k / n, Repl = n)
 }) |>
+  purrr::list_rbind() |>
   dplyr::bind_rows(tibble(X = seq(0, 3), Freq = dbinom(X, size, p), Repl = Inf))
 df_rbinom |>
   ggplot() +
@@ -317,9 +318,10 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
-df = purrr::map_dfr(c(0.2, 0.5, 0.9), function(p) {
+df = purrr::map(c(0.2, 0.5, 0.9), \(p) {
   tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
 }) |>
+  purrr::list_rbind() |>
   dplyr::filter(Prob > 0.001)
 x_br = c(seq.int(0, 10), seq.int(15, 100, 5))
 ggplot(df) +
@@ -350,9 +352,9 @@ ggplot(df) +
 #| fig.height: 4
 #| fig.width: 11
 p = 0.25
-df = purrr::map_dfr(2**seq.int(0, 4), function(n) {
+df = purrr::map(2**seq.int(0, 4), \(n) {
   tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
-})
+}) |> purrr::list_rbind()
 ggplot(df) +
   aes(X, Prob) +
   scale_x_continuous(breaks = df[["X"]]) +
@@ -531,9 +533,10 @@ e.g., 一様分布 [0, 100) から40サンプル
 #| fig.width: 11
 n = 40L
 X = replicate(10000L, mean(runif(n, 0, 100)))
-purrr::map_dfr(c(10, 100, 1000, 10000), ~ {
-  tibble::tibble(X = head(X, .x), Repl = .x)
+purrr::map(c(10, 100, 1000, 10000), \(n) {
+  tibble::tibble(X = head(X, n), Repl = n)
 }) |>
+  purrr::list_rbind() |>
   ggplot() +
   aes(X) +
   geom_histogram(bins = 25) +
@@ -551,10 +554,11 @@ purrr::map_dfr(c(10, 100, 1000, 10000), ~ {
 #| echo: false
 #| fig.height: 3
 #| fig.width: 11
-purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
-  tibble::tibble(X = seq(0, .x), Prob = dbinom(X, .x, 0.25), n = .x) |>
+purrr::map(c(1, 4, 16, 64, 256), \(n) {
+  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, 0.25), n = n) |>
     dplyr::filter(Prob > 1e-5)
 }) |>
+  purrr::list_rbind() |>
   ggplot() +
   aes(X, Prob) +
   geom_col(width = 1) +
@@ -575,10 +579,11 @@ purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
 #| echo: false
 #| fig.height: 2.5
 #| fig.width: 11
-purrr::map_dfr(c(1, 4, 16, 64, 256), ~ {
-  tibble::tibble(X = seq(0, 4 * .x), Prob = dpois(X, .x), lambda = .x) |>
+purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
+  tibble::tibble(X = seq(0, 4 * lambda), Prob = dpois(X, lambda), lambda) |>
     dplyr::filter(Prob > 1e-5)
 }) |>
+  purrr::list_rbind() |>
   ggplot() +
   aes(X, Prob) +
   geom_col(width = 1) +

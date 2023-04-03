@@ -109,15 +109,10 @@ Percentile, Quantile (四分位)
 df = tibble::tibble(x = rnorm(200)) |>
   dplyr::filter(abs(x) < 2) |>
   dplyr::mutate(x = x + 3)
-dfq = df |> dplyr::summarize(
-  min = min(x),
-  Q1 = quantile(x, 0.25),
-  Q2 = quantile(x, 0.50),
-  Q3 = quantile(x, 0.75),
-  max = max(x)
-) |>
-  tidyr::pivot_longer(everything(), values_to = "x") |>
-  dplyr::mutate(percent = paste0(c(0, 25, 50, 75, 100), "%"))
+probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
+dfq = df |>
+  dplyr::reframe(x = quantile(x, probs)) |>
+  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
 
 p_hist = ggplot(df) + aes(x) +
   geom_histogram(bins = 30) +

@@ -70,9 +70,9 @@
 set.seed(24601)
 df_rpois = tibble::tibble(X = rpois(50L, 3))
 max_x = 11L
-df_dpois = purrr::map_dfr(c(1, 3, 5), ~ {
-  tibble(lambda = .x, X = seq.int(0L, max_x), Prob = dpois(X, lambda))
-})
+df_dpois = purrr::map(c(1, 3, 5), \(lambda) {
+  tibble::tibble(lambda, X = seq.int(0L, max_x), Prob = dpois(X, lambda))
+}) |> purrr::list_rbind()
 ```
 ```{r, poisson-seed}
 #| echo: false
@@ -309,12 +309,13 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 #| fig.height: 4
 #| fig.width: 11
 nrep = 1000L
-purrr::map_dfr(c(5, 50, 500, 5000), ~ {
-  tibble::tibble(X = rpois(.x * nrep, 3), repl = rep(seq_len(nrep), each = .x)) |>
+purrr::map(c(5, 50, 500, 5000), \(n) {
+  tibble::tibble(X = rpois(n * nrep, 3), repl = rep(seq_len(nrep), each = n)) |>
     dplyr::group_by(repl) |>
     dplyr::summarize(estimated_lambda = mean(X)) |>
-    dplyr::mutate(n = .x)
+    dplyr::mutate(n = n)
 }) |>
+  purrr::list_rbind() |>
   ggplot() +
   aes(estimated_lambda) +
   geom_histogram(bins = 25, center = 3) +

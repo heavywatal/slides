@@ -66,15 +66,16 @@ tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
 set.seed(24601)
 coin_X = c(0L, 0L, 0L, 1L, rbinom(496L, 1L, 0.5))
 coin_show = c(4, 20, 100, 500)
-df_coin = purrr::map_dfr(c(0, 1, 2, 3, coin_show), ~{
-  k = sum(head(coin_X, .x))
+df_coin = purrr::map(c(0, 1, 2, 3, coin_show), \(i) {
+  k = sum(head(coin_X, i))
   tibble::tibble(
-    i = .x,
-    label = sprintf("%d / %d", k, .x),
+    i = i,
+    label = sprintf("%d / %d", k, i),
     p = seq(0, 1, 0.01),
-    logLik = dbinom(k, .x, p, log = TRUE),
-    Density = dbeta(p, k + 1, .x - k + 1))
+    logLik = dbinom(k, i, p, log = TRUE),
+    Density = dbeta(p, k + 1, i - k + 1))
 }) |>
+  purrr::list_rbind() |>
   dplyr::mutate(label = factor(label, levels = unique(label)))
 ```
 ```{r, coin-frequentist}
@@ -687,9 +688,9 @@ n_total = 20
 df_point = tibble::tibble(p = seq(0.48, 0.64, .delta), logLik = .logLik(p))
 df_arrow = df_point |>
   dplyr::group_by(p) |>
-  dplyr::mutate(data = purrr::map_dfr(p, ~{
-    pl = p + 0.005
-    pr = p + .delta - 0.005
+  dplyr::mutate(data = purrr::map(p, \(.p) {
+    pl = .p + 0.005
+    pr = .p + .delta - 0.005
     ll = .logLik(pl)
     lr = .logLik(pr)
     if (ll < lr) {
@@ -698,7 +699,7 @@ df_arrow = df_point |>
       data.frame(pbegin = pr, pend = pl, lbegin = lr, lend = ll)
     }
   })) |>
-  tidyr::unpack(data)
+  tidyr::unnest(data)
 
 .ar = grid::arrow(angle = 20, length = grid::unit(0.11, "inches"), type = "closed")
 .ar2 = grid::arrow(angle = 20, length = grid::unit(0.09, "inches"), type = "closed", ends = "first")

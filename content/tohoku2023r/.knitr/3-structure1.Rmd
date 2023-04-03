@@ -660,17 +660,37 @@ result = diamonds |>
 
 
 ---
-## 要約・集計: `summarize()` 発展編
+## 要約・集計: `summarize(across())`
 
-複数の列の複数の値を柔軟に集計する:
+複数の列の値をまとめて集計する:
 ```{r, group-summarize-across}
 result = diamonds |>
   group_by(cut) |>
-  summarize(across(where(is.numeric), range)) |>
+  summarize(across(where(is.numeric), mean)) |>
   print()
 ```
 
 🔰 `mpg` の**各数値列の最大値を駆動方式ごとに**計算しよう
+
+
+---
+## 要約・集計: `reframe()`
+
+
+
+1グループにつき複数行の集計結果も扱える:
+```{r, reframe}
+quantile95 = function(x) {
+  quantile(x, c(0.025, 0.975))
+}
+
+result = diamonds |>
+  reframe(across(where(is.numeric), quantile95)) |>
+  print()
+```
+
+🔰 `mpg` の**各数値列の `range()` を駆動方式ごとに**計算しよう
+
 
 ---
 ## 要約・集計: `count()`
