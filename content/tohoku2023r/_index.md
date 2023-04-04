@@ -9,7 +9,7 @@ draft = false
 -   講師: 岩嵜航 (東北大学 生命科学研究科 進化ゲノミクス分野 牧野研)
 -   科目: 東北大学 理学部生物学科 進化学実習
 -   日程: 2023年4月10, 11, 12, 13, 17日
--   場所: 東北大学 / zoom.us
+-   場所: 東北大学理学部合同A棟実習室 / zoom.us
 -   概要:<br>
     理学部生物学科における研究とは、大雑把に言うと
     「生物に関するデータを集め、その背後にある理（ことわり）を読み解くこと」です。
@@ -29,24 +29,25 @@ draft = false
     生物学研究におけるデータ解釈・解析の重要性を認識する。
     Rを使用してデータの前処理・可視化ができるようになる。
 -   授業計画
-    1. 導入: データ解析の全体像。Rを使うメリット。Rの基本。
-    2. データの可視化
+    1. 導入: データ解析の全体像。Rの基本。
+    2. データの可視化、レポート作成。
     3. データ構造の処理1: 抽出、集約など。
     4. データ構造の処理2: 結合、変形など。
-    5. データ内容の処理: 数値、文字列、日時など。
-    6. 統計モデリング1: 確率分布、尤度
-    7. 統計モデリング2: 一般化線形モデル
-    8. データ解釈の基礎知識、レポート作成方法
-    9. 実践・発表
+    5. データ内容の処理: 数値、文字列など。
+    6. データ入力、データ解釈
+    7. 統計モデリング1: 確率分布、尤度
+    8. 統計モデリング2: 一般化線形モデル
+    9. 発表会
 
     | 時間  | 4/10 Mon | 4/11 Tue | 4/12 Wed | 4/13 Thu | 4/17 Mon |
     | ----- | -------- | -------- | -------- | -------- | -------- |
-    | 13:00 | **導入** | 課題解答 | 課題解答 | 課題解答 | グループ作業 |
-    | 14:30 | **可視化** | **構造処理1** | **内容処理** | **モデリング2** | 発表会 |
-    | 16:00 | 予備 | **構造処理2** | **モデリング1** | **データ解釈** | 発表会 |
+    | 13:00 | **導入** | **構造処理1** | **内容処理** | **統計モデル1** | 発表会 |
+    | 14:40 | **可視化** | **構造処理2** | **データ解釈** | **統計モデル2** | 発表会 |
+    | 16:20 | 練習問題 | 練習問題 | 練習問題 | 練習問題 | 予備 |
 
 -   準備学習等
     - ファイル、フォルダ、クリックなど一般的なパソコンの基礎知識と経験
+    - 下記のパソコン環境設定
 -   教科書
     - なし
 -   参考書
@@ -60,52 +61,68 @@ draft = false
 
 途中まででもいいので、できるかぎり実習前に済ませてもらえると助かります。
 
-参考:
-[R初心者の館 by das_Kinoさん](https://das-kino.hatenablog.com/entry/2019/11/07/125044),
-[矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
+1.  OSのソフトウェア・アップデートを基本的に全て適用して再起動。
+    - Windows 11 (≥22H2)
+    - macOS Ventura (≥13.3)
+1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+検索)ようにOSを設定。
+1.  <https://cran.r-project.org/>
+    から最新版の **R本体(≥4.2.3)** をダウンロードしてインストール。
+    OK連打のデフォルト設定で。
+    古いものが既に入っている場合は念のため削除してから。
+    - [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.*.*-win.exe`
+    - [Mac](https://cran.r-project.org/bin/macosx/)
+      → `R-4.*.*-arm64.pkg` (Apple Silicon) or `R-4.*.*.pkg` (Intel)
+1.  <https://posit.co/download/rstudio-desktop/>
+    から最新版の **RStudio(≥2023.03.0)** をダウンロードしてインストール。
+    古いものが既に入っている場合は念のため削除してから。
+1.  開発者ツールをインストール。
+    ここでは必須ではないけどいずれ使うことになる。
+    - Windows: [**Rtools**](https://cran.r-project.org/bin/windows/Rtools/)
+      (R本体のバージョンに合わせる)
+    - Mac: [**Command Line Tools**](https://duckduckgo.com/?q=command+line+tools):
+      ターミナルで `xcode-select --install` を実行。
+      Xcode環境は不要。
+1.  RStudioを起動し、左側のConsoleで次の1行を実行:
+    ```r
+    install.packages("tidyverse", type = "binary")
+    ```
+    何か訊かれたら `yes` と回答。
+    パッケージがたくさんインストールされる。
+    エラーや警告らしきものがあれば全文コピーしておく。
+1.  Consoleに次の2行を打ち込んでメッセージを確認:
+    ```r
+    library(conflicted)
+    library(tidyverse)
+    ```
+    ```
+    ── Attaching core tidyverse packages ───────────────── tidyverse 2.0.0 ──
+    ✔ dplyr     1.1.1     ✔ readr     2.1.4
+    ✔ forcats   1.0.0     ✔ stringr   1.5.0
+    ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+    ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+    ✔ purrr     1.0.1
+    ```
 
-1.  手元のコンピューターの **ユーザー名（ホームフォルダの名前）** を確認。
-    半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがちです。
-    たぶん変更できない？ので新しいユーザーを作って引っ越すのがいいと思います。
+### エラーや警告が出たら
+
+1.  実習当日に教員やTAに相談。全員の環境を確認してから進みます。
+1.  **バージョン確認**。OS、R、RStudioなどのソフトウェアが古すぎるかも。
+    それらが十分に新しければ、次に挙げる日本語やOneDriveの問題は対処済みのはず。
+1.  手元のコンピューターの**ホームフォルダ**を確認。
+    新しくターミナルを開いて `pwd` コマンドを実行。
+    ここに半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがち。
+    ここだけ修正するのはかなり難しい
+    (ユーザー名のフルネーム表示は変更できるけどそれは無関係)。
+    新しいユーザーアカウントを作って引っ越すとか、
+    OSをクリーンインストールするとかしてやり直したほうが結局早そう。
     **半角アルファベット小文字のみ**で短いものを推奨。
     - ✅ Good: `watal`, `tamakino`
     - ❌ Bad: `岩嵜航`, `Watal Iwasaki`, `heavy.watal`
-1.  OSのソフトウェア・アップデートをすべて適用して再起動。
-1.  OSの設定で、ファイル名の末尾の拡張子(`.pdf` とか `.png` とか)を常時表示する。
-1.  Windowsの場合、
-    [矢内勇生さん](https://yukiyanai.github.io/jp/resources/)
-    の情報を参照しつつOneDrive問題に対処する。
-1.  <https://cran.r-project.org/>
-    から最新版の **R本体(≥4.2.3)** をダウンロードしてインストール。
-    既にインストールしてある場合はバージョンを確認。
-1.  <https://rstudio.com/products/rstudio/download/#download>
-    から最新版の **RStudio(≥2023.03.0)** をダウンロードしてインストール。
-    既にインストールしてある場合はバージョンを確認。
-1.  Windowsの場合、念のため **Rtools** をインストール。次のページに従って設定:<br>
-    <https://cran.r-project.org/bin/windows/Rtools/>
-
-    Macの場合、念のため次のソフトウェアをインストール:
-    - **Command Line Tools**: `xcode-select --install` (Xcode本体は不要)
-    - **XQuartz**: [手動ダウンロード](https://www.xquartz.org/) or `brew install xquartz`
-
-1.  RStudioを起動し、左側のConsoleで `install.packages("tidyverse", type = "binary")` を実行。
-    何か訊かれたら `yes` と回答。
-    パッケージがたくさんインストールされます。
-1.  Consoleに `update.packages(type = "binary")` と打ち込んで全パッケージ更新。
-1.  Consoleに `library(tidyverse)` と打ち込んでパッケージを読み込み、
-    以下のようなメッセージと共に読み込まれるのを確認:
-
-    ```r
-    > library(tidyverse)
-    ── Attaching packages ───────────────────────────── tidyverse 1.3.1 ──
-    ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-    ✔ tibble  3.1.6     ✔ dplyr   1.0.7
-    ✔ tidyr   1.2.0     ✔ stringr 1.4.0
-    ✔ readr   2.1.2     ✔ forcats 0.5.1
-    ── Conflicts ──────────────────────────────── tidyverse_conflicts() ──
-    ✖ dplyr::filter() masks stats::filter()
-    ✖ dplyr::lag()    masks stats::lag()
-    ```
+1.  Windowsの場合OneDriveが悪さしているかも。
+    参考:
+    - <https://ryotamugiyama.com/2020/08/03/rinstall/>
+    - <https://okumuralab.org/~okumura/stat/R-win.html>
+    - <https://yukiyanai.github.io/jp/resources/>
 
 
 ## 講義資料
