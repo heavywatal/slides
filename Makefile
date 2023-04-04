@@ -1,4 +1,4 @@
-DROPBOX := ${HOME}/Library/CloudStorage/Dropbox/slides-draft
+DROPBOX := ${HOME}/Library/CloudStorage/Dropbox/slides/image
 DECKS := $(wildcard content/*)
 NAMES := $(notdir ${DECKS})
 IMGDSTS := $(addsuffix /image,${DECKS})
@@ -28,7 +28,7 @@ public:
 	hugo --cleanDestinationDir --environment public
 
 image: ${IMGDSTS}
-	rsync -av ${DROPBOX}/static/ static/
+	@:
 
 content/%/image: ${DROPBOX}/%
 	rsync -auv $^/ $@/
