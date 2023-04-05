@@ -262,12 +262,6 @@ withr::with_namespace("tidyverse", {
 </a>
 </figure>
 
-**dplyr ≥1.0.7** と **tidyr ≥1.2.0** を使いたいので古かったら更新:
-```r
-update.packages(ask = "no", type = "binary")
-# いちいち確認せずにコンパイル済み安定版を入れるオプション
-```
-
 ---
 ## dplyr --- data.frameの高速処理担当
 
@@ -301,6 +295,7 @@ update.packages(ask = "no", type = "binary")
 パッケージを読み込んで、データを見てみる
 ```r
 # install.packages("tidyverse")
+library(conflicted) # 安全のおまじない
 library(tidyverse)
 print(diamonds)
 View(diamonds)  # RStudio
@@ -676,16 +671,12 @@ result = diamonds |>
 ---
 ## 要約・集計: `reframe()`
 
-
-
-1グループにつき複数行の集計結果も扱える:
+複数の値を返す関数で集約すると、結果は複数行にまたがる:
 ```{r, reframe}
-quantile95 = function(x) {
-  quantile(x, c(0.025, 0.975))
-}
+quantile(diamonds$price)
 
 result = diamonds |>
-  reframe(across(where(is.numeric), quantile95)) |>
+  reframe(across(where(is.numeric), quantile)) |>
   print()
 ```
 

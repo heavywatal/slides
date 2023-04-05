@@ -628,12 +628,10 @@ VADeaths |>
 ## ちょっと補足
 
 ```{r, vadeaths-class}
+VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
+  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
 class(VADeaths)
 rownames(VADeaths)
-VADeaths |>
-  as.data.frame() |>            # dplyr/tidyrで扱うのはdata.frame
-  tibble::rownames_to_column("age") |>  # 行名は扱いにくいので普通の列に
-  print()
 ```
 
 ---
@@ -641,13 +639,13 @@ VADeaths |>
 
 ```{r, vadeaths-rownames}
 #| results: "hold"
-as.data.frame(VADeaths) |>              # data.frameに変換
-  tibble::rownames_to_column("age")              # 行名を列に
+VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
+  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
 ```
 
 ```{r, vadeaths-plot}
 #| fig.height: 4
-#| fig.width: 5
+#| fig.width: 6
 #| echo: false
 va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
   tibble::rownames_to_column("age") |>          # 行名を列に
@@ -659,7 +657,7 @@ va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
   tidyr::separate(age, c("lbound", "ubound"), "-", convert = TRUE)
 
 # 別解
-as.data.frame(VADeaths) |>
+.devnull = as.data.frame(VADeaths) |>
   tibble::rownames_to_column("age") |>
   tidyr::pivot_longer(!age, names_to = "region_sex", values_to = "death") |>
   tidyr::separate(region_sex, c("region", "sex")) |>

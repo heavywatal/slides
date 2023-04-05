@@ -214,46 +214,47 @@ print(iris)
 
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
-```{r, plot}
-#| fig.height: 5
-#| fig.width: 5
+```{r, base-plot-iris}
+#| fig.show: "hold"
+#| fig.height: 4
+#| fig.width: 4
+boxplot(Petal.Width ~ Species, data = iris)
 plot(iris$Sepal.Length, iris$Sepal.Width)
-```
-
----
-## R標準のグラフィックス
-
-描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
-
-```{r, hist}
-#| fig.height: 5
-#| fig.width: 5
 hist(iris$Petal.Length)
 ```
 
----
-## R標準のグラフィックス
-
-描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
-
-```{r, plot-density}
-#| fig.height: 5
-#| fig.width: 5
-plot(density(iris$Petal.Length))
-```
-
----
-## R標準のグラフィックス
-
-描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
-
-```{r, boxplot}
-#| fig.height: 5
-#| fig.width: 5
-boxplot(Petal.Width ~ Species, data = iris)
-```
-
 きれいなグラフを簡単に描けるパッケージを使いたい。
+
+---
+## ggplot2: tidyverseの可視化担当
+
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+</a>
+
+- "The <strong><u>G</u></strong>rammer of <strong><u>G</u></strong>raphics" という体系に基づく設計
+- 単にいろんなグラフを「描ける」だけじゃなく<br>
+  **一貫性のある文法で合理的に描ける**
+
+<br>
+
+```{r, ggplot-iris}
+#| echo: false
+#| fig.show: "hold"
+#| fig.height: 4
+#| fig.width: 4
+set.seed(1)
+.theme = theme_classic(base_size = 20) + theme(legend.position = "none")
+ggplot(iris) + aes(Species, Petal.Width) +
+  geom_boxplot(aes(fill = Species), outlier.shape = NA) +
+  geom_jitter(width = 0.2, height = 0, shape = 16, size = 2, alpha = 0.33) +
+  .theme
+ggplot(iris) + aes(Sepal.Length, Sepal.Width) +
+  geom_point(aes(color = Species), shape = 16, size = 3, alpha = 0.66) + .theme
+ggplot(iris) + aes(Petal.Length) +
+  geom_histogram(aes(fill = Species), boundary = 1, binwidth = 0.5) + .theme
+```
+
 
 ---
 ## ggplot2: tidyverseの可視化担当
@@ -486,6 +487,7 @@ Error in ggplot(diamonds) : could not find function "ggplot"
 
 パッケージ読み込みを忘れてた。新しくRを起動するたびに必要:
 ```r
+library(conflicted) # 安全のおまじない
 library(tidyverse)  # including ggplot2
 ggplot(diamonds)    # OK!
 ```
@@ -559,11 +561,12 @@ pL = ggplot(mpg) +
   geom_point(color = "blue")
 pC = ggplot(mpg) +
   aes(x = displ, y = cty) +
-  geom_point(aes(color = drv))
+  geom_point(aes(color = drv)) +
+  scale_color_discrete(type = NULL)  # to show bad default
 pR = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = cyl)) +
-  scale_color_continuous(type = "gradient")
+  scale_color_continuous(type = NULL)  # to show bad default
 cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ```
 
@@ -904,6 +907,230 @@ cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
   「ホントはこうしたかったけど方法が見つからなかった」<br>
   などのコメント・質問が多く出ることを期待します。
 
+
+
+
+
+---
+## いろいろ試した結果をとっておきたい
+
+スクリプト.Rさえ保存しておけばいつでも実行できるけど... **面倒**
+
+`ggsave()` で画像を書き出しておけるけど... **どのコードの結果か分からない**
+
+→ **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
+
+```{r, hello}
+#| results: "hold"
+#| fig.show: "hold"
+#| fig.height: 3.5
+#| fig.width: 5
+3 * 14
+ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
+```
+
+
+---
+## Quarto Document として研究ノートを作る
+
+<a href="https://quarto.org/">
+<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+</a>
+
+プログラミングからレポート作成まで一元管理できて楽ちん。
+
+- 本文とRコードを含むテキストファイル.qmdを作る。
+- HTML, PDFなどリッチな形式に変換して読む。
+  - コードだけでなく実行結果の**図**や**表**も埋め込める。
+
+<hr>
+
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+</a>
+
+Quarto Markdown (`.qmd`)
+: RやPythonのコードと図表を埋め込める**Markdown**亜種。
+: Quarto登場前にほぼR専用だった `.Rmd` と使い勝手は同じ。
+
+Markdown (`.md`)
+: 最もよく普及している**軽量マークアップ言語**のひとつ。
+: 微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。
+
+🔰 どんなものが作れるのか
+[作成例ギャラリー](https://quarto.org/docs/gallery/)
+を見てみよう。
+
+---
+## マークアップ言語
+
+文書の構造や視覚的修飾を記述するための言語。<br>
+e.g., **HTML**+CSS, XML, LaTeX
+
+```html
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
+
+🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
+
+
+---
+## 軽量マークアップ言語
+
+**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
+e.g., **Markdown**, reStructuredText, 各種Wiki記法など
+
+```md
+### 見出し3
+
+ここは段落。
+*強調(italic)*、
+**強い強調(bold)**、
+[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+
+---
+## Quartoする環境は既に整っているはず
+
+```{r, versions}
+#| include: false
+R_version = paste(R.version$major, R.version$minor, sep = ".")
+pkg_versions = installed.packages()[, "Version"]
+RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
+# quarto_version = system2("quarto", "--version", stdout = TRUE)
+```
+
+- **R (≥ `r R_version`)**: 最新版 – 0.1 くらいまでが許容範囲
+- **RStudio (≥ `r RStudio_version`)**: Quarto CLI を同梱
+- **tidyverse (≥ `r pkg_versions["tidyverse"]`)**: 次の2つを自動インストール
+  - rmarkdown (≥ `r pkg_versions["rmarkdown"]`)
+  - knitr (≥ `r pkg_versions["knitr"]`)
+
+(示してあるバージョンは最低要件ではなく私の現在の環境の)
+
+<hr>
+
+- [Quarto CLI](https://quarto.org/docs/get-started/):
+  最新版を求めるなら手動で入れる。
+- [`install.packages("quarto")`](https://github.com/quarto-dev/quarto-r):
+  多くの人には不要。
+  Quarto CLIをRコマンドで呼べるようにするだけ。
+- [pandoc](https://pandoc.org/): Quarto CLI に同梱。
+  手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。
+
+---
+## Markdown記法で書いてみよう
+
+1. RStudio > New File > Markdown File
+   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
+1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
+   - 見出し1, 2, 3
+   - 箇条書き (番号あり・なし)
+   - インラインコード、コードブロック
+1. <kbd>Preview</kbd>ボタンで確認
+
+---
+## Quarto Document を作ってみよう
+
+RStudio > New File > Quarto Document...<br>
+(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
+
+<img src="/slides/image/rstudio/new-quarto-document.png" width="100%">
+
+---
+## 普通のmdには無いqmdの特徴
+
+**ヘッダー**
+: 最上部の `---` で挟まれた部分。
+  文書全体に関わるメタデータを入力。
+: オプションは出力形式によって異なる。
+  e.g., [`html`](https://quarto.org/docs/output-formats/html-basics.html)
+
+**R code chunk**
+: `` ```{r} `` のように始まるブロック。
+: コードの実行結果を最終産物に埋め込める。
+: [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
+  - `echo: false`: コードを非表示。結果は表示。
+  - `eval: false`: コードを実行せず表示だけ。
+  - `include: false`: コードも結果も表示せず、実行だけする。
+  - `fig.width: 7, fig.height: 7`: 図の大きさを制御。
+
+まあ細かいことは必要になってから調べるとして...
+
+---
+## qmdをHTMLに変換してみよう
+
+<div>
+<img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
+</div>
+
+---
+## qmdをHTMLに変換してみよう
+
+1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
+   e.g., `report.qmd`
+1. ⚙️ ボタンから "Preview in Viewer Pane" を選択。
+1. "→Render" を押す。
+   - 埋め込まれたRコードが実行される。
+   - 実行結果を含むMarkdownが作られる。
+   - MarkdownからHTMLに変換される。 e.g., `report.html`
+   - プレビューが自動的に開く。
+
+🔰 編集 → Render を繰り返して変化を確認しよう
+
+---
+## レポートの体裁の例
+
+左のようなqmdを作ってRenderし、右のようなHTMLファイルを提出。
+
+<div>
+<img src="../tohoku2022r/image/report-example.webp" width="52%"></img>
+<img src="../tohoku2022r/image/report-example-html.webp" width="47%" style="vertical-align: top"></img>
+</div>
+
+---
+## 🔰 レポート (締切: 2023-05-18)
+
+- 酒井先生のレポート講座5/8を受けてから提出。
+- 課題: 実習中に解いた課題をQuarto Markdownでまとめる。
+  - 講義資料の🔰若葉マークの練習問題
+  - 毎日最後に出る課題
+- 様式
+  - Render済み**htmlファイル**。1日分で1つ、トピックに提出。計4つ。
+  - ファイル名 `{ID}-{name}-day{day}.html`,<br>
+    e.g., `C0SB0000-iwasaki-day1.html`
+- 評価ポイント
+  - エラーも警告も無くコードが走る
+  - 文書の構造や図が視覚的に見やすく整理されている
+  - 半年後の自分が読んでわかるような親切コメント
+- 手抜きポイント
+  - 生物学的な意義があるか、みたいなのは不問
 
 ---
 ## 参考

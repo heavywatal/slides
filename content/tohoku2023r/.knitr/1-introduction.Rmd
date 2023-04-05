@@ -93,160 +93,7 @@ diamonds |>
 
 **生のままよりは把握しやすい**かも。
 
----
-## 分布を特徴づける代表値 central tendency
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.6;">
-
-平均値 mean
-: 和を観察数で割る
-
-中央値 median
-: 順に並べて真ん中
-
-最頻値 mode
-: 最も頻度が高い値
-
-  </div>
-  <div class="column">
-  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
-  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
-  </a>
-  </div>
-</div>
-
-目的や状況に応じて使い分けよう。
-
-外れ値に対する応答
-: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
-  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
-
----
-## ばらつきを捉える記述統計量
-
-分散 variance
-: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
-: これの平方根が**標準偏差 (standard deviation)**。
-
-Percentile, Quantile (四分位)
-: 小さい順にならべて上位何%にあるか。
-: 中央値 = 50th percentile = 第二四分位(Q2)
-
-```{r, quantile}
-#| fig.width: 10
-#| fig.height: 4
-#| echo: false
-df = tibble::tibble(x = rnorm(200)) |>
-  dplyr::filter(abs(x) < 2) |>
-  dplyr::mutate(x = x + 3)
-probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
-dfq = df |>
-  dplyr::reframe(x = quantile(x, probs)) |>
-  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
-
-p_hist = ggplot(df) + aes(x) +
-  geom_histogram(bins = 30) +
-  theme_void()
-built = ggplot_build(p_hist)
-bdata = built$data[[1]]
-xlim = bdata |> dplyr::select(xmin, xmax) |> range()
-p_box = ggplot(df) + aes(x) +
-  geom_boxplot() +
-  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
-  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
-  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
-  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
-  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
-  theme_void()
-cowplot::plot_grid(p_hist, p_box, ncol = 1L)
-```
-
----
-## ばらつきの様子は大小の判断にも重要
-
-<div class="column-container" style="padding-left: 10px;">
-<div class="column" style="flex-shrink: 1.1;">
-観測値1つずつ。<br>
-たまたまかも。
-</div>
-<div class="column" style="flex-shrink: 1;">
-ばらつき大きい。<br>
-Bが高いのもたまたま?
-</div>
-<div class="column" style="flex-shrink: 1;">
-ばらつき小さい。<br>
-AとBには差がありそう。
-</div>
-</div>
-
-```{r, comparison}
-#| fig.width: 11
-#| fig.height: 4
-#| echo: false
-n = 20
-df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
-df2 = dplyr::bind_rows(
-  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
-  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
-df3 = dplyr::bind_rows(
-  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
-  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
-.lim = c(0, max(df2$y, df3$y))
-.th = list(coord_cartesian(ylim = .lim),
-  theme_classic(base_size = 20),
-  theme(legend.position = "none", axis.title = element_blank()))
-
-p1 = ggplot(df1) + aes(x, y, color = x) +
-  geom_point(shape = 16, size = 5) +
-  .th
-p2 = ggplot(df2) + aes(x, y, color = x) +
-  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
-  .th
-cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
-```
-
-「こんなことがたまたま起こる確率はすごく低いです！」<br>
-をちゃんと示す手続きが**統計的仮説検定**。
-
----
-## 記述統計量に頼りすぎず分布を可視化する
-
-同じデータでも見せ方で印象・情報量が変わる。
-
-```{r, visualize-distribution}
-#| echo: false
-#| fig.width: 9
-#| fig.height: 6
-df = mpg |> dplyr::mutate(y = hwy)
-df_mean = df |> dplyr::summarize(y = mean(y))
-p0 = ggplot(df) + aes(y = y) +
-  theme_classic() +
-  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
-
-ylim = c(0, max(df$y))
-coord_y = coord_cartesian(ylim = ylim)
-coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
-
-pcol = p0 + aes(x = 0) +
-  geom_col(data = df_mean, fill = "#999999") +
-  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
-
-cowplot::plot_grid(nrow = 2L,
-  pcol + coord_one,
-  p0 + geom_boxplot() + coord_one,
-  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
-  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
-  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
-  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
-    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
-    stroke = 0, alpha = 0.66) + coord_y
-)
-```
-
+しかし要注意......
 
 ---
 ## 代表値ばかり見て可視化を怠ると構造を見逃す
@@ -337,25 +184,6 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 <img src="../lifesci2020seminar/image/schelling-segregation.gif" width="160" align="right" style="margin: -20px -15px; height: 160px; object-fit: cover;">
 
 ---
-## ウェットな実験もモデルの一種と見なせる
-
-対象システムを単純化・理想化して扱いやすくしたもの<br>
-→ 自然ではありえない状況にしてでも、見たい関係を見る<br>
-→ 「Xを変えればYが変わる」という**還元的な理解の1ステップ**
-
-- ノイズをなるべく除去
-  - 栄養や温度など、**環境を揃える**
-  - 近親交配を繰り返して純系を作り、**遺伝的背景を揃える**
-- 興味のある要因のみ変えて、表現型の違いを評価
-  - 遺伝子1つ2つだけ改変
-  - 投与する薬剤の種類・量を変えてみる
-  - 栄養塩の濃度と光の強さを変えてみる
-
-ドライの理論研究者を指して「モデル屋」と呼びがちだが、<br>
-広い意味では生物学者みんな「モデル屋」。
-
-
----
 ## データ科学における数理モデル
 
 データ生成をうまく真似できそうな仮定の数式表現。<br>
@@ -397,6 +225,25 @@ diamonds |>
 
 ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
 → モデルをさらに改良していき、理解の精度を上げられるかも
+
+
+---
+## ウェットな実験もモデルの一種と見なせる
+
+対象システムを単純化・理想化して扱いやすくしたもの<br>
+→ 自然ではありえない状況にしてでも、見たい関係を見る<br>
+→ 「Xを変えればYが変わる」という**還元的な理解の1ステップ**
+
+- ノイズをなるべく除去
+  - 栄養や温度など、**環境を揃える**
+  - 近親交配を繰り返して純系を作り、**遺伝的背景を揃える**
+- 興味のある要因のみ変えて、表現型の違いを評価
+  - **遺伝子**1つ2つだけ改変
+  - 投与する**薬剤**の種類・量を変えてみる
+  - **栄養塩**の濃度と**光**の強さを変えてみる
+
+ドライの理論研究者を指して「モデル屋」と呼びがちだが、<br>
+広い意味では生物学者みんな「モデル屋」。
 
 
 ---
@@ -689,7 +536,7 @@ hist(iris$Petal.Length)
 ## "Project" を新規作成する
 
 File → New Project... → New Directory → New Project →<br>
-→ Directory name: `r-training-2022`<br>
+→ Directory name: `r-training-2023`<br>
 → as subdirectory of: `~/project` or `C:/Users/yourname/project`
 
 <img src="/slides/image/rstudio/create-new-project.png" class="screenshot"
@@ -739,8 +586,8 @@ e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 スクリプト、データ、結果を分けて整理する例:
 
 ```
-r-training-2022/           # プロジェクトの最上階
-├── r-training-2022.Rproj  # これダブルクリックでRStudioを起動
+r-training-2023/           # プロジェクトの最上階
+├── r-training-2023.Rproj  # これダブルクリックでRStudioを起動
 ├── hello.R
 ├── transform.R            # データ整理・変形のスクリプト
 ├── visualize.R            # 作図のスクリプト
@@ -1038,11 +885,10 @@ iris[["Petal.Length"]]     # Petal.Length列
 iris[["Petal.Length"]][2]  # Petal.Length列の2番目
 ```
 
-結果がdata.frameになるかvectorになるか微妙:
+結果がdata.frameになるかvectorになるか曖昧で危険:
 ```r
 iris[, 3]                  # 3列目
 iris[, "Petal.Length"]     # Petal.Length列
-iris[2, 3]                 # 2行目3列目
 iris[2, "Petal.Length"]    # 2行目Petal.Length列
 ```
 
@@ -1075,10 +921,8 @@ print(mydata)
 - ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
 
     ```r
-    install.packages("readr") # R標準の read.table() とかは難しいので
-    library(readr)            # パッケージのやつを使うよ
-    write_tsv(iris, "data/iris.tsv")   # 書き出し
-    iris2 = read_tsv("data/iris.tsv")  # 読み込み
+    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
     ```
 
 あれれー、エラーが出る？
@@ -1215,7 +1059,7 @@ withr::with_namespace("tidyverse", {
 1. データの取得、読み込み
 1. 探索的データ解析
     - **前処理、加工** (地味。意外と重い) 👈 明日以降の主題
-    - **可視化**、仮説生成 (派手！楽しい！) 👈 本日の主題
+    - **可視化**、仮説生成 (派手！楽しい！) 👈 本日後半の主題
     - **統計解析**、仮説検証 (みんな勉強したがる)
 1. 報告、発表
 
@@ -1229,32 +1073,15 @@ withr::with_namespace("tidyverse", {
 ---
 ## 実習全体の予定
 
-| 時間  | 4/11 Mon | 4/12 Tue | 4/13 Wed | 4/14 Thu |
-| ----- | -------- | -------- | -------- | -------- |
-| 13:00 | **導入** | 課題解答 | 課題解答 | 課題解答 |
-| 14:30 | **可視化** | **構造処理1** | **内容処理** | **モデリング2** |
-| 16:00 | 予備 | **構造処理2** | **モデリング1** | **データ解釈** |
+| 時間  | 4/10 Mon | 4/11 Tue | 4/12 Wed | 4/13 Thu | 4/17 Mon |
+| ----- | -------- | -------- | -------- | -------- | -------- |
+| 13:00 | **導入** | **構造処理1** | **内容処理** | **統計モデル1** | 発表会 |
+| 14:40 | **可視化** | **構造処理2** | **データ解釈** | **統計モデル2** | 発表会 |
+| 16:20 | 練習問題 | 練習問題 | 練習問題 | 練習問題 | 予備 |
 
-- 毎日最後に課題を出します
-- 翌日最初に班ごとに解答例を発表してもらいます。
-- 発表前に20分ほど、班ごとに相談する時間を設けます。
-- 4/18 Mon は講義なしで相談と発表の時間を長めに取ります。
-
----
-## レポート課題
-
-4/14木曜に、Rを使ったレポート作成技術を習得します。<br>
-それを使って、実習中に解いた課題をまとめてください。
-
-- 課題
-  - 講義資料の🔰若葉マークの練習問題
-  - 毎日最後に出る課題
-- 評価ポイント
-  - エラーも警告も無くコードが動く
-  - 文書の構造や図が視覚的に見やすく整理されている
-  - 習った技術や自分で調べた技術がいろいろ盛り込まれている
-- 手抜きポイント
-  - 生物学的な意義、実用性があるか、みたいなのは不問
+- 毎日最後に練習問題を出します。解けた班から解散。
+- 4/17 Mon は講義なしで成果発表会。
+- レポート課題については今日の後半にお知らせ。
 
 ---
 ## Reference

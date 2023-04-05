@@ -7,6 +7,7 @@
 #| include: false
 #| cache: false
 data(starwars, package = "dplyr")
+data(world_bank_pop, package = "tidyr")
 data(fruit, package = "stringr")
 ```
 
@@ -99,12 +100,6 @@ withr::with_namespace("tidyverse", {
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
-
-たまには更新しよう:
-```r
-update.packages(ask = "no", type = "binary")
-# いちいち確認せずにビルド済み安定版を入れるオプション。無くても。
-```
 
 ---
 ## 変数/オブジェクトの型 (復習)
@@ -263,7 +258,7 @@ result = diamonds |>
 (指定した列に) `NA` が含まれてる行を削除する。
 
 ```{r, drop-na}
-df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> tidyr::drop_na()
 ```
 
@@ -280,8 +275,8 @@ starwars
 欠損値 `NA` を任意の値で置き換える。
 
 ```{r, replace-na}
-df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
-df |> tidyr::replace_na(list(x = 0, y = "unknown"))
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
+df |> tidyr::replace_na(list(x = 9999, y = "unknown"))
 ```
 
 🔰 `starwars` で**髪や目の色が不明の部分を"UNKNOWN"に置換**しよう
@@ -297,8 +292,8 @@ starwars
 特定の値を `NA` に置き換える:
 
 ```{r, na-if}
-df |>
-  dplyr::mutate(x = dplyr::na_if(x, 1), y = dplyr::na_if(y, "a"))
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
+df |> dplyr::mutate(x = dplyr::na_if(x, 1), y = dplyr::na_if(y, "a"))
 ```
 
 🔰 `starwars` の**性別"none"を欠損値に**しよう
@@ -311,19 +306,17 @@ starwars
 ---
 ## 欠損値の補完 `dplyr::coalesce()`
 
-先に指定した列が `NA` なら次の列の値を採用:
+先に指定したvectorの値が `NA` なら次のvectorの値を採用:
 
 ```{r, coalesce}
-y = c(1, 2, NA, NA, 5)
-z = c(NA, NA, 3, 4, 5)
-dplyr::coalesce(y, z)
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
+df |> dplyr::mutate(y_or_z = dplyr::coalesce(y, z))
 ```
 
 異なる型を混ぜると怒られる:
 ```{r, coalesce-type}
 #| error: true
-df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "b"))
-df |> dplyr::mutate(z = dplyr::coalesce(x, y))
+df |> dplyr::mutate(x_or_y = dplyr::coalesce(x, y))
 ```
 
 🔰 `starwars` で**髪色の欠損値を肌色で補おう**
@@ -331,7 +324,7 @@ df |> dplyr::mutate(z = dplyr::coalesce(x, y))
 ---
 ## 条件に応じて値を選択 `dplyr::if_else()`
 
-普通の `if`, `else` とは違ってvector演算なのが特徴:
+`TRUE` の位置では `x` を採用、`FALSE` の位置では `y` を採用:
 
 ```{r, ifelse}
 condition = c(TRUE, TRUE, FALSE)
@@ -552,11 +545,17 @@ wtl::printdf(starwars, n = 6L)
 ---
 ## dplyr, tidyr の列選択などでも活躍
 
-`matches()` があれば `starts_with()`/`ends_with()` は不要:
+`matches()` だけで `starts_with()`/`ends_with()` の役もこなせる:
 
-```r
-diamonds |> dplyr::select(matches("^c"))   # starts_with("c")
-starwars |> dplyr::select(matches("s$"))   # ends_with("s")
+```{r, tidyselect}
+#| results: "hide"
+                        # starts_with("c")
+diamonds |> dplyr::select(matches("^c"))
+
+                        # ends_with("s")
+starwars |> dplyr::select(matches("s$"))
+
+                        # 数字だけ
 world_bank_pop |>
   tidyr::pivot_longer(matches("^\\d+$"), names_to = "year")
 ```
@@ -877,131 +876,14 @@ lubridate::wday(today, label = TRUE)
 
 
 ---
-## 🔰 3日目の課題1: 好きなデータをいじくり倒してみよう
+## 🔰 3日目の課題1: データをいじくり倒してみよう
 
-- 自分がこれから解析したいデータ (もし手元にあれば)
-- 何か適当なパブリックデータ。例えば:
-    - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
-    - [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
-    - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
-    - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
-    - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
-- (苦肉の策) Rやパッケージに付属のデータ
-    - `diamonds`, `starwars`, `mpg`, etc. See `data()`
+TODO: 適度に整形が必要で可視化しやすいデータ。
 
 発表・レポートの条件
 : 最低1枚の図と、そこに至る前処理＋可視化のコード。
 : グラフから読み取れることを一言。
 
----
-## 実演: [目黒区オープンデータ](https://odcs.bodik.jp/131105/)
-
-[町丁別・年齢別・男女別人口...](https://data.bodik.jp/organization/968e265c-d998-4475-8abf-7e8a53f81595?res_format=CSV&groups=gr_0200)
-の最新CSVをダウンロード、読み込み
-
-```{r, meguro-read}
-#| echo: -1
-if (!fs::file_exists("131105_population_20211001.csv")) {
-  infile = "https://data.bodik.jp/dataset/98331303-9277-4266-bac6-a637ab5e47a5/resource/8019010f-a2b1-4313-bcd8-45ade27d2a3d/download/131105_population_20211001.csv"
-  raw_meguro = readr::read_csv(infile)
-  readr::write_csv(raw_meguro, fs::path_file(infile), na = "")
-}
-infile = "131105_population_20211001.csv"
-raw_meguro = readr::read_csv(infile)
-print(raw_meguro)
-```
-
----
-## 実演: 目黒区オープンデータ
-
-ggplotしたくなる形に変形。1行ずつ経過を確認しよう。
-
-```{r, meguro-tidy}
-tidy_meguro = raw_meguro |>
-  dplyr::select("地域名", matches("の.+性$")) |>
-  dplyr::rename(place = 地域名) |>
-  dplyr::mutate(place = stringr::str_remove(place, "\\S丁目")) |>
-  dplyr::group_by(place) |>
-  dplyr::summarize(across(everything(), sum)) |>
-  dplyr::ungroup() |>
-  tidyr::pivot_longer(!place, names_to = "category", values_to = "count") |>
-  tidyr::separate(category, c("age", "sex"), sep = "の") |>
-  dplyr::mutate(age = as.integer(stringr::str_extract(age, "^\\d+"))) |>
-  dplyr::filter(!is.na(age)) |>
-  print()
-```
-
----
-## 実演: 目黒区オープンデータ
-
-作図してみる
-
-```{r, meguro-plot}
-#| fig.height: 4.5
-#| fig.width: 10
-ggplot(tidy_meguro) +
-  aes(age, count) +
-  geom_col(aes(fill = sex)) +
-  facet_wrap(vars(place), nrow = 3L) +
-  theme_bw(base_family = "HiraginoSans-W3") # 日本語は鬼門
-```
-
----
-## 実演: [e-Stat 国勢調査2015](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) (宮城県)
-
-文字コードが古い。列名が2行にまたがってる。数値の列に変な文字。
-
-```{r, estat-read}
-infile = "tblT000849C04.txt"
-sjis = readr::locale(encoding = "SJIS")
-# readr::read_csv(infile, locale = sjis)
-miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
-  dplyr::slice(-1)
-miyagi_R = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7), skip = 1L, na = c("-", "X"), name_repair = "minimal")
-raw_miyagi = dplyr::bind_cols(miyagi_L, miyagi_R) |> print()
-```
-
----
-## 実演: e-Stat 国勢調査2015 (宮城県)
-
-まだ罠がたくさん: 列名の頭にスペース。全角数字。変な区分。
-
-```{r, estat-tidy}
-tidy_miyagi = raw_miyagi |>
-  dplyr::filter(HYOSYO == 1) |>
-  dplyr::select(CITYNAME, matches("[男女].+[歳上]$")) |>
-  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
-  dplyr::mutate(category = stringr::str_trim(category)) |>
-  tidyr::separate(category, c("sex", "age"), 1) |>
-  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
-  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
-  dplyr::mutate(lower = readr::parse_number(lower), upper = readr::parse_number(upper)) |>
-  dplyr::filter((upper - lower) < 5 | lower == 75) |>
-  dplyr::rename(age = lower) |>
-  print()
-```
-
----
-## 実演: e-Stat 国勢調査2015 (宮城県)
-
-```{r, estat-factor}
-#| include: false
-total_miyagi = tidy_miyagi |>
-  dplyr::count(CITYNAME, wt = count, name = "count") |>
-  dplyr::arrange(desc(count))
-tidy_miyagi = tidy_miyagi |>
-  dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
-```
-
-```{r, estat-plot}
-#| fig.height: 6
-#| fig.width: 11
-ggplot(tidy_miyagi) +
-  aes(age, count) +
-  geom_col(aes(fill = sex)) +
-  facet_wrap(vars(CITYNAME), ncol = 8L) +
-  theme_minimal(base_family = "HiraginoSans-W3", base_size = 14)
-```
 
 ---
 ## Reference

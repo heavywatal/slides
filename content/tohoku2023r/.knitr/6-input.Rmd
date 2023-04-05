@@ -9,32 +9,373 @@
 ```
 
 ---
-## この実習の目標
+## 今回のお品書き
 
-### ✅ <del>生物学研究にはデータとモデルが必須だと認識</del>
-
-### ✅ <del>再現可能な解析を楽にやりたい気持ちになる</del>
-
-### ✅ <del>必要な方法を調べ、実践する力をつける</del>
-
-### ⬜ データ解析の基本に触れる
-
-<br>
-個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。
-
-
----
-## 本日のお品書き
+⬜ データ入力の心得
+- 野良データを読み込む難しさ
+- 自分が一次データを作るときに気をつけること
 
 ⬜ データ解釈の心得 (理論や手法の詳細には触れない)
 - 誤差 (バイアス、ばらつき)
 - 統計的仮説検定
 - 因果関係と相関関係
 
-⬜ データ入力の心得
 
-⬜ R Markdownを用いたレポート作成
+---
+## 🔰 最終課題: パブリックデータを拾って解析してみよう
+
+- [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
+- [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+- [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
+- [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+- [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
+
+発表・レポートの条件
+: 最低1枚の図と、そこに至る前処理＋可視化のコード。
+: グラフから読み取れることを一言。
+
+---
+## 実演: [目黒区オープンデータ](https://odcs.bodik.jp/131105/)
+
+[町丁別・年齢別・男女別人口...](https://data.bodik.jp/organization/968e265c-d998-4475-8abf-7e8a53f81595?res_format=CSV&groups=gr_0200)
+の最新CSVをダウンロード、読み込み
+
+```{r, meguro-read}
+#| echo: -1
+if (!fs::file_exists("131105_population_20211001.csv")) {
+  infile = "https://data.bodik.jp/dataset/98331303-9277-4266-bac6-a637ab5e47a5/resource/8019010f-a2b1-4313-bcd8-45ade27d2a3d/download/131105_population_20211001.csv"
+  raw_meguro = readr::read_csv(infile)
+  readr::write_csv(raw_meguro, fs::path_file(infile), na = "")
+}
+infile = "131105_population_20211001.csv"
+raw_meguro = readr::read_csv(infile)
+print(raw_meguro)
+```
+
+---
+## 実演: 目黒区オープンデータ
+
+ggplotしたくなる形に変形。1行ずつ経過を確認しよう。
+
+```{r, meguro-tidy}
+tidy_meguro = raw_meguro |>
+  dplyr::select("地域名", matches("の.+性$")) |>
+  dplyr::rename(place = 地域名) |>
+  dplyr::mutate(place = stringr::str_remove(place, "\\S丁目")) |>
+  dplyr::group_by(place) |>
+  dplyr::summarize(across(everything(), sum)) |>
+  dplyr::ungroup() |>
+  tidyr::pivot_longer(!place, names_to = "category", values_to = "count") |>
+  tidyr::separate(category, c("age", "sex"), sep = "の") |>
+  dplyr::mutate(age = as.integer(stringr::str_extract(age, "^\\d+"))) |>
+  dplyr::filter(!is.na(age)) |>
+  print()
+```
+
+---
+## 実演: 目黒区オープンデータ
+
+作図してみる
+
+```{r, meguro-plot}
+#| fig.height: 4.5
+#| fig.width: 10
+ggplot(tidy_meguro) +
+  aes(age, count) +
+  geom_col(aes(fill = sex)) +
+  facet_wrap(vars(place), nrow = 3L) +
+  theme_bw(base_family = "HiraginoSans-W3") # 日本語は鬼門
+```
+
+---
+## 実演: [e-Stat 国勢調査2015](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) (宮城県)
+
+文字コードが古い。列名が2行にまたがってる。数値の列に変な文字。
+
+```{r, estat-read}
+infile = "tblT000849C04.txt"
+sjis = readr::locale(encoding = "SJIS")
+# readr::read_csv(infile, locale = sjis)
+miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+miyagi_R = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7), skip = 1L, na = c("-", "X"), name_repair = "minimal")
+raw_miyagi = dplyr::bind_cols(miyagi_L, miyagi_R) |> print()
+```
+
+---
+## 実演: e-Stat 国勢調査2015 (宮城県)
+
+まだ罠がたくさん: 列名の頭にスペース。全角数字。変な区分。
+
+```{r, estat-tidy}
+tidy_miyagi = raw_miyagi |>
+  dplyr::filter(HYOSYO == 1) |>
+  dplyr::select(CITYNAME, matches("[男女].+[歳上]$")) |>
+  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
+  dplyr::mutate(category = stringr::str_trim(category)) |>
+  tidyr::separate(category, c("sex", "age"), 1) |>
+  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
+  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  dplyr::mutate(lower = readr::parse_number(lower), upper = readr::parse_number(upper)) |>
+  dplyr::filter((upper - lower) < 5 | lower == 75) |>
+  dplyr::rename(age = lower) |>
+  print()
+```
+
+---
+## 実演: e-Stat 国勢調査2015 (宮城県)
+
+```{r, estat-factor}
+#| include: false
+total_miyagi = tidy_miyagi |>
+  dplyr::count(CITYNAME, wt = count, name = "count") |>
+  dplyr::arrange(desc(count))
+tidy_miyagi = tidy_miyagi |>
+  dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
+```
+
+```{r, estat-plot}
+#| fig.height: 6
+#| fig.width: 11
+ggplot(tidy_miyagi) +
+  aes(age, count) +
+  geom_col(aes(fill = sex)) +
+  facet_wrap(vars(CITYNAME), ncol = 8L) +
+  theme_minimal(base_family = "HiraginoSans-W3", base_size = 14)
+```
+
+---
+## データの読み込みが難しい
+
+TODO
+
+---
+## 自分が一次データを作るときに気をつけたいこと
+
+Rを使ったデータ前処理を習得した✨<br>
+雑然データからでも下ごしらえして解析できるぞ！
+
+とはいえ...
+
+- まず、読み込めないと始まらない。
+- dplyrやtidyrで手に負えないほど不規則では困る。
+
+自分がデータ入力する際に、どう気をつけたらいいか？
+
+<br>
+
+総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
+[「統計表における機械判読可能なデータの表記方法の統一ルール」](https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html)
+から抜粋。
+
+---
+## データ入力の心得 1. 1つのセルに1つの値
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::separate()`, `tidyr::separate_rows()`, `stringr::str_split()`, `stringr::str_extract()`
+
+---
+## データ入力の心得 1. 1つのセルに1つの値
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::separate()`, `tidyr::separate_rows()`, `stringr::str_split()`, `stringr::str_extract()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+いやいや、欄外に記載するのも不規則でダメですよ。別シートか、別カラムに。
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 3. 空白や改行で見た目を整えない
+
+機械にとって `"　A"` と `"A"` は違う値。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 3. 空白や改行で見た目を整えない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 4. セルを結合しない、絶対に
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`
+
+---
+## データ入力の心得 4. セルを結合しない、絶対に
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`
+
+---
+## データ入力の心得 5. 同じものが続いても省略しない
+
+人が見れば分かるけど、機械も同じように読んではくれない。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`, `tidyr::separate()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 6. 機種依存文字を避ける
+
+できれば全角・日本語も避けてすべて半角英数で。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringi::stri_trans_nfkc()`
+
+---
+## データ入力の心得 7. データを分断しない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-1-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+
+---
+## データ入力の心得 7. データを分断しない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-1-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+---
+## データ入力の心得 8. 1つのシートには1つの表
+
+もっと言うと、複数シートのファイルを作らず、それぞれ別ファイルに。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+---
+## データ入力の心得 9. その他
+
+- 1行目ではすべての列に名前を与える。
+  - なんとなく**1行目は空行**、**1列目は名前無し**とかやりがち。ダメ。
+  - 2行目以降に列名がハミ出してもダメ。
+  - プログラム内で参照される変数名として成立するように。
+    - アンダースコア_以外の**記号・空白を入れない**のが安全。
+    - **先頭は数字も避ける**。
+- 保存形式はプレーンテキスト推奨。Excel形式(.xlsx)は扱いにくい。
+    - タブ区切り(.tsv) or カンマ区切り(.csv)
+    - ファイル名、フォルダ名も機械処理するつもりで規則的に。
+
+[熊谷直喜さんのブログ「R解析用データフォーマット例」](http://nhkuma.blogspot.com/2012/12/r_5.html)
+も一読を。
+
+---
+## データ入力の心得おさらい
+
+つまり、Rで前処理・可視化・解析するぞという気持ち:
+
+1. 1つのセルに1つの値
+1. 余計な文字列が数値扱いを妨げる
+1. 空白や改行で見た目を整えない
+1. セルを結合しない、絶対に
+1. 同じものが続いても省略しない
+1. 機種依存文字、というか半角英数以外を避ける
+1. データを分断しない
+1. 1つのシート(ファイル)には1つの表
+
+🔰 総務省ルールの「修正後」にまだ残る改善点をなるべく多く列挙しよう。
+
+
+---
+## Excelの親切に要注意
+
+表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
+しかし**親切設計がユーザーに牙を剥く**！
+
+- 文字列が勝手に日付になる: `22-4`, `4-14`
+- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
+  ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
+
+🔰 次のようなCSVファイルを作り、Excelで読み取ってみよう。<br>
+
+```
+gene,label
+MARCH1,22-4
+SEPT1,4-14
+```
+
+🔰 Excelで日付になったものを保存して、Rで読み取ってみよう。
 
 
 ---
@@ -206,11 +547,11 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
 ---
 ## 偶然誤差によるばらつき方 = 確率分布
 
-先日 [6. 統計モデリング1](6-distribution.html) で習ったやつ！
+次回 [7. 統計モデリング1](7-distribution.html) でやります。
 
-背後にあるメカニズムによっていろんな形になるのでした。
+背後にあるメカニズムによっていろんな形になる。
 
-<iframe width="400" height="300" src="./6-distribution.html#/32"></iframe>
+<iframe width="400" height="300" src="./7-distribution.html#/32"></iframe>
 
 
 ---
@@ -702,458 +1043,22 @@ cowplot::plot_grid(
 
 
 
-
-
-
-
 ---
-## 本日のお品書き
-
-✅ データ解釈の心得
-- バイアス
-- 誤差
-- 統計的仮説検定
-- 因果関係と相関関係
-
-⬜ データ入力の心得
-
-⬜ R Markdownを用いたレポート作成
-
-
-
-
-
----
-## 自分が一次データを作るときに気をつけたいこと
-
-Rを使ったデータ前処理を習得した✨<br>
-雑然データからでも下ごしらえして解析できるぞ！
-
-とはいえ...
-
-- まず、読み込めないと始まらない。
-- dplyrやtidyrで手に負えないほど不規則では困る。
-
-自分がデータ入力する際に、どう気をつけたらいいか？
-
-<br>
-
-総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
-[「統計表における機械判読可能なデータの表記方法の統一ルール」](https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html)
-から抜粋。
-
----
-## データ入力の心得 1. 1つのセルに1つの値
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`tidyr::separate()`, `tidyr::separate_rows()`, `stringr::str_split()`, `stringr::str_extract()`
-
----
-## データ入力の心得 1. 1つのセルに1つの値
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`tidyr::separate()`, `tidyr::separate_rows()`, `stringr::str_split()`, `stringr::str_extract()`
-
----
-## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
-
----
-## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
-
----
-## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-いやいや、欄外に記載するのも不規則でダメですよ。別シートか、別カラムに。
-
-悪い形に遭遇したときに使える関数:
-`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
-
----
-## データ入力の心得 3. 空白や改行で見た目を整えない
-
-機械にとって `"　A"` と `"A"` は違う値。
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`stringr::str_remove()`, `stringr::str_replace()`
-
----
-## データ入力の心得 3. 空白や改行で見た目を整えない
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`stringr::str_remove()`, `stringr::str_replace()`
-
----
-## データ入力の心得 4. セルを結合しない、絶対に
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`tidyr::fill()`
-
----
-## データ入力の心得 4. セルを結合しない、絶対に
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`tidyr::fill()`
-
----
-## データ入力の心得 5. 同じものが続いても省略しない
-
-人が見れば分かるけど、機械も同じように読んではくれない。
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`tidyr::fill()`, `tidyr::separate()`, `stringr::str_replace()`
-
----
-## データ入力の心得 6. 機種依存文字を避ける
-
-できれば全角・日本語も避けてすべて半角英数で。
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-悪い形に遭遇したときに使える関数:
-`stringi::stri_trans_nfkc()`
-
----
-## データ入力の心得 7. データを分断しない
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-2-1-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
-
----
-## データ入力の心得 7. データを分断しない
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-2-1-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
----
-## データ入力の心得 8. 1つのシートには1つの表
-
-もっと言うと、複数シートのファイルを作らず、それぞれ別ファイルに。
-
-<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
-<img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
-</a></figure>
-
----
-## データ入力の心得 9. その他
-
-- 1行目ではすべての列に名前を与える。
-  - なんとなく**1行目は空行**、**1列目は名前無し**とかやりがち。ダメ。
-  - 2行目以降に列名がハミ出してもダメ。
-  - プログラム内で参照される変数名として成立するように。
-    - アンダースコア_以外の**記号・空白を入れない**のが安全。
-    - **先頭は数字も避ける**。
-- 保存形式はプレーンテキスト推奨。Excel形式(.xlsx)は扱いにくい。
-    - タブ区切り(.tsv) or カンマ区切り(.csv)
-    - ファイル名、フォルダ名も機械処理するつもりで規則的に。
-
-[熊谷直喜さんのブログ「R解析用データフォーマット例」](http://nhkuma.blogspot.com/2012/12/r_5.html)
-も一読を。
-
----
-## データ入力の心得おさらい
-
-つまり、Rで前処理・可視化・解析するぞという気持ち:
-
-1. 1つのセルに1つの値
-1. 余計な文字列が数値扱いを妨げる
-1. 空白や改行で見た目を整えない
-1. セルを結合しない、絶対に
-1. 同じものが続いても省略しない
-1. 機種依存文字、というか半角英数以外を避ける
-1. データを分断しない
-1. 1つのシート(ファイル)には1つの表
-
-🔰 総務省ルールの「修正後」にまだ残る改善点をなるべく多く列挙しよう。
-
-
----
-## Excelの親切に要注意
-
-表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
-しかし**親切設計がユーザーに牙を剥く**！
-
-- 文字列が勝手に日付になる: `22-4`, `4-14`
-- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
-  ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
-
-🔰 次のようなCSVファイルを作り、Excelで読み取ってみよう。<br>
-
-```
-gene,label
-MARCH1,22-4
-SEPT1,4-14
-```
-
-🔰 Excelで日付になったものを保存して、Rで読み取ってみよう。
-
-
-
-
-
-
-
----
-## 本日のお品書き
-
-✅ データ解釈の心得
-- バイアス
-- 誤差
-- 統計的仮説検定
-- 因果関係と相関関係
-
-✅ データ入力の心得
-
-⬜ R Markdownを用いたレポート作成
-
-
-
-
-
-
----
-## R Markdown 形式でレポートを書く
-
-<a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="180" align="right">
-</a>
-
-解析からレポート作成まで一元管理できて楽ちん。
-
-- 本文とRコードを含むテキストファイル.Rmdを作る。
-- HTML, PDF, Wordなどの形式に変換して読む。
-  - コードそのものも当然埋め込める。
-  - 実行結果の**図**や**表**も埋め込める。
-
-<hr>
-
-R Markdown (`.Rmd`)
-: Rなどで図や表を埋め込めるようにした**Markdown**亜種。
-
-Markdown (`.md`)
-: 最もよく普及している**軽量マークアップ言語**のひとつ。
-: 微妙に異なる方言がある。Rmdで使うのは Pandoc Markdown 。
-
-🔰 どんなものが作れるのか
-[作成例ギャラリー](https://r-markdown-gallery.com/)
-を見てみよう。
-
----
-## マークアップ言語
-
-文書の構造や視覚的修飾を記述するための言語。<br>
-e.g., **HTML**+CSS, XML, LaTeX
-
-```html
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-```
-
-<div style="border: solid 1px #888888; padding: 0 4px;">
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-</div>
-
-表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
-
-🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
-
-
----
-## 軽量マークアップ言語
-
-**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
-e.g., **Markdown**, reStructuredText, 各種Wiki記法など
-
-```md
-### 見出し3
-
-ここは段落。
-*強調(italic)*、
-**強い強調(bold)**、
-[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
-```
-
-<div style="border: solid 1px #888888; padding: 0 4px;">
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-</div>
-
-
----
-## Markdown記法で書いてみよう
-
-1. RStudio > New File > Markdown File
-   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
-1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
-   - 見出し1, 2, 3
-   - 箇条書き (番号あり・なし)
-   - インラインコード、コードブロック
-1. <kbd>Preview</kbd>ボタンで確認
-
----
-## R Markdown を作ってみよう
-
-RStudio > New File > R Markdown...<br>
-(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
-
-<img src="/slides/image/rstudio/new-r-markdown.png" width="70%">
-
----
-## 普通のmdには無いRmdの特徴
-
-**ヘッダー**
-: 最上部の `---` で挟まれた部分。
-  文書全体に関わるメタデータを入力。
-: オプションは出力形式によって異なる。
-  e.g., [`html_document`](https://bookdown.org/yihui/rmarkdown/html-document.html)
-
-**R code chunk**
-: `` ```{r chunk-name, opt1=FALSE, ...} `` のように始まるブロック。
-: コードの実行結果を最終産物に埋め込める。
-: [オプションがいろいろある](https://yihui.org/knitr/options/)。e.g.,
-  - `echo=FALSE`: コードを非表示。結果は表示。
-  - `eval=FALSE`: コードを実行せず表示だけ。
-  - `include=FALSE`: コードも結果も表示せず、実行だけする。
-  - `fig.width=7, fig.height=7`: 図の大きさを制御。
-
-まあ細かいことは必要になってから調べるとして...
-
-
----
-## R MarkdownをHTMLに変換してみよう
-
-1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
-   e.g., `report.Rmd`
-1. 🧶 Knit ボタンを押す。
-   - 埋め込まれたRコードが実行される。
-   - 実行結果を含むMarkdownが作られる。
-   - MarkdownからHTMLに変換される。 e.g., `report.html`
-   - プレビューが自動的に開く。
-
-🔰 編集 → Knit を繰り返して変化を確認しよう
-
----
-## レポートの体裁の例
-
-左のようなRmdを作って🧶Knitし、右のようなHTMLファイルを提出。
-
-<div>
-<img src="../tohoku2022r/image/report-example.webp" width="52%"></img>
-<img src="../tohoku2022r/image/report-example-html.webp" width="47%" style="vertical-align: top"></img>
-</div>
-
----
-## 🔰 レポート (締切: 2022-05-09)
-
-- 課題: 実習中に解いた課題をR Markdownでまとめる。
-  - 講義資料の🔰若葉マークの練習問題
-  - 翌日にグループで相談・発表した課題
-- 様式
-  - Knit済み**htmlファイル**。1日分で1つ、トピックに提出。計4つ。
-  - ファイル名 `C0SB0000-iwasaki-day1.html`
-- 評価ポイント
-  - エラーも警告も無くコード(🧶Knit)が走っている
-  - 文書の構造や図が視覚的に見やすく整理されている
-  - 半年後の自分が読んでわかるような親切コメント
-- 手抜きポイント
-  - 生物学的な意義があるか、みたいなのは不問
-
-
----
-## 🔰 4日目の課題2
+## 🔰 3日目の課題3
 
 書籍、ニュースサイト、ブログ記事などを検索し、<br>
 **良くないデータ解析の例**を探して**改善案**を挙げよう。
 
 1. データの集め方(サンプルの選び方)が偏っていて良くない例
 1. データの解釈(相関や因果)を誤っている例
-1. 生データを公開してくれてるのはいいけど、形式が良くない例
+1. 生データを公開してくれるのはいいけど形式が汚くて使いにくい例
 1. 図の描き方で嘘をついている例 (誇張、印象操作)
 
-4/18月曜はまず40分ほど班ごとに相談。<br>
-その後、各班の代表事例を発表してもらいます。
+それぞれの例について、下記の項目を報告してください:
 
-- 出典。URLとか書籍名。
+- 出典。URLや書籍名。
 - データの概要、書き手の主張。
-- ここが良くない。
-- こうすればよくなりそう。
+- ここが良くないので、こう改善すべき。
 
 
 ---
