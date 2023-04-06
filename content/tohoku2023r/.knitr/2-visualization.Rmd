@@ -26,60 +26,6 @@
 </a>
 </figure>
 
-
----
-## そもそもなぜ解析？ 生の数字見ればよくない？
-
-生データは情報が多すぎて関係性も何も見えない
-
-```{r, diamonds}
-print(diamonds)
-```
-
-ダイヤモンド53,940個について10項目の値を持つ `data.frame`
-
----
-## 要約統計量を見てみよう
-
-各列の**平均**とか**標準偏差**とか:
-
-```{r, summary-diamonds}
-#| echo: false
-dia_cols = c("carat", "depth", "table", "price")
-diamonds |>
-  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
-  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
-```
-
-大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
-```{r, cov-diamonds}
-#| echo: false
-diamonds |>
-  dplyr::select(all_of(dia_cols)) |>
-  scale() |>
-  cov() |>
-  wtl::printmat("%.2f", upper = FALSE)
-```
-
-<hr>
-
-**生のままよりは把握しやすい**かも。
-
-しかし要注意...
-
----
-## 代表値ばかり見て可視化を怠ると構造を見逃す
-
-<figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
-</a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
-     style="position: absolute; left: 0; top: 0; z-index: 255;">
-</figure>
-
 ---
 ## 作図してみると全体像・構造が見やすい
 
@@ -91,21 +37,15 @@ diamonds |>
 その度合いは `clarity` によって異なるらしい。
 
 ---
-## 作図してみると全体像・構造が見やすい
+## 代表値ばかり見て可視化を怠ると構造を見逃す
 
-情報の整理 → **正しい解析・新しい発見・仮説生成**
-
-<figure>
-<a href="https://r4ds.had.co.nz/explore-intro.html">
-<img src="/slides/image/r4ds/data-science-explore.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figure style="position: relative;">
+<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
 </a>
-</figure>
-<figure style="margin-bottom: 32px;">
-<a href="https://tsutawarudesign.com/">
-<img src="/slides/image/tsutawaru/hajimeni-04.svg" width="720" style="margin: -24px -32px -32px -24px;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
-</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
 </figure>
 
 ---
@@ -123,82 +63,20 @@ diamonds |>
 デザインの基本的なルールを<br>
 知りさえすれば誰でも上達する。<br>
 
-<a href="https://www.amazon.co.jp/dp/4297119854?&linkCode=li3&tag=heavywatal-22&linkId=e78727fee8cad1fa8c50eb32b94eb838&language=ja_JP&ref_=as_li_ss_il" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=4297119854&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=heavywatal-22&language=ja_JP" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=heavywatal-22&language=ja_JP&l=li3&o=9&a=4297119854" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
 ---
-## 同じデータでも見せ方で印象が変わる
-
-平均値の差？ ばらつきの様子？ 軸はゼロから始まる？<br>
-**目的に合わせて見せ方を吟味**しよう。
-
-```{r, iris-compare}
-#| echo: false
-#| fig.height: 7
-#| fig.width: 10
-tidy_iris = iris %>%
-  tibble::rownames_to_column("id") %>%
-  tidyr::pivot_longer(!c(id, Species)) %>%
-  tidyr::separate(name, c("part", "measure"))
-
-mean_sd = function(x, mult = 1.96) {
-  x = stats::na.omit(x)
-  div = mult * stats::sd(x)
-  mu = mean(x)
-  data.frame(y = mu, ymin = mu - div, ymax = mu + div)
-}
-
-theme_iris = theme_linedraw(base_size = 15) + theme(
-    strip.placement = "outside", strip.background = element_blank(),
-    axis.title = element_blank(), axis.text.y = element_blank(),
-    axis.ticks.y = element_blank(), legend.position = "top"
-  )
-
-p_iris = ggplot(tidy_iris) +
-  aes(Species, value, fill = Species) +
-  scale_fill_brewer(palette = "Set1", guide = "none") +
-  scale_y_continuous(breaks = seq(0, 8, 2)) +
-  facet_grid(vars(measure), vars(part), switch = "both", scale = "free_x", space = "free_x") +
-  theme_iris
-
-p_bar = p_iris +
-  stat_summary(geom = "bar", fun = mean, alpha = 0.9) +
-  stat_summary(geom = "errorbar", fun.data = mean_sd, width = 0.2) +
-  coord_flip()
-
-p_box = p_iris + geom_boxplot() + coord_flip()
-
-p_dot = p_iris +
-  geom_dotplot(binwidth = 0.1, binaxis = "y", stackdir = "center", stackratio = 0.8, alpha = 0.9, colour = "#666666") +
-  coord_flip()
-
-p_ridges = ggplot(tidy_iris) +
-  aes(value, Species, fill = Species) +
-  ggridges::geom_density_ridges(aes(value, Species),
-    jittered_points = TRUE,
-    position = ggridges::position_points_jitter(width = 0.05, height = 0),
-    point_shape = "|", point_size = 3, alpha = 0.7
-  ) +
-  scale_fill_brewer(palette = "Set1", guide = "none") +
-  scale_x_continuous(breaks = seq(0, 8, 2)) +
-  facet_grid(vars(measure), vars(part), switch = "both", scale = "free_x", space = "free_x") +
-  theme_iris
-
-cowplot::plot_grid(p_bar, p_box, p_dot, p_ridges, ncol = 2L)
-```
-
----
-## 本日2時限目の話題: Rによるデータ可視化
+## おしながき: Rによるデータ可視化とレポート作成
 
 ### ✅ <del>データ解析全体の流れ。可視化だいじ</del>
 
 ### ⬜ 一貫性のある文法で合理的に描けるggplot2
 
-### ⬜ 画像出力まできっちりプログラミング
+### ⬜ Rのコードと実行結果をレポートに埋め込むQuarto
+
 
 ---
-## これから可視化する data.frame
+## `iris`: アヤメ属3種150個体の測定データ
 
-`iris` はアヤメ属3種150個体に関する測定データ。<br>
 Rに最初から入ってて、例としてよく使われる。
 
 ```{r, iris}

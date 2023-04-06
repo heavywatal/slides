@@ -43,9 +43,12 @@
 ```{r, meguro-read}
 #| echo: -1
 if (!fs::file_exists("131105_population_20211001.csv")) {
-  infile = "https://data.bodik.jp/dataset/98331303-9277-4266-bac6-a637ab5e47a5/resource/8019010f-a2b1-4313-bcd8-45ade27d2a3d/download/131105_population_20211001.csv"
-  raw_meguro = readr::read_csv(infile)
-  readr::write_csv(raw_meguro, fs::path_file(infile), na = "")
+  dataset = "98331303-9277-4266-bac6-a637ab5e47a5"
+  resource = "8019010f-a2b1-4313-bcd8-45ade27d2a3d"
+  basename = "131105_population_20211001.csv"
+  url = stringr::str_glue("https://data.bodik.jp/dataset/{dataset}/resource/{resource}/download/{basename}")
+  raw_meguro = readr::read_csv(url)
+  readr::write_csv(raw_meguro, basename, na = "")
 }
 infile = "131105_population_20211001.csv"
 raw_meguro = readr::read_csv(infile)
@@ -78,13 +81,14 @@ tidy_meguro = raw_meguro |>
 作図してみる
 
 ```{r, meguro-plot}
-#| fig.height: 4.5
-#| fig.width: 10
-ggplot(tidy_meguro) +
-  aes(age, count) +
-  geom_col(aes(fill = sex)) +
+#| fig.height: 4.8
+#| fig.width: 12
+tidy_meguro |>
+  dplyr::mutate(count = ifelse(sex == "男性", -1, 1) * count) |>
+  ggplot() +
+  geom_col(aes(age, count, fill = sex)) +
   facet_wrap(vars(place), nrow = 3L) +
-  theme_bw(base_family = "HiraginoSans-W3") # 日本語は鬼門
+  coord_flip() + theme_minimal(base_size = 16)
 ```
 
 ---
@@ -135,13 +139,14 @@ tidy_miyagi = tidy_miyagi |>
 ```
 
 ```{r, estat-plot}
-#| fig.height: 6
-#| fig.width: 11
-ggplot(tidy_miyagi) +
-  aes(age, count) +
-  geom_col(aes(fill = sex)) +
-  facet_wrap(vars(CITYNAME), ncol = 8L) +
-  theme_minimal(base_family = "HiraginoSans-W3", base_size = 14)
+#| fig.height: 5.5
+#| fig.width: 12
+tidy_miyagi |>
+  dplyr::mutate(count = ifelse(sex == "男", -1, 1) * count) |>
+  ggplot() +
+  geom_col(aes(age, count, fill = sex)) +
+  facet_wrap(vars(CITYNAME), nrow = 4L) +
+  coord_flip() + theme_minimal(base_size = 15)
 ```
 
 ---
@@ -599,6 +604,7 @@ Percentile, Quantile (四分位)
 #| fig.width: 10
 #| fig.height: 4
 #| echo: false
+set.seed(24601)
 df = tibble::tibble(x = rnorm(200)) |>
   dplyr::filter(abs(x) < 2) |>
   dplyr::mutate(x = x + 3)
@@ -671,7 +677,7 @@ cowplot::plot_grid(nrow = 2L,
 
 <div class="column-container" style="padding-left: 10px;">
 <div class="column" style="flex-shrink: 1.1;">
-観測値1つだけ。<br>
+観測値1つずつ。<br>
 たまたまかも。
 </div>
 <div class="column" style="flex-shrink: 1;">
@@ -701,11 +707,11 @@ df3 = dplyr::bind_rows(
   theme_classic(base_size = 20),
   theme(legend.position = "none", axis.title = element_blank()))
 
-p1 = ggplot(df1) + aes(x, y, fill = x) +
-  geom_col() +
+p1 = ggplot(df1) + aes(x, y, color = x) +
+  geom_point(shape = 16, size = 5) +
   .th
 p2 = ggplot(df2) + aes(x, y, color = x) +
-  geom_jitter(height = 0, width = 0.2, shape = 16, size = 3, alpha = 0.66) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
   .th
 cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
 ```
