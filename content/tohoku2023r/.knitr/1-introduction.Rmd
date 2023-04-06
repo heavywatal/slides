@@ -626,20 +626,17 @@ r-training-2023/           # プロジェクトの最上階
 とにかく手を動かして体感しよう！
 
 1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
-
     ```r
     head(iris)
     ```
-
 1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
     `Error` や `Warning` があったらよく読んで対処する。<br>
     (無視していい `Warning` もたまーにあるけど)
-
 1.  🔰若葉マークの練習問題があれば解いてみる。<br>
     そこまでのコードの**コピペ＋改変**でできるはず。
 
-疑問・困りごとがある場合は**気軽にChat欄に**書き込んでください。<br>
-私の代わりに解答するのも大歓迎です助かります。
+疑問・困りごとがある場合は**気軽に割り込んで**ください。<br>
+TAがいるならTAが、リモートならChat欄が随時受付中です。
 
 
 ---
@@ -876,7 +873,7 @@ iris[, 3:4]                # 3-4列目
 iris[2:5, 3:4]             # 2-5行目, 3-4列目
 ```
 
-vectorとして取得する:
+1列をvectorとして取得する:
 ```r
 iris[[3]]                  # 3列目
 iris$Petal.Length          # Petal.Length列
@@ -884,7 +881,7 @@ iris[["Petal.Length"]]     # Petal.Length列
 iris[["Petal.Length"]][2]  # Petal.Length列の2番目
 ```
 
-結果がdata.frameになるかvectorになるか曖昧で危険:
+結果がdata.frameになるかvectorになるか曖昧で危険、非推奨:
 ```r
 iris[, 3]                  # 3列目
 iris[, "Petal.Length"]     # Petal.Length列
@@ -915,43 +912,35 @@ print(mydata)
 ---
 ## data.frameの読み書き
 
-- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
-- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
-- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+Rには `read.csv()` とか `write.csv()` とかが標準装備されてるけど、、、
 
-    ```r
-    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
-    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
-    ```
-
-あれれー、エラーが出る？
-
-```{r, cannot-open}
-#| error: true
-#| echo: false
-readr::write_tsv(iris, "data/iris.tsv")
-```
-
----
-## ファイル読み書きでありがちなエラー
-
-- 読みたいファイル名が間違っている。
-- 読みたいファイルが作業ディレクトリとは違うところにある。
-- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
-
-冷静に、現在の作業ディレクトリとその中身を確認しよう:
 ```r
-getwd()               # GET Working Directory
-list.files(".")       # List files in "." (here)
-list.files("data")    # List files in "./data"
-dir.create("data")    # Create directory
+write.csv(iris, "iris.csv")
+```
+```
+"","Sepal.Length","Sepal.Width","Petal.Length","Petal.Width","Species"
+"1",5.1,3.5,1.4,0.2,"setosa"
+"2",4.9,3,1.4,0.2,"setosa"
+"3",4.7,3.2,1.3,0.2,"setosa"
 ```
 
-[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html)
-を読んでおきましょう。
+<a href="https://readr.tidyverse.org/">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+</a>
 
-🔰 R組み込みデータや自作データを読み書きしてみよう。
+なんか**左端の列**とか **"引用符"** が勝手に作られたりいろいろ不便。
 
+`readr` というパッケージを使えばそういう悩みから解放される。
+
+```r
+readr::write_csv(iris, "iris.csv")
+```
+```
+Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species
+5.1,3.5,1.4,0.2,setosa
+4.9,3,1.4,0.2,setosa
+4.7,3.2,1.3,0.2,setosa
+```
 
 ---
 ## R package
@@ -1034,15 +1023,13 @@ withr::with_namespace("tidyverse", {
 
 ✅ Rはデータ解析に便利なプログラミング言語・環境
 
-✅ R環境のセットアップ
-
 ✅ **プロジェクト**を使ってファイルを管理
 
 ✅ **スクリプト**を書いてから**コンソール**で実行
 
 ✅ 変数には型がある: 数値、文字列、**データフレーム**など
 
-✅ 便利な**パッケージ**を使おう
+✅ 便利な**パッケージ**を使っていく
 
 ✅ 疑問・エラーの解決方法
 
@@ -1075,12 +1062,12 @@ withr::with_namespace("tidyverse", {
 | 時間  | 4/10 Mon | 4/11 Tue | 4/12 Wed | 4/13 Thu | 4/17 Mon |
 | ----- | -------- | -------- | -------- | -------- | -------- |
 | 13:00 | **導入** | **構造処理1** | **内容処理** | **統計モデル1** | 発表会 |
-| 14:40 | **可視化** | **構造処理2** | **データ解釈** | **統計モデル2** | 発表会 |
+| 14:40 | **可視化** | **構造処理2** | **入力・解釈** | **統計モデル2** | 発表会 |
 | 16:20 | 練習問題 | 練習問題 | 練習問題 | 練習問題 | 予備 |
 
 - 毎日最後に練習問題を出します。解けた班から解散。
-- 4/17 Mon は講義なしで成果発表会。
-- レポート課題については今日の後半にお知らせ。
+- レポート課題については今日の後半にお知らせ。<br>
+  🔰練習問題をちゃんとこなせば半自動的にレポートもできあがる仕掛け。
 
 ---
 ## Reference

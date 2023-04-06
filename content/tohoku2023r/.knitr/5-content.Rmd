@@ -663,6 +663,7 @@ mpg_fct = mpg |>
 #| fig.width: 7
 #| fig.height: 5
 #| echo: false
+set.seed(1)
 p1 = mpg |>
   ggplot() +
   aes(drv, hwy) +
@@ -755,7 +756,7 @@ mpg |>
 iris |> tibble::rowid_to_column() |>
   dplyr::mutate(value = 1L) |>
   tidyr::pivot_wider(names_from = Species,
-              values_from = value, values_fill = 0L)
+                     values_from = value, values_fill = 0L)
 ```
 
 🔰 これを元の `iris` に戻してみよう
@@ -768,7 +769,7 @@ iris |> tibble::rowid_to_column() |>
 - POSIXlt: list(秒, 分, 時, 日, 月, 年, ...)。単位ごとに抜き出しやすい。
 
 ```{r, datetime}
-now = "2021-09-15 11:00:00"
+now = "2023-04-12 14:10:00"
 ct = as.POSIXct(now)
 unclass(ct)
 lt = as.POSIXlt(now)
@@ -786,17 +787,17 @@ unclass(lt) |> as_tibble()
 
 日時型への変換:
 ```{r, lubridate-parse}
-lubridate::ymd(c("20201017", "2020-10-17", "20/10/17"))
+lubridate::ymd(c("20230412", "2023-04-12", "23/04/12"))
 ```
 
 日時型から単位ごとに値を取得:
 ```{r, lubridate-get}
-today = lubridate::ymd(20201017)
+today = lubridate::ymd(20230412)
 lubridate::month(today)
 lubridate::wday(today, label = TRUE)
 ```
 
-🔰 [公式ドキュメント](https://lubridate.tidyverse.org/)などを見ていろいろな変換・抽出を試してみよう
+🔰 [公式ドキュメント](https://lubridate.tidyverse.org/)を見て、未登場の機能を紹介してください。
 
 ---
 ## データ内容を対象とする処理 | まとめ
@@ -857,32 +858,43 @@ lubridate::wday(today, label = TRUE)
 
 
 ---
-## 統計解析の一歩手前までなら行ける
+## 🔰 3日目の課題1: 組み込みデータをいじくり倒してみよう
 
-1. コンピュータ環境の整備
-1. データの取得、読み込み
-1. 探索的データ解析
-    - **前処理、加工** (地味。意外と重い) 👈 本実習の主題
-    - 可視化、仮説生成 (派手！だいじ！)
-    - 統計解析、仮説検証 (みんな勉強したがる)
-1. 報告、発表
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="180">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="180">
+</a><br>
+<a href="https://forcats.tidyverse.org/">
+<img src="/_img/hex-stickers/forcats.webp" width="180">
+</a><br>
+<a href="https://lubridate.tidyverse.org/">
+<img src="/_img/hex-stickers/lubridate.webp" width="180">
+</a><br>
+</div>
 
-<figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
-</a>
-</figure>
+- データを1人1つ選び、作図して読み取れることを一言。
+- 前処理でいろいろなパッケージ・関数を駆使するほど良い。
 
-
----
-## 🔰 3日目の課題1: データをいじくり倒してみよう
-
-TODO: 適度に整形が必要で可視化しやすいデータ。
-
-発表・レポートの条件
-: 最低1枚の図と、そこに至る前処理＋可視化のコード。
-: グラフから読み取れることを一言。
+```r
+dplyr::storms
+dplyr::starwars
+tidyr::billboard
+tidyr::cms_patient_experience
+tidyr::cms_patient_care
+tidyr::relig_income
+tidyr::us_rent_income
+tidyr::who
+tidyr::population
+tidyr::world_bank_pop
+forcats::gss_cat
+lubridate::lakers
+ggplot2::midwest
+ggplot2::msleep
+ggplot2::txhousing
+```
 
 
 ---

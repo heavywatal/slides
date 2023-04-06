@@ -463,7 +463,7 @@ ggplot(diamonds) +
 #| fig.width: 6
 ggplot(diamonds) +
   aes(cut, carat) +
-  geom_boxplot(color = "#3366ff", fill = "gold", alpha = 0.5, linewidth = 2)
+  geom_boxplot(color = "royalblue", fill = "gold", alpha = 0.5, linewidth = 2)
 ```
 
 ---
@@ -826,6 +826,7 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 
 ```{r, long}
 #| eval: false
+set.seed(1)
 p = ggplot(diamonds) +
   aes(x = cut, y = price) +
   geom_jitter(aes(color = cut), height = 0, width = 0.2, alpha = 0.1, stroke = 0) +
@@ -867,7 +868,7 @@ ggplot2は3Dが苦手
 ---
 ## 🔰 1日目の課題1: 模写
 
-下図になるべく似るように作図・調整して `ggsave()` してください。<br>
+下図になるべく似るように作図・調整してください。<br>
 
 ```{r, ggplot-homework}
 #| fig.height: 4
@@ -902,8 +903,6 @@ cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
 ```
 
 - 細かい設定まで見逃さないように、班で協力しましょう。
-- ここで作るPNGファイルはレポートに含めないことにします。<br>
-  班ごとにTAに見せて合格したら帰れます。
 
 
 ---
@@ -980,16 +979,16 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 </a>
 
 Quarto Markdown (`.qmd`)
-: RやPythonのコードと図表を埋め込める**Markdown**亜種。
+: **Markdown**亜種。RやPythonのコードと図表を埋め込める。
 : Quarto登場前にほぼR専用だった `.Rmd` と使い勝手は同じ。
 
 Markdown (`.md`)
 : 最もよく普及している**軽量マークアップ言語**のひとつ。
 : 微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。
 
-🔰 どんなものが作れるのか
+(どんなものが作れるのか
 [作成例ギャラリー](https://quarto.org/docs/gallery/)
-を見てみよう。
+を見てみよう。)
 
 ---
 ## マークアップ言語
@@ -1017,7 +1016,7 @@ e.g., **HTML**+CSS, XML, LaTeX
 
 表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
 
-🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
+(好きなウェブサイトのHTMLソースコードを見てみよう。)
 
 
 ---
@@ -1079,10 +1078,11 @@ RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "-
 
 1. RStudio > New File > Markdown File
    <img src="/slides/image/rstudio/new-markdown.png" width="60%">
-1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
+1. ["markdown 記法"で検索](https://duckduckgo.com/?q=markdown+syntax)して何か書く。
+   最低限、次の概念を含むように:
    - 見出し1, 2, 3
+   - コードブロック、インラインコード
    - 箇条書き (番号あり・なし)
-   - インラインコード、コードブロック
 1. <kbd>Preview</kbd>ボタンで確認
 
 ---
@@ -1096,25 +1096,27 @@ RStudio > New File > Quarto Document...<br>
 ---
 ## 普通のmdには無いqmdの特徴
 
-**ヘッダー**
+ヘッダー (フロントマター)
 : 最上部の `---` で挟まれた部分。
   文書全体に関わるメタデータを入力。
 : オプションは出力形式によって異なる。
   e.g., [`html`](https://quarto.org/docs/output-formats/html-basics.html)
 
-**R code chunk**
-: `` ```{r} `` のように始まるブロック。
+R code chunk
+: `` ```{r} `` のように始まるコードブロック。
 : コードの実行結果を最終産物に埋め込める。
 : [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
   - `echo: false`: コードを非表示。結果は表示。
   - `eval: false`: コードを実行せず表示だけ。
   - `include: false`: コードも結果も表示せず、実行だけする。
-  - `fig.width: 7, fig.height: 7`: 図の大きさを制御。
+  - `fig.width: 7`, `fig.height: 7`: 図の大きさを制御。
 
 まあ細かいことは必要になってから調べるとして...
 
 ---
 ## qmdをHTMLに変換してみよう
+
+左のqmdを "→Render" すると右のができる。手順は次スライド。
 
 <div>
 <img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
@@ -1131,8 +1133,8 @@ RStudio > New File > Quarto Document...<br>
    - 実行結果を含むMarkdownが作られる。
    - MarkdownからHTMLに変換される。 e.g., `report.html`
    - プレビューが自動的に開く。
+1. 編集 → 保存 → Render を繰り返して作り込む。
 
-🔰 編集 → Render を繰り返して変化を確認しよう
 
 ---
 ## レポートの体裁の例
@@ -1140,8 +1142,7 @@ RStudio > New File > Quarto Document...<br>
 左のようなqmdを作ってRenderし、右のようなHTMLファイルを提出。
 
 <div>
-<img src="../tohoku2022r/image/report-example.webp" width="52%"></img>
-<img src="../tohoku2022r/image/report-example-html.webp" width="47%" style="vertical-align: top"></img>
+<img src="../tohoku2023r/image/report-example.webp" width="90%"></img>
 </div>
 
 
@@ -1149,19 +1150,26 @@ RStudio > New File > Quarto Document...<br>
 ## 🔰 レポート (締切: 2023-05-18)
 
 - 酒井先生のレポート講座5/8を受けてから提出。
-- 課題: 実習中に解いた課題をQuarto Markdownでまとめる。
-  - 講義資料の🔰若葉マークの練習問題
-  - 「{d}日目の課題{n}」
-- 様式
-  - Render済み**htmlファイル**。1日分で1つ、トピックに提出。計4つ。
-  - ファイル名 `{ID}-{name}-day{day}.html`,<br>
-    e.g., `C0SB0000-iwasaki-day1.html`
+- 課題: 講義資料の🔰若葉マークすべて。
+- 様式: Quarto Markdownで書き、Render済みHTMLを提出。
+  - 1日分で1ファイル、それぞれClassroomトピックに提出。計4つ。
+  - `{ID}-{name}-day{d}.html`, e.g., `C0SB0000-iwasaki-day2.html`
+  - `embed-resources: true` で画像などを埋め込んだ独立HTML。
 - 評価ポイント
-  - エラーも警告も無くコードが走る
-  - 文書の構造や図が視覚的に見やすく整理されている
-  - 半年後の自分が読んでわかるような親切コメント
+  - エラーも警告も無くコードが走る。
+  - 文書の構造や図が視覚的に見やすく整理されている。
+  - 半年後の自分が読んでわかるような `# 親切コメント`。
 - 手抜きポイント
-  - 生物学的な意義があるか、みたいなのは不問
+  - 生物学的な意義があるか、みたいなのはほぼ不問。
+
+---
+## 今日の残り時間
+
+- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
+- 課題1 模写を `ggsave()` まできっちりやる。
+- TAが班の代表画像を評価し、合格した班から解散。
+- 残ってほかの課題に取り組んでもOK。
+
 
 ---
 ## 参考

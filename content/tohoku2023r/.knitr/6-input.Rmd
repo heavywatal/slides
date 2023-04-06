@@ -9,107 +9,150 @@
 ```
 
 ---
-## 今回のお品書き
+## データ解析のおおまかな流れ
 
-⬜ データ入力の心得
-- 野良データを読み込む難しさ
-- 自分が一次データを作るときに気をつけること
+1. コンピュータ環境の整備 ✅
+1. データの取得、読み込み 👈 今回はここから
+1. 探索的データ解析
+    - 前処理、加工 ✅ 完全に理解した
+    - 可視化、仮説生成 ✅ 完全に理解した
+    - 統計解析、仮説検証 ⬜ 今日の終盤と次回
+1. 報告、発表 ✅ Quarto楽しい
 
-⬜ データ解釈の心得 (理論や手法の詳細には触れない)
-- 誤差 (バイアス、ばらつき)
-- 統計的仮説検定
-- 因果関係と相関関係
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
 
-
----
-## 🔰 最終課題: パブリックデータを拾って解析してみよう
-
-- [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
-- [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
-- [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
-- [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
-- [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
-
-発表・レポートの条件
-: 最低1枚の図と、そこに至る前処理＋可視化のコード。
-: グラフから読み取れることを一言。
 
 ---
-## 実演: [目黒区オープンデータ](https://odcs.bodik.jp/131105/)
+## data.frameの読み書き
 
-[町丁別・年齢別・男女別人口...](https://data.bodik.jp/organization/968e265c-d998-4475-8abf-7e8a53f81595?res_format=CSV&groups=gr_0200)
-の最新CSVをダウンロード、読み込み
+<a href="https://readr.tidyverse.org/">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+</a>
 
-```{r, meguro-read}
-#| echo: -1
-if (!fs::file_exists("131105_population_20211001.csv")) {
-  dataset = "98331303-9277-4266-bac6-a637ab5e47a5"
-  resource = "8019010f-a2b1-4313-bcd8-45ade27d2a3d"
-  basename = "131105_population_20211001.csv"
-  url = stringr::str_glue("https://data.bodik.jp/dataset/{dataset}/resource/{resource}/download/{basename}")
-  raw_meguro = readr::read_csv(url)
-  readr::write_csv(raw_meguro, basename, na = "")
-}
-infile = "131105_population_20211001.csv"
-raw_meguro = readr::read_csv(infile)
-print(raw_meguro)
+- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- R標準の関数ではなく readr パッケージを使う。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+    ```r
+    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
+    ```
+
+あれれー、エラーが出る？
+
+```{r, cannot-open}
+#| error: true
+#| echo: false
+readr::write_tsv(iris, "data/iris.tsv")
 ```
 
 ---
-## 実演: 目黒区オープンデータ
+## ファイル読み書きでありがちなエラー
 
-ggplotしたくなる形に変形。1行ずつ経過を確認しよう。
+- 読みたいファイル名が間違っている。
+- 読みたいファイルが作業ディレクトリとは違うところにある。
+- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
 
-```{r, meguro-tidy}
-tidy_meguro = raw_meguro |>
-  dplyr::select("地域名", matches("の.+性$")) |>
-  dplyr::rename(place = 地域名) |>
-  dplyr::mutate(place = stringr::str_remove(place, "\\S丁目")) |>
-  dplyr::group_by(place) |>
-  dplyr::summarize(across(everything(), sum)) |>
-  dplyr::ungroup() |>
-  tidyr::pivot_longer(!place, names_to = "category", values_to = "count") |>
-  tidyr::separate(category, c("age", "sex"), sep = "の") |>
-  dplyr::mutate(age = as.integer(stringr::str_extract(age, "^\\d+"))) |>
-  dplyr::filter(!is.na(age)) |>
-  print()
+冷静に、現在の作業ディレクトリとその中身を確認しよう:
+```r
+getwd()                 # GET Working Directory
+fs::dir_ls(".")         # List files in "." (here)
+fs::dir_ls("data")      # List files in "./data"
+fs::dir_create("data")  # Create directory
+```
+
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html)
+を読んでおきましょう。
+
+🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
+
+🔰 それらを別の名前で読み込み直してみよう。
+
+---
+## 🔰 最終課題予告
+
+<iframe width="1200" height="810" src="./8-glm.html#/49"></iframe>
+
+読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？
+
+---
+## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
+
+2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
+
+うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
+
+<img `r src_alt_fig_chunk("estat-plot")`>
+
+---
+## オープンデータを入手できても簡単には読み込めない
+
+初手エラー:
+```{r, estat-read-error}
+#| error: true
+infile = "tblT001082C04.txt"
+readr::read_csv(infile)
+```
+
+RStudioでテキストとして開いてみると文字化け:
+
+```{r, estat-as-text}
+#| echo: false
+readr::read_lines(infile) |>
+  head(5) |>
+  cat(sep = "\n")
+```
+
+メニューから "File → **Reopen with Encoding...**" を選択。<br>
+たいてい、古い日本語ファイルにありがちな**SHIFT-JIS**が正解。<br>
+(もっと古いファイルならEUC-JPとかの場合もある。)
+
+---
+## 文字コードを指定して読み込み
+
+よく見ると、8列目以降の列名が2行にまたがっている:
+```{r, estat-sjis}
+sjis = readr::locale(encoding = "SHIFT-JIS")
+readr::read_csv(infile, locale = sjis)
 ```
 
 ---
-## 実演: 目黒区オープンデータ
+## 左側と右側を分けて読み、それぞれ削ってからbind
 
-作図してみる
-
-```{r, meguro-plot}
-#| fig.height: 4.8
-#| fig.width: 12
-tidy_meguro |>
-  dplyr::mutate(count = ifelse(sex == "男性", -1, 1) * count) |>
-  ggplot() +
-  geom_col(aes(age, count, fill = sex)) +
-  facet_wrap(vars(place), nrow = 3L) +
-  coord_flip() + theme_minimal(base_size = 16)
-```
-
----
-## 実演: [e-Stat 国勢調査2015](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) (宮城県)
-
-文字コードが古い。列名が2行にまたがってる。数値の列に変な文字。
-
-```{r, estat-read}
-infile = "tblT000849C04.txt"
-sjis = readr::locale(encoding = "SJIS")
-# readr::read_csv(infile, locale = sjis)
-miyagi_L = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+なんか数値の列のはずなのに `-` という文字が混じっている。(中には `X` も):
+```{r, estat-lr}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
   dplyr::slice(-1)
-miyagi_R = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7), skip = 1L, na = c("-", "X"), name_repair = "minimal")
-raw_miyagi = dplyr::bind_cols(miyagi_L, miyagi_R) |> print()
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L)
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
 ```
 
 ---
-## 実演: e-Stat 国勢調査2015 (宮城県)
+## 数値のはずの列に混じる `-` と `X` を `NA` 扱い
 
-まだ罠がたくさん: 列名の頭にスペース。全角数字。変な区分。
+これでようやくスタート地点。。。
+```{r, estat-lr-na}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"))
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+<!-- dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"), name_repair = "minimal") -->
+
+---
+## あとはdplyrとtidyrでお掃除
+
+まだ罠はたくさん: 列名の頭にスペース。全角数字。変な区分。
 
 ```{r, estat-tidy}
 tidy_miyagi = raw_miyagi |>
@@ -120,14 +163,15 @@ tidy_miyagi = raw_miyagi |>
   tidyr::separate(category, c("sex", "age"), 1) |>
   dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
   tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
-  dplyr::mutate(lower = readr::parse_number(lower), upper = readr::parse_number(upper)) |>
+  dplyr::mutate(lower = readr::parse_number(lower),
+                upper = readr::parse_number(upper)) |>
   dplyr::filter((upper - lower) < 5 | lower == 75) |>
-  dplyr::rename(age = lower) |>
+  dplyr::mutate(age = (lower + upper) / 2) |>
   print()
 ```
 
 ---
-## 実演: e-Stat 国勢調査2015 (宮城県)
+## ここまでくれば作図は簡単
 
 ```{r, estat-factor}
 #| include: false
@@ -150,12 +194,7 @@ tidy_miyagi |>
 ```
 
 ---
-## データの読み込みが難しい
-
-TODO
-
----
-## 自分が一次データを作るときに気をつけたいこと
+## 前処理の前処理が必要になるようなデータは困る
 
 Rを使ったデータ前処理を習得した✨<br>
 雑然データからでも下ごしらえして解析できるぞ！
@@ -165,7 +204,7 @@ Rを使ったデータ前処理を習得した✨<br>
 - まず、読み込めないと始まらない。
 - dplyrやtidyrで手に負えないほど不規則では困る。
 
-自分がデータ入力する際に、どう気をつけたらいいか？
+自分が一次データを作る立場なら、どう気をつけたらいいか？
 
 <br>
 
@@ -363,7 +402,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 
 ---
-## Excelの親切に要注意
+## Excelの親切あるいは裏切りに要注意
 
 表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
 しかし**親切設計がユーザーに牙を剥く**！
@@ -372,15 +411,29 @@ Rを使ったデータ前処理を習得した✨<br>
 - 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
   ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
 
-🔰 次のようなCSVファイルを作り、Excelで読み取ってみよう。<br>
+🔰 CSVファイルを読み書きして恐怖を体感しよう:
 
 ```
 gene,label
 MARCH1,22-4
 SEPT1,4-14
 ```
+1.  上の内容のプレーンテキストを作って `excel.csv` と名付ける
+1.  Excelでそれで開き、日付になることを確認。
+1.  それを別名のCSVとして保存し、テキストの中身を確認してレポート。
 
-🔰 Excelで日付になったものを保存して、Rで読み取ってみよう。
+---
+## 今回のお品書き
+
+✅ データ入力の心得
+- 野良データを読み込む難しさ
+- 自分が一次データを作るときに気をつけること
+
+⬜ データ解釈の心得 (理論や手法の詳細には触れない)
+- 誤差 (バイアス、ばらつき)
+- 統計的仮説検定
+- 因果関係と相関関係
+
 
 
 ---
@@ -389,7 +442,7 @@ SEPT1,4-14
 どんなに素晴らしい統計処理をしようとも、データがゴミなら結論もゴミ。
 
 <figure>
-<img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg">
+<img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg" width="1200">
 </figure>
 
 - 目的に応じてちゃんとデータを採ることが重要！
@@ -404,7 +457,7 @@ SEPT1,4-14
 : 量的な問題 → 一部の標本を抽出して測るしかない
 
 <figure>
-<img src="../tohoku2022r/image/math-model-biased.drawio.svg"><br>
+<img src="../tohoku2022r/image/math-model-biased.drawio.svg" width="1080"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -421,7 +474,7 @@ SEPT1,4-14
 e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
 
 <figure>
-<img src="../tohoku2022r/image/error-random-systematic.drawio.svg" width="420"><br>
+<img src="../tohoku2022r/image/error-random-systematic.drawio.svg" width="640"><br>
 <figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -430,7 +483,7 @@ e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
 ## 選択バイアス
 
 <figure style="position: absolute; top: 40px; right: 40px;"><a href="https://en.wikipedia.org/wiki/Survivorship_bias">
-<img src="/slides/image/free/Survivorship-bias.svg" width="300"><br>
+<img src="/slides/image/free/Survivorship-bias.svg" width="400"><br>
 <figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
 </a></figure>
 
@@ -517,6 +570,7 @@ dplyr::bind_rows(
 #| echo: false
 #| fig.width: 4
 #| fig.height: 4
+set.seed(19937)
 n = 20
 tibble::tibble(x = runif(n), y = runif(n)) |>
   ggplot() + aes(x, y) +
@@ -556,7 +610,7 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
 
 背後にあるメカニズムによっていろんな形になる。
 
-<iframe width="400" height="300" src="./7-distribution.html#/32"></iframe>
+<iframe width="600" height="450" src="./7-distribution.html#/33"></iframe>
 
 
 ---
@@ -655,6 +709,7 @@ pcol = p0 + aes(x = 0) +
   geom_col(data = df_mean, fill = "#999999") +
   stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
 
+set.seed(1)
 cowplot::plot_grid(nrow = 2L,
   pcol + coord_one,
   p0 + geom_boxplot() + coord_one,
@@ -694,6 +749,7 @@ AとBには差がありそう。
 #| fig.width: 11
 #| fig.height: 4
 #| echo: false
+set.seed(19937)
 n = 20
 df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
 df2 = dplyr::bind_rows(
@@ -807,6 +863,7 @@ $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 #| fig.height: 4.2
 #| echo: false
 # 1 - (1 - 0.05) ** 10
+set.seed(19937)
 nsam = 10L
 nrep = 20L
 y = split(rnorm(nsam * nrep * 2), ceiling(seq_len(nsam * nrep * 2) / nsam))
@@ -880,6 +937,7 @@ df |>
 #| echo: false
 #| fig.width: 3.2
 #| fig.height: 3.2
+set.seed(19937)
 n = 40L
 tibble::tibble(
   study_time = runif(n, 0, 40),
@@ -916,6 +974,7 @@ tibble::tibble(
 #| echo: false
 #| fig.width: 4
 #| fig.height: 4
+set.seed(19937)
 n = 40L
 tibble::tibble(
   temperature = runif(n, 0, 40),
@@ -933,7 +992,7 @@ tibble::tibble(
 <div class="column" style="flex-shrink: 1;">
 
 <figure>
-<img src="../tohoku2022r/image/hermeneutics-4-1-3.drawio.svg" width="500">
+<img src="../tohoku2022r/image/hermeneutics-4-1-3.drawio.svg" width="750">
 </figure>
 
 </div>
@@ -957,6 +1016,7 @@ tibble::tibble(
 #| echo: false
 #| fig.width: 4
 #| fig.height: 4
+set.seed(19937)
 n = 256
 tibble::tibble(x = runif(n), y = runif(n)) |>
   dplyr::mutate(sampled = abs(x + y - 1) < 0.2) |>
@@ -980,6 +1040,7 @@ tibble::tibble(x = runif(n), y = runif(n)) |>
 #| echo: false
 #| fig.width: 11
 #| fig.height: 3.6
+set.seed(19937)
 n = 32
 df = tibble::tibble(x = rnorm(n), y = rnorm(n))
 df_outlier = df |> dplyr::bind_rows(data.frame(x = 10, y = 10))
@@ -1017,7 +1078,7 @@ cowplot::plot_grid(
 ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？
 
 <figure>
-<img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="100%">
+<img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="1200">
 <figcaption><cite>
 <a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
 </cite></figcaption>
@@ -1030,7 +1091,7 @@ cowplot::plot_grid(
 ## 変数間の関係性まとめ
 
 <figure>
-<img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="700">
+<img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="1200">
 <figcaption><cite>
 <a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
 </cite></figcaption>
@@ -1050,21 +1111,31 @@ cowplot::plot_grid(
 
 
 ---
-## 🔰 3日目の課題3
+## 🔰 3日目の課題2
 
 書籍、ニュースサイト、ブログ記事などを検索し、<br>
 **良くないデータ解析の例**を探して**改善案**を挙げよう。
 
 1. データの集め方(サンプルの選び方)が偏っていて良くない例
 1. データの解釈(相関や因果)を誤っている例
-1. 生データを公開してくれるのはいいけど形式が汚くて使いにくい例
 1. 図の描き方で嘘をついている例 (誇張、印象操作)
+1. 生データを公開してくれるのはいいけど形式が汚くて使いにくい例
 
 それぞれの例について、下記の項目を報告してください:
 
 - 出典。URLや書籍名。
 - データの概要、書き手の主張。
 - ここが良くないので、こう改善すべき。
+
+
+---
+## 今日の残り時間
+
+- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
+- まずは個人で課題1と2に取り組み、ある程度できたら班内で見せ合う。
+- 班員のよかった部分を自分のレポートに取り込む。
+- 最もよかった解析をTAに報告して解散。
+- 残ってほかの課題に取り組んでもOK。
 
 
 ---

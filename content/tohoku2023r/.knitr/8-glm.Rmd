@@ -21,12 +21,12 @@
 「データ解析のための統計モデリング入門」<br>
 をベースに回帰分析の概要を紹介。
 
-1. イントロ [(#7 昨日)](7-distribution.html)
+1. イントロ [(#7 前回)](7-distribution.html)
 1. 統計モデルの基本
     - 確率変数・**確率分布** 👈 主役
     - 尤度・最尤推定
 1. 一般化線形モデル、混合モデル [(#8 今回)](8-glm.html)
-1. <del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない
+1. <del>ベイズ統計、階層ベイズモデル</del> (今回はここまでやらない)
 
 回帰のキモは**線ではなく分布**。
 
@@ -119,8 +119,8 @@ p_pois +
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
 
-<figure>
-<img src="../tokiomarine2021/glm.drawio.svg" width="100%"><br>
+<figure style="margin-block: 1em 0;">
+<img src="../tokiomarine2021/glm.drawio.svg" width="600"><br>
 </figure>
 
   </div>
@@ -504,6 +504,7 @@ dfs = tibble::tribble(
   2.55, (avgs["cloudy"] + avgs["rainy"]) / 2, "beta[2]"
 )
 
+set.seed(1)
 .arr = grid::arrow(length = grid::unit(0.1, "inches"))
 df_ancova |>
   ggplot() + aes(weather, beer_sales, color = weather) +
@@ -712,7 +713,59 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 とりあえず当てはめと作図だけ。<br>
 結果の解釈やモデルの評価はこの後。
 
+```{r, generate-df-weight}
+#| ref.label: "df-weight"
+#| echo: -1
+#| cache.vars: []
+```
 
+---
+## 🔰 ポアソン回帰
+
+```{r, generate-df-seeds}
+#| ref.label: "df-seeds"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 重回帰
+
+```{r, generate-df-beer}
+#| ref.label: "df-beer"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 ロジスティック回帰
+
+```{r, generate-df-logistic}
+#| ref.label: "df-logistic"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 共分散分析: GLM with 質的変数 + 量的変数
+
+まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
+
+```{r, generate-df-ancova}
+#| ref.label: "df-ancova"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 交互作用
+
+
+```{r, generate-df-interact}
+#| ref.label: "df-interact"
+#| echo: -1
+#| cache.vars: []
+```
 
 ---
 ## データはひとつ、モデルはたくさん
@@ -821,6 +874,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 #| fig.height: 4
 #| fig.width: 11
 #| cache.vars: []
+set.seed(19937)
 n = 16L
 true_coef = c(0.1, 0.2)
 df_plant = tibble::tibble(
@@ -1241,8 +1295,6 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
 ```
 
-🔰余裕があったら性別や年なども説明変数に入れてみよう。
-
 ```{r, penguins-multiple}
 #| echo: false
 #| include: false
@@ -1256,28 +1308,81 @@ p_bill + geom_line(aes(y = pred, color = sex), data = added4, size = 1) +
 
 
 ---
-## 🔰 4日目の課題2
+## 🔰 4日目の課題2: 架空データでGLM
 
-1. これまでに登場したデータセット、何でもいいのでGLMを適用してみよう。
-1. 確率分布とリンク関数を差し替えてAICの変化を確認しよう。
-1. 正規分布**じゃない**ほうが当てはまりのいいデータを探してみよう。
+宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。<br>
+冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。<br>
+これらの変数の間に、なんらかの関係は見られるだろうか？
 
-報告に含めてほしい項目:
+[adventure.tsv](adventure.tsv)
 
-- データの出どころ、概要
-- 読み込み、前処理、可視化、フィッティングのコード
-- できあがりの図
+```{r, adventure-data}
+#| echo: false
+set.seed(19937)
+samplesize = 1000L
+b0 = 0.7
+b1 = 0.01
+b2 = -0.5
+b3 = 0.02
+b12 = 0.03
 
-<!--  -->
+dfraw = tibble::tibble(
+  level = sample.int(50L, samplesize, replace = TRUE),
+  is_mage = rbinom(samplesize, 1, 0.4),
+  via_cave = rbinom(samplesize, 1, ifelse(is_mage, 0.5, 0.3)),
+  lambda = exp(b0 + b1 * level + b2 * is_mage + b3 * via_cave + b12 * level * is_mage),
+  encounter = rpois(samplesize, lambda)
+)
+
+dfout = dfraw |> dplyr::mutate(
+    job = ifelse(is_mage, "mage", "fighter"),
+    route = ifelse(via_cave, "cave", "field"),
+    .before = encounter
+  ) |>
+  dplyr::select(!lambda & !is_mage & !via_cave)
+
+readr::write_tsv(dfout, "../adventure.tsv") |> print()
+```
+
+```{r, adventure-analysis}
+#| include: false
+fit = glm(encounter ~ level + job + route + level:job, data = dfout, family = poisson)
+summary(fit)
+df_pred = modelr::add_predictions(dfout, fit, type = "response")
+
+p_enc = ggplot(df_pred) +
+  aes(level, encounter, color = job) +
+  geom_point() +
+  geom_line(aes(y = pred)) +
+  facet_wrap(vars(route))
+
+p_route = ggplot(df_pred) +
+  aes(job, fill = job) +
+  geom_bar() +
+  facet_wrap(vars(route))
+```
 
 ---
-## 🔰 最終課題 (再掲)
+## 🔰 最終課題: オープンデータを拾って解析しよう。
 
-パブリックデータを拾って解析しよう。
+- [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
+- [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+- [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
+- [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+- [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
+- ほか、なんでも興味のあるデータ
+
+発表・レポートの条件
+: 最低1枚の図と、そこに至る前処理＋可視化のコード。
+: グラフから読み取れることを一言。
+: GLMで変数間の関係を考察できるとなおよし。
+
+週明けに班内で話し合ってベスト2を選び、全体に向けて発表。
 
 
 ---
 ## ここ以降は余裕があれば進む
+
 ---
 ## n個のうちy個生存。二項分布に従......わない！
 
@@ -1595,6 +1700,14 @@ e.g.,<br>
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
+
+
+---
+## 今日の残り時間
+
+- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
+- まずは個人で課題1と2に取り組み、ある程度できたら班内で見せ合う。
+- 最終課題に向けて話し合ったり。
 
 
 ---
