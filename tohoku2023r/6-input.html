@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>6. データ入力、データ解釈 — 進化学実習 2023 牧野研 東北大学</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="6. データ入力、データ解釈 — 進化学実習 2023 牧野研 東北大学">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tohoku2023r/6-input.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes/notes.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/search/search.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1440, height: 1080});
+  document.querySelector('html').style.fontSize = '240%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-reveal.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="進化学実習-2023-牧野研-東北大学"><a href=".">進化学実習 2023 牧野研 東北大学</a></h1>
+<div class="author">
+岩嵜 航
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+<ol>
+<li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li><a href="2-visualization.html">データの可視化、レポート作成。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li class="current-deck"><a href="6-input.html">データ入力、データ解釈</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li><a href="9-report.html">発表会</a>
+</ol>
+<div class="footnote">
+2023-04-12 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2023r/">https://heavywatal.github.io/slides/tohoku2023r/</a>
+</div>
+
+</section>
+<section>
+<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<ol>
+<li>コンピュータ環境の整備 ✅</li>
+<li>データの取得、読み込み 👈 今回はここから</li>
+<li>探索的データ解析
+<ul>
+<li>前処理、加工 ✅ 完全に理解した</li>
+<li>可視化、仮説生成 ✅ 完全に理解した</li>
+<li>統計解析、仮説検証 ⬜ 今日の終盤と次回</li>
+</ul>
+</li>
+<li>報告、発表 ✅ Quarto楽しい</li>
+</ol>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="dataframeの読み書き">data.frameの読み書き</h2>
+<a href="https://readr.tidyverse.org/">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+</a>
+<ul>
+<li>
+<p>readxlパッケージを使えば <code>.xlsx</code> ファイルも読める、けど</p>
+</li>
+<li>
+<p>カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。</p>
+</li>
+<li>
+<p>R標準の関数ではなく readr パッケージを使う。</p>
+</li>
+<li>
+<p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
+</span></span></code></pre></div></li>
+</ul>
+<p>あれれー、エラーが出る？</p>
+<pre tabindex="0"><code>Error: Cannot open file for writing:
+* &#39;data/iris.tsv&#39;
+</code></pre>
+</section>
+<section>
+<h2 id="ファイル読み書きでありがちなエラー">ファイル読み書きでありがちなエラー</h2>
+<ul>
+<li>読みたいファイル名が間違っている。</li>
+<li>読みたいファイルが作業ディレクトリとは違うところにある。</li>
+<li>書き込み先のディレクトリが存在しない。→ 予め作っておこう</li>
+</ul>
+<p>冷静に、現在の作業ディレクトリとその中身を確認しよう:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">getwd</span><span class="p">()</span>                 <span class="c1"># GET Working Directory</span>
+</span></span><span class="line"><span class="cl"><span class="n">fs</span><span class="o">::</span><span class="nf">dir_ls</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>         <span class="c1"># List files in &#34;.&#34; (here)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fs</span><span class="o">::</span><span class="nf">dir_ls</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>      <span class="c1"># List files in &#34;./data&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">fs</span><span class="o">::</span><span class="nf">dir_create</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>  <span class="c1"># Create directory</span>
+</span></span></code></pre></div><p><a href="https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
+を読んでおきましょう。</p>
+<p>🔰 これまでに登場したデータを <code>data/</code> 以下に書き出してみよう。</p>
+<p>🔰 それらを別の名前で読み込み直してみよう。</p>
+
+</section>
+<section>
+<h2 id="-最終課題予告">🔰 最終課題予告</h2>
+<iframe width="1200" height="810" src="./8-glm.html#/49"></iframe>
+<p>読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？
+</section>
+<section>
+<h2 id="実演-e-stat-国勢調査httpswwwe-statgojpgisstatmap-searchpage1type1toukeicode00200521-csv">実演: <a href="https://www.e-stat.go.jp/gis/statmap-search?page=1&amp;type=1&amp;toukeiCode=00200521">e-Stat 国勢調査</a> CSV</h2>
+<p>2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県</p>
+<p>うまくすれば次のような人口ピラミッドを描けるはずのファイルだが&hellip;</p>
+<img src="figure/estat-plot-1.png" alt="plot of chunk estat-plot">
+</section>
+<section>
+<h2 id="オープンデータを入手できても簡単には読み込めない">オープンデータを入手できても簡単には読み込めない</h2>
+<p>初手エラー:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">infile</span> <span class="o">=</span> <span class="s">&#34;tblT001082C04.txt&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Error in nchar(x, keepNA = FALSE): invalid multibyte string, element 2
+</code></pre><p>RStudioでテキストとして開いてみると文字化け:</p>
+<pre tabindex="0"><code>KEY_CODE,HYOSYO,CITYNAME,NAME,HTKSYORI,HTKSAKI,GASSAN,T001082001,T001082002,T001082003,T001082004,T001082005,T001082006,T001082007,T001082008,T001082009,T001082010,T001082011,T001082012,T001082013,T001082014,T001082015,T001082016,T001082017,T001082018,T001082019,T001082020,T001082021,T001082022,T001082023,T001082024,T001082025,T001082026,T001082027,T001082028,T001082029,T001082030,T001082031,T001082032,T001082033,T001082034,T001082035,T001082036,T001082037,T001082038,T001082039,T001082040,T001082041,T001082042,T001082043,T001082044,T001082045,T001082046,T001082047,T001082048,T001082049,T001082050,T001082051,T001082052,T001082053,T001082054,T001082055,T001082056,T001082057,T001082058,T001082059,T001082060
+,,,,,,,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;81&gt;A&lt;94&gt;N&lt;97&gt;&lt;ee&gt;&lt;81&gt;u&lt;95&gt;s&lt;8f&gt;ځv&lt;8a&gt;܂&lt;de&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;O&lt;81&gt;`&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;T&lt;81&gt;`&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;P&lt;82&gt;O&lt;81&gt;`&lt;82&gt;P&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;P&lt;82&gt;T&lt;81&gt;`&lt;82&gt;P&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;Q&lt;82&gt;O&lt;81&gt;`&lt;82&gt;Q&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;Q&lt;82&gt;T&lt;81&gt;`&lt;82&gt;Q&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;R&lt;82&gt;O&lt;81&gt;`&lt;82&gt;R&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;R&lt;82&gt;T&lt;81&gt;`&lt;82&gt;R&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;S&lt;82&gt;O&lt;81&gt;`&lt;82&gt;S&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;S&lt;82&gt;T&lt;81&gt;`&lt;82&gt;S&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;T&lt;82&gt;O&lt;81&gt;`&lt;82&gt;T&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;T&lt;82&gt;T&lt;81&gt;`&lt;82&gt;T&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;U&lt;82&gt;O&lt;81&gt;`&lt;82&gt;U&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;U&lt;82&gt;T&lt;81&gt;`&lt;82&gt;U&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;V&lt;82&gt;O&lt;81&gt;`&lt;82&gt;V&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;P&lt;82&gt;T&lt;8d&gt;Ζ&lt;a2&gt;&lt;96&gt;&lt;9e&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;P&lt;82&gt;T&lt;81&gt;`&lt;82&gt;U&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;U&lt;82&gt;T&lt;8d&gt;Έȏ&lt;e3&gt;,&lt;91&gt;&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;82&gt;V&lt;82&gt;T&lt;8d&gt;Έȏ&lt;e3&gt;,&lt;92&gt;j&lt;82&gt;̑&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;81&gt;A&lt;94&gt;N&lt;97&gt;&lt;ee&gt;&lt;81&gt;u&lt;95&gt;s&lt;8f&gt;ځv&lt;8a&gt;܂&lt;de&gt;,&lt;92&gt;j&lt;82&gt;O&lt;81&gt;`&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;T&lt;81&gt;`&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;P&lt;82&gt;O&lt;81&gt;`&lt;82&gt;P&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;P&lt;82&gt;T&lt;81&gt;`&lt;82&gt;P&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;Q&lt;82&gt;O&lt;81&gt;`&lt;82&gt;Q&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;Q&lt;82&gt;T&lt;81&gt;`&lt;82&gt;Q&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;R&lt;82&gt;O&lt;81&gt;`&lt;82&gt;R&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;R&lt;82&gt;T&lt;81&gt;`&lt;82&gt;R&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;S&lt;82&gt;O&lt;81&gt;`&lt;82&gt;S&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;S&lt;82&gt;T&lt;81&gt;`&lt;82&gt;S&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;T&lt;82&gt;O&lt;81&gt;`&lt;82&gt;T&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;T&lt;82&gt;T&lt;81&gt;`&lt;82&gt;T&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;U&lt;82&gt;O&lt;81&gt;`&lt;82&gt;U&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;U&lt;82&gt;T&lt;81&gt;`&lt;82&gt;U&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;V&lt;82&gt;O&lt;81&gt;`&lt;82&gt;V&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;P&lt;82&gt;T&lt;8d&gt;Ζ&lt;a2&gt;&lt;96&gt;&lt;9e&gt;,&lt;92&gt;j&lt;82&gt;P&lt;82&gt;T&lt;81&gt;`&lt;82&gt;U&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;92&gt;j&lt;82&gt;U&lt;82&gt;T&lt;8d&gt;Έȏ&lt;e3&gt;,&lt;92&gt;j&lt;82&gt;V&lt;82&gt;T&lt;8d&gt;Έȏ&lt;e3&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;̑&lt;8d&gt;&lt;90&gt;&lt;94&gt;&lt;81&gt;A&lt;94&gt;N&lt;97&gt;&lt;ee&gt;&lt;81&gt;u&lt;95&gt;s&lt;8f&gt;ځv&lt;8a&gt;܂&lt;de&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;O&lt;81&gt;`&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;T&lt;81&gt;`&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;P&lt;82&gt;O&lt;81&gt;`&lt;82&gt;P&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;P&lt;82&gt;T&lt;81&gt;`&lt;82&gt;P&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;Q&lt;82&gt;O&lt;81&gt;`&lt;82&gt;Q&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;Q&lt;82&gt;T&lt;81&gt;`&lt;82&gt;Q&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;R&lt;82&gt;O&lt;81&gt;`&lt;82&gt;R&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;R&lt;82&gt;T&lt;81&gt;`&lt;82&gt;R&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;S&lt;82&gt;O&lt;81&gt;`&lt;82&gt;S&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;S&lt;82&gt;T&lt;81&gt;`&lt;82&gt;S&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;T&lt;82&gt;O&lt;81&gt;`&lt;82&gt;T&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;T&lt;82&gt;T&lt;81&gt;`&lt;82&gt;T&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;U&lt;82&gt;O&lt;81&gt;`&lt;82&gt;U&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;U&lt;82&gt;T&lt;81&gt;`&lt;82&gt;U&lt;82&gt;X&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;V&lt;82&gt;O&lt;81&gt;`&lt;82&gt;V&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;P&lt;82&gt;T&lt;8d&gt;Ζ&lt;a2&gt;&lt;96&gt;&lt;9e&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;P&lt;82&gt;T&lt;81&gt;`&lt;82&gt;U&lt;82&gt;S&lt;8d&gt;&lt;ce&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;U&lt;82&gt;T&lt;8d&gt;Έȏ&lt;e3&gt;,&lt;8f&gt;&lt;97&gt;&lt;82&gt;V&lt;82&gt;T&lt;8d&gt;Έȏ&lt;e3&gt;
+04101,1,&lt;90&gt;&lt;e5&gt;&lt;91&gt;&lt;e4&gt;&lt;8e&gt;s&lt;90&gt;t&lt;8b&gt;&lt;e6&gt;,,0,,,311590,10231,11633,11838,15944,23772,17838,17677,19028,21113,23299,20544,18295,16702,17137,17700,33702,194212,69969,35132,150932,5350,6087,6066,8321,12579,8669,8600,9241,10232,11412,10317,9031,7893,8010,8082,17503,96295,29477,13385,160658,4881,5546,5772,7623,11193,9169,9077,9787,10881,11887,10227,9264,8809,9127,9618,16199,97917,40492,21747
+041010010,2,&lt;90&gt;&lt;e5&gt;&lt;91&gt;&lt;e4&gt;&lt;8e&gt;s&lt;90&gt;t&lt;8b&gt;&lt;e6&gt;,&lt;90&gt;t&lt;92&gt;&lt;ac&gt;,0,,,649,16,15,17,23,53,62,49,40,40,40,45,33,28,38,38,48,413,143,67,307,8,10,7,10,26,30,27,21,18,14,25,16,11,15,16,25,198,60,29,342,8,5,10,13,27,32,22,19,22,26,20,17,17,23,22,23,215,83,38
+041010020,2,&lt;90&gt;&lt;e5&gt;&lt;91&gt;&lt;e4&gt;&lt;8e&gt;s&lt;90&gt;t&lt;8b&gt;&lt;e6&gt;,&lt;82&gt;&lt;a0&gt;&lt;82&gt;&lt;af&gt;&lt;82&gt;ڂ̒&lt;ac&gt;,0,,,741,23,18,13,26,32,55,48,42,60,51,48,47,38,55,43,54,447,209,111,365,12,10,4,15,16,22,28,19,39,27,25,16,23,24,21,26,230,89,44,376,11,8,9,11,16,33,20,23,21,24,23,31,15,31,22,28,217,120,67
+</code></pre><p>メニューから &ldquo;File → <strong>Reopen with Encoding&hellip;</strong>&rdquo; を選択。<br>
+たいてい、古い日本語ファイルにありがちな<strong>SHIFT-JIS</strong>が正解。<br>
+(もっと古いファイルならEUC-JPとかの場合もある。)</p>
+
+</section>
+<section>
+<h2 id="文字コードを指定して読み込み">文字コードを指定して読み込み</h2>
+<p>よく見ると、8列目以降の列名が2行にまたがっている:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sjis</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">locale</span><span class="p">(</span><span class="n">encoding</span> <span class="o">=</span> <span class="s">&#34;SHIFT-JIS&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">locale</span> <span class="o">=</span> <span class="n">sjis</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>        KEY_CODE HYOSYO     CITYNAME         NAME HTKSYORI HTKSAKI GASSAN             T001082001   T001082002   T001082003       T001082004       T001082005       T001082006       T001082007       T001082008       T001082009       T001082010       T001082011       T001082012       T001082013       T001082014       T001082015       T001082016     T001082017       T001082018     T001082019     T001082020                 T001082021 T001082022 T001082023     T001082024     T001082025     T001082026     T001082027     T001082028     T001082029     T001082030     T001082031     T001082032     T001082033     T001082034     T001082035     T001082036   T001082037     T001082038   T001082039   T001082040                 T001082041 T001082042 T001082043     T001082044     T001082045     T001082046     T001082047     T001082048     T001082049     T001082050     T001082051     T001082052     T001082053     T001082054     T001082055     T001082056   T001082057     T001082058   T001082059   T001082060
+   1        &lt;NA&gt;     NA         &lt;NA&gt;         &lt;NA&gt;       NA    &lt;NA&gt;   &lt;NA&gt; 総数、年齢「不詳」含む 総数０〜４歳 総数５〜９歳 総数１０〜１４歳 総数１５〜１９歳 総数２０〜２４歳 総数２５〜２９歳 総数３０〜３４歳 総数３５〜３９歳 総数４０〜４４歳 総数４５〜４９歳 総数５０〜５４歳 総数５５〜５９歳 総数６０〜６４歳 総数６５〜６９歳 総数７０〜７４歳 総数１５歳未満 総数１５〜６４歳 総数６５歳以上 総数７５歳以上 男の総数、年齢「不詳」含む 男０〜４歳 男５〜９歳 男１０〜１４歳 男１５〜１９歳 男２０〜２４歳 男２５〜２９歳 男３０〜３４歳 男３５〜３９歳 男４０〜４４歳 男４５〜４９歳 男５０〜５４歳 男５５〜５９歳 男６０〜６４歳 男６５〜６９歳 男７０〜７４歳 男１５歳未満 男１５〜６４歳 男６５歳以上 男７５歳以上 女の総数、年齢「不詳」含む 女０〜４歳 女５〜９歳 女１０〜１４歳 女１５〜１９歳 女２０〜２４歳 女２５〜２９歳 女３０〜３４歳 女３５〜３９歳 女４０〜４４歳 女４５〜４９歳 女５０〜５４歳 女５５〜５９歳 女６０〜６４歳 女６５〜６９歳 女７０〜７４歳 女１５歳未満 女１５〜６４歳 女６５歳以上 女７５歳以上
+   2       04101      1 仙台市青葉区         &lt;NA&gt;        0    &lt;NA&gt;   &lt;NA&gt;                 311590        10231        11633            11838            15944            23772            17838            17677            19028            21113            23299            20544            18295            16702            17137            17700          33702           194212          69969          35132                     150932       5350       6087           6066           8321          12579           8669           8600           9241          10232          11412          10317           9031           7893           8010           8082        17503          96295        29477        13385                     160658       4881       5546           5772           7623          11193           9169           9077           9787          10881          11887          10227           9264           8809           9127           9618        16199          97917        40492        21747
+   3   041010010      2 仙台市青葉区       青葉町        0    &lt;NA&gt;   &lt;NA&gt;                    649           16           15               17               23               53               62               49               40               40               40               45               33               28               38               38             48              413            143             67                        307          8         10              7             10             26             30             27             21             18             14             25             16             11             15             16           25            198           60           29                        342          8          5             10             13             27             32             22             19             22             26             20             17             17             23             22           23            215           83           38
+   4   041010020      2 仙台市青葉区   あけぼの町        0    &lt;NA&gt;   &lt;NA&gt;                    741           23           18               13               26               32               55               48               42               60               51               48               47               38               55               43             54              447            209            111                        365         12         10              4             15             16             22             28             19             39             27             25             16             23             24             21           26            230           89           44                        376         11          8              9             11             16             33             20             23             21             24             23             31             15             31             22           28            217          120           67
+  --                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+5941 04606004015      4     南三陸町   歌津字石浜        0    &lt;NA&gt;   &lt;NA&gt;                    295            9            7               11                6                6               12                6               18               16               19               21               36               18               30               26             27              158            110             54                        146          5          5              5              3              5              8              2              6              8             10             14             16              8             11             20           15             80           51           20                        149          4          2              6              3              1              4              4             12              8              9              7             20             10             19              6           12             78           59           34
+5942 04606004016      4     南三陸町 歌津字田の浦        0    &lt;NA&gt;   &lt;NA&gt;                    144            5            2                5                3                5                7                5                7                6                5               15               12               17               14                4             12               82             50             32                         66          -          1              3              1              3              4              3              4              3              2              6              5              9              9              4            4             40           22            9                         78          5          1              2              2              2              3              2              3              3              3              9              7              8              5              -            8             42           28           23
+5943 04606004017      4     南三陸町 歌津字草木沢        0    &lt;NA&gt;   &lt;NA&gt;                    457           21           16               18               16               12               13               20               18               18               41               34               28               37               46               43             55              237            165             76                        234         11          6              8             10             11              5              9             10             11             22             18             15             17             19             29           25            128           81           33                        223         10         10             10              6              1              8             11              8              7             19             16             13             20             27             14           30            109           84           43
+5944 04606004018      4     南三陸町 歌津字伊里前        0    &lt;NA&gt;   &lt;NA&gt;                      -            -            -                -                -                -                -                -                -                -                -                -                -                -                -                -              -                -              -              -                          -          -          -              -              -              -              -              -              -              -              -              -              -              -              -              -            -              -            -            -                          -          -          -              -              -              -              -              -              -              -              -              -              -              -              -              -            -              -            -            -
+</code></pre>
+</section>
+<section>
+<h2 id="左側と右側を分けて読みそれぞれ削ってからbind">左側と右側を分けて読み、それぞれ削ってからbind</h2>
+<p>なんか数値の列のはずなのに <code>-</code> という文字が混じっている。(中には <code>X</code> も):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">dfL</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">locale</span> <span class="o">=</span> <span class="n">sjis</span><span class="p">,</span> <span class="n">col_select</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">7</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice</span><span class="p">(</span><span class="m">-1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dfR</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">locale</span> <span class="o">=</span> <span class="n">sjis</span><span class="p">,</span> <span class="n">col_select</span> <span class="o">=</span> <span class="o">-</span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">7</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">skip</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">raw_miyagi</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">bind_cols</span><span class="p">(</span><span class="n">dfL</span><span class="p">,</span> <span class="n">dfR</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>        KEY_CODE HYOSYO     CITYNAME         NAME HTKSYORI HTKSAKI GASSAN 総数、年齢「不詳」含む 総数０〜４歳 総数５〜９歳 総数１０〜１４歳 総数１５〜１９歳 総数２０〜２４歳 総数２５〜２９歳 総数３０〜３４歳 総数３５〜３９歳 総数４０〜４４歳 総数４５〜４９歳 総数５０〜５４歳 総数５５〜５９歳 総数６０〜６４歳 総数６５〜６９歳 総数７０〜７４歳 総数１５歳未満 総数１５〜６４歳 総数６５歳以上 総数７５歳以上 男の総数、年齢「不詳」含む 男０〜４歳 男５〜９歳 男１０〜１４歳 男１５〜１９歳 男２０〜２４歳 男２５〜２９歳 男３０〜３４歳 男３５〜３９歳 男４０〜４４歳 男４５〜４９歳 男５０〜５４歳 男５５〜５９歳 男６０〜６４歳 男６５〜６９歳 男７０〜７４歳 男１５歳未満 男１５〜６４歳 男６５歳以上 男７５歳以上 女の総数、年齢「不詳」含む 女０〜４歳 女５〜９歳 女１０〜１４歳 女１５〜１９歳 女２０〜２４歳 女２５〜２９歳 女３０〜３４歳 女３５〜３９歳 女４０〜４４歳 女４５〜４９歳 女５０〜５４歳 女５５〜５９歳 女６０〜６４歳 女６５〜６９歳 女７０〜７４歳 女１５歳未満 女１５〜６４歳 女６５歳以上 女７５歳以上
+   1       04101      1 仙台市青葉区         &lt;NA&gt;        0    &lt;NA&gt;   &lt;NA&gt;                 311590        10231        11633            11838            15944            23772            17838            17677            19028            21113            23299            20544            18295            16702            17137            17700          33702           194212          69969          35132                     150932       5350       6087           6066           8321          12579           8669           8600           9241          10232          11412          10317           9031           7893           8010           8082        17503          96295        29477        13385                     160658       4881       5546           5772           7623          11193           9169           9077           9787          10881          11887          10227           9264           8809           9127           9618        16199          97917        40492        21747
+   2   041010010      2 仙台市青葉区       青葉町        0    &lt;NA&gt;   &lt;NA&gt;                    649           16           15               17               23               53               62               49               40               40               40               45               33               28               38               38             48              413            143             67                        307          8         10              7             10             26             30             27             21             18             14             25             16             11             15             16           25            198           60           29                        342          8          5             10             13             27             32             22             19             22             26             20             17             17             23             22           23            215           83           38
+   3   041010020      2 仙台市青葉区   あけぼの町        0    &lt;NA&gt;   &lt;NA&gt;                    741           23           18               13               26               32               55               48               42               60               51               48               47               38               55               43             54              447            209            111                        365         12         10              4             15             16             22             28             19             39             27             25             16             23             24             21           26            230           89           44                        376         11          8              9             11             16             33             20             23             21             24             23             31             15             31             22           28            217          120           67
+   4   041010030      3 仙台市青葉区       旭ケ丘        0    &lt;NA&gt;   &lt;NA&gt;                   9160          279          289              272              315              766              880              771              643              633              713              561              493              436              363              358            840             6211           1671            950                       4274        149        161            141            155            315            366            352            308            296            350            278            237            220            165            167          451           2877          697          365                       4886        130        128            131            160            451            514            419            335            337            363            283            256            216            198            191          389           3334          974          585
+  --                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+5940 04606004015      4     南三陸町   歌津字石浜        0    &lt;NA&gt;   &lt;NA&gt;                    295            9            7               11                6                6               12                6               18               16               19               21               36               18               30               26             27              158            110             54                        146          5          5              5              3              5              8              2              6              8             10             14             16              8             11             20           15             80           51           20                        149          4          2              6              3              1              4              4             12              8              9              7             20             10             19              6           12             78           59           34
+5941 04606004016      4     南三陸町 歌津字田の浦        0    &lt;NA&gt;   &lt;NA&gt;                    144            5            2                5                3                5                7                5                7                6                5               15               12               17               14                4             12               82             50             32                         66          -          1              3              1              3              4              3              4              3              2              6              5              9              9              4            4             40           22            9                         78          5          1              2              2              2              3              2              3              3              3              9              7              8              5              -            8             42           28           23
+5942 04606004017      4     南三陸町 歌津字草木沢        0    &lt;NA&gt;   &lt;NA&gt;                    457           21           16               18               16               12               13               20               18               18               41               34               28               37               46               43             55              237            165             76                        234         11          6              8             10             11              5              9             10             11             22             18             15             17             19             29           25            128           81           33                        223         10         10             10              6              1              8             11              8              7             19             16             13             20             27             14           30            109           84           43
+5943 04606004018      4     南三陸町 歌津字伊里前        0    &lt;NA&gt;   &lt;NA&gt;                      -            -            -                -                -                -                -                -                -                -                -                -                -                -                -                -              -                -              -              -                          -          -          -              -              -              -              -              -              -              -              -              -              -              -              -              -            -              -            -            -                          -          -          -              -              -              -              -              -              -              -              -              -              -              -              -              -            -              -            -            -
+</code></pre>
+</section>
+<section>
+<h2 id="数値のはずの列に混じる---と-x-を-na-扱い">数値のはずの列に混じる <code>-</code> と <code>X</code> を <code>NA</code> 扱い</h2>
+<p>これでようやくスタート地点。。。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">dfL</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">locale</span> <span class="o">=</span> <span class="n">sjis</span><span class="p">,</span> <span class="n">col_select</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">7</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice</span><span class="p">(</span><span class="m">-1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">dfR</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_csv</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">locale</span> <span class="o">=</span> <span class="n">sjis</span><span class="p">,</span> <span class="n">col_select</span> <span class="o">=</span> <span class="o">-</span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">7</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">skip</span> <span class="o">=</span> <span class="m">1L</span><span class="p">,</span> <span class="n">na</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;-&#34;</span><span class="p">,</span> <span class="s">&#34;X&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">raw_miyagi</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">bind_cols</span><span class="p">(</span><span class="n">dfL</span><span class="p">,</span> <span class="n">dfR</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>        KEY_CODE HYOSYO     CITYNAME         NAME HTKSYORI HTKSAKI GASSAN 総数、年齢「不詳」含む 総数０〜４歳 総数５〜９歳 総数１０〜１４歳 総数１５〜１９歳 総数２０〜２４歳 総数２５〜２９歳 総数３０〜３４歳 総数３５〜３９歳 総数４０〜４４歳 総数４５〜４９歳 総数５０〜５４歳 総数５５〜５９歳 総数６０〜６４歳 総数６５〜６９歳 総数７０〜７４歳 総数１５歳未満 総数１５〜６４歳 総数６５歳以上 総数７５歳以上 男の総数、年齢「不詳」含む 男０〜４歳 男５〜９歳 男１０〜１４歳 男１５〜１９歳 男２０〜２４歳 男２５〜２９歳 男３０〜３４歳 男３５〜３９歳 男４０〜４４歳 男４５〜４９歳 男５０〜５４歳 男５５〜５９歳 男６０〜６４歳 男６５〜６９歳 男７０〜７４歳 男１５歳未満 男１５〜６４歳 男６５歳以上 男７５歳以上 女の総数、年齢「不詳」含む 女０〜４歳 女５〜９歳 女１０〜１４歳 女１５〜１９歳 女２０〜２４歳 女２５〜２９歳 女３０〜３４歳 女３５〜３９歳 女４０〜４４歳 女４５〜４９歳 女５０〜５４歳 女５５〜５９歳 女６０〜６４歳 女６５〜６９歳 女７０〜７４歳 女１５歳未満 女１５〜６４歳 女６５歳以上 女７５歳以上
+   1       04101      1 仙台市青葉区         &lt;NA&gt;        0    &lt;NA&gt;   &lt;NA&gt;                 311590        10231        11633            11838            15944            23772            17838            17677            19028            21113            23299            20544            18295            16702            17137            17700          33702           194212          69969          35132                     150932       5350       6087           6066           8321          12579           8669           8600           9241          10232          11412          10317           9031           7893           8010           8082        17503          96295        29477        13385                     160658       4881       5546           5772           7623          11193           9169           9077           9787          10881          11887          10227           9264           8809           9127           9618        16199          97917        40492        21747
+   2   041010010      2 仙台市青葉区       青葉町        0    &lt;NA&gt;   &lt;NA&gt;                    649           16           15               17               23               53               62               49               40               40               40               45               33               28               38               38             48              413            143             67                        307          8         10              7             10             26             30             27             21             18             14             25             16             11             15             16           25            198           60           29                        342          8          5             10             13             27             32             22             19             22             26             20             17             17             23             22           23            215           83           38
+   3   041010020      2 仙台市青葉区   あけぼの町        0    &lt;NA&gt;   &lt;NA&gt;                    741           23           18               13               26               32               55               48               42               60               51               48               47               38               55               43             54              447            209            111                        365         12         10              4             15             16             22             28             19             39             27             25             16             23             24             21           26            230           89           44                        376         11          8              9             11             16             33             20             23             21             24             23             31             15             31             22           28            217          120           67
+   4   041010030      3 仙台市青葉区       旭ケ丘        0    &lt;NA&gt;   &lt;NA&gt;                   9160          279          289              272              315              766              880              771              643              633              713              561              493              436              363              358            840             6211           1671            950                       4274        149        161            141            155            315            366            352            308            296            350            278            237            220            165            167          451           2877          697          365                       4886        130        128            131            160            451            514            419            335            337            363            283            256            216            198            191          389           3334          974          585
+  --                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+5940 04606004015      4     南三陸町   歌津字石浜        0    &lt;NA&gt;   &lt;NA&gt;                    295            9            7               11                6                6               12                6               18               16               19               21               36               18               30               26             27              158            110             54                        146          5          5              5              3              5              8              2              6              8             10             14             16              8             11             20           15             80           51           20                        149          4          2              6              3              1              4              4             12              8              9              7             20             10             19              6           12             78           59           34
+5941 04606004016      4     南三陸町 歌津字田の浦        0    &lt;NA&gt;   &lt;NA&gt;                    144            5            2                5                3                5                7                5                7                6                5               15               12               17               14                4             12               82             50             32                         66         NA          1              3              1              3              4              3              4              3              2              6              5              9              9              4            4             40           22            9                         78          5          1              2              2              2              3              2              3              3              3              9              7              8              5             NA            8             42           28           23
+5942 04606004017      4     南三陸町 歌津字草木沢        0    &lt;NA&gt;   &lt;NA&gt;                    457           21           16               18               16               12               13               20               18               18               41               34               28               37               46               43             55              237            165             76                        234         11          6              8             10             11              5              9             10             11             22             18             15             17             19             29           25            128           81           33                        223         10         10             10              6              1              8             11              8              7             19             16             13             20             27             14           30            109           84           43
+5943 04606004018      4     南三陸町 歌津字伊里前        0    &lt;NA&gt;   &lt;NA&gt;                     NA           NA           NA               NA               NA               NA               NA               NA               NA               NA               NA               NA               NA               NA               NA               NA             NA               NA             NA             NA                         NA         NA         NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA           NA             NA           NA           NA                         NA         NA         NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA             NA           NA             NA           NA           NA
+</code></pre><!-- dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"), name_repair = "minimal") -->
+</section>
+<section>
+<h2 id="あとはdplyrとtidyrでお掃除">あとはdplyrとtidyrでお掃除</h2>
+<p>まだ罠はたくさん: 列名の頭にスペース。全角数字。変な区分。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tidy_miyagi</span> <span class="o">=</span> <span class="n">raw_miyagi</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">HYOSYO</span> <span class="o">==</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">CITYNAME</span><span class="p">,</span> <span class="nf">matches</span><span class="p">(</span><span class="s">&#34;[男女].+[歳上]$&#34;</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_longer</span><span class="p">(</span><span class="o">!</span><span class="n">CITYNAME</span><span class="p">,</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;category&#34;</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;count&#34;</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">category</span> <span class="o">=</span> <span class="n">stringr</span><span class="o">::</span><span class="nf">str_trim</span><span class="p">(</span><span class="n">category</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tidyr</span><span class="o">::</span><span class="nf">separate</span><span class="p">(</span><span class="n">category</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;sex&#34;</span><span class="p">,</span> <span class="s">&#34;age&#34;</span><span class="p">),</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="n">stringi</span><span class="o">::</span><span class="nf">stri_trans_nfkc</span><span class="p">(</span><span class="n">age</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tidyr</span><span class="o">::</span><span class="nf">separate</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;lower&#34;</span><span class="p">,</span> <span class="s">&#34;upper&#34;</span><span class="p">),</span> <span class="s">&#34;〜&#34;</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;right&#34;</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">lower</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">parse_number</span><span class="p">(</span><span class="n">lower</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                <span class="n">upper</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">parse_number</span><span class="p">(</span><span class="n">upper</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">((</span><span class="n">upper</span> <span class="o">-</span> <span class="n">lower</span><span class="p">)</span> <span class="o">&lt;</span> <span class="m">5</span> <span class="o">|</span> <span class="n">lower</span> <span class="o">==</span> <span class="m">75</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="p">(</span><span class="n">lower</span> <span class="o">+</span> <span class="n">upper</span><span class="p">)</span> <span class="o">/</span> <span class="m">2</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>         CITYNAME sex lower upper count age
+   1 仙台市青葉区  男     0     4  5350   2
+   2 仙台市青葉区  男     5     9  6087   7
+   3 仙台市青葉区  男    10    14  6066  12
+   4 仙台市青葉区  男    15    19  8321  17
+  --                                       
+1245     南三陸町  女    60    64   507  62
+1246     南三陸町  女    65    69   553  67
+1247     南三陸町  女    70    74   450  72
+1248     南三陸町  女    75    NA  1602  NA
+</code></pre>
+</section>
+<section>
+<h2 id="ここまでくれば作図は簡単">ここまでくれば作図は簡単</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tidy_miyagi</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">count</span> <span class="o">=</span> <span class="nf">ifelse</span><span class="p">(</span><span class="n">sex</span> <span class="o">==</span> <span class="s">&#34;男&#34;</span><span class="p">,</span> <span class="m">-1</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">count</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">ggplot</span><span class="p">()</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_col</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="n">sex</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">CITYNAME</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">4L</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_flip</span><span class="p">()</span> <span class="o">+</span> <span class="nf">theme_minimal</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">15</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/estat-plot-1.png" alt="plot of chunk estat-plot"></p>
+
+</section>
+<section>
+<h2 id="前処理の前処理が必要になるようなデータは困る">前処理の前処理が必要になるようなデータは困る</h2>
+<p>Rを使ったデータ前処理を習得した✨<br>
+雑然データからでも下ごしらえして解析できるぞ！</p>
+<p>とはいえ&hellip;</p>
+<ul>
+<li>まず、読み込めないと始まらない。</li>
+<li>dplyrやtidyrで手に負えないほど不規則では困る。</li>
+</ul>
+<p>自分が一次データを作る立場なら、どう気をつけたらいいか？</p>
+<br>
+<p>総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
+<a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">「統計表における機械判読可能なデータの表記方法の統一ルール」</a>
+から抜粋。</p>
+
+</section>
+<section>
+<h2 id="データ入力の心得-1-1つのセルに1つの値">データ入力の心得 1. 1つのセルに1つの値</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>tidyr::separate()</code>, <code>tidyr::separate_rows()</code>, <code>stringr::str_split()</code>, <code>stringr::str_extract()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-1-1つのセルに1つの値">データ入力の心得 1. 1つのセルに1つの値</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>tidyr::separate()</code>, <code>tidyr::separate_rows()</code>, <code>stringr::str_split()</code>, <code>stringr::str_extract()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-2-余計な文字列が数値扱いを妨げる">データ入力の心得 2. 余計な文字列が数値扱いを妨げる</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>readr::parse_number()</code>, <code>stringr::str_remove()</code>, <code>stringr::str_replace()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-2-余計な文字列が数値扱いを妨げる">データ入力の心得 2. 余計な文字列が数値扱いを妨げる</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>readr::parse_number()</code>, <code>stringr::str_remove()</code>, <code>stringr::str_replace()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-2-余計な文字列が数値扱いを妨げる">データ入力の心得 2. 余計な文字列が数値扱いを妨げる</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>いやいや、欄外に記載するのも不規則でダメですよ。別シートか、別カラムに。</p>
+<p>悪い形に遭遇したときに使える関数:
+<code>readr::parse_number()</code>, <code>stringr::str_remove()</code>, <code>stringr::str_replace()</code></p>
+
+</section>
+<section>
+<h2 id="データ入力の心得-3-空白や改行で見た目を整えない">データ入力の心得 3. 空白や改行で見た目を整えない</h2>
+<p>機械にとって <code>&quot;　A&quot;</code> と <code>&quot;A&quot;</code> は違う値。</p>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>stringr::str_remove()</code>, <code>stringr::str_replace()</code></p>
+
+</section>
+<section>
+<h2 id="データ入力の心得-3-空白や改行で見た目を整えない">データ入力の心得 3. 空白や改行で見た目を整えない</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>stringr::str_remove()</code>, <code>stringr::str_replace()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-4-セルを結合しない絶対に">データ入力の心得 4. セルを結合しない、絶対に</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>tidyr::fill()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-4-セルを結合しない絶対に">データ入力の心得 4. セルを結合しない、絶対に</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>tidyr::fill()</code>
+</section>
+<section>
+<h2 id="データ入力の心得-5-同じものが続いても省略しない">データ入力の心得 5. 同じものが続いても省略しない</h2>
+<p>人が見れば分かるけど、機械も同じように読んではくれない。</p>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>tidyr::fill()</code>, <code>tidyr::separate()</code>, <code>stringr::str_replace()</code></p>
+
+</section>
+<section>
+<h2 id="データ入力の心得-6-機種依存文字を避ける">データ入力の心得 6. 機種依存文字を避ける</h2>
+<p>できれば全角・日本語も避けてすべて半角英数で。</p>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+<p>悪い形に遭遇したときに使える関数:
+<code>stringi::stri_trans_nfkc()</code></p>
+
+</section>
+<section>
+<h2 id="データ入力の心得-7-データを分断しない">データ入力の心得 7. データを分断しない</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-1-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+</section>
+<section>
+<h2 id="データ入力の心得-7-データを分断しない">データ入力の心得 7. データを分断しない</h2>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-1-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+</section>
+<section>
+<h2 id="データ入力の心得-8-1つのシートには1つの表">データ入力の心得 8. 1つのシートには1つの表</h2>
+<p>もっと言うと、複数シートのファイルを作らず、それぞれ別ファイルに。</p>
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+</section>
+<section>
+<h2 id="データ入力の心得-9-その他">データ入力の心得 9. その他</h2>
+<ul>
+<li>1行目ではすべての列に名前を与える。
+<ul>
+<li>なんとなく<strong>1行目は空行</strong>、<strong>1列目は名前無し</strong>とかやりがち。ダメ。</li>
+<li>2行目以降に列名がハミ出してもダメ。</li>
+<li>プログラム内で参照される変数名として成立するように。
+<ul>
+<li>アンダースコア_以外の<strong>記号・空白を入れない</strong>のが安全。</li>
+<li><strong>先頭は数字も避ける</strong>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>保存形式はプレーンテキスト推奨。Excel形式(.xlsx)は扱いにくい。
+<ul>
+<li>タブ区切り(.tsv) or カンマ区切り(.csv)</li>
+<li>ファイル名、フォルダ名も機械処理するつもりで規則的に。</li>
+</ul>
+</li>
+</ul>
+<p><a href="http://nhkuma.blogspot.com/2012/12/r_5.html">熊谷直喜さんのブログ「R解析用データフォーマット例」</a>
+も一読を。
+</section>
+<section>
+<h2 id="データ入力の心得おさらい">データ入力の心得おさらい</h2>
+<p>つまり、Rで前処理・可視化・解析するぞという気持ち:</p>
+<ol>
+<li>1つのセルに1つの値</li>
+<li>余計な文字列が数値扱いを妨げる</li>
+<li>空白や改行で見た目を整えない</li>
+<li>セルを結合しない、絶対に</li>
+<li>同じものが続いても省略しない</li>
+<li>機種依存文字、というか半角英数以外を避ける</li>
+<li>データを分断しない</li>
+<li>1つのシート(ファイル)には1つの表</li>
+</ol>
+<p>🔰 総務省ルールの「修正後」にまだ残る改善点をなるべく多く列挙しよう。</p>
+
+</section>
+<section>
+<h2 id="excelの親切あるいは裏切りに要注意">Excelの親切あるいは裏切りに要注意</h2>
+<p>表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
+しかし<strong>親切設計がユーザーに牙を剥く</strong>！</p>
+<ul>
+<li>文字列が勝手に日付になる: <code>22-4</code>, <code>4-14</code></li>
+<li>遺伝子名が勝手に日付になる: <code>MARCH1</code>, <code>SEPT1</code><br>
+(<a href="https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates">2020年、これを避けるために改名された</a>)</li>
+</ul>
+<p>🔰 CSVファイルを読み書きして恐怖を体感しよう:</p>
+<pre tabindex="0"><code>gene,label
+MARCH1,22-4
+SEPT1,4-14
+</code></pre><ol>
+<li>上の内容のプレーンテキストを作って <code>excel.csv</code> と名付ける</li>
+<li>Excelでそれで開き、日付になることを確認。</li>
+<li>それを別名のCSVとして保存し、テキストの中身を確認してレポート。</li>
+</ol>
+
+</section>
+<section>
+<h2 id="今回のお品書き">今回のお品書き</h2>
+<p>✅ データ入力の心得</p>
+<ul>
+<li>野良データを読み込む難しさ</li>
+<li>自分が一次データを作るときに気をつけること</li>
+</ul>
+<p>⬜ データ解釈の心得 (理論や手法の詳細には触れない)</p>
+<ul>
+<li>誤差 (バイアス、ばらつき)</li>
+<li>統計的仮説検定</li>
+<li>因果関係と相関関係</li>
+</ul>
+
+</section>
+<section>
+<h2 id="garbage-in-garbage-out">Garbage in, garbage out</h2>
+<p>どんなに素晴らしい統計処理をしようとも、データがゴミなら結論もゴミ。</p>
+<figure>
+<img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg" width="1200">
+</figure>
+<ul>
+<li>目的に応じてちゃんとデータを採ることが重要！</li>
+<li>何がデータを悪くしてしまうのか、見ていこう</li>
+</ul>
+
+</section>
+<section>
+<h2 id="観測には必ず何らかの歪みがある">観測には必ず何らかの歪みがある</h2>
+<dl>
+<dt>現象・母集団の性質を知りたいけど、そのものは測れない。<br></dt>
+<dd>質的な問題 → 測れる側面だけ測るしかない</dd>
+<dd>量的な問題 → 一部の標本を抽出して測るしかない</dd>
+</dl>
+<figure>
+<img src="../tohoku2022r/image/math-model-biased.drawio.svg" width="1080"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+</section>
+<section>
+<h2 id="2種類の誤差">2種類の誤差</h2>
+<dl>
+<dt>系統的誤差 systematic error / バイアス bias</dt>
+<dd>一定の傾向をもって生じる誤差。原因を特定して対処。</dd>
+<dt>偶然誤差 random error</dt>
+<dd>偶然生じてしまうばらつき。計測を繰り返して対処。</dd>
+</dl>
+<p>e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値</p>
+<figure>
+<img src="../tohoku2022r/image/error-random-systematic.drawio.svg" width="640"><br>
+<figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+</section>
+<section>
+<h2 id="選択バイアス">選択バイアス</h2>
+<figure style="position: absolute; top: 40px; right: 40px;"><a href="https://en.wikipedia.org/wiki/Survivorship_bias">
+<img src="/slides/image/free/Survivorship-bias.svg" width="400"><br>
+<figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
+</a></figure>
+<p>データの採れかたが結果に傾向をもたらしてしまう。</p>
+<dl>
+<dt>生存(者)バイアス</dt>
+<dd>生き残ったものだけがデータとして観測される。</dd>
+<dd>帰還した多数の戦闘機✈️✈️の損傷の分布(右図)。<br>
+被弾 → <strong><span style="color: #bb0000;">生還 → 観測される</span></strong><br>
+被弾 → <strong>墜落 → 観測されない</strong><br>
+損傷が観察されなかった場所をむしろ補強すべき。</dd>
+<dt>サンプリングバイアス</dt>
+<dd>サンプル対象を決めた時点で偏っている。</dd>
+<dd>📞電話でアンケート調査 →
+電話機を持てる裕福な人、その時間に通話できる人、
+知らない番号からでも出る人、調査している新聞社に共感している人。</dd>
+</dl>
+<p>🔰 生物学研究における選択バイアスにはどういうものがありそう？</p>
+
+</section>
+<section>
+<h2 id="測定基準に関するバイアスの例">測定基準に関するバイアスの例</h2>
+<dl>
+<dt>基準が揃っていない</dt>
+<dd>国民1人あたりの弁護士数を国際比較すると日本が少ない。<br>
+諸外国では税理士や司法書士を弁護士に含めて集計している。</dd>
+<dt>基準が時間とともに変化</dt>
+<dd>自閉症と診断された児童の数は<strong>見かけ上</strong>年々増えている。<br>
+診断基準の変更、病気の知名度向上が主な原因。<br>
+(親の高齢化の寄与を示唆する研究もあるらしい)</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="データの扱いに起因するバイアス">データの扱いに起因するバイアス</h2>
+<dl>
+<dt>チェリー・ピッキング 🍒</dt>
+<dd>自分の仮説と矛盾する情報を無視し、都合のいい情報だけ集めること。</dd>
+<dd><a href="https://www.mext.go.jp/b_menu/shingi/gijyutu/gijyutu12/houkoku/attach/1334660.htm">研究活動における3つの不正</a>のうち<strong>改竄</strong>にあたる。</dd>
+<dt>確証バイアス</dt>
+<dd>無意識にチェリー・ピッキングしてしまう心理的傾向。</dd>
+<dd>悪気なくやってしまわないよう、自覚を持つことが大事。</dd>
+</dl>
+<p>表に数字、裏にアルファベットが書いてあるカード。<br>
+「偶数の裏は必ずA、という法則があるか？」<br>
+これを確かめるには次の4枚のうちどれを裏返せばいいか？</p>
+<p><img src="./figure/four-cards-1.png" alt="plot of chunk four-cards"></p>
+
+</section>
+<section>
+<h2 id="たまたま生じたパターンにも意味を見出しがち">たまたま生じたパターンにも意味を見出しがち</h2>
+<dl>
+<dt>前後即因果の誤謬</dt>
+<dd>たまたま前後で生じた現象に因果関係があると思いがち</dd>
+<dt>ギャンブラーの誤謬</dt>
+<dd>N回も連続で裏が出たら、次は表が出やすいと思いがち</dd>
+</dl>
+<p><img src="./figure/random-pattern-1.png" alt="plot of chunk random-pattern">
+</section>
+<section>
+<h2 id="データ解釈に関わる認知バイアス">データ解釈に関わる認知バイアス</h2>
+<dl>
+<dt>利用可能性ヒューリスティック</dt>
+<dd>思い浮かびやすいものほど過大評価しがち</dd>
+<dd>e.g., 1文字目がkの単語、3文字目がkの単語、多いのはどっち？</dd>
+<dt>代表性ヒューリスティック</dt>
+<dd>ステレオタイプを過大評価しがち</dd>
+<dd>e.g., リンダは31歳の独身女性。率直で聡明。大学では哲学専攻。
+人種差別や社会正義などに深く関心を持ち、学生時代には反核デモにも参加。<br>
+現在のリンダは次のどちらである可能性が高いか？
+<ol>
+<li>リンダは銀行員として働いている。</li>
+<li>リンダは銀行員として働きながら、フェミニスト運動に参加している。</li>
+</ol>
+</dd>
+</dl>
+<p>認知バイアス・誤謬はほかにもいろいろある。<br>
+データ解析とは関係なく、知っておくのは悪くない。
+</section>
+<section>
+<h2 id="偶然誤差によるばらつき方--確率分布">偶然誤差によるばらつき方 = 確率分布</h2>
+<p>次回 <a href="7-distribution.html">7. 統計モデリング1</a> でやります。</p>
+<p>背後にあるメカニズムによっていろんな形になる。</p>
+<iframe width="600" height="450" src="./7-distribution.html#/33"></iframe>
+
+</section>
+<section>
+<h2 id="分布を特徴づける代表値-central-tendency">分布を特徴づける代表値 central tendency</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+<dl>
+<dt>平均値 mean</dt>
+<dd>和を観察数で割る</dd>
+<dt>中央値 median</dt>
+<dd>順に並べて真ん中</dd>
+<dt>最頻値 mode</dt>
+<dd>最も頻度が高い値
+</div>
+<div class="column">
+<a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+<img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+<figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+</a>
+</div>
+</dd>
+</dl>
+</div>
+<p>目的や状況に応じて使い分けよう。</p>
+<dl>
+<dt>外れ値に対する応答</dt>
+<dd>もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+→ 県民の<strong>平均</strong>資産は4000万円上昇。<strong>中央値</strong>・<strong>最頻値</strong>はほぼそのまま。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="ばらつきを捉える記述統計量">ばらつきを捉える記述統計量</h2>
+<dl>
+<dt>分散 variance</dt>
+<dd>平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$</dd>
+<dd>これの平方根が<strong>標準偏差 (standard deviation)</strong>。</dd>
+<dt>Percentile, Quantile (四分位)</dt>
+<dd>小さい順にならべて上位何%にあるか。</dd>
+<dd>中央値 = 50th percentile = 第二四分位(Q2)</dd>
+</dl>
+<p><img src="./figure/quantile-1.png" alt="plot of chunk quantile">
+</section>
+<section>
+<h2 id="記述統計量に頼りすぎず分布を可視化する">記述統計量に頼りすぎず分布を可視化する</h2>
+<p>同じデータでも見せ方で印象・情報量が変わる。</p>
+<p><img src="./figure/visualize-distribution-1.png" alt="plot of chunk visualize-distribution"></p>
+
+</section>
+<section>
+<h2 id="2つの量の関係性-大小の比較">2つの量の関係性: 大小の比較</h2>
+<p>ばらつきの度合いも加味して判断する。</p>
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
+観測値1つずつ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき大きい。<br>
+Bが高いのもたまたま?
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+<p><img src="./figure/comparison-1.png" alt="plot of chunk comparison"></p>
+<p>「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが<strong>統計的仮説検定</strong>→</p>
+
+</section>
+<section>
+<h2 id="目的やデータに応じて正しい検定を選ぶ">目的やデータに応じて正しい検定を選ぶ</h2>
+<p>例えば「2つの量の大小を比較したい」だけでもいくつかある。<br>
+今回は選定には深入りせず、検定の考え方だけ触れておく。</p>
+<figure><a href="https://comicalcommet.github.io/r-training-2021/">
+<img src="/slides/image/rstats/comicalcommet-test-chart.jpg" width="90%">
+<figcaption><cite>
+「Rを用いたデータ解析の基礎と応用」石川由希さん@名古屋大
+</cite></figcaption>
+</a></figure>
+
+</section>
+<section>
+<h2 id="統計的仮説検定の考え方">統計的仮説検定の考え方</h2>
+<p>🎲サイコロを<strong>10回</strong>振ったら<strong>9回</strong>も6の目が出たぞ。イカサマじゃないか？</p>
+<dl>
+<dt>帰無仮説</dt>
+<dd>6の目が出る確率 = 1/6。普通のサイコロです。</dd>
+<dt>対立仮説</dt>
+<dd>6の目が出る確率 ≠ 1/6。イカサマです。</dd>
+</dl>
+<div>\[\begin{split}
+p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6} ^ {10}
+  = 8.43 \times 10 ^ {-7}
+\end{split}\]</div>
+<ol>
+<li>帰無仮説のもとで今回のデータ以上に極端な値が得られる確率<em>p</em>を計算</li>
+<li>この <strong><em>p</em>-value</strong> が<strong>有意水準(危険率)</strong>$\alpha$より低い場合、帰無仮説を棄却<br>
+(大概 $\alpha$ = 0.05 とか 0.01 とか。予め決めておく。)</li>
+<li>対立仮説を採択。6の目の出る確率は1/6と<strong>有意に異なる</strong>。</li>
+</ol>
+
+</section>
+<section>
+<h2 id="統計的仮説検定の考え方">統計的仮説検定の考え方</h2>
+<p>🎲サイコロを<strong>12回</strong>振ったら<strong>4回</strong>も6の目が出たぞ。<br>
+これも1/6よりは高いけど、イカサマのダイスかな？</p>
+<p><span style="color: #990000;">帰無仮説のもとで12回中4回以上6が出る確率: $p = 0.125 &gt; \alpha$</span><br></p>
+<p>帰無仮説を棄却できず。6の目の出る確率が1/6と<strong>有意に異なるとは言えない</strong>。</p>
+<p><img src="./figure/test-dice-1.png" alt="plot of chunk test-dice"></p>
+<p>平たく言えば「普通のサイコロでもそんなに珍しい出目じゃない」</p>
+
+</section>
+<section>
+<h2 id="多重検定で偽陽性のリスクが上昇">多重検定で偽陽性のリスクが上昇</h2>
+<p>危険率$\alpha=0.05$の検定は、最大5%の確率で誤って帰無仮説を棄却(<strong>偽陽性</strong>)。<br>
+同様の検定を10回やると、そのうち少なくとも1つで偽陽性になる確率は<br>
+$1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br></p>
+<p><img src="./figure/multiple-tests-1.png" alt="plot of chunk multiple-tests"></p>
+<dl>
+<dt>多重比較補正</dt>
+<dd>検定を繰り返したぶんだけ基準を厳しくして偽陽性率を抑えること。</dd>
+<dd>Bonferroni法、Holm法、Benjamini and Hochberg法など。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="広くて深い統計解析の世界">広くて深い統計解析の世界</h2>
+<blockquote>
+<p>データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
+統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
+&mdash;&mdash; <a href="https://amzn.to/3urpls1">三中信宏「統計思考の世界」</a></p>
+</blockquote>
+<figure style="margin-top: -1em;">
+<a href="http://leeswijzer.org/R/R-top.html">
+<img src="/slides/image/rstats/Mandala2004-small.jpg" width="80%">
+<figcaption><cite>「大統計曼荼羅」三中信宏</cite></figcaption>
+</a>
+</figure>
+<!--  -->
+
+</section>
+<section>
+<h2 id="2つの量の関係性-相関関係と因果関係">2つの量の関係性: 相関関係と因果関係</h2>
+<style>
+.spurious {color: #fde725;}
+.correlation {color: #35B779;}
+.causality-wrong {color: #31688e;}
+.causality {color: #440154;}
+</style>
+<div class="column-container">
+<div class="column" style="flex-shrink: 1;">
+<dl>
+<dt><span class="correlation">相関関係</span></dt>
+<dd>ある値が大きいほど、別の値も大きいor小さい。</dd>
+<dd>e.g., 数学の成績と物理の成績。</dd>
+<dt><span class="causality">因果関係</span></dt>
+<dd>ある事象が別の事象に影響を与える。</dd>
+<dd>e.g., 1時間勉強するごとに成績が3点伸びる。</dd>
+</dl>
+</div>
+<div class="column" style="flex-shrink: 1.8;">
+<p><img src="./figure/causal-relationship-1.png" alt="plot of chunk causal-relationship"></p>
+</div>
+</div>
+<hr>
+<ul>
+<li><span class="causality">因果関係</span>があれば<span class="correlation">相関関係</span>として表れる</li>
+<li><strong><span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない</strong>→</li>
+</ul>
+
+</section>
+<section>
+<h2 id="因果相関を見誤るパターン1-交絡因子">因果・相関を見誤るパターン1: 交絡因子</h2>
+<p><strong>誤:</strong> 🍦アイスの売り上げが増えるほど🍺ビールの売り上げが増える。</p>
+<p><strong>正:</strong> 🍦アイスも🍺ビールも<strong>気温が高いほど</strong>売れる。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.2;">
+<p><img src="./figure/confounding-factor-1.png" alt="plot of chunk confounding-factor"></p>
+</div>
+<div class="column" style="flex-shrink: 1;">
+<figure>
+<img src="../tohoku2022r/image/hermeneutics-4-1-3.drawio.svg" width="750">
+</figure>
+</div>
+</div>
+
+</section>
+<section>
+<h2 id="因果相関を見誤るパターン2-逆の因果関係">因果・相関を見誤るパターン2: 逆の因果関係</h2>
+<p><strong>誤:</strong> <span class="causality-wrong">警察官が多いほど犯罪が増える。</span></p>
+<p><strong>正:</strong> <span class="causality">犯罪が多いから警察官が多く配備される。</span></p>
+<br>
+<h2 id="因果相関を見誤るパターン3-選択バイアス">因果・相関を見誤るパターン3: 選択バイアス</h2>
+<p>(x + y) が一定の幅に収まるようなペアだけを集めてしまうとか</p>
+<p><img src="./figure/spurious-correlation-selection-bias-1.png" alt="plot of chunk spurious-correlation-selection-bias"></p>
+
+</section>
+<section>
+<h2 id="因果相関を見誤るパターン4-外れ値グループ構造">因果・相関を見誤るパターン4: 外れ値・グループ構造</h2>
+<p><strong>少数の外れ値</strong>や<strong>グループ構造</strong>によって相関係数rが跳ね上がりうる。</p>
+<p><img src="./figure/correlation-lies-1.png" alt="plot of chunk correlation-lies"></p>
+
+</section>
+<section>
+<h2 id="因果相関を見誤るパターン5-偶然">因果・相関を見誤るパターン5: 偶然</h2>
+<p>ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？</p>
+<figure>
+<img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="1200">
+<figcaption><cite>
+<a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
+</cite></figcaption>
+</figure>
+<p>このウェブサイトにはジョークとしてこうした例が多数集められている↑</p>
+
+</section>
+<section>
+<h2 id="変数間の関係性まとめ">変数間の関係性まとめ</h2>
+<figure>
+<img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="1200">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+<hr>
+<ul>
+<li><strong><span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない</strong>。</li>
+<li><span class="causality-wrong">逆の因果関係</span>や<span class="spurious">見せかけの相関</span>にも要注意。</li>
+</ul>
+<p>🔰 これら4つの関係性に該当する事例をそれぞれ1つ以上探してみよう。
+</section>
+<section>
+<h2 id="-3日目の課題2">🔰 3日目の課題2</h2>
+<p>書籍、ニュースサイト、ブログ記事などを検索し、<br>
+<strong>良くないデータ解析の例</strong>を探して<strong>改善案</strong>を挙げよう。</p>
+<ol>
+<li>データの集め方(サンプルの選び方)が偏っていて良くない例</li>
+<li>データの解釈(相関や因果)を誤っている例</li>
+<li>図の描き方で嘘をついている例 (誇張、印象操作)</li>
+<li>生データを公開してくれるのはいいけど形式が汚くて使いにくい例</li>
+</ol>
+<p>それぞれの例について、下記の項目を報告してください:</p>
+<ul>
+<li>出典。URLや書籍名。</li>
+<li>データの概要、書き手の主張。</li>
+<li>ここが良くないので、こう改善すべき。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="今日の残り時間">今日の残り時間</h2>
+<ul>
+<li>班やTAに相談し、消化しきれなかった部分をなるべく解消する。</li>
+<li>まずは個人で課題1と2に取り組み、ある程度できたら班内で見せ合う。</li>
+<li>班員のよかった部分を自分のレポートに取り込む。</li>
+<li>最もよかった解析をTAに報告して解散。</li>
+<li>残ってほかの課題に取り組んでもOK。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li>「<a href="https://comicalcommet.github.io/r-training-2021/">Rを用いたデータ解析の基礎と応用</a>」
+石川由希 2021 名古屋大学</li>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/3urpls1">統計思考の世界</a> 三中信宏 2018</li>
+<li>R Markdown
+<ul>
+<li><a href="https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf">Cheat sheet (PDF)</a></li>
+<li><a href="https://r4ds.had.co.nz/r-markdown.html">R for Data Science &mdash; R Markdown</a></li>
+<li><a href="https://bookdown.org/yihui/rmarkdown/">R Markdown: The Definitive Guide</a></li>
+</ul>
+</li>
+</ul>
+<a href="7-distribution.html" class="readmore">
+7. 統計モデリング1: 確率分布、尤度
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>
