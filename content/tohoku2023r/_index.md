@@ -118,6 +118,16 @@ draft = false
     **半角アルファベット小文字のみ**で短いものを推奨。
     - ✅ Good: `watal`, `tamakino`
     - ❌ Bad: `岩嵜航`, `Watal Iwasaki`, `heavy.watal`
+
+    Windowsのホームフォルダ(`%USERPROFILE%`)はログインの仕方で決まるっぽい:
+    - ✅ **Microsoftアカウント**(`example@outlook.jp`)でログイン:
+      `C:/Users/examp/` (ユーザー名が漢字だろうがなんだろうが、**メールアドレスの最初の5文字**が使われるのでセーフ)
+    - Microsoftアカウントを使わず、**ローカルユーザー**としてログイン
+      - ✅ 半角英字のみのユーザー名なら問題ない: `C:/Users/goodname/`
+      - ❌ 漢字など全角文字を含むアカウント名: `C:/Users/朗軽 遊佐/`<br>
+        RとRStudioは既に対応済みだけど、Quarto(あるいはPandoc?)は未対応らしくてエラー。
+        他のソフトウェアでも不具合が出る危険あり。
+        ローカルユーザーを作ったあとでMicrosoftアカウントと紐付けても直らなそう。
 1.  Windowsの場合OneDriveが悪さしているかも。
     参考:
     - <https://ryotamugiyama.com/2020/08/03/rinstall/>
