@@ -1272,7 +1272,7 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
-#| cache.vars: []
+#| cache.vars: [p_bill]
 p_bill = penguins_dropna |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +
@@ -1302,7 +1302,7 @@ fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
 broom::tidy(fit4)
 broom::glance(fit4)
 added4 = modelr::add_predictions(penguins, fit4)
-p_bill + geom_line(aes(y = pred, color = sex), data = added4, size = 1) +
+p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
   scale_color_discrete()
 ```
 
