@@ -451,6 +451,30 @@ df_weight = tibble::tibble(
 ```
 
 ---
+## 🔰 とにかくGLMを使ってみる練習 解答例
+
+
+```r
+fit_wh = glm(weight ~ height, family = gaussian(link = identity), data = df_weight)
+coef(fit_wh)
+```
+
+```
+(Intercept)      height 
+  -69.85222    78.63444 
+```
+
+```r
+df_fit_wh = modelr::add_predictions(df_weight, fit_wh, type = "response")
+ggplot(df_fit_wh) +
+  aes(height, weight) +
+  geom_point() +
+  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+```
+
+![plot of chunk glm-df-weight](./figure/glm-df-weight-1.png)
+
+---
 ## 🔰 ポアソン回帰
 
 
@@ -481,6 +505,9 @@ df_seeds = tibble::tibble(
 ---
 ## 🔰 重回帰
 
+`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
+とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
+
 
 ```r
 n = 200L
@@ -509,6 +536,8 @@ df_beer = tibble::tibble(
 ---
 ## 🔰 ロジスティック回帰
 
+次ページにヒント。
+
 
 ```r
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
@@ -536,6 +565,27 @@ df_logistic = tibble::tibble(
 199  1.015520 -2.6953441 0.06324865  0            0   10
 200 34.259733  7.2779199 0.99930986 10           10    0
 ```
+
+---
+## ロジスティック回帰のヒント
+
+左辺の応答変数に指定できるのはだいたい次の2種類:
+- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
+- 1列目が成功回数、2列目が失敗回数の整数matrix
+
+今回の場合、成功回数 `y` だけをformulaに入れると怒られる
+
+```r
+glm(y ~ x, df_logistic, family = binomial)
+```
+
+```
+Error in eval(family$initialize): y values must be 0 <= y <= 1
+```
+ので失敗回数もモデルに含むよう `response ~ x` とする。
+
+(今回のように試行回数が10回固定じゃなくても使える、ということ)
+
 
 ---
 ## 🔰 共分散分析: GLM with 質的変数 + 量的変数
