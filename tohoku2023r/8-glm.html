@@ -495,6 +495,20 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </code></pre>
 </section>
 <section>
+<h2 id="-とにかくglmを使ってみる練習-解答例">🔰 とにかくGLMを使ってみる練習 解答例</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit_wh</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">weight</span> <span class="o">~</span> <span class="n">height</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">identity</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit_wh</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)      height 
+  -69.85222    78.63444 
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">df_fit_wh</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">df_weight</span><span class="p">,</span> <span class="n">fit_wh</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">df_fit_wh</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/glm-df-weight-1.png" alt="plot of chunk glm-df-weight"></p>
+
+</section>
+<section>
 <h2 id="-ポアソン回帰">🔰 ポアソン回帰</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">300L</span>
 </span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="m">3</span>
@@ -518,6 +532,8 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </section>
 <section>
 <h2 id="-重回帰">🔰 重回帰</h2>
+<p><code>pred</code> で回帰線を引くには <code>add_predictions()</code> の使い方に工夫が必要。<br>
+とりあえず <code>geom_point()</code> で&quot;回帰点々&quot;を表示してみるとこまでで可とする。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
 </span></span><span class="line"><span class="cl"><span class="n">true_coef</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="m">0.05</span><span class="p">,</span> <span class="m">0.006</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">df_beer</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
@@ -540,6 +556,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </section>
 <section>
 <h2 id="-ロジスティック回帰">🔰 ロジスティック回帰</h2>
+<p>次ページにヒント。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sigmoid</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gain</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gain</span> <span class="o">*</span> <span class="n">x</span><span class="p">))}</span>
 </span></span><span class="line"><span class="cl"><span class="n">nrep</span> <span class="o">=</span> <span class="m">200L</span>
 </span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">10L</span>
@@ -562,6 +579,20 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 199  1.015520 -2.6953441 0.06324865  0            0   10
 200 34.259733  7.2779199 0.99930986 10           10    0
 </code></pre>
+</section>
+<section>
+<h2 id="ロジスティック回帰のヒント">ロジスティック回帰のヒント</h2>
+<p>左辺の応答変数に指定できるのはだいたい次の2種類:</p>
+<ul>
+<li>成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)</li>
+<li>1列目が成功回数、2列目が失敗回数の整数matrix</li>
+</ul>
+<p>今回の場合、成功回数 <code>y</code> だけをformulaに入れると怒られる</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">,</span> <span class="n">df_logistic</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">binomial</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Error in eval(family$initialize): y values must be 0 &lt;= y &lt;= 1
+</code></pre><p>ので失敗回数もモデルに含むよう <code>response ~ x</code> とする。</p>
+<p>(今回のように試行回数が10回固定じゃなくても使える、ということ)</p>
+
 </section>
 <section>
 <h2 id="-共分散分析-glm-with-質的変数--量的変数">🔰 共分散分析: GLM with 質的変数 + 量的変数</h2>
