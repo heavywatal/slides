@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>統計モデリング入門 2023 岩手連大</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="統計モデリング入門 2023 岩手連大">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/iwate2023stats/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/theme-plain.css">
+</head>
+<body>
+<main>
+<header>
+<h1>統計モデリング入門 2023 岩手連大</h1>
+</header>
+<ul>
+<li>講師: 岩嵜航 (東北大学 生命科学研究科)</li>
+<li>日程: 2023年6月21, 23, 28, 30日</li>
+<li>場所: 岩手大学 <a href="https://ugas.agr.iwate-u.ac.jp/">連合農学研究科</a></li>
+</ul>
+<h2 id="概要">概要</h2>
+<ul>
+<li>授業内容<br>
+何らかの現象を理解・説明しようとするとき、その全てをあるがままに捉えることはできません。
+扱いやすいように単純化・理想化したモデルを作り、限られたデータを通して統計的に解釈するのが科学のやり方です。
+本実習ではその基礎として回帰モデルの考え方を身に着けましょう。</li>
+<li>受講するうえで必要になる前提知識
+<ul>
+<li>ファイル、フォルダ、クリックなど一般的なパソコンの基礎知識と経験</li>
+</ul>
+</li>
+<li>教科書
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+</ul>
+</li>
+<li>参考書
+<ul>
+<li>Rによるデータ前処理・可視化: <a href="https://heavywatal.github.io/slides/tmd2022/">https://heavywatal.github.io/slides/tmd2022/</a></li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+</li>
+<li>その他 (注意事項等)
+<ul>
+<li>講義資料は公開予定: <a href="https://heavywatal.github.io/slides/iwate2023stats/">https://heavywatal.github.io/slides/iwate2023stats/</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="実習環境の設定">実習環境の設定</h2>
+<p>環境整備に講義時間を割けないので、なるべく講義開始前に済ませておいてください。</p>
+<ol>
+<li>OSのソフトウェア・アップデートを基本的に全て適用して再起動。
+<ul>
+<li>Windows 11 (≥22H2)</li>
+<li>macOS Ventura (≥13.3)</li>
+</ul>
+</li>
+<li>ファイル名の末尾(<code>.pdf</code> とか <code>.png</code> とか)の<a href="https://duckduckgo.com/?q=%E6%8B%A1%E5%BC%B5%E5%AD%90+%E8%A1%A8%E7%A4%BA">拡張子を常時表示する</a>ようにOSを設定。</li>
+<li><a href="https://cran.r-project.org/">https://cran.r-project.org/</a>
+から最新版の <strong>R本体(≥4.3.0)</strong> をダウンロードしてインストール。
+OK連打のデフォルト設定で。
+古いものが既に入っている場合は念のため削除してから。
+<ul>
+<li><a href="https://cran.r-project.org/bin/windows/base">Windows → base</a> → <code>R-4.*.*-win.exe</code></li>
+<li><a href="https://cran.r-project.org/bin/macosx/">Mac</a>
+→ <code>R-4.*.*-arm64.pkg</code> (Apple Silicon) or <code>R-4.*.*.pkg</code> (Intel)</li>
+</ul>
+</li>
+<li><a href="https://posit.co/download/rstudio-desktop/">https://posit.co/download/rstudio-desktop/</a>
+から最新版の <strong>RStudio(≥2023.03.0)</strong> をダウンロードしてインストール。
+古いものが既に入っている場合は念のため削除してから。</li>
+<li>開発者ツールをインストール。
+<ul>
+<li>Windows: <a href="https://cran.r-project.org/bin/windows/Rtools/"><strong>Rtools</strong></a>
+(R本体のバージョンに合わせる)</li>
+<li>Mac: <a href="https://duckduckgo.com/?q=command+line+tools"><strong>Command Line Tools</strong></a>:
+ターミナルで <code>xcode-select --install</code> を実行。
+Xcode環境は不要。</li>
+</ul>
+</li>
+<li>RStudioを起動し、左側のConsoleで次の1行を実行:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;binary&#34;</span><span class="p">)</span>
+</span></span></code></pre></div>何か訊かれたら <code>yes</code> と回答。
+パッケージがたくさんインストールされる。
+エラーや警告らしきものがあれば全文コピーしておく。</li>
+<li>Consoleに次の2行を打ち込んでメッセージを確認:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>── Attaching core tidyverse packages ───────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.2     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.2     ✔ tibble    3.2.1
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1
+</code></pre></li>
+</ol>
+<h3 id="エラーや警告が出たら">エラーや警告が出たら</h3>
+<ol>
+<li>
+<p><strong>バージョン確認</strong>。OS、R、RStudioなどのソフトウェアが古すぎるかも。
+それらが十分に新しければ、次に挙げる日本語やOneDriveの問題は対処済みのはず。</p>
+</li>
+<li>
+<p>手元のコンピューターの<strong>ホームフォルダ</strong>(Windowsの場合 <code>%USERPROFILE%</code>)を確認。
+新しくターミナルを開いて <code>pwd</code> コマンドを実行。
+ここに半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがち。
+ここだけ修正するのはかなり難しい
+(ユーザー名のフルネーム表示は変更できるけどそれは無関係)。
+新しいユーザーアカウントを作って引っ越すとか、
+OSをクリーンインストールするとかしてやり直したほうが結局早そう。
+<strong>半角アルファベット小文字のみ</strong>で短いものを推奨。</p>
+<ul>
+<li>✅ Good: <code>watal</code>, <code>tamakino</code></li>
+<li>❌ Bad: <code>岩嵜航</code>, <code>Watal Iwasaki</code>, <code>heavy.watal</code></li>
+</ul>
+<p>Windowsのホームフォルダ(<code>%USERPROFILE%</code>)はログインの仕方で決まるっぽい:</p>
+<ul>
+<li>✅ <strong>Microsoftアカウント</strong>(<code>example@outlook.jp</code>)でログイン:
+<code>C:/Users/examp/</code> (ユーザー名が漢字だろうがなんだろうが、<strong>メールアドレスの最初の5文字</strong>が使われるのでセーフ)</li>
+<li>Microsoftアカウントを使わず、<strong>ローカルユーザー</strong>としてログイン
+<ul>
+<li>✅ 半角英字のみのユーザー名なら問題ない: <code>C:/Users/goodname/</code></li>
+<li>❌ 漢字など全角文字を含むアカウント名: <code>C:/Users/朗軽 遊佐/</code><br>
+RとRStudioは既に対応済みだけど、Quarto(あるいはPandoc?)は未対応らしくてエラー。
+他のソフトウェアでも不具合が出る危険あり。
+ローカルユーザーを作ったあとでMicrosoftアカウントと紐付けても直らなそう。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Windowsの場合OneDriveが悪さしているかも。
+参考:</p>
+<ul>
+<li><a href="https://ryotamugiyama.com/2020/08/03/rinstall/">https://ryotamugiyama.com/2020/08/03/rinstall/</a></li>
+<li><a href="https://okumuralab.org/~okumura/stat/R-win.html">https://okumuralab.org/~okumura/stat/R-win.html</a></li>
+<li><a href="https://yukiyanai.github.io/jp/resources/">https://yukiyanai.github.io/jp/resources/</a></li>
+</ul>
+</li>
+<li>
+<p>実習当日チャット欄に投げてください。時間の許す限り対処します。</p>
+</li>
+</ol>
+<h2 id="講義資料">講義資料</h2>
+<p>全4回。リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。</p>
+
+<ul>
+<li>2023-06-21 18:00 | <a href="/slides/iwate2023stats/1-introduction.html">導入、Rの基礎、直線回帰</a></li>
+<li>2023-06-23 18:00 | <a href="/slides/iwate2023stats/2-distribution.html">確率分布、尤度、最尤推定</a></li>
+<li>2023-06-28 18:00 | <a href="/slides/iwate2023stats/3-glm.html">一般化線形モデル、個体差</a></li>
+<li>2023-06-30 18:00 | <a href="/slides/iwate2023stats/4-bayesian.html">ベイズの定理、事後分布、MCMC、Stan</a></li>
+</ul>
+</main>
+</body>
+</html>
