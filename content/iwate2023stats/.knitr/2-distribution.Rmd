@@ -1,0 +1,1375 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+```
+
+---
+## Work in Progress 🚧
+```{r, stop}
+#| include: false
+#| cache: false
+knitr::knit_exit()
+```
+
+---
+## 何でもかんでも直線あてはめではよろしくない
+
+```{r, df-pois}
+#| echo: false
+set.seed(24601)
+n = 300L
+a = 3
+b = -3
+df_pois = tibble::tibble(
+  body_mass = runif(n, 0.4, 1.7),
+  num_seeds = rpois(n, exp(a * body_mass + b))
+)
+```
+```{r, lm-bad}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 5
+x_breaks = c(0.5, 1.0, 1.5)
+coeff = lm(num_seeds ~ body_mass, data = df_pois)$coefficients
+df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
+  dplyr::mutate(density = dnorm(num_seeds, coeff[1] + coeff[2] * body_mass, 1.4)) |>
+  dplyr::filter(density > 1e-4)
+
+p_pois = ggplot(df_pois) +
+  aes(body_mass, num_seeds) +
+  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
+  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  scale_x_continuous(breaks = x_breaks) +
+  coord_cartesian(ylim = c(-5, 15)) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
+```
+
+- 観察データは常に**正の値**なのに予測が負に突入してない？
+- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
+
+
+---
+## 何でもかんでも直線あてはめではよろしくない
+
+```{r, glm-better}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
+p_lm = p_pois +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
+                            fill = "#56B4E9AA", linetype = 0)
+# p_lm
+
+df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
+  dplyr::mutate(density = dpois(num_seeds, exp(a * body_mass + b))) |>
+  dplyr::filter(density > 1e-4)
+df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
+
+p_poisson = p_pois +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass), df_bars,
+                            fill = "#56B4E9AA", linetype = 0)
+# p_poisson
+
+cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
+```
+
+- 観察データは常に**正の値**なのに予測が負に突入してない？
+- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
+- **データに合わせた統計モデルを使うとマシ**
+
+
+---
+## ちょっとずつ線形モデルを発展させていく
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+
+
+---
+## 確率分布
+
+発生する事象(値)と頻度の関係。
+
+手元のデータを数えて作るのが**経験分布**<br>
+e.g., サイコロを12回投げた結果、学生1000人の身長
+
+```{r, distribution}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 8
+p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
+  ggplot() +
+  aes(face) +
+  geom_bar(aes(y = after_stat(prop))) +
+  scale_x_continuous(breaks = seq_len(6L)) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) |>
+  ggplot() +
+  aes(height) +
+  geom_histogram(aes(y = after_stat(density)), binwidth = 1, boundary = 0) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), axis.ticks = element_blank())
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+一方、少数のパラメータと数式で作るのが**理論分布**。<br>
+(こちらを単に「確率分布」と呼ぶことが多い印象）
+
+---
+## 確率変数$X$はパラメータ$\theta$の確率分布$f$に従う...?
+
+$X \sim f(\theta)$
+
+e.g.,<br>
+コインを3枚投げたうち表の出る枚数 $X$ は**二項分布に従う**。<br>
+$X \sim \text{Binomial}(n = 3, p = 0.5)$
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+
+```{r, dbinom}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 3
+size = 3L
+p = 0.5
+tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) |>
+  ggplot() +
+  aes(X, Prob) +
+  geom_col() +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+  </div>
+  <div class="column" style="padding-top: 10px;">
+\[\begin{split}
+\text{Prob}(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+k &\in \{0, 1, 2, \ldots, n\}
+\end{split}\]
+  </div>
+</div>
+
+一緒に実験してみよう。
+
+---
+## 試行を繰り返して記録してみる
+
+コインを3枚投げたうち表の出た枚数 $X$
+
+試行1: **表** 裏 **表** → $X = 2$<br>
+試行2: 裏 裏 裏 → $X = 0$<br>
+試行3: **表** 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$
+
+```{r, rbinom}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
+size = 3L
+p = 0.5
+X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
+df_rbinom = purrr::map(c(1, 2, 3, 10, 100), \(n) {
+  tibble::tibble(X = head(X, n)) |>
+    dplyr::count(X, name = "k") |>
+    dplyr::mutate(Freq = k / n, Repl = n)
+}) |>
+  purrr::list_rbind() |>
+  dplyr::bind_rows(tibble(X = seq(0, 3), Freq = dbinom(X, size, p), Repl = Inf))
+df_rbinom |>
+  ggplot() +
+  aes(X, Freq) +
+  geom_col() +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  facet_wrap(vars(Repl), nrow = 1L, labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+<div style="text-align: right;">
+試行回数を増やすほど<b>二項分布</b>の形に近づく。<br>
+0と3はレア。1と2が3倍ほど出やすいらしい。
+</div>
+
+---
+## コイントスしなくても $X$ らしきものを生成できる
+
+- コインを3枚投げたうち表の出る枚数 $X$
+- $n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<img `r src_alt_fig_chunk("dbinom")`>
+  </div>
+  <div class="column" style="padding-top: 10px;">
+$X \sim \text{Binomial}(n = 3, p = 0.5)$
+
+&nbsp;&nbsp; ↓ サンプル
+
+{2, 0, 1, 2, 1, 3, 0, 2, ...}
+  </div>
+</div>
+
+これらはとてもよく似ているので<br>
+**「コインをn枚投げたうち表の出る枚数は二項分布に従う」**<br>
+みたいな言い方をする。逆に言うと<br>
+**「二項分布とはn回試行のうちの成功回数を確率変数とする分布」**<br>
+のように理解できる。
+
+---
+## 統計モデリングの一環とも捉えられる
+
+コイン3枚投げを繰り返して得たデータ {2, 0, 1, 2, 1, 3, 0, 2, ...}
+
+&nbsp;&nbsp; ↓ たった2つのパラメータで記述。情報を圧縮。
+
+$n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
+
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+こういうふうに現象と対応した確率分布、ほかにもある？
+
+???
+ただし「これが3連コイントスの真理だ」ではない。<br>
+あくまで「こう単純化して理解できそう・使えそう」なだけ。
+
+ほかの仮定: コインが立つかも。偏ったコインかも。両表かも。
+
+二項分布はn枚コイントスをたった2パラメータで説明する優秀モデル
+
+
+---
+## 有名な確率分布、それに「従う」もの
+
+離散一様分布
+: コインの表裏、サイコロの出目1–6
+
+幾何分布
+: 成功率pの試行が初めて成功するまでの失敗回数
+
+二項分布
+: 成功率p、試行回数nのうちの成功回数
+
+ポアソン分布
+: 単位時間あたり平均$\lambda$回起こる事象の発生回数
+
+ガンマ分布
+: ポアソン過程でk回起こるまでの待ち時間
+: (k = 1のとき**指数分布**と呼ばれる)
+
+正規分布
+: 確率変数の和、平均値
+
+---
+## 離散一様分布
+
+同じ確率で起こるn通りの事象のうちXが起こる確率
+
+e.g., コインの表裏、サイコロの出目1–6
+
+```{r, dunif}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
+df_coin = tibble::tibble(X = c("head", "tail"), Prob = c(0.5, 0.5), group = "Coin")
+df_dice = tibble::tibble(X = as.character(seq_len(6L)), Prob = rep(1 / 6, 6), group = "Dice")
+dplyr::bind_rows(df_coin, df_dice) |>
+  ggplot() +
+  aes(X, Prob) +
+  geom_col() +
+  scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
+  facet_grid(cols = vars(group), scale = "free_x", space = "free_x") +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+🔰 一様分布になりそうな例を考えてみよう
+
+
+---
+## 幾何分布 $~\text{Geom}(p)$
+
+成功率pの試行が初めて成功するまでの失敗回数
+
+e.g., コイントスで表が出るまでに何回裏が出るか
+
+```{r, geometric}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+df = purrr::map(c(0.2, 0.5, 0.9), \(p) {
+  tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
+}) |>
+  purrr::list_rbind() |>
+  dplyr::filter(Prob > 0.001)
+x_br = c(seq.int(0, 10), seq.int(15, 100, 5))
+ggplot(df) +
+  aes(X, Prob) +
+  scale_x_continuous(breaks = x_br) +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  geom_col() +
+  facet_grid(cols = vars(p), scales = "free_x", space = "free_x", labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+\\[
+\text{Prob}(X = k \mid p) = p (1 - p)^k
+\\]
+
+「初めて成功するまでの試行回数」とする定義もある。
+
+🔰 幾何分布になりそうな例を考えてみよう
+
+---
+## 二項分布 $~\text{Binomial}(n,~p)$
+
+確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
+
+```{r, dbinom-n}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+p = 0.25
+df = purrr::map(2**seq.int(0, 4), \(n) {
+  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
+}) |> purrr::list_rbind()
+ggplot(df) +
+  aes(X, Prob) +
+  scale_x_continuous(breaks = df[["X"]]) +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  geom_col() +
+  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
+  labs(title = paste0("p = ", p)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+\\[
+\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\\]
+
+🔰 二項分布になりそうな例を考えてみよう
+
+
+---
+## ポアソン分布 $~\text{Poisson}(\lambda)$
+
+平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。
+
+e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数
+
+```{r, dpoisson}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+lambda = c(1, 5, 10)
+.arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed")
+p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
+  dplyr::mutate(time = purrr::map(lambda, ~ runif(.x * 3, 0, 3))) |>
+  tidyr::unnest(time) |>
+  ggplot() +
+  aes(time, y) +
+  annotate("segment", x = -0.1, xend = 3.1, y = 1:3, yend = 1:3, linewidth = 2, arrow = .arrow, linejoin = "mitre") +
+  geom_point(aes(color = lambda, fill = lambda), size = 8, shape = 124, key_glyph = draw_key_rect) +
+  scale_color_continuous(guide = NULL) +
+  scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
+  scale_y_continuous(limits = c(0.5, 3.5), breaks = NULL) +
+  labs(y = NULL, x = "time (space)") +
+  theme_bw(base_size = 18) +
+  theme(
+    axis.text.y = element_blank(), axis.ticks = element_blank(), panel.border = element_blank(),
+    panel.grid.minor = element_blank(), legend.position = "top"
+  )
+
+p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) |>
+  dplyr::mutate(Prob = dpois(X, lambda)) |>
+  ggplot() +
+  aes(X, Prob) +
+  geom_col(aes(fill = lambda), position = "identity", alpha = 0.5) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank(), legend.position = "none"
+  )
+cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
+```
+
+\\[
+\text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\\]
+
+二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
+めったに起きないことを何回も試行するような感じ。
+
+
+---
+## 指数分布 $~\text{Exp}(\lambda)$
+
+ポアソン過程の事象の発生間隔。平均は $1 / \lambda$ 。
+
+e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔
+
+```{r, dexp}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
+  dplyr::mutate(Prob = dexp(x, rate = lambda)) |>
+  ggplot() +
+  aes(x, Prob) +
+  geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank(), legend.position = "none"
+  )
+cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
+```
+
+\\[
+\text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
+\\]
+
+幾何分布の連続値版。
+
+🔰 ポアソン分布・指数分布になりそうな例を考えてみよう
+
+
+---
+## ガンマ分布 $~\text{Gamma}(k,~\lambda)$
+
+ポアソン過程の事象k回発生までの待ち時間
+
+e.g., メッセージを2つ受信するまでの待ち時間
+
+```{r, dgamma}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
+  dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) |>
+  ggplot() +
+  aes(x, Prob) +
+  geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank(), legend.position = "none"
+  )
+cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
+```
+
+\\[
+\text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\\]
+
+指数分布をkのぶん右に膨らませた感じ。<br>
+shapeパラメータ $k = 1$ のとき指数分布と一致。
+
+
+---
+## 正規分布 $~\mathcal{N}(\mu,~\sigma)$
+
+平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
+e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):
+
+```{r, gaussian}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 11
+ci = qnorm(c(0.005, 0.025, 0.975, 0.995), 50, 10)
+tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
+  ggplot() +
+  aes(x, Prob) +
+  geom_area(alpha = 0.4) +
+  geom_area(data = function(.x) {
+    dplyr::filter(.x, dplyr::between(x, ci[2], ci[3]))
+  }, alpha = 0.4) +
+  geom_area(data = function(.x) {
+    dplyr::filter(.x, dplyr::between(x, ci[1], ci[4]))
+  }, alpha = 0.4) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank(), legend.position = "none"
+  )
+```
+
+\\[
+\text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\\]
+
+---
+## 正規分布に近づくものがいろいろある
+
+標本平均の反復(**中心極限定理**);
+e.g., 一様分布 [0, 100) から40サンプル
+
+```{r, central-limit}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
+n = 40L
+X = replicate(10000L, mean(runif(n, 0, 100)))
+purrr::map(c(10, 100, 1000, 10000), \(n) {
+  tibble::tibble(X = head(X, n), Repl = n)
+}) |>
+  purrr::list_rbind() |>
+  ggplot() +
+  aes(X) +
+  geom_histogram(bins = 25) +
+  facet_wrap(vars(Repl), nrow = 1L, scale = "free_y", labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+大きい$n$の二項分布
+
+```{r, binom-normal}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
+purrr::map(c(1, 4, 16, 64, 256), \(n) {
+  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, 0.25), n = n) |>
+    dplyr::filter(Prob > 1e-5)
+}) |>
+  purrr::list_rbind() |>
+  ggplot() +
+  aes(X, Prob) +
+  geom_col(width = 1) +
+  facet_wrap(vars(n), nrow = 1L, scale = "free", labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+---
+## 正規分布に近づくものがいろいろある
+
+大きい$\lambda$のポアソン分布
+
+```{r, poisson-normal}
+#| echo: false
+#| fig.height: 2.5
+#| fig.width: 11
+purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
+  tibble::tibble(X = seq(0, 4 * lambda), Prob = dpois(X, lambda), lambda) |>
+    dplyr::filter(Prob > 1e-5)
+}) |>
+  purrr::list_rbind() |>
+  ggplot() +
+  aes(X, Prob) +
+  geom_col(width = 1) +
+  facet_wrap(vars(lambda), nrow = 1L, scale = "free", labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布
+
+```{r, gamma-normal}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+.guide = guide_legend(reverse = TRUE, label.position = "left", label.hjust = 1)
+tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
+  dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) |>
+  ggplot() +
+  aes(x, Prob) +
+  geom_area(aes(fill = k, group = k), position = "identity", alpha = 0.5) +
+  scale_fill_viridis_c(trans = "log10", guide = .guide) +
+  coord_cartesian(xlim = c(0, 20)) +
+  theme_bw(base_size = 20) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+
+---
+## 有名な確率分布対応関係ふりかえり
+
+<figure style="float: right;">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
+</figure>
+
+離散一様分布
+: コインの表裏、サイコロの出目1–6
+
+幾何分布
+: 成功率pの試行が初めて成功するまでの失敗回数
+
+二項分布
+: 成功率p、試行回数nのうちの成功回数
+
+ポアソン分布
+: 単位時間あたり平均$\lambda$回起こる事象の発生回数
+
+ガンマ分布
+: ポアソン過程でk回起こるまでの待ち時間
+: (k = 1のとき**指数分布**と呼ばれる)
+
+正規分布
+: 確率変数の和、平均値。使い勝手が良く、よく登場する。
+
+
+---
+## 現実には、確率分布に「従わない」ことが多い
+
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。
+
+<img `r src_alt_fig_chunk("overdispersion")`>
+
+「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
+**「普通はこれに従うはず」を理解してこそ**できる思考。
+
+
+---
+## 疑似乱数生成器 Pseudo Random Number Generator
+
+コンピューター上でランダム**っぽい**数値を出力する装置。<br>
+実際には**決定論的**に計算されているので、<br>
+シード(出発点)と呼び出し回数が同じなら出る数も同じになる。
+
+```r
+set.seed(42)
+runif(3L)
+# 0.9148060 0.9370754 0.2861395
+runif(3L)
+# 0.8304476 0.6417455 0.5190959
+set.seed(42)
+runif(6L)
+# 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959
+```
+
+シードに適当な固定値を与えておくことで再現性を保てる。<br>
+ただし「このシードじゃないと良い結果が出ない」はダメ。
+
+さまざまな「分布に従う」乱数を生成することもできる。
+
+---
+## いろんな乱数を生成・可視化して感覚を掴もう
+
+```{r, try-prng}
+#| eval: false
+n = 100
+x = sample.int(6, n, replace = TRUE)
+x = runif(n, min = 0, max = 1)
+x = rgeom(n, prob = 0.5)
+x = rbinom(n, size = 3, prob = 0.5)
+x = rpois(n, lambda = 10)
+x = rnorm(n, mean = 50, sd = 10)
+print(x)
+
+p1 = ggplot(data.frame(x)) + aes(x)
+p1 + geom_histogram() # for continuous values
+p1 + geom_bar()       # for discrete values
+```
+
+🔰 小さい `n` から徐々に大きくして変化を確認しよう。
+
+🔰 ほかのオプションもいろいろ変えて変化を確認しよう。
+
+🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
+   全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
+
+```{r, hidden-gacha}
+#| include: false
+x = rbinom(1000000, 10, 0.01)
+p = ggplot(data.frame(x)) + aes(x) + geom_bar()
+table(x)
+```
+
+---
+## いろいろ試した結果をとっておきたい
+
+スクリプト.Rさえ保存しておけばいつでも実行できるけど... **面倒**
+
+`ggsave()` で画像を書き出しておけるけど... **どのコードの結果か分からない**
+
+→ **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
+
+```{r, hello}
+#| results: "hold"
+#| fig.show: "hold"
+#| fig.height: 3.5
+#| fig.width: 5
+3 * 14
+ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
+```
+
+
+---
+## Quarto Document として研究ノートを作る
+
+<a href="https://quarto.org/">
+<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+</a>
+
+プログラミングからレポート作成まで一元管理できて楽ちん。
+
+- 本文とRコードを含むテキストファイル.qmdを作る。
+- HTML, PDFなどリッチな形式に変換して読む。
+  - コードだけでなく実行結果の**図**や**表**も埋め込める。
+
+<hr>
+
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+</a>
+
+Quarto Markdown (`.qmd`)
+: RやPythonのコードと図表を埋め込める**Markdown**亜種。
+: Quarto登場前にほぼR専用だった `.Rmd` と使い勝手は同じ。
+
+Markdown (`.md`)
+: 最もよく普及している**軽量マークアップ言語**のひとつ。
+: 微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。
+
+🔰 どんなものが作れるのか
+[作成例ギャラリー](https://quarto.org/docs/gallery/)
+を見てみよう。
+
+---
+## マークアップ言語
+
+文書の構造や視覚的修飾を記述するための言語。<br>
+e.g., **HTML**+CSS, XML, LaTeX
+
+```html
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
+
+🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
+
+
+---
+## 軽量マークアップ言語
+
+**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
+e.g., **Markdown**, reStructuredText, 各種Wiki記法など
+
+```md
+### 見出し3
+
+ここは段落。
+*強調(italic)*、
+**強い強調(bold)**、
+[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+
+---
+## Quartoする環境は既に整っているはず
+
+```{r, versions}
+#| include: false
+R_version = paste(R.version$major, R.version$minor, sep = ".")
+pkg_versions = installed.packages()[, "Version"]
+RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
+# quarto_version = system2("quarto", "--version", stdout = TRUE)
+```
+
+- **R (≥ `r R_version`)**: 最新版 – 0.1 くらいまでが許容範囲
+- **RStudio (≥ `r RStudio_version`)**: Quarto CLI を同梱
+- **tidyverse (≥ `r pkg_versions["tidyverse"]`)**: 次の2つを自動インストール
+  - rmarkdown (≥ `r pkg_versions["rmarkdown"]`)
+  - knitr (≥ `r pkg_versions["knitr"]`)
+
+(示してあるバージョンは最低要件ではなく私の現在の環境の)
+
+<hr>
+
+- [Quarto CLI](https://quarto.org/docs/get-started/):
+  最新版を求めるなら手動で入れる。
+- [`install.packages("quarto")`](https://github.com/quarto-dev/quarto-r):
+  多くの人には不要。
+  Quarto CLIをRコマンドで呼べるようにするだけ。
+- [pandoc](https://pandoc.org/): Quarto CLI に同梱。
+  手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。
+
+---
+## Markdown記法で書いてみよう
+
+1. RStudio > New File > Markdown File
+   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
+1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
+   - 見出し1, 2, 3
+   - 箇条書き (番号あり・なし)
+   - インラインコード、コードブロック
+1. <kbd>Preview</kbd>ボタンで確認
+
+---
+## Quarto Document を作ってみよう
+
+RStudio > New File > Quarto Document...<br>
+(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
+
+<img src="/slides/image/rstudio/new-quarto-document.png" width="100%">
+
+---
+## 普通のmdには無いqmdの特徴
+
+**ヘッダー**
+: 最上部の `---` で挟まれた部分。
+  文書全体に関わるメタデータを入力。
+: オプションは出力形式によって異なる。
+  e.g., [`html`](https://quarto.org/docs/output-formats/html-basics.html)
+
+**R code chunk**
+: `` ```{r} `` のように始まるブロック。
+: コードの実行結果を最終産物に埋め込める。
+: [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
+  - `echo: false`: コードを非表示。結果は表示。
+  - `eval: false`: コードを実行せず表示だけ。
+  - `include: false`: コードも結果も表示せず、実行だけする。
+  - `fig.width: 7, fig.height: 7`: 図の大きさを制御。
+
+まあ細かいことは必要になってから調べるとして...
+
+---
+## qmdをHTMLに変換してみよう
+
+<div>
+<img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
+</div>
+
+---
+## qmdをHTMLに変換してみよう
+
+1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
+   e.g., `report.qmd`
+1. ⚙️ ボタンから "Preview in Viewer Pane" を選択。
+1. <kbd>→Render</kbd> を押す。
+   - 埋め込まれたRコードが実行される。
+   - 実行結果を含むMarkdownが作られる。
+   - MarkdownからHTMLに変換される。 e.g., `report.html`
+   - プレビューが自動的に開く。
+
+🔰 編集 → Render を繰り返して変化を確認しよう
+
+
+---
+## 🔰 疑似乱数生成をいろいろ試した研究ノートを作ろう
+
+さっきはこんな汚いスクリプトだった:
+
+```{r, try-prng-print}
+#| ref.label: "try-prng"
+#| eval: false
+```
+
+1. ひとつの分布につきひとつの図を描くqmdに書き換える。
+1. コードチャンクを分けたり見出しを付けたりして整理する。
+1. パラメータをいろいろ変えた結果も加えていく。
+
+
+---
+## 本講義のお品書き
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに回帰分析の概要を紹介。
+
+1. イントロ
+1. Rの基礎を駆け足で
+1. 統計モデルの基本
+    - 直線回帰
+    - 確率変数・**確率分布** 👈 ここまでやった
+    - 尤度・最尤推定
+1. 一般化線形モデル、混合モデル
+1. ベイズ統計、階層ベイズモデル
+
+回帰のキモは**線ではなく分布**
+
+
+---
+## 有名な確率分布対応関係ふりかえり
+
+<figure style="float: right;">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
+</figure>
+
+離散一様分布
+: コインの表裏、サイコロの出目1–6
+
+幾何分布
+: 成功率pの試行が初めて成功するまでの失敗回数
+
+二項分布
+: 成功率p、試行回数nのうちの成功回数
+
+ポアソン分布
+: 単位時間あたり平均$\lambda$回起こる事象の発生回数
+
+ガンマ分布
+: ポアソン過程でk回起こるまでの待ち時間
+: (k = 1のとき**指数分布**と呼ばれる)
+
+正規分布
+: 確率変数の和、平均値。使い勝手が良く、よく登場する。
+
+
+---
+## データに分布をあてはめたい
+
+ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
+個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
+
+```{r, df-poisson}
+#| echo: false
+set.seed(24601)
+df_rpois = tibble::tibble(X = rpois(50L, 3))
+max_x = 11L
+df_dpois = purrr::map(c(1, 3, 5), \(lambda) {
+  tibble::tibble(lambda, X = seq.int(0L, max_x), Prob = dpois(X, lambda))
+}) |> purrr::list_rbind()
+```
+```{r, poisson-seed}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 4
+ggplot(df_rpois) +
+  aes(X) +
+  geom_bar(width = 0.4) +
+  coord_cartesian(xlim = c(0, max_x)) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+カウントデータだから<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
+分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+
+
+---
+## データに分布をあてはめたい
+
+ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
+個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
+
+```{r, poisson-seed-lambda}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+p_pois = ggplot(df_rpois) +
+  aes(X) +
+  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  facet_wrap(vars(lambda), nrow = 1L, labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
+  )
+p_pois
+```
+
+カウントデータだからポアソン分布っぽい。<br>
+分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+
+黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
+よく重なるのは $\lambda \approx 3$ くらいか。
+
+
+---
+## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
+
+<ruby>尤<rt>もっと</rt></ruby>もらしさ。
+モデルのあてはまりの良さの尺度のひとつ。
+
+**あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
+定義通り素直に書くと<br>
+$\text{Prob}(D \mid M)$
+
+データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
+$L(M \mid D)$
+
+モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+$L(\theta \mid D)$ とか $L(\theta)$ とか
+
+
+---
+## 尤度を手計算できる例
+
+コインを5枚投げた結果 $D$: 表 4, 裏 1
+
+表が出る確率 $p = 0.5$ と仮定:
+<div>\[\begin{split}
+L(0.5 \mid D)
+  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
+\end{split}\]</div>
+
+表が出る確率 $p = 0.8$ と仮定:
+<div>\[\begin{split}
+L(0.8 \mid D)
+  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
+\end{split}\]</div>
+
+$L(0.8 \mid D) > L(0.5 \mid D)$
+
+$p = 0.8$ のほうがより尤もらしい。
+
+
+
+---
+## 種子数ポアソン分布の例でも尤度を計算してみる
+
+ある植物が作った種子を数える。$n = 50$個体ぶん。
+
+<div>\[\begin{split}
+L(\lambda \mid D)
+  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
+\end{split}\]</div>
+
+```{r, poisson-seed-likelihood}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+df_likelihood = df_rpois |>
+  dplyr::left_join(df_dpois, by = "X") |>
+  dplyr::group_by(lambda) |>
+  dplyr::summarize(L = prod(Prob)) |>
+  dplyr::mutate(logL = log(L), label = sprintf("L(%.0f|D) = %.1e", lambda, L))
+p_pois +
+  geom_text(data = df_likelihood, aes(label = label), color = "#56B4E9",
+            x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 6)
+```
+
+この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。
+
+---
+## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
+
+扱いやすい **対数尤度** (log likelihood) にしてから計算する。<br>
+一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
+
+<div>\[\begin{split}
+\log L(\lambda \mid D)
+  &= \sum _i ^n \left[ X_i \log (\lambda) - \lambda - \log (X_i !) \right] \\
+\frac {\mathrm d \log L(\lambda \mid D)} {\mathrm d \lambda}
+  &= \frac 1 \lambda \sum _i ^n X_i - n = 0 \\
+\hat \lambda &= \frac 1 n \sum _i ^n X_i
+\end{split}\]</div>
+
+
+```{r, poisson-mle}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 10
+count_rpois = df_rpois |> dplyr::count(X)
+calc_likelihood_rpois = function(lambda) {
+  prod(dpois(count_rpois[["X"]], lambda)**count_rpois[["n"]])
+}
+X_mle = mean(df_rpois[["X"]])
+L_mle = calc_likelihood_rpois(X_mle)
+p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_likelihood_rpois)) |>
+  dplyr::mutate(logL = log(L)) |>
+  ggplot() +
+  aes(lambda, logL) +
+  geom_line() +
+  geom_vline(xintercept = X_mle, color = "#56B4E9") +
+  annotate("point", x = X_mle, y = log(L_mle), size = 3, color = "#56B4E9") +
+  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
+           x = Inf, y = Inf, hjust = 1.1, vjust = 1.2, size = 5) +
+  labs(y = "log L") +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+df_dpois = tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
+p_pois = ggplot(df_rpois) +
+  aes(X) +
+  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
+  )
+
+cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
+```
+
+---
+## 最尤推定を使っても“真のλ”は得られない
+
+今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
+「50個体サンプル→最尤推定」を1,000回繰り返してみると:
+
+```{r, poisson-mle-repl}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 11
+nrep = 1000L
+df_repl = tibble::tibble(X = rpois(50L * nrep, 3), repl = rep(seq_len(nrep), each = 50L))
+df_sum = df_repl |>
+  dplyr::group_by(repl) |>
+  dplyr::summarize(lambda = mean(X))
+df_minmax = dplyr::bind_rows(dplyr::slice_max(df_sum, lambda), dplyr::slice_min(df_sum, lambda))
+
+p_repl = df_sum |>
+  ggplot() +
+  aes(lambda) +
+  geom_histogram(bins = 25, center = 3) +
+  annotate("point", x = df_minmax$lambda, y = 0, color = "#56B4E9", size = 8, alpha = 0.5) +
+  labs(x = "estimated_lambda") +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank()
+  )
+
+df_dpois = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) |>
+  dplyr::mutate(Prob = dpois(X, lambda))
+p_minmax = df_repl |>
+  dplyr::filter(repl %in% df_minmax$repl) |>
+  dplyr::left_join(df_minmax, by = "repl") |>
+  ggplot() +
+  aes(X) +
+  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
+  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
+  )
+
+cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
+```
+
+サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
+(標本データへのあてはまりはかなり良く見えるのに！)
+
+
+---
+## サンプルサイズを増やすほどマシにはなる
+
+“$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:
+
+```{r, poisson-mle-nsam}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+nrep = 1000L
+purrr::map(c(5, 50, 500, 5000), \(n) {
+  tibble::tibble(X = rpois(n * nrep, 3), repl = rep(seq_len(nrep), each = n)) |>
+    dplyr::group_by(repl) |>
+    dplyr::summarize(estimated_lambda = mean(X)) |>
+    dplyr::mutate(n = n)
+}) |>
+  purrr::list_rbind() |>
+  ggplot() +
+  aes(estimated_lambda) +
+  geom_histogram(bins = 25, center = 3) +
+  facet_wrap(vars(n), nrow = 1L, labeller = label_both) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
+A. 推定したい統計量とか、許容できる誤差とかによる。
+
+
+---
+## すべてのモデルは間違っている
+
+確率分布がいい感じに最尤推定できたとしても、<br>
+それはあくまでモデル。仮定。近似。
+
+> All models are wrong, but some are useful. --- George E. P. Box
+
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+---
+## 統計モデリングの道具 --- まとめ
+
+- **確率変数** $X$
+- **確率分布** $X \sim f(\theta)$
+    - **少ないパラメータ** $\theta$ でばらつきの様子を表現
+    - **この現象はこの分布を作りがち(〜に従う)** という知見がある
+- **尤度**
+    - あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$
+    - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
+    - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
+    - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**
+
+
+---
+## 🔰 尤度の練習問題
+
+サイコロを10回振ったら6の目が3回出た。
+
+1. 6の目の出る確率が1/6だとした場合の尤度は?
+1. 6の目の出る確率が0.2だとした場合の尤度は?
+1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
+1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
+   数学で解ければ**優**。Rで見つければ**良**。目分量・勘で**可**。
+
+ヒント
+: 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
+
+
+```{r, get-likelihood}
+#| include: false
+get_likelihood = function(p, k = 3, n = 10) {
+  choose(n, k) * p**k * (1 - p)**(n - k)
+  # dbinom(k, n, p)
+}
+
+get_likelihood(0.2)
+```
+
+---
+## 🔰 分布を当てはめる練習問題
+
+1. データの分布を描いてみる
+1. 理論分布のどれが当てはまりそうか検討する
+1. 理論分布を適当なパラメータで描いてみる
+1. 尤度を計算しつつ擦り寄せる
+
+```{r, distribution-datasets}
+#| include: false
+fs::dir_create("../data")
+
+set.seed(19937)
+n = 600L
+rate = 2.5
+df = tibble::tibble(
+  time = cumsum(rexp(n, rate)),
+  label = sample(LETTERS[1:3], n, replace = TRUE)
+)
+readr::write_tsv(df, "../data/radiation.tsv")
+
+set.seed(19937)
+n = 600L
+trials = 10
+p = 0.1
+df = tibble::tibble(
+  trials,
+  hit = rbinom(n, trials, p)
+)
+readr::write_csv(df, "../data/gacha.csv")
+```
+
+<div class="column-container">
+  <div class="column">
+
+[`radiation.tsv`](data/radiation.tsv)
+```{r, radiation-tsv}
+#| echo: false
+readr::read_tsv("../data/radiation.tsv")
+```
+
+  </div>
+  <div class="column">
+
+[`gacha.csv`](data/gacha.csv)
+```{r, gacha-csv}
+#| echo: false
+readr::read_csv("../data/gacha.csv")
+```
+
+  </div>
+</div>
+
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+
+`r .meta$next_link`
