@@ -1,13 +1,11 @@
-#!/usr/bin/env python3
-"""
-"""
+"""Transform chunk options to yaml and check name duplication."""
 import logging
 import re
 from pathlib import Path
 
 from wtl import cli
 
-_log = logging.getLogger(__name__.removeprefix("__main_"))
+_log = logging.getLogger(__name__)
 used: set[str] = set()
 
 
@@ -15,14 +13,13 @@ def main():
     parser = cli.ArgumentParser()
     parser.add_argument("infile", nargs="*", type=Path)
     args = parser.parse_args()
-    global _log
-    _log_module = _log
+    log_name = _log.name.removeprefix("__main_")
     for infile in args.infile:
-        _log = _log_module.getChild(infile.name)
-        with open(infile) as fin:
+        _log.name = f"{log_name}.{infile.name}"
+        with infile.open() as fin:
             lines = [sub(line.rstrip(), i) for i, line in enumerate(fin)]
         if not cli.dry_run:
-            with open(infile, "w") as fout:
+            with infile.open("w") as fout:
                 fout.write("\n".join(lines))
                 fout.write("\n")
 
@@ -35,12 +32,10 @@ def sub(line: str, i: int):
         else:
             _log.info(line)
         return new
-    else:
-        return line
+    return line
 
 
 def repl(mobj: re.Match[str], i: int):
-    global used
     header = mobj.group(1).lower()
     label = mobj.group(2)
     options = mobj.group(3)
@@ -51,7 +46,8 @@ def repl(mobj: re.Match[str], i: int):
         _log.warning(f"{i}:use-hyphen: {label}")
     if label:
         if label in used:
-            if label.startswith("setup-") and i < 10:
+            threshold = 10
+            if label.startswith("setup-") and i < threshold:
                 _log.info(f"{i}:duplicated: {label}")
             else:
                 _log.warning(f"{i}:duplicated: {label}")
