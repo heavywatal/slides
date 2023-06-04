@@ -5,14 +5,7 @@
 ```
 ```{r, setup-local}
 #| include: false
-```
-
----
-## Work in Progress 🚧
-```{r, stop}
-#| include: false
 #| cache: false
-knitr::knit_exit()
 ```
 
 ---
@@ -52,7 +45,7 @@ dia_cols = c("carat", "depth", "table", "price")
 diamonds |>
   dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
   tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
-  dplyr::mutate(dplyr::across(where(is.numeric), round, digits = 2))
+  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
@@ -232,7 +225,7 @@ cowplot::plot_grid(nrow = 2L,
 <img src="/slides/image/rstats/datasaurus.png" width="95%">
 <figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
 </a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="240"
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
 </figure>
 
@@ -286,17 +279,17 @@ diamonds |>
 
 対象システムを単純化・理想化して扱いやすくしたもの
 
-Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="200" align="right" style="margin: 0 -5px;">
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" align="right" style="margin: 0 -5px;">
 : 数学的な方程式として記述されるもの。
 : e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
 : <br>
 
-Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="200" align="right">
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" align="right">
 : 数値計算の手続きとして記述されるもの。
 : e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
 : <br>
 
-Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="320" align="right">
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" align="right">
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
@@ -310,7 +303,6 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
 
 プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
-<img src="../lifesci2020seminar/image/schelling-segregation.gif" width="160" align="right" style="margin: -20px -15px; height: 160px; object-fit: cover;">
 
 ---
 ## データ科学における数理モデル
@@ -319,7 +311,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 &nbsp;
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1100"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -536,7 +528,7 @@ hist(iris$Petal.Length)
 <figure style="margin: 0;">
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
-     style="object-fit: cover; object-position: top; height: 480px;">
+  style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
 <figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
 </a>
 </figure>
@@ -546,11 +538,11 @@ hist(iris$Petal.Length)
 ## "Project" を新規作成する
 
 File → New Project... → New Directory → New Project →<br>
-→ Directory name: `r-training-2022`<br>
+→ Directory name: `r-training-2023`<br>
 → as subdirectory of: `~/project` or `C:/Users/yourname/project`
 
-<img src="/slides/image/rstudio/create-new-project.png" width="90%"
-     style="object-fit: cover; object-position: top; height: 420px;">
+<img src="/slides/image/rstudio/create-new-project.png" class="screenshot"
+  width="90%" style="object-fit: cover; object-position: top; height: 16em;">
 
 📁 ディレクトリ ＝ フォルダ。 `~/` = ホームディレクトリ
 
@@ -596,8 +588,8 @@ e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 スクリプト、データ、結果を分けて整理する例:
 
 ```
-r-training-2022/           # プロジェクトの最上階
-├── r-training-2022.Rproj  # これダブルクリックでRStudioを起動
+r-training-2023/           # プロジェクトの最上階
+├── r-training-2023.Rproj  # これダブルクリックでRStudioを起動
 ├── hello.R
 ├── transform.R            # データ整理・変形のスクリプト
 ├── visualize.R            # 作図のスクリプト
@@ -609,10 +601,19 @@ r-training-2022/           # プロジェクトの最上階
     └── iris-summary.tsv
 ```
 
-プロジェクト最上階を作業ディレクトリとし、<br>
+プロジェクト最上階を**作業ディレクトリ**とし、<br>
 ファイル読み書きの基準にする。(後で詳しく)
 
 ほんの一例です。好きな構造に決めてください。
+
+---
+## 作業ディレクトリ: Rにとっての現在地 `getwd()`
+
+- ファイル読み書き、画像の保存などはここが基準。
+- `*.Rproj` ダブルクリックでRStudioを開けば、いい位置で作業再開。
+
+<img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
+
 
 ---
 ## Rと接する上での心構え
@@ -637,15 +638,12 @@ r-training-2022/           # プロジェクトの最上階
 とにかく手を動かして体感しよう！
 
 1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
-
     ```r
     head(iris)
     ```
-
 1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
     `Error` や `Warning` があったらよく読んで対処する。<br>
     (無視していい `Warning` もたまーにあるけど)
-
 1.  🔰若葉マークの練習問題があれば解いてみる。<br>
     そこまでのコードの**コピペ＋改変**でできるはず。
 
@@ -825,7 +823,7 @@ y
   <div class="column">
     <figure>
     <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
-    <img src="/slides/image/free/front-row.jpg" height="600">
+    <img src="/slides/image/free/front-row.jpg" height="720">
     <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
     </a>
     </figure>
@@ -833,7 +831,7 @@ y
   <div class="column">
     <figure>
     <a href="https://en.wikipedia.org/wiki/Rhodes">
-    <img src="/slides/image/free/apollon-columns.jpg" height="600">
+    <img src="/slides/image/free/apollon-columns.jpg" height="720">
     <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
     </a>
     </figure>
@@ -886,7 +884,7 @@ iris[, 3:4]                # 3-4列目
 iris[2:5, 3:4]             # 2-5行目, 3-4列目
 ```
 
-vectorとして取得する:
+1列をvectorとして取得する:
 ```r
 iris[[3]]                  # 3列目
 iris$Petal.Length          # Petal.Length列
@@ -894,11 +892,10 @@ iris[["Petal.Length"]]     # Petal.Length列
 iris[["Petal.Length"]][2]  # Petal.Length列の2番目
 ```
 
-結果がdata.frameになるかvectorになるか微妙:
+結果がdata.frameになるかvectorになるか曖昧で危険、非推奨:
 ```r
 iris[, 3]                  # 3列目
 iris[, "Petal.Length"]     # Petal.Length列
-iris[2, 3]                 # 2行目3列目
 iris[2, "Petal.Length"]    # 2行目Petal.Length列
 ```
 
@@ -977,7 +974,7 @@ Contributed Packages
 : 有志により開発され、
   [CRAN](https://cran.rstudio.com/web/packages/) や
   [Bioconductor](https://www.bioconductor.org/) に公開されている。
-: 要インストール。使う前に読み込む。
+: 要インストール。使う前に読み込むおまじないが必要。
 
 ```r
 install.packages("readr")  # 一度やればOK
@@ -1023,7 +1020,7 @@ withr::with_namespace("tidyverse", {
 ## ggplot2: tidyverseの可視化担当
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="160" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
 </a>
 
 - "The <strong><u>G</u></strong>rammer of <strong><u>G</u></strong>raphics" という体系に基づく設計
@@ -1037,16 +1034,14 @@ withr::with_namespace("tidyverse", {
 <img src="/slides/image/nagoya/binhex.png" width="24%">
 <img src="/slides/image/nagoya/faithful.png" width="24%">
 -->
-<img src="/slides/image/tumopp/paper/Fig1.png" height="300">
-<img src="/slides/image/tumopp/param-p.png" height="300">
-<img src="/slides/image/tumopp/param-k.png" height="300"><br>
-<img src="/slides/image/tumopp/paper/Fig3.png" height="150">
-<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="150">
-<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="150">
-<img src="/slides/image/tumopp/Cmoore_Lstep.gif" height="150">
-<img src="/slides/image/tumopp/Chex_Lconst.gif" height="150">
-<img src="/slides/image/tumopp/Chex_Llinear.gif" height="150">
-<img src="/slides/image/tumopp/Chex_Lstep.gif" height="150">
+<img src="/slides/image/tumopp/paper/Fig1.png" height="360">
+<img src="/slides/image/tumopp/param-p.png" height="360">
+<img src="/slides/image/tumopp/param-k.png" height="360"><br>
+<img src="/slides/image/tumopp/paper/Fig3.png" height="180">
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="180">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="180">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="180">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="180">
 <figcaption class="url">Iwasaki and Innan (2017)</figcaption>
 </figure>
 
@@ -1063,7 +1058,7 @@ R標準のやつとは根本的に違うシステムで作図する。
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-<img src="/slides/image/rstats/ggplot-layers.png" height="880">
+<img src="/slides/image/rstats/ggplot-layers.png" height="930">
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -1197,7 +1192,7 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ```
 
 ---
-## 図をオブジェクトとして取っておける
+## 途中経過オブジェクトを取っておける
 
 ```{r, ggplot-object}
 #| fig.show: "hold"
@@ -1210,6 +1205,7 @@ p4 = p3 + facet_wrap(vars(clarity))
 print(p3)
 ```
 
+この `p3` は後で使います。
 
 ---
 ## ファイル名もサイズも再現可能な作図
@@ -1265,7 +1261,7 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png" width="720">
+<img src="/slides/image/r4ds/data-science.png" width="800">
 <figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
 </a>
 </figure>
@@ -1431,13 +1427,13 @@ VADeaths |>
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="160">
+<img src="/_img/hex-stickers/dplyr.webp" width="180">
 </a><br>
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="160">
+<img src="/_img/hex-stickers/tidyr.webp" width="180">
 </a><br>
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="160">
+<img src="/_img/hex-stickers/stringr.webp" width="180">
 </a>
 </div>
 
@@ -1462,7 +1458,7 @@ VADeaths |>
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="160" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
 </a>
 
 シンプルな関数がたくさん。繋げて使う (piping)
@@ -1601,7 +1597,7 @@ R < 4.2 までよく使われていた `%>%` もほぼ同じ。
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="160" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="180" align="right">
 </a>
 
 横広から縦長に

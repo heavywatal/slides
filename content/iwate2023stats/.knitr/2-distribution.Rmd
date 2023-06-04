@@ -5,14 +5,7 @@
 ```
 ```{r, setup-local}
 #| include: false
-```
-
----
-## Work in Progress 🚧
-```{r, stop}
-#| include: false
 #| cache: false
-knitr::knit_exit()
 ```
 
 ---
@@ -118,6 +111,7 @@ e.g., サイコロを12回投げた結果、学生1000人の身長
 #| echo: false
 #| fig.height: 4
 #| fig.width: 8
+set.seed(19937)
 p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
   ggplot() +
   aes(face) +
@@ -192,6 +186,7 @@ k &\in \{0, 1, 2, \ldots, n\}
 #| echo: false
 #| fig.height: 3
 #| fig.width: 11
+set.seed(19937)
 size = 3L
 p = 0.5
 X = c(2L, 0L, 1L, 2L, 1L, 3L, 0L, 2L, rbinom(92L, size, p))
@@ -382,6 +377,44 @@ ggplot(df) +
 
 
 ---
+## 負の二項分布 $~\text{NB}(n, p)$
+
+成功率pの試行がn回成功するまでの失敗回数X。
+n = 1 のとき幾何分布と一致。
+
+```{r, nbinom}
+#| echo: false
+#| fig.height: 3.8
+#| fig.width: 11
+p = 0.5
+df = purrr::map(seq.int(1, 3), function(n) {
+  tibble::tibble(X = seq.int(0, 10), Prob = dnbinom(X, n, p), n = n)
+}) |>  purrr::list_rbind()
+ggplot(df) +
+  aes(X, Prob) +
+  scale_x_continuous(breaks = df[["X"]]) +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  geom_col() +
+  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
+  labs(title = paste0("p = ", p)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+\\[
+\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\\]
+
+失敗回数ではなく試行回数を変数とする定義もある。
+
+🔰 負の二項分布になりそうな例を考えてみよう
+
+<!--
+平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+($k \to \infty$でポアソン分布と一致)
+-->
+
+---
 ## ポアソン分布 $~\text{Poisson}(\lambda)$
 
 平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。
@@ -392,6 +425,7 @@ e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の�
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
+set.seed(19937)
 lambda = c(1, 5, 10)
 .arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed")
 p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
@@ -539,6 +573,7 @@ e.g., 一様分布 [0, 100) から40サンプル
 #| echo: false
 #| fig.height: 3
 #| fig.width: 11
+set.seed(19937)
 n = 40L
 X = replicate(10000L, mean(runif(n, 0, 100)))
 purrr::map(c(10, 100, 1000, 10000), \(n) {
@@ -744,7 +779,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ## Quarto Document として研究ノートを作る
 
 <a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+<img src="/_img/hex-stickers/quarto.webp" width="180" align="right">
 </a>
 
 プログラミングからレポート作成まで一元管理できて楽ちん。
@@ -756,7 +791,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 <hr>
 
 <a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="180" align="right">
 </a>
 
 Quarto Markdown (`.qmd`)
@@ -1180,6 +1215,7 @@ cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
 #| echo: false
 #| fig.height: 5
 #| fig.width: 11
+set.seed(19937)
 nrep = 1000L
 df_repl = tibble::tibble(X = rpois(50L * nrep, 3), repl = rep(seq_len(nrep), each = 50L))
 df_sum = df_repl |>
@@ -1231,6 +1267,7 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
+set.seed(19937)
 nrep = 1000L
 purrr::map(c(5, 50, 500, 5000), \(n) {
   tibble::tibble(X = rpois(n * nrep, 3), repl = rep(seq_len(nrep), each = n)) |>
@@ -1271,6 +1308,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 ---
 ## 統計モデリングの道具 --- まとめ
 
+- 何はともあれ作図して俯瞰
 - **確率変数** $X$
 - **確率分布** $X \sim f(\theta)$
     - **少ないパラメータ** $\theta$ でばらつきの様子を表現
@@ -1295,12 +1333,12 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 ヒント
 : 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
-
+: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。
 
 ```{r, get-likelihood}
 #| include: false
 get_likelihood = function(p, k = 3, n = 10) {
-  choose(n, k) * p**k * (1 - p)**(n - k)
+  choose(n, k) * p ** k * (1 - p) ** (n - k)
   # dbinom(k, n, p)
 }
 

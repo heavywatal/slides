@@ -5,14 +5,7 @@
 ```
 ```{r, setup-local}
 #| include: false
-```
-
----
-## Work in Progress 🚧
-```{r, stop}
-#| include: false
 #| cache: false
-knitr::knit_exit()
 ```
 
 ---
@@ -469,6 +462,7 @@ dfs = tibble::tribble(
   2.55, (avgs["cloudy"] + avgs["rainy"]) / 2, "beta[2]"
 )
 
+set.seed(1)
 .arr = grid::arrow(length = grid::unit(0.1, "inches"))
 df_ancova |>
   ggplot() + aes(weather, beer_sales, color = weather) +
@@ -609,6 +603,7 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
 解釈が一気に難しくなるのでむやみに使わない。
 
 
+
 ---
 ## 一般化線形モデル(GLM)ふりかえり
 
@@ -623,7 +618,7 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
 |分散分析|正規分布|恒等|質的変数|
 |共分散分析|正規分布|恒等|質的変数+量的変数|
 
-確率分布については[前章を参照](2-stats-model.html)。<br>
+確率分布については[前章を参照](2-distribution.html)。<br>
 リンク関数をもう少しだけ掘り下げたい。
 
 
@@ -684,6 +679,21 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ```
 
 ---
+## 🔰 とにかくGLMを使ってみる練習 解答例
+
+```{r, glm-df-weight}
+#| fig.width: 4
+#| fig.height: 4
+fit_wh = glm(weight ~ height, family = gaussian(link = identity), data = df_weight)
+coef(fit_wh)
+df_fit_wh = modelr::add_predictions(df_weight, fit_wh, type = "response")
+ggplot(df_fit_wh) +
+  aes(height, weight) +
+  geom_point() +
+  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+```
+
+---
 ## 🔰 ポアソン回帰
 
 ```{r, generate-df-seeds}
@@ -695,6 +705,9 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ---
 ## 🔰 重回帰
 
+`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
+とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
+
 ```{r, generate-df-beer}
 #| ref.label: "df-beer"
 #| echo: -1
@@ -704,11 +717,30 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ---
 ## 🔰 ロジスティック回帰
 
+次ページにヒント。
+
 ```{r, generate-df-logistic}
 #| ref.label: "df-logistic"
 #| echo: -1
 #| cache.vars: []
 ```
+
+---
+## ロジスティック回帰のヒント
+
+左辺の応答変数に指定できるのはだいたい次の2種類:
+- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
+- 1列目が成功回数、2列目が失敗回数の整数matrix
+
+今回の場合、成功回数 `y` だけをformulaに入れると怒られる
+```{r, logistic-error}
+#| error: true
+glm(y ~ x, df_logistic, family = binomial)
+```
+ので失敗回数もモデルに含むよう `response ~ x` とする。
+
+(今回のように試行回数が10回固定じゃなくても使える、ということ)
+
 
 ---
 ## 🔰 共分散分析: GLM with 質的変数 + 量的変数
@@ -838,6 +870,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 #| fig.height: 4
 #| fig.width: 11
 #| cache.vars: []
+set.seed(19937)
 n = 16L
 true_coef = c(0.1, 0.2)
 df_plant = tibble::tibble(
@@ -1017,7 +1050,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -1041,6 +1074,8 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 - パラメータを最尤推定する
 - 尤度は「手元のデータへのあてはまり」
 - モデルを比較するときは情報量基準を参考にする
+
+
 
 ---
 ## penguinsデータセット
@@ -1233,7 +1268,7 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| echo: false
 #| fig.height: 4
 #| fig.width: 11
-#| cache.vars: []
+#| cache.vars: [p_bill]
 p_bill = penguins_dropna |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
   geom_point(shape = 16, alpha = 0.66) +
@@ -1256,16 +1291,16 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
 ```
 
-🔰余裕があったら性別や年なども説明変数に入れてみよう。
-
-<!-- TODO: 練習に適した課題データ -->
-
-
-
-
-
-
-
+```{r, penguins-multiple}
+#| echo: false
+#| include: false
+fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
+broom::tidy(fit4)
+broom::glance(fit4)
+added4 = modelr::add_predictions(penguins, fit4)
+p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
+  scale_color_discrete()
+```
 
 
 ---
