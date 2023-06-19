@@ -6,7 +6,7 @@ draft = false
 
 - 講師: 岩嵜航 (東北大学 生命科学研究科)
 - 日程: 2023年6月21, 23, 28, 30日
-- 場所: 岩手大学 [連合農学研究科](https://ugas.agr.iwate-u.ac.jp/)
+- 場所: 岩手大学 [連合農学研究科](https://ugas.agr.iwate-u.ac.jp/) Webex
 
 
 ## 概要
