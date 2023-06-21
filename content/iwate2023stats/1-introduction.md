@@ -362,10 +362,10 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 1. Rの基礎を駆け足で
 1. 統計モデルの基本
     - 直線回帰
-    - 確率変数・**確率分布** 👈 本日後半の主役
+    - 確率変数・**確率分布** 👈 次回の主役
     - 尤度・最尤推定
 1. 一般化線形モデル、混合モデル
-1. ベイズ統計、階層ベイズモデル
+1. ベイズ統計（、階層ベイズモデル）
 
 <!-- 回帰のキモは**線ではなく分布** -->
 
@@ -1332,6 +1332,24 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 
 ![plot of chunk cowplot](./figure/cowplot-1.png)
 
+---
+## 実例も豊富でよくできた公式ウェブサイトを活用しよう
+
+<https://ggplot2.tidyverse.org/>
+
+<figure>
+<img src="/slides/image/rstats/ggplot2-reference-geoms.png">
+</figure>
+
+</section>
+<section style="padding: 0;">
+
+<figure style="margin: 0;">
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/slides/image/cheatsheet/data-visualization.png" width="1200">
+<figcaption class="url">https://ggplot2.tidyverse.org/</figcaption>
+</a>
+</figure>
 
 ---
 ## データ解析のおおまかな流れ
