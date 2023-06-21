@@ -532,7 +532,7 @@ e.g., <code>1 + 2 + 3</code>, <code>3 * 7 * 2</code>, <code>4 / 2</code>, <code>
 <li><code>*.Rproj</code> ダブルクリックでRStudioを開けば、いい位置で作業再開。</li>
 </ul>
 <img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
-
+<p><code>setwd(&quot;目的地&quot;)</code> で移動できるけど、しない方針。
 </section>
 <section>
 <h2 id="rと接する上での心構え">Rと接する上での心構え</h2>
@@ -852,7 +852,7 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 </span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>       <span class="c1"># List files in &#34;.&#34; (here)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">list.files</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># List files in &#34;./data&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="nf">dir.create</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>    <span class="c1"># Create directory</span>
-</span></span></code></pre></div><p><a href="https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
+</span></span></code></pre></div><p><a href="https://comicalcommet.github.io/r-training-2022/R_training_2022_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
 を読んでおきましょう。</p>
 <p>🔰 R組み込みデータや自作データを読み書きしてみよう。</p>
 
@@ -1522,127 +1522,6 @@ but every messy dataset is messy in its own way<br>
 <p>2022年9月に開講。おそらくe-なんとかで視聴可能。</p>
 <iframe width="100%" height="600" src="../tmd2022/"></iframe>
 <p>2023年もおそらく同じ時期に開講予定&hellip;?</p>
-
-</section>
-<section>
-<h2 id="直線あてはめ-統計モデルの出発点">直線あてはめ: 統計モデルの出発点</h2>
-<img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
-<ul>
-<li>身長が高いほど体重も重い。いい感じ。</li>
-</ul>
-<p>(説明のために作った架空のデータ。今後もほぼそうです)
-</section>
-<section>
-<h2 id="回帰モデルの2段階">回帰モデルの2段階</h2>
-<ol>
-<li>
-<p>Define a <strong>family of models</strong>: だいたいどんな形か、式をたてる</p>
-<ul>
-<li>直線: $y = a_1 + a_2 x$</li>
-<li>対数: $\log(y) = a_1 + a_2 x$</li>
-<li>二次曲線: $y = a_1 + a_2 x^2$</li>
-</ul>
-</li>
-<li>
-<p>Generate a <strong>fitted model</strong>: データに合うようにパラメータを調整</p>
-<ul>
-<li>$y = 3x + 7$</li>
-<li>$y = 9x^2$</li>
-</ul>
-</li>
-</ol>
-<p><a href="https://r4ds.had.co.nz/model-basics.html" class="url"><a href="https://r4ds.had.co.nz/model-basics.html">https://r4ds.had.co.nz/model-basics.html</a></a></p>
-
-</section>
-<section>
-<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
-<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
- </p>
-<p><img src="./figure/weight-height-1.png" alt="plot of chunk weight-height"></p>
-
-</section>
-<section>
-<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
-<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
-じゃあ傾き <em>a</em> と切片 <em>b</em>、どう決める？</p>
-<p><img src="./figure/weight-lines-1.png" alt="plot of chunk weight-lines"></p>
-
-</section>
-<section>
-<h2 id="最小二乗法-ordinary-least-square-ols">最小二乗法 (Ordinary Least Square: OLS)</h2>
-<p><span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。</p>
-<p><img src="./figure/weight-residual-1.png" alt="plot of chunk weight-residual"></p>
-
-</section>
-<section>
-<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
-<p>ランダムに試してみて、上位のものを採用。<br>
-この程度の試行回数では足りなそう。</p>
-<p><img src="./figure/weight-goodlines-1.png" alt="plot of chunk weight-goodlines"></p>
-
-</section>
-<section>
-<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
-<p><strong>グリッドサーチ</strong>: パラメータ空間の一定範囲内を均等に試す。<br>
-さっきのランダムよりはちょっとマシか。</p>
-<p><img src="./figure/weight-grid-1.png" alt="plot of chunk weight-grid"></p>
-<p>こうした<strong>最適化</strong>の手法はいろいろあるけど、ここでは扱わない。</p>
-
-</section>
-<section>
-<h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">$</span><span class="n">par</span>
-</span></span></code></pre></div><pre tabindex="0"><code>intercept     slope 
--69.68394  78.53490 
-</code></pre><p><img src="./figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
-<p>上記コードは最適化一般の書き方。<br>
-回帰が目的なら次ページのようにするのが楽 →</p>
-
-</section>
-<section>
-<h2 id="lm-で直線あてはめしてみる"><code>lm()</code> で直線あてはめしてみる</h2>
-<p>架空のデータを作る(乱数生成については後述):</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">50</span>
-</span></span><span class="line"><span class="cl"><span class="n">df_weight</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="n">height</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">1.70</span><span class="p">,</span> <span class="m">0.05</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">  <span class="n">bmi</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">22</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">  <span class="n">weight</span> <span class="o">=</span> <span class="n">bmi</span> <span class="o">*</span> <span class="p">(</span><span class="n">height</span><span class="o">**</span><span class="m">2</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span></code></pre></div><p>データと関係式(<code>Y ~ X</code> の形)を <code>lm()</code> に渡して係数を読む:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">lm</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">~</span> <span class="n">height</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)      height 
-  -69.85222    78.63444 
-</code></pre><p>せっかくなので作図もやってみる→</p>
-
-</section>
-<section>
-<h2 id="lm-の結果をggplotする"><code>lm()</code> の結果をggplotする</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">df_weight</span><span class="p">,</span> <span class="n">fit</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="m">2L</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>    height      bmi   weight     pred
-1 1.718019 21.55500 63.62151 65.24322
-2 1.782862 22.83775 72.59199 70.34213
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">df</span><span class="p">)</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
-</span></span></code></pre></div><p><img src="./figure/lm-ggplot-1.png" alt="plot of chunk lm-ggplot"></p>
-
-</section>
-<section>
-<h2 id="-ほかのデータでも-lm-を試してみよう">🔰 ほかのデータでも <code>lm()</code> を試してみよう</h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">lm</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">hwy</span> <span class="o">~</span> <span class="n">displ</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)       displ 
-  35.697651   -3.530589 
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mpg_added</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">mpg</span><span class="p">,</span> <span class="n">fit</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg_added</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
-</span></span></code></pre></div><p><img src="./figure/lm-mpg-1.png" alt="plot of chunk lm-mpg"></p>
-<p>🔰 <code>diamonds</code> などほかのデータでも <code>lm()</code> を試してみよう。</p>
 
 </section>
 <section>
