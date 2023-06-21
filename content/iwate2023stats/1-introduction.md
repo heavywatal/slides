@@ -519,6 +519,7 @@ r-training-2023/           # プロジェクトの最上階
 
 <img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
 
+`setwd("目的地")` で移動できるけど、しない方針。
 
 ---
 ## Rと接する上での心構え
@@ -1041,7 +1042,7 @@ list.files("data")    # List files in "./data"
 dir.create("data")    # Create directory
 ```
 
-[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2021/R_training_2021_7.html)
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2022/R_training_2022_7.html)
 を読んでおきましょう。
 
 🔰 R組み込みデータや自作データを読み書きしてみよう。
@@ -1886,176 +1887,6 @@ pivot_wider(table2, names_from = type, values_from = count)
 <iframe width="100%" height="600" src="../tmd2022/"></iframe>
 
 2023年もおそらく同じ時期に開講予定...?
-
-
----
-## 直線あてはめ: 統計モデルの出発点
-
-<img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
-
-- 身長が高いほど体重も重い。いい感じ。
-
-(説明のために作った架空のデータ。今後もほぼそうです)
-
-
----
-## 回帰モデルの2段階
-
-1. Define a **family of models**: だいたいどんな形か、式をたてる
-    - 直線: $y = a_1 + a_2 x$
-    - 対数: $\log(y) = a_1 + a_2 x$
-    - 二次曲線: $y = a_1 + a_2 x^2$
-
-2. Generate a **fitted model**: データに合うようにパラメータを調整
-    - $y = 3x + 7$
-    - $y = 9x^2$
-
-<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
-
-
----
-## たぶん身長が高いほど体重も重い
-
-なんとなく $y = a x + b$ でいい線が引けそう<br>
-&nbsp;
-
-
-![plot of chunk weight-height](./figure/weight-height-1.png)
-
-
----
-## たぶん身長が高いほど体重も重い
-
-なんとなく $y = a x + b$ でいい線が引けそう<br>
-じゃあ傾き *a* と切片 *b*、どう決める？
-
-![plot of chunk weight-lines](./figure/weight-lines-1.png)
-
-
----
-## 最小二乗法 (Ordinary Least Square: OLS)
-
-<span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。
-
-![plot of chunk weight-residual](./figure/weight-residual-1.png)
-
-
-
----
-## 残差平方和(RSS)が最小となるパラメータを探せ
-
-ランダムに試してみて、上位のものを採用。<br>
-この程度の試行回数では足りなそう。
-
-![plot of chunk weight-goodlines](./figure/weight-goodlines-1.png)
-
----
-## 残差平方和(RSS)が最小となるパラメータを探せ
-
-**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。<br>
-さっきのランダムよりはちょっとマシか。
-
-![plot of chunk weight-grid](./figure/weight-grid-1.png)
-
-こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
-
-
----
-## これくらいなら一瞬で計算してもらえる
-
-
-```r
-par_init = c(intercept = 0, slope = 0)
-result = optim(par_init, fn = rss_weight, data = df_weight)
-result$par
-```
-
-```
-intercept     slope 
--69.68394  78.53490 
-```
-
-![plot of chunk weight-lm](./figure/weight-lm-1.png)
-
-上記コードは最適化一般の書き方。<br>
-回帰が目的なら次ページのようにするのが楽 →
-
-
----
-## `lm()` で直線あてはめしてみる
-
-架空のデータを作る(乱数生成については後述):
-
-```r
-n = 50
-df_weight = tibble::tibble(
-  height = rnorm(n, 1.70, 0.05),
-  bmi = rnorm(n, 22, 1),
-  weight = bmi * (height**2)
-)
-```
-
-データと関係式(`Y ~ X` の形)を `lm()` に渡して係数を読む:
-
-```r
-fit = lm(data = df_weight, formula = weight ~ height)
-coef(fit)
-```
-
-```
-(Intercept)      height 
-  -69.85222    78.63444 
-```
-
-せっかくなので作図もやってみる→
-
----
-## `lm()` の結果をggplotする
-
-
-```r
-df = modelr::add_predictions(df_weight, fit, type = "response")
-head(df, 2L)
-```
-
-```
-    height      bmi   weight     pred
-1 1.718019 21.55500 63.62151 65.24322
-2 1.782862 22.83775 72.59199 70.34213
-```
-
-```r
-ggplot(df) +
-  aes(height, weight) +
-  geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
-```
-
-![plot of chunk lm-ggplot](./figure/lm-ggplot-1.png)
-
----
-## 🔰 ほかのデータでも `lm()` を試してみよう
-
-
-```r
-fit = lm(data = mpg, formula = hwy ~ displ)
-coef(fit)
-```
-
-```
-(Intercept)       displ 
-  35.697651   -3.530589 
-```
-
-```r
-mpg_added = modelr::add_predictions(mpg, fit)
-ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
-```
-
-![plot of chunk lm-mpg](./figure/lm-mpg-1.png)
-
-🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
 
 
 ---
