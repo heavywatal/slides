@@ -1,7 +1,7 @@
 +++
 url = "iwate2023stats/1-introduction.html"
-linktitle = "導入、Rの基礎、直線回帰"
-title = "1. 導入、Rの基礎、直線回帰 — 統計モデリング入門 2023 岩手連大"
+linktitle = "導入、Rの基礎"
+title = "1. 導入、Rの基礎 — 統計モデリング入門 2023 岩手連大"
 date = 2023-06-21T18:00:00+09:00
 draft = false
 css = "style.css"
@@ -20,8 +20,8 @@ dpi = 100
 </div>
 
 <ol>
-<li class="current-deck"><a href="1-introduction.html">導入、Rの基礎、直線回帰</a>
-<li><a href="2-distribution.html">確率分布、尤度、最尤推定</a>
+<li class="current-deck"><a href="1-introduction.html">導入、Rの基礎</a>
+<li><a href="2-distribution.html">直線回帰、確率分布、尤度、最尤推定</a>
 <li><a href="3-glm.html">一般化線形モデル、個体差</a>
 <li><a href="4-bayesian.html">ベイズの定理、事後分布、MCMC、Stan</a>
 </ol>
@@ -1890,6 +1890,25 @@ pivot_wider(table2, names_from = type, values_from = count)
 
 
 ---
+## 初日のまとめ
+
+#### ✅ まずはデータを可視化して俯瞰しよう
+
+#### ✅ 回帰の統計モデリングに取り組んでいく
+
+#### ✅ Rの基礎
+
+- Rはデータ解析に便利なプログラミング言語・環境
+- **スクリプト**を書いてから**コンソール**で実行
+- 変数には型がある: 数値、文字列、**データフレーム**など
+- 便利な**パッケージ**を使っていく: tidyverse (ggplot2, dplyr, tidyr, etc.)
+
+<br>
+個々の方法は覚えなくても大丈夫！<br>
+忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+
+
+---
 ## 疑問やエラーの解決方法
 
 - エラーのほとんどは凡ミス由来。よく確認しよう。
@@ -1935,5 +1954,5 @@ Other versions
   東京海上 [DSHC](https://tokiomarine-dshc.com/) (2022-08)
 
 <a href="2-distribution.html" class="readmore">
-2. 確率分布、尤度、最尤推定
+2. 直線回帰、確率分布、尤度、最尤推定
 </a>

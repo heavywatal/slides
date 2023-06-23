@@ -20,8 +20,8 @@ dpi = 100
 </div>
 
 <ol>
-<li><a href="1-introduction.html">導入、Rの基礎、直線回帰</a>
-<li><a href="2-distribution.html">確率分布、尤度、最尤推定</a>
+<li><a href="1-introduction.html">導入、Rの基礎</a>
+<li><a href="2-distribution.html">直線回帰、確率分布、尤度、最尤推定</a>
 <li class="current-deck"><a href="3-glm.html">一般化線形モデル、個体差</a>
 <li><a href="4-bayesian.html">ベイズの定理、事後分布、MCMC、Stan</a>
 </ol>

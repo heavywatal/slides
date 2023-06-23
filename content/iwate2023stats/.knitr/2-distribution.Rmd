@@ -8,13 +8,270 @@
 #| cache: false
 ```
 
+
+
 ---
-## Work in Progress 🚧
-```{r, stop}
-#| include: false
-#| cache: false
-knitr::knit_exit()
+## ちょっとずつ線形モデルを発展させていく
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+
+
+
+---
+## 直線あてはめ: 統計モデルの出発点
+
+<img `r src_alt_fig_chunk("weight-lm")`>
+
+- 身長が高いほど体重も重い。いい感じ。
+
+(説明のために作った架空のデータ。今後もほぼそうです)
+
+
+---
+## 回帰モデルの2段階
+
+1. Define a **family of models**: だいたいどんな形か、式をたてる
+    - 直線: $y = a_1 + a_2 x$
+    - 対数: $\log(y) = a_1 + a_2 x$
+    - 二次曲線: $y = a_1 + a_2 x^2$
+
+2. Generate a **fitted model**: データに合うようにパラメータを調整
+    - $y = 3x + 7$
+    - $y = 9x^2$
+
+<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
+
+
+---
+## たぶん身長が高いほど体重も重い
+
+なんとなく $y = a x + b$ でいい線が引けそう<br>
+&nbsp;
+
+```{r, df-linear}
+#| echo: false
+#| cache: true
+set.seed(19937)
+n = 50
+df_weight = tibble::tibble(
+  height = rnorm(n, 1.70, 0.05),
+  bmi = rnorm(n, 22, 1),
+  weight = bmi * (height**2)
+)
 ```
+```{r, weight-height}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 5
+p_weight = ggplot(df_weight) +
+  aes(height, weight) +
+  geom_point(alpha = 0.5) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid = element_blank())
+p_weight
+```
+
+
+---
+## たぶん身長が高いほど体重も重い
+
+なんとなく $y = a x + b$ でいい線が引けそう<br>
+じゃあ傾き *a* と切片 *b*、どう決める？
+
+```{r, weight-lines}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 5
+df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
+  dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
+p_weight +
+  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
+```
+
+
+---
+## 最小二乗法 (Ordinary Least Square: OLS)
+
+<span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。
+
+```{r, weight-residual}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
+predict_weight = function(parameters, data) {
+  parameters[1] + parameters[2] * data$height
+}
+
+add_pred_weight = function(data, parameters) {
+  dplyr::mutate(data, pred = predict_weight(param1, data = data))
+}
+
+rss_weight = function(parameters, data) {
+  pred = predict_weight(parameters, data)
+  sqdev = (data[["weight"]] - pred)**2
+  sum(sqdev)
+}
+# rss_weight(c(40, -5), df_weight)
+
+param1 = c(10, 30)
+lm_weight = lm(weight ~ height, data = df_weight)
+rss1 = rss_weight(param1, df_weight)
+rss2 = rss_weight(lm_weight$coefficients, df_weight)
+stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
+
+p1 = p_weight %+%
+  add_pred_weight(df_weight, param1) +
+  geom_line(aes(y = pred), color = "#3366ff") +
+  geom_linerange(aes(ymin = weight, ymax = pred), color = "#E69F00")
+p2 = p1 %+%
+  (df_weight |> modelr::add_predictions(lm_weight))
+cowplot::plot_grid(nrow = 1L,
+  p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
+  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2))
+```
+
+
+---
+## 残差平方和(RSS)が最小となるパラメータを探せ
+
+ランダムに試してみて、上位のものを採用。<br>
+この程度の試行回数では足りなそう。
+
+```{r, weight-goodlines}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
+n = 200
+df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) |>
+  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
+p_ab = ggplot(df_ab_random) +
+  aes(intercept, slope) +
+  geom_point(data = function(x) {
+    dplyr::filter(x, rank(rss) < 6)
+  }, shape = 1, size = 4) +
+  geom_point(aes(color = log10(rss))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
+
+df_randmin = df_ab_random |> dplyr::slice_min(rss, n = 5)
+p2 = p_weight + geom_abline(
+  aes(slope = slope, intercept = intercept),
+  data = df_randmin, color = "#3366ff", alpha = 0.5
+)
+cowplot::plot_grid(p_ab, p2, nrow = 1L)
+```
+
+---
+## 残差平方和(RSS)が最小となるパラメータを探せ
+
+**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。<br>
+さっきのランダムよりはちょっとマシか。
+
+```{r, weight-grid}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 10
+df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) |>
+  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
+
+p1 = p_ab %+% df_ab_grid
+
+df_gridmin = df_ab_grid |> dplyr::slice_min(rss, n = 5)
+p2 = p_weight + geom_abline(
+  aes(slope = slope, intercept = intercept),
+  data = df_gridmin, color = "#3366ff", alpha = 0.5
+)
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
+
+
+---
+## これくらいなら一瞬で計算してもらえる
+
+```{r, ols}
+par_init = c(intercept = 0, slope = 0)
+result = optim(par_init, fn = rss_weight, data = df_weight)
+result$par
+```
+
+```{r, weight-lm}
+#| echo: false
+#| fig.height: 3.7
+#| fig.width: 3.7
+label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
+p_weight +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, size = 6, color = "#3366ff")
+```
+
+上記コードは最適化一般の書き方。<br>
+回帰が目的なら次ページのようにするのが楽 →
+
+
+---
+## `lm()` で直線あてはめしてみる
+
+架空のデータを作る(乱数生成については後述):
+```{r, generate-df-linear}
+#| ref.label: "df-linear"
+#| echo: -1
+#| eval: false
+```
+
+データと関係式(`Y ~ X` の形)を `lm()` に渡して係数を読む:
+```{r, lm-demo}
+fit = lm(data = df_weight, formula = weight ~ height)
+coef(fit)
+```
+
+せっかくなので作図もやってみる→
+
+---
+## `lm()` の結果をggplotする
+
+```{r, lm-ggplot}
+#| fig.height: 3
+#| fig.width: 3
+df = modelr::add_predictions(df_weight, fit, type = "response")
+head(df, 2L)
+ggplot(df) +
+  aes(height, weight) +
+  geom_point() +
+  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+```
+
+---
+## 🔰 ほかのデータでも `lm()` を試してみよう
+
+```{r, lm-mpg}
+#| fig.height: 2.5
+#| fig.width: 2.5
+fit = lm(data = mpg, formula = hwy ~ displ)
+coef(fit)
+
+mpg_added = modelr::add_predictions(mpg, fit)
+ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+```
+
+🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
+
 
 ---
 ## 何でもかんでも直線あてはめではよろしくない
