@@ -1,7 +1,7 @@
 +++
 url = "iwate2023stats/2-distribution.html"
-linktitle = "直線回帰、確率分布、尤度、最尤推定"
-title = "2. 直線回帰、確率分布、尤度、最尤推定 — 統計モデリング入門 2023 岩手連大"
+linktitle = "直線回帰、確率分布"
+title = "2. 直線回帰、確率分布 — 統計モデリング入門 2023 岩手連大"
 date = 2023-06-23T18:00:00+09:00
 draft = false
 css = "style.css"
@@ -21,8 +21,8 @@ dpi = 100
 
 <ol>
 <li><a href="1-introduction.html">導入、Rの基礎</a>
-<li class="current-deck"><a href="2-distribution.html">直線回帰、確率分布、尤度、最尤推定</a>
-<li><a href="3-glm.html">一般化線形モデル、個体差</a>
+<li class="current-deck"><a href="2-distribution.html">直線回帰、確率分布</a>
+<li><a href="3-glm.html">尤度、最尤推定、一般化線形モデル、個体差</a>
 <li><a href="4-bayesian.html">ベイズの定理、事後分布、MCMC、Stan</a>
 </ol>
 
@@ -374,8 +374,8 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 離散一様分布
 : コインの表裏、サイコロの出目1–6
 
-幾何分布
-: 成功率pの試行が初めて成功するまでの失敗回数
+負の二項分布 (幾何分布 if n = 1)
+: 成功率pの試行がn回成功するまでの失敗回数
 
 二項分布
 : 成功率p、試行回数nのうちの成功回数
@@ -383,12 +383,11 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 ポアソン分布
 : 単位時間あたり平均$\lambda$回起こる事象の発生回数
 
-ガンマ分布
+ガンマ分布 (指数分布 if k = 1)
 : ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
 
 正規分布
-: 確率変数の和、平均値
+: 確率変数の和、平均値など。
 
 ---
 ## 離散一様分布
@@ -420,20 +419,6 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 🔰 幾何分布になりそうな例を考えてみよう
 
 ---
-## 二項分布 $~\text{Binomial}(n,~p)$
-
-確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
-
-![plot of chunk dbinom-n](./figure/dbinom-n-1.png)
-
-\\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
-\\]
-
-🔰 二項分布になりそうな例を考えてみよう
-
-
----
 ## 負の二項分布 $~\text{NB}(n, p)$
 
 成功率pの試行がn回成功するまでの失敗回数X。
@@ -453,6 +438,21 @@ n = 1 のとき幾何分布と一致。
 平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
 ($k \to \infty$でポアソン分布と一致)
 -->
+
+
+---
+## 二項分布 $~\text{Binomial}(n,~p)$
+
+確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
+
+![plot of chunk dbinom-n](./figure/dbinom-n-1.png)
+
+\\[
+\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\\]
+
+🔰 二項分布になりそうな例を考えてみよう
+
 
 ---
 ## ポアソン分布 $~\text{Poisson}(\lambda)$
@@ -552,8 +552,8 @@ e.g., 一様分布 [0, 100) から40サンプル
 離散一様分布
 : コインの表裏、サイコロの出目1–6
 
-幾何分布
-: 成功率pの試行が初めて成功するまでの失敗回数
+負の二項分布 (幾何分布 if n = 1)
+: 成功率pの試行がn回成功するまでの失敗回数
 
 二項分布
 : 成功率p、試行回数nのうちの成功回数
@@ -561,9 +561,8 @@ e.g., 一様分布 [0, 100) から40サンプル
 ポアソン分布
 : 単位時間あたり平均$\lambda$回起こる事象の発生回数
 
-ガンマ分布
+ガンマ分布 (指数分布 if k = 1)
 : ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
 
 正規分布
 : 確率変数の和、平均値。使い勝手が良く、よく登場する。
@@ -876,255 +875,6 @@ p1 + geom_bar()       # for discrete values
 
 
 ---
-## 有名な確率分布対応関係ふりかえり
-
-<figure style="float: right;">
-<img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
-</figure>
-
-離散一様分布
-: コインの表裏、サイコロの出目1–6
-
-幾何分布
-: 成功率pの試行が初めて成功するまでの失敗回数
-
-二項分布
-: 成功率p、試行回数nのうちの成功回数
-
-ポアソン分布
-: 単位時間あたり平均$\lambda$回起こる事象の発生回数
-
-ガンマ分布
-: ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
-
-正規分布
-: 確率変数の和、平均値。使い勝手が良く、よく登場する。
-
-
----
-## データに分布をあてはめたい
-
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
-個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
-
-
-![plot of chunk poisson-seed](./figure/poisson-seed-1.png)
-
-カウントデータだから<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
-
-
----
-## データに分布をあてはめたい
-
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
-個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
-
-![plot of chunk poisson-seed-lambda](./figure/poisson-seed-lambda-1.png)
-
-カウントデータだからポアソン分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
-
-黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
-よく重なるのは $\lambda \approx 3$ くらいか。
-
-
----
-## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
-
-<ruby>尤<rt>もっと</rt></ruby>もらしさ。
-モデルのあてはまりの良さの尺度のひとつ。
-
-**あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
-定義通り素直に書くと<br>
-$\text{Prob}(D \mid M)$
-
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
-$L(M \mid D)$
-
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
-$L(\theta \mid D)$ とか $L(\theta)$ とか
-
-
----
-## 尤度を手計算できる例
-
-コインを5枚投げた結果 $D$: 表 4, 裏 1
-
-表が出る確率 $p = 0.5$ と仮定:
-<div>\[\begin{split}
-L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
-  &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
-\end{split}\]</div>
-
-表が出る確率 $p = 0.8$ と仮定:
-<div>\[\begin{split}
-L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
-  &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
-\end{split}\]</div>
-
-$L(0.8 \mid D) > L(0.5 \mid D)$
-
-$p = 0.8$ のほうがより尤もらしい。
-
-
-
----
-## 種子数ポアソン分布の例でも尤度を計算してみる
-
-ある植物が作った種子を数える。$n = 50$個体ぶん。
-
-<div>\[\begin{split}
-L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
-  = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
-\end{split}\]</div>
-
-![plot of chunk poisson-seed-likelihood](./figure/poisson-seed-likelihood-1.png)
-
-この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。
-
----
-## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
-
-扱いやすい **対数尤度** (log likelihood) にしてから計算する。<br>
-一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
-
-<div>\[\begin{split}
-\log L(\lambda \mid D)
-  &= \sum _i ^n \left[ X_i \log (\lambda) - \lambda - \log (X_i !) \right] \\
-\frac {\mathrm d \log L(\lambda \mid D)} {\mathrm d \lambda}
-  &= \frac 1 \lambda \sum _i ^n X_i - n = 0 \\
-\hat \lambda &= \frac 1 n \sum _i ^n X_i
-\end{split}\]</div>
-
-
-![plot of chunk poisson-mle](./figure/poisson-mle-1.png)
-
----
-## 最尤推定を使っても“真のλ”は得られない
-
-今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
-「50個体サンプル→最尤推定」を1,000回繰り返してみると:
-
-![plot of chunk poisson-mle-repl](./figure/poisson-mle-repl-1.png)
-
-サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
-(標本データへのあてはまりはかなり良く見えるのに！)
-
-
----
-## サンプルサイズを増やすほどマシにはなる
-
-“$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:
-
-![plot of chunk poisson-mle-nsam](./figure/poisson-mle-nsam-1.png)
-
-Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
-A. 推定したい統計量とか、許容できる誤差とかによる。
-
-
----
-## すべてのモデルは間違っている
-
-確率分布がいい感じに最尤推定できたとしても、<br>
-それはあくまでモデル。仮定。近似。
-
-> All models are wrong, but some are useful. --- George E. P. Box
-
-<figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
-
----
-## 統計モデリングの道具 --- まとめ
-
-- 何はともあれ作図して俯瞰
-- **確率変数** $X$
-- **確率分布** $X \sim f(\theta)$
-    - **少ないパラメータ** $\theta$ でばらつきの様子を表現
-    - **この現象はこの分布を作りがち(〜に従う)** という知見がある
-- **尤度**
-    - あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$
-    - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
-    - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
-    - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**
-
-
----
-## 🔰 尤度の練習問題
-
-サイコロを10回振ったら6の目が3回出た。
-
-1. 6の目の出る確率が1/6だとした場合の尤度は?
-1. 6の目の出る確率が0.2だとした場合の尤度は?
-1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
-1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
-   数学で解ければ**優**。Rで見つければ**良**。目分量・勘で**可**。
-
-ヒント
-: 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
-: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。
-
-
-
----
-## 🔰 分布を当てはめる練習問題
-
-1. データの分布を描いてみる
-1. 理論分布のどれが当てはまりそうか検討する
-1. 理論分布を適当なパラメータで描いてみる
-1. 尤度を計算しつつ擦り寄せる
-
-
-
-<div class="column-container">
-  <div class="column">
-
-[`radiation.tsv`](data/radiation.tsv)
-
-```
-           time label
-  1   0.1125739     A
-  2   0.3140102     A
-  3   0.3277063     A
-  4   0.6970379     C
- --                  
-597 231.2013532     A
-598 232.1383628     B
-599 232.4407758     C
-600 232.7671255     B
-```
-
-  </div>
-  <div class="column">
-
-[`gacha.csv`](data/gacha.csv)
-
-```
-    trials hit
-  1     10   1
-  2     10   2
-  3     10   3
-  4     10   0
- --           
-597     10   2
-598     10   0
-599     10   1
-600     10   1
-```
-
-  </div>
-</div>
-
-
-
----
 ## 参考文献
 
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
@@ -1135,5 +885,5 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
 
 <a href="3-glm.html" class="readmore">
-3. 一般化線形モデル、個体差
+3. 尤度、最尤推定、一般化線形モデル、個体差
 </a>

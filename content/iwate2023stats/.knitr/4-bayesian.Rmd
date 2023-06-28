@@ -9,13 +9,6 @@
 wtl::knit_engines_set_cache_stan("stan/")
 ```
 
----
-## Work in Progress 🚧
-```{r, stop}
-#| include: false
-#| cache: false
-knitr::knit_exit()
-```
 
 ---
 ## コイントス4回、たまたま表が1回だったら
@@ -229,7 +222,7 @@ devnull = tibble::tibble(
 ## ベイズの定理 in 統計モデリング
 
 <p>
-<img src="../tokiomarine2021/bayesian.drawio.svg">
+<img src="../tokiomarine2021/bayesian.drawio.svg" width="1200">
 </p>
 
 モデル$M$に対する確信度合いをデータ$D$に基づいて更新する。<br>
@@ -1023,7 +1016,7 @@ myplot_trace = function(fit) {
   bayesplot::mcmc_trace(fit$draws("lambda")) +
     scale_color_discrete(guide = "none") +
     labs(title = ifelse(s[["rhat"]] < 1.05, "Good", "Bad"), subtitle = stats) +
-    theme_bw(base_size = 16) +
+    theme_bw(base_size = 18) +
     theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
       axis.title.y = element_blank(), axis.text.y = element_blank())
 }
@@ -1071,6 +1064,24 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
     - モデルの構造を見直す
     - アルゴリズム・ソフトウェアを変える
 
+
+---
+## 似て非なる: MCMCサンプル増やす vs データ増やす
+
+<div>
+<img `r src_alt_fig_chunk("propto-lik")` style="vertical-align: middle;">
+$\;\sim\;$
+<img `r src_alt_fig_chunk("propto-lik", number = 2)` style="vertical-align: middle;">
+$\;\propto\;$
+<img `r src_alt_fig_chunk("propto-lik", number = 3)` style="vertical-align: middle;">
+</div>
+
+- MCMCサンプルを増やす → 事後分布・尤度関数をより良く近似
+- データを増やす → 分布の裾野が狭まり、確信が強まる
+
+<img `r src_alt_fig_chunk("coin-bayesian")`>
+
+
 ---
 ##  MCMCの方法いろいろ
 
@@ -1097,17 +1108,6 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 - [PyMC3](https://docs.pymc.io/)
 - [NumPyro](https://num.pyro.ai/)
 - [TensorFlow Probability](https://www.tensorflow.org/probability/)
-
-
----
-## ベイズ推定とMCMCまとめ
-
-- 推定結果は**事後分布** ∝ 尤度関数。
-    - 広がり具合によって不確実性も表現できる。
-    - **逐次学習**で尖っていき、確信が強まる。
-- コンピュータに頼った計算方法としてのモンテカルロ法。
-    - 高次元・変な形の分布でも効率よくサンプルできるかが肝。
-    - ソフトウェアの代表は**Stan** → これから見ていく
 
 
 ---
@@ -1348,108 +1348,7 @@ target += normal_lpdf(x | theta, 1.0);    // likelihood
 
 
 ---
-## ベイズ推定とMCMC
-
-<p>
-<img src="../tokiomarine2021/bayesian.drawio.svg">
-</p>
-
-- 推定結果は**事後分布** ∝ 尤度関数。
-    - 広がり具合によって不確実性も表現できる。
-    - **逐次学習**で尖っていき、確信が強まる。
-- コンピュータに頼った計算方法としてのモンテカルロ法。
-    - 高次元・変な形の分布でも効率よくサンプルできるかが肝。
-    - ソフトウェアの代表は**Stan**。
-    - Stan言語でモデルを書き、RやPythonから動かす。
-
-
-
-
-
-
-
-
-
-
-
----
-## ちょっとずつ線形モデルを発展させていく
-
-<figure style="float: right;">
-<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
-<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
-</a>
-</figure>
-
-久保先生の"緑本"こと<br>
-「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
-をベースに回帰分析の概要を紹介。
-
-**線形モデル LM** (単純な直線あてはめ)
-
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span>
-
-**一般化線形モデル GLM**
-
-<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span>
-
-**一般化線形混合モデル GLMM**
-
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
-
-**階層ベイズモデル HBM**
-
----
-## MCMCで良さげなパラメータを効率よくサンプルする
-
-乱数を使って（モンテカルロ法）、<br>
-前の値から次の値に飛ぶ（マルコフ連鎖）
-
-<img `r src_alt_fig_chunk("metropolis-trajectory", "gif", number="")`>
-
-
----
-## 推定結果は分布
-
-<div>
-<img `r src_alt_fig_chunk("propto-lik")` style="vertical-align: middle;">
-$\;\sim\;$
-<img `r src_alt_fig_chunk("propto-lik", number = 2)` style="vertical-align: middle;">
-$\;\propto\;$
-<img `r src_alt_fig_chunk("propto-lik", number = 3)` style="vertical-align: middle;">
-</div>
-
-- MCMCサンプルを増やす → 事後分布・尤度関数をより良く近似
-- データを増やす → 分布の裾野が狭まり、確信が強まる
-
-<img `r src_alt_fig_chunk("coin-bayesian")`>
-
----
-## Stan
-
-<a href="https://mc-stan.org/">
-<img src="/slides/image/stan/logo_name.png" width="120" align="right">
-</a>
-
-- Stan言語で**モデルを柔軟に記述**できる。
-- C++で書かれていて**高速に動作**。
-- RやPythonなどから呼び出して使うのが便利。
-  - RStanと[**CmdStanR**](https://mc-stan.org/cmdstanr/)の2つあるけど後者を使う。
-
-```r
-library(cmdstanr)
-library(bayesplot)
-```
-
-前回、回帰ではないパラメータ推定をやった。
-
-<hr>
-
-次に、回帰分析をStanでやってみる。
-
-
----
-## Stanで回帰じゃないパラメータ推定 (おさらい)
+## Stanで回帰じゃないパラメータ推定、まとめ
 
 別ファイルに書いておく。
 e.g., `coin.stan`:
@@ -1967,12 +1866,12 @@ tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) |>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 <figure>
-<img `r src_alt_fig_chunk("lm-bad")` height=200>
-<img `r src_alt_fig_chunk("glm-poisson")` height=200>
-<img `r src_alt_fig_chunk("glm-logistic")` height=200>
-<img `r src_alt_fig_chunk("multiple-regression")` height=200>
-<img `r src_alt_fig_chunk("glm-anova")` height=200>
-<img `r src_alt_fig_chunk("glm-ancova")` height=200>
+<img `r src_alt_fig_chunk("lm-bad")` height=240>
+<img `r src_alt_fig_chunk("glm-poisson")` height=240>
+<img `r src_alt_fig_chunk("glm-logistic")` height=240>
+<img `r src_alt_fig_chunk("multiple-regression")` height=240>
+<img `r src_alt_fig_chunk("glm-anova")` height=240>
+<img `r src_alt_fig_chunk("glm-ancova")` height=240>
 </figure>
   </div>
 </div>
@@ -2177,37 +2076,34 @@ model {
 ```
 
 
----
-## 参考文献
-
-- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
-- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
-- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
-- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
-- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
-- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
-
-`r .meta$next_link`
-
-
-
-
-
-
-
-
-
 
 
 ---
-## GLMMで登場した個体差を階層ベイズモデルで
+## ちょっとずつ線形モデルを発展させていく
 
-<figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1000">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
 </a>
 </figure>
+
+久保先生の"緑本"こと<br>
+「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
+をベースに回帰分析の概要を紹介。
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと<span style="font-weight: bold; color: #B2001D;">自由なモデリング</span>を！</span>
+
+**階層ベイズモデル HBM**
 
 
 ---
@@ -2218,19 +2114,6 @@ model {
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
 <img `r src_alt_fig_chunk("overdispersion")`>
-
-
-
----
-## 個体差をモデルに組み込みたい
-
-各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。<br>
-「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
-i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
-
-<img `r src_alt_fig_chunk("saturated-glmm")`>
-
-個体の生存能力をもっと少ないパラメータで表現できないか？
 
 
 ---
@@ -2244,21 +2127,11 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
 パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。
 
-前者は標本平均 $\hat p$ から求まるとして、後者どうする？
 
 ---
 ## 個体能力のばらつき $\sigma$ が大きいと両端が増える
 
 普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
-
-<img `r src_alt_fig_chunk("alter-sigma")`>
-
-<img `r src_alt_fig_chunk("alter-sigma", number = 2)`>
-
----
-## zの値で色分けしてみると想像しやすい
-
-正規分布と二項分布の混ぜ合わせ......?
 
 <img `r src_alt_fig_chunk("alter-sigma-z")`>
 
@@ -2383,96 +2256,6 @@ df_beer_od = tibble::tibble(
 
 
 ---
-## 非線形回帰の例: データ
-
-刺激強度xに対する応答強度yを20個体調査。<br>
-非対称なひと山。応答変数も説明変数も正の値。
-
-<div>\[\begin{split}
-y = ae ^ {-bx} - ce ^ {-dx}
-\end{split}\]</div>
-
-```{r, non-linear}
-#| echo: false
-#| fig.width: 10
-#| fig.height: 5
-set.seed(19937L)
-expo = function(x, y0, lambda) y0 * exp(- lambda * x)
-
-genfunc = function(params) {
-  function(x) {
-    expo(x, params["a"], params["b"]) - expo(x, params["c"], params["d"])
-  }
-}
-
-params = c(a = 0.08, b = 0.01, c = 0.05, d = 0.05)
-func = genfunc(params)
-n_inds = 20L
-sd_inds = 0.005
-shape = 60
-min_ipi = 5
-intercept = sort(rnorm(n_inds, 0, sd_inds))
-df = tidyr::crossing(id = seq_len(n_inds), x = seq(min_ipi, 105, 10)) |>
-  dplyr::mutate(y = rgamma(length(x), shape = shape, scale = (func(x) + intercept[id]) / shape))
-
-p_base = ggplot(df) + aes(x, y) +
-  geom_point(aes(color = id), alpha = 0.7, shape = 16, size = 3) +
-  geom_line(aes(color = id, group = id), alpha = 0.2) +
-  xlim(0, NA) + ylim(0, NA) +
-  geom_function(fun = func) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-
-p_base
-```
-
----
-## 非線形回帰の例: Stanコード
-
-さっきの数式を `model` ブロックに書く。
-
-```stan
-data {
-  int<lower=1> N;
-  vector[N] x;
-  vector[N] y;
-  int id[N];
-  int<lower=1> Ninds;
-}
-
-parameters {
-  real<lower=0> a;
-  real<lower=0> d;
-  real<lower=0,upper=a> c;
-  real<lower=0,upper=d> b;
-  real shape;
-  vector[Ninds] intercept;
-}
-
-model {
-  vector[N] mu = a * exp(-b * x) - (a - c) * exp(-d * x) + intercept[id];
-  y ~ gamma(shape, shape ./ mu);
-  a ~ normal(0, 100);
-  b ~ normal(0, 100);
-  c ~ normal(0, 100);
-  d ~ normal(0, 100);
-  shape ~ normal(0, 100);
-  intercept ~ normal(0, 0.005);
-}
-```
-
-
-
----
-## 階層ベイズモデルのほかの応用先
-
-- 時系列モデル (状態空間モデル)
-- 空間構造のあるモデル (e.g., CARモデル)
-- 欠損値の補完
-
-
-
----
 ## ベイズ推定まとめ
 
 - 条件付き確率 $\text{Prob}(B \mid A)$ の理解が大事。
@@ -2492,7 +2275,7 @@ model {
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1000">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>
