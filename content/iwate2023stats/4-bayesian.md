@@ -1348,7 +1348,7 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 ---
 ## 🔰 Stanで一般化線形モデル
 
-[GLM回のデータ](4-glm.html#/15)をStanでモデリングしてみよう。
+[GLM回のデータ](3-glm.html#/31)をStanでモデリングしてみよう。
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
@@ -1398,7 +1398,7 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 
 <img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction" height="300">
 
-[第4回GLM回](4-glm.html#/32)を参照。
+[第3回GLM回](3-glm.html#/51)を参照。
 
 ---
 ## 🔰 Stanでpenguinsの回帰分析をしてみよう
