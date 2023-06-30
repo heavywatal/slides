@@ -173,6 +173,20 @@ dpi = 100
 ---
 ## 表が出る確率のベイズ推定: 1. 事前分布
 
+<div class="column-container">
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
+&ensp;$\propto$
+  </div>
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
+&ensp;⨉
+  </div>
+  <div class="column">
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
+  </div>
+</div>
+
 コイントスを繰り返して、表が出る確率pをベイズ推定したい。
 
 事前分布には**ベータ分布**を採用(理由は後で分かる):
@@ -190,17 +204,22 @@ dpi = 100
 
 
 
+---
+## 表が出る確率のベイズ推定: 2. 尤度関数
+
 <div class="column-container">
-  <div class="column"></div>
-  <div class="column"></div>
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
+&ensp;$\propto$
+  </div>
   <div class="column">
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
+&ensp;⨉
+  </div>
+  <div class="column" style="opacity: 0.2;">
 <img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
   </div>
 </div>
-
-
----
-## 表が出る確率のベイズ推定: 2. 尤度関数
 
 4回投げて表が1回だった、というデータで**尤度**を計算(**二項分布**):
 <div>\[\begin{split}
@@ -209,20 +228,23 @@ dpi = 100
 
 これに事前分布を掛けて正規化したら事後分布になるはず。
 
-<div class="column-container">
-  <div class="column"></div>
-  <div class="column">
-<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
-&ensp;⨉
-  </div>
-  <div class="column">
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
-  </div>
-</div>
-
 
 ---
 ## 表が出る確率のベイズ推定: 3. 事後分布
+
+<div class="column-container">
+  <div class="column">
+<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
+&ensp;$\propto$
+  </div>
+  <div class="column" style="opacity: 0.66;">
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
+&ensp;⨉
+  </div>
+  <div class="column" style="opacity: 0.66;">
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
+  </div>
+</div>
 
 なんと、事後分布もベータ分布になる。
 
@@ -236,20 +258,6 @@ dpi = 100
 \end{split}\]</div>
 
 ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。
-
-<div class="column-container">
-  <div class="column">
-<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
-&ensp;$\propto$
-  </div>
-  <div class="column">
-<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
-&ensp;⨉
-  </div>
-  <div class="column">
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
-  </div>
-</div>
 
 
 ---
