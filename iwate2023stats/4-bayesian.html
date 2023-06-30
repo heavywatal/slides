@@ -206,6 +206,19 @@ p = 0.6 とかである可能性もまあある。
 </section>
 <section>
 <h2 id="表が出る確率のベイズ推定-1-事前分布">表が出る確率のベイズ推定: 1. 事前分布</h2>
+<div class="column-container">
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
+&ensp;$\propto$
+  </div>
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
+&ensp;⨉
+  </div>
+  <div class="column">
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
+  </div>
+</div>
 <p>コイントスを繰り返して、表が出る確率pをベイズ推定したい。</p>
 <p>事前分布には<strong>ベータ分布</strong>を採用(理由は後で分かる):</p>
 <div>\[\begin{split}
@@ -215,36 +228,45 @@ p = 0.6 とかである可能性もまあある。
 <p>分布の形は $a,~b$ によって決まる。<br>
 ガンマ関数の部分は厳つく見えるけどただの正規化定数。<br>
 投げる前なのでとりあえず真っ平らを仮定 $\text{Beta}(p \mid a = 1, b = 1)$:</p>
-<div class="column-container">
-  <div class="column"></div>
-  <div class="column"></div>
-  <div class="column">
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
-  </div>
-</div>
 
 </section>
 <section>
 <h2 id="表が出る確率のベイズ推定-2-尤度関数">表が出る確率のベイズ推定: 2. 尤度関数</h2>
+<div class="column-container">
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
+&ensp;$\propto$
+  </div>
+  <div class="column">
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
+&ensp;⨉
+  </div>
+  <div class="column" style="opacity: 0.2;">
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
+  </div>
+</div>
 <p>4回投げて表が1回だった、というデータで<strong>尤度</strong>を計算(<strong>二項分布</strong>):</p>
 <div>\[\begin{split}
 \text{Binom}(1 \mid 4,~p) = \binom {1} {4} p^{1} (1 - p)^{3}
 \end{split}\]</div>
 <p>これに事前分布を掛けて正規化したら事後分布になるはず。</p>
-<div class="column-container">
-  <div class="column"></div>
-  <div class="column">
-<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
-&ensp;⨉
-  </div>
-  <div class="column">
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
-  </div>
-</div>
 
 </section>
 <section>
 <h2 id="表が出る確率のベイズ推定-3-事後分布">表が出る確率のベイズ推定: 3. 事後分布</h2>
+<div class="column-container">
+  <div class="column">
+<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
+&ensp;$\propto$
+  </div>
+  <div class="column" style="opacity: 0.66;">
+<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
+&ensp;⨉
+  </div>
+  <div class="column" style="opacity: 0.66;">
+<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
+  </div>
+</div>
 <p>なんと、事後分布もベータ分布になる。</p>
 <div>\[\begin{split}
 \text{Posterior}
@@ -255,19 +277,6 @@ p = 0.6 とかである可能性もまあある。
   &= \text{Beta}(p \mid 2, 4)
 \end{split}\]</div>
 <p>ベータ分布の形パラメータ$a$が表、$b$が裏の回数分だけ増加。</p>
-<div class="column-container">
-  <div class="column">
-<img src="figure/posterior-beta-1.png" alt="plot of chunk posterior-beta" style="vertical-align: middle;">
-&ensp;$\propto$
-  </div>
-  <div class="column">
-<img src="figure/likelihood-binom-1.png" alt="plot of chunk likelihood-binom" style="vertical-align: middle;">
-&ensp;⨉
-  </div>
-  <div class="column">
-<img src="figure/prior-beta-1.png" alt="plot of chunk prior-beta" style="vertical-align: middle;">
-  </div>
-</div>
 
 </section>
 <section>
