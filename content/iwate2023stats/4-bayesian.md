@@ -113,7 +113,7 @@ dpi = 100
 <img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="200" align="right"></a>
 
 移項するだけで**ベイズの定理**:
-<img src="../tokiomarine2021/bayes.drawio.svg" style="padding-left: 1rem;">
+<img src="../iwate2023stats/bayes.drawio.svg" style="padding-left: 1rem;">
 
 宴会場にビールが運ばれてきた。これはどこのブルワリーの？
 
@@ -155,7 +155,7 @@ dpi = 100
 ## ベイズの定理 in 統計モデリング
 
 <p>
-<img src="../tokiomarine2021/bayesian.drawio.svg" width="1200">
+<img src="../iwate2023stats/bayesian.drawio.svg">
 </p>
 
 モデル$M$に対する確信度合いをデータ$D$に基づいて更新する。<br>
