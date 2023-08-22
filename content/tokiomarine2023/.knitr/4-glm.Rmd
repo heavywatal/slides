@@ -438,15 +438,14 @@ n = 200L
 b = c(70, 3, 20, -20)  # true coef
 weather_levels = c("sunny", "cloudy", "rainy")
 df_ancova = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) |>
+  temperature = runif(n, 8, 32),
+  weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
+) |>
   dplyr::mutate(name = weather, value = 1L) |>
   tidyr::pivot_wider(values_fill = 0L) |>
   dplyr::select(!cloudy) |>
   dplyr::mutate(mu = b[1] + b[2] * temperature + b[3] * sunny + b[4] * rainy) |>
-  dplyr::mutate(beer_sales = rnorm(n, mu, 10)
-) |>
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10)) |>
   print()
 ```
 
@@ -594,9 +593,9 @@ n = 200L
 b = c(70, 3, 100, -2)  # true coef
 weather_levels = c("sunny", "rainy")
 df_interact = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) |>
+  temperature = runif(n, 8, 32),
+  weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
+) |>
   dplyr::mutate(name = weather, value = 1L) |>
   tidyr::pivot_wider(values_fill = 0L) |>
   dplyr::mutate(mu = b[1] * sunny + b[2] * temperature + b[3] * rainy + b[4] * temperature * rainy) |>
@@ -670,123 +669,48 @@ $\text{logit}(p_i)$
 
 
 ---
-## RにおけるGLMのやりかた
+## statsmodelsにおけるGLMのやりかた
 
-直線回帰のときの `lm` とほぼ同じ。
+[`smf.glm`](https://www.statsmodels.org/stable/generated/statsmodels.formula.api.glm.html)
+の使い方は直線回帰のOLSとほぼ同じ
 
-```{r, glm}
-formula = weight ~ height
-fit = glm(formula, data = df_weight)
-coef(fit)
+```{python smf-glm}
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+formula = "weight ~ height"
+model = smf.glm(formula, data=r.df_weight)
+result = model.fit()
+print(model.family)
 ```
 
-デフォルトは正規分布・恒等リンクで `lm` と同じ結果。<br>
-`family=` オプションで確率分布とリンク関数を明示的に指定:
-```r
-glm(formula, family = gaussian(link = identity), data = mydata)
-glm(formula, family = poisson(link = log), data = mydata)
-glm(formula, family = binomial(link = logit), data = mydata)
+何も指定しない場合は正規分布・恒等リンク。<br>
+`family=` オプションで
+[確率分布](https://www.statsmodels.org/stable/glm.html#families)
+と
+[リンク関数](https://www.statsmodels.org/stable/glm.html#link-functions)
+を明示的に指定:
+```{python family-explicit}
+identity = sm.families.links.Identity()
+gaussian = sm.families.Gaussian(link=identity)
+model = smf.glm(formula, data=r.df_weight, family=gaussian)
 ```
-
-See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/family.html) for more details.
-
 
 ---
 ## 🔰 とにかくGLMを使ってみる練習
 
+🔰
+[`4-glm.ipynb`](./4-glm.ipynb)
+をJupyterで開き、順々に実行してみよう。<br>
+ここまでに登場した回帰分析のPythonコードが書いてあります。
+
 とりあえず当てはめと作図だけ。<br>
 結果の解釈やモデルの評価はこの後。
 
-```{r, generate-df-weight}
-#| ref.label: "df-weight"
-#| echo: -1
-#| cache.vars: []
-```
+<hr>
 
----
-## 🔰 とにかくGLMを使ってみる練習 解答例
-
-```{r, glm-df-weight}
-#| fig.width: 4
-#| fig.height: 4
-fit_wh = glm(weight ~ height, family = gaussian(link = identity), data = df_weight)
-coef(fit_wh)
-df_fit_wh = modelr::add_predictions(df_weight, fit_wh, type = "response")
-ggplot(df_fit_wh) +
-  aes(height, weight) +
-  geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
-```
-
----
-## 🔰 ポアソン回帰
-
-```{r, generate-df-seeds}
-#| ref.label: "df-seeds"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 重回帰
-
-`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
-とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
-
-```{r, generate-df-beer}
-#| ref.label: "df-beer"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 ロジスティック回帰
-
-次ページにヒント。
-
-```{r, generate-df-logistic}
-#| ref.label: "df-logistic"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## ロジスティック回帰のヒント
-
-左辺の応答変数に指定できるのはだいたい次の2種類:
-- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
-- 1列目が成功回数、2列目が失敗回数の整数matrix
-
-今回の場合、成功回数 `y` だけをformulaに入れると怒られる
-```{r, logistic-error}
-#| error: true
-glm(y ~ x, df_logistic, family = binomial)
-```
-ので失敗回数もモデルに含むよう `response ~ x` とする。
-
-(今回のように試行回数が10回固定じゃなくても使える、ということ)
+☕️ 休憩 + 質疑応答
 
 
----
-## 🔰 共分散分析: GLM with 質的変数 + 量的変数
-
-まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
-
-```{r, generate-df-ancova}
-#| ref.label: "df-ancova"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 交互作用
-
-
-```{r, generate-df-interact}
-#| ref.label: "df-interact"
-#| echo: -1
-#| cache.vars: []
-```
 
 ---
 ## データはひとつ、モデルはたくさん
@@ -824,8 +748,9 @@ $L(\theta \mid D)$ or $L(\theta)$
 各モデルで最適なパラメータを探して、比較:<br>
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
-```{r, llf}
-broom::glance(fit)
+```py
+result = model.fit()
+result.llf  # log likelihood
 ```
 
 ---
@@ -1014,8 +939,9 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
       (Kullback--Leibler情報量を使って導出するらしい)
 
 
-```{r, print-llf}
-#| ref.label: "llf"
+```py
+result = model.fit()
+result.aic
 ```
 
 ???
@@ -1100,6 +1026,10 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 - 尤度は「手元のデータへのあてはまり」
 - モデルを比較するときは情報量基準を参考にする
 
+<hr>
+
+☕️ 休憩 + 質疑応答
+
 
 
 ---
@@ -1111,16 +1041,21 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```r
-install.packages("palmerpenguins")
-library(palmerpenguins)
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```{python pypenguins, results = "hide", cache = FALSE}
+import statsmodels.api as sm
+penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
 print(penguins)
 ```
 ```{r, penguins}
 #| include: false
 withr::local_package("palmerpenguins")
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```
+```{r, penguins-dropna}
+#| include: false
+penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
+penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+dim(penguins_dropna)
 ```
 
 ---
@@ -1138,20 +1073,11 @@ print(penguins)
 ```
 
 ---
-## 欠損値のある行を取り除いておく
-
-性別はとりあえず使わないので、体長関連だけでも。
-
-```{r, penguins-dropna}
-penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
-penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
-dim(penguins_dropna)
-```
-
----
 ## 🔰 penguinsでGLMの練習
 
-次の課題を解いてみよう。<br>
+🔰
+[`4-glm.ipynb`](./4-glm.ipynb)
+に戻り、次の課題を解いてみよう。<br>
 (次ページ以降に解答。まずは自力で。)
 
 1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
@@ -1160,13 +1086,24 @@ dim(penguins_dropna)
 1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
 1. 余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。
 
+```{python import-nocache}
+#| cache: false
+import seaborn as sns
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+```
 
 ---
 ## 単回帰の練習: 1. まず作図
 
 どうやら、重いペンギンほど翼長も長い。
 
+```python
+grid = sns.FacetGrid(penguins)
+grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
+```
 ```{r, penguins-weight}
+#| echo: false
 #| fig.height: 4.5
 #| fig.width: 4.5
 p_penweight = ggplot(penguins_dropna) +
@@ -1184,7 +1121,17 @@ p_penweight
 とりあえずデフォルトの正規分布・恒等リンク。
 $y = 136.7 + 0.0153 x$
 
+```{python penguins-fit1-py}
+formula = "flipper_length_mm ~ body_mass_g"
+model1 = smf.glm(formula, data=penguins)
+results1 = model1.fit()
+print(results1.params)
+print(results1.llf)
+print(results1.aic)
+```
+
 ```{r, penguins-fit1}
+#| include: false
 fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
 broom::tidy(fit1)
 broom::glance(fit1)
@@ -1195,7 +1142,15 @@ broom::glance(fit1)
 
 結果とデータから予測値を作って回帰線を引く。
 
+```python
+pen_pred = penguins.assign(pred=results1.predict(penguins))
+grid = sns.FacetGrid(pen_pred)
+grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
+grid.map(sns.lineplot, "body_mass_g", "pred")
+```
+
 ```{r, penguins-weight-glm}
+#| echo: false
 #| fig.height: 5
 #| fig.width: 5
 added1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
@@ -1209,7 +1164,14 @@ p1
 
 種によって色分けしてみると、傾向の違いが見える。
 
+```python
+palette = {"Adelie": "#ff6600", "Gentoo": "#c35bcc", "Chinstrap": "#007174"}
+grid = sns.FacetGrid(penguins, hue="species", palette=palette)
+grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
+```
+
 ```{r, penguins-weight-sp}
+#| echo: false
 #| fig.height: 5
 #| fig.width: 7
 p_penweight_color = p_penweight + aes(color = species) +
@@ -1224,7 +1186,17 @@ p_penweight_color
 Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。
 
+```{python penguins-fit2-py}
+formula = "flipper_length_mm ~ body_mass_g + species"
+model2 = smf.glm(formula, data=penguins)
+results2 = model2.fit()
+print(results2.params)
+print(results2.llf)
+print(results2.aic)
+```
+
 ```{r, penguins-fit2}
+#| include: false
 fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
 broom::tidy(fit2)
 broom::glance(fit2)
@@ -1233,7 +1205,15 @@ broom::glance(fit2)
 ---
 ## 重回帰の練習: 3. フィッティング結果を作図
 
+```python
+pen_pred = penguins.assign(pred=results2.predict(penguins))
+grid = sns.FacetGrid(pen_pred, hue="species", palette=palette)
+grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
+grid.map(sns.lineplot, "body_mass_g", "pred")
+```
+
 ```{r, penguins-weight-sp-glm}
+#| echo: false
 #| fig.height: 5
 #| fig.width: 7
 added2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
@@ -1251,7 +1231,17 @@ p2
 Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
+```{python penguins-fit3-py}
+formula = "flipper_length_mm ~ body_mass_g + species + body_mass_g:species"
+model3 = smf.glm(formula, data=penguins)
+results3 = model3.fit()
+print(results3.params)
+print(results3.llf)
+print(results3.aic)
+```
+
 ```{r, penguins-fit3}
+#| include: false
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
 broom::tidy(fit3)
 broom::glance(fit3)
@@ -1260,7 +1250,15 @@ broom::glance(fit3)
 ---
 ## 交互作用の練習: フィッティング結果を作図
 
+```python
+pen_pred = penguins.assign(pred=results3.predict(penguins))
+grid = sns.FacetGrid(pen_pred, hue="species", palette=palette)
+grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
+grid.map(sns.lineplot, "body_mass_g", "pred")
+```
+
 ```{r, penguins-interaction}
+#| echo: false
 #| fig.height: 5
 #| fig.width: 7
 added3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
@@ -1274,7 +1272,14 @@ p3
 
 AICで選ぶなら交互作用入り重回帰が良さそう。
 
+```python
+results1.aic
+results2.aic
+results3.aic
+```
+
 ```{r, penguins-aic}
+#| echo: false
 #| fig.height: 4
 #| fig.width: 11
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
@@ -1289,6 +1294,52 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
+```{r, penguins-bill}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+#| cache.vars: [p_bill]
+p_bill = penguins_dropna |>
+  ggplot() + aes(bill_length_mm, bill_depth_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  scale_color_manual(values = penguins_colors) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
+fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
+fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
+d1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
+d2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
+d3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
+p1 = p_bill + geom_line(aes(y = pred), d1, linewidth = 1, color = "#3366ff")
+p2 = p_bill + aes(color = species) + geom_line(aes(y = pred), d2, linewidth = 1)
+p3 = p_bill + aes(color = species) + geom_line(aes(y = pred), d3, linewidth = 1)
+labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
+cowplot::plot_grid(p1 + labs(title = labels[1]),
+                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
+                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
+```
+
+---
+## 🔰 手元のデータ、公共データなどでGLMしてみよう
+
+正規分布・恒等リンクじゃないものだとなお良し。
+
+Pythonパッケージから読み込めるものを探すのもあり。<br>
+e.g., [`sm.datasets.get_rdataset(item, package)`](https://vincentarelbundock.github.io/Rdatasets/articles/data.html)
+
+```python
+import seaborn as sns
+sns.get_dataset_names()
+titanic = sns.load_dataset("titanic")
+
+import statsmodels.api as sm
+iris = sm.datasets.get_rdataset("iris").data
+diamonds = sm.datasets.get_rdataset("diamonds", "ggplot2").data
+```
+
+<!-- TODO: 練習に適した課題データ -->
 
 ---
 ## 一般化線形モデル(GLM)まとめ

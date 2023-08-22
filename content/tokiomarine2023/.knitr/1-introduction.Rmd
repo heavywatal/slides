@@ -63,163 +63,11 @@ diamonds |>
 
 **生のままよりは把握しやすい**かも。
 
----
-## 分布を特徴づける代表値 central tendency
-
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.6;">
-
-平均値 mean
-: 和を観察数で割る
-
-中央値 median
-: 順に並べて真ん中
-
-最頻値 mode
-: 最も頻度が高い値
-
-  </div>
-  <div class="column">
-  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
-  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
-  </a>
-  </div>
-</div>
-
-目的や状況に応じて使い分けよう。
-
-外れ値に対する応答
-: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
-  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
-
----
-## ばらつきを捉える記述統計量
-
-分散 variance
-: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
-: これの平方根が**標準偏差 (standard deviation)**。
-
-Percentile, Quantile (四分位)
-: 小さい順にならべて上位何%にあるか。
-: 中央値 = 50th percentile = 第二四分位(Q2)
-
-```{r, quantile}
-#| fig.width: 10
-#| fig.height: 4
-#| echo: false
-df = tibble::tibble(x = rnorm(200)) |>
-  dplyr::filter(abs(x) < 2) |>
-  dplyr::mutate(x = x + 3)
-probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
-dfq = df |>
-  dplyr::reframe(x = quantile(x, probs)) |>
-  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
-
-p_hist = ggplot(df) + aes(x) +
-  geom_histogram(bins = 30) +
-  theme_void()
-built = ggplot_build(p_hist)
-bdata = built$data[[1]]
-xlim = bdata |> dplyr::select(xmin, xmax) |> range()
-p_box = ggplot(df) + aes(x) +
-  geom_boxplot() +
-  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
-  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
-  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
-  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
-  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
-  theme_void()
-cowplot::plot_grid(p_hist, p_box, ncol = 1L)
-```
-
----
-## ばらつきの様子は大小の判断にも重要
-
-<div class="column-container" style="padding-left: 10px;">
-<div class="column" style="flex-shrink: 1.1;">
-観測値1つずつ。<br>
-たまたまかも。
-</div>
-<div class="column" style="flex-shrink: 1;">
-ばらつき大きい。<br>
-Bが高いのもたまたま?
-</div>
-<div class="column" style="flex-shrink: 1;">
-ばらつき小さい。<br>
-AとBには差がありそう。
-</div>
-</div>
-
-```{r, comparison}
-#| fig.width: 11
-#| fig.height: 4
-#| echo: false
-n = 20
-df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
-df2 = dplyr::bind_rows(
-  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
-  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
-df3 = dplyr::bind_rows(
-  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
-  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
-.lim = c(0, max(df2$y, df3$y))
-.th = list(coord_cartesian(ylim = .lim),
-  theme_classic(base_size = 20),
-  theme(legend.position = "none", axis.title = element_blank()))
-
-p1 = ggplot(df1) + aes(x, y, color = x) +
-  geom_point(shape = 16, size = 5) +
-  .th
-p2 = ggplot(df2) + aes(x, y, color = x) +
-  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
-  .th
-cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
-```
-
-「こんなことがたまたま起こる確率はすごく低いです！」<br>
-をちゃんと示す手続きが**統計的仮説検定**。
-
----
-## 記述統計量に頼りすぎず分布を可視化する
-
-同じデータでも見せ方で印象・情報量が変わる。
-
-```{r, visualize-distribution}
-#| echo: false
-#| fig.width: 9
-#| fig.height: 6
-df = mpg |> dplyr::mutate(y = hwy)
-df_mean = df |> dplyr::summarize(y = mean(y))
-p0 = ggplot(df) + aes(y = y) +
-  theme_classic() +
-  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
-
-ylim = c(0, max(df$y))
-coord_y = coord_cartesian(ylim = ylim)
-coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
-
-pcol = p0 + aes(x = 0) +
-  geom_col(data = df_mean, fill = "#999999") +
-  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
-
-cowplot::plot_grid(nrow = 2L,
-  pcol + coord_one,
-  p0 + geom_boxplot() + coord_one,
-  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
-  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
-  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
-  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
-    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
-  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
-    stroke = 0, alpha = 0.66) + coord_y
-)
-```
+しかし要注意...
 
 
 ---
-## 代表値ばかり見て可視化を怠ると構造を見逃す
+## 要約統計量だけ見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
 <a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
@@ -434,43 +282,27 @@ diamonds |>
 をベースに回帰分析の概要を紹介。
 
 1. イントロ 👈 いまここ
-1. Rの基礎を駆け足で
 1. 統計モデルの基本
     - 直線回帰
     - 確率変数・**確率分布** 👈 次回の主役
     - 尤度・最尤推定
 1. 一般化線形モデル、混合モデル
-1. ベイズ統計（、階層ベイズモデル）
+1. ベイズ統計、階層ベイズモデル
 
-<!-- 回帰のキモは**線ではなく分布** -->
-
-
-
-
-
-
-
+回帰のキモは**線ではなく分布**
 
 
 
 ---
 ## 参考文献
 
-R for Data Science --- Hadley Wickham and Garrett Grolemund
-: <https://r4ds.had.co.nz/>,
-  [Book](https://amzn.to/2tbRmVc),
-  [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
-
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
-
-Other versions
-: 「[Rによるデータ前処理実習](/slides/tmd2022/)」
-  東京医科歯科大 [データ関連人材育成プログラム](https://ds.tmdu.org/) (2022-09)
-: 「[進化学実習2023](/slides/tohoku2023r/)」
-  東北大学 理学部生物学科 (2023-04)
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
-   石川由希 2023 名古屋大学
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
+  (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
 
 `r .meta$next_link`

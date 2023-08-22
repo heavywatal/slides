@@ -203,10 +203,11 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ---
 ## これくらいなら一瞬で計算してもらえる
 
-```{r, ols}
-par_init = c(intercept = 0, slope = 0)
-result = optim(par_init, fn = rss_weight, data = df_weight)
-result$par
+```{python ols}
+import statsmodels.formula.api as smf
+model = smf.ols("weight ~ height", r.df_weight)
+result = model.fit()
+result.params
 ```
 
 ```{r, weight-lm}
@@ -224,52 +225,25 @@ p_weight +
 
 
 ---
-## `lm()` で直線あてはめしてみる
+## 🔰 直線あてはめしてみる
 
-架空のデータを作る(乱数生成については後述):
-```{r, generate-df-linear}
-#| ref.label: "df-linear"
-#| echo: -1
-#| eval: false
-```
+回帰に使えるPythonパッケージ2選:
 
-データと関係式(`Y ~ X` の形)を `lm()` に渡して係数を読む:
-```{r, lm-demo}
-fit = lm(data = df_weight, formula = weight ~ height)
-coef(fit)
-```
+[statsmodels](https://www.statsmodels.org)
+: 統計モデリング寄り。今回はこちらを紹介。
+: Rに似た書き方や統計量の計算などいろいろ楽。
 
-せっかくなので作図もやってみる→
+[scikit-learn](https://scikit-learn.org)
+: 機械学習寄り
+: 回帰以外のさまざまな手法も統一的な書き方で使える
 
----
-## `lm()` の結果をggplotする
+🔰
+[`2-distribution.ipynb`](./2-distribution.ipynb)
+をJupyterで開き、順々に実行してみよう。
 
-```{r, lm-ggplot}
-#| fig.height: 3
-#| fig.width: 3
-df = modelr::add_predictions(df_weight, fit, type = "response")
-head(df, 2L)
-ggplot(df) +
-  aes(height, weight) +
-  geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
-```
+<hr>
 
----
-## 🔰 ほかのデータでも `lm()` を試してみよう
-
-```{r, lm-mpg}
-#| fig.height: 2.5
-#| fig.width: 2.5
-fit = lm(data = mpg, formula = hwy ~ displ)
-coef(fit)
-
-mpg_added = modelr::add_predictions(mpg, fit)
-ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
-```
-
-🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
+☕️ 休憩 + 質疑応答
 
 
 ---
@@ -970,15 +944,16 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 実際には**決定論的**に計算されているので、<br>
 シード(出発点)と呼び出し回数が同じなら出る数も同じになる。
 
-```r
-set.seed(42)
-runif(3L)
-# 0.9148060 0.9370754 0.2861395
-runif(3L)
-# 0.8304476 0.6417455 0.5190959
-set.seed(42)
-runif(6L)
-# 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959
+```python
+import numpy as np
+rng = np.random.default_rng(seed=42)  # initialize
+rng.integers(1, 6, 4)
+# array([1, 4, 4, 3])
+rng.integers(1, 6, 4)
+# array([3, 5, 1, 4])
+rng = np.random.default_rng(seed=42)  # re-initialize
+rng.integers(1, 6, 8)
+# array([1, 4, 4, 3, 3, 5, 1, 4])
 ```
 
 シードに適当な固定値を与えておくことで再現性を保てる。<br>
@@ -989,243 +964,30 @@ runif(6L)
 ---
 ## いろんな乱数を生成・可視化して感覚を掴もう
 
-```{r, try-prng}
-#| eval: false
-n = 100
-x = sample.int(6, n, replace = TRUE)
-x = runif(n, min = 0, max = 1)
-x = rgeom(n, prob = 0.5)
-x = rbinom(n, size = 3, prob = 0.5)
-x = rpois(n, lambda = 10)
-x = rnorm(n, mean = 50, sd = 10)
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+rng = np.random.default_rng(seed=24601)  # Random Number Generator
+
+x = rng.integers(1, 6, 100)
+# x = rng.binomial(3, 0.5, 100)
+# x = rng.poisson(3, 100)
+# x = rng.normal(50, 10, 100)
+
 print(x)
-
-p1 = ggplot(data.frame(x)) + aes(x)
-p1 + geom_histogram() # for continuous values
-p1 + geom_bar()       # for discrete values
+# sns.histplot(x)   # for continuous values
+sns.countplot(x)    # for discrete values
 ```
 
-🔰 小さい `n` から徐々に大きくして変化を確認しよう。
-
-🔰 ほかのオプションもいろいろ変えて変化を確認しよう。
-
-🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
-   全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
-
-```{r, hidden-gacha}
-#| include: false
-x = rbinom(1000000, 10, 0.01)
-p = ggplot(data.frame(x)) + aes(x) + geom_bar()
-table(x)
-```
-
----
-## いろいろ試した結果をとっておきたい
-
-スクリプト.Rさえ保存しておけばいつでも実行できるけど... **面倒**
-
-`ggsave()` で画像を書き出しておけるけど... **どのコードの結果か分からない**
-
-→ **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
-
-```{r, hello}
-#| results: "hold"
-#| fig.show: "hold"
-#| fig.height: 3.5
-#| fig.width: 5
-3 * 14
-ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
-```
-
-
----
-## Quarto Document として研究ノートを作る
-
-<a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="180" align="right">
-</a>
-
-プログラミングからレポート作成まで一元管理できて楽ちん。
-
-- 本文とRコードを含むテキストファイル.qmdを作る。
-- HTML, PDFなどリッチな形式に変換して読む。
-  - コードだけでなく実行結果の**図**や**表**も埋め込める。
+🔰
+[`2-distribution.ipynb`](./2-distribution.ipynb)
+をJupyterで開き、順々に実行してみよう。
 
 <hr>
 
-<a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="180" align="right">
-</a>
-
-Quarto Markdown (`.qmd`)
-: RやPythonのコードと図表を埋め込める**Markdown**亜種。
-: Quarto登場前にほぼR専用だった `.Rmd` と使い勝手は同じ。
-
-Markdown (`.md`)
-: 最もよく普及している**軽量マークアップ言語**のひとつ。
-: 微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。
-
-🔰 どんなものが作れるのか
-[作成例ギャラリー](https://quarto.org/docs/gallery/)
-を見てみよう。
-
----
-## マークアップ言語
-
-文書の構造や視覚的修飾を記述するための言語。<br>
-e.g., **HTML**+CSS, XML, LaTeX
-
-```html
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-```
-
-<div style="border: solid 1px #888888; padding: 0 4px;">
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-</div>
-
-表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
-
-🔰 好きなウェブサイトのソースコード(HTML)を見てみよう。
-
-
----
-## 軽量マークアップ言語
-
-**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
-e.g., **Markdown**, reStructuredText, 各種Wiki記法など
-
-```md
-### 見出し3
-
-ここは段落。
-*強調(italic)*、
-**強い強調(bold)**、
-[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
-```
-
-<div style="border: solid 1px #888888; padding: 0 4px;">
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-</div>
-
-
----
-## Quartoする環境は既に整っているはず
-
-```{r, versions}
-#| include: false
-R_version = paste(R.version$major, R.version$minor, sep = ".")
-pkg_versions = installed.packages()[, "Version"]
-RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
-# quarto_version = system2("quarto", "--version", stdout = TRUE)
-```
-
-- **R (≥ `r R_version`)**: 最新版 – 0.1 くらいまでが許容範囲
-- **RStudio (≥ `r RStudio_version`)**: Quarto CLI を同梱
-- **tidyverse (≥ `r pkg_versions["tidyverse"]`)**: 次の2つを自動インストール
-  - rmarkdown (≥ `r pkg_versions["rmarkdown"]`)
-  - knitr (≥ `r pkg_versions["knitr"]`)
-
-(示してあるバージョンは最低要件ではなく私の現在の環境の)
-
-<hr>
-
-- [Quarto CLI](https://quarto.org/docs/get-started/):
-  最新版を求めるなら手動で入れる。
-- [`install.packages("quarto")`](https://github.com/quarto-dev/quarto-r):
-  多くの人には不要。
-  Quarto CLIをRコマンドで呼べるようにするだけ。
-- [pandoc](https://pandoc.org/): Quarto CLI に同梱。
-  手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。
-
----
-## Markdown記法で書いてみよう
-
-1. RStudio > New File > Markdown File
-   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
-1. ["markdown 記法"とかで検索](https://duckduckgo.com/?q=markdown+syntax)しつつ何か書く。
-   - 見出し1, 2, 3
-   - 箇条書き (番号あり・なし)
-   - インラインコード、コードブロック
-1. <kbd>Preview</kbd>ボタンで確認
-
----
-## Quarto Document を作ってみよう
-
-RStudio > New File > Quarto Document...<br>
-(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
-
-<img src="/slides/image/rstudio/new-quarto-document.png" width="100%">
-
----
-## 普通のmdには無いqmdの特徴
-
-**ヘッダー**
-: 最上部の `---` で挟まれた部分。
-  文書全体に関わるメタデータを入力。
-: オプションは出力形式によって異なる。
-  e.g., [`html`](https://quarto.org/docs/output-formats/html-basics.html)
-
-**R code chunk**
-: `` ```{r} `` のように始まるブロック。
-: コードの実行結果を最終産物に埋め込める。
-: [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
-  - `echo: false`: コードを非表示。結果は表示。
-  - `eval: false`: コードを実行せず表示だけ。
-  - `include: false`: コードも結果も表示せず、実行だけする。
-  - `fig.width: 7, fig.height: 7`: 図の大きさを制御。
-
-まあ細かいことは必要になってから調べるとして...
-
----
-## qmdをHTMLに変換してみよう
-
-<div>
-<img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
-</div>
-
----
-## qmdをHTMLに変換してみよう
-
-1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
-   e.g., `report.qmd`
-1. ⚙️ ボタンから "Preview in Viewer Pane" を選択。
-1. <kbd>→Render</kbd> を押す。
-   - 埋め込まれたRコードが実行される。
-   - 実行結果を含むMarkdownが作られる。
-   - MarkdownからHTMLに変換される。 e.g., `report.html`
-   - プレビューが自動的に開く。
-
-🔰 編集 → Render を繰り返して変化を確認しよう
-
-
----
-## 🔰 疑似乱数生成をいろいろ試した研究ノートを作ろう
-
-さっきはこんな汚いスクリプトだった:
-
-```{r, try-prng-print}
-#| ref.label: "try-prng"
-#| eval: false
-```
-
-1. ひとつの分布につきひとつの図を描くqmdに書き換える。
-1. コードチャンクを分けたり見出しを付けたりして整理する。
-1. パラメータをいろいろ変えた結果も加えていく。
+☕️ 休憩 + 質疑応答
 
 
 ---
@@ -1242,7 +1004,6 @@ RStudio > New File > Quarto Document...<br>
 をベースに回帰分析の概要を紹介。
 
 1. イントロ
-1. Rの基礎を駆け足で
 1. 統計モデルの基本
     - 直線回帰
     - 確率変数・**確率分布** 👈 ここまでやった

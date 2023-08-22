@@ -391,7 +391,7 @@ prior_beta %+%
 | 正規分布 (分散既知) | 正規分布 |
 
 共役事前分布を使うことが常に最善とは限らない。<br>
-計算コストがかかっても**無情報事前分布**を使う風潮。
+**無情報事前分布**を使って計算機に頑張らせる風潮。
 
 ---
 ## 事後分布を用いた推定
@@ -1129,41 +1129,15 @@ $\;\propto\;$
 - C++で書かれていて**高速に動作**。
 - RやPythonなどから呼び出して使うのが便利。
 
-## R Interface
+## Python Interface
 
-[RStan](http://mc-stan.org/rstan/)
-: [Rcpp](https://heavywatal.github.io/rstats/rcpp.html)を介して[StanHeaders](https://github.com/stan-dev/rstan/tree/develop/StanHeaders)を取り込んだパッケージ。
+[PyStan](https://pystan.readthedocs.io)
+: WindowsやJupyterで使うには難あり。
 
-[CmdStanR](https://mc-stan.org/cmdstanr/) 👈 今後の主流
+[CmdStanPy](https://cmdstanpy.readthedocs.io) 👈 今後の主流
 : [CmdStan](https://mc-stan.org/users/interfaces/cmdstan)
   を呼び出し、書き出されたCSVを読み取る。
 
-
----
-## CmdStanR: インストールがちょっと特殊
-
-実行の前後にRを再起動してまっさらにすることを推奨。
-
-1. C++言語を扱うためのツールを用意。
-    - <img height=24 width=24 src="https://cdn.simpleicons.org/apple"></img>
-      macOS: Command Line Tools (`xcode-select --install`)
-    - <img height=24 width=24 src="https://cdn.simpleicons.org/windows"></img>
-      Windows: [RTools](https://cran.r-project.org/bin/windows/Rtools/)
-      (Rのバージョンに合わせる)
-1. [CmdStanR](https://mc-stan.org/cmdstanr/)パッケージをインストール。
-   (まだCRANに登録されていない):
-    ```r
-    install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-    ```
-1. CmdStan本体と可視化パッケージのインストール:
-    ```r
-    library(cmdstanr)
-    check_cmdstan_toolchain(fix = TRUE)
-    install_cmdstan()
-    install.packages("bayesplot")
-    ```
-
-<https://mc-stan.org/cmdstanr/articles/cmdstanr.html>
 
 
 ---
