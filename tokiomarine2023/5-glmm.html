@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>5. 個体差、一般化線形混合モデル(GLMM) — 統計モデリング概論 DSHC 2023</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="5. 個体差、一般化線形混合モデル(GLMM) — 統計モデリング概論 DSHC 2023">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2023/5-glmm.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes/notes.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/search/search.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1333, height: 1000});
+  document.querySelector('html').style.fontSize = '222%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="統計モデリング概論-dshc-2023"><a href=".">統計モデリング概論 DSHC 2023</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-distribution.html">直線回帰、確率分布、擬似乱数生成</a>
+<li><a href="3-likelihood.html">尤度、最尤推定</a>
+<li><a href="4-glm.html">一般化線形モデル(GLM)</a>
+<li class="current-deck"><a href="5-glmm.html">個体差、一般化線形混合モデル(GLMM)</a>
+<li><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
+<li><a href="7-stan.html">StanでGLM</a>
+<li><a href="8-hbm.html">階層ベイズモデル(HBM)</a>
+</ol>
+<div class="footnote">
+2023-08-23 東京海上 Data Science Hill Climb<br>
+<a href="https://heavywatal.github.io/slides/tokiomarine2023/">https://heavywatal.github.io/slides/tokiomarine2023/</a>
+</div>
+
+</section>
+<section>
+<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">データ解析のための統計モデリング入門</a>」<br>
+をベースに回帰分析の概要を紹介。</p>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p><span style="color: #888888;">    ↓ いろんな<strong>確率分布</strong>を扱いたい</span></p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p><span style="color: #888888;">    ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span></p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p><span style="color: #888888;">    ↓ もっと自由なモデリングを！</span></p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+
+</section>
+<section>
+<h2 id="n個のうちy個生存二項分布に従わない">n個のうちy個生存。二項分布に従&hellip;&hellip;わない！</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<p><img src="./figure/overdispersion-1.png" alt="plot of chunk overdispersion"></p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$をそのままパラメータにすると<strong>過剰適合</strong>。<br>
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから&hellip;&hellip;</p>
+<p><img src="./figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm"></p>
+<p>個体の生存能力をもっと少ないパラメータで表現できないか？</p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
+<p><img src="./figure/sigmoid-1.png" alt="plot of chunk sigmoid"></p>
+<p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
+<p>前者は標本平均 $\hat p$ から求まるとして、後者どうする？</p>
+
+</section>
+<section>
+<h2 id="個体能力のばらつき-sigma-が大きいと両端が増える">個体能力のばらつき $\sigma$ が大きいと両端が増える</h2>
+<p>普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。</p>
+<p><img src="./figure/alter-sigma-1.png" alt="plot of chunk alter-sigma"><img src="./figure/alter-sigma-2.png" alt="plot of chunk alter-sigma"></p>
+
+</section>
+<section>
+<h2 id="zの値で色分けしてみると想像しやすい">zの値で色分けしてみると想像しやすい</h2>
+<p>正規分布と二項分布の混ぜ合わせ&hellip;&hellip;?</p>
+<p><img src="./figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z"><img src="./figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z"></p>
+
+</section>
+<section>
+<h2 id="混合分布ただの二項分布よりも良いあてはまり">混合分布。ただの二項分布よりも良いあてはまり。</h2>
+<p>パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。</p>
+<p><img src="./figure/before-mixing-1.png" alt="plot of chunk before-mixing"></p>
+<div align="center">
+<p><img src="./figure/after-mixing-1.png" alt="plot of chunk after-mixing"></p>
+</div>
+</section>
+<section>
+<h2 id="-乱数生成で混合分布を実感してみよう-5-glmmipynb5-glmmipynb">🔰 乱数生成で混合分布を実感してみよう <a href="./5-glmm.ipynb"><code>@5-glmm.ipynb</code></a></h2>
+<ol>
+<li>100個体の能力値zを正規乱数で生成。分布を描く。</li>
+<li>各個体の種子生存率pをシグモイド関数で計算。分布を描く。</li>
+<li>そのpを使って実際の生存種子数を二項分布(n = 8)から生成。分布を描く。</li>
+<li>能力の平均や分散の値を変えたらどうなるか見てみる。</li>
+</ol>
+<img width="800" src="figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z">
+<img width="800" src="figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z">
+</section>
+<section>
+<h2 id="ビールの注文数再び">ビールの注文数、再び</h2>
+<p>お客さんたちが注文したビールの杯数X。平均2.74杯。<br>
+はいはい、<span style="color: #56B4E9;">ポアソン分布</span>でしょ&hellip;&hellip;
+いや、分散が大きいぞ。</p>
+<p><img src="./figure/beer-overdispersion-1.png" alt="plot of chunk beer-overdispersion"></p>
+<p>全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。<br></p>
+<p>🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。</p>
+
+</section>
+<section>
+<h2 id="負の二項分布-textnbn-p">負の二項分布 $~\text{NB}(n, p)$</h2>
+<p>成功率pの試行がn回成功するまでの失敗回数X。
+n = 1 のとき幾何分布と一致。</p>
+<p><img src="./figure/nbinom-1.png" alt="plot of chunk nbinom"></p>
+<p>\[
+\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\]</p>
+<p>失敗回数ではなく試行回数を変数とする定義もある。</p>
+<p>平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+($k \to \infty$でポアソン分布と一致)</p>
+
+</section>
+<section>
+<h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
+<p><strong>固定効果(fixed effects)</strong> のみ扱っていたGLMを拡張して、<br>
+<strong>変量効果(random effect)</strong> を混合したモデル。<br>
+<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small></p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+  + z_{1i} + \ldots \\
+z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
+\end{split}\]</p>
+<p>e.g.,<br>
+個体$i$の種子生存率$p_i$は、<br>
+(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
+(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。</p>
+
+</section>
+<section>
+<h2 id="固定効果にするか変量効果にするか">固定効果にするか、変量効果にするか</h2>
+<p>推定したパラメータを予測に使うなら固定効果</p>
+<dl>
+<dt>予測に使えそうなので固定効果向き</dt>
+<dd><ul>
+<li>観測・操作した連続値変数: 長さ、重さ、温度、etc.</li>
+</ul>
+</dd>
+<dd><ul>
+<li>観測・操作したカテゴリカル変数: 性別、投薬、etc.</li>
+</ul>
+</dd>
+<dt>予測に使えないので変量効果向き</dt>
+<dd><ul>
+<li>観測・操作できなかった個体差:<br>
+たまたま集まってくれた学生15人 {A, B, C, &hellip;}。<br>
+Aさんの固定効果を推定できても、Zさんの予測には使えない。</li>
+</ul>
+</dd>
+<dd><ul>
+<li>観測・操作できなかったグループ差:<br>
+↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
+いグループの固定効果を推定できても、また集まることはない。</li>
+</ul>
+</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="どういうときに変量効果を考える必要があるか">どういうときに変量効果を考える必要があるか</h2>
+<p>データに<strong>擬似反復</strong>が含まれるとき。<br>
+ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。</p>
+<table>
+<thead>
+<tr>
+<th>植木鉢</th>
+<th>個体/植木鉢</th>
+<th>種子/個体</th>
+<th>疑似反復</th>
+<th>推定不可</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100個</td>
+<td>1個体ずつ</td>
+<td>1個ずつ</td>
+<td>–</td>
+<td>個体差・鉢差</td>
+</tr>
+<tr>
+<td>25個</td>
+<td>1個体ずつ</td>
+<td>4個ずつ</td>
+<td>個体</td>
+<td>鉢差</td>
+</tr>
+<tr>
+<td>20個</td>
+<td>5個体ずつ</td>
+<td>1個ずつ</td>
+<td>植木鉢</td>
+<td>個体差</td>
+</tr>
+<tr>
+<td>5個</td>
+<td>5個体ずつ</td>
+<td>4個ずつ</td>
+<td>植木鉢・個体</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<p>疑似反復あり<br>
+→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
+→ そのぶんを差し引いて固定効果を推定したい</p>
+
+</section>
+<section>
+<h2 id="glmmの問題点展望">GLMMの問題点・展望</h2>
+<ul>
+<li>最尤推定の計算が難しくなるので、あまり複雑にはできない
+<ul>
+<li>ベイズ推定を使えばクリアできる</li>
+</ul>
+</li>
+<li>GLMの拡張として理解はできても、実際に書くのは難しめ
+<ul>
+<li>階層ベイズモデルの一種として見るほうが便利</li>
+</ul>
+</li>
+</ul>
+<p>→ ここでGLMMの練習はせず、階層ベイズモデルに進む。</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="一般化線形混合モデルまとめ">一般化線形(混合)モデルまとめ</h2>
+<ul>
+<li>何はともあれ作図して俯瞰</li>
+<li>GLMは統計モデリングの考え方の根幹
+<ul>
+<li>確率分布・リンク関数・説明変数</li>
+<li>尤度・最尤法によるパラメータ推定</li>
+<li>情報量基準などによるモデル選択</li>
+</ul>
+</li>
+<li>GLMMは現実のデータ解析に向けた強化
+<ul>
+<li>疑似反復による変量効果を考慮</li>
+<li>階層ベイズモデルとして扱うほうが楽</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="6-bayesian.html" class="readmore">
+6. ベイズの定理、事後分布、MCMC
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>
