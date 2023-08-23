@@ -75,7 +75,7 @@ print(result.params)
 
 # ## ポアソン回帰
 # `family` の指定以外はさっきと全く同じ。
-# `Poinson()` の `link` はデフォルトで `Log()` なので省略可能。
+# `Poisson()` の `link` はデフォルトで `Log()` なので省略可能。
 # なぜか小文字の `log()` にしないと動かない環境もあるらしい。
 # %%
 poisson = sm.families.Poisson(link=sm.families.links.Log())
