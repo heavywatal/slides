@@ -44,7 +44,7 @@ sm.show_versions()
 # ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
 
 # %%
-# %pip install 'cmdstanpy>=1.1.0'
+# %pip install 'cmdstanpy>=1.0.4'
 import cmdstanpy
 print(cmdstanpy.__version__)
 
@@ -63,12 +63,12 @@ cmdstanpy.install_cmdstan()
 # [公式example](https://github.com/stan-dev/cmdstanpy#example) が走ることを確認:
 
 # %%
-from pathlib import Path
+import os
 from cmdstanpy import cmdstan_path, CmdStanModel
 
 # specify locations of Stan program file and data
-stan_file = Path(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.stan')
-data_file = Path(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.data.json')
+stan_file = os.path.join(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.stan')
+data_file = os.path.join(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.data.json')
 
 # instantiate a model; compiles the Stan program by default
 model = CmdStanModel(stan_file=stan_file)
@@ -84,7 +84,7 @@ fit.summary()
 # ### [ArviZ](https://python.arviz.org/)
 
 # %%
-# %pip install 'arviz>=0.16.0'
+# %pip install 'arviz>=0.12.1'
 import arviz as az  # noqa: E402
 print(az.__version__)
 
