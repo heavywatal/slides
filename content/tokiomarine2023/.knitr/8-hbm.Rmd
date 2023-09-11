@@ -108,6 +108,10 @@ model {
   r ~ normal(0, sigma);
   sigma ~ student_t(3, 0, 1);
 }
+
+generated quantities {
+  array[N] int yrep = binomial_rng(8, p);
+}
 ```
 
 ---
@@ -167,7 +171,28 @@ cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 #| echo: false
 ```
 
+```{r, stan-glmm-ppc}
+#| fig.width: 6
+#| fig.height: 5
+#| include: false
+X = df_seeds_od[["y"]]
+max_yrep = max(X)
+y = wtl::tabulate0(X, nbins = max_yrep)
+mrep = fit$draws("yrep", format = "matrix")
+yrep = apply(mrep, 1, \(x) wtl::tabulate0(x, nbins = max_yrep)) |> t()
+bayesplot::ppc_intervals(
+  y = y, yrep = yrep, x = seq(0, max_yrep), alpha = 0.5, linewidth = 3
+) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
 <img `r src_alt_fig_chunk("overdispersion")`>
+<img `r src_alt_fig_chunk("stan-glmm-ppc")`>
 
 
 ---
@@ -187,8 +212,63 @@ df_beer_od = tibble::tibble(
 )
 ```
 
-<img `r src_alt_fig_chunk("beer-overdispersion")`>
+```{stan, beer-od}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  array[N] int<lower=0> X;
+}
 
+parameters {
+  vector<lower=0>[N] lambda;
+  real<lower=0> alpha;
+  real<lower=0> beta;
+}
+
+model {
+  X ~ poisson(lambda);
+  lambda ~ gamma(alpha, beta);
+}
+
+generated quantities {
+  array[N] int yrep = poisson_rng(lambda);
+}
+```
+
+```{r, stan-beer-od}
+#| cache_stan: "beer-od"
+#| stan_save_output_files: "fit_b"
+#| include: false
+beer_data = list(X = df_beer_od$X, N = samplesize)
+model_b = cmdstanr::cmdstan_model("stan/beer-od.stan")
+fit_b = model_b$sample(data = beer_data, seed = 19937L, step_size = 0.1, refresh = 0)
+#draws = fit_b$draws(c("alpha", "beta"), format = "df") |> print()
+#bayesplot::mcmc_trace(draws)
+```
+
+```{r, stan-beer-od-ppc}
+#| fig.width: 6
+#| fig.height: 4
+#| include: false
+X = beer_data[["X"]]
+max_yrep = max(X) + 2L
+y = wtl::tabulate0(X, nbins = max_yrep)
+mrep = fit_b$draws("yrep", format = "matrix")
+yrep = apply(mrep, 1, \(x) wtl::tabulate0(x, nbins = max_yrep)) |> t()
+bayesplot::ppc_intervals(
+  y = y, yrep = yrep, x = seq(0, max_yrep), alpha = 0.5, linewidth = 3
+) +
+  theme_bw(base_size = 18) +
+  theme(
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank()
+  )
+```
+
+<img `r src_alt_fig_chunk("beer-overdispersion")`>
+<img `r src_alt_fig_chunk("stan-beer-od-ppc")`>
 
 ---
 ## ベイズ推定まとめ

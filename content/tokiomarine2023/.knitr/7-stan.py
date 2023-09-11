@@ -273,7 +273,7 @@ _dic = {
 _df = pd.DataFrame(_dic)
 
 df_aov = (
-    _df.join(pd.get_dummies(_df["weather"]))
+    _df.join(pd.get_dummies(_df["weather"], dtype=int))
     .drop("cloudy", axis=1)
     .assign(
         mu=lambda _: true_intercept
