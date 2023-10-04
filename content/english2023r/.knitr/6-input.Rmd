@@ -1,0 +1,1155 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+#| cache: false
+```
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備 ✅
+1. データの取得、読み込み 👈 今回はここから
+1. 探索的データ解析
+    - 前処理、加工 ✅ 完全に理解した
+    - 可視化、仮説生成 ✅ 完全に理解した
+    - 統計解析、仮説検証 ⬜ 今日の終盤と次回
+1. 報告、発表 ✅ Quarto楽しい
+
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
+
+
+---
+## data.frameの読み書き
+
+<a href="https://readr.tidyverse.org/">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+</a>
+
+- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- R標準の関数ではなく readr パッケージを使う。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+    ```r
+    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
+    ```
+
+あれれー、エラーが出る？
+
+```{r, cannot-open}
+#| error: true
+#| echo: false
+readr::write_tsv(iris, "data/iris.tsv")
+```
+
+---
+## ファイル読み書きでありがちなエラー
+
+- 読みたいファイル名が間違っている。
+- 読みたいファイルが作業ディレクトリとは違うところにある。
+- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
+
+冷静に、現在の作業ディレクトリとその中身を確認しよう:
+```r
+getwd()                 # GET Working Directory
+fs::dir_ls(".")         # List files in "." (here)
+fs::dir_ls("data")      # List files in "./data"
+fs::dir_create("data")  # Create directory
+```
+
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html)
+を読んでおきましょう。
+
+🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
+
+🔰 それらを別の名前で読み込み直してみよう。
+
+---
+## 🔰 最終課題予告
+
+<iframe width="1200" height="810" src="./8-glm.html#/51"></iframe>
+
+読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？
+
+---
+## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
+
+2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
+
+うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
+
+<img `r src_alt_fig_chunk("estat-plot")`>
+
+---
+## オープンデータを入手できても簡単には読み込めない
+
+初手エラー:
+```{r, estat-read-error}
+#| error: true
+infile = "tblT001082C04.txt"
+readr::read_csv(infile)
+```
+
+RStudioでテキストとして開いてみると文字化け:
+
+```{r, estat-as-text}
+#| echo: false
+readLines(infile, 5L) |> t() |> t() |>
+  prmatrix(rowlab = rep("", 5), collab = "", quote = FALSE)
+```
+
+メニューから "File → **Reopen with Encoding...**" を選択。<br>
+たいてい、古い日本語ファイルにありがちな**SHIFT-JIS**が正解。<br>
+(もっと古いファイルならEUC-JPとかの場合もある。)
+
+---
+## 文字コードを指定して読み込み
+
+よく見ると、8列目以降の列名が2行にまたがっている:
+```{r, estat-sjis}
+sjis = readr::locale(encoding = "SHIFT-JIS")
+readr::read_csv(infile, locale = sjis)
+```
+
+---
+## 左側と右側を分けて読み、それぞれ削ってからbind
+
+なんか数値の列のはずなのに `-` という文字が混じっている。(中には `X` も):
+```{r, estat-lr}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L)
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+---
+## 数値のはずの列に混じる `-` と `X` を `NA` 扱い
+
+これでようやくスタート地点。。。
+```{r, estat-lr-na}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"))
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+<!-- dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"), name_repair = "minimal") -->
+
+---
+## あとはdplyrとtidyrでお掃除
+
+まだ罠はたくさん: 列名の頭にスペース。全角数字。変な区分。
+
+```{r, estat-tidy}
+tidy_miyagi = raw_miyagi |>
+  dplyr::filter(HYOSYO == 1) |>
+  dplyr::select(CITYNAME, matches("[男女].+[歳上]$")) |>
+  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
+  dplyr::mutate(category = stringr::str_trim(category)) |>
+  tidyr::separate(category, c("sex", "age"), 1) |>
+  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
+  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  dplyr::mutate(lower = readr::parse_number(lower),
+                upper = readr::parse_number(upper)) |>
+  dplyr::filter((upper - lower) < 5 | lower == 75) |>
+  dplyr::mutate(age = (lower + upper) / 2) |>
+  print()
+```
+
+---
+## ここまでくれば作図は簡単
+
+```{r, estat-factor}
+#| include: false
+total_miyagi = tidy_miyagi |>
+  dplyr::count(CITYNAME, wt = count, name = "count") |>
+  dplyr::arrange(desc(count))
+tidy_miyagi = tidy_miyagi |>
+  dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
+```
+
+```{r, estat-plot}
+#| fig.height: 5.5
+#| fig.width: 12
+tidy_miyagi |>
+  dplyr::mutate(count = ifelse(sex == "男", -1, 1) * count) |>
+  ggplot() +
+  geom_col(aes(age, count, fill = sex)) +
+  facet_wrap(vars(CITYNAME), nrow = 4L) +
+  coord_flip() + theme_minimal(base_size = 15)
+```
+
+---
+## 前処理の前処理が必要になるようなデータは困る
+
+Rを使ったデータ前処理を習得した✨<br>
+雑然データからでも下ごしらえして解析できるぞ！
+
+とはいえ...
+
+- まず、読み込めないと始まらない。
+- dplyrやtidyrで手に負えないほど不規則では困る。
+
+自分が一次データを作る立場なら、どう気をつけたらいいか？
+
+<br>
+
+総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
+[「統計表における機械判読可能なデータの表記方法の統一ルール」](https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html)
+から抜粋。
+
+---
+## データ入力の心得 1. 1つのセルに1つの値
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::separate()`, `tidyr::separate_rows()`, `stringr::str_split()`, `stringr::str_extract()`
+
+---
+## データ入力の心得 1. 1つのセルに1つの値
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::separate()`, `tidyr::separate_rows()`, `stringr::str_split()`, `stringr::str_extract()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+いやいや、欄外に記載するのも不規則でダメですよ。別シートか、別カラムに。
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 3. 空白や改行で見た目を整えない
+
+機械にとって `"　A"` と `"A"` は違う値。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 3. 空白や改行で見た目を整えない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 4. セルを結合しない、絶対に
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`
+
+---
+## データ入力の心得 4. セルを結合しない、絶対に
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`
+
+---
+## データ入力の心得 5. 同じものが続いても省略しない
+
+人が見れば分かるけど、機械も同じように読んではくれない。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`, `tidyr::separate()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 6. 機種依存文字を避ける
+
+できれば全角・日本語も避けてすべて半角英数で。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringi::stri_trans_nfkc()`
+
+---
+## データ入力の心得 7. データを分断しない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-1-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+
+---
+## データ入力の心得 7. データを分断しない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-1-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+---
+## データ入力の心得 8. 1つのシートには1つの表
+
+もっと言うと、複数シートのファイルを作らず、それぞれ別ファイルに。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+---
+## データ入力の心得 9. その他
+
+- 1行目ではすべての列に名前を与える。
+  - なんとなく**1行目は空行**、**1列目は名前無し**とかやりがち。ダメ。
+  - 2行目以降に列名がハミ出してもダメ。
+  - プログラム内で参照される変数名として成立するように。
+    - アンダースコア_以外の**記号・空白を入れない**のが安全。
+    - **先頭は数字も避ける**。
+- 保存形式はプレーンテキスト推奨。Excel形式(.xlsx)は扱いにくい。
+    - タブ区切り(.tsv) or カンマ区切り(.csv)
+    - ファイル名、フォルダ名も機械処理するつもりで規則的に。
+
+[熊谷直喜さんのブログ「R解析用データフォーマット例」](http://nhkuma.blogspot.com/2012/12/r_5.html)
+も一読を。
+
+---
+## データ入力の心得おさらい
+
+つまり、Rで前処理・可視化・解析するぞという気持ち:
+
+1. 1つのセルに1つの値
+1. 余計な文字列が数値扱いを妨げる
+1. 空白や改行で見た目を整えない
+1. セルを結合しない、絶対に
+1. 同じものが続いても省略しない
+1. 機種依存文字、というか半角英数以外を避ける
+1. データを分断しない
+1. 1つのシート(ファイル)には1つの表
+
+🔰 総務省ルールの「修正後」にまだ残る改善点をなるべく多く列挙しよう。
+
+
+---
+## Excelの親切あるいは裏切りに要注意
+
+表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
+しかし**親切設計がユーザーに牙を剥く**！
+
+- 文字列が勝手に日付になる: `22-4`, `4-14`
+- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
+  ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
+
+🔰 CSVファイルを読み書きして恐怖を体感しよう:
+
+```
+gene,label
+MARCH1,22-4
+SEPT1,4-14
+```
+1.  上の内容のプレーンテキストを作って `excel.csv` と名付ける
+1.  Excelでそれで開き、日付になることを確認。
+1.  それを別名のCSVとして保存し、テキストの中身を確認してレポート。
+
+---
+## 今回のお品書き
+
+✅ データ入力の心得
+- 野良データを読み込む難しさ
+- 自分が一次データを作るときに気をつけること
+
+⬜ データ解釈の心得 (理論や手法の詳細には触れない)
+- 誤差 (バイアス、ばらつき)
+- 統計的仮説検定
+- 因果関係と相関関係
+
+
+
+---
+## Garbage in, garbage out
+
+どんなに素晴らしい統計処理をしようとも、データがゴミなら結論もゴミ。
+
+<figure>
+<img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg" width="1200">
+</figure>
+
+- 目的に応じてちゃんとデータを採ることが重要！
+- 何がデータを悪くしてしまうのか、見ていこう
+
+
+---
+## 観測には必ず何らかの歪みがある
+
+現象・母集団の性質を知りたいけど、そのものは測れない。<br>
+: 質的な問題 → 測れる側面だけ測るしかない
+: 量的な問題 → 一部の標本を抽出して測るしかない
+
+<figure>
+<img src="../tohoku2022r/image/math-model-biased.drawio.svg" width="1080"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+---
+## 2種類の誤差
+
+系統的誤差 systematic error / バイアス bias
+: 一定の傾向をもって生じる誤差。原因を特定して対処。
+
+偶然誤差 random error
+: 偶然生じてしまうばらつき。計測を繰り返して対処。
+
+e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
+
+<figure>
+<img src="../tohoku2022r/image/error-random-systematic.drawio.svg" width="640"><br>
+<figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+---
+## 選択バイアス
+
+<figure style="position: absolute; top: 40px; right: 40px;"><a href="https://en.wikipedia.org/wiki/Survivorship_bias">
+<img src="/slides/image/free/Survivorship-bias.svg" width="400"><br>
+<figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
+</a></figure>
+
+データの採れかたが結果に傾向をもたらしてしまう。
+
+生存(者)バイアス
+: 生き残ったものだけがデータとして観測される。
+: 帰還した多数の戦闘機✈️✈️の損傷の分布(右図)。<br>
+  被弾 → **<span style="color: #bb0000;">生還 → 観測される</span>**<br>
+  被弾 → **墜落 → 観測されない**<br>
+  損傷が観察されなかった場所をむしろ補強すべき。
+
+サンプリングバイアス
+: サンプル対象を決めた時点で偏っている。
+: 📞電話でアンケート調査 →
+  電話機を持てる裕福な人、その時間に通話できる人、
+  知らない番号からでも出る人、調査している新聞社に共感している人。
+
+🔰 生物学研究における選択バイアスにはどういうものがありそう？
+
+---
+## 測定基準に関するバイアスの例
+
+基準が揃っていない
+: 国民1人あたりの弁護士数を国際比較すると日本が少ない。<br>
+  諸外国では税理士や司法書士を弁護士に含めて集計している。
+
+基準が時間とともに変化
+: 自閉症と診断された児童の数は**見かけ上**年々増えている。<br>
+  診断基準の変更、病気の知名度向上が主な原因。<br>
+  (親の高齢化の寄与を示唆する研究もあるらしい)
+
+---
+## データの扱いに起因するバイアス
+
+チェリー・ピッキング 🍒
+: 自分の仮説と矛盾する情報を無視し、都合のいい情報だけ集めること。
+: [研究活動における3つの不正](https://www.mext.go.jp/b_menu/shingi/gijyutu/gijyutu12/houkoku/attach/1334660.htm)のうち**改竄**にあたる。
+
+確証バイアス
+: 無意識にチェリー・ピッキングしてしまう心理的傾向。
+: 悪気なくやってしまわないよう、自覚を持つことが大事。
+
+表に数字、裏にアルファベットが書いてあるカード。<br>
+「偶数の裏は必ずA、という法則があるか？」<br>
+これを確かめるには次の4枚のうちどれを裏返せばいいか？
+
+```{r, four-cards}
+#| echo: false
+#| fig.width: 6
+#| fig.height: 2
+n = 20
+g = (1 + sqrt(5)) / 2
+card = tibble::tibble(x = c(0, 1, 1, 0), y = c(0, 0, g, g))
+dplyr::bind_rows(
+  card |> dplyr::mutate(id = 0),
+  card |> dplyr::mutate(id = 1, x = x + 1.1),
+  card |> dplyr::mutate(id = 2, x = x + 2.2),
+  card |> dplyr::mutate(id = 3, x = x + 3.3)
+) |>
+  ggplot() + aes(x, y) +
+  geom_polygon(aes(group = id), fill = NA, color = "#333333") +
+  scale_fill_identity() +
+  annotate("text", x = c(0.5, 1.6, 2.7, 3.8), y = g / 2, label = c("1", "2", "A", "B"), size = 20) +
+  coord_fixed() +
+  theme_void()
+```
+
+???
+論理学的な正解は2, B。
+
+
+
+---
+## たまたま生じたパターンにも意味を見出しがち
+
+前後即因果の誤謬
+: たまたま前後で生じた現象に因果関係があると思いがち
+
+ギャンブラーの誤謬
+: N回も連続で裏が出たら、次は表が出やすいと思いがち
+
+```{r, random-pattern}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
+set.seed(19937)
+n = 20
+tibble::tibble(x = runif(n), y = runif(n)) |>
+  ggplot() + aes(x, y) +
+  geom_point(shape = 16, size = 3, alpha = 0.66) +
+  coord_fixed(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
+  theme_minimal()
+```
+
+---
+## データ解釈に関わる認知バイアス
+
+利用可能性ヒューリスティック
+: 思い浮かびやすいものほど過大評価しがち
+: e.g., 1文字目がkの単語、3文字目がkの単語、多いのはどっち？
+
+代表性ヒューリスティック
+: ステレオタイプを過大評価しがち
+: e.g., リンダは31歳の独身女性。率直で聡明。大学では哲学専攻。
+  人種差別や社会正義などに深く関心を持ち、学生時代には反核デモにも参加。<br>
+  現在のリンダは次のどちらである可能性が高いか？
+  1. リンダは銀行員として働いている。
+  1. リンダは銀行員として働きながら、フェミニスト運動に参加している。
+
+認知バイアス・誤謬はほかにもいろいろある。<br>
+データ解析とは関係なく、知っておくのは悪くない。
+
+???
+
+https://lambtani.hatenablog.jp/entry/2017/05/18/032108
+
+
+
+---
+## 偶然誤差によるばらつき方 = 確率分布
+
+次回 [7. 統計モデリング1](7-distribution.html) でやります。
+
+背後にあるメカニズムによっていろんな形になる。
+
+<iframe width="600" height="450" src="./7-distribution.html#/33"></iframe>
+
+
+---
+## 分布を特徴づける代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  </a>
+  </div>
+</div>
+
+目的や状況に応じて使い分けよう。
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+---
+## ばらつきを捉える記述統計量
+
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r, quantile}
+#| fig.width: 10
+#| fig.height: 4
+#| echo: false
+set.seed(24601)
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
+  dplyr::mutate(x = x + 3)
+probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
+dfq = df |>
+  dplyr::reframe(x = quantile(x, probs)) |>
+  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
+  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
+  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
+  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
+
+
+---
+## 記述統計量に頼りすぎず分布を可視化する
+
+同じデータでも見せ方で印象・情報量が変わる。
+
+```{r, visualize-distribution}
+#| echo: false
+#| fig.width: 9
+#| fig.height: 6
+df = mpg |> dplyr::mutate(y = hwy)
+df_mean = df |> dplyr::summarize(y = mean(y))
+p0 = ggplot(df) + aes(y = y) +
+  theme_classic() +
+  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+ylim = c(0, max(df$y))
+coord_y = coord_cartesian(ylim = ylim)
+coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
+
+pcol = p0 + aes(x = 0) +
+  geom_col(data = df_mean, fill = "#999999") +
+  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
+
+set.seed(1)
+cowplot::plot_grid(nrow = 2L,
+  pcol + coord_one,
+  p0 + geom_boxplot() + coord_one,
+  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
+  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66) + coord_y
+)
+```
+
+
+---
+## 2つの量の関係性: 大小の比較
+
+ばらつきの度合いも加味して判断する。
+
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
+観測値1つずつ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき大きい。<br>
+Bが高いのもたまたま?
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+
+```{r, comparison}
+#| fig.width: 11
+#| fig.height: 4
+#| echo: false
+set.seed(19937)
+n = 20
+df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
+df2 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
+  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
+df3 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
+  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
+.lim = c(0, max(df2$y, df3$y))
+.th = list(coord_cartesian(ylim = .lim),
+  theme_classic(base_size = 20),
+  theme(legend.position = "none", axis.title = element_blank()))
+
+p1 = ggplot(df1) + aes(x, y, color = x) +
+  geom_point(shape = 16, size = 5) +
+  .th
+p2 = ggplot(df2) + aes(x, y, color = x) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
+  .th
+cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
+```
+
+「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが**統計的仮説検定**→
+
+
+---
+## 目的やデータに応じて正しい検定を選ぶ
+
+例えば「2つの量の大小を比較したい」だけでもいくつかある。<br>
+今回は選定には深入りせず、検定の考え方だけ触れておく。
+
+<figure><a href="https://comicalcommet.github.io/r-training-2023/">
+<img src="/slides/image/rstats/comicalcommet-test-chart.jpg" width="90%">
+<figcaption><cite>
+「Rを用いたデータ解析の基礎と応用」石川由希さん@名古屋大
+</cite></figcaption>
+</a></figure>
+
+
+---
+## 統計的仮説検定の考え方
+
+🎲サイコロを**10回**振ったら**9回**も6の目が出たぞ。イカサマじゃないか？
+
+帰無仮説
+: 6の目が出る確率 = 1/6。普通のサイコロです。
+
+対立仮説
+: 6の目が出る確率 ≠ 1/6。イカサマです。
+
+<div>\[\begin{split}
+p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6} ^ {10}
+  = 8.43 \times 10 ^ {-7}
+\end{split}\]</div>
+
+1. 帰無仮説のもとで今回のデータ以上に極端な値が得られる確率*p*を計算
+1. この ***p*-value** が**有意水準(危険率)**$\alpha$より低い場合、帰無仮説を棄却<br>
+   (大概 $\alpha$ = 0.05 とか 0.01 とか。予め決めておく。)
+1. 対立仮説を採択。6の目の出る確率は1/6と**有意に異なる**。
+
+```{r, test-dice-hidden}
+#| include: false
+n = 10
+k = 9
+p = 1 / 6
+pbinom(k - 1, n, p, lower.tail = FALSE)
+x = seq(k, n)
+stopifnot(all.equal(dbinom(x, n, p), choose(n, x) * p ** x * (1 - p) ** (n - x)))
+stopifnot(all.equal(sum(dbinom(x, n, p)), pbinom(k - 1, n, p, lower.tail = FALSE)))
+```
+
+---
+## 統計的仮説検定の考え方
+
+🎲サイコロを**12回**振ったら**4回**も6の目が出たぞ。<br>
+これも1/6よりは高いけど、イカサマのダイスかな？
+
+<span style="color: #990000;">帰無仮説のもとで12回中4回以上6が出る確率: $p = 0.125 > \alpha$</span><br>
+
+帰無仮説を棄却できず。6の目の出る確率が1/6と**有意に異なるとは言えない**。
+
+```{r, test-dice}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
+X = 4L
+n = 12L
+tibble::tibble(x = seq.int(0L, n), Probability = dbinom(x, n, 1 / 6)) |>
+  dplyr::mutate(color = ifelse(x >= X, "#990000", "#666666")) |>
+  ggplot() + aes(x, Probability, fill = color) +
+  geom_col() +
+  scale_fill_identity() +
+  theme_classic(base_size = 20)
+# pbinom(X - 1L, n, 1 / 6, lower.tail = FALSE)
+# sum(dbinom(seq(X, n), n, 1 / 6))
+```
+
+平たく言えば「普通のサイコロでもそんなに珍しい出目じゃない」
+
+
+---
+## 多重検定で偽陽性のリスクが上昇
+
+危険率$\alpha=0.05$の検定は、最大5%の確率で誤って帰無仮説を棄却(**偽陽性**)。<br>
+同様の検定を10回やると、そのうち少なくとも1つで偽陽性になる確率は<br>
+$1 - (1 - 0.05)^{10} \approx 0.40$ まで上昇。<br>
+
+```{r, multiple-tests}
+#| fig.width: 11
+#| fig.height: 4.2
+#| echo: false
+# 1 - (1 - 0.05) ** 10
+set.seed(1279)
+nsam = 10L
+nrep = 20L
+y = split(rnorm(nsam * nrep * 2), ceiling(seq_len(nsam * nrep * 2) / nsam))
+df = tidyr::crossing(repl = seq_len(nrep), x = c("A", "B")) |>
+  dplyr::mutate(y = y) |>
+  tidyr::unnest(y)
+dfp = df |>
+  tidyr::nest(data = !repl) |>
+  dplyr::mutate(p = purrr::map_dbl(data, ~ t.test(y ~ x, data = .x)$p.value)) |>
+  dplyr::select(!data) |>
+  dplyr::mutate(x = 1.5, y = Inf, label = ifelse(p < 0.05, sprintf("p = %.3f", p), ""))
+df |>
+  ggplot() + aes(x, y) +
+  geom_boxplot(aes(fill = x)) +
+  geom_text(data = dfp, aes(label = label), hjust = 0.5, vjust = 1.2) +
+  facet_wrap(vars(repl), nrow = 2L) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+多重比較補正
+: 検定を繰り返したぶんだけ基準を厳しくして偽陽性率を抑えること。
+: Bonferroni法、Holm法、Benjamini and Hochberg法など。
+
+
+---
+## 広くて深い統計解析の世界
+
+> データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
+> 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
+> ------ [三中信宏「統計思考の世界」](https://amzn.to/3urpls1)
+
+<figure style="margin-top: -1em;">
+<a href="http://leeswijzer.org/R/R-top.html">
+<img src="/slides/image/rstats/Mandala2004-small.jpg" width="80%">
+<figcaption><cite>「大統計曼荼羅」三中信宏</cite></figcaption>
+</a>
+</figure>
+
+
+
+
+<!--  -->
+
+
+---
+## 2つの量の関係性: 相関関係と因果関係
+
+<style>
+.spurious {color: #fde725;}
+.correlation {color: #35B779;}
+.causality-wrong {color: #31688e;}
+.causality {color: #440154;}
+</style>
+
+<div class="column-container">
+<div class="column" style="flex-shrink: 1;">
+
+<span class="correlation">相関関係</span>
+: ある値が大きいほど、別の値も大きいor小さい。
+: e.g., 数学の成績と物理の成績。
+
+<span class="causality">因果関係</span>
+: ある事象が別の事象に影響を与える。
+: e.g., 1時間勉強するごとに成績が3点伸びる。
+
+</div>
+<div class="column" style="flex-shrink: 1.8;">
+
+```{r, causal-relationship}
+#| echo: false
+#| fig.width: 3.2
+#| fig.height: 3.2
+set.seed(19937)
+n = 40L
+tibble::tibble(
+  study_time = runif(n, 0, 40),
+  score = pmin(rnorm(n, 3 * study_time, 10), 100)) |>
+  ggplot() +
+  aes(study_time, score) +
+  geom_point(shape = 16, alpha = 0.66, size = 3) +
+  stat_smooth(method = lm, formula = y ~ x + 0, se = FALSE, color = "#440154", size = 2, alpha = 0.7) +
+  theme_classic(base_size = 20) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+</div>
+</div>
+
+
+<hr>
+
+- <span class="causality">因果関係</span>があれば<span class="correlation">相関関係</span>として表れる
+- **<span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない**→
+
+
+---
+## 因果・相関を見誤るパターン1: 交絡因子
+
+**誤:** 🍦アイスの売り上げが増えるほど🍺ビールの売り上げが増える。
+
+**正:** 🍦アイスも🍺ビールも**気温が高いほど**売れる。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.2;">
+
+```{r, confounding-factor}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
+set.seed(19937)
+n = 40L
+tibble::tibble(
+  temperature = runif(n, 0, 40),
+  beer_sales = rpois(n, temperature * 1.3),
+  icecream_sales = rpois(n, temperature)) |>
+  ggplot() +
+  aes(icecream_sales, beer_sales) +
+  geom_point(shape = 16, alpha = 0.66, size = 3) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, color = "#358779", size = 2, alpha = 0.7) +
+  theme_classic(base_size = 20) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+</div>
+<div class="column" style="flex-shrink: 1;">
+
+<figure>
+<img src="../tohoku2022r/image/hermeneutics-4-1-3.drawio.svg" width="750">
+</figure>
+
+</div>
+</div>
+
+
+---
+## 因果・相関を見誤るパターン2: 逆の因果関係
+
+**誤:** <span class="causality-wrong">警察官が多いほど犯罪が増える。</span>
+
+**正:** <span class="causality">犯罪が多いから警察官が多く配備される。</span>
+
+<br>
+
+## 因果・相関を見誤るパターン3: 選択バイアス
+
+(x + y) が一定の幅に収まるようなペアだけを集めてしまうとか
+
+```{r, spurious-correlation-selection-bias}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
+set.seed(19937)
+n = 256
+tibble::tibble(x = runif(n), y = runif(n)) |>
+  dplyr::mutate(sampled = abs(x + y - 1) < 0.2) |>
+  dplyr::mutate(color = ifelse(sampled, "#fde725", "#aaaaaa")) |>
+  ggplot() +
+  aes(x, y) +
+  geom_point(aes(color = color), shape = 16, size = 3, alpha = 1) +
+  scale_color_identity() +
+  coord_fixed() +
+  theme_classic(base_size = 20) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+
+---
+## 因果・相関を見誤るパターン4: 外れ値・グループ構造
+
+**少数の外れ値**や**グループ構造**によって相関係数rが跳ね上がりうる。
+
+```{r, correlation-lies}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 3.6
+set.seed(19937)
+n = 32
+df = tibble::tibble(x = rnorm(n), y = rnorm(n))
+df_outlier = df |> dplyr::bind_rows(data.frame(x = 10, y = 10))
+df_subgroups = df |> dplyr::bind_rows(df + 8)
+.lim = range(df_outlier, df_subgroups)
+
+.make_label_cor = function(df) {
+  r = cor(df[["x"]], df[["y"]])
+  sprintf("r = %.2f", r)
+}
+# .make_label_cor(df_usbb)
+
+.plot_cor = function(df) {
+  ggplot(df) + aes(x, y) +
+    geom_point(shape = 16, size = 3, alpha = 0.66) +
+    stat_smooth(method = lm, formula = y ~ x, se = FALSE, size = 3, color = "#fde725") +
+    annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 8, label = .make_label_cor(df)) +
+    coord_fixed(xlim = .lim, ylim = .lim) +
+    theme_classic(base_size = 20) +
+    theme(axis.text = element_blank(), axis.ticks = element_blank())
+}
+
+cowplot::plot_grid(
+  .plot_cor(df),
+  .plot_cor(df_outlier),
+  .plot_cor(df_subgroups),
+  nrow = 1L
+)
+```
+
+
+---
+## 因果・相関を見誤るパターン5: 偶然
+
+ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？
+
+<figure>
+<img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="1200">
+<figcaption><cite>
+<a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
+</cite></figcaption>
+</figure>
+
+このウェブサイトにはジョークとしてこうした例が多数集められている↑
+
+
+---
+## 変数間の関係性まとめ
+
+<figure>
+<img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="1200">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+
+<hr>
+
+- **<span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない**。
+- <span class="causality-wrong">逆の因果関係</span>や<span class="spurious">見せかけの相関</span>にも要注意。
+
+🔰 これら4つの関係性に該当する事例をそれぞれ1つ以上探してみよう。
+
+???
+16--17世紀、怪我をしたら武器に軟膏を塗ると早く治るという迷信。
+質の低い軟膏を傷口に塗らないことがプラスに働いたというのが真相。
+
+
+
+---
+## 🔰 3日目の課題2
+
+書籍、ニュースサイト、ブログ記事などを検索し、<br>
+**良くないデータ解析の例**を探して**改善案**を挙げよう。
+
+1. データの集め方(サンプルの選び方)が偏っていて良くない例
+1. データの解釈(相関や因果)を誤っている例
+1. 図の描き方で嘘をついている例 (誇張、印象操作)
+1. 生データを公開してくれるのはいいけど形式が汚くて使いにくい例
+
+それぞれの例について、下記の項目を報告してください:
+
+- 出典。URLや書籍名。
+- データの概要、書き手の主張。
+- ここが良くないので、こう改善すべき。
+
+
+---
+## 今日の残り時間
+
+- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
+- まずは個人で課題1と2に取り組み、ある程度できたら班内で見せ合う。
+- 班員のよかった部分を自分のレポートに取り込む。
+- 最もよかった解析をTAに報告して解散。
+- 残ってほかの課題に取り組んでもOK。
+
+
+---
+## 参考文献
+
+- 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
+   石川由希 2023 名古屋大学
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- [統計思考の世界](https://amzn.to/3urpls1) 三中信宏 2018
+- R Markdown
+  - [Cheat sheet (PDF)](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf)
+  - [R for Data Science --- R Markdown](https://r4ds.had.co.nz/r-markdown.html)
+  - [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+
+`r .meta$next_link`
