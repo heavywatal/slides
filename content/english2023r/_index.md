@@ -1,6 +1,6 @@
 +++
 title = "Hands-on Introduction to R 2023"
-date = 2023-10-23T12:00:00+09:00
+date = 2023-11-27T16:00:00+09:00
 draft = false
 +++
 
@@ -9,8 +9,11 @@ draft = false
 ## Summary
 
 -   Lecturer: Watal M Iwasaki, PhD
--   Date: 2023-10-XX
+-   Date: 2023-11-27 to 2023-12-06
+-   Time: 16:00+JST, 90 minutes a day
 -   Place: Zoom.us + Biology bldg., Aobayama, Tohoku University
+-   Website: <https://heavywatal.github.io/slides/english2023r/><br>
+    Links to the slides are [at the bottom](<javascript:document.getElementById('slides').scrollIntoView({behavior: 'smooth'});>):
 -   Abstract:<br>
     理学部生物学科における研究とは、大雑把に言うと
     「生物に関するデータを集め、その背後にある理（ことわり）を読み解くこと」です。
@@ -26,27 +29,15 @@ draft = false
     規則性のある退屈な仕事は機械に任せるのが得策です。
     本実習では、近年さらに易しくなったR言語を用いることで、
     生データから効果的な作図まで簡単に辿り着けるということを体験してもらいます。
--   Goal:
-    生物学研究におけるデータ解釈・解析の重要性を認識する。
-    Rを使用してデータの前処理・可視化ができるようになる。
--   Schedule
-
-    | time  | 10/XX Mon | 10/XX Tue | 10/XX Wed | 10/XX Thu |
-    | ----- | --------- | --------- | --------- | --------- |
-    | 13:00 | **intro** | **transform 1** | **cleansing** | **stats 1** |
-    | 14:40 | **visualize** | **transform 2** | **input** | **stats 2** |
-    | 16:20 | practice | practice | practice | practice |
-
 -   Prerequisite
-    - ファイル、フォルダ、クリックなど一般的なパソコンの基礎知識と経験
-    - 下記のパソコン環境設定
+    - Basic computer skills: browsing webpages, handling files and folders, etc.
+    - Preparation of computing environment (described later)
 -   Textbook
     - None
 -   References
     - [Hadley Wickham et al. "R for Data Science"](https://r4ds.hadley.nz/)
     - [江崎貴裕「分析者のためのデータ解釈学入門」](https://amzn.to/3uznzCK) 2020
     - [本橋智光「前処理大全」](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)
--   Link to the slides: <https://heavywatal.github.io/slides/english2023r/>
 
 
 ## 実習環境の設定
@@ -55,17 +46,17 @@ draft = false
 
 1.  OSのソフトウェア・アップデートを基本的に全て適用して再起動。
     - Windows 11 (≥22H2)
-    - macOS Ventura (≥13.3)
+    - macOS Ventura (≥13.6)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
 1.  <https://cran.r-project.org/>
-    から最新版の **R本体(≥4.2.3)** をダウンロードしてインストール。
+    から最新版の **R本体(≥4.3.1)** をダウンロードしてインストール。
     OK連打のデフォルト設定で。
     古いものが既に入っている場合は念のため削除してから。
     - [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.*.*-win.exe`
     - [Mac](https://cran.r-project.org/bin/macosx/)
       → `R-4.*.*-arm64.pkg` (Apple Silicon) or `R-4.*.*.pkg` (Intel)
 1.  <https://posit.co/download/rstudio-desktop/>
-    から最新版の **RStudio(≥2023.03.0)** をダウンロードしてインストール。
+    から最新版の **RStudio(≥2023.09.0)** をダウンロードしてインストール。
     古いものが既に入っている場合は念のため削除してから。
 1.  開発者ツールをインストール。
     ここでは必須ではないけどいずれ使うことになる。
@@ -88,11 +79,11 @@ draft = false
     ```
     ```
     ── Attaching core tidyverse packages ───────────────── tidyverse 2.0.0 ──
-    ✔ dplyr     1.1.1     ✔ readr     2.1.4
+    ✔ dplyr     1.1.3     ✔ readr     2.1.4
     ✔ forcats   1.0.0     ✔ stringr   1.5.0
-    ✔ ggplot2   3.4.2     ✔ tibble    3.2.1
-    ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-    ✔ purrr     1.0.1
+    ✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+    ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+    ✔ purrr     1.0.2
     ```
 
 ### エラーや警告が出たら
