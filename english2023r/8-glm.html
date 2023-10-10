@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>8. Statistical modeling 2: linear regression — Hands-on Introduction to R 2023</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="8. Statistical modeling 2: linear regression — Hands-on Introduction to R 2023">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/english2023r/8-glm.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes/notes.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/search/search.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1440, height: 1080});
+  document.querySelector('html').style.fontSize = '240%';
+})
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="hands-on-introduction-to-r-2023"><a href=".">Hands-on Introduction to R 2023</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+Graduate School of Life Sciences, Tohoku University
+</div>
+<ol>
+<li><a href="1-introduction.html">Introduction: what is data analysis and R basics</a>
+<li><a href="2-visualization.html">Data visualization and reporting</a>
+<li><a href="3-structure1.html">Data transformation 1: extract, summarize</a>
+<li><a href="4-structure2.html">Data transformation 2: join, pivot</a>
+<li><a href="5-content.html">Data cleansing and conversion: numbers, text</a>
+<li><a href="6-input.html">Data input and interpretation</a>
+<li><a href="7-distribution.html">Statistical modeling 1: probability distribution, likelihood</a>
+<li class="current-deck"><a href="8-glm.html">Statistical modeling 2: linear regression</a>
+</ol>
+<div class="footnote">
+2023-12-06 Tohoku University<br>
+<a href="https://heavywatal.github.io/slides/english2023r/">https://heavywatal.github.io/slides/english2023r/</a>
+</div>
+
+</section>
+<section>
+<h2 id="統計モデリングのお品書き">統計モデリングのお品書き</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに回帰分析の概要を紹介。</p>
+<ol>
+<li>イントロ <a href="7-distribution.html">(#7 前回)</a></li>
+<li>統計モデルの基本
+<ul>
+<li>確率変数・<strong>確率分布</strong> 👈 主役</li>
+<li>尤度・最尤推定</li>
+</ul>
+</li>
+<li>一般化線形モデル、混合モデル <a href="8-glm.html">(#8 今回)</a></li>
+<li><del>ベイズ統計、階層ベイズモデル</del> (今回はここまでやらない)</li>
+</ol>
+<p>回帰のキモは<strong>線ではなく分布</strong>。</p>
+<hr>
+<cite>
+<p><a href="https://heavywatal.github.io/slides/tokiomarine2021/">Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)</a>
+の演習無し抜粋バージョン (~2時間 x 2回)。</p>
+</cite>
+
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
+<li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
+</ul>
+
+</section>
+<section>
+<h2 id="ここまで見てきた統計モデル">ここまで見てきた統計モデル</h2>
+<p>確率変数$X$はパラメータ$\theta$の確率分布$f$に“従う”: 
+$X \sim f(\theta) $</p>
+<p>e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分布に従う:</p>
+<div>\[\begin{split}
+X \sim \text{Poisson}(\lambda)
+\end{split}\]</div>
+<p><img src="./figure/only-dist-1.png" alt="plot of chunk only-dist"></p>
+<p>これを一般化線形モデル(GLM)として見ることもできる。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデルglmとして記述してみる">一般化線形モデル(GLM)として記述してみる</h2>
+<p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+平均値$\lambda_i$は<strong>他のデータによらず$\beta_0$で一定</strong>。</p>
+<div>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\lambda_i &= \beta_0
+\end{split}\]</div>
+<p><img src="./figure/glm-without-x-1.png" alt="plot of chunk glm-without-x"></p>
+<p>種子数をY軸にして、式を2つに分けただけ&hellip;?<br>
+<strong>説明変数</strong>を含むモデルを見ればご利益が分かるかも。</p>
+
+</section>
+<section>
+<h2 id="説明変数が1つある一般化線形モデル">説明変数が1つある一般化線形モデル</h2>
+<p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+平均値の対数$\log(\lambda_i)$は<strong>その個体の大きさ$x_i$に比例</strong>する。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0;">
+<figure style="margin-block: 1em 0;">
+<img src="../tokiomarine2021/glm.drawio.svg" width="600"><br>
+</figure>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="./figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
+  </div>
+</div>
+<p>この場合は<strong>単回帰</strong>。説明変数が複数あると<strong>重回帰</strong>。</p>
+
+</section>
+<section>
+<h2 id="複数の説明変数を同時に扱う重回帰">複数の説明変数を同時に扱う重回帰</h2>
+<p>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\end{split}\]</p>
+<p>気温も湿度も高いほどビールが売れる架空データ:</p>
+<p><img src="./figure/multiple-regression-1.png" alt="plot of chunk multiple-regression"></p>
+<p>ほかの<strong>確率分布</strong>と<strong>リンク関数</strong>を使う例を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="ロジスティック回帰">ロジスティック回帰</h2>
+<ul>
+<li>確率分布: <strong>二項分布</strong></li>
+<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>客10人中$y_i$人がビールを注文。<br>
+その日$i$の気温$x_i$によって割合が変化。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+<p>ロジスティック関数↑</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="./figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
+<ul>
+<li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
+<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>風が吹けば桶屋が儲かる。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Bernoulli}(p_i) \\
+  &= \text{Binomial}(1,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+<p>ロジスティック関数↑</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="./figure/wind-1.png" alt="plot of chunk wind"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="一般線形モデル-化無し-はglmの一種">一般線形モデル (“化”無し) はGLMの一種</h2>
+<ul>
+<li>確率分布: <strong>正規分布</strong></li>
+<li>リンク関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
+</ul>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
+\text{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<p><img src="./figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
+  </div>
+</div>
+<p>最小二乗法の直線あてはめと結果的に同じになる。</p>
+<p><small style="color: #999999;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small></p>
+
+</section>
+<section>
+<h2 id="分散分析-uanualysis-uouf-uvauriance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
+<p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等リンク</strong>のGLM、と解釈可能。<br>
+<span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">→</th>
+<th style="text-align:center">$x_1$ ☀️ 晴れ</th>
+<th style="text-align:center">$x_2$ ☔️ 雨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☁️ くもり</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="./figure/glm-anova-1.png" alt="plot of chunk glm-anova"></p>
+  </div>
+</div>
+<p>くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。</p>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="共分散分析-uanualysis-of-ucovauriance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
+<p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
+正規分布・等分散・恒等リンクなどが仮定される。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">→</th>
+<th style="text-align:center">$x_1$ ☀️ 晴れ</th>
+<th style="text-align:center">$x_2$ ☔️ 雨</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☁️ くもり</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">1</td>
+<td style="text-align:center">0</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center"></td>
+<td style="text-align:center">0</td>
+<td style="text-align:center">1</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
+\end{split}\]</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="./figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
+  </div>
+</div>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="交互作用">交互作用</h2>
+<p>ある説明変数の効果が、別の説明変数によって異なる。<br>
+e.g., ビール売上の温度依存性が天気によって異なる。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
+<table>
+<thead>
+<tr>
+<th>天気</th>
+<th style="text-align:center">$x_1$</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>☀️ 晴れ</td>
+<td style="text-align:center">1</td>
+</tr>
+<tr>
+<td>☔️ 雨</td>
+<td style="text-align:center">0</td>
+</tr>
+</tbody>
+</table>
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
+\end{split}\]</p>
+<p>雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
+  </div>
+  <div class="column" style="flex-shrink: 1.3;">
+<p><img src="./figure/interaction-1.png" alt="plot of chunk interaction"></p>
+  </div>
+</div>
+<p>解釈が一気に難しくなるのでむやみに使わない。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
+<p>確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
+特定の組み合わせには名前がある。</p>
+<table>
+<thead>
+<tr>
+<th>名前</th>
+<th>確率分布</th>
+<th>リンク関数</th>
+<th>説明変数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ポアソン回帰</td>
+<td>ポアソン分布</td>
+<td>log</td>
+<td></td>
+</tr>
+<tr>
+<td>ロジスティック回帰</td>
+<td>二項分布</td>
+<td>logit</td>
+<td></td>
+</tr>
+<tr>
+<td>一般線形回帰</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td></td>
+</tr>
+<tr>
+<td>分散分析</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td>質的変数</td>
+</tr>
+<tr>
+<td>共分散分析</td>
+<td>正規分布</td>
+<td>恒等</td>
+<td>質的変数+量的変数</td>
+</tr>
+</tbody>
+</table>
+<p>リンク関数をもう少しだけ掘り下げたい。</p>
+
+</section>
+<section>
+<h2 id="リンク関数">リンク関数</h2>
+<p>統計モデリングにおいて「まっすぐ以外も表現できる」意味</p>
+<dl>
+<dt>$\text{identity}(\mu_i)$</dt>
+<dd>$\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$</dd>
+<dd>説明変数の効果が<strong>足し算</strong>的に働く。</dd>
+<dt>$\log(\lambda_i)$</dt>
+<dd>$\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$</dd>
+<dd>説明変数の効果が<strong>掛け算</strong>的に働く。<br>
+e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる</dd>
+<dt>$\text{logit}(p_i)$</dt>
+<dd>$p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)</dd>
+<dd>説明変数の効果が<strong>頭打ち</strong>になる。<br>
+e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
+</dl>
+<p>ほかに <code>probit</code>, <code>inverse</code>, <code>sqrt</code>, etc.</p>
+
+</section>
+<section>
+<h2 id="rにおけるglmのやりかた">RにおけるGLMのやりかた</h2>
+<p>直線回帰のときの <code>lm</code> とほぼ同じ。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">~</span> <span class="n">height</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)      height 
+  -69.85222    78.63444 
+</code></pre><p>デフォルトは正規分布・恒等リンクで <code>lm</code> と同じ結果。<br>
+<code>family=</code> オプションで確率分布とリンク関数を明示的に指定:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">identity</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">poisson</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">log</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">binomial</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">logit</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">mydata</span><span class="p">)</span>
+</span></span></code></pre></div><p>See <a href="https://stat.ethz.ch/R-manual/R-patched/library/stats/html/family.html"><code>?family</code></a> for more details.</p>
+
+</section>
+<section>
+<h2 id="-とにかくglmを使ってみる練習">🔰 とにかくGLMを使ってみる練習</h2>
+<p>とりあえず当てはめと作図だけ。<br>
+結果の解釈やモデルの評価はこの後。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">50</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_weight</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">height</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">1.70</span><span class="p">,</span> <span class="m">0.05</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">bmi</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">22</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">weight</span> <span class="o">=</span> <span class="n">bmi</span> <span class="o">*</span> <span class="p">(</span><span class="n">height</span><span class="o">**</span><span class="m">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     height      bmi   weight
+ 1 1.718019 21.55500 63.62151
+ 2 1.782862 22.83775 72.59199
+ 3 1.617464 22.43569 58.69604
+ 4 1.678291 23.37245 65.83231
+--                           
+47 1.762930 21.78337 67.70106
+48 1.744133 21.47257 65.31960
+49 1.730495 19.72866 59.07966
+50 1.676496 22.85824 64.24627
+</code></pre>
+</section>
+<section>
+<h2 id="-とにかくglmを使ってみる練習-解答例">🔰 とにかくGLMを使ってみる練習 解答例</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit_wh</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">weight</span> <span class="o">~</span> <span class="n">height</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="nf">gaussian</span><span class="p">(</span><span class="n">link</span> <span class="o">=</span> <span class="n">identity</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit_wh</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)      height 
+  -69.85222    78.63444 
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">df_fit_wh</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">df_weight</span><span class="p">,</span> <span class="n">fit_wh</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">df_fit_wh</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/glm-df-weight-1.png" alt="plot of chunk glm-df-weight"></p>
+
+</section>
+<section>
+<h2 id="-ポアソン回帰">🔰 ポアソン回帰</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">300L</span>
+</span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="m">3</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="m">-3</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_seeds</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">body_mass</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">0.4</span><span class="p">,</span> <span class="m">1.7</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">num_seeds</span> <span class="o">=</span> <span class="nf">rpois</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nf">exp</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">body_mass</span> <span class="o">+</span> <span class="n">b</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    body_mass num_seeds
+  1 0.9185923         1
+  2 0.5154446         0
+  3 1.3362802         4
+  4 1.6858125        11
+ --                    
+297 1.3407210         3
+298 1.3357421         1
+299 0.8928759         0
+300 0.4583795         0
+</code></pre>
+</section>
+<section>
+<h2 id="-重回帰">🔰 重回帰</h2>
+<p><code>pred</code> で回帰線を引くには <code>add_predictions()</code> の使い方に工夫が必要。<br>
+とりあえず <code>geom_point()</code> で&quot;回帰点々&quot;を表示してみるとこまでで可とする。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
+</span></span><span class="line"><span class="cl"><span class="n">true_coef</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="m">0.05</span><span class="p">,</span> <span class="m">0.006</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_beer</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">temperature</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="m">32</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">humidity</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">20</span><span class="p">,</span> <span class="m">80</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">beer_sales</span> <span class="o">=</span> <span class="nf">rpois</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="nf">exp</span><span class="p">(</span><span class="n">true_coef[1]</span> <span class="o">+</span> <span class="n">true_coef[2]</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">+</span> <span class="n">true_coef[3]</span> <span class="o">*</span> <span class="n">humidity</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    temperature humidity beer_sales
+  1    17.57401 54.68339         67
+  2    10.13129 67.34727         55
+  3    25.28517 40.93855        104
+  4    31.73808 32.14308        113
+ --                                
+197    26.28116 41.89173        105
+198    23.53532 73.12257        113
+199    13.87494 41.92560         51
+200    31.60519 61.47984        140
+</code></pre>
+</section>
+<section>
+<h2 id="-ロジスティック回帰">🔰 ロジスティック回帰</h2>
+<p>次ページにヒント。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sigmoid</span> <span class="o">=</span> <span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gain</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gain</span> <span class="o">*</span> <span class="n">x</span><span class="p">))}</span>
+</span></span><span class="line"><span class="cl"><span class="n">nrep</span> <span class="o">=</span> <span class="m">200L</span>
+</span></span><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">10L</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_logistic</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">nrep</span><span class="p">,</span> <span class="m">-10</span><span class="p">,</span> <span class="m">35</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">logit_p</span> <span class="o">=</span> <span class="m">-3</span> <span class="o">+</span> <span class="m">0.3</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">logit_p</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">y</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">nrep</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">response</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">y</span><span class="p">),</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>            x    logit_p          p  y response[,1] [,2]
+  1  7.951271 -0.6146188 0.35100632  4            4    6
+  2 -6.003840 -4.8011520 0.00815325  0            0   10
+  3 22.409698  3.7229095 0.97640654 10           10    0
+  4 34.508895  7.3526686 0.99935953 10           10    0
+ --                                                     
+197 24.277180  4.2831541 0.98638875 10           10    0
+198 19.128721  2.7386162 0.93926720  8            8    2
+199  1.015520 -2.6953441 0.06324865  0            0   10
+200 34.259733  7.2779199 0.99930986 10           10    0
+</code></pre>
+</section>
+<section>
+<h2 id="ロジスティック回帰のヒント">ロジスティック回帰のヒント</h2>
+<p>左辺の応答変数に指定できるのはだいたい次の2種類:</p>
+<ul>
+<li>成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)</li>
+<li>1列目が成功回数、2列目が失敗回数の整数matrix</li>
+</ul>
+<p>今回の場合、成功回数 <code>y</code> だけをformulaに入れると怒られる</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">,</span> <span class="n">df_logistic</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">binomial</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Error in eval(family$initialize): y values must be 0 &lt;= y &lt;= 1
+</code></pre><p>ので失敗回数もモデルに含むよう <code>response ~ x</code> とする。</p>
+<p>(今回のように試行回数が10回固定じゃなくても使える、ということ)</p>
+
+</section>
+<section>
+<h2 id="-共分散分析-glm-with-質的変数--量的変数">🔰 共分散分析: GLM with 質的変数 + 量的変数</h2>
+<p>まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">70</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">20</span><span class="p">,</span> <span class="m">-20</span><span class="p">)</span>  <span class="c1"># true coef</span>
+</span></span><span class="line"><span class="cl"><span class="n">weather_levels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;sunny&#34;</span><span class="p">,</span> <span class="s">&#34;cloudy&#34;</span><span class="p">,</span> <span class="s">&#34;rainy&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_ancova</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">temperature</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="m">32</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">weather</span> <span class="o">=</span> <span class="nf">factor</span><span class="p">(</span><span class="nf">sample</span><span class="p">(</span><span class="n">weather_levels</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="kc">TRUE</span><span class="p">),</span> <span class="n">levels</span> <span class="o">=</span> <span class="n">weather_levels</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">weather</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_wider</span><span class="p">(</span><span class="n">values_fill</span> <span class="o">=</span> <span class="m">0L</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="o">!</span><span class="n">cloudy</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">mu</span> <span class="o">=</span> <span class="n">b[1]</span> <span class="o">+</span> <span class="n">b[2]</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">+</span> <span class="n">b[3]</span> <span class="o">*</span> <span class="n">sunny</span> <span class="o">+</span> <span class="n">b[4]</span> <span class="o">*</span> <span class="n">rainy</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">beer_sales</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    temperature weather sunny rainy        mu beer_sales
+  1   23.377217  cloudy     0     0 140.13165  129.36288
+  2   26.043088  cloudy     0     0 148.12926  138.26966
+  3   30.830351  cloudy     0     0 162.49105  141.46190
+  4   15.022311  cloudy     0     0 115.06693  108.18593
+ --                                                     
+197    8.277514  cloudy     0     0  94.83254   74.38321
+198   28.675228   rainy     0     1 136.02568  140.34777
+199   27.310881   rainy     0     1 131.93264  122.31587
+200   24.064285   sunny     1     0 162.19286  144.89368
+</code></pre>
+</section>
+<section>
+<h2 id="-交互作用">🔰 交互作用</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
+</span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">70</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">100</span><span class="p">,</span> <span class="m">-2</span><span class="p">)</span>  <span class="c1"># true coef</span>
+</span></span><span class="line"><span class="cl"><span class="n">weather_levels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;sunny&#34;</span><span class="p">,</span> <span class="s">&#34;rainy&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_interact</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="n">temperature</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="m">8</span><span class="p">,</span> <span class="m">32</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">    <span class="n">weather</span> <span class="o">=</span> <span class="nf">factor</span><span class="p">(</span><span class="nf">sample</span><span class="p">(</span><span class="n">weather_levels</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="kc">TRUE</span><span class="p">),</span> <span class="n">levels</span> <span class="o">=</span> <span class="n">weather_levels</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">name</span> <span class="o">=</span> <span class="n">weather</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_wider</span><span class="p">(</span><span class="n">values_fill</span> <span class="o">=</span> <span class="m">0L</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">mu</span> <span class="o">=</span> <span class="n">b[1]</span> <span class="o">*</span> <span class="n">sunny</span> <span class="o">+</span> <span class="n">b[2]</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">+</span> <span class="n">b[3]</span> <span class="o">*</span> <span class="n">rainy</span> <span class="o">+</span> <span class="n">b[4]</span> <span class="o">*</span> <span class="n">temperature</span> <span class="o">*</span> <span class="n">rainy</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">beer_sales</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="m">10</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    temperature weather rainy sunny        mu beer_sales
+  1   23.377217   rainy     1     0 123.37722   116.2995
+  2   26.043088   rainy     1     0 126.04309   133.9018
+  3   30.830351   rainy     1     0 130.83035   130.6798
+  4   15.022311   rainy     1     0 115.02231   117.5620
+ --                                                     
+197    8.277514   sunny     0     1  94.83254   104.2573
+198   28.675228   sunny     0     1 156.02568   155.3134
+199   27.310881   rainy     1     0 127.31088   131.0297
+200   24.064285   sunny     0     1 142.19286   142.8241
+</code></pre>
+</section>
+<section>
+<h2 id="データはひとつモデルはたくさん">データはひとつ、モデルはたくさん</h2>
+<p>どう選ぶ？</p>
+<ol>
+<li>メカニズム的に納得できるものを選ぶ
+<ul>
+<li>ポアソン過程の<strong>カウント</strong>ならポアソン分布、<strong>間隔</strong>ならガンマ分布</li>
+<li>n回中k回のように<strong>割合的なカウント</strong>なら二項分布</li>
+</ul>
+</li>
+<li>データを可視化してみて、それっぽい形・性質のものを選ぶ
+<ul>
+<li><strong>左右対称のひと山</strong>ならとりあえず正規分布</li>
+<li><strong>負の値を取らない</strong>ならガンマ分布</li>
+<li>直線的か、指数関数的か、頭打ちか、などなど</li>
+</ul>
+</li>
+</ol>
+<p>客観的な指標もほしい。<br>
+モデルの尤もらしさといえば&hellip;</p>
+
+</section>
+<section>
+<h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
+<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>:<br>
+$\text{Prob}(D \mid M)$</p>
+<p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
+$L(M \mid D)$</p>
+<p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+$L(\theta \mid D)$ or $L(\theta)$</p>
+<p><strong>対数尤度</strong> $\log L$ の形にしたほうがいろいろ便利。</p>
+<hr>
+<p>各モデルで最適なパラメータを探して、比較:<br>
+$\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      1305.043      49 -124.9298 255.8597 261.5957 433.2606          48   50
+</code></pre>
+</section>
+<section>
+<h2 id="たしかに尤度はあてはまりの良さを表してそう">たしかに尤度はあてはまりの良さを表してそう</h2>
+<p>この場合は直線回帰よりもポアソン回帰が良さそう:</p>
+<p><img src="./figure/compare-loglik-1.png" alt="plot of chunk compare-loglik"></p>
+<p>この調子で、より尤度の高いモデルを探していけばいいだろうか？</p>
+
+</section>
+<section>
+<h2 id="あてはまりが良ければいいってもんでもない">あてはまりが良ければいいってもんでもない</h2>
+<dl>
+<dt>過剰適合 / 過学習 / overfitting</dt>
+<dd>パラメータを増やせば<strong>現データへの</strong>適合度・尤度を高くできるが、<br>
+予測・理解の役には立たなくなる。</dd>
+</dl>
+<p><img src="./figure/saturated-model-1.png" alt="plot of chunk saturated-model"></p>
+<p><strong>帰無モデル</strong>: 説明変数なし。切片のみ。<br>
+<strong>飽和モデル</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル</p>
+
+</section>
+<section>
+<h2 id="無駄な説明変数を加えても尤度は上がる">無駄な説明変数を加えても尤度は上がる</h2>
+<p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+観察時に着てた服の色 $x_2$ を追加すると尤度が上がる&hellip;&hellip;?</p>
+<p><img src="./figure/many-models-1.png" alt="plot of chunk many-models"></p>
+
+</section>
+<section>
+<h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
+<p>\[\begin{split}
+\text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
+\end{split}\]</p>
+<ul>
+<li><strong>AICが小さいほど予測精度の良いモデル</strong>。
+<ul>
+<li>尤度は上げたい。</li>
+<li>パラメータ数 $k$ が増えるとペナルティ。</li>
+</ul>
+</li>
+<li>どのデータに対する当てはまりを目指すかという観点
+<ul>
+<li>「手元のデータ」に対する対数尤度は $\log L^*$<br></li>
+<li>「真のメカニズムから出てくる未来のデータ」に対する<br>
+平均対数尤度の推定量は $(\log L^* - k)$<br>
+(Kullback&ndash;Leibler情報量を使って導出するらしい)</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      1305.043      49 -124.9298 255.8597 261.5957 433.2606          48   50
+</code></pre>
+</section>
+<section>
+<h2 id="無駄な説明変数の追加でaic増加">無駄な説明変数の追加でAIC増加</h2>
+<p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。</p>
+<p><img src="./figure/many-models-aic-1.png" alt="plot of chunk many-models-aic"></p>
+
+</section>
+<section>
+<h2 id="ほかの情報量基準">ほかの情報量基準</h2>
+<ul>
+<li>$\text{BIC} = -2 \log L^* + k \log n$
+<ul>
+<li>パラメータ数 $k$ でペナルティを付けるのはAICと同じ。</li>
+<li>データの観測数 $n$ に依存する点でAICと異なる。<br>
+感覚としては「AICはデータサイズによるペナルティが無い」</li>
+<li>(周辺尤度の最大化という観点で導出するらしい)</li>
+</ul>
+</li>
+<li><a href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html">WAIC</a>,
+<a href="http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html">WBIC</a>
+<ul>
+<li>AIC, BICを一般化し、広く使えるようにしたもの。</li>
+<li>理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
+そうじゃない場合(現実的には常に)こちらが優位。</li>
+<li>WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="モデル選択の心構え">モデル選択の心構え</h2>
+<p>「正しい」ものを選べるわけではない。<br>
+予測・理解に useful なものを何らかの基準で選ぶだけ。</p>
+<blockquote>
+<p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
+</blockquote>
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+</section>
+<section>
+<h2 id="現実的な注意点悩みどころ">現実的な注意点・悩みどころ</h2>
+<ul>
+<li>多重共線性(multicollinearity):
+<ul>
+<li>説明変数同士が強い相関関係にある</li>
+</ul>
+</li>
+<li>変数変換:
+<ul>
+<li>気安くやるべきじゃないけど、対数変換などしばしば有用</li>
+<li>割り算した値は危険</li>
+</ul>
+</li>
+<li>交互作用を入れると解釈が難しくなる。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="一般化線形モデル座学まとめ">一般化線形モデル座学まとめ</h2>
+<ul>
+<li>何はともあれ散布図を描く</li>
+<li>適切な確率分布・リンク関数・説明変数を考える</li>
+<li>パラメータを最尤推定する</li>
+<li>尤度は「手元のデータへのあてはまり」</li>
+<li>モデルを比較するときは情報量基準を参考にする</li>
+</ul>
+
+</section>
+<section>
+<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;palmerpenguins&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">palmerpenguins</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">penguins_colors</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">Adelie</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">Chinstrap</span> <span class="o">=</span> <span class="s">&#34;purple&#34;</span><span class="p">,</span> <span class="n">Gentoo</span> <span class="o">=</span> <span class="s">&#34;cyan4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">penguins</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<pre tabindex="0"><code>      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
+  1    Adelie Torgersen           39.1          18.7               181        3750   male 2007
+  2    Adelie Torgersen           39.5          17.4               186        3800 female 2007
+  3    Adelie Torgersen           40.3          18.0               195        3250 female 2007
+  4    Adelie Torgersen             NA            NA                NA          NA     NA 2007
+ --                                                                                           
+341 Chinstrap     Dream           43.5          18.1               202        3400 female 2009
+342 Chinstrap     Dream           49.6          18.2               193        3775   male 2009
+343 Chinstrap     Dream           50.8          19.0               210        4100   male 2009
+344 Chinstrap     Dream           50.2          18.7               198        3775 female 2009
+</code></pre>
+</section>
+<section>
+<h2 id="欠損値のある行を取り除いておく">欠損値のある行を取り除いておく</h2>
+<p>性別はとりあえず使わないので、体長関連だけでも。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">if_any</span><span class="p">(</span><span class="nf">everything</span><span class="p">(),</span> <span class="n">is.na</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex year
+ 1  Adelie Torgersen             NA            NA                NA          NA  NA 2007
+ 2  Adelie Torgersen           34.1          18.1               193        3475  NA 2007
+ 3  Adelie Torgersen           42.0          20.2               190        4250  NA 2007
+ 4  Adelie Torgersen           37.8          17.1               186        3300  NA 2007
+--                                                                                      
+ 8  Gentoo    Biscoe           46.2          14.4               214        4650  NA 2008
+ 9  Gentoo    Biscoe           47.3          13.8               216        4725  NA 2009
+10  Gentoo    Biscoe           44.5          15.7               217        4875  NA 2009
+11  Gentoo    Biscoe             NA            NA                NA          NA  NA 2009
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">dim</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 342   8
+</code></pre>
+</section>
+<section>
+<h2 id="-penguinsでglmの練習">🔰 penguinsでGLMの練習</h2>
+<p>次の課題を解いてみよう。<br>
+(次ページ以降に解答。まずは自力で。)</p>
+<ol>
+<li><code>body_mass_g</code> を横軸、 <code>flipper_length_mm</code> を縦軸に、まず作図。</li>
+<li>単回帰して、切片と傾きを求める。そして作図。</li>
+<li><code>species</code> で色分けして作図。</li>
+<li><code>species</code> も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。</li>
+<li>余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。</li>
+</ol>
+
+</section>
+<section>
+<h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
+<p>どうやら、重いペンギンほど翼長も長い。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">,</span> <span class="n">flipper_length_mm</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.66</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme</span><span class="p">(</span><span class="n">panel.grid.minor</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_penweight</span>
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-1.png" alt="plot of chunk penguins-weight"></p>
+
+</section>
+<section>
+<h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
+<p>とりあえずデフォルトの正規分布・恒等リンク。
+$y = 136.7 + 0.0153 x$</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>         term     estimate   std.error statistic       p.value
+1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
+2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC     BIC deviance df.residual nobs
+1      67426.54     341 -1145.518 2297.035 2308.54  16250.3         340  342
+</code></pre>
+</section>
+<section>
+<h2 id="単回帰の練習-3-フィッティング結果を作図">単回帰の練習: 3. フィッティング結果を作図</h2>
+<p>結果とデータから予測値を作って回帰線を引く。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added1</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit1</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added1</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p1</span>
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-glm-1.png" alt="plot of chunk penguins-weight-glm"></p>
+
+</section>
+<section>
+<h2 id="重回帰の練習-1-まず作図">重回帰の練習: 1. まず作図</h2>
+<p>種によって色分けしてみると、傾向の違いが見える。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight_color</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p_penweight_color</span>
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-sp-1.png" alt="plot of chunk penguins-weight-sp"></p>
+
+</section>
+<section>
+<h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
+<p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+体重の効果は単回帰のとき(0.0153)より小さい。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
+1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
+2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
+4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338  342
+</code></pre>
+</section>
+<section>
+<h2 id="重回帰の練習-3-フィッティング結果を作図">重回帰の練習: 3. フィッティング結果を作図</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added2</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added2</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p2</span>
+</span></span></code></pre></div><p><img src="./figure/penguins-weight-sp-glm-1.png" alt="plot of chunk penguins-weight-sp-glm"></p>
+<p><strong>傾き</strong>も種によって違うかも。<strong>交互作用</strong>を入れてみたい。</p>
+
+</section>
+<section>
+<h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
+<p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+切片の違いは解釈しにくくなった。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>                          term      estimate    std.error statistic       p.value
+1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
+2                  body_mass_g   0.006676867 0.0009522935  7.011354  1.301783e-11
+3             speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
+4                speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
+5 body_mass_g:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
+6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      67426.54     341 -1055.711 2125.422 2152.265 9611.166         336  342
+</code></pre>
+</section>
+<section>
+<h2 id="交互作用の練習-フィッティング結果を作図">交互作用の練習: フィッティング結果を作図</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added3</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit3</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added3</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p3</span>
+</span></span></code></pre></div><p><img src="./figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction"></p>
+
+</section>
+<section>
+<h2 id="ここまでの3つのモデルでどれがいいか">ここまでの3つのモデルでどれがいいか？</h2>
+<p>AICで選ぶなら交互作用入り重回帰が良さそう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">labels</span> <span class="o">=</span> <span class="nf">sprintf</span><span class="p">(</span><span class="s">&#34;AIC = %.1f&#34;</span><span class="p">,</span> <span class="nf">AIC</span><span class="p">(</span><span class="n">fit1</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">fit3</span><span class="p">)</span><span class="o">$</span><span class="n">AIC</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">p1</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[1]</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="n">p2</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[2]</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span> <span class="o">=</span> <span class="s">&#34;none&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">                   <span class="n">p3</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[3]</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span> <span class="o">=</span> <span class="s">&#34;none&#34;</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/penguins-aic-1.png" alt="plot of chunk penguins-aic"></p>
+
+</section>
+<section>
+<h2 id="余裕があったら追加の練習">余裕があったら追加の練習</h2>
+<p>🔰クチバシの長さと深さで同じ解析をやってみよう。</p>
+<p><img src="./figure/penguins-bill-1.png" alt="plot of chunk penguins-bill"></p>
+
+</section>
+<section>
+<h2 id="-4日目の課題2-架空データでglm">🔰 4日目の課題2: 架空データでGLM</h2>
+<p>宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。<br>
+冒険者の<strong>レベル</strong>、<strong>職業</strong>、通ってきた<strong>ルート</strong>、魔物との<strong>遭遇回数</strong>。<br>
+これらの変数の間に、なんらかの関係は見られるだろうか？</p>
+<p><a href="adventure.tsv">adventure.tsv</a></p>
+<pre tabindex="0"><code>     level     job route encounter
+   1     7 fighter field         2
+   2     7 fighter field         0
+   3    40    mage  cave         9
+   4    38    mage field         3
+  --                              
+ 997    17 fighter  cave         4
+ 998    49    mage field         8
+ 999    43 fighter field         6
+1000    37    mage field        11
+</code></pre>
+</section>
+<section>
+<h2 id="-最終課題-オープンデータを拾って解析しよう">🔰 最終課題: オープンデータを拾って解析しよう。</h2>
+<ul>
+<li><a href="https://www.e-stat.go.jp/">e-Stat</a>: 政府統計の総合窓口</li>
+<li><a href="https://www.data.go.jp/data/dataset?res_format=CSV">data.go.jp データカタログサイト</a>: 中央省庁</li>
+<li><a href="https://odcs.bodik.jp/">BODIKオープンデータカタログサイト</a>: 地方自治体</li>
+<li><a href="https://www.data.jma.go.jp/gmd/risk/obsdl/index.php">気象庁</a></li>
+<li><a href="https://www.data.gov/">DATA.GOV</a>: U.S. Government’s open data</li>
+<li>ほか、なんでも興味のあるデータ</li>
+</ul>
+<dl>
+<dt>発表・レポートの条件</dt>
+<dd>最低1枚の図と、そこに至る前処理＋可視化のコード。</dd>
+<dd>グラフから読み取れることを一言。</dd>
+<dd>GLMで変数間の関係を考察できるとなおよし。</dd>
+</dl>
+<p>週明けに班内で話し合ってベスト2を選び、全体に向けて発表。
+</section>
+<section>
+<h2 id="ここ以降は余裕があれば進む">ここ以降は余裕があれば進む</h2>
+
+</section>
+<section>
+<h2 id="n個のうちy個生存二項分布に従わない">n個のうちy個生存。二項分布に従&hellip;&hellip;わない！</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<p><img src="./figure/overdispersion-1.png" alt="plot of chunk overdispersion"></p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$をそのままパラメータにすると<strong>過剰適合</strong>。<br>
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから&hellip;&hellip;</p>
+<p><img src="./figure/saturated-glmm-1.png" alt="plot of chunk saturated-glmm"></p>
+<p>個体の生存能力をもっと少ないパラメータで表現できないか？</p>
+
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
+<p><img src="./figure/sigmoid-1.png" alt="plot of chunk sigmoid"></p>
+<p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
+<p>前者は標本平均 $\hat p$ から求まるとして、後者どうする？</p>
+
+</section>
+<section>
+<h2 id="個体能力のばらつき-sigma-が大きいと両端が増える">個体能力のばらつき $\sigma$ が大きいと両端が増える</h2>
+<p>普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。</p>
+<p><img src="./figure/alter-sigma-1.png" alt="plot of chunk alter-sigma"><img src="./figure/alter-sigma-2.png" alt="plot of chunk alter-sigma"></p>
+
+</section>
+<section>
+<h2 id="zの値で色分けしてみると想像しやすい">zの値で色分けしてみると想像しやすい</h2>
+<p>正規分布と二項分布の混ぜ合わせ&hellip;&hellip;?</p>
+<p><img src="./figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z"><img src="./figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z"></p>
+
+</section>
+<section>
+<h2 id="混合分布ただの二項分布よりも良いあてはまり">混合分布。ただの二項分布よりも良いあてはまり。</h2>
+<p>パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。</p>
+<p><img src="./figure/before-mixing-1.png" alt="plot of chunk before-mixing"></p>
+<div align="center">
+<p><img src="./figure/after-mixing-1.png" alt="plot of chunk after-mixing"></p>
+</div>
+</section>
+<section>
+<h2 id="一般化線形混合モデル-glmm">一般化線形混合モデル GLMM</h2>
+<p><strong>固定効果(fixed effects)</strong> のみ扱っていたGLMを拡張して、<br>
+<strong>変量効果(random effect)</strong> を混合したモデル。<br>
+<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small></p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+  + z_{1i} + \ldots \\
+z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
+\end{split}\]</p>
+<p>e.g.,<br>
+個体$i$の種子生存率$p_i$は、<br>
+(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
+(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。</p>
+
+</section>
+<section>
+<h2 id="固定効果にするか変量効果にするか">固定効果にするか、変量効果にするか</h2>
+<p>推定したパラメータを予測に使うなら固定効果</p>
+<dl>
+<dt>予測に使えそうなので固定効果向き</dt>
+<dd><ul>
+<li>観測・操作した連続値変数: 長さ、重さ、温度、etc.</li>
+</ul>
+</dd>
+<dd><ul>
+<li>観測・操作したカテゴリカル変数: 性別、投薬、etc.</li>
+</ul>
+</dd>
+<dt>予測に使えないので変量効果向き</dt>
+<dd><ul>
+<li>観測・操作できなかった個体差:<br>
+たまたま集まってくれた学生15人 {A, B, C, &hellip;}。<br>
+Aさんの固定効果を推定できても、Zさんの予測には使えない。</li>
+</ul>
+</dd>
+<dd><ul>
+<li>観測・操作できなかったグループ差:<br>
+↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
+いグループの固定効果を推定できても、また集まることはない。</li>
+</ul>
+</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="どういうときに変量効果を考える必要があるか">どういうときに変量効果を考える必要があるか</h2>
+<p>データに<strong>擬似反復</strong>が含まれるとき。<br>
+ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。</p>
+<table>
+<thead>
+<tr>
+<th>植木鉢</th>
+<th>個体/植木鉢</th>
+<th>種子/個体</th>
+<th>疑似反復</th>
+<th>推定不可</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100個</td>
+<td>1個体ずつ</td>
+<td>1個ずつ</td>
+<td>–</td>
+<td>個体差・鉢差</td>
+</tr>
+<tr>
+<td>25個</td>
+<td>1個体ずつ</td>
+<td>4個ずつ</td>
+<td>個体</td>
+<td>鉢差</td>
+</tr>
+<tr>
+<td>20個</td>
+<td>5個体ずつ</td>
+<td>1個ずつ</td>
+<td>植木鉢</td>
+<td>個体差</td>
+</tr>
+<tr>
+<td>5個</td>
+<td>5個体ずつ</td>
+<td>4個ずつ</td>
+<td>植木鉢・個体</td>
+<td>–</td>
+</tr>
+</tbody>
+</table>
+<p>疑似反復あり<br>
+→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
+→ そのぶんを差し引いて固定効果を推定したい</p>
+
+</section>
+<section>
+<h2 id="glmmの問題点展望">GLMMの問題点・展望</h2>
+<ul>
+<li>最尤推定の計算が難しくなるので、あまり複雑にはできない
+<ul>
+<li>ベイズ推定を使えばクリアできる</li>
+</ul>
+</li>
+<li>GLMの拡張として理解はできても、実際に書くのは難しめ
+<ul>
+<li>階層ベイズモデルの一種として見るほうが便利</li>
+</ul>
+</li>
+</ul>
+<p>→ ここでGLMMの練習はせず、階層ベイズモデルに進む。</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+</section>
+<section>
+<h2 id="一般化線形混合モデルまとめ">一般化線形(混合)モデルまとめ</h2>
+<ul>
+<li>何はともあれ作図して俯瞰</li>
+<li>GLMは統計モデリングの考え方の根幹
+<ul>
+<li>確率分布・リンク関数・説明変数</li>
+<li>尤度・最尤法によるパラメータ推定</li>
+<li>情報量基準などによるモデル選択</li>
+</ul>
+</li>
+<li>GLMMは現実のデータ解析に向けた強化
+<ul>
+<li>疑似反復による変量効果を考慮</li>
+<li>階層ベイズモデルとして扱うほうが楽</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="今日の残り時間">今日の残り時間</h2>
+<ul>
+<li>班やTAに相談し、消化しきれなかった部分をなるべく解消する。</li>
+<li>まずは個人で課題1と2に取り組み、ある程度できたら班内で見せ合う。</li>
+<li>最終課題に向けて話し合ったり。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/2Q0f6JQ">科学とモデル&mdash;シミュレーションの哲学 入門</a> Michael Weisberg 2017<br>
+(原著: <a href="https://amzn.to/3bdvhuI">Simulation and Similarity</a> 2013)</li>
+</ul>
+
+</section>
+</div>
+</div>
+</body>
+</html>

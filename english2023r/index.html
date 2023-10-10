@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Hands-on Introduction to R 2023</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Hands-on Introduction to R 2023">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/english2023r/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<link rel="stylesheet" href="/lib/katex/katex.min.css">
+<script defer src="/lib/katex/katex.min.js"></script>
+<script defer src="/lib/katex/contrib/auto-render.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  renderMathInElement(document.body, {
+    delimiters: [
+      {left: "\\[", right: "\\]", display: true},
+      {left: "$", right: "$", display: false}
+    ]
+  });
+});
+</script>
+<style>
+.katex {
+  font-size: 1.12em;
+}
+
+.katex-display > .katex {
+  text-align: left;
+  padding-left: 2rem;
+}
+</style>
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-V60H2JH0G6', { 'anonymize_ip': false });
+}
+</script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-plain.css">
+</head>
+<body>
+<main>
+<header>
+<h1>Hands-on Introduction to R 2023</h1>
+</header>
+<p>🚧 Translation in progress 🚧</p>
+<h2 id="summary">Summary</h2>
+<ul>
+<li>Lecturer: Watal M Iwasaki, PhD</li>
+<li>Date: 2023-11-27 to 2023-12-06</li>
+<li>Time: 16:00+JST, 90 minutes a day</li>
+<li>Place: Zoom.us + Biology bldg., Aobayama, Tohoku University</li>
+<li>Website: <a href="https://heavywatal.github.io/slides/english2023r/">https://heavywatal.github.io/slides/english2023r/</a><br>
+Links to the slides are <a href="javascript:document.getElementById('slides').scrollIntoView(%7Bbehavior:%20'smooth'%7D);">at the bottom</a>:</li>
+<li>Abstract:<br>
+理学部生物学科における研究とは、大雑把に言うと
+「生物に関するデータを集め、その背後にある理（ことわり）を読み解くこと」です。
+そのため、データの解析と作図はどんな研究をするにもほぼ不可欠となります。
+正しい結論を導くためには、データをいろいろな角度から可視化して全体の構造を見渡すことが特に重要です。
+また、観察・実験・データベースなどから得られるデータは多種多様であり、
+そのまますぐ使えることはめったにありません。
+まずデータを整形するところから始める必要があります。
+この前処理にせよ、作図にせよ、
+「エクセルであれをあっちにコピペして、メニューからあれを選択して&hellip;」
+といった手作業でやるのは大変ですし、再現性が無いため科学の手続きとしても問題です。
+いつでもだれでも再検証したり使いまわしたりできるように、
+規則性のある退屈な仕事は機械に任せるのが得策です。
+本実習では、近年さらに易しくなったR言語を用いることで、
+生データから効果的な作図まで簡単に辿り着けるということを体験してもらいます。</li>
+<li>Prerequisite
+<ul>
+<li>Basic computer skills: browsing webpages, handling files and folders, etc.</li>
+<li>Preparation of computing environment (described later)</li>
+</ul>
+</li>
+<li>Textbook
+<ul>
+<li>None</li>
+</ul>
+</li>
+<li>References
+<ul>
+<li><a href="https://r4ds.hadley.nz/">Hadley Wickham et al. &ldquo;R for Data Science&rdquo;</a></li>
+<li><a href="https://amzn.to/3uznzCK">江崎貴裕「分析者のためのデータ解釈学入門」</a> 2020</li>
+<li><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&amp;linkCode=ll1&amp;tag=heavywatal-22&amp;linkId=8a3fd4e9a0c944b1b41242bbab8d147b">本橋智光「前処理大全」</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="実習環境の設定">実習環境の設定</h2>
+<p>途中まででもいいので、できるかぎり実習前に済ませてもらえると助かります。</p>
+<ol>
+<li>OSのソフトウェア・アップデートを基本的に全て適用して再起動。
+<ul>
+<li>Windows 11 (≥22H2)</li>
+<li>macOS Ventura (≥13.6)</li>
+</ul>
+</li>
+<li>ファイル名の末尾(<code>.pdf</code> とか <code>.png</code> とか)の<a href="https://duckduckgo.com/?q=%E6%8B%A1%E5%BC%B5%E5%AD%90+%E8%A1%A8%E7%A4%BA">拡張子を常時表示する</a>ようにOSを設定。</li>
+<li><a href="https://cran.r-project.org/">https://cran.r-project.org/</a>
+から最新版の <strong>R本体(≥4.3.1)</strong> をダウンロードしてインストール。
+OK連打のデフォルト設定で。
+古いものが既に入っている場合は念のため削除してから。
+<ul>
+<li><a href="https://cran.r-project.org/bin/windows/base">Windows → base</a> → <code>R-4.*.*-win.exe</code></li>
+<li><a href="https://cran.r-project.org/bin/macosx/">Mac</a>
+→ <code>R-4.*.*-arm64.pkg</code> (Apple Silicon) or <code>R-4.*.*.pkg</code> (Intel)</li>
+</ul>
+</li>
+<li><a href="https://posit.co/download/rstudio-desktop/">https://posit.co/download/rstudio-desktop/</a>
+から最新版の <strong>RStudio(≥2023.09.0)</strong> をダウンロードしてインストール。
+古いものが既に入っている場合は念のため削除してから。</li>
+<li>開発者ツールをインストール。
+ここでは必須ではないけどいずれ使うことになる。
+<ul>
+<li>Windows: <a href="https://cran.r-project.org/bin/windows/Rtools/"><strong>Rtools</strong></a>
+(R本体のバージョンに合わせる)</li>
+<li>Mac: <a href="https://duckduckgo.com/?q=command+line+tools"><strong>Command Line Tools</strong></a>:
+ターミナルで <code>xcode-select --install</code> を実行。
+Xcode環境は不要。</li>
+</ul>
+</li>
+<li>RStudioを起動し、左側のConsoleで次の1行を実行:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;binary&#34;</span><span class="p">)</span>
+</span></span></code></pre></div>何か訊かれたら <code>yes</code> と回答。
+パッケージがたくさんインストールされる。
+エラーや警告らしきものがあれば全文コピーしておく。</li>
+<li>Consoleに次の2行を打ち込んでメッセージを確認:
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>── Attaching core tidyverse packages ───────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.3     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2
+</code></pre></li>
+</ol>
+<h3 id="エラーや警告が出たら">エラーや警告が出たら</h3>
+<ol>
+<li>
+<p>実習当日に教員やTAに相談。全員の環境を確認してから進みます。</p>
+</li>
+<li>
+<p><strong>バージョン確認</strong>。OS、R、RStudioなどのソフトウェアが古すぎるかも。
+それらが十分に新しければ、次に挙げる日本語やOneDriveの問題は対処済みのはず。</p>
+</li>
+<li>
+<p>手元のコンピューターの<strong>ホームフォルダ</strong>を確認。
+新しくターミナルを開いて <code>pwd</code> コマンドを実行。
+ここに半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがち。
+ここだけ修正するのはかなり難しい
+(ユーザー名のフルネーム表示は変更できるけどそれは無関係)。
+新しいユーザーアカウントを作って引っ越すとか、
+OSをクリーンインストールするとかしてやり直したほうが結局早そう。
+<strong>半角アルファベット小文字のみ</strong>で短いものを推奨。</p>
+<ul>
+<li>✅ Good: <code>watal</code>, <code>tamakino</code></li>
+<li>❌ Bad: <code>岩嵜航</code>, <code>Watal Iwasaki</code>, <code>heavy.watal</code></li>
+</ul>
+<p>Windowsのホームフォルダ(<code>%USERPROFILE%</code>)はログインの仕方で決まるっぽい:</p>
+<ul>
+<li>✅ <strong>Microsoftアカウント</strong>(<code>example@outlook.jp</code>)でログイン:
+<code>C:/Users/examp/</code> (ユーザー名が漢字だろうがなんだろうが、<strong>メールアドレスの最初の5文字</strong>が使われるのでセーフ)</li>
+<li>Microsoftアカウントを使わず、<strong>ローカルユーザー</strong>としてログイン
+<ul>
+<li>✅ 半角英字のみのユーザー名なら問題ない: <code>C:/Users/goodname/</code></li>
+<li>❌ 漢字など全角文字を含むアカウント名: <code>C:/Users/朗軽 遊佐/</code><br>
+RとRStudioは既に対応済みだけど、Quarto(あるいはPandoc?)は未対応らしくてエラー。
+他のソフトウェアでも不具合が出る危険あり。
+ローカルユーザーを作ったあとでMicrosoftアカウントと紐付けても直らなそう。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Windowsの場合OneDriveが悪さしているかも。
+参考:</p>
+<ul>
+<li><a href="https://ryotamugiyama.com/2020/08/03/rinstall/">https://ryotamugiyama.com/2020/08/03/rinstall/</a></li>
+<li><a href="https://okumuralab.org/~okumura/stat/R-win.html">https://okumuralab.org/~okumura/stat/R-win.html</a></li>
+<li><a href="https://yukiyanai.github.io/jp/resources/">https://yukiyanai.github.io/jp/resources/</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="slides">Slides</h2>
+<p>🚧 Translation in progress 🚧</p>
+<p><kbd>←</kbd><kbd>→</kbd> keys to go back and forth.</p>
+
+<ul>
+<li>2023-11-27 16:00 | <a href="/slides/english2023r/1-introduction.html">Introduction: what is data analysis and R basics</a></li>
+<li>2023-11-28 16:00 | <a href="/slides/english2023r/2-visualization.html">Data visualization and reporting</a></li>
+<li>2023-11-29 16:00 | <a href="/slides/english2023r/3-structure1.html">Data transformation 1: extract, summarize</a></li>
+<li>2023-11-30 16:00 | <a href="/slides/english2023r/4-structure2.html">Data transformation 2: join, pivot</a></li>
+<li>2023-12-01 16:00 | <a href="/slides/english2023r/5-content.html">Data cleansing and conversion: numbers, text</a></li>
+<li>2023-12-04 16:00 | <a href="/slides/english2023r/6-input.html">Data input and interpretation</a></li>
+<li>2023-12-05 16:00 | <a href="/slides/english2023r/7-distribution.html">Statistical modeling 1: probability distribution, likelihood</a></li>
+<li>2023-12-06 16:00 | <a href="/slides/english2023r/8-glm.html">Statistical modeling 2: linear regression</a></li>
+</ul>
+</main>
+</body>
+</html>
