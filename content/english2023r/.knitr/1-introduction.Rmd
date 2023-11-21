@@ -9,66 +9,50 @@
 ```
 
 ---
-## 本実習のお品書き「データ取り扱いの基礎」
+## Menu: basics of data handling
 
-- 生物学研究におけるデータ解析の重要性を認識する。
-  - 理解する、とは
-- プログラミング言語Rを習得し、長い目で見て楽をする。
-  - データの可視化
-  - データの前処理
-  - レポート作成
-- データ解析入門
-  - 統計モデリング・仮説検定
-  - データ解釈の心構え・落とし穴
-
-牧野研以外の実習・研究でも使える知識・技術。<br>
-(研究じゃない場面でも役に立つはず。)
+- Recognize the importance of data analysis in biological research
+  - What is "to understand"
+- Learn R programming to be lazy in the long term
+  - data visualization
+  - data preparation
+  - reporting
+- Introduction to data analysis
+  - Statistical modelling
+  - Data interpretation and pitfalls
 
 
 ---
-## 「生物の理（ことわり）を知りたい」理学部生物学科
+## Basic steps in biological research
 
-- 生物の複雑な機能や形態がどのように進化してきたのか解明したい
-- 多様な生態系がどう誕生し維持されてきたのか理解したい
-- 四肢と鰭の発生プログラムの違いや共通点を理解したい
-- 行動選択や学習に関わる分子神経機構を解明したい
-- 細胞内小器官の時空間的制御を理解したい
-- プラナリアなどの再生能力をもたらす遺伝的基盤を解明したい
-- 昆虫が植物に「虫こぶ」を作らせる機構を解明したい
-- etc.
-
-
----
-## 研究の基本プロセス
-
-1. 課題を見つける、仮説を立てる
-1. 実験🧫・観察🔬・文献📚などからデータを集める
-1. **データを整理・解析して仮説を検証する**
-1. **結果を報告する**、1に戻る
+1. Find problems and make hypotheses.
+1. Collect data from experimentation🧫, observation🔬, literature📚.
+1. **Analyze the data and test the hypotheses**
+1. **Report results**. Go back to 1.
 
 <br>
 
-- 実験や観察は研究の半分くらい。
-- 残り半分はデータの整理・解析・報告。<br>
-  → しかし軽視されがち。ここを**ちゃんと、でも楽に**やりたい。
+- Experimentation and observation are onlly the first half.
+- The other half involves data preparation, analyses, reporting.<br>
+  → but tend to be understated. We want to do it **properly and easily**.
 
 
 ---
-## データ解析って必要？ 生の数字見ればよくない？
+## Is data analysis necessary? Why not just raw data?
 
-生のままでは複雑過ぎ、情報多すぎ、何もわからない。
+Raw data are often too complex and have too much information to make sense.
 
 ```{r, diamonds}
 print(ggplot2::diamonds)
 ```
 
-ダイヤモンド53,940個について10項目の値を持つデータセット
+A data set of diamonds (53,940 observations, 10 variables).
 
 
 ---
-## 要約統計量を見てみよう
+## Take a look at summary statistics
 
-各列の**平均**とか**標準偏差**とか:
+**average**, **standard deviation**, etc. of each column:
 
 ```{r, summary-diamonds}
 #| echo: false
@@ -79,7 +63,7 @@ diamonds |>
   dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
 ```
 
-大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+`carat` and `price` looks positively correlated:
 ```{r, cov-diamonds}
 #| echo: false
 diamonds |>
@@ -91,27 +75,29 @@ diamonds |>
 
 <hr>
 
-**生のままよりは把握しやすい**かも。
+OK, summary stats may help better understanding than raw data do.
 
-しかし要注意......
+But be aware......
 
 ---
-## 代表値ばかり見て可視化を怠ると構造を見逃す
+## Never trust summary statics alone
+
+Interesting relationships may be overlooked without visualization.
 
 <figure style="position: relative;">
 <a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<img src="/slides/image/rstats/datasaurus.png" width="86%">
 <figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
 </a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="20%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
 </figure>
 
 
 ---
-## データ可視化は理解の第一歩
+## Data visualization is the first step of understanding
 
-情報をうまく絞って整理 → **直感的にわかる**
+Reduction and reorganization of information → **intuitive understanding**
 
 ```{r, simplify-diamonds}
 #| echo: false
@@ -134,26 +120,26 @@ diamonds |>
   )
 ```
 
-`carat` が大きいほど `price` も高いらしい。<br>
-その度合いは `clarity` によって異なるらしい。
+The larger `carat`, the higher `price`.<br>
+The slope seems to differ by `clarity`.
 
 ---
-## 統計とは
+## Statistical analysis
 
-データをうまくまとめ、それに基づいて推論するための手法。
+is the process of summarizing data and making inferances based on it.
 
-- **記述統計**: データそのものを要約する
-    - 要約統計量 (e.g., 平均、標準偏差、etc.)
-    - 作図、作表
-- **推測統計**: データの背後にある母集団・生成過程を考える
-    - 数理モデル
-    - 確率分布
-    - パラメータ(母数)
+- **Descriptive statistics**: summrizes data themselves
+    - summary stats (e.g., average, standard deviation, etc.)
+    - making figures and tables
+- **Inferential statistics**: considers processes behind data
+    - mathematical models
+    - probability distributions
+    - parameters
 
-「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
+**Modelling** is necessary if you want more than "intuitive understanding"
 
 ---
-## モデルとは
+## Model
 
 対象システムを単純化・理想化して扱いやすくしたもの
 
@@ -183,9 +169,9 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
 
 ---
-## データ科学における数理モデル
+## Mathematical models in data science
 
-データ生成をうまく真似できそうな仮定の数式表現。<br>
+Mathematical expression of assumptions to simulate data generation<br>
 &nbsp;
 
 <figure>
@@ -203,10 +189,10 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
 
 ---
-## データ科学における数理モデル
+## Mathematical models in data science
 
-データ生成をうまく真似できそうな仮定の数式表現。<br>
-e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
+Mathematical expression of assumptions to simulate data generation<br>
+e.g., the larger the more expensive: $\text{price} = A \times \text{carat} + B + \epsilon$
 
 ```{r, lm-diamonds}
 #| echo: false
@@ -227,13 +213,13 @@ diamonds |>
 
 
 ---
-## ウェットな実験もモデルの一種と見なせる
+## Wet experimentation is a kind of modelling
 
 対象システムを単純化・理想化して扱いやすくしたもの<br>
 → 自然ではありえない状況にしてでも、見たい関係を見る<br>
 → 「Xを変えればYが変わる」という**還元的な理解の1ステップ**
 
-- ノイズをなるべく除去
+- Reduce noises
   - 栄養や温度など、**環境を揃える**
   - 近親交配を繰り返して純系を作り、**遺伝的背景を揃える**
 - 興味のある要因のみ変えて、表現型の違いを評価
@@ -246,7 +232,7 @@ diamonds |>
 
 
 ---
-## 科学の営み = 巨人の肩に立つ
+## Making an advance in science = stanting on the shoulders of giants
 
 <figure style="position: absolute; top: 2em; right: 1.5em;">
 <a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
@@ -257,7 +243,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </a>
 </figure>
 
-先人たちの積み重ねに基づいて、新しい発見をする
+A new discovery is always based on the previous studies.
 
 記録を残すことは何より重要
 : 実験や野外観察では些細なことも漏らさず記録。
@@ -271,10 +257,10 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 : 💩「ありまぁす！」
 : ✅「誰でも確実に再現できるプロトコルがこちらです」
 
-**Reproducible Research (再現可能な研究)** が巨人を大きくする。
+**Reproducible research** makes the giants bigger.
 
 ---
-## 再現不可能な職人的研究の例
+## An example of unreproducible research
 
 動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
 それらを決める要因は何か。膨大な観察データに基づく超大作卒論。
@@ -284,9 +270,9 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 
 ---
-## 生データ: ここはまだそんなに悪くない
+## Raw data: not so bad, so far
 
-週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+The location and behavior of every individual were recorded once per week.<br>
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
 <figure style="position: relative; margin: 20px 0;">
@@ -296,7 +282,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 
 ---
-## マウスとコピペを駆使して条件ごとに複製・集計
+## Aggregating by copy-and-paste for each condition
 
 ちゃんと合ってるのかな... ファイルもタブもたくさん...
 
@@ -308,7 +294,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 
 ---
-## マウスとコピペを駆使して条件ごとに複製・集計
+## Aggregating by copy-and-paste for each condition
 
 ちゃんと合ってるのかな... ファイルもタブもたくさん...
 
@@ -324,7 +310,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 
 ---
-## 目と手で数え、濃淡を計算し、画像ソフトで塗る
+## Manually counting and painting in a grayscale
 
 泣きながら何十枚も...。無料期間が終わって今は使えない...。
 
@@ -337,7 +323,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <img src="/slides/image/messy/zebra_PM.jpg" width="450">
 
 ---
-## 目作業・手作業 ＝ シーシュポスの岩
+## It is like Sisyphus's endless task
 
 <figure style="float: right; margin: 0.7rem 0 0;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
@@ -359,7 +345,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ---
 ## プログラミングで大量のファイルを捌く
 
-先の例に負けず生データはどっさり。でも頑張るのは機械。
+The dataset is larger than the previous example.
+でも頑張るのは機械。
 
 <figure>
 <img src="/slides/image/tek/finder.png" height="630">
@@ -383,7 +370,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 
 ---
-## Rにやらせて楽しよう
+## Be lazy and let R do your job
 
 - 規則性のある退屈な仕事は人間よりも機械のほうが得意。
 - 一度書いたプログラムは、データが変わっても**使いまわせる**。
@@ -401,9 +388,9 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 
 ---
-## Rとは
+## R is a programming language/environment
 
-統計解析と作図の機能が充実したプログラミング言語・環境
+for statistical computing and graphics
 
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
@@ -412,22 +399,23 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </a>
 </figure>
 
-クロスプラットフォーム
-: Linux, Mac, Windows で動く
+Cross-platform
+: Linux, Mac, Windows
 
-オープンソース
-: 永久に無償で、すべての機能を使える。
-: 集合知によって常に進化している。
+Open source
+: Free of charge.
+: Improved by collective intelligence.
 
-コミュニティ
-: 相談できる人や参考になるウェブサイトがたくさん見つかる。
+Community
+: Easy to find many websites and people to consult.
 
-他のプログラミング言語でもいいよ:
-[Python](https://www.python.org/)とか[Julia](https://julialang.org/)とか。
+There are some alternatives.<br>
+[Python](https://www.python.org/) is comparable.
+[Julia](https://julialang.org/) is rising.
 
 
 ---
-## この実習の目標
+## Purposes of this hands-on lectures
 
 ### ✅ <del>生物学研究にはデータとモデルが必須だと認識</del>
 
@@ -481,35 +469,33 @@ See https://support.apple.com/HT201236
 
 
 ---
-## R環境のセットアップ
+## Setup R environment
 
-[R本体](https://cran.rstudio.com/)
-: コマンドを解釈して実行するコア部分。
-: よく使われる関数なども標準パッケージとして同梱。
+[R](https://cran.rstudio.com/)
+: Core software to interpret and execute commands.
+: Standard packages and functions are included.
 
 [RStudio Desktop](https://www.rstudio.com/)
-: Rをより快適に使うための総合開発環境 (IDE)
-: 必須じゃないけど便利なので結構みんな使ってる。
+: Integrated environment to help users interact with R.
+: Not necessary, but many people like it.
 
 <img src="/slides/image/rstudio/rstudio-300x260.png">
 
 
 ---
-## RStudioを起動して、環境チェック
+## Launch RStudio and check your environment
 
-次のコードをコピーして、左下のConsoleにペースト <kbd>return</kbd>
+Copy the following code, and paste it to Console on the left bottom <kbd>return</kbd>.
 
 ```r
 student_id = "C1SB0000"   # 自分のIDに書き換えてください
 source("https://example.com/sice/report.R")
 ```
 
-`Hello, C1SB0000.`
-のような返事が返ってきていればOK。
+You will get a response like `Hello, C1SB0000.`<br>
+Let me know if any error has occurred.
 
-なんらかのエラーが出た人は申し出てください。
-
-余裕があれば `update.packages()` を実行して更新。
+Run `update.packages()` when you have spare time.
 
 <aside style="font-size: 50%; opacity: 50%;">
 <a href="https://github.com/heavywatal/sysinfocollector">
@@ -517,9 +503,9 @@ source("https://example.com/sice/report.R")
 </aside>
 
 ---
-## RStudioを起動してConsoleで対話しよう
+## Launch RStudio and play with Console
 
-**Workspace (Environment)** = 一時オブジェクトの集まり
+**Workspace (Environment)** = a collection of temporary objects on memory
 
 <img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
 
@@ -537,12 +523,12 @@ hist(iris$Petal.Length)
 
 
 ---
-## 毎回まっさらなワークスペースで始める設定
+## Configure RStudio to always start with a clean workspace
 
 <img height=22 width=22 src="https://cdn.simpleicons.org/apple"> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
 <img height=22 width=22 src="https://cdn.simpleicons.org/windows"> Tools → Global options
 
-"Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
+Uncheck "Restore ...". Set "Save workspace ..." to **Never**.
 
 <figure style="margin: 0;">
 <a href="https://r4ds.hadley.nz/workflow-scripts.html#fig-blank-slate">
@@ -554,7 +540,7 @@ hist(iris$Petal.Length)
 
 
 ---
-## "Project" を新規作成する
+## Create a new "Project"
 
 File → New Project... → New Directory → New Project →<br>
 → Directory name: `r-training-2023`<br>
@@ -563,24 +549,24 @@ File → New Project... → New Directory → New Project →<br>
 <img src="/slides/image/rstudio/create-new-project.png" class="screenshot"
   width="90%" style="object-fit: cover; object-position: top; height: 16em;">
 
-📁 ディレクトリ ＝ フォルダ。 `~/` = ホームディレクトリ
+📁 directory = folder. `~/` = home directory.
 
 ---
-## Rスクリプトに書いてから実行
+## Write R script, and send it to Console
 
 File → New File → R script
 
 <img src="/slides/image/rstudio/newfile.png" width="100%">
 
 ---
-## Rスクリプトに書いてから実行
+## Write R script, and send it to Console
 
 File → New File → R script
 
 <img src="/slides/image/rstudio/script-console.png" width="100%">
 
 ---
-## Rスクリプトに書いてから実行
+## Write R script, and send it to Console
 
 Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
 Execute them with <kbd>ctrl</kbd><kbd>return</kbd>
@@ -588,91 +574,86 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd>
 <img src="/slides/image/rstudio/101.png" width="100%">
 
 ---
-## Rスクリプトを保存する
+## Save R script
 
-- 手順
-    - File → Save <kbd>command</kbd><kbd>s</kbd>
-    - ファイル名: `hello.R`
-    - 場所: さっき作ったプロジェクト内 (デフォルトでそうなるはず)
-- **スクリプトを書いたら消さずに保存すること！**
-    - 書いたスクリプトは財産
-    - 保存しておけばまた使い回せる
+- Steps
+    - <kbd>command</kbd><kbd>s</kbd> or File → Save
+    - Name: `hello.R`
+    - Place: in the project (by default)
+- **Save all the code you write!**
+    - You can reuse them in other projects.
+    - The code you can reuse is your skill already.
 
-🔰 いろんな四則演算を試して `hello.R` に保存してみよう。<br>
+🔰 Try basic arithmetic operations and save them to `hello.R`.<br>
 e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 
 ---
-## プロジェクト📁にファイルが溜まっていく
+## Structure of project directory 📁
 
-スクリプト、データ、結果を分けて整理する例:
+- Gathering all the relevant files makes programming easier.
+- Separating with subdirectories helps you keep files organized.
 
 ```
-r-training-2023/           # プロジェクトの最上階
-├── r-training-2023.Rproj  # これダブルクリックでRStudioを起動
+r-training-2023/           # the root of the project
+├── r-training-2023.Rproj  # double-click this to launch RStudio
 ├── hello.R
-├── transform.R            # データ整理・変形のスクリプト
-├── visualize.R            # 作図のスクリプト
-├── data/                  # 元データを置くところ
-│   ├── iris.tsv
-│   └── diamonds.xlsx
-└── output/                # 結果の出力先
+├── transform.R            # script for data preparation
+├── visualize.R            # script for data visualization
+├── data/                  # input
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+└── results/               # output
     ├── iris-petal.png
     └── iris-summary.tsv
 ```
 
-プロジェクト最上階を**作業ディレクトリ**とし、<br>
-ファイル読み書きの基準にする。(後で詳しく)
-
-ほんの一例です。好きな構造に決めてください。
+The project root becomes the **working directory**.
 
 
 ---
-## 作業ディレクトリ: Rにとっての現在地 `getwd()`
+## Get working directory `getwd()`
 
-- ファイル読み書き、画像の保存などはここが基準。
-- `*.Rproj` ダブルクリックでRStudioを開けば、いい位置で作業再開。
+- The starting point of relative paths to input/output files.
+- Double-clicking `*.Rproj` will launch RStudio with an appropriate working directory.
 
 <img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
 
 
 ---
-## Rと接する上での心構え
+## Attitude toward programming in R
 
 <figure>
 <img src="/slides/image/free/akusyu_uchuujin.png" height="200">
 </figure>
 
-エラー文を恐れない
-: 熟練プログラマでも頻繁にエラーを起こす。
-: エラーはRからのメッセージ。**意図を読み取って修正**しよう。
-: プログラミングの経験値 ≈ エラー解決の経験値
+Don't fear errors
+: Even experts cause errors very often.
+: An error is a message from R. Try to understand it.
+: Experience point of programming ≈ exp. of error handling.
 
-困ったらウェブ検索
-: あなたの問題は全世界のRユーザーが既に通った道。
-: 日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。
+Search on the web
+: Some R users in the world have already solved your problems.
+: Queries can be 日本語, Engligh, or whole error message.
 
 
 ---
-## この実習の取り組み方
+## How to use this hands-on lecture
 
-とにかく手を動かして体感しよう！
-
-1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
+1.  Find commands in slides, and copy-n-paste them **to your R script**:
     ```r
     head(iris)
     ```
-1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
-    `Error` や `Warning` があったらよく読んで対処する。<br>
-    (無視していい `Warning` もたまーにあるけど)
-1.  🔰若葉マークの練習問題があれば解いてみる。<br>
-    そこまでのコードの**コピペ＋改変**でできるはず。
+1.  **Execute it** in the Console.
+1.  **Check the output**.<br>
+    Read `error` and `warning` if any.
+1.  Try practice exercises (marked with 🔰)
 
-疑問・困りごとがある場合は**気軽に割り込んで**ください。<br>
-TAがいるならTAが、リモートならChat欄が随時受付中です。
+<hr>
 
+Feel free to interupt me any time.
 
 ---
-## 変数/オブジェクトを作ってみよう
+## Create variables/objects
 
 ```{r, objects}
 x = 2        # Create x
@@ -681,20 +662,20 @@ y = 5        # Create y
 y            # What's in y?
 ```
 
-Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。<br>
-`#` 記号より右はRに無視される。コメントを書くのに便利。
+R accepts `<-` as an assignment operator, but I recommend `=`.<br>
+Texts following `#` are ignored. Useful for comments.
 
 ```{r, sum}
 x + y
 ```
 
-🔰 `x` と `y` の引き算、掛け算、割り算をやってみよう
+🔰 Try subtraction, multiplication, and division with `x` and `y`.
 
 
 ---
-## 基本的な演算
+## Basic operations
 
-`+` とか `*` のような演算子(operator)を変数の間に置く。<br>
+Symbols like `+` and `*` are called **operators**.
 
 ```r
 10 + 3    # addition
@@ -706,29 +687,29 @@ x + y
 10 ** 3   # exponent 10^3
 ```
 
-🔰 コピペして結果を確認してみよう。
+🔰 Check the results of the commands above.
 
 ---
-## 関数 (function)
+## Functions
 
-変数を受け取って、何か仕事して、返す命令セット
+Receive some variables, do some job, and return something.
 
 ```{r, function}
-x = seq(1, 3)  # 1と3を渡すとvectorが返ってくる
+x = seq(1, 3)  # receives 1 and 3, and returns a vector.
 x
-sum(x)         # vectorを渡すと足し算が返ってくる
-square = function(something) {  # 自分の関数を定義
+sum(x)         # receives a vector, and returns a sum
+square = function(something) {  # define a new function
   something ** 2
 }
-square(x)                       # 使ってみる
+square(x)                       # use it
 ```
 
-🔰 自分の関数を何か作ってみよう。
-e.g., 2倍にする関数 `twice`
+🔰 Create your own function.
+e.g., a function named `twice` to return doubled numbers.
 
 
 ---
-## 変数/オブジェクトを作ってみよう Part 2
+## Create variable/objects, part 2
 
 ```{r, objects2}
 x = 42       # Create x
@@ -737,7 +718,7 @@ y = "24601"  # Create y
 y            # What's in y?
 ```
 
-この `x` と `y` を足そうとするとエラーになる。なぜ？
+R cannot calculate the sum of them:
 
 ```{r, error}
 #| error: true
@@ -745,7 +726,7 @@ x + y        # Error! Why?
 ```
 
 ---
-## 変数/オブジェクトの型
+## Data types
 
 ```{r, isas}
 class(x)
@@ -754,44 +735,44 @@ is.character(x)
 as.character(x)
 ```
 
-🔰 さっき作った `y` にも同じ関数を適用してみよう。
+🔰 Apply the same functions to `y`.
 
 ---
-## 変数/オブジェクトの型
+## Data types
 
-- `vector`: 基本型。一次元の配列。
-    - `logical`: 論理値 (`TRUE` or `FALSE`)
-    - `numeric`: 数値 (整数 `42L` or 実数 `3.1416`)
-    - `character`: 文字列 (`"a string"`)
-    - `factor`: 因子 (文字列っぽいけど微妙に違う)
-- `array`: 多次元配列。`vector`同様、全要素が同じ型。
-    - `matrix`: 行列 = 二次元の配列。
-- `list`: 異なる型でも詰め込める太っ腹ベクトル。
-- **`data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
-  **`tibble`** とか **`tbl_df`** と呼ばれる亜種もあるけどほぼ同じ。
+- atomic vector: one-dimensional array. very basic.
+    - `logical`: (`TRUE` or `FALSE`)
+    - `numeric`: (integer `42L` or real number `3.1416`)
+    - `character`: (`"a string"`)
+    - `factor`: (hybrid of character and integer)
+- `array`: multi-dimensional array.
+    - `matrix`: two-dimensional array.
+- `list`: subspecies of vector that can be heterogenous.
+- **`data.frame`: Rectangular table of the vectors. important** <br>
+  There are alternatives called **`tibble`** and **`tbl_df`**.
 
 
 ---
-## vector: 一次元の配列
+## vector: one-dimensional array
 
-1個の値でもベクトル扱い。<br>
-同じ長さ(または長さ1)の相手との計算が得意。
+R is good at **element-wise operation** on vectors.<br>
+There is no scalar type; it is treated as a vector of length 1.
 
 ```{r, vector}
-x = c(1, 2, 9)  # 長さ3の数値ベクトル
-x + x           # 同じ長さ同士の計算
-y = 10          # 長さ1の数値ベクトル
-x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
-x < 5           # 5より小さいか
+x = c(1, 2, 9)  # length of 3
+x + x           # the same length
+y = 10          # length of 1
+x + y           # the shorter vector is recycled
+x < 5           # is it smaller than 5?
 ```
 
-🔰 この `x, y` を使っていろいろな演算を試してみよう
+🔰 Try other operations on these `x` and `y`.
 
 
 ---
-## vectorから部分的に抜き出す
+## Subsetting/subscripting vectors
 
-`[]` を使う。番号は1から始まる。
+Use `[]` to extract a subset. Indices starts from 1.
 
 ```{r, vector-index}
 letters
@@ -801,27 +782,26 @@ letters[seq(1, 26) < 4]  # TRUE TRUE TRUE FALSE FALSE ...
 ```
 
 ---
-## vectorを渡した結果は関数によって異なる
+## Two major groups of numeric functions
 
-各要素に適用するもの:
-```{r, vector-function}
+element-wise:
+```{r, vector-function-element-wise}
 x = c(1, 2, 9)
 y = sqrt(x)     # square root
 y
 ```
 
-全要素を集約した値を返すもの:
-```{r, vector-forloop}
+aggragete (use all values to generate one output):
+```{r, vector-function-aggregate}
 z = sum(x)
 z
 ```
 
-🔰 `log()`, `exp()`, `length()`, `max()`, `mean()`
-にvectorを渡してみよう。
+🔰 Try `log()`, `exp()`, `length()`, `max()`, `mean()` and classify them.
 
 
 ---
-## matrix: 二次元の配列 (行列)
+## matrix: two-dimensional array
 
 1本のvectorを折り曲げて長方形にしたもの。<br>
 中身は全て同じ型。機械学習とか画像処理とかで使う。
@@ -834,11 +814,11 @@ y = matrix(v, nrow = 2, byrow = TRUE)  # 行ごとに詰める
 y
 ```
 
-🔰 結果を確認してみよう: `x + y`, `dim(x)`, `nrow(x)`, `ncol(x)`.
+🔰 Try `x + y`, `dim(x)`, `nrow(x)`, `ncol(x)`.
 
 
 ---
-## 行 (row), 列 (column) の憶え方
+## How to remember the directions of row and column
 
 <div class="column-container">
   <div class="column">
@@ -861,10 +841,10 @@ y
 
 
 ---
-## data.frame: 長方形のテーブル (重要!)
+## data.frame: rectangular table (important!)
 
-同じ長さの列vectorを複数束ねた長方形の表。<br>
-e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
+A set of vertical vectors with the same length.<br>
+e.g., 4 numeric and 1 factor vectors with the length of 150:
 
 ```{r, dataframe}
 #| echo: -1
@@ -872,58 +852,56 @@ iris = tibble::as_tibble(iris)
 print(iris)
 ```
 
-`iris` はアヤメ属3種150個体に関する測定データ。<br>
-Rに最初から入ってて、例としてよく使われる。
 
 ---
-## data.frameを眺める
+## Various ways to view a data.frame
 
-概要を掴む:
+Overview:
 ```r
-head(iris, 6)   # 先頭だけ見てみる。末尾は tail()
-nrow(iris)      # 行数: Number of ROWs
-ncol(iris)      # 列数: Number of COLumns
-names(iris)     # 列名
-summary(iris)   # 要約
-View(iris)      # RStudioで閲覧
+head(iris, 6)   # First N rows. tail() for last rows.
+nrow(iris)      # Number of ROWs
+ncol(iris)      # Number of COLumns
+names(iris)     # of columns
+summary(iris)   # mean, quantiles, etc.
+View(iris)      # in RStudio/VSCode
 ```
 ```{r, str}
-str(iris)       # 構造が分かる形で表示
+str(iris)       # structure
 ```
 
-🔰 ほかのデータもいろいろ見てみよう。
+🔰 Try some other data.frames
 e.g., `mtcars`, `quakes`, [`data()`](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html)
 
 ---
-## data.frameを眺める
+## Various ways to view a data.frame
 
-部分的なdata.frameを取得する:
+Subset:
 ```r
-iris[2, ]                  # 2行目
-iris[2:5, ]                # 2行目から5行目まで
-iris[, 3:4]                # 3-4列目
-iris[2:5, 3:4]             # 2-5行目, 3-4列目
+iris[2, ]                  # 2nd row
+iris[2:5, ]                # 2nd to 5th rows
+iris[, 3:4]                # 3rd to 4th columns
+iris[2:5, 3:4]             # 2nd to 5th rows, 3rd to 4th columns
 ```
 
-1列をvectorとして取得する:
+Extract a column **as vector**:
 ```r
-iris[[3]]                  # 3列目
-iris$Petal.Length          # Petal.Length列
-iris[["Petal.Length"]]     # Petal.Length列
-iris[["Petal.Length"]][2]  # Petal.Length列の2番目
+iris[[3]]                  # 3rd column
+iris$Petal.Length          # a column named Petal.Length
+iris[["Petal.Length"]]     # a column named Petal.Length
+iris[["Petal.Length"]][2]  # 2nd element of Petal.Length
 ```
 
-結果がdata.frameになるかvectorになるか曖昧で危険、非推奨:
+Unrecommended. Hard to know if the result is data.frame or vector:
 ```r
-iris[, 3]                  # 3列目
-iris[, "Petal.Length"]     # Petal.Length列
-iris[2, "Petal.Length"]    # 2行目Petal.Length列
+iris[, 3]                  # data.frame with a single column?
+iris[, "Petal.Length"]     # data.frame with a single column?
+iris[2, "Petal.Length"]    # data.frame with a single cell?
 ```
 
 ---
-## data.frameの新規作成
+## Create a new data.frame
 
-同じ長さの **列(column) vector** を結合して作る:
+Combine **column vectors** with the same length:
 ```{r, dataframe-new}
 x = c(1, 2, 3)
 y = c("A", "B", "C")
@@ -931,14 +909,14 @@ mydata = data.frame(x, y)
 print(mydata)
 ```
 
-🔰 次のようなdata.frameを作って `theDF` と名付けよう:
+🔰 Create a data.frame named `theDF` as follows:
 ```
  i s
 24 x
 25 y
 26 z
 ```
-ヒント: `c()` 無しでクリアすることも可能。
+Hint: you can do it with and without `c()`.
 
 
 ---
@@ -1088,18 +1066,6 @@ withr::with_namespace("tidyverse", {
 </a>
 </figure>
 
----
-## 実習全体の予定
-
-| 時間  | 4/10 Mon | 4/11 Tue | 4/12 Wed | 4/13 Thu | 4/17 Mon |
-| ----- | -------- | -------- | -------- | -------- | -------- |
-| 13:00 | **導入** | **構造処理1** | **内容処理** | **統計モデル1** | 発表会 |
-| 14:40 | **可視化** | **構造処理2** | **入力・解釈** | **統計モデル2** | 発表会 |
-| 16:20 | 練習問題 | 練習問題 | 練習問題 | 練習問題 | 予備 |
-
-- 毎日最後に練習問題を出します。解けた班から解散。
-- レポート課題については今日の後半にお知らせ。<br>
-  🔰練習問題をちゃんとこなせば半自動的にレポートもできあがる仕掛け。
 
 ---
 ## Reference
