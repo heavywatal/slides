@@ -15,20 +15,11 @@ draft = false
 -   Website: <https://heavywatal.github.io/slides/english2023r/><br>
     Links to the slides are [at the bottom](<javascript:document.getElementById('slides').scrollIntoView({behavior: 'smooth'});>):
 -   Abstract:<br>
-    理学部生物学科における研究とは、大雑把に言うと
-    「生物に関するデータを集め、その背後にある理（ことわり）を読み解くこと」です。
-    そのため、データの解析と作図はどんな研究をするにもほぼ不可欠となります。
-    正しい結論を導くためには、データをいろいろな角度から可視化して全体の構造を見渡すことが特に重要です。
-    また、観察・実験・データベースなどから得られるデータは多種多様であり、
-    そのまますぐ使えることはめったにありません。
-    まずデータを整形するところから始める必要があります。
-    この前処理にせよ、作図にせよ、
-    「エクセルであれをあっちにコピペして、メニューからあれを選択して...」
-    といった手作業でやるのは大変ですし、再現性が無いため科学の手続きとしても問題です。
-    いつでもだれでも再検証したり使いまわしたりできるように、
-    規則性のある退屈な仕事は機械に任せるのが得策です。
-    本実習では、近年さらに易しくなったR言語を用いることで、
-    生データから効果的な作図まで簡単に辿り着けるということを体験してもらいます。
+    Biological research is, roughly speaking, to collect data from organisms and decipher the rule behind them.
+    Data analysis and visualization are therefore essential skills for any researcher in this field.
+    But don't even think about manual works in Excel because they are combersome, error-prone, and above all, unreproducible.
+    Let machines do repetitive and boring tasks.
+    Here, we learn how to use R language/environment effectively to prepare and analyze data.
 -   Prerequisite
     - Basic computer skills: browsing webpages, handling files and folders, etc.
     - Preparation of computing environment (described later)
