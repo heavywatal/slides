@@ -588,9 +588,10 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd>
 e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 
 ---
-## Structure of project directory 📁
+## Organize the project directory 📁
 
-- Gathering all the relevant files makes programming easier.
+- There are only two files for now, but many more in the future.
+- Gathering all the relevant files here makes programming easier.
 - Separating with subdirectories helps you keep files organized.
 
 ```
@@ -607,14 +608,16 @@ r-training-2023/           # the root of the project
     └── iris-summary.tsv
 ```
 
-The project root becomes the **working directory**.
+The next topics are **working directory** and **relative path**.
 
 
 ---
-## Get working directory `getwd()`
+## Working directory: starting point of relative paths
 
-- The starting point of relative paths to input/output files.
-- Double-clicking `*.Rproj` will launch RStudio with an appropriate working directory.
+The project root is the working directory by default. **Never change it**.
+
+✅ Good: `read_tsv("data/iris.tsv")`<br>
+❌ Bad: `setwd("data"); read_tsv("iris.tsv")`
 
 <img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
 
@@ -920,36 +923,31 @@ Hint: you can do it with and without `c()`.
 
 
 ---
-## data.frameの読み書き
+## Reading and writing data.frame
 
-Rには `read.csv()` とか `write.csv()` とかが標準装備されてるけど、、、
+R has built-in functions such as `read.csv()` and `write.csv()`,
 
 ```r
 write.csv(iris, "iris.csv")
 ```
-```
-"","Sepal.Length","Sepal.Width","Petal.Length","Petal.Width","Species"
-"1",5.1,3.5,1.4,0.2,"setosa"
-"2",4.9,3,1.4,0.2,"setosa"
-"3",4.7,3.2,1.3,0.2,"setosa"
+```{r, write-csv-base}
+#| echo: false
+iris |> head(3L) |> write.csv(stdout())
 ```
 
 <a href="https://readr.tidyverse.org/">
 <img src="/_img/hex-stickers/readr.webp" width="180" align="right">
 </a>
 
-なんか**左端の列**とか **"引用符"** が勝手に作られたりいろいろ不便。
-
-`readr` というパッケージを使えばそういう悩みから解放される。
+but they are difficult to use properly.<br>
+Use `readr` package instead.
 
 ```r
 readr::write_csv(iris, "iris.csv")
 ```
-```
-Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species
-5.1,3.5,1.4,0.2,setosa
-4.9,3,1.4,0.2,setosa
-4.7,3.2,1.3,0.2,setosa
+```{r, write-csv-readr}
+#| echo: false
+iris |> head(3L) |> readr::write_csv(stdout())
 ```
 
 ---
@@ -977,7 +975,7 @@ update.packages()          # たまには更新しよう
 : パッケージを使わないR作業 = 火もナイフも使わない料理
 
 ---
-## tidyverse: データ科学のためのパッケージ群
+## tidyverse: a collection of R packages designed for data science
 
 <a href="https://www.tidyverse.org/">
 <img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
