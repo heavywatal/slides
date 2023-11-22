@@ -91,63 +91,48 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="本実習のお品書きデータ取り扱いの基礎">本実習のお品書き「データ取り扱いの基礎」</h2>
+<h2 id="menu-basics-of-data-handling">Menu: basics of data handling</h2>
 <ul>
-<li>生物学研究におけるデータ解析の重要性を認識する。
+<li>Recognize the importance of data analysis in biological research
 <ul>
-<li>理解する、とは</li>
+<li>What is &ldquo;to understand&rdquo;</li>
 </ul>
 </li>
-<li>プログラミング言語Rを習得し、長い目で見て楽をする。
+<li>Learn R programming to be lazy in the long term
 <ul>
-<li>データの可視化</li>
-<li>データの前処理</li>
-<li>レポート作成</li>
+<li>data visualization</li>
+<li>data preparation</li>
+<li>reporting</li>
 </ul>
 </li>
-<li>データ解析入門
+<li>Introduction to data analysis
 <ul>
-<li>統計モデリング・仮説検定</li>
-<li>データ解釈の心構え・落とし穴</li>
+<li>Statistical modelling</li>
+<li>Data interpretation and pitfalls</li>
 </ul>
 </li>
-</ul>
-<p>牧野研以外の実習・研究でも使える知識・技術。<br>
-(研究じゃない場面でも役に立つはず。)
-</section>
-<section>
-<h2 id="生物の理ことわりを知りたい理学部生物学科">「生物の理（ことわり）を知りたい」理学部生物学科</h2>
-<ul>
-<li>生物の複雑な機能や形態がどのように進化してきたのか解明したい</li>
-<li>多様な生態系がどう誕生し維持されてきたのか理解したい</li>
-<li>四肢と鰭の発生プログラムの違いや共通点を理解したい</li>
-<li>行動選択や学習に関わる分子神経機構を解明したい</li>
-<li>細胞内小器官の時空間的制御を理解したい</li>
-<li>プラナリアなどの再生能力をもたらす遺伝的基盤を解明したい</li>
-<li>昆虫が植物に「虫こぶ」を作らせる機構を解明したい</li>
-<li>etc.</li>
 </ul>
 
 </section>
 <section>
-<h2 id="研究の基本プロセス">研究の基本プロセス</h2>
+<h2 id="basic-steps-in-biological-research">Basic steps in biological research</h2>
 <ol>
-<li>課題を見つける、仮説を立てる</li>
-<li>実験🧫・観察🔬・文献📚などからデータを集める</li>
-<li><strong>データを整理・解析して仮説を検証する</strong></li>
-<li><strong>結果を報告する</strong>、1に戻る</li>
+<li>Find problems and make hypotheses.</li>
+<li>Collect data from experimentation🧫, observation🔬, literature📚.</li>
+<li><strong>Analyze the data and test the hypotheses</strong></li>
+<li><strong>Report results</strong>. Go back to 1.</li>
 </ol>
 <br>
 <ul>
-<li>実験や観察は研究の半分くらい。</li>
-<li>残り半分はデータの整理・解析・報告。<br>
-→ しかし軽視されがち。ここを<strong>ちゃんと、でも楽に</strong>やりたい。</li>
+<li>Experimentation and observation are onlly the first half.</li>
+<li>The other half involves data preparation, analyses, reporting.<br>
+→ but tend to be understated. We want to do it <strong>properly and easily</strong>.</li>
 </ul>
 
 </section>
 <section>
-<h2 id="データ解析って必要-生の数字見ればよくない">データ解析って必要？ 生の数字見ればよくない？</h2>
-<p>生のままでは複雑過ぎ、情報多すぎ、何もわからない。</p>
+<h2 id="is-data-analysis-necessary-why-not-just-raw-data">Is data analysis necessary? Why not just raw data?</h2>
+<p>Raw data are often too complex and have too much information to make sense.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price    x    y    z
     1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
@@ -159,71 +144,72 @@ Graduate School of Life Sciences, Tohoku University
 53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
 53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
 53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
-</code></pre><p>ダイヤモンド53,940個について10項目の値を持つデータセット</p>
+</code></pre><p>A data set of diamonds (53,940 observations, 10 variables).</p>
 
 </section>
 <section>
-<h2 id="要約統計量を見てみよう">要約統計量を見てみよう</h2>
-<p>各列の<strong>平均</strong>とか<strong>標準偏差</strong>とか:</p>
+<h2 id="take-a-look-at-summary-statistics">Take a look at summary statistics</h2>
+<p><strong>average</strong>, <strong>standard deviation</strong>, etc. of each column:</p>
 <pre tabindex="0"><code>  stat carat depth table    price
 1 mean  0.80 61.75 57.46  3932.80
 2   sd  0.47  1.43  2.23  3989.44
 3  max  5.01 79.00 95.00 18823.00
 4  min  0.20 43.00 43.00   326.00
-</code></pre><p>大きさ <code>carat</code> と価格 <code>price</code> の<strong>相関係数</strong>はかなり高い:</p>
+</code></pre><p><code>carat</code> and <code>price</code> looks positively correlated:</p>
 <pre tabindex="0"><code>      carat depth table price
 carat  1.00                  
 depth  0.03  1.00            
 table  0.18 -0.30  1.00      
 price  0.92 -0.01  0.13  1.00
 </code></pre><hr>
-<p><strong>生のままよりは把握しやすい</strong>かも。</p>
-<p>しかし要注意&hellip;&hellip;</p>
+<p>OK, summary stats may help better understanding than raw data do.</p>
+<p>But be aware&hellip;&hellip;</p>
 
 </section>
 <section>
-<h2 id="代表値ばかり見て可視化を怠ると構造を見逃す">代表値ばかり見て可視化を怠ると構造を見逃す</h2>
+<h2 id="never-trust-summary-statics-alone">Never trust summary statics alone</h2>
+<p>Interesting relationships may be overlooked without visualization.</p>
 <figure style="position: relative;">
 <a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<img src="/slides/image/rstats/datasaurus.png" width="86%">
 <figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
 </a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="20%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
 </figure>
 
 </section>
 <section>
-<h2 id="データ可視化は理解の第一歩">データ可視化は理解の第一歩</h2>
-<p>情報をうまく絞って整理 → <strong>直感的にわかる</strong></p>
+<h2 id="data-visualization-is-the-first-step-of-understanding">Data visualization is the first step of understanding</h2>
+<p>Reduction and reorganization of information → <strong>intuitive understanding</strong></p>
 <p><img src="./figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds"></p>
-<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
-その度合いは <code>clarity</code> によって異なるらしい。</p>
+<p>The larger <code>carat</code>, the higher <code>price</code>.<br>
+The slope seems to differ by <code>clarity</code>.</p>
 
 </section>
 <section>
-<h2 id="統計とは">統計とは</h2>
-<p>データをうまくまとめ、それに基づいて推論するための手法。</p>
+<h2 id="statistical-analysis">Statistical analysis</h2>
+<p>is the process of summarizing data and making inferances based on it.</p>
 <ul>
-<li><strong>記述統計</strong>: データそのものを要約する
+<li><strong>Descriptive statistics</strong>: summrizes data themselves
 <ul>
-<li>要約統計量 (e.g., 平均、標準偏差、etc.)</li>
-<li>作図、作表</li>
+<li>summary stats (e.g., average, standard deviation, etc.)</li>
+<li>making figures and tables</li>
 </ul>
 </li>
-<li><strong>推測統計</strong>: データの背後にある母集団・生成過程を考える
+<li><strong>Inferential statistics</strong>: considers processes behind data
 <ul>
-<li>数理モデル</li>
-<li>確率分布</li>
-<li>パラメータ(母数)</li>
+<li>mathematical models</li>
+<li>probability distributions</li>
+<li>parameters</li>
 </ul>
 </li>
 </ul>
-<p>「グラフを眺めてなんとなく分かる」以上の分析には<strong>モデル</strong>が必要</p>
+<p><strong>Modelling</strong> is necessary if you want more than &ldquo;intuitive understanding&rdquo;</p>
 
 </section>
 <section>
-<h2 id="モデルとは">モデルとは</h2>
+<h2 id="model">Model</h2>
 <p>対象システムを単純化・理想化して扱いやすくしたもの</p>
 <dl>
 <dt>Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" align="right" style="margin: 0 -5px;"></dt>
@@ -246,8 +232,8 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 </section>
 <section>
-<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
-<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
+<h2 id="mathematical-models-in-data-science">Mathematical models in data science</h2>
+<p>Mathematical expression of assumptions to simulate data generation<br>
  </p>
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="1100"><br>
@@ -256,21 +242,21 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 </section>
 <section>
-<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
-<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
-e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$</p>
+<h2 id="mathematical-models-in-data-science">Mathematical models in data science</h2>
+<p>Mathematical expression of assumptions to simulate data generation<br>
+e.g., the larger the more expensive: $\text{price} = A \times \text{carat} + B + \epsilon$</p>
 <p><img src="./figure/lm-diamonds-1.png" alt="plot of chunk lm-diamonds"></p>
 <p>ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
 → モデルをさらに改良していき、理解の精度を上げられるかも</p>
 
 </section>
 <section>
-<h2 id="ウェットな実験もモデルの一種と見なせる">ウェットな実験もモデルの一種と見なせる</h2>
+<h2 id="wet-experimentation-is-a-kind-of-modelling">Wet experimentation is a kind of modelling</h2>
 <p>対象システムを単純化・理想化して扱いやすくしたもの<br>
 → 自然ではありえない状況にしてでも、見たい関係を見る<br>
 → 「Xを変えればYが変わる」という<strong>還元的な理解の1ステップ</strong></p>
 <ul>
-<li>ノイズをなるべく除去
+<li>Reduce noises
 <ul>
 <li>栄養や温度など、<strong>環境を揃える</strong></li>
 <li>近親交配を繰り返して純系を作り、<strong>遺伝的背景を揃える</strong></li>
@@ -289,7 +275,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 </section>
 <section>
-<h2 id="科学の営み--巨人の肩に立つ">科学の営み = 巨人の肩に立つ</h2>
+<h2 id="making-an-advance-in-science--stanting-on-the-shoulders-of-giants">Making an advance in science = stanting on the shoulders of giants</h2>
 <figure style="position: absolute; top: 2em; right: 1.5em;">
 <a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
 <img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="320">
@@ -298,7 +284,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figcaption>
 </a>
 </figure>
-<p>先人たちの積み重ねに基づいて、新しい発見をする</p>
+<p>A new discovery is always based on the previous studies.</p>
 <dl>
 <dt>記録を残すことは何より重要</dt>
 <dd>実験や野外観察では些細なことも漏らさず記録。</dd>
@@ -310,11 +296,11 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <dd>💩「ありまぁす！」</dd>
 <dd>✅「誰でも確実に再現できるプロトコルがこちらです」</dd>
 </dl>
-<p><strong>Reproducible Research (再現可能な研究)</strong> が巨人を大きくする。</p>
+<p><strong>Reproducible research</strong> makes the giants bigger.</p>
 
 </section>
 <section>
-<h2 id="再現不可能な職人的研究の例">再現不可能な職人的研究の例</h2>
+<h2 id="an-example-of-unreproducible-research">An example of unreproducible research</h2>
 <p>動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
 それらを決める要因は何か。膨大な観察データに基づく超大作卒論。</p>
 <figure>
@@ -322,8 +308,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 </section>
 <section>
-<h2 id="生データ-ここはまだそんなに悪くない">生データ: ここはまだそんなに悪くない</h2>
-<p>週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+<h2 id="raw-data-not-so-bad-so-far">Raw data: not so bad, so far</h2>
+<p>The location and behavior of every individual were recorded once per week.<br>
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。</p>
 <figure style="position: relative; margin: 20px 0;">
 <img src="/slides/image/messy/dir-0826.png" class="screenshot" height="750">
@@ -332,7 +318,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 </section>
 <section>
-<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+<h2 id="aggregating-by-copy-and-paste-for-each-condition">Aggregating by copy-and-paste for each condition</h2>
 <p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
 <figure style="position: relative;">
 <img src="/slides/image/messy/dir-z.png" class="screenshot" height="800"
@@ -342,7 +328,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 </section>
 <section>
-<h2 id="マウスとコピペを駆使して条件ごとに複製集計">マウスとコピペを駆使して条件ごとに複製・集計</h2>
+<h2 id="aggregating-by-copy-and-paste-for-each-condition">Aggregating by copy-and-paste for each condition</h2>
 <p>ちゃんと合ってるのかな&hellip; ファイルもタブもたくさん&hellip;</p>
 <figure style="position: relative;">
 <img src="/slides/image/messy/dir-z.png" class="screenshot" height="800"
@@ -356,7 +342,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 </section>
 <section>
-<h2 id="目と手で数え濃淡を計算し画像ソフトで塗る">目と手で数え、濃淡を計算し、画像ソフトで塗る</h2>
+<h2 id="manually-counting-and-painting-in-a-grayscale">Manually counting and painting in a grayscale</h2>
 <p>泣きながら何十枚も&hellip;。無料期間が終わって今は使えない&hellip;。</p>
 <figure style="position: relative; margin: 1em 0;">
 <img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
@@ -367,7 +353,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <img src="/slides/image/messy/zebra_PM.jpg" width="450">
 </section>
 <section>
-<h2 id="目作業手作業--シーシュポスの岩">目作業・手作業 ＝ シーシュポスの岩</h2>
+<h2 id="it-is-like-sisyphuss-endless-task">It is like Sisyphus&rsquo;s endless task</h2>
 <figure style="float: right; margin: 0.7rem 0 0;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
 <img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="420">
@@ -389,7 +375,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </section>
 <section>
 <h2 id="プログラミングで大量のファイルを捌く">プログラミングで大量のファイルを捌く</h2>
-<p>先の例に負けず生データはどっさり。でも頑張るのは機械。</p>
+<p>The dataset is larger than the previous example.
+でも頑張るのは機械。</p>
 <figure>
 <img src="/slides/image/tek/finder.png" height="630">
 <img src="/slides/image/tek/fig5.png" height="630">
@@ -411,7 +398,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 </section>
 <section>
-<h2 id="rにやらせて楽しよう">Rにやらせて楽しよう</h2>
+<h2 id="be-lazy-and-let-r-do-your-job">Be lazy and let R do your job</h2>
 <ul>
 <li>規則性のある退屈な仕事は人間よりも機械のほうが得意。</li>
 <li>一度書いたプログラムは、データが変わっても<strong>使いまわせる</strong>。</li>
@@ -429,8 +416,8 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </figure>
 </section>
 <section>
-<h2 id="rとは">Rとは</h2>
-<p>統計解析と作図の機能が充実したプログラミング言語・環境</p>
+<h2 id="r-is-a-programming-languageenvironment">R is a programming language/environment</h2>
+<p>for statistical computing and graphics</p>
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
 <img src="/slides/image/rstats/Rlogo.svg" height="300">
@@ -438,20 +425,21 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 </a>
 </figure>
 <dl>
-<dt>クロスプラットフォーム</dt>
-<dd>Linux, Mac, Windows で動く</dd>
-<dt>オープンソース</dt>
-<dd>永久に無償で、すべての機能を使える。</dd>
-<dd>集合知によって常に進化している。</dd>
-<dt>コミュニティ</dt>
-<dd>相談できる人や参考になるウェブサイトがたくさん見つかる。</dd>
+<dt>Cross-platform</dt>
+<dd>Linux, Mac, Windows</dd>
+<dt>Open source</dt>
+<dd>Free of charge.</dd>
+<dd>Improved by collective intelligence.</dd>
+<dt>Community</dt>
+<dd>Easy to find many websites and people to consult.</dd>
 </dl>
-<p>他のプログラミング言語でもいいよ:
-<a href="https://www.python.org/">Python</a>とか<a href="https://julialang.org/">Julia</a>とか。</p>
+<p>There are some alternatives.<br>
+<a href="https://www.python.org/">Python</a> is comparable.
+<a href="https://julialang.org/">Julia</a> is rising.</p>
 
 </section>
 <section>
-<h2 id="この実習の目標">この実習の目標</h2>
+<h2 id="purposes-of-this-hands-on-lectures">Purposes of this hands-on lectures</h2>
 <h3 id="-del生物学研究にはデータとモデルが必須だと認識del">✅ <del>生物学研究にはデータとモデルが必須だと認識</del></h3>
 <h3 id="-del再現可能な解析を楽にやりたい気持ちになるdel">✅ <del>再現可能な解析を楽にやりたい気持ちになる</del></h3>
 <h3 id="-必要な方法を調べ実践する力をつける">⬜ 必要な方法を調べ、実践する力をつける</h3>
@@ -532,42 +520,41 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <p>See <a href="https://support.apple.com/HT201236">https://support.apple.com/HT201236</a>
 </section>
 <section>
-<h2 id="r環境のセットアップ">R環境のセットアップ</h2>
+<h2 id="setup-r-environment">Setup R environment</h2>
 <dl>
-<dt><a href="https://cran.rstudio.com/">R本体</a></dt>
-<dd>コマンドを解釈して実行するコア部分。</dd>
-<dd>よく使われる関数なども標準パッケージとして同梱。</dd>
+<dt><a href="https://cran.rstudio.com/">R</a></dt>
+<dd>Core software to interpret and execute commands.</dd>
+<dd>Standard packages and functions are included.</dd>
 <dt><a href="https://www.rstudio.com/">RStudio Desktop</a></dt>
-<dd>Rをより快適に使うための総合開発環境 (IDE)</dd>
-<dd>必須じゃないけど便利なので結構みんな使ってる。</dd>
+<dd>Integrated environment to help users interact with R.</dd>
+<dd>Not necessary, but many people like it.</dd>
 </dl>
 <img src="/slides/image/rstudio/rstudio-300x260.png">
 
 </section>
 <section>
-<h2 id="rstudioを起動して環境チェック">RStudioを起動して、環境チェック</h2>
-<p>次のコードをコピーして、左下のConsoleにペースト <kbd>return</kbd></p>
+<h2 id="launch-rstudio-and-check-your-environment">Launch RStudio and check your environment</h2>
+<p>Copy the following code, and paste it to Console on the left bottom <kbd>return</kbd>.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">student_id</span> <span class="o">=</span> <span class="s">&#34;C1SB0000&#34;</span>   <span class="c1"># 自分のIDに書き換えてください</span>
 </span></span><span class="line"><span class="cl"><span class="nf">source</span><span class="p">(</span><span class="s">&#34;https://example.com/sice/report.R&#34;</span><span class="p">)</span>
-</span></span></code></pre></div><p><code>Hello, C1SB0000.</code>
-のような返事が返ってきていればOK。</p>
-<p>なんらかのエラーが出た人は申し出てください。</p>
-<p>余裕があれば <code>update.packages()</code> を実行して更新。</p>
+</span></span></code></pre></div><p>You will get a response like <code>Hello, C1SB0000.</code><br>
+Let me know if any error has occurred.</p>
+<p>Run <code>update.packages()</code> when you have spare time.</p>
 <aside style="font-size: 50%; opacity: 50%;">
 <a href="https://github.com/heavywatal/sysinfocollector">
          https://github.com/heavywatal/sysinfocollector</a>
 </aside>
 </section>
 <section>
-<h2 id="rstudioを起動してconsoleで対話しよう">RStudioを起動してConsoleで対話しよう</h2>
-<p><strong>Workspace (Environment)</strong> = 一時オブジェクトの集まり</p>
+<h2 id="launch-rstudio-and-play-with-console">Launch RStudio and play with Console</h2>
+<p><strong>Workspace (Environment)</strong> = a collection of temporary objects on memory</p>
 <img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
 </section>
 <section>
-<h2 id="毎回まっさらなワークスペースで始める設定">毎回まっさらなワークスペースで始める設定</h2>
+<h2 id="configure-rstudio-to-always-start-with-a-clean-workspace">Configure RStudio to always start with a clean workspace</h2>
 <p><img height=22 width=22 src="https://cdn.simpleicons.org/apple"> RStudio → Preferences   <kbd>command</kbd><kbd>,</kbd><br>
 <img height=22 width=22 src="https://cdn.simpleicons.org/windows"> Tools → Global options</p>
-<p>&ldquo;Restore &hellip;&rdquo; の<strong>チェックを外し</strong>て、 &ldquo;Save &hellip;&rdquo; の<strong>Never</strong>を選択</p>
+<p>Uncheck &ldquo;Restore &hellip;&rdquo;. Set &ldquo;Save workspace &hellip;&rdquo; to <strong>Never</strong>.</p>
 <figure style="margin: 0;">
 <a href="https://r4ds.hadley.nz/workflow-scripts.html#fig-blank-slate">
 <img src="/slides/image/rstudio/preferences-workspace.png"
@@ -578,130 +565,129 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 
 </section>
 <section>
-<h2 id="project-を新規作成する">&ldquo;Project&rdquo; を新規作成する</h2>
+<h2 id="create-a-new-project">Create a new &ldquo;Project&rdquo;</h2>
 <p>File → New Project&hellip; → New Directory → New Project →<br>
 → Directory name: <code>r-training-2023</code><br>
 → as subdirectory of: <code>~/project</code> or <code>C:/Users/yourname/project</code></p>
 <p><img src="/slides/image/rstudio/create-new-project.png" class="screenshot"
 width="90%" style="object-fit: cover; object-position: top; height: 16em;"></p>
-<p>📁 ディレクトリ ＝ フォルダ。 <code>~/</code> = ホームディレクトリ</p>
+<p>📁 directory = folder. <code>~/</code> = home directory.</p>
 
 </section>
 <section>
-<h2 id="rスクリプトに書いてから実行">Rスクリプトに書いてから実行</h2>
+<h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
 <p>File → New File → R script</p>
 <img src="/slides/image/rstudio/newfile.png" width="100%">
 </section>
 <section>
-<h2 id="rスクリプトに書いてから実行">Rスクリプトに書いてから実行</h2>
+<h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
 <p>File → New File → R script</p>
 <img src="/slides/image/rstudio/script-console.png" width="100%">
 </section>
 <section>
-<h2 id="rスクリプトに書いてから実行">Rスクリプトに書いてから実行</h2>
+<h2 id="write-r-script-and-send-it-to-console">Write R script, and send it to Console</h2>
 <p>Select text with <kbd>shift</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>↑</kbd><kbd>→</kbd><br>
 Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 <img src="/slides/image/rstudio/101.png" width="100%">
 </section>
 <section>
-<h2 id="rスクリプトを保存する">Rスクリプトを保存する</h2>
+<h2 id="save-r-script">Save R script</h2>
 <ul>
-<li>手順
+<li>Steps
 <ul>
-<li>File → Save <kbd>command</kbd><kbd>s</kbd></li>
-<li>ファイル名: <code>hello.R</code></li>
-<li>場所: さっき作ったプロジェクト内 (デフォルトでそうなるはず)</li>
+<li><kbd>command</kbd><kbd>s</kbd> or File → Save</li>
+<li>Name: <code>hello.R</code></li>
+<li>Place: in the project (by default)</li>
 </ul>
 </li>
-<li><strong>スクリプトを書いたら消さずに保存すること！</strong>
+<li><strong>Save all the code you write!</strong>
 <ul>
-<li>書いたスクリプトは財産</li>
-<li>保存しておけばまた使い回せる</li>
+<li>You can reuse them in other projects.</li>
+<li>The code you can reuse is your skill already.</li>
 </ul>
 </li>
 </ul>
-<p>🔰 いろんな四則演算を試して <code>hello.R</code> に保存してみよう。<br>
+<p>🔰 Try basic arithmetic operations and save them to <code>hello.R</code>.<br>
 e.g., <code>1 + 2 + 3</code>, <code>3 * 7 * 2</code>, <code>4 / 2</code>, <code>4 / 3</code>, etc.
 </section>
 <section>
-<h2 id="プロジェクトにファイルが溜まっていく">プロジェクト📁にファイルが溜まっていく</h2>
-<p>スクリプト、データ、結果を分けて整理する例:</p>
-<pre tabindex="0"><code>r-training-2023/           # プロジェクトの最上階
-├── r-training-2023.Rproj  # これダブルクリックでRStudioを起動
+<h2 id="structure-of-project-directory-">Structure of project directory 📁</h2>
+<ul>
+<li>Gathering all the relevant files makes programming easier.</li>
+<li>Separating with subdirectories helps you keep files organized.</li>
+</ul>
+<pre tabindex="0"><code>r-training-2023/           # the root of the project
+├── r-training-2023.Rproj  # double-click this to launch RStudio
 ├── hello.R
-├── transform.R            # データ整理・変形のスクリプト
-├── visualize.R            # 作図のスクリプト
-├── data/                  # 元データを置くところ
-│   ├── iris.tsv
-│   └── diamonds.xlsx
-└── output/                # 結果の出力先
+├── transform.R            # script for data preparation
+├── visualize.R            # script for data visualization
+├── data/                  # input
+│   ├── iris.tsv
+│   └── diamonds.xlsx
+└── results/               # output
     ├── iris-petal.png
     └── iris-summary.tsv
-</code></pre><p>プロジェクト最上階を<strong>作業ディレクトリ</strong>とし、<br>
-ファイル読み書きの基準にする。(後で詳しく)</p>
-<p>ほんの一例です。好きな構造に決めてください。</p>
+</code></pre><p>The project root becomes the <strong>working directory</strong>.</p>
 
 </section>
 <section>
-<h2 id="作業ディレクトリ-rにとっての現在地-getwd">作業ディレクトリ: Rにとっての現在地 <code>getwd()</code></h2>
+<h2 id="get-working-directory-getwd">Get working directory <code>getwd()</code></h2>
 <ul>
-<li>ファイル読み書き、画像の保存などはここが基準。</li>
-<li><code>*.Rproj</code> ダブルクリックでRStudioを開けば、いい位置で作業再開。</li>
+<li>The starting point of relative paths to input/output files.</li>
+<li>Double-clicking <code>*.Rproj</code> will launch RStudio with an appropriate working directory.</li>
 </ul>
 <img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
 
 </section>
 <section>
-<h2 id="rと接する上での心構え">Rと接する上での心構え</h2>
+<h2 id="attitude-toward-programming-in-r">Attitude toward programming in R</h2>
 <figure>
 <img src="/slides/image/free/akusyu_uchuujin.png" height="200">
 </figure>
 <dl>
-<dt>エラー文を恐れない</dt>
-<dd>熟練プログラマでも頻繁にエラーを起こす。</dd>
-<dd>エラーはRからのメッセージ。<strong>意図を読み取って修正</strong>しよう。</dd>
-<dd>プログラミングの経験値 ≈ エラー解決の経験値</dd>
-<dt>困ったらウェブ検索</dt>
-<dd>あなたの問題は全世界のRユーザーが既に通った道。</dd>
-<dd>日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。</dd>
+<dt>Don&rsquo;t fear errors</dt>
+<dd>Even experts cause errors very often.</dd>
+<dd>An error is a message from R. Try to understand it.</dd>
+<dd>Experience point of programming ≈ exp. of error handling.</dd>
+<dt>Search on the web</dt>
+<dd>Some R users in the world have already solved your problems.</dd>
+<dd>Queries can be 日本語, Engligh, or whole error message.</dd>
 </dl>
 
 </section>
 <section>
-<h2 id="この実習の取り組み方">この実習の取り組み方</h2>
-<p>とにかく手を動かして体感しよう！</p>
+<h2 id="how-to-use-this-hands-on-lecture">How to use this hands-on lecture</h2>
 <ol>
-<li>こういう枠が出てきたら、自分のRスクリプトに<strong>コピペして保存</strong>:
+<li>Find commands in slides, and copy-n-paste them <strong>to your R script</strong>:
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
 </span></span></code></pre></div></li>
-<li><strong>実行してコンソールを確認</strong>。思ったとおりの出力？<br>
-<code>Error</code> や <code>Warning</code> があったらよく読んで対処する。<br>
-(無視していい <code>Warning</code> もたまーにあるけど)</li>
-<li>🔰若葉マークの練習問題があれば解いてみる。<br>
-そこまでのコードの<strong>コピペ＋改変</strong>でできるはず。</li>
+<li><strong>Execute it</strong> in the Console.</li>
+<li><strong>Check the output</strong>.<br>
+Read <code>error</code> and <code>warning</code> if any.</li>
+<li>Try practice exercises (marked with 🔰)</li>
 </ol>
-<p>疑問・困りごとがある場合は<strong>気軽に割り込んで</strong>ください。<br>
-TAがいるならTAが、リモートならChat欄が随時受付中です。</p>
+<hr>
+<p>Feel free to interupt me any time.</p>
 
 </section>
 <section>
-<h2 id="変数オブジェクトを作ってみよう">変数/オブジェクトを作ってみよう</h2>
+<h2 id="create-variablesobjects">Create variables/objects</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="m">2</span>        <span class="c1"># Create x</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 2
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="m">5</span>        <span class="c1"># Create y</span>
 </span></span><span class="line"><span class="cl"><span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 5
-</code></pre><p>Rでは代入演算子として矢印 <code>&lt;-</code> も使えるけど私は <code>=</code> 推奨。<br>
-<code>#</code> 記号より右はRに無視される。コメントを書くのに便利。</p>
+</code></pre><p>R accepts <code>&lt;-</code> as an assignment operator, but I recommend <code>=</code>.<br>
+Texts following <code>#</code> are ignored. Useful for comments.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 7
-</code></pre><p>🔰 <code>x</code> と <code>y</code> の引き算、掛け算、割り算をやってみよう</p>
+</code></pre><p>🔰 Try subtraction, multiplication, and division with <code>x</code> and <code>y</code>.</p>
 
 </section>
 <section>
-<h2 id="基本的な演算">基本的な演算</h2>
-<p><code>+</code> とか <code>*</code> のような演算子(operator)を変数の間に置く。<br></p>
+<h2 id="basic-operations">Basic operations</h2>
+<p>Symbols like <code>+</code> and <code>*</code> are called <strong>operators</strong>.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="m">10</span> <span class="o">+</span> <span class="m">3</span>    <span class="c1"># addition</span>
 </span></span><span class="line"><span class="cl"><span class="m">10</span> <span class="o">-</span> <span class="m">3</span>    <span class="c1"># subtraction</span>
 </span></span><span class="line"><span class="cl"><span class="m">10</span> <span class="o">*</span> <span class="m">3</span>    <span class="c1"># multiplication</span>
@@ -709,41 +695,41 @@ TAがいるならTAが、リモートならChat欄が随時受付中です。</p
 </span></span><span class="line"><span class="cl"><span class="m">10</span> <span class="o">%/%</span> <span class="m">3</span>  <span class="c1"># integer division</span>
 </span></span><span class="line"><span class="cl"><span class="m">10</span> <span class="o">%%</span> <span class="m">3</span>   <span class="c1"># modulus 剰余</span>
 </span></span><span class="line"><span class="cl"><span class="m">10</span> <span class="o">**</span> <span class="m">3</span>   <span class="c1"># exponent 10^3</span>
-</span></span></code></pre></div><p>🔰 コピペして結果を確認してみよう。</p>
+</span></span></code></pre></div><p>🔰 Check the results of the commands above.</p>
 
 </section>
 <section>
-<h2 id="関数-function">関数 (function)</h2>
-<p>変数を受け取って、何か仕事して、返す命令セット</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>  <span class="c1"># 1と3を渡すとvectorが返ってくる</span>
+<h2 id="functions">Functions</h2>
+<p>Receive some variables, do some job, and return something.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>  <span class="c1"># receives 1 and 3, and returns a vector.</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 1 2 3
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># vectorを渡すと足し算が返ってくる</span>
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># receives a vector, and returns a sum</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 6
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">square</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">something</span><span class="p">)</span> <span class="p">{</span>  <span class="c1"># 自分の関数を定義</span>
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">square</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">something</span><span class="p">)</span> <span class="p">{</span>  <span class="c1"># define a new function</span>
 </span></span><span class="line"><span class="cl">  <span class="n">something</span> <span class="o">**</span> <span class="m">2</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># 使ってみる</span>
+</span></span><span class="line"><span class="cl"><span class="nf">square</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># use it</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 1 4 9
-</code></pre><p>🔰 自分の関数を何か作ってみよう。
-e.g., 2倍にする関数 <code>twice</code></p>
+</code></pre><p>🔰 Create your own function.
+e.g., a function named <code>twice</code> to return doubled numbers.</p>
 
 </section>
 <section>
-<h2 id="変数オブジェクトを作ってみよう-part-2">変数/オブジェクトを作ってみよう Part 2</h2>
+<h2 id="create-variableobjects-part-2">Create variable/objects, part 2</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="m">42</span>       <span class="c1"># Create x</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span>            <span class="c1"># What&#39;s in x?</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 42
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="s">&#34;24601&#34;</span>  <span class="c1"># Create y</span>
 </span></span><span class="line"><span class="cl"><span class="n">y</span>            <span class="c1"># What&#39;s in y?</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;24601&#34;
-</code></pre><p>この <code>x</code> と <code>y</code> を足そうとするとエラーになる。なぜ？</p>
+</code></pre><p>R cannot calculate the sum of them:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>        <span class="c1"># Error! Why?</span>
 </span></span></code></pre></div><pre tabindex="0"><code>Error in x + y: non-numeric argument to binary operator
 </code></pre>
 </section>
 <section>
-<h2 id="変数オブジェクトの型">変数/オブジェクトの型</h2>
+<h2 id="data-types">Data types</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">class</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;numeric&#34;
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">is.numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
@@ -752,49 +738,49 @@ e.g., 2倍にする関数 <code>twice</code></p>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] FALSE
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">as.character</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;42&#34;
-</code></pre><p>🔰 さっき作った <code>y</code> にも同じ関数を適用してみよう。</p>
+</code></pre><p>🔰 Apply the same functions to <code>y</code>.</p>
 
 </section>
 <section>
-<h2 id="変数オブジェクトの型">変数/オブジェクトの型</h2>
+<h2 id="data-types">Data types</h2>
 <ul>
-<li><code>vector</code>: 基本型。一次元の配列。
+<li>atomic vector: one-dimensional array. very basic.
 <ul>
-<li><code>logical</code>: 論理値 (<code>TRUE</code> or <code>FALSE</code>)</li>
-<li><code>numeric</code>: 数値 (整数 <code>42L</code> or 実数 <code>3.1416</code>)</li>
-<li><code>character</code>: 文字列 (<code>&quot;a string&quot;</code>)</li>
-<li><code>factor</code>: 因子 (文字列っぽいけど微妙に違う)</li>
+<li><code>logical</code>: (<code>TRUE</code> or <code>FALSE</code>)</li>
+<li><code>numeric</code>: (integer <code>42L</code> or real number <code>3.1416</code>)</li>
+<li><code>character</code>: (<code>&quot;a string&quot;</code>)</li>
+<li><code>factor</code>: (hybrid of character and integer)</li>
 </ul>
 </li>
-<li><code>array</code>: 多次元配列。<code>vector</code>同様、全要素が同じ型。
+<li><code>array</code>: multi-dimensional array.
 <ul>
-<li><code>matrix</code>: 行列 = 二次元の配列。</li>
+<li><code>matrix</code>: two-dimensional array.</li>
 </ul>
 </li>
-<li><code>list</code>: 異なる型でも詰め込める太っ腹ベクトル。</li>
-<li><strong><code>data.frame</code>: 同じ長さのベクトルを並べた長方形のテーブル。重要。</strong> <br>
-<strong><code>tibble</code></strong> とか <strong><code>tbl_df</code></strong> と呼ばれる亜種もあるけどほぼ同じ。</li>
+<li><code>list</code>: subspecies of vector that can be heterogenous.</li>
+<li><strong><code>data.frame</code>: Rectangular table of the vectors. important</strong> <br>
+There are alternatives called <strong><code>tibble</code></strong> and <strong><code>tbl_df</code></strong>.</li>
 </ul>
 
 </section>
 <section>
-<h2 id="vector-一次元の配列">vector: 一次元の配列</h2>
-<p>1個の値でもベクトル扱い。<br>
-同じ長さ(または長さ1)の相手との計算が得意。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># 長さ3の数値ベクトル</span>
-</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">x</span>           <span class="c1"># 同じ長さ同士の計算</span>
+<h2 id="vector-one-dimensional-array">vector: one-dimensional array</h2>
+<p>R is good at <strong>element-wise operation</strong> on vectors.<br>
+There is no scalar type; it is treated as a vector of length 1.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>  <span class="c1"># length of 3</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">x</span>           <span class="c1"># the same length</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1]  2  4 18
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="m">10</span>          <span class="c1"># 長さ1の数値ベクトル</span>
-</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>           <span class="c1"># 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)</span>
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="m">10</span>          <span class="c1"># length of 1</span>
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">+</span> <span class="n">y</span>           <span class="c1"># the shorter vector is recycled</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 11 12 19
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">&lt;</span> <span class="m">5</span>           <span class="c1"># 5より小さいか</span>
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">&lt;</span> <span class="m">5</span>           <span class="c1"># is it smaller than 5?</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1]  TRUE  TRUE FALSE
-</code></pre><p>🔰 この <code>x, y</code> を使っていろいろな演算を試してみよう</p>
+</code></pre><p>🔰 Try other operations on these <code>x</code> and <code>y</code>.</p>
 
 </section>
 <section>
-<h2 id="vectorから部分的に抜き出す">vectorから部分的に抜き出す</h2>
-<p><code>[]</code> を使う。番号は1から始まる。</p>
+<h2 id="subsettingsubscripting-vectors">Subsetting/subscripting vectors</h2>
+<p>Use <code>[]</code> to extract a subset. Indices starts from 1.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="kc">letters</span>
 </span></span></code></pre></div><pre tabindex="0"><code> [1] &#34;a&#34; &#34;b&#34; &#34;c&#34; &#34;d&#34; &#34;e&#34; &#34;f&#34; &#34;g&#34; &#34;h&#34; &#34;i&#34; &#34;j&#34; &#34;k&#34; &#34;l&#34; &#34;m&#34; &#34;n&#34; &#34;o&#34; &#34;p&#34; &#34;q&#34; &#34;r&#34; &#34;s&#34; &#34;t&#34; &#34;u&#34; &#34;v&#34; &#34;w&#34; &#34;x&#34; &#34;y&#34; &#34;z&#34;
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="kc">letters</span><span class="n">[3]</span>
@@ -806,22 +792,21 @@ e.g., 2倍にする関数 <code>twice</code></p>
 </code></pre>
 </section>
 <section>
-<h2 id="vectorを渡した結果は関数によって異なる">vectorを渡した結果は関数によって異なる</h2>
-<p>各要素に適用するもの:</p>
+<h2 id="two-major-groups-of-numeric-functions">Two major groups of numeric functions</h2>
+<p>element-wise:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="nf">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>     <span class="c1"># square root</span>
 </span></span><span class="line"><span class="cl"><span class="n">y</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 1.000000 1.414214 3.000000
-</code></pre><p>全要素を集約した値を返すもの:</p>
+</code></pre><p>aggragete (use all values to generate one output):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">z</span> <span class="o">=</span> <span class="nf">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">z</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 12
-</code></pre><p>🔰 <code>log()</code>, <code>exp()</code>, <code>length()</code>, <code>max()</code>, <code>mean()</code>
-にvectorを渡してみよう。</p>
+</code></pre><p>🔰 Try <code>log()</code>, <code>exp()</code>, <code>length()</code>, <code>max()</code>, <code>mean()</code> and classify them.</p>
 
 </section>
 <section>
-<h2 id="matrix-二次元の配列-行列">matrix: 二次元の配列 (行列)</h2>
+<h2 id="matrix-two-dimensional-array">matrix: two-dimensional array</h2>
 <p>1本のvectorを折り曲げて長方形にしたもの。<br>
 中身は全て同じ型。機械学習とか画像処理とかで使う。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">v</span> <span class="o">=</span> <span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">8</span><span class="p">)</span>              <span class="c1"># c(1, 2, 3, 4, 5, 6, 7, 8)</span>
@@ -835,11 +820,11 @@ e.g., 2倍にする関数 <code>twice</code></p>
 </span></span></code></pre></div><pre tabindex="0"><code>     [,1] [,2] [,3] [,4]
 [1,]    1    2    3    4
 [2,]    5    6    7    8
-</code></pre><p>🔰 結果を確認してみよう: <code>x + y</code>, <code>dim(x)</code>, <code>nrow(x)</code>, <code>ncol(x)</code>.</p>
+</code></pre><p>🔰 Try <code>x + y</code>, <code>dim(x)</code>, <code>nrow(x)</code>, <code>ncol(x)</code>.</p>
 
 </section>
 <section>
-<h2 id="行-row-列-column-の憶え方">行 (row), 列 (column) の憶え方</h2>
+<h2 id="how-to-remember-the-directions-of-row-and-column">How to remember the directions of row and column</h2>
 <div class="column-container">
   <div class="column">
     <figure>
@@ -861,9 +846,9 @@ e.g., 2倍にする関数 <code>twice</code></p>
 
 </section>
 <section>
-<h2 id="dataframe-長方形のテーブル-重要">data.frame: 長方形のテーブル (重要!)</h2>
-<p>同じ長さの列vectorを複数束ねた長方形の表。<br>
-e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:</p>
+<h2 id="dataframe-rectangular-table-important">data.frame: rectangular table (important!)</h2>
+<p>A set of vertical vectors with the same length.<br>
+e.g., 4 numeric and 1 factor vectors with the length of 150:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
   1          5.1         3.5          1.4         0.2    setosa
@@ -875,51 +860,49 @@ e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:</p>
 148          6.5         3.0          5.2         2.0 virginica
 149          6.2         3.4          5.4         2.3 virginica
 150          5.9         3.0          5.1         1.8 virginica
-</code></pre><p><code>iris</code> はアヤメ属3種150個体に関する測定データ。<br>
-Rに最初から入ってて、例としてよく使われる。</p>
-
+</code></pre>
 </section>
 <section>
-<h2 id="dataframeを眺める">data.frameを眺める</h2>
-<p>概要を掴む:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>   <span class="c1"># 先頭だけ見てみる。末尾は tail()</span>
-</span></span><span class="line"><span class="cl"><span class="nf">nrow</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 行数: Number of ROWs</span>
-</span></span><span class="line"><span class="cl"><span class="nf">ncol</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># 列数: Number of COLumns</span>
-</span></span><span class="line"><span class="cl"><span class="nf">names</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>     <span class="c1"># 列名</span>
-</span></span><span class="line"><span class="cl"><span class="nf">summary</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>   <span class="c1"># 要約</span>
-</span></span><span class="line"><span class="cl"><span class="nf">View</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># RStudioで閲覧</span>
-</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">str</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>       <span class="c1"># 構造が分かる形で表示</span>
+<h2 id="various-ways-to-view-a-dataframe">Various ways to view a data.frame</h2>
+<p>Overview:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span>   <span class="c1"># First N rows. tail() for last rows.</span>
+</span></span><span class="line"><span class="cl"><span class="nf">nrow</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># Number of ROWs</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ncol</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># Number of COLumns</span>
+</span></span><span class="line"><span class="cl"><span class="nf">names</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>     <span class="c1"># of columns</span>
+</span></span><span class="line"><span class="cl"><span class="nf">summary</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>   <span class="c1"># mean, quantiles, etc.</span>
+</span></span><span class="line"><span class="cl"><span class="nf">View</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>      <span class="c1"># in RStudio/VSCode</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">str</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>       <span class="c1"># structure</span>
 </span></span></code></pre></div><pre tabindex="0"><code>tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
  $ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
  $ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
  $ Petal.Length: num [1:150] 1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
  $ Petal.Width : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
  $ Species     : Factor w/ 3 levels &#34;setosa&#34;,&#34;versicolor&#34;,..: 1 1 1 1 1 1 1 1 1 1 ...
-</code></pre><p>🔰 ほかのデータもいろいろ見てみよう。
+</code></pre><p>🔰 Try some other data.frames
 e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html"><code>data()</code></a></p>
 
 </section>
 <section>
-<h2 id="dataframeを眺める">data.frameを眺める</h2>
-<p>部分的なdata.frameを取得する:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2行目</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2行目から5行目まで</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3-4列目</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2-5行目, 3-4列目</span>
-</span></span></code></pre></div><p>1列をvectorとして取得する:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[[3]]</span>                  <span class="c1"># 3列目</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># Petal.Length列</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># Petal.Length列</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># Petal.Length列の2番目</span>
-</span></span></code></pre></div><p>結果がdata.frameになるかvectorになるか曖昧で危険、非推奨:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># 3列目</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># Petal.Length列</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># 2行目Petal.Length列</span>
+<h2 id="various-ways-to-view-a-dataframe">Various ways to view a data.frame</h2>
+<p>Subset:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="n">]</span>                  <span class="c1"># 2nd row</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="n">]</span>                <span class="c1"># 2nd to 5th rows</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>                <span class="c1"># 3rd to 4th columns</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="o">:</span><span class="m">5</span><span class="p">,</span> <span class="m">3</span><span class="o">:</span><span class="m">4</span><span class="n">]</span>             <span class="c1"># 2nd to 5th rows, 3rd to 4th columns</span>
+</span></span></code></pre></div><p>Extract a column <strong>as vector</strong>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[[3]]</span>                  <span class="c1"># 3rd column</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span>          <span class="c1"># a column named Petal.Length</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]]</span>     <span class="c1"># a column named Petal.Length</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[[</span><span class="s">&#34;Petal.Length&#34;</span><span class="n">]][2]</span>  <span class="c1"># 2nd element of Petal.Length</span>
+</span></span></code></pre></div><p>Unrecommended. Hard to know if the result is data.frame or vector:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="m">3</span><span class="n">]</span>                  <span class="c1"># data.frame with a single column?</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>     <span class="c1"># data.frame with a single column?</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris[2</span><span class="p">,</span> <span class="s">&#34;Petal.Length&#34;</span><span class="n">]</span>    <span class="c1"># data.frame with a single cell?</span>
 </span></span></code></pre></div>
 </section>
 <section>
-<h2 id="dataframeの新規作成">data.frameの新規作成</h2>
-<p>同じ長さの <strong>列(column) vector</strong> を結合して作る:</p>
+<h2 id="create-a-new-dataframe">Create a new data.frame</h2>
+<p>Combine <strong>column vectors</strong> with the same length:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">3</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">y</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">mydata</span> <span class="o">=</span> <span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
@@ -928,12 +911,12 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 1 1 A
 2 2 B
 3 3 C
-</code></pre><p>🔰 次のようなdata.frameを作って <code>theDF</code> と名付けよう:</p>
+</code></pre><p>🔰 Create a data.frame named <code>theDF</code> as follows:</p>
 <pre tabindex="0"><code> i s
 24 x
 25 y
 26 z
-</code></pre><p>ヒント: <code>c()</code> 無しでクリアすることも可能。</p>
+</code></pre><p>Hint: you can do it with and without <code>c()</code>.</p>
 
 </section>
 <section>
@@ -1061,52 +1044,6 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 <figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
-</section>
-<section>
-<h2 id="実習全体の予定">実習全体の予定</h2>
-<table>
-<thead>
-<tr>
-<th>時間</th>
-<th>4/10 Mon</th>
-<th>4/11 Tue</th>
-<th>4/12 Wed</th>
-<th>4/13 Thu</th>
-<th>4/17 Mon</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>13:00</td>
-<td><strong>導入</strong></td>
-<td><strong>構造処理1</strong></td>
-<td><strong>内容処理</strong></td>
-<td><strong>統計モデル1</strong></td>
-<td>発表会</td>
-</tr>
-<tr>
-<td>14:40</td>
-<td><strong>可視化</strong></td>
-<td><strong>構造処理2</strong></td>
-<td><strong>入力・解釈</strong></td>
-<td><strong>統計モデル2</strong></td>
-<td>発表会</td>
-</tr>
-<tr>
-<td>16:20</td>
-<td>練習問題</td>
-<td>練習問題</td>
-<td>練習問題</td>
-<td>練習問題</td>
-<td>予備</td>
-</tr>
-</tbody>
-</table>
-<ul>
-<li>毎日最後に練習問題を出します。解けた班から解散。</li>
-<li>レポート課題については今日の後半にお知らせ。<br>
-🔰練習問題をちゃんとこなせば半自動的にレポートもできあがる仕掛け。</li>
-</ul>
 
 </section>
 <section>
