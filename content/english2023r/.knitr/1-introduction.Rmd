@@ -953,29 +953,30 @@ iris |> head(3L) |> readr::write_csv(stdout())
 ---
 ## R package
 
-便利な関数やデータセットなどをひとまとめにしたもの。
+A collection of useful functions and datasets.
 
 Standard Packages
-: Rの標準機能。何もしなくても使用可能
+: Installed as a part of R.
 
 Contributed Packages
-: 有志により開発され、
+: Written by many different authors.
+  Available for download from
   [CRAN](https://cran.rstudio.com/web/packages/index.html)
-  にまとめて公開されている。
-: 要インストール。使う前に読み込むおまじないが必要。
+  and other repositories.
+: Commands for installing and loading:
 
 ```r
-install.packages("readr")  # 一度やればOK
-library(readr)             # 読み込みはRを起動するたびに必要
-update.packages()          # たまには更新しよう
+install.packages("readr")  # once per computer
+library(readr)             # everytime you start R
+update.packages()          # once in a while
 ```
 
-素のRも覚えきってないのにいきなりパッケージ？
-: 大丈夫。誰も覚えきってない。
-: パッケージを使わないR作業 = 火もナイフも使わない料理
+Wait. Using packages before understanding base R?
+: No problem. No body .
+: R without packages = Cooking without fire or knives
 
 ---
-## tidyverse: a collection of R packages designed for data science
+## tidyverse: a collection of R packages for data science
 
 <a href="https://www.tidyverse.org/">
 <img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
@@ -983,8 +984,8 @@ update.packages()          # たまには更新しよう
 
 ```r
 install.packages("tidyverse")
-library(conflicted) # 安全のおまじない
-library(tidyverse)  # 一挙に読み込み
+library(conflicted) # charm for safe coding
+library(tidyverse)  # load core packages as once
 ```
 ```{r, tidyverse-messasge}
 #| echo: false
@@ -993,7 +994,7 @@ withr::with_namespace("tidyverse", {
 })
 ```
 
-一貫したデザインでデータ解析の様々な工程をカバー
+Consistently designed to cover all the processes in data analysis.
 
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
@@ -1006,56 +1007,50 @@ withr::with_namespace("tidyverse", {
 ---
 ## 疑問やエラーの解決方法
 
-- エラーのほとんどは凡ミス由来。よく確認しよう。
-    - エラー文をちゃんと読む: `No such file or directory`
-    - 変数の中身を確かめる: `str(iris)`, `attributes(iris)`
+- Most errors derive from easy mistakes.
+    - Read error messages: `No such file or directory`
+    - Check your objects: `str(iris)`, `attributes(iris)`
     - [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html)
-      をチェックする
-- エラー文やパッケージ名をコピペしてウェブ検索<br>
+- Search web by copy-and-paste error messages<br>
   → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
-  や個人サイトに解決策
-- Slack <img height=22 width=22 src="https://cdn.simpleicons.org/slack">
-  [r-wakalang](https://github.com/tokyor/r-wakalang)
-  で質問を投稿する。<br>
-  (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)
-- 状況再現できる小さな例
-  [(reprex)](https://reprex.tidyverse.org/)
-  を添えると回答を得やすい。<br>
-  (これを準備してるうちに問題が切り分けられて自己解決したり)
-- パッケージの公式ドキュメントをちゃんと読む
-- R(Studio)内のヘルプを読む: `?sum`, `help.start()`
+  and blogs often provide solutions
+- Post questions with minimal reproducible examples
+  [(reprex)](https://reprex.tidyverse.org/).<br>
+  (It also helps you isolate the problems and find solutions by yourself.)
+- Read the official documents of packages.
+- Read helps in R(Studio): `?sum`, `help.start()`
 
 
 ---
 ## 1時限目後半: Rの基礎
 
-✅ Rはデータ解析に便利なプログラミング言語・環境
+✅ R is a programming language/environment for data analysis.
 
-✅ **プロジェクト**を使ってファイルを管理
+✅ Create a **"project"** first to organize your files.
 
-✅ **スクリプト**を書いてから**コンソール**で実行
+✅ Save commands to **scripts** before executing in the **console**.
 
-✅ 変数には型がある: 数値、文字列、**データフレーム**など
+✅ Data types: numeric, character, **data.frame**, etc.
 
-✅ 便利な**パッケージ**を使っていく
+✅ Useful R packages: tidyverse, etc.
 
-✅ 疑問・エラーの解決方法
+✅ How to solve questions and errors.
 
 <hr>
 
-個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+You don't have to remember every command.<br>
+Just repeat forgetting and searching.
 
 ---
-## データ解析のおおまかな流れ
+## Outline of data analysis
 
-1. コンピュータ環境の整備
-1. データの取得、読み込み
-1. 探索的データ解析
-    - **前処理、加工** (地味。意外と重い) 👈 明日以降の主題
-    - **可視化**、仮説生成 (派手！楽しい！) 👈 本日後半の主題
-    - **統計解析**、仮説検証 (みんな勉強したがる)
-1. 報告、発表
+1. Setup computer environment
+1. Get and read input data
+1. Exploratory data analysis
+    - **Preparation** (地味。意外と重い) 👈 明日以降の主題
+    - **Visualization**, generating hypotheses (派手！楽しい！) 👈 本日後半の主題
+    - **Statistical analysis**, testing hypotheses (みんな勉強したがる)
+1. Report
 
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
