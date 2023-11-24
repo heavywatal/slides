@@ -17,7 +17,7 @@ draft = false
 -   Abstract:<br>
     Biological research is, roughly speaking, to collect data from organisms and decipher the rule behind them.
     Data analysis and visualization are therefore essential skills for any researcher in this field.
-    But don't even think about manual works in Excel because they are combersome, error-prone, and above all, unreproducible.
+    But don't even think about manual works in Excel because they are cumbersome, error-prone, and above all, unreproducible.
     Let machines do repetitive and boring tasks.
     Here, we learn how to use R language/environment effectively to prepare and analyze data.
 -   Prerequisite
@@ -36,14 +36,14 @@ draft = false
 1.  Apply all the software updates available and restart the OS:
     - Windows 11 (≥22H2)
     - macOS Ventura (≥13.6)
-1.  Configure OS to [always show file extensions](https://duckduckgo.com/?q=show+file+extensions)(suffixes of file names such as `.pdf` and `.png`)
+1.  Configure OS to [always show file extensions](https://duckduckgo.com/?q=show+file+extensions) (suffixes of file names such as `.pdf` and `.png`)
 1.  Download the latest **R (≥4.3.2)** from <https://cran.r-project.org/>.
     Install it with the default settings by pressing OK/Proceed.
     If you have old versions installed, remove them before new installation just in case.
     - [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.*.*-win.exe`
     - [Mac](https://cran.r-project.org/bin/macosx/)
       → `R-4.*.*-arm64.pkg` (Apple Silicon) or `R-4.*.*.pkg` (Intel)
-1.  Download the latest **RStudio(≥2023.09.0)** from
+1.  Download the latest **RStudio (≥2023.09.0)** from
     <https://posit.co/download/rstudio-desktop/>
     and install it.
     If you have old versions installed, remove them before new installation just in case.
