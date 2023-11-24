@@ -611,9 +611,10 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd></p>
 e.g., <code>1 + 2 + 3</code>, <code>3 * 7 * 2</code>, <code>4 / 2</code>, <code>4 / 3</code>, etc.
 </section>
 <section>
-<h2 id="structure-of-project-directory-">Structure of project directory 📁</h2>
+<h2 id="organize-the-project-directory-">Organize the project directory 📁</h2>
 <ul>
-<li>Gathering all the relevant files makes programming easier.</li>
+<li>There are only two files for now, but many more in the future.</li>
+<li>Gathering all the relevant files here makes programming easier.</li>
 <li>Separating with subdirectories helps you keep files organized.</li>
 </ul>
 <pre tabindex="0"><code>r-training-2023/           # the root of the project
@@ -627,15 +628,14 @@ e.g., <code>1 + 2 + 3</code>, <code>3 * 7 * 2</code>, <code>4 / 2</code>, <code>
 └── results/               # output
     ├── iris-petal.png
     └── iris-summary.tsv
-</code></pre><p>The project root becomes the <strong>working directory</strong>.</p>
+</code></pre><p>The next topics are <strong>working directory</strong> and <strong>relative path</strong>.</p>
 
 </section>
 <section>
-<h2 id="get-working-directory-getwd">Get working directory <code>getwd()</code></h2>
-<ul>
-<li>The starting point of relative paths to input/output files.</li>
-<li>Double-clicking <code>*.Rproj</code> will launch RStudio with an appropriate working directory.</li>
-</ul>
+<h2 id="working-directory-starting-point-of-relative-paths">Working directory: starting point of relative paths</h2>
+<p>The project root is the working directory by default. <strong>Never change it</strong>.</p>
+<p>✅ Good: <code>read_tsv(&quot;data/iris.tsv&quot;)</code><br>
+❌ Bad: <code>setwd(&quot;data&quot;); read_tsv(&quot;iris.tsv&quot;)</code></p>
 <img src="/slides/image/rstudio/getwd.png" style="width: 100%;">
 
 </section>
@@ -920,8 +920,8 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 
 </section>
 <section>
-<h2 id="dataframeの読み書き">data.frameの読み書き</h2>
-<p>Rには <code>read.csv()</code> とか <code>write.csv()</code> とかが標準装備されてるけど、、、</p>
+<h2 id="reading-and-writing-dataframe">Reading and writing data.frame</h2>
+<p>R has built-in functions such as <code>read.csv()</code> and <code>write.csv()</code>,</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">write.csv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;iris.csv&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>&#34;&#34;,&#34;Sepal.Length&#34;,&#34;Sepal.Width&#34;,&#34;Petal.Length&#34;,&#34;Petal.Width&#34;,&#34;Species&#34;
 &#34;1&#34;,5.1,3.5,1.4,0.2,&#34;setosa&#34;
@@ -930,8 +930,8 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 </code></pre><a href="https://readr.tidyverse.org/">
 <img src="/_img/hex-stickers/readr.webp" width="180" align="right">
 </a>
-<p>なんか<strong>左端の列</strong>とか <strong>&ldquo;引用符&rdquo;</strong> が勝手に作られたりいろいろ不便。</p>
-<p><code>readr</code> というパッケージを使えばそういう悩みから解放される。</p>
+<p>but they are difficult to use properly.<br>
+Use <code>readr</code> package instead.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">write_csv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;iris.csv&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>Sepal.Length,Sepal.Width,Petal.Length,Petal.Width,Species
 5.1,3.5,1.4,0.2,setosa
@@ -941,41 +941,42 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 </section>
 <section>
 <h2 id="r-package">R package</h2>
-<p>便利な関数やデータセットなどをひとまとめにしたもの。</p>
+<p>A collection of useful functions and datasets.</p>
 <dl>
 <dt>Standard Packages</dt>
-<dd>Rの標準機能。何もしなくても使用可能</dd>
+<dd>Installed as a part of R.</dd>
 <dt>Contributed Packages</dt>
-<dd>有志により開発され、
+<dd>Written by many different authors.
+Available for download from
 <a href="https://cran.rstudio.com/web/packages/index.html">CRAN</a>
-にまとめて公開されている。</dd>
-<dd>要インストール。使う前に読み込むおまじないが必要。</dd>
+and other repositories.</dd>
+<dd>Commands for installing and loading:</dd>
 </dl>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># 一度やればOK</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># 読み込みはRを起動するたびに必要</span>
-</span></span><span class="line"><span class="cl"><span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># たまには更新しよう</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;readr&#34;</span><span class="p">)</span>  <span class="c1"># once per computer</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>             <span class="c1"># everytime you start R</span>
+</span></span><span class="line"><span class="cl"><span class="nf">update.packages</span><span class="p">()</span>          <span class="c1"># once in a while</span>
 </span></span></code></pre></div><dl>
-<dt>素のRも覚えきってないのにいきなりパッケージ？</dt>
-<dd>大丈夫。誰も覚えきってない。</dd>
-<dd>パッケージを使わないR作業 = 火もナイフも使わない料理</dd>
+<dt>Wait. Using packages before understanding base R?</dt>
+<dd>No problem. No body .</dd>
+<dd>R without packages = Cooking without fire or knives</dd>
 </dl>
 
 </section>
 <section>
-<h2 id="tidyverse-データ科学のためのパッケージ群">tidyverse: データ科学のためのパッケージ群</h2>
+<h2 id="tidyverse-a-collection-of-r-packages-for-data-science">tidyverse: a collection of R packages for data science</h2>
 <a href="https://www.tidyverse.org/">
 <img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
 </a>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># 安全のおまじない</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># 一挙に読み込み</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># charm for safe coding</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># load core packages as once</span>
 </span></span></code></pre></div><pre tabindex="0"><code>── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
-✔ dplyr     1.1.3     ✔ readr     2.1.4
-✔ forcats   1.0.0     ✔ stringr   1.5.0
-✔ ggplot2   3.4.3     ✔ tibble    3.2.1
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
 ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
 ✔ purrr     1.0.2     
-</code></pre><p>一貫したデザインでデータ解析の様々な工程をカバー</p>
+</code></pre><p>Consistently designed to cover all the processes in data analysis.</p>
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="800">
@@ -987,56 +988,50 @@ e.g., <code>mtcars</code>, <code>quakes</code>, <a href="https://stat.ethz.ch/R-
 <section>
 <h2 id="疑問やエラーの解決方法">疑問やエラーの解決方法</h2>
 <ul>
-<li>エラーのほとんどは凡ミス由来。よく確認しよう。
+<li>Most errors derive from easy mistakes.
 <ul>
-<li>エラー文をちゃんと読む: <code>No such file or directory</code></li>
-<li>変数の中身を確かめる: <code>str(iris)</code>, <code>attributes(iris)</code></li>
-<li><a href="https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
-をチェックする</li>
+<li>Read error messages: <code>No such file or directory</code></li>
+<li>Check your objects: <code>str(iris)</code>, <code>attributes(iris)</code></li>
+<li><a href="https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a></li>
 </ul>
 </li>
-<li>エラー文やパッケージ名をコピペしてウェブ検索<br>
+<li>Search web by copy-and-paste error messages<br>
 → <a href="https://stackoverflow.com/questions/tagged/r">StackOverflow</a>
-や個人サイトに解決策</li>
-<li>Slack <img height=22 width=22 src="https://cdn.simpleicons.org/slack">
-<a href="https://github.com/tokyor/r-wakalang">r-wakalang</a>
-で質問を投稿する。<br>
-(質問に飢えた優しいワニが多数生息 👀   👀   👀   👀)</li>
-<li>状況再現できる小さな例
-<a href="https://reprex.tidyverse.org/">(reprex)</a>
-を添えると回答を得やすい。<br>
-(これを準備してるうちに問題が切り分けられて自己解決したり)</li>
-<li>パッケージの公式ドキュメントをちゃんと読む</li>
-<li>R(Studio)内のヘルプを読む: <code>?sum</code>, <code>help.start()</code></li>
+and blogs often provide solutions</li>
+<li>Post questions with minimal reproducible examples
+<a href="https://reprex.tidyverse.org/">(reprex)</a>.<br>
+(It also helps you isolate the problems and find solutions by yourself.)</li>
+<li>Read the official documents of packages.</li>
+<li>Read helps in R(Studio): <code>?sum</code>, <code>help.start()</code></li>
 </ul>
 
 </section>
 <section>
 <h2 id="1時限目後半-rの基礎">1時限目後半: Rの基礎</h2>
-<p>✅ Rはデータ解析に便利なプログラミング言語・環境</p>
-<p>✅ <strong>プロジェクト</strong>を使ってファイルを管理</p>
-<p>✅ <strong>スクリプト</strong>を書いてから<strong>コンソール</strong>で実行</p>
-<p>✅ 変数には型がある: 数値、文字列、<strong>データフレーム</strong>など</p>
-<p>✅ 便利な<strong>パッケージ</strong>を使っていく</p>
-<p>✅ 疑問・エラーの解決方法</p>
+<p>✅ R is a programming language/environment for data analysis.</p>
+<p>✅ Create a <strong>&ldquo;project&rdquo;</strong> first to organize your files.</p>
+<p>✅ Save commands to <strong>scripts</strong> before executing in the <strong>console</strong>.</p>
+<p>✅ Data types: numeric, character, <strong>data.frame</strong>, etc.</p>
+<p>✅ Useful R packages: tidyverse, etc.</p>
+<p>✅ How to solve questions and errors.</p>
 <hr>
-<p>個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。</p>
+<p>You don&rsquo;t have to remember every command.<br>
+Just repeat forgetting and searching.</p>
 
 </section>
 <section>
-<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<h2 id="outline-of-data-analysis">Outline of data analysis</h2>
 <ol>
-<li>コンピュータ環境の整備</li>
-<li>データの取得、読み込み</li>
-<li>探索的データ解析
+<li>Setup computer environment</li>
+<li>Get and read input data</li>
+<li>Exploratory data analysis
 <ul>
-<li><strong>前処理、加工</strong> (地味。意外と重い) 👈 明日以降の主題</li>
-<li><strong>可視化</strong>、仮説生成 (派手！楽しい！) 👈 本日後半の主題</li>
-<li><strong>統計解析</strong>、仮説検証 (みんな勉強したがる)</li>
+<li><strong>Preparation</strong> (地味。意外と重い) 👈 明日以降の主題</li>
+<li><strong>Visualization</strong>, generating hypotheses (派手！楽しい！) 👈 本日後半の主題</li>
+<li><strong>Statistical analysis</strong>, testing hypotheses (みんな勉強したがる)</li>
 </ul>
 </li>
-<li>報告、発表</li>
+<li>Report</li>
 </ol>
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
