@@ -27,7 +27,7 @@ clean:
 public:
 	hugo --cleanDestinationDir --environment public
 
-image: ${IMGDSTS}
+image: ${IMGDSTS} static/image
 	@:
 
 content/%/image: ${DROPBOX}/%
@@ -35,3 +35,6 @@ content/%/image: ${DROPBOX}/%
 
 ${DROPBOX}/%: | content/%
 	mkdir $@
+
+static/image: ${DROPBOX}-static/image
+	rsync -auv $^/ $@/
