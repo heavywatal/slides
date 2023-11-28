@@ -9,34 +9,35 @@
 ```
 
 ---
-## この実習の目標
+## Purposes of this hands-on lectures
 
-### ✅ <del>生物学研究にはデータとモデルが必須だと認識</del>
+### ✅ <del>Every biological research involves data and models</del>
 
-### ✅ <del>再現可能な解析を楽にやりたい気持ちになる</del>
+### ✅ <del>You want to do reproducible analysis</del>
 
-### ⬜ 必要な方法を調べ、実践する力をつける
+### ⬜ Learn how to do it and how to learn more
 
-- Rでできそうなことを把握する
-- 困ったときの対処法・相談先を知る
+- Overview what R can do
+- Know where to consult when you have a problem.
 
-### ⬜ データ解析の基本に触れる
+### ⬜ Glance at the basics of data analysis
 
-<br>
-個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+<hr>
+
+You don't have to remember every command.<br>
+Just repeat forgetting and searching.
 
 
 ---
-## データ解析のおおまかな流れ
+## Outline of data analysis
 
-1. コンピュータ環境の整備 ✅
-1. データの取得、読み込み
-1. 探索的データ解析
-    - **前処理、加工** (地味。意外と重い) 👈 今回の主題
-    - 可視化、仮説生成 (派手！だいじ！) ✅ 完全に理解した
-    - 統計解析、仮説検証 (みんな勉強したがる)
-1. 報告、発表 ✅ Quarto楽しい
+1. Setup computer environment ✅
+1. Get and read input data ⬜ day 6
+1. Exploratory data analysis
+    - **Preparation** (harder than it seems) ⬜ day 3--5 👈
+    - **Visualization**, generating hypotheses (fun!) ✅ day 2
+    - **Statistical analysis**, testing hypotheses ⬜ day 7--8
+1. Report ✅ day 2
 
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
@@ -47,9 +48,9 @@
 
 
 ---
-## 可視化だいじ。わかった。
+## Now we know visualization is very important
 
-情報の整理 → **正しい解析・新しい発見・仮説生成**
+reorganization of information → **proper analysis, new hypotheses**
 
 <figure>
 <a href="https://r4ds.hadley.nz/whole-game">
@@ -58,17 +59,20 @@
 </a>
 </figure>
 
-でも**データ分析に費やす労力の8割は前処理**らしいよ。。。
+But it is rare that you get data in the right form to draw graphs.
+
+Some say,<br>
+data scientists **spend 80% of their resources for data preparation**.
 
 
 ---
-## 機械処理しやすい形 vs 人が読み書きしやすい形
+## Machine process ≠ Human read/write
 
-作図や解析に使えるデータ形式はほぼ決まってる
+Similar data formats required for visualization and analysis
 : `ggplot(data, ...)`, `glm(..., data, ...)`, ...
 
-出発点となるデータはさまざま
-: 実験ノート、フィールドノート、データベース、...
+Different data formats from source to source
+: lab notebooks, fieldnotes, databases, etc.
 
 > Happy families are all alike;<br>
 > every unhappy family is unhappy in its own way<br>
@@ -80,7 +84,7 @@
 
 
 ---
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
@@ -89,9 +93,9 @@
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1.png" width="450" style="transform: translate(-0.6em, 0);">
     <div style="position: absolute; top: 18em;">
-    縦1列は1つの変数<br>
-    横1行は1つの観測<br>
-    1セルは1つの値<br>
+    Each column is a variable.<br>
+    Each row is an observation.<br>
+    Each cell is a single value.<br>
     </div>
   </div>
 </div>
@@ -102,7 +106,7 @@
 </cite>
 
 ---
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
@@ -111,9 +115,9 @@
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="640" style="transform: translate(-1.6em, -0.5em);">
     <div style="position: absolute; top: 18em;">
-    <strong>縦1列は1つの変数</strong><br>
-    横1行は1つの観測<br>
-    1セルは1つの値<br>
+    <strong>Each column is a variable.</strong><br>
+    Each row is an observation.<br>
+    Each cell is a single value.<br>
     </div>
   </div>
 </div>
@@ -124,7 +128,7 @@
 </cite>
 
 ---
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
@@ -133,9 +137,9 @@
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="450" style="transform: translate(-1em, 0);">
     <div style="position: absolute; top: 18em;">
-    縦1列は1つの変数<br>
-    <strong>横1行は1つの観測</strong><br>
-    1セルは1つの値<br>
+    Each column is a variable.<br>
+    <strong>Each row is an observation.</strong><br>
+    Each cell is a single value.<br>
     </div>
   </div>
 </div>
@@ -146,7 +150,7 @@
 </cite>
 
 ---
-## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
+## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
@@ -155,9 +159,9 @@
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="420" style="transform: translate(-0.6em, 0.1em);">
     <div style="position: absolute; top: 18em;">
-    縦1列は1つの変数<br>
-    横1行は1つの観測<br>
-    <strong>1セルは1つの値</strong><br>
+    Each column is a variable.<br>
+    Each row is an observation.<br>
+    <strong>Each cell is a single value.</strong><br>
     </div>
   </div>
 </div>
@@ -169,11 +173,11 @@
 
 
 ---
-## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+## tidy data &nbsp; ≈ &nbsp; data.frame tempting you to ggplot
 
-- **縦1列**は1つの**変数**
-- **横1行**は1つの**観測**
-- **1セル**は1つの**値**
+- Each **column** is a **variable**.
+- Each **row** is an **observation**.
+- Each **cell** is a **single value**.
 
 <cite style="display: block; text-align: right;">
 <a class="url" href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>
@@ -184,10 +188,9 @@ print(ggplot2::diamonds)
 ```
 
 ---
-## 整然データ tidy data &nbsp; ≈ &nbsp; ggplot したくなる形
+## tidy data &nbsp; ≈ &nbsp; data.frame tempting you to ggplot
 
-x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
-
+Aesthetic mapping and faceting by column names:
 ```{r, tidy-data-benefit}
 #| fig.height: 5.5
 #| fig.width: 9
@@ -197,13 +200,14 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 ```
 
 ---
-## 目標: 生データを下ごしらえして食べやすい形に
+## Immediate goal: skills to prepare tidy data
 
 ```{r, before-tidy}
 print(VADeaths)
 ```
 
-↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+↓ *mise en place* &nbsp;🔪&nbsp; put everything in place
+<img `r src_alt_fig_chunk("vadeaths-plot")` align="right" width="540" style="margin-block-start: 4em;">
 
 ```{r, after-tidy}
 #| echo: false
@@ -214,28 +218,27 @@ VADeaths |>
   tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
 ```
 
-
 ---
-## 前処理は大きく2つに分けられる
+## Data preparation can be divided into to two groups
 
-- **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
-    - 使いたい部分だけ抽出
-    - グループごとに特徴を要約
-    - 何かの順に並べ替え
-    - 異なるテーブルの結合
-    - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
-    - 数値の変換: 対数、正規化
-    - 外れ値・欠損値への対処
-    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
-    - 文字列処理: 正規表現によるパターンマッチ
+- **Processing data structure** 👈 day 3 and 4
+    - Extract subsets
+    - Summarize by group
+    - Sort rows
+    - Combine tables
+    - Pivot longer ↔ wider
+- Processing data content <span style="color: #888888;">— day 5</span>
+    - Type conversion: continuous vs discrete, factors, time
+    - Mathematical conversion: logarithm, normalization
+    - Handling outliers and missing values
+    - Character manipulation: pattern matching
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
 </a></cite>
 
 ---
-## tidyverse: データ科学のためのパッケージ群
+## tidyverse: a collection of R packages for data science
 
 <a href="https://www.tidyverse.org/">
 <img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
@@ -243,8 +246,8 @@ VADeaths |>
 
 ```r
 install.packages("tidyverse")
-library(conflicted) # 安全のおまじない
-library(tidyverse)  # 一挙に読み込み
+library(conflicted) # charm for safe coding
+library(tidyverse)  # load core packages at once
 ```
 ```{r, tidyverse-message}
 #| echo: false
@@ -253,7 +256,7 @@ withr::with_namespace("tidyverse", {
 })
 ```
 
-一貫したデザインでデータ解析の様々な工程をカバー
+Consistently designed to cover all the processes in data analysis.
 
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
@@ -263,40 +266,40 @@ withr::with_namespace("tidyverse", {
 </figure>
 
 ---
-## dplyr --- data.frameの高速処理担当
+## dplyr --- plyer for data.frames
 
 <a href="https://dplyr.tidyverse.org/">
 <img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
 </a>
 
-シンプルな関数がたくさん。繋げて使う (piping)
+A consistent set of verbs/functions for data manipulation.
 
-抽出
-: 列: `select()`,
-: 行: `filter()`, `distinct()`, `slice()`
+Extract
+: columns: `select()`,
+: rows: `filter()`, `distinct()`, `slice()`
 
-要約・集計
+Aggregate
 : `group_by()`, `summarize()`, `count()`
 
-並べ替え
+Reorder
 : `arrange()`, `relocate()`
 
-列の追加・変更
+Modify/add columns
 : `mutate()`, `rename()`
 
-結合
-: 行方向: `bind_rows()`
-: 列方向: `left_join()`, `inner_join()`, `full_join()`
+Join/bind
+: rows: `bind_rows()`
+: columns: `left_join()`, `inner_join()`, `full_join()`
 
 
 ---
-## dplyrを使ってみる準備
+## Getting ready to use dplyr
 
-パッケージを読み込んで、データを見てみる
+Load packages. Take a look at the data:
 ```r
 # install.packages("tidyverse")
-library(conflicted) # 安全のおまじない
-library(tidyverse)
+library(conflicted) # charm for safe coding
+library(tidyverse)  # load packages including ggplot2, dplyr
 print(diamonds)
 View(diamonds)  # RStudio
 ```
@@ -306,135 +309,141 @@ View(diamonds)  # RStudio
 print(diamonds)
 ```
 
-🔰 `starwars` データも眺めてみよう
+🔰 View also `starwars` data.
 
 ---
-## dplyr の関数を使うときのお作法
+## Use explicit namespace `dplyr::`
 
-名前空間を明示する演算子 `::` を使う:
-
-```{r, dplyr-namespace}
-dplyr::filter(diamonds, carat > 3)
-```
-
-**同名の関数と衝突**する場合(ここではR標準の `stats::filters()`)、<br>
-「私が使いたいのは **dplyrのほうの `filter()`** です」と明示したい。
-
-そうじゃなくても「この関数はあのパッケージ由来」が分かって便利。
-
----
-## dplyr はこういうふうに使いやすい
-
-小さな関数を繋げて使う流れ作業:
-```{r, dplyr-example}
-result = diamonds |>                   # 生データから出発して
-  dplyr::select(carat, cut, price) |>  # 列を抽出して
-  dplyr::filter(carat > 1) |>          # 行を抽出して
-  dplyr::group_by(cut) |>              # グループ化して
-  dplyr::summarize(mean(price)) |>     # 平均を計算
-  print()                              # 表示してみる
-```
-
-この見慣れぬ記号 `|>` は何？<br>
-(`select()` など個々の関数は後で触れるとして)
-
----
-## Pipe operator (パイプ演算子) `|>`
-
-パイプの左側の変数を、右側の関数の第一引数にねじ込む:
+There are conflicts between same-named functions from different packages.<br>
+`library(conflicted)` makes every conflict an error for safety:
 ```r
-diamonds |> filter(carat > 1)
-filter(diamonds, carat > 1)     # これと同じ
+filter(diamonds, carat > 4.2)
+```
+```
+Error: ! [conflicted] filter found in 2 packages.
+Either pick the one you want with `::`:
+• dplyr::filter
+• stats::filter
+Or declare a preference with `conflicts_prefer()`:
+• `conflicts_prefer(dplyr::filter)`
+• `conflicts_prefer(stats::filter)`
+```
 
-# 前処理の流れ作業に便利:
+Follow the instruction, and use `::` operator:
+```{r, dplyr-namespace}
+dplyr::filter(diamonds, carat > 4.2)
+```
+
+
+---
+## Typical usage of dplyr functions
+
+Apply small functions like assembly-line operations:
+```{r, dplyr-example}
+result = diamonds |>                   # start
+  dplyr::select(carat, cut, price) |>  # extract columns
+  dplyr::filter(carat > 1) |>          # extract rows
+  dplyr::group_by(cut) |>              # split internally
+  dplyr::summarize(mean(price)) |>     # average by group
+  print()                              # output to console
+```
+
+What is this unfamiliar `|>` operator?<br>
+(Each function will be explained later.)
+
+---
+## Pipe operator `|>`
+
+puts the variable on the left into the first argument of the function on the right:
+```r
+# These two lines are equivalent
+diamonds |> filter(carat > 1)
+filter(diamonds, carat > 1)
+
+# useful for assembly-line:
 diamonds |> filter(carat > 1) |> select(carat, price) |> ...
 potatoes |> cut() |> fry() |> season("salt") |> eat()
 ```
 
-🔰 パイプを使わない形に書き換え、出力を確認しよう:
+🔰 Translate the following code not to use the pipe:
 ```{r, letters}
 seq(1, 6) |> sum()
 letters |> toupper() |> head(3)
 ```
 
-[解答例]
+[example solution]
 ```r
 sum(seq(1, 6))
 head(toupper(letters), 3)
 ```
 
 ---
-## パイプ演算子 `|>` を使わない方法
+## If we didn't have the pipe `|>`
 
-😐 一時変数をイチイチ作る:
+😐 Create temporary objects every time:
 ```{r, pipe-tmp-var}
-tmp1 = dplyr::select(diamonds, carat, cut, price) # 列を抽出して
-tmp2 = dplyr::filter(tmp1, carat > 1)             # 行を抽出して
-tmp3 = dplyr::group_by(tmp2, cut)                 # グループ化して
-result = dplyr::summarize(tmp3, mean(price))      # 平均を計算
+tmp1 = dplyr::select(diamonds, carat, cut, price) # extract columns
+tmp2 = dplyr::filter(tmp1, carat > 1)             # extract rows
+tmp3 = dplyr::group_by(tmp2, cut)                 # split internally
+result = dplyr::summarize(tmp3, mean(price))      # average by group
 ```
 
-😐 同じ名前を使い回す:
+😐 Reuse the same name again and again:
 ```{r, pipe-recursive-assign}
-result = dplyr::select(diamonds, carat, cut, price) # 列を抽出して
-result = dplyr::filter(result, carat > 1)           # 行を抽出して
-result = dplyr::group_by(result, cut)               # グループ化して
-result = dplyr::summarize(result, mean(price))      # 平均を計算
+result = dplyr::select(diamonds, carat, cut, price) # extract columns
+result = dplyr::filter(result, carat > 1)           # extract rows
+result = dplyr::group_by(result, cut)               # split internally
+result = dplyr::summarize(result, mean(price))      # average by group
 ```
 
-どちらも悪くない。
-何度も変数名を入力するのがやや冗長。
+Not too bad.
+But a bit redundant to repeat variable names many times.
 
 
 ---
-## パイプ演算子 `|>` を使わない方法
+## If we didn't have the pipe `|>`
 
-😫 一時変数を使わずに:
+😫 Get over without temporary objects:
 ```{r, pipe-nest}
-result = dplyr::summarize(              # 平均を計算
-    dplyr::group_by(                        # グループ化して
-      dplyr::filter(                            # 行を抽出して
-        dplyr::select(diamonds, carat, cut, price), # 列を抽出して
-        carat > 1),                             # 行を抽出して
-      cut),                                 # グループ化して
-    mean(price))                        # 平均を計算
+result = dplyr::summarize(              # average by group
+    dplyr::group_by(                        # split internally
+      dplyr::filter(                            # extract rows
+        dplyr::select(diamonds, carat, cut, price), # extract columns
+        carat > 1),                             # extract rows
+      cut),                                 # split internally
+    mean(price))                        # average by group
 ```
 
-🤪 改行さえせずに:
+🤪 even without line breaks:
 ```{r, pipe-oneliner}
 result = dplyr::summarize(dplyr::group_by(dplyr::filter(dplyr::select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
 ```
 
-論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
-さっきのほうがぜんぜんマシ。
+They require erratic eye movements.<br>
+Worse than the previous ones.
 
 ---
-## パイプ演算子 `|>` を使おう
+## Let's use the pipe `|>`
 
-😁 慣れれば、論理の流れを追いやすい:
-```{r, eg-pipe}
-result = diamonds |>
-  dplyr::select(carat, cut, price) |>   # 列を抽出して
-  dplyr::filter(carat > 1) |>           # 行を抽出して
-  dplyr::group_by(cut) |>               # グループ化して
-  dplyr::summarize(mean(price)) |>      # 平均を計算
-  print()                               # 表示してみる
+😁 Much easier to follow the logical flow from top to bottom:
+```{r, pipe-again}
+#| ref.label: dplyr-example
 ```
 
-tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
-使わなければならないわけではないが、読めたほうがいい。
+It may take an extra effort to get used to it, but it's worth it.<br>
+tidyverse packages are designed to be used with the pipe.
 
 <div style="font-size: 0.8em; color: #888888;">
 
-R < 4.2 までよく使われていた `%>%` もほぼ同じ。
+`%>%` is almost the same. It was widely used when R < 4.2.
 
 </div>
 
 
 ---
-## 列の抽出: `select()`
+## `select()` columns
 
-**列の番号**で指定:
+based on **their numbers**:
 ```{r, select-number}
 result = diamonds |>
   dplyr::select(1, 2, 7) |>
@@ -446,9 +455,9 @@ result = diamonds |>
 🔰 `starwars` の 1, 10, 11 列目を3通りの方法で抽出してみよう
 
 ---
-## 列の抽出: `select()`
+## `select()` columns
 
-**列の名前**で指定:
+based on **their names**:
 ```{r, select-name}
 result = diamonds |>
   dplyr::select(carat, cut, price) |>
@@ -461,9 +470,9 @@ result = diamonds |>
 
 
 ---
-## 列の抽出: `select()`
+## `select()` columns
 
-**捨てる列**を反転指定:
+to **discard**:
 ```{r, select-negative}
 result = diamonds |>
   dplyr::select(!c(carat, cut, price)) |>
@@ -475,9 +484,9 @@ result = diamonds |>
 🔰 `starwars` の **1, 10, 11 列目を除外**してみよう
 
 ---
-## 列の抽出: `select()`
+## `select()` columns
 
-名前の**部分一致**で指定:
+based on **the partial match** of their names:
 ```{r, select-matches}
 result = diamonds |>
   dplyr::select(starts_with("c")) |>
@@ -489,9 +498,9 @@ See `?dplyr_tidy_select` or [selection helpers](https://tidyselect.r-lib.org/ref
 🔰 `starwars` の **"s" で終わる列**を抽出してみよう
 
 ---
-## 列の抽出: `select()`
+## `select()` columns
 
-**列の型**で指定:
+based on **data types**:
 ```{r, select-where}
 result = diamonds |>
   dplyr::select(where(is.numeric)) |>
@@ -503,9 +512,9 @@ See `?dplyr_tidy_select` or [`tidyselect::where`](https://tidyselect.r-lib.org/r
 🔰 `starwars` の**文字列型の列**を抽出してみよう
 
 ---
-## 行の抽出: `filter()`
+## `filter()` rows
 
-等号 `==` で**完全一致する行**のみ残す:
+based on the **exact match** (`==`) of their values:
 ```{r, filter-exact}
 result = diamonds |>
   dplyr::filter(cut == "Ideal") |>
@@ -517,9 +526,9 @@ result = diamonds |>
 🔰 `starwars` の**人間**を抽出してみよう
 
 ---
-## 行の抽出: `filter()`
+## `filter()` rows
 
-不等号 `!=`, `<`, `<=`, `>`, `>=` を満たす行のみ残す:
+that satisfy the inequality (`!=`, `<`, `<=`, `>`, `>=`):
 ```{r, filter-unequal}
 result = diamonds |>
   dplyr::filter(cut != "Ideal") |>
@@ -529,9 +538,9 @@ result = diamonds |>
 🔰 `starwars` の**身長が150以下のキャラクタ**を抽出してみよう
 
 ---
-## 行の抽出: `filter()`
+## `filter()` rows
 
-複数の値のうち**どれかに一致する行**のみ残す:
+with values that **match any of the given values**:
 ```{r, filter-in}
 result = diamonds |>
   dplyr::filter(cut %in% c("Ideal", "Good")) |>
@@ -541,9 +550,9 @@ result = diamonds |>
 🔰 `starwars` の**目の色が青か赤のキャラクタ**を抽出してみよう
 
 ---
-## 行の抽出: `filter()`
+## `filter()` rows
 
-2つの条件を**両方満たす行**のみ残す (AND):
+that satisfy **both** of the given conditions (AND):
 ```{r, filter-and}
 result = diamonds |>
   dplyr::filter(carat > 2 & price < 14000) |>
@@ -554,9 +563,9 @@ result = diamonds |>
 
 
 ---
-## 行の抽出: `filter()`
+## `filter()` rows
 
-2つの条件の**いずれかを満たす行**のみ残す (OR):
+that satisfy **either** of the given conditions (OR):
 ```{r, filter-or}
 result = diamonds |>
   dplyr::filter(carat > 2 | price < 14000) |>
@@ -566,24 +575,24 @@ result = diamonds |>
 🔰 `starwars` の**身長200以上または体重100以上のキャラ**を抽出しよう
 
 ---
-## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
+## `slice_max()`, `slice_min()`
 
-指定した列の値が**大きい順**に `n` 行または割合 `prop` で抽出:
+extract rows with the largest values of the given columns:
 ```{r, slice-max}
 result = diamonds |>
   dplyr::slice_max(price, n = 5L) |>
   print()
 ```
 
-**割合を指定**するなら `n` の代わりに `prop = 0.05`
+Provide `n` or `prop` to set the number/proportion of rows.
 
 🔰 `starwars` の**身長が低い順に5名だけ**抽出してみよう
 
 
 ---
-## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
+## `slice_max()`, `slice_min()`
 
-指定した列の値が**大きい順**に**各グループから**抽出:
+extract rows with the largest values from each group:
 ```{r, group-slice-max}
 result = diamonds |>
   dplyr::group_by(cut) |>
@@ -594,9 +603,9 @@ result = diamonds |>
 🔰 `starwars` の**ジェンダーごとに身長が低い3名ずつ**抽出してみよう
 
 ---
-## 先頭/末尾の行の抽出: `slice_head()`, `slice_tail()`
+## `slice_head()`, `slice_tail()`
 
-**各グループの先頭**を `n` 行または割合 `prop` で抽出:
+extract the head/tail rows from **each group**:
 ```{r, group-slice-head}
 result = diamonds |>
   dplyr::group_by(cut) |>
@@ -604,13 +613,15 @@ result = diamonds |>
   print()
 ```
 
+Provide `n` or `prop` to set the number/proportion of rows.
+
 🔰 `starwars` の**ジェンダーごとに先頭3名ずつ**抽出してみよう
 
 
 ---
-## ランダムに行の抽出: `slice_sample()`
+## `slice_sample()`
 
-**ランダムに** `n` 行または割合 `prop` でサンプル:
+extract `n` rows **randomly** from each group:
 ```{r, slice-sample}
 #| echo: -1
 set.seed(19937)
@@ -624,9 +635,9 @@ result = diamonds |>
 
 
 ---
-## X番目の行の抽出: `slice()`
+## `slice()`
 
-**各グループのX番目の行**を抽出:
+extract arbitrary rows from each group:
 ```{r, group-slice}
 result = diamonds |>
   dplyr::group_by(cut) |>
@@ -636,9 +647,9 @@ result = diamonds |>
 
 
 ---
-## 要約・集計: `summarize()`
+## `summarize()`
 
-列の**合計、平均、最大**などを求める:
+calculate the **sum, mean, maximum** of the given columns:
 ```{r, summarize}
 result = diamonds |>
   dplyr::summarize(sum(carat), mean(carat), max(price)) |>
@@ -651,9 +662,9 @@ vectorを受け取って1つの値を返す集約関数:<br>
 🔰 `mpg` の**市街地(cty)と高速道路(hwy)の燃費平均値**を計算しよう
 
 ---
-## 要約・集計: `summarize()`
+## `summarize()`
 
-列の値を**グループごとに**集計する:
+for each group:
 ```{r, group-summarize}
 result = diamonds |>
   dplyr::group_by(cut) |>
@@ -666,9 +677,9 @@ result = diamonds |>
 
 
 ---
-## 要約・集計: `summarize(across())`
+## `summarize(across())`
 
-複数の列の値をまとめて集計する:
+multiple columns at once:
 ```{r, group-summarize-across}
 result = diamonds |>
   dplyr::group_by(cut) |>
@@ -680,9 +691,9 @@ result = diamonds |>
 
 
 ---
-## 要約・集計: `reframe()`
+## `reframe()`
 
-複数の値を返す関数で集約すると、結果は複数行にまたがる:
+summarizes each group to an arbitrary number of rows:
 ```{r, reframe}
 quantile(diamonds$price)
 
@@ -695,9 +706,9 @@ result = diamonds |>
 
 
 ---
-## 要約・集計: `count()`
+## `count()` occurrences
 
-指定した列の組み合わせ出現数を数える:
+of the combination of given columns:
 ```{r, count}
 result = diamonds |>
   dplyr::count(cut, color) |>
@@ -708,52 +719,51 @@ result = diamonds |>
 
 
 ---
-## 重複行の除去: `distinct()`
+## Keep only `distinct()` rows
 
-指定した列に関してユニークな行のみ残す:
+regarding the given columns:
 ```{r, distinct}
 result = diamonds |>
   dplyr::distinct(cut, color) |>
   print()
 ```
 
-`.keep_all = TRUE`
-オプションを付けると指定しなかった列も残せる。
+Set `.keep_all = TRUE` to keep other columns.
 
 🔰 `starwars` の**性とジェンダーの組み合わせ**だけ残してみよう
 
 
 ---
-## 行の並べ替え: `arrange()`
+## `arrange()` rows
 
-指定した列の**昇順(または降順 `desc()`)で**行を並べ替える:
+based on the given columns **in ascending (or descending `desc()`) order**:
 ```{r, arrange}
 result = diamonds |>
-  dplyr::arrange(color, desc(carat)) |>  # 色の昇順。色が同じなら大きさ降順
-  print()
+  dplyr::arrange(color, desc(carat)) |>
+  print()  # descending order of carat if the colors are the same
 ```
 
 🔰 `starwars` の**種族と身長で並べ替え**てみよう
 
 ---
-## 列の並べ替え: `relocate()`
+## `relocate()` columns
 
-指定した列を左端に移動:
+to the left:
 ```{r, relocate}
 result = diamonds |>
   dplyr::relocate(carat, price, clarity) |>
   print()
 ```
 
-`.before`, `.after` オプションで微調整も可能。
+`.before`, `.after` options are available for fine adjustment.
 
 🔰 `starwars` の**種族と出身地を名前の右に移動**してみよう
 
 
 ---
-## 列の追加・変更: `mutate()`
+## `mutate()`
 
-既存の列名を指定すると上書き:
+create a new column or modify an existing one:
 ```{r, mutate}
 result = diamonds |>
   dplyr::mutate(ratio = price / carat,
@@ -765,9 +775,9 @@ result = diamonds |>
 
 
 ---
-## 列名の変更: `rename()`
+## `rename()` columns
 
-`new = old` の形で指定する:
+in the form of `new = old`:
 ```{r, rename}
 result = diamonds |>
   dplyr::rename(size = carat) |>
@@ -778,21 +788,20 @@ result = diamonds |>
 
 🔰 `starwars` の**heightをcmに、massをkgに改名**してみよう
 
-
 ---
-## 前処理は大きく2つに分けられる
+## Data preparation can be divided into to two groups
 
-- **データ構造を対象とする処理** 第3, 4回 本日の話題
-    - **使いたい部分だけ抽出**
-    - **グループごとに特徴を要約**
-    - **何かの順に並べ替え** 👈 第3回 ここまで紹介
-    - 異なるテーブルの結合
-    - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
-    - 数値の変換: 対数、正規化
-    - 外れ値・欠損値への対処
-    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
-    - 文字列処理: 正規表現によるパターンマッチ
+- **Processing data structure** day 3
+    - **Extract subsets**
+    - **Summarize by group**
+    - **Sort rows** 👈 up to here
+    - Combine tables <span style="color: #888888;">— day 4</span>
+    - Pivot longer ↔ wider
+- Processing data content <span style="color: #888888;">— day 5</span>
+    - Type conversion: continuous vs discrete, factors, time
+    - Mathematical conversion: logarithm, normalization
+    - Handling outliers and missing values
+    - Character manipulation: pattern matching
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
@@ -800,11 +809,22 @@ result = diamonds |>
 
 
 ---
-## 憶えなくていい。公式サイトなどを見ながら作業
+## Don't try to remember; visit the official website
+
+It is the shortest path to getting data transformation done.
 
 <figure>
 <a href="https://dplyr.tidyverse.org/">
 <img src="/slides/image/rstats/dplyr-website.png" width="80%">
+<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+</a>
+</figure>
+
+---
+
+<figure style="margin: 0;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/cheatsheet/data-transformation.png" width="100%">
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
