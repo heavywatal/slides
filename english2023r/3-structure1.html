@@ -91,33 +91,32 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="この実習の目標">この実習の目標</h2>
-<h3 id="-del生物学研究にはデータとモデルが必須だと認識del">✅ <del>生物学研究にはデータとモデルが必須だと認識</del></h3>
-<h3 id="-del再現可能な解析を楽にやりたい気持ちになるdel">✅ <del>再現可能な解析を楽にやりたい気持ちになる</del></h3>
-<h3 id="-必要な方法を調べ実践する力をつける">⬜ 必要な方法を調べ、実践する力をつける</h3>
+<h2 id="purposes-of-this-hands-on-lectures">Purposes of this hands-on lectures</h2>
+<h3 id="-delevery-biological-research-involves-data-and-modelsdel">✅ <del>Every biological research involves data and models</del></h3>
+<h3 id="-delyou-want-to-do-reproducible-analysisdel">✅ <del>You want to do reproducible analysis</del></h3>
+<h3 id="-learn-how-to-do-it-and-how-to-learn-more">⬜ Learn how to do it and how to learn more</h3>
 <ul>
-<li>Rでできそうなことを把握する</li>
-<li>困ったときの対処法・相談先を知る</li>
+<li>Overview what R can do</li>
+<li>Know where to consult when you have a problem.</li>
 </ul>
-<h3 id="-データ解析の基本に触れる">⬜ データ解析の基本に触れる</h3>
-<br>
-個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。
-
+<h3 id="-glance-at-the-basics-of-data-analysis">⬜ Glance at the basics of data analysis</h3>
+<hr>
+<p>You don&rsquo;t have to remember every command.<br>
+Just repeat forgetting and searching.
 </section>
 <section>
-<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<h2 id="outline-of-data-analysis">Outline of data analysis</h2>
 <ol>
-<li>コンピュータ環境の整備 ✅</li>
-<li>データの取得、読み込み</li>
-<li>探索的データ解析
+<li>Setup computer environment ✅</li>
+<li>Get and read input data ⬜ day 6</li>
+<li>Exploratory data analysis
 <ul>
-<li><strong>前処理、加工</strong> (地味。意外と重い) 👈 今回の主題</li>
-<li>可視化、仮説生成 (派手！だいじ！) ✅ 完全に理解した</li>
-<li>統計解析、仮説検証 (みんな勉強したがる)</li>
+<li><strong>Preparation</strong> (harder than it seems) ⬜ day 3&ndash;5 👈</li>
+<li><strong>Visualization</strong>, generating hypotheses (fun!) ✅ day 2</li>
+<li><strong>Statistical analysis</strong>, testing hypotheses ⬜ day 7&ndash;8</li>
 </ul>
 </li>
-<li>報告、発表 ✅ Quarto楽しい</li>
+<li>Report ✅ day 2</li>
 </ol>
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
@@ -128,24 +127,26 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="可視化だいじわかった">可視化だいじ。わかった。</h2>
-<p>情報の整理 → <strong>正しい解析・新しい発見・仮説生成</strong></p>
+<h2 id="now-we-know-visualization-is-very-important">Now we know visualization is very important</h2>
+<p>reorganization of information → <strong>proper analysis, new hypotheses</strong></p>
 <figure>
 <a href="https://r4ds.hadley.nz/whole-game">
 <img src="/slides/image/r4ds/data-science-explore.png" width="720">
 <figcaption class="url">https://r4ds.hadley.nz/whole-game</figcaption>
 </a>
 </figure>
-<p>でも<strong>データ分析に費やす労力の8割は前処理</strong>らしいよ。。。</p>
+<p>But it is rare that you get data in the right form to draw graphs.</p>
+<p>Some say,<br>
+data scientists <strong>spend 80% of their resources for data preparation</strong>.</p>
 
 </section>
 <section>
-<h2 id="機械処理しやすい形-vs-人が読み書きしやすい形">機械処理しやすい形 vs 人が読み書きしやすい形</h2>
+<h2 id="machine-process--human-readwrite">Machine process ≠ Human read/write</h2>
 <dl>
-<dt>作図や解析に使えるデータ形式はほぼ決まってる</dt>
+<dt>Similar data formats required for visualization and analysis</dt>
 <dd><code>ggplot(data, ...)</code>, <code>glm(..., data, ...)</code>, &hellip;</dd>
-<dt>出発点となるデータはさまざま</dt>
-<dd>実験ノート、フィールドノート、データベース、&hellip;</dd>
+<dt>Different data formats from source to source</dt>
+<dd>lab notebooks, fieldnotes, databases, etc.</dd>
 </dl>
 <blockquote>
 <p>Happy families are all alike;<br>
@@ -160,7 +161,7 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<h2 id="tidy-data-nbsp-nbsp-vs-nbsp-nbsp-messy-data">tidy data     vs     messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/image/fnshr/tidy-data-ex1.png" height="820" style="vertical-align: top;">
@@ -168,9 +169,9 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1.png" width="450" style="transform: translate(-0.6em, 0);">
     <div style="position: absolute; top: 18em;">
-    縦1列は1つの変数<br>
-    横1行は1つの観測<br>
-    1セルは1つの値<br>
+    Each column is a variable.<br>
+    Each row is an observation.<br>
+    Each cell is a single value.<br>
     </div>
   </div>
 </div>
@@ -181,7 +182,7 @@ but every messy dataset is messy in its own way<br>
 </cite>
 </section>
 <section>
-<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<h2 id="tidy-data-nbsp-nbsp-vs-nbsp-nbsp-messy-data">tidy data     vs     messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/image/fnshr/tidy-data-ex1-var.png" height="880" style="vertical-align: top;">
@@ -189,9 +190,9 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1-var.png" width="640" style="transform: translate(-1.6em, -0.5em);">
     <div style="position: absolute; top: 18em;">
-    <strong>縦1列は1つの変数</strong><br>
-    横1行は1つの観測<br>
-    1セルは1つの値<br>
+    <strong>Each column is a variable.</strong><br>
+    Each row is an observation.<br>
+    Each cell is a single value.<br>
     </div>
   </div>
 </div>
@@ -202,7 +203,7 @@ but every messy dataset is messy in its own way<br>
 </cite>
 </section>
 <section>
-<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<h2 id="tidy-data-nbsp-nbsp-vs-nbsp-nbsp-messy-data">tidy data     vs     messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="800" style="vertical-align: top;">
@@ -210,9 +211,9 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1-obs.png" width="450" style="transform: translate(-1em, 0);">
     <div style="position: absolute; top: 18em;">
-    縦1列は1つの変数<br>
-    <strong>横1行は1つの観測</strong><br>
-    1セルは1つの値<br>
+    Each column is a variable.<br>
+    <strong>Each row is an observation.</strong><br>
+    Each cell is a single value.<br>
     </div>
   </div>
 </div>
@@ -223,7 +224,7 @@ but every messy dataset is messy in its own way<br>
 </cite>
 </section>
 <section>
-<h2 id="整然データ-tidy-data-nbsp-vs-nbsp-雑然データ-messy-data">整然データ tidy data   vs   雑然データ messy data</h2>
+<h2 id="tidy-data-nbsp-nbsp-vs-nbsp-nbsp-messy-data">tidy data     vs     messy data</h2>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.1;">
     <img src="/slides/image/fnshr/tidy-data-ex1-obs.png" height="800" style="vertical-align: top;">
@@ -231,9 +232,9 @@ but every messy dataset is messy in its own way<br>
   <div class="column">
     <img src="/slides/image/fnshr/messy-data-ex1-val.png" width="420" style="transform: translate(-0.6em, 0.1em);">
     <div style="position: absolute; top: 18em;">
-    縦1列は1つの変数<br>
-    横1行は1つの観測<br>
-    <strong>1セルは1つの値</strong><br>
+    Each column is a variable.<br>
+    Each row is an observation.<br>
+    <strong>Each cell is a single value.</strong><br>
     </div>
   </div>
 </div>
@@ -245,11 +246,11 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="整然データ-tidy-data-nbsp--nbsp-ggplot-したくなる形">整然データ tidy data   ≈   ggplot したくなる形</h2>
+<h2 id="tidy-data-nbsp--nbsp-dataframe-tempting-you-to-ggplot">tidy data   ≈   data.frame tempting you to ggplot</h2>
 <ul>
-<li><strong>縦1列</strong>は1つの<strong>変数</strong></li>
-<li><strong>横1行</strong>は1つの<strong>観測</strong></li>
-<li><strong>1セル</strong>は1つの<strong>値</strong></li>
+<li>Each <strong>column</strong> is a <strong>variable</strong>.</li>
+<li>Each <strong>row</strong> is an <strong>observation</strong>.</li>
+<li>Each <strong>cell</strong> is a <strong>single value</strong>.</li>
 </ul>
 <cite style="display: block; text-align: right;">
 <a class="url" href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>
@@ -268,8 +269,8 @@ but every messy dataset is messy in its own way<br>
 </code></pre>
 </section>
 <section>
-<h2 id="整然データ-tidy-data-nbsp--nbsp-ggplot-したくなる形">整然データ tidy data   ≈   ggplot したくなる形</h2>
-<p>x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:</p>
+<h2 id="tidy-data-nbsp--nbsp-dataframe-tempting-you-to-ggplot">tidy data   ≈   data.frame tempting you to ggplot</h2>
+<p>Aesthetic mapping and faceting by column names:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">color</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">cut</span><span class="p">))</span>
@@ -277,7 +278,7 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="目標-生データを下ごしらえして食べやすい形に">目標: 生データを下ごしらえして食べやすい形に</h2>
+<h2 id="immediate-goal-skills-to-prepare-tidy-data">Immediate goal: skills to prepare tidy data</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">VADeaths</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>      Rural Male Rural Female Urban Male Urban Female
 50-54       11.7          8.7       15.4          8.4
@@ -285,7 +286,8 @@ but every messy dataset is messy in its own way<br>
 60-64       26.9         20.3       37.0         19.3
 65-69       41.0         30.9       54.6         35.1
 70-74       66.0         54.3       71.1         50.0
-</code></pre><p>↓ 下ごしらえ: 作図・解析で使いやすい整然データに</p>
+</code></pre><p>↓ <em>mise en place</em>  🔪  put everything in place
+<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" align="right" width="540" style="margin-block-start: 4em;"></p>
 <pre tabindex="0"><code>   lbound ubound region    sex death
  1     50     54  Rural   Male  11.7
  2     50     54  Rural Female   8.7
@@ -299,23 +301,23 @@ but every messy dataset is messy in its own way<br>
 </code></pre>
 </section>
 <section>
-<h2 id="前処理は大きく2つに分けられる">前処理は大きく2つに分けられる</h2>
+<h2 id="data-preparation-can-be-divided-into-to-two-groups">Data preparation can be divided into to two groups</h2>
 <ul>
-<li><strong>データ構造を対象とする処理</strong> 👈 第3, 4回 本日の話題
+<li><strong>Processing data structure</strong> 👈 day 3 and 4
 <ul>
-<li>使いたい部分だけ抽出</li>
-<li>グループごとに特徴を要約</li>
-<li>何かの順に並べ替え</li>
-<li>異なるテーブルの結合</li>
-<li>変形: 縦長 ↔ 横広</li>
+<li>Extract subsets</li>
+<li>Summarize by group</li>
+<li>Sort rows</li>
+<li>Combine tables</li>
+<li>Pivot longer ↔ wider</li>
 </ul>
 </li>
-<li>データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
+<li>Processing data content <span style="color: #888888;">— day 5</span>
 <ul>
-<li>数値の変換: 対数、正規化</li>
-<li>外れ値・欠損値への対処</li>
-<li>型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時</li>
-<li>文字列処理: 正規表現によるパターンマッチ</li>
+<li>Type conversion: continuous vs discrete, factors, time</li>
+<li>Mathematical conversion: logarithm, normalization</li>
+<li>Handling outliers and missing values</li>
+<li>Character manipulation: pattern matching</li>
 </ul>
 </li>
 </ul>
@@ -324,20 +326,20 @@ but every messy dataset is messy in its own way<br>
 </a></cite>
 </section>
 <section>
-<h2 id="tidyverse-データ科学のためのパッケージ群">tidyverse: データ科学のためのパッケージ群</h2>
+<h2 id="tidyverse-a-collection-of-r-packages-for-data-science">tidyverse: a collection of R packages for data science</h2>
 <a href="https://www.tidyverse.org/">
 <img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
 </a>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># 安全のおまじない</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># 一挙に読み込み</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># charm for safe coding</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># load core packages at once</span>
 </span></span></code></pre></div><pre tabindex="0"><code>── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.4
 ✔ forcats   1.0.0     ✔ stringr   1.5.1
 ✔ ggplot2   3.4.4     ✔ tibble    3.2.1
 ✔ lubridate 1.9.3     ✔ tidyr     1.3.0
 ✔ purrr     1.0.2     
-</code></pre><p>一貫したデザインでデータ解析の様々な工程をカバー</p>
+</code></pre><p>Consistently designed to cover all the processes in data analysis.</p>
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
@@ -346,33 +348,33 @@ but every messy dataset is messy in its own way<br>
 </figure>
 </section>
 <section>
-<h2 id="dplyr-----dataframeの高速処理担当">dplyr &mdash; data.frameの高速処理担当</h2>
+<h2 id="dplyr-----plyer-for-dataframes">dplyr &mdash; plyer for data.frames</h2>
 <a href="https://dplyr.tidyverse.org/">
 <img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
 </a>
-<p>シンプルな関数がたくさん。繋げて使う (piping)</p>
+<p>A consistent set of verbs/functions for data manipulation.</p>
 <dl>
-<dt>抽出</dt>
-<dd>列: <code>select()</code>,</dd>
-<dd>行: <code>filter()</code>, <code>distinct()</code>, <code>slice()</code></dd>
-<dt>要約・集計</dt>
+<dt>Extract</dt>
+<dd>columns: <code>select()</code>,</dd>
+<dd>rows: <code>filter()</code>, <code>distinct()</code>, <code>slice()</code></dd>
+<dt>Aggregate</dt>
 <dd><code>group_by()</code>, <code>summarize()</code>, <code>count()</code></dd>
-<dt>並べ替え</dt>
+<dt>Reorder</dt>
 <dd><code>arrange()</code>, <code>relocate()</code></dd>
-<dt>列の追加・変更</dt>
+<dt>Modify/add columns</dt>
 <dd><code>mutate()</code>, <code>rename()</code></dd>
-<dt>結合</dt>
-<dd>行方向: <code>bind_rows()</code></dd>
-<dd>列方向: <code>left_join()</code>, <code>inner_join()</code>, <code>full_join()</code></dd>
+<dt>Join/bind</dt>
+<dd>rows: <code>bind_rows()</code></dd>
+<dd>columns: <code>left_join()</code>, <code>inner_join()</code>, <code>full_join()</code></dd>
 </dl>
 
 </section>
 <section>
-<h2 id="dplyrを使ってみる準備">dplyrを使ってみる準備</h2>
-<p>パッケージを読み込んで、データを見てみる</p>
+<h2 id="getting-ready-to-use-dplyr">Getting ready to use dplyr</h2>
+<p>Load packages. Take a look at the data:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;tidyverse&#34;)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># 安全のおまじない</span>
-</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># charm for safe coding</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># load packages including ggplot2, dplyr</span>
 </span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">View</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>  <span class="c1"># RStudio</span>
 </span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price    x    y    z
@@ -385,123 +387,124 @@ but every messy dataset is messy in its own way<br>
 53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
 53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
 53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
-</code></pre><p>🔰 <code>starwars</code> データも眺めてみよう</p>
+</code></pre><p>🔰 View also <code>starwars</code> data.</p>
 
 </section>
 <section>
-<h2 id="dplyr-の関数を使うときのお作法">dplyr の関数を使うときのお作法</h2>
-<p>名前空間を明示する演算子 <code>::</code> を使う:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">3</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>   carat     cut color clarity depth table price    x    y    z
- 1  3.01 Premium     I      I1  62.7    58  8040 9.10 8.97 5.67
- 2  3.11    Fair     J      I1  65.9    57  9823 9.15 9.02 5.98
- 3  3.01 Premium     F      I1  62.2    56  9925 9.24 9.13 5.73
- 4  3.05 Premium     E      I1  60.9    58 10453 9.26 9.25 5.66
---                                                             
-29  3.01    Good     H     SI2  57.6    64 18593 9.44 9.38 5.42
-30  3.51 Premium     J     VS2  62.5    59 18701 9.66 9.63 6.03
-31  3.01 Premium     J     SI2  60.7    59 18710 9.35 9.22 5.64
-32  3.01 Premium     J     SI2  59.7    58 18710 9.41 9.32 5.59
-</code></pre><p><strong>同名の関数と衝突</strong>する場合(ここではR標準の <code>stats::filters()</code>)、<br>
-「私が使いたいのは <strong>dplyrのほうの <code>filter()</code></strong> です」と明示したい。</p>
-<p>そうじゃなくても「この関数はあのパッケージ由来」が分かって便利。</p>
-
+<h2 id="use-explicit-namespace-dplyr">Use explicit namespace <code>dplyr::</code></h2>
+<p>There are conflicts between same-named functions from different packages.<br>
+<code>library(conflicted)</code> makes every conflict an error for safety:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">filter</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">4.2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Error: ! [conflicted] filter found in 2 packages.
+Either pick the one you want with `::`:
+• dplyr::filter
+• stats::filter
+Or declare a preference with `conflicts_prefer()`:
+• `conflicts_prefer(dplyr::filter)`
+• `conflicts_prefer(stats::filter)`
+</code></pre><p>Follow the instruction, and use <code>::</code> operator:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">4.2</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  carat  cut color clarity depth table price     x     y    z
+1  5.01 Fair     J      I1  65.5    59 18018 10.74 10.54 6.98
+2  4.50 Fair     J      I1  65.8    58 18531 10.23 10.16 6.72
+</code></pre>
 </section>
 <section>
-<h2 id="dplyr-はこういうふうに使いやすい">dplyr はこういうふうに使いやすい</h2>
-<p>小さな関数を繋げて使う流れ作業:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>                   <span class="c1"># 生データから出発して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>  <span class="c1"># 列を抽出して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>          <span class="c1"># 行を抽出して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>              <span class="c1"># グループ化して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>     <span class="c1"># 平均を計算</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                              <span class="c1"># 表示してみる</span>
+<h2 id="typical-usage-of-dplyr-functions">Typical usage of dplyr functions</h2>
+<p>Apply small functions like assembly-line operations:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>                   <span class="c1"># start</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>  <span class="c1"># extract columns</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>          <span class="c1"># extract rows</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>              <span class="c1"># split internally</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>     <span class="c1"># average by group</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                              <span class="c1"># output to console</span>
 </span></span></code></pre></div><pre tabindex="0"><code>        cut mean(price)
 1      Fair    7177.856
 2      Good    7753.601
 3 Very Good    8340.549
 4   Premium    8487.249
 5     Ideal    8674.227
-</code></pre><p>この見慣れぬ記号 <code>|&gt;</code> は何？<br>
-(<code>select()</code> など個々の関数は後で触れるとして)</p>
+</code></pre><p>What is this unfamiliar <code>|&gt;</code> operator?<br>
+(Each function will be explained later.)</p>
 
 </section>
 <section>
-<h2 id="pipe-operator-パイプ演算子-">Pipe operator (パイプ演算子) <code>|&gt;</code></h2>
-<p>パイプの左側の変数を、右側の関数の第一引数にねじ込む:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">|&gt;</span> <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">filter</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>     <span class="c1"># これと同じ</span>
+<h2 id="pipe-operator-">Pipe operator <code>|&gt;</code></h2>
+<p>puts the variable on the left into the first argument of the function on the right:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># These two lines are equivalent</span>
+</span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">|&gt;</span> <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">filter</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 前処理の流れ作業に便利:</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># useful for assembly-line:</span>
 </span></span><span class="line"><span class="cl"><span class="n">diamonds</span> <span class="o">|&gt;</span> <span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="kc">...</span>
 </span></span><span class="line"><span class="cl"><span class="n">potatoes</span> <span class="o">|&gt;</span> <span class="nf">cut</span><span class="p">()</span> <span class="o">|&gt;</span> <span class="nf">fry</span><span class="p">()</span> <span class="o">|&gt;</span> <span class="nf">season</span><span class="p">(</span><span class="s">&#34;salt&#34;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">eat</span><span class="p">()</span>
-</span></span></code></pre></div><p>🔰 パイプを使わない形に書き換え、出力を確認しよう:</p>
+</span></span></code></pre></div><p>🔰 Translate the following code not to use the pipe:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">6</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">sum</span><span class="p">()</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 21
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="kc">letters</span> <span class="o">|&gt;</span> <span class="nf">toupper</span><span class="p">()</span> <span class="o">|&gt;</span> <span class="nf">head</span><span class="p">(</span><span class="m">3</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;A&#34; &#34;B&#34; &#34;C&#34;
-</code></pre><p>[解答例]</p>
+</code></pre><p>[example solution]</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">sum</span><span class="p">(</span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">6</span><span class="p">))</span>
 </span></span><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="nf">toupper</span><span class="p">(</span><span class="kc">letters</span><span class="p">),</span> <span class="m">3</span><span class="p">)</span>
 </span></span></code></pre></div>
 </section>
 <section>
-<h2 id="パイプ演算子--を使わない方法">パイプ演算子 <code>|&gt;</code> を使わない方法</h2>
-<p>😐 一時変数をイチイチ作る:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tmp1</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="c1"># 列を抽出して</span>
-</span></span><span class="line"><span class="cl"><span class="n">tmp2</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>             <span class="c1"># 行を抽出して</span>
-</span></span><span class="line"><span class="cl"><span class="n">tmp3</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">tmp2</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>                 <span class="c1"># グループ化して</span>
-</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">tmp3</span><span class="p">,</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>      <span class="c1"># 平均を計算</span>
-</span></span></code></pre></div><p>😐 同じ名前を使い回す:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="c1"># 列を抽出して</span>
-</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>           <span class="c1"># 行を抽出して</span>
-</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>               <span class="c1"># グループ化して</span>
-</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>      <span class="c1"># 平均を計算</span>
-</span></span></code></pre></div><p>どちらも悪くない。
-何度も変数名を入力するのがやや冗長。</p>
+<h2 id="if-we-didnt-have-the-pipe-">If we didn&rsquo;t have the pipe <code>|&gt;</code></h2>
+<p>😐 Create temporary objects every time:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">tmp1</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="c1"># extract columns</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp2</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">tmp1</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>             <span class="c1"># extract rows</span>
+</span></span><span class="line"><span class="cl"><span class="n">tmp3</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">tmp2</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>                 <span class="c1"># split internally</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">tmp3</span><span class="p">,</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>      <span class="c1"># average by group</span>
+</span></span></code></pre></div><p>😐 Reuse the same name again and again:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="c1"># extract columns</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span>           <span class="c1"># extract rows</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>               <span class="c1"># split internally</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>      <span class="c1"># average by group</span>
+</span></span></code></pre></div><p>Not too bad.
+But a bit redundant to repeat variable names many times.</p>
 
 </section>
 <section>
-<h2 id="パイプ演算子--を使わない方法">パイプ演算子 <code>|&gt;</code> を使わない方法</h2>
-<p>😫 一時変数を使わずに:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span>              <span class="c1"># 平均を計算</span>
-</span></span><span class="line"><span class="cl">    <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span>                        <span class="c1"># グループ化して</span>
-</span></span><span class="line"><span class="cl">      <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span>                            <span class="c1"># 行を抽出して</span>
-</span></span><span class="line"><span class="cl">        <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">),</span> <span class="c1"># 列を抽出して</span>
-</span></span><span class="line"><span class="cl">        <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">),</span>                             <span class="c1"># 行を抽出して</span>
-</span></span><span class="line"><span class="cl">      <span class="n">cut</span><span class="p">),</span>                                 <span class="c1"># グループ化して</span>
-</span></span><span class="line"><span class="cl">    <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>                        <span class="c1"># 平均を計算</span>
-</span></span></code></pre></div><p>🤪 改行さえせずに:</p>
+<h2 id="if-we-didnt-have-the-pipe-">If we didn&rsquo;t have the pipe <code>|&gt;</code></h2>
+<p>😫 Get over without temporary objects:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span>              <span class="c1"># average by group</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span>                        <span class="c1"># split internally</span>
+</span></span><span class="line"><span class="cl">      <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span>                            <span class="c1"># extract rows</span>
+</span></span><span class="line"><span class="cl">        <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">),</span> <span class="c1"># extract columns</span>
+</span></span><span class="line"><span class="cl">        <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">),</span>                             <span class="c1"># extract rows</span>
+</span></span><span class="line"><span class="cl">      <span class="n">cut</span><span class="p">),</span>                                 <span class="c1"># split internally</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>                        <span class="c1"># average by group</span>
+</span></span></code></pre></div><p>🤪 even without line breaks:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">diamonds</span><span class="p">,</span> <span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">),</span> <span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">),</span> <span class="n">cut</span><span class="p">),</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>
-</span></span></code></pre></div><p>論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
-さっきのほうがぜんぜんマシ。</p>
+</span></span></code></pre></div><p>They require erratic eye movements.<br>
+Worse than the previous ones.</p>
 
 </section>
 <section>
-<h2 id="パイプ演算子--を使おう">パイプ演算子 <code>|&gt;</code> を使おう</h2>
-<p>😁 慣れれば、論理の流れを追いやすい:</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>   <span class="c1"># 列を抽出して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>           <span class="c1"># 行を抽出して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>               <span class="c1"># グループ化して</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>      <span class="c1"># 平均を計算</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                               <span class="c1"># 表示してみる</span>
+<h2 id="lets-use-the-pipe-">Let&rsquo;s use the pipe <code>|&gt;</code></h2>
+<p>😁 Much easier to follow the logical flow from top to bottom:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>                   <span class="c1"># start</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>  <span class="c1"># extract columns</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>          <span class="c1"># extract rows</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>              <span class="c1"># split internally</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>     <span class="c1"># average by group</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>                              <span class="c1"># output to console</span>
 </span></span></code></pre></div><pre tabindex="0"><code>        cut mean(price)
 1      Fair    7177.856
 2      Good    7753.601
 3 Very Good    8340.549
 4   Premium    8487.249
 5     Ideal    8674.227
-</code></pre><p>tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
-使わなければならないわけではないが、読めたほうがいい。</p>
+</code></pre><p>It may take an extra effort to get used to it, but it&rsquo;s worth it.<br>
+tidyverse packages are designed to be used with the pipe.</p>
 <div style="font-size: 0.8em; color: #888888;">
-<p>R &lt; 4.2 までよく使われていた <code>%&gt;%</code> もほぼ同じ。</p>
+<p><code>%&gt;%</code> is almost the same. It was widely used when R &lt; 4.2.</p>
 </div>
 
 </section>
 <section>
-<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
-<p><strong>列の番号</strong>で指定:</p>
+<h2 id="select-columns"><code>select()</code> columns</h2>
+<p>based on <strong>their numbers</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">7</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -520,8 +523,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
-<p><strong>列の名前</strong>で指定:</p>
+<h2 id="select-columns"><code>select()</code> columns</h2>
+<p>based on <strong>their names</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -540,8 +543,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
-<p><strong>捨てる列</strong>を反転指定:</p>
+<h2 id="select-columns"><code>select()</code> columns</h2>
+<p>to <strong>discard</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="o">!</span><span class="nf">c</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">cut</span><span class="p">,</span> <span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -560,8 +563,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
-<p>名前の<strong>部分一致</strong>で指定:</p>
+<h2 id="select-columns"><code>select()</code> columns</h2>
+<p>based on <strong>the partial match</strong> of their names:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="nf">starts_with</span><span class="p">(</span><span class="s">&#34;c&#34;</span><span class="p">))</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -580,8 +583,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="列の抽出-select">列の抽出: <code>select()</code></h2>
-<p><strong>列の型</strong>で指定:</p>
+<h2 id="select-columns"><code>select()</code> columns</h2>
+<p>based on <strong>data types</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="nf">where</span><span class="p">(</span><span class="n">is.numeric</span><span class="p">))</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -600,8 +603,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
-<p>等号 <code>==</code> で<strong>完全一致する行</strong>のみ残す:</p>
+<h2 id="filter-rows"><code>filter()</code> rows</h2>
+<p>based on the <strong>exact match</strong> (<code>==</code>) of their values:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">cut</span> <span class="o">==</span> <span class="s">&#34;Ideal&#34;</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -620,8 +623,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
-<p>不等号 <code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code> を満たす行のみ残す:</p>
+<h2 id="filter-rows"><code>filter()</code> rows</h2>
+<p>that satisfy the inequality (<code>!=</code>, <code>&lt;</code>, <code>&lt;=</code>, <code>&gt;</code>, <code>&gt;=</code>):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">cut</span> <span class="o">!=</span> <span class="s">&#34;Ideal&#34;</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -639,8 +642,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
-<p>複数の値のうち<strong>どれかに一致する行</strong>のみ残す:</p>
+<h2 id="filter-rows"><code>filter()</code> rows</h2>
+<p>with values that <strong>match any of the given values</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">cut</span> <span class="o">%in%</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;Ideal&#34;</span><span class="p">,</span> <span class="s">&#34;Good&#34;</span><span class="p">))</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -658,8 +661,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
-<p>2つの条件を<strong>両方満たす行</strong>のみ残す (AND):</p>
+<h2 id="filter-rows"><code>filter()</code> rows</h2>
+<p>that satisfy <strong>both</strong> of the given conditions (AND):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">2</span> <span class="o">&amp;</span> <span class="n">price</span> <span class="o">&lt;</span> <span class="m">14000</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -677,8 +680,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="行の抽出-filter">行の抽出: <code>filter()</code></h2>
-<p>2つの条件の<strong>いずれかを満たす行</strong>のみ残す (OR):</p>
+<h2 id="filter-rows"><code>filter()</code> rows</h2>
+<p>that satisfy <strong>either</strong> of the given conditions (OR):</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">2</span> <span class="o">|</span> <span class="n">price</span> <span class="o">&lt;</span> <span class="m">14000</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -696,8 +699,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="上位下位の行の抽出-slice_max-slice_min">上位/下位の行の抽出: <code>slice_max()</code>, <code>slice_min()</code></h2>
-<p>指定した列の値が<strong>大きい順</strong>に <code>n</code> 行または割合 <code>prop</code> で抽出:</p>
+<h2 id="slice_max-slice_min"><code>slice_max()</code>, <code>slice_min()</code></h2>
+<p>extract rows with the largest values of the given columns:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice_max</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="m">5L</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -707,13 +710,13 @@ but every messy dataset is messy in its own way<br>
 3  1.51     Ideal     G      IF  61.7    55 18806 7.37 7.41 4.56
 4  2.07     Ideal     G     SI2  62.5    55 18804 8.20 8.13 5.11
 5  2.00 Very Good     H     SI1  62.8    57 18803 7.95 8.00 5.01
-</code></pre><p><strong>割合を指定</strong>するなら <code>n</code> の代わりに <code>prop = 0.05</code></p>
+</code></pre><p>Provide <code>n</code> or <code>prop</code> to set the number/proportion of rows.</p>
 <p>🔰 <code>starwars</code> の<strong>身長が低い順に5名だけ</strong>抽出してみよう</p>
 
 </section>
 <section>
-<h2 id="上位下位の行の抽出-slice_max-slice_min">上位/下位の行の抽出: <code>slice_max()</code>, <code>slice_min()</code></h2>
-<p>指定した列の値が<strong>大きい順</strong>に<strong>各グループから</strong>抽出:</p>
+<h2 id="slice_max-slice_min"><code>slice_max()</code>, <code>slice_min()</code></h2>
+<p>extract rows with the largest values from each group:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice_max</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="m">2L</span><span class="p">)</span> <span class="o">|&gt;</span>
@@ -732,8 +735,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="先頭末尾の行の抽出-slice_head-slice_tail">先頭/末尾の行の抽出: <code>slice_head()</code>, <code>slice_tail()</code></h2>
-<p><strong>各グループの先頭</strong>を <code>n</code> 行または割合 <code>prop</code> で抽出:</p>
+<h2 id="slice_head-slice_tail"><code>slice_head()</code>, <code>slice_tail()</code></h2>
+<p>extract the head/tail rows from <strong>each group</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice_head</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="m">3L</span><span class="p">)</span> <span class="o">|&gt;</span>
@@ -748,12 +751,13 @@ but every messy dataset is messy in its own way<br>
 13  0.23   Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
 14  0.23   Ideal     J     VS1  62.8    56   340 3.93 3.90 2.46
 15  0.31   Ideal     J     SI2  62.2    54   344 4.35 4.37 2.71
-</code></pre><p>🔰 <code>starwars</code> の<strong>ジェンダーごとに先頭3名ずつ</strong>抽出してみよう</p>
+</code></pre><p>Provide <code>n</code> or <code>prop</code> to set the number/proportion of rows.</p>
+<p>🔰 <code>starwars</code> の<strong>ジェンダーごとに先頭3名ずつ</strong>抽出してみよう</p>
 
 </section>
 <section>
-<h2 id="ランダムに行の抽出-slice_sample">ランダムに行の抽出: <code>slice_sample()</code></h2>
-<p><strong>ランダムに</strong> <code>n</code> 行または割合 <code>prop</code> でサンプル:</p>
+<h2 id="slice_sample"><code>slice_sample()</code></h2>
+<p>extract <code>n</code> rows <strong>randomly</strong> from each group:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice_sample</span><span class="p">(</span><span class="n">n</span> <span class="o">=</span> <span class="m">3L</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span> <span class="o">|&gt;</span>
@@ -772,8 +776,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="x番目の行の抽出-slice">X番目の行の抽出: <code>slice()</code></h2>
-<p><strong>各グループのX番目の行</strong>を抽出:</p>
+<h2 id="slice"><code>slice()</code></h2>
+<p>extract arbitrary rows from each group:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">slice</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">9</span><span class="p">))</span> <span class="o">|&gt;</span>
@@ -791,8 +795,8 @@ but every messy dataset is messy in its own way<br>
 </code></pre>
 </section>
 <section>
-<h2 id="要約集計-summarize">要約・集計: <code>summarize()</code></h2>
-<p>列の<strong>合計、平均、最大</strong>などを求める:</p>
+<h2 id="summarize"><code>summarize()</code></h2>
+<p>calculate the <strong>sum, mean, maximum</strong> of the given columns:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="nf">sum</span><span class="p">(</span><span class="n">carat</span><span class="p">),</span> <span class="nf">mean</span><span class="p">(</span><span class="n">carat</span><span class="p">),</span> <span class="nf">max</span><span class="p">(</span><span class="n">price</span><span class="p">))</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -804,8 +808,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="要約集計-summarize">要約・集計: <code>summarize()</code></h2>
-<p>列の値を<strong>グループごとに</strong>集計する:</p>
+<h2 id="summarize"><code>summarize()</code></h2>
+<p>for each group:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">avg_carat</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">carat</span><span class="p">),</span>
@@ -821,8 +825,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="要約集計-summarizeacross">要約・集計: <code>summarize(across())</code></h2>
-<p>複数の列の値をまとめて集計する:</p>
+<h2 id="summarizeacross"><code>summarize(across())</code></h2>
+<p>multiple columns at once:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">group_by</span><span class="p">(</span><span class="n">cut</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="nf">across</span><span class="p">(</span><span class="nf">where</span><span class="p">(</span><span class="n">is.numeric</span><span class="p">),</span> <span class="n">mean</span><span class="p">))</span> <span class="o">|&gt;</span>
@@ -837,8 +841,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="要約集計-reframe">要約・集計: <code>reframe()</code></h2>
-<p>複数の値を返す関数で集約すると、結果は複数行にまたがる:</p>
+<h2 id="reframe"><code>reframe()</code></h2>
+<p>summarizes each group to an arbitrary number of rows:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">quantile</span><span class="p">(</span><span class="n">diamonds</span><span class="o">$</span><span class="n">price</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>      0%      25%      50%      75%     100% 
   326.00   950.00  2401.00  5324.25 18823.00 
@@ -855,8 +859,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="要約集計-count">要約・集計: <code>count()</code></h2>
-<p>指定した列の組み合わせ出現数を数える:</p>
+<h2 id="count-occurrences"><code>count()</code> occurrences</h2>
+<p>of the combination of given columns:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">count</span><span class="p">(</span><span class="n">cut</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -874,8 +878,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="重複行の除去-distinct">重複行の除去: <code>distinct()</code></h2>
-<p>指定した列に関してユニークな行のみ残す:</p>
+<h2 id="keep-only-distinct-rows">Keep only <code>distinct()</code> rows</h2>
+<p>regarding the given columns:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">distinct</span><span class="p">(</span><span class="n">cut</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -889,17 +893,16 @@ but every messy dataset is messy in its own way<br>
 33    Fair     J
 34    Fair     I
 35    Fair     D
-</code></pre><p><code>.keep_all = TRUE</code>
-オプションを付けると指定しなかった列も残せる。</p>
+</code></pre><p>Set <code>.keep_all = TRUE</code> to keep other columns.</p>
 <p>🔰 <code>starwars</code> の<strong>性とジェンダーの組み合わせ</strong>だけ残してみよう</p>
 
 </section>
 <section>
-<h2 id="行の並べ替え-arrange">行の並べ替え: <code>arrange()</code></h2>
-<p>指定した列の<strong>昇順(または降順 <code>desc()</code>)で</strong>行を並べ替える:</p>
+<h2 id="arrange-rows"><code>arrange()</code> rows</h2>
+<p>based on the given columns <strong>in ascending (or descending <code>desc()</code>) order</strong>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">arrange</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nf">desc</span><span class="p">(</span><span class="n">carat</span><span class="p">))</span> <span class="o">|&gt;</span>  <span class="c1"># 色の昇順。色が同じなら大きさ降順</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">arrange</span><span class="p">(</span><span class="n">color</span><span class="p">,</span> <span class="nf">desc</span><span class="p">(</span><span class="n">carat</span><span class="p">))</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>  <span class="c1"># descending order of carat if the colors are the same</span>
 </span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price    x    y    z
     1  3.40      Fair     D      I1  66.8    52 15964 9.42 9.34 6.27
     2  2.75     Ideal     D      I1  60.9    57 13156 9.04 8.98 5.49
@@ -914,8 +917,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="列の並べ替え-relocate">列の並べ替え: <code>relocate()</code></h2>
-<p>指定した列を左端に移動:</p>
+<h2 id="relocate-columns"><code>relocate()</code> columns</h2>
+<p>to the left:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">relocate</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">,</span> <span class="n">clarity</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -929,13 +932,13 @@ but every messy dataset is messy in its own way<br>
 53938  0.70  2757     SI1 Very Good     D  62.8    60 5.66 5.68 3.56
 53939  0.86  2757     SI2   Premium     H  61.0    58 6.15 6.12 3.74
 53940  0.75  2757     SI2     Ideal     D  62.2    55 5.83 5.87 3.64
-</code></pre><p><code>.before</code>, <code>.after</code> オプションで微調整も可能。</p>
+</code></pre><p><code>.before</code>, <code>.after</code> options are available for fine adjustment.</p>
 <p>🔰 <code>starwars</code> の<strong>種族と出身地を名前の右に移動</strong>してみよう</p>
 
 </section>
 <section>
-<h2 id="列の追加変更-mutate">列の追加・変更: <code>mutate()</code></h2>
-<p>既存の列名を指定すると上書き:</p>
+<h2 id="mutate"><code>mutate()</code></h2>
+<p>create a new column or modify an existing one:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">ratio</span> <span class="o">=</span> <span class="n">price</span> <span class="o">/</span> <span class="n">carat</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">                <span class="n">price</span> <span class="o">=</span> <span class="m">105.59</span> <span class="o">*</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>
@@ -954,8 +957,8 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="列名の変更-rename">列名の変更: <code>rename()</code></h2>
-<p><code>new = old</code> の形で指定する:</p>
+<h2 id="rename-columns"><code>rename()</code> columns</h2>
+<p>in the form of <code>new = old</code>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">rename</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="n">carat</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
@@ -974,23 +977,23 @@ but every messy dataset is messy in its own way<br>
 
 </section>
 <section>
-<h2 id="前処理は大きく2つに分けられる">前処理は大きく2つに分けられる</h2>
+<h2 id="data-preparation-can-be-divided-into-to-two-groups">Data preparation can be divided into to two groups</h2>
 <ul>
-<li><strong>データ構造を対象とする処理</strong> 第3, 4回 本日の話題
+<li><strong>Processing data structure</strong> day 3
 <ul>
-<li><strong>使いたい部分だけ抽出</strong></li>
-<li><strong>グループごとに特徴を要約</strong></li>
-<li><strong>何かの順に並べ替え</strong> 👈 第3回 ここまで紹介</li>
-<li>異なるテーブルの結合</li>
-<li>変形: 縦長 ↔ 横広</li>
+<li><strong>Extract subsets</strong></li>
+<li><strong>Summarize by group</strong></li>
+<li><strong>Sort rows</strong> 👈 up to here</li>
+<li>Combine tables <span style="color: #888888;">— day 4</span></li>
+<li>Pivot longer ↔ wider</li>
 </ul>
 </li>
-<li>データ内容を対象とする処理 <span style="color: #888888;">— 第5回 明日</span>
+<li>Processing data content <span style="color: #888888;">— day 5</span>
 <ul>
-<li>数値の変換: 対数、正規化</li>
-<li>外れ値・欠損値への対処</li>
-<li>型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時</li>
-<li>文字列処理: 正規表現によるパターンマッチ</li>
+<li>Type conversion: continuous vs discrete, factors, time</li>
+<li>Mathematical conversion: logarithm, normalization</li>
+<li>Handling outliers and missing values</li>
+<li>Character manipulation: pattern matching</li>
 </ul>
 </li>
 </ul>
@@ -999,10 +1002,19 @@ but every messy dataset is messy in its own way<br>
 </a></cite>
 </section>
 <section>
-<h2 id="憶えなくていい公式サイトなどを見ながら作業">憶えなくていい。公式サイトなどを見ながら作業</h2>
+<h2 id="dont-try-to-remember-visit-the-official-website">Don&rsquo;t try to remember; visit the official website</h2>
+<p>It is the shortest path to getting data transformation done.</p>
 <figure>
 <a href="https://dplyr.tidyverse.org/">
 <img src="/slides/image/rstats/dplyr-website.png" width="80%">
+<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<figure style="margin: 0;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/cheatsheet/data-transformation.png" width="100%">
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
