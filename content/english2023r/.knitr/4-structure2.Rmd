@@ -9,18 +9,20 @@
 data(band_members, band_instruments, band_instruments2, package = "dplyr")
 data(relig_income, population, world_bank_pop, us_rent_income, fish_encounters,
      table2, table3, table4a, table5, package = "tidyr")
+library(conflicted)
+library(dplyr)
 ```
 
 ---
 ## Learning data preparation in two categories
 
-- **Processing data structure** day 3
+- **Processing data structure** <span style="opacity: 0.5;">— day 3</span>
     - Extract subsets
     - Summarize by group
     - Sort rows
     - **Combine tables** 👈 day 4
     - **Pivot longer ↔ wider**
-- Processing data content <span style="color: #888888;">— day 5</span>
+- Processing data content <span style="opacity: 0.5;">— day 5</span>
     - Type conversion: continuous vs discrete, factors, time
     - Mathematical conversion: logarithm, normalization
     - Handling outliers and missing values
@@ -61,18 +63,19 @@ Join/bind
 ---
 ## `bind_rows()` vertically
 
-example to combine the extracted first and last 6 rows:
+An example to combine the extracted first and last 6 rows:
 ```{r, bind-rows}
 dplyr::bind_rows(head(diamonds), tail(diamonds))
 ```
 
-🔰 `mpg` で同様に3行ずつ取って結合してみよう
+🔰 Combine the first and last 3 rows of `mpg`.
 
+🔰 See how `bind_rows(diamonds, mpg)` successes/fails.
 
 ---
 ## `bind_cols()` horizontally
 
-example to combine two tables side-by-side:
+An example to combine two tables side-by-side:
 ```{r, bind-cols}
 dplyr::bind_cols(band_members, band_instruments2)
 ```
@@ -85,14 +88,14 @@ band_members          band_instruments2
 3  Paul Beatles       3  Keith guitar
 ```
 
-**中身が合ってなくても**行数が合ってれば成功してしまう。<br>
-共通する列を**糊しろ**にして結合したい場合は `*_join()` 関数 →
+3-row + 3-row → Success, **no matter how mismatched** the contents are.<br>
+To join tables **by common columns**, use `*_join()` →
 
 
 ---
-## 共通する列で結合: `full_join()`
+## `full_join()` tables by common columns
 
-他方に無い部分を `NA` で補完して**左右とも全行**保持:
+keeping all observations in **both sides**:
 ```{r, full-join}
 dplyr::full_join(band_members, band_instruments, by = "name")
 ```
@@ -105,30 +108,12 @@ band_members          band_instruments
 3  Paul Beatles       3 Keith guitar
 ```
 
-🔰 結合前と結合後の表を手元でも確認しよう
+🔰 View the tables before and after joining.
 
 ---
-## 共通する列で結合: `full_join()`
+## `left_join()` tables by common columns
 
-結合に使う列の名前が違ってても大丈夫:
-```{r, full-join-by}
-dplyr::full_join(band_members, band_instruments2, by = c(name = "artist"))
-```
-```
-band_members          band_instruments2
-   name    band         artist  plays
-  <chr>   <chr>          <chr>  <chr>
-1  Mick  Stones       1   John guitar
-2  John Beatles       2   Paul   bass
-3  Paul Beatles       3  Keith guitar
-```
-
-🔰 結合前と結合後の表を手元でも確認しよう
-
----
-## 共通する列で結合: `left_join()`
-
-右側に無い部分を `NA` で補完して**左側だけ全行**保持:
+keeping all observations in **the left hand side**:
 ```{r, left-join}
 dplyr::left_join(band_members, band_instruments, by = "name")
 ```
@@ -141,14 +126,14 @@ band_members          band_instruments
 3  Paul Beatles       3 Keith guitar
 ```
 
-その逆は `right_join()`
+`right_join()` is the opposite.
 
-🔰 結合前と結合後の表を手元でも確認しよう
+🔰 View the tables before and after joining.
 
 ---
-## 共通する列で結合: `inner_join()`
+## `inner_join()` tables by common columns
 
-左右ともに**共通する値のある行だけ**保持:
+keeping **only matched observations**:
 ```{r, inner-join}
 dplyr::inner_join(band_members, band_instruments, by = "name")
 ```
@@ -161,41 +146,42 @@ band_members          band_instruments
 3  Paul Beatles       3 Keith guitar
 ```
 
-🔰 結合前と結合後の表を手元でも確認しよう
+🔰 View the tables before and after joining.
 
 ---
-## joinまとめ
+## Specify common columns `by = join_by(x == y)`
 
-<div class="column-container">
-<div class="column" style="flex-shrink: 1.4;">
+if they have different names:
+```{r, join-by}
+dplyr::inner_join(band_members, band_instruments2,
+                  by = join_by(name == artist))
+```
+```
+band_members          band_instruments2
+   name    band         artist  plays
+  <chr>   <chr>          <chr>  <chr>
+1  Mick  Stones       1   John guitar
+2  John Beatles       2   Paul   bass
+3  Paul Beatles       3  Keith guitar
+```
 
-<figure>
+Exact match `==` is not the only choice.
+See [`?join_by`](https://dplyr.tidyverse.org/reference/join_by.html) for more details.
+
+---
+## Roundup of `*_join()`
+
+<figure style="margin-block: 1em;">
 <a href="https://r4ds.hadley.nz/joins.html">
-<img src="/slides/image/r4ds/join.png" height="820">
+<img src="/slides/image/r4ds/join-venn.png" width="100%">
 <br>
 <figcaption class="url">https://r4ds.hadley.nz/joins.html</figcaption>
 </a>
 </figure>
 
-</div>
-<div class="column">
-
-生命科学における `left_join()` の例
-
-左: **興味のある遺伝子**の発現データ<br>
-右: **全遺伝子**のアノテーション情報
-
-&nbsp; ↓ `left_join`(by = "遺伝子名")
-
-**興味のある遺伝子**の発現+アノテーション
-
-</div>
-</div>
 
 ---
-## practice joining: `nycflights13` dataset
-
-🔰 関連するdata.frameをいろいろな方法で結合してみよう。
+## 🔰 Practice of joining: `nycflights13` dataset
 
 ```r
 # install.packages("nycflights13")
@@ -204,9 +190,9 @@ data(package = "nycflights13")
 # airlines, airports, flights, planes, weather
 ```
 
-<figure>
+<figure style="margin-block: 1em;">
 <a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
-<img src="/slides/image/r4ds/relational-nycflights.png" height="480">
+<img src="/slides/image/r4ds/relational-nycflights.png" height="500">
 <br>
 <figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
 </a>
@@ -214,35 +200,37 @@ data(package = "nycflights13")
 
 
 ---
-## tidyr --- data.frameの変形・整形担当
+## tidyr --- transformer of data.frame
 
 <a href="https://tidyr.tidyverse.org/">
 <img src="/_img/hex-stickers/tidyr.webp" width="180" align="right">
 </a>
 
-横広から縦長に
+Pivoting
 : `pivot_longer()`, <del><code>gather()</code></del>
-
-縦長から横広に
 : `pivot_wider()`, <del><code>spread()</code></del>
 
-列を分離、結合
-: `separate()`, `unite()`
+Nesting, rectangling
+: `nest()`, `unnest()`, `hoist()`
 
-入れ子構造をつくる、解消する
-: `nest()`, `unnest()`
+Character columns
+: `separate_longer_delim()`, `separate_longer_position()`
+: `separate_wider_delim()`, `separate_wider_position()`
+: `unite()`
+
+Missing values
+: `complete()`, `drop_na()`, `replace_na()`
 
 *etc.*
 
-- こういう変形なしでそのまま使えるデータは激レア
-- エクセルでポチポチやらず、tidyrで手続きを記述しよう
-- ちょっとハードルは高いけど、使えるようになると**強い**💪
 
 ---
-## `pivot_longer()` 横広から縦長に
+## [`pivot_longer()`](https://tidyr.tidyverse.org/reference/pivot_longer.html) lengthens data
 
-複数列にまたがる値を1列にする。<br>
-そのラベルも合わせて移動。
+- Column names (`1999`, `2000`) are a variable.<br>
+  → `year` column
+- A variable (`0.7K`, ..., `213K`) is stored in multiple columns like a matrix.<br>
+  → `cases` column
 
 <figure>
 <a href="https://r4ds.hadley.nz/data-tidy.html#sec-pivoting">
@@ -254,52 +242,50 @@ data(package = "nycflights13")
 
 ```r
 table4a
-pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
+pivot_longer(table4a, !country, names_to = "year", values_to = "cases")
 ```
 
-🔰 変形前と変形後を手元のRで確認してみよう。
+🔰 View the data before and after pivoting.
 
 
 ---
-## `pivot_longer()` 横広から縦長に: `relig_income` の例
+## Try `relig_income |> pivot_longer()`
 
-宗教と収入の関係を調査したデータ。<br>
-世帯数のカウントが複数列にまたがっている。
+- Column names (`<$10k`, `$10-20k`, ...) are a variable.
+- The number of households (`27`, `12`, ...) are in multiple columns.
 
 ```{r, relig-income}
 print(relig_income)
 ```
 
 ---
-## `pivot_longer()` 横広から縦長に: `relig_income` の例
+## Try `relig_income |> pivot_longer()`
 
-宗教と収入の関係を調査したデータ。<br>
-こうなってたらggplotできるのに。
+- Column names (`<$10k`, `$10-20k`, ...) are a variable.
+- The number of households (`27`, `12`, ...) are in multiple columns.
 
 <div class="column-container">
 <div class="column">
 
 ```{r, pivot-longer}
-#| include: false
-relig_long = relig_income[1:2, 1:4] |> print() |>
+#| echo: false
+relig_long = relig_income |>
   tidyr::pivot_longer(!religion, names_to = "income", values_to = "count") |>
   print()
 ```
-```{r, relig-long}
-print(relig_long)
-```
 
-🔰 次ページの答えを見ず自力でやってみよう
+🔰 The result looks like ↑
+
+🔰 Then ggplot like →
 
 </div>
 <div class="column">
 
 ```{r, relig-income-plot}
 #| echo: false
-#| fig.width: 4.5
+#| fig.width: 5
 #| fig.height: 6
-relig_income |>
-  tidyr::pivot_longer(!religion, names_to = "income", values_to = "count") |>
+relig_long |>
   dplyr::mutate(income = dplyr::na_if(income, "Don't know/refused")) |>
   dplyr::mutate(income = factor(income, levels = rev(unique(income)))) |>
   ggplot() +
@@ -316,22 +302,22 @@ relig_income |>
 </div>
 
 ---
-## `pivot_longer()` 横広から縦長に: `relig_income` の例
+## Try `relig_income |> pivot_longer()`
 
-複数列にまたがっている世帯数カウントを `count` 1列に移動。<br>
-列名になってた収入帯を `income` 列に移動。
+- Column names (`<$10k`, `$10-20k`, ...) are a variable. → `income`
+- The number of households (`27`, `12`, ...) are in multiple columns. → `count`
 
 ```{r, pivot-longer}
 ```
 
-移動する列を指定する `!religion` のところは直接 `2:10` とかも可。
+Columns to move can be selected like `-1` or `2:11` as well as `!religion`.
 
 
 ---
-## `pivot_wider()` 縦長から横広に
+## [`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html) widens data
 
-1列に収まっていた値を複数列の行列に変換。<br>
-そのラベルを列の名前にする。
+- `type` column is not a variable. → column names
+- `count` column stores values of two different variables → two columns
 
 <figure>
 <a href="https://r4ds.hadley.nz/data-tidy.html#widening-data">
@@ -345,13 +331,37 @@ relig_income |>
 pivot_wider(table2, names_from = type, values_from = count)
 ```
 
-🔰 変形前と変形後を手元のRで確認してみよう。
+🔰 View the data before and after pivoting.
 
 ---
-## `pivot_wider()` 縦長から横広に: `fish_encounters`
+## Try `cms_patient_care |> pivot_wider()`
 
-発信器のついた魚が観測地点を通過したことを記録したデータ。<br>
-既にggplotしやすそうな形だけど、あえて1魚1行の横広にしたい。
+- `type` column is not a variable. → column names
+- `score` column stores values of two different variables → two columns
+
+```{r, cms-patient-care}
+print(cms_patient_care)
+```
+
+---
+## Try `cms_patient_care |> pivot_wider()`
+
+- `type` column is not a variable. → column names
+- `score` column stores values of two different variables → two columns
+
+```{r, cms-patient-care-wider}
+#| echo: false
+cms_patient_care |> pivot_wider(names_from=type, values_from=score)
+```
+
+🔰 The result looks like ↑
+
+
+---
+## Sometimes we want to widen already-tidy data
+
+- `station` column becomes new column names.
+- The values in `seen` get spread across multiple columns.
 
 <div class="column-container">
 <div class="column">
@@ -375,42 +385,42 @@ fish_encounters |>
 </div>
 </div>
 
-🔰 次ページの答えを見ず自力でやってみよう
+🔰 Try pivoting above.
 
 ---
-## `pivot_wider()` 縦長から横広に: `fish_encounters`
+## Try `fish_encounters |> pivot_wider()`
 
-観測地点 `station` を列名に移動。<br>
-観察されたかどうか `seen` を各列に移動。存在しなければ `NA`
+- `station` column becomes new column names.
+- The values in `seen` get spread across multiple columns.
 
 ```{r, pivot-wider}
 fish_encounters |>
   tidyr::pivot_wider(names_from = station, values_from = seen)
 ```
 
-`values_fill = 0` とすれば `NA` じゃなく `0` で埋められる。
+Optional `values_fill = 0` fills missing value `NA` with `0`.
 
 ---
-## `pivot_wider()` 縦長から横広に: 練習問題1
+## Practice 1
 
 ```{r, population}
 print(population)
 ```
 
-🔰 1国のデータが1行になるように変形しよう↓
+🔰 `pivot_wider()` ↓
 ```{r, wider-goal1}
 #| echo: false
 population |> tidyr::pivot_wider(names_from = "year", values_from = "population")
 ```
 
 ---
-## `pivot_wider()` 縦長から横広に: 練習問題2
+## Practice 2
 
 ```{r, population2}
 print(population)
 ```
 
-🔰 1年のデータが1行になるように変形しよう↓
+🔰 `pivot_wider()` ↓
 ```{r, wider-goal2}
 #| echo: false
 population |> tidyr::pivot_wider(names_from = "country", values_from = "population")
@@ -418,13 +428,13 @@ population |> tidyr::pivot_wider(names_from = "country", values_from = "populati
 
 
 ---
-## `pivot_wider()` 縦長から横広に: 練習問題3
+## Practice 3
 
 ```{r, us-rent-income}
 print(us_rent_income)
 ```
 
-🔰 `income` と `rent` の推定値がそれぞれ列となるように変形しよう
+🔰 `pivot_wider()` ↓
 ```{r, wider-goal3}
 #| echo: false
 us_rent_income |>
@@ -434,7 +444,7 @@ us_rent_income |>
 
 
 ---
-## `separate()` 列を分離
+## `separate()` a character column
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
@@ -448,12 +458,12 @@ us_rent_income |>
 table3 |> tidyr::separate(rate, into = c("cases", "population"), sep = "/")
 ```
 
-`sep` は指定しなくてもデフォルトで記号や空白を認識してくれる。
+`sep` can be omitted; it matches non-alphanumeric values by default.
 
-🔰 変形前と変形後を手元のRで確認してみよう。
+🔰 View data before and after `separate()`.
 
 ---
-## `unite()` 列を融合
+## `unite()` columns to a single column
 
 <figure>
 <a href="https://r4ds.had.co.nz/tidy-data.html#unite">
@@ -469,35 +479,33 @@ table5 |> tidyr::unite(YEAR, century, year, sep = "") |>
   dplyr::mutate(YEAR = as.integer(YEAR))
 ```
 
-**結合直後は文字列**になっているので数値なら忘れずに変換。
+Note that the output column is always **character type**.
 
-🔰 変形前と変形後を手元のRで確認してみよう。
+🔰 View data before and after `unite()`.
 
 ---
-## `separate()` / `unite()` 練習問題1
+## `separate()` / `unite()` Practice 1
 
-🔰 `table3` の `rate` を分割したあと、また元に戻してみよう。
+🔰 Separate `table3`'s `rate`, and unite them again.
 
-🔰 `table3` の `year` を分割して `table5` を作ってみよう。
+🔰 Reproduce `table5` by separating `table3`'s `year`.
 
 ```{r, table3-practice}
 print(table3)
 ```
 
 ---
-## `separate()` / `unite()` 練習問題2
+## `separate()` / `unite()` Practice 2
 
-🔰 `world_bank_pop` の `indicator` を3列に分割してみよう。<br>
-   (`sep = "."` を指定せず省略する。理由は文字列処理の回で説明)
+🔰 Separate `world_bank_pop`'s `indicator` into 3 columns.<br>
+   (Omit `sep = "."`. You will know the reason tomorrow)
 
 ```{r, world-bank-pop-practice}
 print(world_bank_pop)
 ```
 
 ---
-## `nest()` 入れ子にする
-
-グループ毎にdata.frameを区切ってlist型の列に入れる。
+## `nest()`, `unnest()` for advanced users
 
 <figure>
 <a href="https://www.tidyverse.org/blog/2019/09/tidyr-1-0-0/">
@@ -510,13 +518,11 @@ print(world_bank_pop)
 <div>
 <a href="https://purrr.tidyverse.org/">
 <img src="/_img/hex-stickers/purrr.webp" width="180" style="vertical-align: middle;">
-purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹介だけ)
+purrr package</a> is a powerful tool to handle nested data.frames.
 </div>
 
 ---
-## `nest()` 入れ子にする
-
-グループ毎にdata.frameを区切ってlist型の列に入れる。
+## `nest()`, `unnest()` for advanced users
 
 ```{r, nest}
 mpg_nested = mpg |> tidyr::nest(data = !drv) |> print()
@@ -677,7 +683,7 @@ ggplot(va_deaths) +
 ## 🔰 Challenge 4: transform and plot `anscombe`
 
 ```r
-anscombe |> tibble::rowid_to_column("id")   # IDをつけておく
+anscombe |> tibble::rowid_to_column("id")   # add ID first
 ```
 ```{r, anscombe}
 #| echo: false
@@ -714,7 +720,7 @@ ggplot(tidy_anscombe) + aes(x, y) +
 ---
 ## 🔰 Challenge 5: Calculate summary stats of `anscombe`
 
-4組のx-yは、平均・分散・相関係数がほぼ同じ？
+4 groups have almost the same mean, sd, correlation coefficient?
 
 ```{r, anscombe-summarize}
 #| echo: false
