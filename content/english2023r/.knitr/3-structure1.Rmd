@@ -17,7 +17,7 @@
 
 ### ⬜ Learn how to do it and how to learn more
 
-- Overview what R can do
+- Overview what R can do.
 - Know where to consult when you have a problem.
 
 ### ⬜ Glance at the basics of data analysis
@@ -219,7 +219,7 @@ VADeaths |>
 ```
 
 ---
-## Data preparation can be divided into to two groups
+## Learning data preparation in two categories
 
 - **Processing data structure** 👈 day 3 and 4
     - Extract subsets
@@ -450,9 +450,9 @@ result = diamonds |>
   print()
 ```
 
-別解: `|> dplyr::select(c(1, 2, 7))`, `diamonds[, c(1, 2, 7)]`
+other solutions: `|> dplyr::select(c(1, 2, 7))`, `diamonds[, c(1, 2, 7)]`
 
-🔰 `starwars` の 1, 10, 11 列目を3通りの方法で抽出してみよう
+🔰 Extract the columns 1, 10, 11 from `starwars` in three ways.
 
 ---
 ## `select()` columns
@@ -464,9 +464,9 @@ result = diamonds |>
   print()
 ```
 
-別解: `|> dplyr::select(c("carat", "cut", "price"))`
+another solution: `|> dplyr::select(c("carat", "cut", "price"))`
 
-🔰 `starwars` の 1, 10, 11 列目を**列名で**抽出してみよう
+🔰 Extract the columns 1, 10, 11 from `starwars` **based on their names**.
 
 
 ---
@@ -479,9 +479,9 @@ result = diamonds |>
   print()
 ```
 
-別解: `|> dplyr::select(!c("carat", "cut", "price"))`
+another solution: `|> dplyr::select(!c("carat", "cut", "price"))`
 
-🔰 `starwars` の **1, 10, 11 列目を除外**してみよう
+🔰 **Exclude** the columns 1, 10, 11 from `starwars`.
 
 ---
 ## `select()` columns
@@ -495,7 +495,7 @@ result = diamonds |>
 
 See `?dplyr_tidy_select` or [selection helpers](https://tidyselect.r-lib.org/reference/language.html) for more details.
 
-🔰 `starwars` の **"s" で終わる列**を抽出してみよう
+🔰 Extract **the columns whose name ends with "s"** from `starwars`
 
 ---
 ## `select()` columns
@@ -509,7 +509,7 @@ result = diamonds |>
 
 See `?dplyr_tidy_select` or [`tidyselect::where`](https://tidyselect.r-lib.org/reference/where.html) for more details.
 
-🔰 `starwars` の**文字列型の列**を抽出してみよう
+🔰 Extract **character columns** from `starwars`.
 
 ---
 ## `filter()` rows
@@ -521,9 +521,9 @@ result = diamonds |>
   print()
 ```
 
-別解: `diamonds[diamonds[["cut"]] == "Ideal", ]`
+another solution: `diamonds[diamonds[["cut"]] == "Ideal", ]`
 
-🔰 `starwars` の**人間**を抽出してみよう
+🔰 Extract **humans** from `starwars`.
 
 ---
 ## `filter()` rows
@@ -535,7 +535,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**身長が150以下のキャラクタ**を抽出してみよう
+🔰 Extract characters **shorter than 150** from `starwars`.
 
 ---
 ## `filter()` rows
@@ -547,7 +547,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**目の色が青か赤のキャラクタ**を抽出してみよう
+🔰 Extract characters **whose eyes are blue or red** from `starwars`.
 
 ---
 ## `filter()` rows
@@ -559,7 +559,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**タトゥーイン生まれの人間**を抽出してみよう
+🔰 Extract **humans whose homeworld is Tatooine** from `starwars`.
 
 
 ---
@@ -572,7 +572,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**身長200以上または体重100以上のキャラ**を抽出しよう
+🔰 Extract those **taller than 200 or heavier than 100** from `starwars`.
 
 ---
 ## `slice_max()`, `slice_min()`
@@ -586,7 +586,7 @@ result = diamonds |>
 
 Provide `n` or `prop` to set the number/proportion of rows.
 
-🔰 `starwars` の**身長が低い順に5名だけ**抽出してみよう
+🔰 Extract **the shortest five characters** from `starwars`.
 
 
 ---
@@ -600,12 +600,12 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**ジェンダーごとに身長が低い3名ずつ**抽出してみよう
+🔰 Extract **the shortest three rows for each gender** from `starwars`.
 
 ---
 ## `slice_head()`, `slice_tail()`
 
-extract the head/tail rows from **each group**:
+extract the first/last `n` rows from **each group**:
 ```{r, group-slice-head}
 result = diamonds |>
   dplyr::group_by(cut) |>
@@ -615,7 +615,7 @@ result = diamonds |>
 
 Provide `n` or `prop` to set the number/proportion of rows.
 
-🔰 `starwars` の**ジェンダーごとに先頭3名ずつ**抽出してみよう
+🔰 Extract **the first three rows for each gender** from `starwars`.
 
 
 ---
@@ -631,7 +631,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` から**ジェンダーごとにランダムに3名**抽出してみよう
+🔰 Extract **the three rows for each gender randomly** from `starwars`.
 
 
 ---
@@ -656,10 +656,10 @@ result = diamonds |>
   print()
 ```
 
-vectorを受け取って1つの値を返す集約関数:<br>
+aggregate functions that receive a vector and return a single value:<br>
 `min()`, `max()`, `mean()`, `median()`, `var()`, `sd()`, etc.
 
-🔰 `mpg` の**市街地(cty)と高速道路(hwy)の燃費平均値**を計算しよう
+🔰 Calculate average `cty` and `hwy` of `mpg`.
 
 ---
 ## `summarize()`
@@ -673,7 +673,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `mpg` の**燃費平均値を駆動方式(drv)ごとに**計算しよう
+🔰 Calculate average `cty` and `hwy` for each `drv` of `mpg`.
 
 
 ---
@@ -687,7 +687,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `mpg` の**各数値列の最大値を駆動方式ごとに**計算しよう
+🔰 Pick the maximum value for each numeric column in `mpg`.
 
 
 ---
@@ -702,7 +702,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `mpg` の**各数値列の `range()` を駆動方式ごとに**計算しよう
+🔰 Apply `range()` to all the numeric columns for each `drv` in `mpg`.
 
 
 ---
@@ -715,7 +715,7 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**性とジェンダーの組み合わせ**を数えてみよう
+🔰 Count the combinations of `sex` and `gender` in `starwars`.
 
 
 ---
@@ -730,7 +730,7 @@ result = diamonds |>
 
 Set `.keep_all = TRUE` to keep other columns.
 
-🔰 `starwars` の**性とジェンダーの組み合わせ**だけ残してみよう
+🔰 Extract the distinct combinations of `sex` and `gender` in `starwars`.
 
 
 ---
@@ -743,7 +743,7 @@ result = diamonds |>
   print()  # descending order of carat if the colors are the same
 ```
 
-🔰 `starwars` の**種族と身長で並べ替え**てみよう
+🔰 Sort `starwars` rows **by species and height**.
 
 ---
 ## `relocate()` columns
@@ -757,7 +757,7 @@ result = diamonds |>
 
 `.before`, `.after` options are available for fine adjustment.
 
-🔰 `starwars` の**種族と出身地を名前の右に移動**してみよう
+🔰 Move `species` and `homeworld` columns to the right of `name` in `starwars`.
 
 
 ---
@@ -771,8 +771,11 @@ result = diamonds |>
   print()
 ```
 
-🔰 `starwars` の**身長をメートルで表してBMIを計算**してみよう
+🔰 Convert `height` to meters, and calculate BMI in `starwars`.
 
+<aside>
+body mass index: $\text{BMI} = \frac{\text{weight}} {\text{height}^2}$
+</aside>
 
 ---
 ## `rename()` columns
@@ -784,12 +787,12 @@ result = diamonds |>
   print()
 ```
 
-`rename_with(diamonds, toupper)` のように関数を渡すと一括変更。
+`rename_with(diamonds, toupper)` applies a function to all the names.
 
-🔰 `starwars` の**heightをcmに、massをkgに改名**してみよう
+🔰 Rename **`height` to `cm`**, and **`mass` to `kg`** in `starwars`.
 
 ---
-## Data preparation can be divided into to two groups
+## Learning data preparation in two categories
 
 - **Processing data structure** day 3
     - **Extract subsets**
