@@ -12,55 +12,56 @@ data(relig_income, population, world_bank_pop, us_rent_income, fish_encounters,
 ```
 
 ---
-## 前処理は大きく2つに分けられる
+## Learning data preparation in two categories
 
-- **データ構造を対象とする処理** — 第3, 4回 本日の話題
-    - 使いたい部分だけ抽出
-    - グループごとに特徴を要約
-    - 何かの順に並べ替え
-    - **異なるテーブルの結合** 👈 第4回ここから
-    - **変形: 縦長 ↔ 横広**
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回</span>
-    - 数値の変換: 対数、正規化
-    - 外れ値・欠損値への対処
-    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
-    - 文字列処理: 正規表現によるパターンマッチ
+- **Processing data structure** day 3
+    - Extract subsets
+    - Summarize by group
+    - Sort rows
+    - **Combine tables** 👈 day 4
+    - **Pivot longer ↔ wider**
+- Processing data content <span style="color: #888888;">— day 5</span>
+    - Type conversion: continuous vs discrete, factors, time
+    - Mathematical conversion: logarithm, normalization
+    - Handling outliers and missing values
+    - Character manipulation: pattern matching
+
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
 </a></cite>
 
 ---
-## dplyr --- data.frameの高速処理担当
+## dplyr --- plyer for data.frames
 
 <a href="https://dplyr.tidyverse.org/">
 <img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
 </a>
 
-シンプルな関数がたくさん。繋げて使う (piping)
+A consistent set of verbs/functions for data manipulation.
 
-抽出
-: 列: `select()`,
-: 行: `filter()`, `distinct()`, `slice()`
+Extract
+: columns: `select()`,
+: rows: `filter()`, `distinct()`, `slice()`
 
-要約・集計
+Aggregate
 : `group_by()`, `summarize()`, `count()`
 
-並べ替え
+Reorder
 : `arrange()`, `relocate()`
 
-列の追加・変更
+Modify/add columns
 : `mutate()`, `rename()`
 
-結合
-: 行方向: `bind_rows()`
-: 列方向: `left_join()`, `inner_join()`, `full_join()`
+Join/bind
+: rows: `bind_rows()`
+: columns: `left_join()`, `inner_join()`, `full_join()`
 
 
 ---
-## 行の結合: `bind_rows()`
+## `bind_rows()` vertically
 
-例。先頭と末尾を6行ずつ取って縦並びで結合する:
+example to combine the extracted first and last 6 rows:
 ```{r, bind-rows}
 dplyr::bind_rows(head(diamonds), tail(diamonds))
 ```
@@ -69,9 +70,9 @@ dplyr::bind_rows(head(diamonds), tail(diamonds))
 
 
 ---
-## 列の結合: `bind_cols()`
+## `bind_cols()` horizontally
 
-例。3行2列の表を横並びで結合する:
+example to combine two tables side-by-side:
 ```{r, bind-cols}
 dplyr::bind_cols(band_members, band_instruments2)
 ```
@@ -192,7 +193,7 @@ band_members          band_instruments
 </div>
 
 ---
-## join例題: `nycflights13` データセット
+## practice joining: `nycflights13` dataset
 
 🔰 関連するdata.frameをいろいろな方法で結合してみよう。
 
@@ -524,7 +525,7 @@ mpg_nested$data[[1]]
 
 
 ---
-## 前処理は大きく2つに分けられる
+## Learning data preparation in two categories
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
@@ -535,17 +536,17 @@ mpg_nested$data[[1]]
 </a>
 </div>
 
-- **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
-    - 使いたい部分だけ抽出 --- `select()`, `filter()`
-    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
-    - 何かの順に並べ替え --- `arrange()`
-    - 異なるテーブルの結合 --- `*_join()`
-    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
-- データ内容を対象とする処理 — 第5回
-    - 数値の変換: 対数、正規化
-    - 外れ値・欠損値への対処
-    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
-    - 文字列処理: 正規表現によるパターンマッチ
+- **Processing data structure** day 3 and 4
+    - Extract subsets --- `select()`, `filter()`
+    - Summarize by group --- `group_by()`, `summarize()`
+    - Sort rows --- `arrange()`
+    - Combine tables --- `*_join()`
+    - Pivot longer ↔ wider --- `pivot_longer()`, `pivot_wider()`
+- Processing data content <span style="color: #888888;">— day 5</span>
+    - Type conversion: continuous vs discrete, factors, time
+    - Mathematical conversion: logarithm, normalization
+    - Handling outliers and missing values
+    - Character manipulation: pattern matching
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
@@ -553,7 +554,9 @@ mpg_nested$data[[1]]
 
 
 ---
-## 憶えなくていい。公式サイトなどを見ながら作業
+## Don't try to remember; visit the official website
+
+It is the shortest path to getting data transformation done.
 
 <figure>
 <a href="https://dplyr.tidyverse.org/">
@@ -565,7 +568,7 @@ mpg_nested$data[[1]]
 
 
 ---
-## 🔰 課題1: `economics` を変形して作図しよう
+## 🔰 Challenge 1: transform and plot `economics`
 
 ```r
 print(economics)
@@ -585,7 +588,7 @@ economics |>
 ```
 
 ---
-## 🔰 課題2: `world_bank_pop` を変形して作図しよう
+## 🔰 Challenge 2: transform and plot `world_bank_pop`
 
 ```r
 print(world_bank_pop)
@@ -608,54 +611,26 @@ ggplot(wbp_tidy) +
 ```
 
 ---
-## 少し前に出てきたこれ、そろそろできるのでは
+## Do you remember this dataset?
 
 ```{r, before-tidy}
 print(VADeaths)
 ```
 
-↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+↓ *mise en place* &nbsp;🔪&nbsp; put everything in place
+<img `r src_alt_fig_chunk("vadeaths-plot")` align="right" width="540" style="margin-block-start: 4em;">
 
 ```{r, after-tidy}
 #| echo: false
-VADeaths |>
-  as.data.frame() |>
-  tibble::rownames_to_column("age") |>
-  tidyr::pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") |>
-  tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
-```
-
----
-## ちょっと補足
-
-```{r, vadeaths-class}
-VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
-  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
-class(VADeaths)
-rownames(VADeaths)
-```
-
----
-## 🔰 課題3: `VADeaths` を縦長にしてggplotしてみよう
-
-```{r, vadeaths-rownames}
-#| results: "hold"
-VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
-  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
-```
-
-```{r, vadeaths-plot}
-#| fig.height: 4
-#| fig.width: 6
-#| echo: false
 va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
-  tibble::rownames_to_column("age") |>          # 行名を列に
-  tidyr::pivot_longer(                         # 縦長に変形したい
+  tibble::rownames_to_column("age") |>  # 行名を列に
+  tidyr::pivot_longer(                  # 縦長に変形したい
     !age,                               # age以外の列に入ってる値を移動
     names_to = c("region", "sex"),      # 元の列名を2つに分離
     names_sep = " ",                    # スペースで切る
     values_to = "death") |>             # 値の行き先の列名
-  tidyr::separate(age, c("lbound", "ubound"), "-", convert = TRUE)
+  tidyr::separate(age, c("lbound", "ubound"), "-", convert = TRUE) |>
+  print()
 
 # 別解
 .devnull = as.data.frame(VADeaths) |>
@@ -663,15 +638,43 @@ va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
   tidyr::pivot_longer(!age, names_to = "region_sex", values_to = "death") |>
   tidyr::separate(region_sex, c("region", "sex")) |>
   tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
+```
 
+---
+## 🔰 Challenge 3: transform and plot `VADeaths`
+
+```{r, vadeaths-rownames}
+VADeaths |> as.data.frame() |>       # was not data.frame
+  tibble::rownames_to_column("age")  # rownames are irregular
+```
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 0.8; min-width: 0;">
+
+Convert it to a regular data.frame first.
+```{r, vadeaths-class}
+class(VADeaths)
+rownames(VADeaths)
+```
+
+  </div>
+  <div class="column">
+
+```{r, vadeaths-plot}
+#| fig.height: 3.8
+#| fig.width: 5.7
+#| echo: false
 ggplot(va_deaths) +
   aes(lbound, death) +
   geom_point(aes(color = sex, shape = region), size = 5) +
   theme_classic(base_size = 18)
 ```
 
+  </div>
+</div>
+
 ---
-## 🔰 課題4: `anscombe` を縦長にしてggplotしてみよう
+## 🔰 Challenge 4: transform and plot `anscombe`
 
 ```r
 anscombe |> tibble::rowid_to_column("id")   # IDをつけておく
@@ -682,9 +685,8 @@ anscombe |> tibble::rowid_to_column("id") |> wtl::printdf(n = 6L)
 ```
 
 ```{r, anscombe-plot}
-#| fig.height: 3
-#| fig.width: 10
-#| out.width: "98%"
+#| fig.height: 4
+#| fig.width: 12
 #| echo: false
 tidy_anscombe = anscombe |>
   tidyr::pivot_longer(                       # 縦長に変形したい
@@ -710,7 +712,7 @@ ggplot(tidy_anscombe) + aes(x, y) +
 ```
 
 ---
-## 🔰 課題5: `anscombe` の要約統計量を計算しよう
+## 🔰 Challenge 5: Calculate summary stats of `anscombe`
 
 4組のx-yは、平均・分散・相関係数がほぼ同じ？
 
@@ -726,15 +728,6 @@ tidy_anscombe |>
     cor_xy = cor(x, y)
   )
 ```
-
-
----
-## 今日の残り時間
-
-- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
-- 5つの課題を協力/手分けして解く。
-- TAが評価して合格した班から解散。
-- 残ってほかの課題に取り組んでもOK。
 
 
 ---
