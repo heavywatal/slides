@@ -205,8 +205,8 @@ To join tables <strong>by common columns</strong>, use <code>*_join()</code> →
 1  Mick  Stones       1  John guitar
 2  John Beatles       2  Paul   bass
 3  Paul Beatles       3 Keith guitar
-</code></pre><p><code>right_join()</code> is the opposite.</p>
-<p>🔰 View the tables before and after joining.</p>
+</code></pre><p>🔰 View the tables before and after joining.</p>
+<p>🔰 Try <code>right_join()</code> as well.</p>
 
 </section>
 <section>
@@ -255,19 +255,30 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 
 </section>
 <section>
-<h2 id="-practice-of-joining-nycflights13-dataset">🔰 Practice of joining: <code>nycflights13</code> dataset</h2>
+<h2 id="practice-of-joining-nycflights13-dataset">Practice of joining: <code>nycflights13</code> dataset</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;nycflights13&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">nycflights13</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">data</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># airlines, airports, flights, planes, weather</span>
 </span></span></code></pre></div><figure style="margin-block: 1em;">
 <a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
-<img src="/slides/image/r4ds/relational-nycflights.png" height="500">
+<img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>
 <figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
 </a>
 </figure>
-
+<p>🔰 The most frequent destination of airplanes with &gt;100 seats from JFK?</p>
+<pre tabindex="0"><code>   origin dest     n                           name      lat        lon  alt tz dst               tzone
+ 1    JFK  LAX 11065               Los Angeles Intl 33.94254 -118.40807  126 -8   A America/Los_Angeles
+ 2    JFK  SFO  7587             San Francisco Intl 37.61897 -122.37489   13 -8   A America/Los_Angeles
+ 3    JFK  MCO  4616                   Orlando Intl 28.42939  -81.30899   96 -5   A    America/New_York
+ 4    JFK  FLL  3683 Fort Lauderdale Hollywood Intl 26.07258  -80.15275    9 -5   A    America/New_York
+--                                                                                                     
+51    JFK  DCA     2  Ronald Reagan Washington Natl 38.85208  -77.03772   15 -5   A    America/New_York
+52    JFK  JAC     2           Jackson Hole Airport 43.60733 -110.73775 6451 -7   A      America/Denver
+53    JFK  BNA     1                 Nashville Intl 36.12447  -86.67819  599 -6   A     America/Chicago
+54    JFK  STL     1          Lambert St Louis Intl 38.74870  -90.37003  618 -6   A     America/Chicago
+</code></pre>
 </section>
 <section>
 <h2 id="tidyr-----transformer-of-dataframe">tidyr &mdash; transformer of data.frame</h2>
@@ -346,8 +357,8 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 178 Unaffiliated          $100-150k   321
 179 Unaffiliated              &gt;150k   258
 180 Unaffiliated Don&#39;t know/refused   597
-</code></pre><p>🔰 The result looks like ↑</p>
-<p>🔰 Then ggplot like →</p>
+</code></pre><p>🔰 Transform it like ↑</p>
+<p>🔰 Then ggplot it like →</p>
 </div>
 <div class="column">
 <p><img src="./figure/relig-income-plot-1.png" alt="plot of chunk relig-income-plot"></p>
@@ -380,7 +391,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 <h2 id="pivot_widerhttpstidyrtidyverseorgreferencepivot_widerhtml-widens-data"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html"><code>pivot_wider()</code></a> widens data</h2>
 <ul>
 <li><code>type</code> column is not a variable. → column names</li>
-<li><code>count</code> column stores values of two different variables → two columns</li>
+<li><code>count</code> column stores values of two different variables. → two columns</li>
 </ul>
 <figure>
 <a href="https://r4ds.hadley.nz/data-tidy.html#widening-data">
@@ -397,7 +408,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 <h2 id="try-cms_patient_care--pivot_wider">Try <code>cms_patient_care |&gt; pivot_wider()</code></h2>
 <ul>
 <li><code>type</code> column is not a variable. → column names</li>
-<li><code>score</code> column stores values of two different variables → two columns</li>
+<li><code>score</code> column stores values of two different variables. → two columns</li>
 </ul>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">cms_patient_care</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>       ccn           facility_name      measure_abbr score        type
@@ -410,14 +421,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 250 011517 HOSPICE OF WEST ALABAMA        treat_pref 100.0    observed
 251 011517 HOSPICE OF WEST ALABAMA   visits_imminent 198.0 denominator
 252 011517 HOSPICE OF WEST ALABAMA   visits_imminent  98.5    observed
-</code></pre>
-</section>
-<section>
-<h2 id="try-cms_patient_care--pivot_wider">Try <code>cms_patient_care |&gt; pivot_wider()</code></h2>
-<ul>
-<li><code>type</code> column is not a variable. → column names</li>
-<li><code>score</code> column stores values of two different variables → two columns</li>
-</ul>
+</code></pre><p>🔰 Pivot wider ↓</p>
 <pre tabindex="0"><code>       ccn           facility_name      measure_abbr denominator observed
   1 011500         BAPTIST HOSPICE beliefs_addressed         202    100.0
   2 011500         BAPTIST HOSPICE composite_process         202     88.1
@@ -428,14 +432,13 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 124 011517 HOSPICE OF WEST ALABAMA    pain_screening         400     97.0
 125 011517 HOSPICE OF WEST ALABAMA        treat_pref         400    100.0
 126 011517 HOSPICE OF WEST ALABAMA   visits_imminent         198     98.5
-</code></pre><p>🔰 The result looks like ↑</p>
-
+</code></pre>
 </section>
 <section>
 <h2 id="sometimes-we-want-to-widen-already-tidy-data">Sometimes we want to widen already-tidy data</h2>
 <ul>
-<li><code>station</code> column becomes new column names.</li>
-<li>The values in <code>seen</code> get spread across multiple columns.</li>
+<li>Turn <code>station</code> column into new column names.</li>
+<li>Spread the values in <code>seen</code> across multiple columns.</li>
 </ul>
 <div class="column-container">
 <div class="column">
@@ -452,7 +455,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 114 4865  Lisbon    1
 </code></pre></div>
 <div class="column">
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fish_wide</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_wider</span><span class="p">(</span><span class="o">???</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>   fish Release I80_1 Lisbon Rstr Base_TD BCE BCW BCE2 BCW2 MAE MAW
  1 4842       1     1      1    1       1   1   1    1    1   1   1
  2 4843       1     1      1    1       1   1   1    1    1   1   1
@@ -465,28 +468,8 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 19 4865       1     1      1   NA      NA  NA  NA   NA   NA  NA  NA
 </code></pre></div>
 </div>
-<p>🔰 Try pivoting above.</p>
-
-</section>
-<section>
-<h2 id="try-fish_encounters--pivot_wider">Try <code>fish_encounters |&gt; pivot_wider()</code></h2>
-<ul>
-<li><code>station</code> column becomes new column names.</li>
-<li>The values in <code>seen</code> get spread across multiple columns.</li>
-</ul>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fish_encounters</span> <span class="o">|&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="n">tidyr</span><span class="o">::</span><span class="nf">pivot_wider</span><span class="p">(</span><span class="n">names_from</span> <span class="o">=</span> <span class="n">station</span><span class="p">,</span> <span class="n">values_from</span> <span class="o">=</span> <span class="n">seen</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>   fish Release I80_1 Lisbon Rstr Base_TD BCE BCW BCE2 BCW2 MAE MAW
- 1 4842       1     1      1    1       1   1   1    1    1   1   1
- 2 4843       1     1      1    1       1   1   1    1    1   1   1
- 3 4844       1     1      1    1       1   1   1    1    1   1   1
- 4 4845       1     1      1    1       1  NA  NA   NA   NA  NA  NA
---                                                                 
-16 4862       1     1      1    1       1   1   1    1    1  NA  NA
-17 4863       1     1     NA   NA      NA  NA  NA   NA   NA  NA  NA
-18 4864       1     1     NA   NA      NA  NA  NA   NA   NA  NA  NA
-19 4865       1     1      1   NA      NA  NA  NA   NA   NA  NA  NA
-</code></pre><p>Optional <code>values_fill = 0</code> fills missing value <code>NA</code> with <code>0</code>.</p>
+<p>🔰 Pivot wider →</p>
+<p>🔰 Try an option <code>values_fill = 0</code> and see the difference.</p>
 
 </section>
 <section>
@@ -502,7 +485,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 4058    Zimbabwe 2011   13358738
 4059    Zimbabwe 2012   13724317
 4060    Zimbabwe 2013   14149648
-</code></pre><p>🔰 <code>pivot_wider()</code> ↓</p>
+</code></pre><p>🔰 Pivot wider ↓</p>
 <pre tabindex="0"><code>                     country     1995     1996     1997     1998     1999     2000     2001     2002     2003     2004     2005     2006     2007     2008     2009     2010     2011     2012     2013
   1              Afghanistan 17586073 18415307 19021226 19496836 19987071 20595360 21347782 22202806 23116142 24018682 24860855 25631282 26349243 27032197 27708187 28397812 29105480 29824536 30551674
   2                  Albania  3357858  3341043  3331317  3325456  3317941  3304948  3286084  3263596  3239385  3216197  3196130  3179573  3166222  3156608  3151185  3150143  3153883  3162083  3173271
@@ -528,7 +511,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 4058    Zimbabwe 2011   13358738
 4059    Zimbabwe 2012   13724317
 4060    Zimbabwe 2013   14149648
-</code></pre><p>🔰 <code>pivot_wider()</code> ↓</p>
+</code></pre><p>🔰 Pivot wider ↓</p>
 <pre tabindex="0"><code>   year Afghanistan Albania  Algeria American Samoa Andorra   Angola Anguilla Antigua and Barbuda Argentina Armenia  Aruba Australia Austria Azerbaijan Bahamas Bahrain Bangladesh Barbados  Belarus  Belgium Belize    Benin Bermuda Bhutan Bolivia (Plurinational State of) Bonaire, Saint Eustatius and Saba Bosnia and Herzegovina Botswana    Brazil British Virgin Islands Brunei Darussalam Bulgaria Burkina Faso  Burundi Cabo Verde Cambodia Cameroon   Canada Cayman Islands Central African Republic     Chad    Chile      China China, Hong Kong SAR China, Macao SAR Colombia Comoros   Congo Cook Islands Costa Rica Côte d&#39;Ivoire Croatia     Cuba Curaçao  Cyprus Czech Republic Democratic People&#39;s Republic of Korea Democratic Republic of the Congo Denmark Djibouti Dominica Dominican Republic  Ecuador    Egypt El Salvador Equatorial Guinea Eritrea Estonia Ethiopia   Fiji Finland   France French Polynesia   Gabon  Gambia Georgia  Germany    Ghana   Greece Greenland Grenada   Guam Guatemala   Guinea Guinea-Bissau Guyana    Haiti Honduras  Hungary Iceland      India Indonesia Iran (Islamic Republic of)     Iraq Ireland  Israel    Italy Jamaica     Japan  Jordan Kazakhstan    Kenya Kiribati  Kuwait Kyrgyzstan Lao People&#39;s Democratic Republic  Latvia Lebanon Lesotho Liberia   Libya Lithuania Luxembourg Madagascar   Malawi Malaysia Maldives     Mali  Malta Marshall Islands Mauritania Mauritius    Mexico Micronesia (Federated States of) Monaco Mongolia Montenegro Montserrat  Morocco Mozambique  Myanmar Namibia Nauru    Nepal Netherlands Antilles Netherlands New Caledonia New Zealand Nicaragua    Niger   Nigeria Niue Northern Mariana Islands  Norway    Oman  Pakistan Palau  Panama Papua New Guinea Paraguay     Peru Philippines   Poland Portugal Puerto Rico   Qatar Republic of Korea Republic of Moldova  Romania Russian Federation   Rwanda Saint Kitts and Nevis Saint Lucia Saint Vincent and the Grenadines  Samoa San Marino Sao Tome and Principe Saudi Arabia  Senegal Serbia &amp; Montenegro  Serbia Seychelles Sierra Leone Singapore Sint Maarten (Dutch part) Slovakia Slovenia Solomon Islands  Somalia South Africa South Sudan    Spain Sri Lanka    Sudan Suriname Swaziland  Sweden Switzerland Syrian Arab Republic Tajikistan Thailand The Former Yugoslav Republic of Macedonia Timor-Leste    Togo Tokelau  Tonga Trinidad and Tobago  Tunisia   Turkey Turkmenistan Turks and Caicos Islands Tuvalu   Uganda  Ukraine United Arab Emirates United Kingdom of Great Britain and Northern Ireland United Republic of Tanzania United States of America Uruguay US Virgin Islands Uzbekistan Vanuatu Venezuela (Bolivarian Republic of) Viet Nam Wallis and Futuna Islands West Bank and Gaza Strip    Yemen   Zambia Zimbabwe
  1 1995    17586073 3357858 29315463          52874   63854 12104952     9807               68349  34833168 3223173  80326  18124234 7985372    7770806  280050  563730  119869585   263165 10189075 10161914 206962  5985658   61407 509105                          7635362                                NA                3520996  1583453 161890816                  18425            295003  8358116     10089876  6209923     399477 10769198 13929575 29294899          31672                  3275695  6980351 14440103 1237531429              6144498           398459 36573895  465895 2720633        18305    3478197      14217430 4690192 10932013      NA  855389       10339223                              21763678                         42012524 5232582   663999    71367            7977966 11315800 61168397     5748013            441829 3407812 1433076 57023519 775587 5108176 58008958           215200 1080477 1065746 5067143 83147770 16760926 10671809     55809  100253 145562   9983861  7837173       1139667 728136  7838241  5591935 10351994  267454  955804355 194112556                   60468352 20363138 3610918 5331622 56967071 2462051 124483305 4320158   15549632 27418077    76378 1586123    4592135                          4871472 2487988 3033406 1753824 2079921 4747619   3628079     408152   13452526  9964065 20725374   244965  8988853 395615            51020    2334388   1128676  95392647                           107556  30700  2298063         NA      10232 26833093   15981571 45329862 1654214  9970 20587157               194332    15420000        189220     3675060   4659458  9167078 108424827 2167                    57518 4359788 2154600 126689577 17255 2757004          4715929  4801834 23939261    69606539 38479899 10097055     3689649  501154          44652994             4339081 22963512          148602147  5663838                 42888      147040                           108122 170158      25680                130378     18567343  8711528            10989446      NA      75433      3927105   3482640                        NA  5362950  1991848          359236  6346440     41426810          NA 39420568  18241711 29963988   435776    963428 8826720     7017042             14338240    5784330 58983954                                   1967013          NA 4284497    1520  95928             1255001  8982649 58522320      4188010                    15334   9227 20740726 51146967              2346305                                             57997197                    29944302                268039654 3224383            107018   22950898  168236                           22092144 76020043                     14143                  2598393 15018201  8841338 11639364
  2 1996    18415307 3341043 29845208          53926   64274 12451945    10063               70245  35264070 3173425  83195  18339037 8009345    7852273  283678  579697  122400896   263884 10156258 10186767 212375  6176318   61703 512594                          7806953                                NA                3485575  1620989 164392423                  18834            302511  8274592     10372562  6294482     408790 11090611 14316949 29586368          33535                  3350299  7216321 14662323 1247897092              6275363           405231 37236124  477548 2797572        18244    3566605      14632391 4647843 10980758      NA  873246       10327823                              22016518                         43122601 5254383   675891    71146            8118570 11557151 62123592     5806750            456389 3473399 1412522 58815116 784647 5126021 58216225           219282 1108698 1095930 4990097 83388930 17169151 10758368     55832  100796 148060  10214623  8094751       1165465 730865  7986858  5723639 10334876  270089  973147577 197097887                   61440887 21017108 3638411 5486219 56937309 2485230 124794906 4450852   15326132 28186224    77511 1585244    4658815                          4986592 2458305 3070984 1779197 2197801 4837354   3606012     414004   13882646 10153315 21259831   250659  9222157 398698            51397    2403805   1142191  97201533                           108342  30971  2316598         NA       9375 27237150   16463426 45991828 1705309 10033 21115271               192128    15514794        193493     3717342   4756631  9499605 111166210 2122                    60248 4385951 2175998 130083700 17695 2814525          4841020  4911701 24365985    71184718 38480234 10140627     3719446  512476          44940974             4308050 22841943          148375246  5929575                 43391      148962                           108078 171276      25914                132323     18848350  8940298            11028631      NA      76391      3919708   3570085                        NA  5372351  1989709          369439  6481035     42204043          NA 39513721  18367795 30824141   441734    984506 8849420     7059633             14746306    5862347 59562136                                   1975207          NA 4392177    1529  96218             1258365  9116617 59442502      4267690                    15967   9264 21407693 50821019              2470810                                             58168519                    30780453                271231546 3247585            107589   23381250  171802                           22556838 77166873                     14221                  2722497 15578640  9073311 11846110
@@ -554,7 +537,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 102    56     Wyoming     rent      828  11
 103    72 Puerto Rico   income       NA  NA
 104    72 Puerto Rico     rent      464   6
-</code></pre><p>🔰 <code>pivot_wider()</code> ↓</p>
+</code></pre><p>🔰 Pivot wider ↓</p>
 <pre tabindex="0"><code>   GEOID          NAME income rent
  1    01       Alabama  24476  747
  2    02        Alaska  32940 1200
@@ -612,7 +595,7 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 
 </section>
 <section>
-<h2 id="separate--unite-practice-1"><code>separate()</code> / <code>unite()</code> Practice 1</h2>
+<h2 id="practice-separate--unite-1">Practice <code>separate()</code> / <code>unite()</code> 1</h2>
 <p>🔰 Separate <code>table3</code>&rsquo;s <code>rate</code>, and unite them again.</p>
 <p>🔰 Reproduce <code>table5</code> by separating <code>table3</code>&rsquo;s <code>year</code>.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">table3</span><span class="p">)</span>
@@ -623,10 +606,18 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 4      Brazil 2000   80488/174504898
 5       China 1999 212258/1272915272
 6       China 2000 213766/1280428583
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">table5</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      country century year              rate
+1 Afghanistan      19   99      745/19987071
+2 Afghanistan      20   00     2666/20595360
+3      Brazil      19   99   37737/172006362
+4      Brazil      20   00   80488/174504898
+5       China      19   99 212258/1272915272
+6       China      20   00 213766/1280428583
 </code></pre>
 </section>
 <section>
-<h2 id="separate--unite-practice-2"><code>separate()</code> / <code>unite()</code> Practice 2</h2>
+<h2 id="practice-separate--unite-2">Practice <code>separate()</code> / <code>unite()</code> 2</h2>
 <p>🔰 Separate <code>world_bank_pop</code>&rsquo;s <code>indicator</code> into 3 columns.<br>
 (Omit <code>sep = &quot;.&quot;</code>. You will know the reason tomorrow)</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
@@ -640,6 +631,16 @@ See <a href="https://dplyr.tidyverse.org/reference/join_by.html"><code>?join_by<
 1062     ZWE SP.URB.GROW 2.228930e+00 1.855721e+00 1.823768e+00 4.510080e-01 1.638574e-01 -1.414815e-02 3.203362e-01 4.282465e-01 2.543894e-01 4.824881e-01 7.068791e-01 8.916117e-01 1.272568e+00 1.613531e+00 1.730983e+00 1.769505e+00 1.806610e+00 1.860765e+00
 1063     ZWE SP.POP.TOTL 1.183468e+07 1.191098e+07 1.198464e+07 1.207583e+07 1.216088e+07  1.222475e+07 1.233049e+07 1.245057e+07 1.255035e+07 1.267981e+07 1.283977e+07 1.302578e+07 1.326533e+07 1.355542e+07 1.385575e+07 1.415494e+07 1.445270e+07 1.475110e+07
 1064     ZWE SP.POP.GROW 1.003969e+00 6.426630e-01 6.165668e-01 7.579605e-01 7.018556e-01  5.238506e-01 8.612226e-01 9.691188e-01 7.982070e-01 1.026265e+00 1.253650e+00 1.438339e+00 1.822309e+00 2.163267e+00 2.191391e+00 2.136294e+00 2.081806e+00 2.043620e+00
+</code></pre><pre tabindex="0"><code>     country sp region stat         2000         2001         2002         2003         2004          2005         2006         2007         2008         2009         2010         2011         2012         2013         2014         2015         2016         2017
+   1     ABW SP    URB TOTL 4.162500e+04 4.202500e+04 4.219400e+04 4.227700e+04 4.231700e+04  4.239900e+04 4.255500e+04 4.272900e+04 4.290600e+04 4.307900e+04 4.320600e+04 4.349300e+04 4.386400e+04 4.422800e+04 4.458800e+04 4.494300e+04 4.529700e+04 4.564800e+04
+   2     ABW SP    URB GROW 1.664222e+00 9.563731e-01 4.013352e-01 1.965172e-01 9.456936e-02  1.935880e-01 3.672580e-01 4.080490e-01 4.133830e-01 4.023963e-01 2.943735e-01 6.620631e-01 8.493932e-01 8.264135e-01 8.106692e-01 7.930256e-01 7.845785e-01 7.718989e-01
+   3     ABW SP    POP TOTL 8.910100e+04 9.069100e+04 9.178100e+04 9.270100e+04 9.354000e+04  9.448300e+04 9.560600e+04 9.678700e+04 9.799600e+04 9.921200e+04 1.003410e+05 1.012880e+05 1.021120e+05 1.028800e+05 1.035940e+05 1.042570e+05 1.048740e+05 1.054390e+05
+   4     ABW SP    POP GROW 2.539234e+00 1.768757e+00 1.194718e+00 9.973955e-01 9.009892e-01  1.003077e+00 1.181566e+00 1.227711e+00 1.241397e+00 1.233231e+00 1.131541e+00 9.393559e-01 8.102306e-01 7.493010e-01 6.916153e-01 6.379592e-01 5.900625e-01 5.372957e-01
+  --                                                                                                                                                                                                                                                                  
+1061     ZWE SP    URB TOTL 3.995150e+06 4.069981e+06 4.144889e+06 4.163625e+06 4.170453e+06  4.169863e+06 4.183242e+06 4.201195e+06 4.211896e+06 4.232267e+06 4.262290e+06 4.300463e+06 4.355539e+06 4.426387e+06 4.503674e+06 4.584076e+06 4.667645e+06 4.755312e+06
+1062     ZWE SP    URB GROW 2.228930e+00 1.855721e+00 1.823768e+00 4.510080e-01 1.638574e-01 -1.414815e-02 3.203362e-01 4.282465e-01 2.543894e-01 4.824881e-01 7.068791e-01 8.916117e-01 1.272568e+00 1.613531e+00 1.730983e+00 1.769505e+00 1.806610e+00 1.860765e+00
+1063     ZWE SP    POP TOTL 1.183468e+07 1.191098e+07 1.198464e+07 1.207583e+07 1.216088e+07  1.222475e+07 1.233049e+07 1.245057e+07 1.255035e+07 1.267981e+07 1.283977e+07 1.302578e+07 1.326533e+07 1.355542e+07 1.385575e+07 1.415494e+07 1.445270e+07 1.475110e+07
+1064     ZWE SP    POP GROW 1.003969e+00 6.426630e-01 6.165668e-01 7.579605e-01 7.018556e-01  5.238506e-01 8.612226e-01 9.691188e-01 7.982070e-01 1.026265e+00 1.253650e+00 1.438339e+00 1.822309e+00 2.163267e+00 2.191391e+00 2.136294e+00 2.081806e+00 2.043620e+00
 </code></pre>
 </section>
 <section>
@@ -719,30 +720,14 @@ purrr package</a> is a powerful tool to handle nested data.frames.
 <figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
 </a>
 </figure>
-
 </section>
 <section>
-<h2 id="-challenge-1-transform-and-plot-economics">🔰 Challenge 1: transform and plot <code>economics</code></h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">economics</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>          date     pce      pop psavert uempmed unemploy
-  1 1967-07-01   506.7 198712.0    12.6     4.5     2944
-  2 1967-08-01   509.8 198911.0    12.6     4.7     2945
- --                                                     
-573 2015-03-01 12158.3 320230.8     7.4    12.0     8504
-574 2015-04-01 12193.8 320402.3     7.6    11.5     8526
-</code></pre><p><img src="./figure/economics-longer-1.png" alt="plot of chunk economics-longer"></p>
-
-</section>
-<section>
-<h2 id="-challenge-2-transform-and-plot-world_bank_pop">🔰 Challenge 2: transform and plot <code>world_bank_pop</code></h2>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005         2006         2007         2008         2009         2010         2011         2012         2013         2014         2015         2016         2017
-   1     ABW SP.URB.TOTL 4.162500e+04 4.202500e+04 4.219400e+04 4.227700e+04 4.231700e+04 4.239900e+04 4.255500e+04 4.272900e+04 4.290600e+04 4.307900e+04 4.320600e+04 4.349300e+04 4.386400e+04 4.422800e+04 4.458800e+04 4.494300e+04 4.529700e+04 4.564800e+04
-   2     ABW SP.URB.GROW 1.664222e+00 9.563731e-01 4.013352e-01 1.965172e-01 9.456936e-02 1.935880e-01 3.672580e-01 4.080490e-01 4.133830e-01 4.023963e-01 2.943735e-01 6.620631e-01 8.493932e-01 8.264135e-01 8.106692e-01 7.930256e-01 7.845785e-01 7.718989e-01
-  --                                                                                                                                                                                                                                                              
-1063     ZWE SP.POP.TOTL 1.183468e+07 1.191098e+07 1.198464e+07 1.207583e+07 1.216088e+07 1.222475e+07 1.233049e+07 1.245057e+07 1.255035e+07 1.267981e+07 1.283977e+07 1.302578e+07 1.326533e+07 1.355542e+07 1.385575e+07 1.415494e+07 1.445270e+07 1.475110e+07
-1064     ZWE SP.POP.GROW 1.003969e+00 6.426630e-01 6.165668e-01 7.579605e-01 7.018556e-01 5.238506e-01 8.612226e-01 9.691188e-01 7.982070e-01 1.026265e+00 1.253650e+00 1.438339e+00 1.822309e+00 2.163267e+00 2.191391e+00 2.136294e+00 2.081806e+00 2.043620e+00
-</code></pre><p><img src="./figure/world-bank-pop-pivot-1.png" alt="plot of chunk world-bank-pop-pivot"></p>
+<figure style="margin: 0;">
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/cheatsheet/tidyr.png" width="100%">
+<figcaption class="url">https://tidyr.tidyverse.org/</figcaption>
+</a>
+</figure>
 
 </section>
 <section>
@@ -769,7 +754,7 @@ purrr package</a> is a powerful tool to handle nested data.frames.
 </code></pre>
 </section>
 <section>
-<h2 id="-challenge-3-transform-and-plot-vadeaths">🔰 Challenge 3: transform and plot <code>VADeaths</code></h2>
+<h2 id="-challenge-1-transform-and-plot-vadeaths">🔰 Challenge 1: transform and plot <code>VADeaths</code></h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">VADeaths</span> <span class="o">|&gt;</span> <span class="nf">as.data.frame</span><span class="p">()</span> <span class="o">|&gt;</span>       <span class="c1"># was not data.frame</span>
 </span></span><span class="line"><span class="cl">  <span class="n">tibble</span><span class="o">::</span><span class="nf">rownames_to_column</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">)</span>  <span class="c1"># rownames are irregular</span>
 </span></span></code></pre></div><pre tabindex="0"><code>    age Rural Male Rural Female Urban Male Urban Female
@@ -790,6 +775,30 @@ purrr package</a> is a powerful tool to handle nested data.frames.
 <p><img src="./figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot"></p>
   </div>
 </div>
+</section>
+<section>
+<h2 id="-challenge-2-transform-and-plot-economics">🔰 Challenge 2: transform and plot <code>economics</code></h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">economics</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>          date     pce      pop psavert uempmed unemploy
+  1 1967-07-01   506.7 198712.0    12.6     4.5     2944
+  2 1967-08-01   509.8 198911.0    12.6     4.7     2945
+ --                                                     
+573 2015-03-01 12158.3 320230.8     7.4    12.0     8504
+574 2015-04-01 12193.8 320402.3     7.6    11.5     8526
+</code></pre><p><img src="./figure/economics-longer-1.png" alt="plot of chunk economics-longer"></p>
+
+</section>
+<section>
+<h2 id="-challenge-3-transform-and-plot-world_bank_pop">🔰 Challenge 3: transform and plot <code>world_bank_pop</code></h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">world_bank_pop</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>     country   indicator         2000         2001         2002         2003         2004         2005         2006         2007         2008         2009         2010         2011         2012         2013         2014         2015         2016         2017
+   1     ABW SP.URB.TOTL 4.162500e+04 4.202500e+04 4.219400e+04 4.227700e+04 4.231700e+04 4.239900e+04 4.255500e+04 4.272900e+04 4.290600e+04 4.307900e+04 4.320600e+04 4.349300e+04 4.386400e+04 4.422800e+04 4.458800e+04 4.494300e+04 4.529700e+04 4.564800e+04
+   2     ABW SP.URB.GROW 1.664222e+00 9.563731e-01 4.013352e-01 1.965172e-01 9.456936e-02 1.935880e-01 3.672580e-01 4.080490e-01 4.133830e-01 4.023963e-01 2.943735e-01 6.620631e-01 8.493932e-01 8.264135e-01 8.106692e-01 7.930256e-01 7.845785e-01 7.718989e-01
+  --                                                                                                                                                                                                                                                              
+1063     ZWE SP.POP.TOTL 1.183468e+07 1.191098e+07 1.198464e+07 1.207583e+07 1.216088e+07 1.222475e+07 1.233049e+07 1.245057e+07 1.255035e+07 1.267981e+07 1.283977e+07 1.302578e+07 1.326533e+07 1.355542e+07 1.385575e+07 1.415494e+07 1.445270e+07 1.475110e+07
+1064     ZWE SP.POP.GROW 1.003969e+00 6.426630e-01 6.165668e-01 7.579605e-01 7.018556e-01 5.238506e-01 8.612226e-01 9.691188e-01 7.982070e-01 1.026265e+00 1.253650e+00 1.438339e+00 1.822309e+00 2.163267e+00 2.191391e+00 2.136294e+00 2.081806e+00 2.043620e+00
+</code></pre><p><img src="./figure/world-bank-pop-pivot-1.png" alt="plot of chunk world-bank-pop-pivot"></p>
+
 </section>
 <section>
 <h2 id="-challenge-4-transform-and-plot-anscombe">🔰 Challenge 4: transform and plot <code>anscombe</code></h2>
