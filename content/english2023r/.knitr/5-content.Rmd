@@ -46,7 +46,7 @@ data(fruit, package = "stringr")
 </figure>
 
 ---
-## 前処理は大きく2つに分けられる
+## Learning data preparation in two categories
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
@@ -57,24 +57,24 @@ data(fruit, package = "stringr")
 </a>
 </div>
 
-- データ構造を対象とする処理 --- 第3, 4回
-    - 使いたい部分だけ抽出 --- `select()`, `filter()`
-    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
-    - 何かの順に並べ替え --- `arrange()`
-    - 異なるテーブルの結合 --- `*_join()`
-    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
-- **データ内容を対象とする処理** 👈 第5回 本日の話題
-    - 数値の変換: 対数、正規化
-    - 外れ値・欠損値への対処
-    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
-    - 文字列処理: 正規表現によるパターンマッチ
+- Processing data structure day 3 and 4
+    - Extract subsets --- `select()`, `filter()`
+    - Summarize by group --- `group_by()`, `summarize()`
+    - Sort rows --- `arrange()`
+    - Combine tables --- `*_join()`
+    - Pivot longer ↔ wider --- `pivot_longer()`, `pivot_wider()`
+- **Processing data content** 👈 day 5
+    - Type conversion: continuous vs discrete, factors, time
+    - Mathematical conversion: logarithm, normalization
+    - Handling outliers and missing values
+    - Character manipulation: pattern matching
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
 </a></cite>
 
 ---
-## tidyverse: データ科学のためのパッケージ群
+## tidyverse: a collection of R packages for data science
 
 <a href="https://www.tidyverse.org/">
 <img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
@@ -82,8 +82,8 @@ data(fruit, package = "stringr")
 
 ```r
 install.packages("tidyverse")
-library(conflicted) # 安全のおまじない
-library(tidyverse)  # 一挙に読み込み
+library(conflicted) # charm for safe coding
+library(tidyverse)  # load core packages at once
 ```
 ```{r, tidyverse-message}
 #| echo: false
@@ -92,7 +92,7 @@ withr::with_namespace("tidyverse", {
 })
 ```
 
-一貫したデザインでデータ解析の様々な工程をカバー
+Consistently designed to cover all the processes in data analysis.
 
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
@@ -102,45 +102,45 @@ withr::with_namespace("tidyverse", {
 </figure>
 
 ---
-## 変数/オブジェクトの型 (復習)
+## Data types (revisit)
 
-- **`vector`: 基本型。一次元の配列。** (👈今回の主役)
-    - `logical`: 論理値 (`TRUE` or `FALSE`)
-    - `numeric`: 数値 (整数 `42L` or 実数 `3.1416`)
-    - `character`: 文字列 (`"a string"`)
-    - `factor`: 因子 (文字列っぽいけど微妙に違う)
-- `array`: 多次元配列。`vector`同様、全要素が同じ型。
-    - `matrix`: 行列 = 二次元の配列。
-- `list`: 異なる型でも詰め込める太っ腹ベクトル。
-- **`data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
-  `tibble` とか `tbl_df` と呼ばれる亜種もあるけどほぼ同じ。
+- **atomic vector: one-dimensional array. very basic.**
+    - `logical`: (`TRUE` or `FALSE`)
+    - `numeric`: (integer `42L` or real number `3.1416`)
+    - `character`: (`"a string"`)
+    - `factor`: (hybrid of character and integer)
+- `array`: multi-dimensional array.
+    - `matrix`: two-dimensional array.
+- `list`: subspecies of vector that can be heterogenous.
+- **`data.frame`: Rectangular table of the vectors. important** <br>
+  There are alternatives called **`tibble`** and **`tbl_df`**.
 
 
 ---
-## vector: 一次元の配列 (復習)
+## vector: one-dimensional array
 
-1個の値でもベクトル扱い。<br>
-ベクトルの各要素に一気に計算を適用できる。
+R is good at **element-wise operation** on vectors.<br>
+There is no scalar type; it is treated as a vector of length 1.
 
-```{r, vector}
-x = c(1, 2, 9)  # 長さ3の数値ベクトル
-x + x           # 同じ長さ同士の計算
-y = 10          # 長さ1の数値ベクトル
-x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
-sqrt(x)         # square root
+```{r, vector-revisit}
+x = c(1, 2, 9)  # length of 3
+x + x           # the same length
+y = 10          # length of 1
+x + y           # the shorter vector is recycled
+x < 5           # is it smaller than 5?
 ```
 
 ---
-## 数値: numeric型
+## numeric vector
 
-普通は倍精度浮動小数点型 `double` として扱われる:
+Type of a real number is `double` (double-precision floating-point number):
 
 ```{r, numeric}
 answer = 42
 typeof(answer)
 ```
 
-明示的に変換したり末尾にLを付けることで整数扱いもできる:
+Integers can be created by explicit conversion or with suffix `L`:
 
 ```{r, integer}
 typeof(as.integer(answer))
@@ -148,10 +148,12 @@ whoami = 24601L
 typeof(whoami)
 ```
 
----
-## 様々な数学関数
+Usually you don't have to care about this, though.
 
-ベクトルを受け取り、それぞれの要素に適用
+---
+## Element-wise mathematical functions
+
+receive a vector, and calculate something for each element:
 
 ```{r, math}
 x = c(1, 2, 3)
@@ -166,31 +168,31 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 </a></div>
 
 ---
-## data.frameは列vectorの集まり
+## data.frame is a set of column vectors
 
-内容を変更する方法はいくつかある。<br>
-`diamonds` の `price` 列をドルから円に変換する例:
+There are several ways to modify column contents:
 
 ```{r, dfcolumn}
-dia = diamonds    # 別名コピー
+dia = diamonds    # copy to keep the original intact
 
-# dollar演算子 $ で指定
-dia$price = 105.59 * dia$price
+# dollar operator $
+dia$price = 147 * dia$price
 
-# 名前を [[文字列]] で指定
-dia[["price"]] = 105.59 * dia[["price"]]
+# [["column name"]]
+dia[["price"]] = 147 * dia[["price"]]
 
-# dplyr::mutate with pipe
+# dplyr::mutate
 dia = diamonds |>
-  dplyr::mutate(price = 105.59 * price)
+  dplyr::mutate(price = 147 * price)
 ```
 
-1発ならどれでもいい。流れ作業には `mutate()` が便利。
+The results are the same,<br>
+but `mutate()` is easy to incorporate into pipelines.
 
 ---
-## 正規化 (min-max normalization)
+## Normalization (min-max)
 
-最小=0、最大=1、になるように:
+so that minimum = 0 and maximum = 1:
 
 ```{r, normalize-min-max}
 normalized_minmax = diamonds |>
@@ -202,9 +204,9 @@ normalized_minmax = diamonds |>
 
 
 ---
-## 正規化 (z-score normalization)
+## Normalization (z-score)
 
-平均=0、標準偏差=1、になるように:
+so that average = 0 and standard deviation = 1:
 
 ```{r, normalize-z-score}
 normalized_z = diamonds |>
@@ -217,9 +219,7 @@ normalized_z = diamonds |>
 
 
 ---
-## 正規化の結果を確認
-
-分布の形は変わらず、範囲が変わる。
+## Distribution shapes remain the same
 
 z-scoreは正規分布前提。これだけ非対称だと使いにくい。
 
@@ -234,14 +234,14 @@ dplyr::bind_rows(diamonds |> dplyr::mutate(normalize = "-"),
   aes(price) +
   geom_density(fill = "#999999", color = NA) +
   facet_wrap(vars(normalize), ncol = 1L, scale = "free", label = label_both) +
-  theme_bw(base_size = 16)
+  theme_bw(base_size = 18)
 ```
 
 
 ---
-## 外れ値の除去
+## Remove outliers
 
-平均値から標準偏差の3倍以上離れているもの($\lvert z \rvert \ge 3$)を取り除く例:
+An example to remove the observations out of average ± 3SD ($\lvert z \rvert \ge 3$):
 
 ```{r, outlier}
 result = diamonds |>
@@ -249,20 +249,21 @@ result = diamonds |>
   print()
 ```
 
+This is not the only way or recommended way.
 唯一の方法ではないし、そもそもやるべきかどうかも要検討
 
 
 ---
-## 欠損値の除去 `tidyr::drop_na()`
+## `tidyr::drop_na()`
 
-(指定した列に) `NA` が含まれてる行を削除する。
+drops rows containing missing values `NA` (in given columns).
 
 ```{r, drop-na}
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> tidyr::drop_na()
 ```
 
-🔰 `starwars` で**身長体重データのある行だけ抽出**してみよう
+🔰 Exclude characters with **missing height or mass** in `starwars`.
 
 ```{r, starwars-drop}
 #| echo: false
@@ -270,16 +271,16 @@ starwars
 ```
 
 ---
-## 欠損値の補完 `tidyr::replace_na()`
+## `tidyr::replace_na()`
 
-欠損値 `NA` を任意の値で置き換える。
+replaces missing values `NA` with an arbitrary value.
 
 ```{r, replace-na}
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> tidyr::replace_na(list(x = 9999, y = "unknown"))
 ```
 
-🔰 `starwars` で**髪や目の色が不明の部分を"UNKNOWN"に置換**しよう
+🔰 Replace missing hair/eye colors with "UNKNOWN" in `starwars`.
 
 ```{r, starwars-replacena}
 #| echo: false
@@ -287,16 +288,16 @@ starwars
 ```
 
 ---
-## 欠損値とみなす `dplyr::na_if()`
+## `dplyr::na_if()`
 
-特定の値を `NA` に置き換える:
+converts a value to `NA` if matched:
 
 ```{r, na-if}
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> dplyr::mutate(x = dplyr::na_if(x, 1), y = dplyr::na_if(y, "a"))
 ```
 
-🔰 `starwars` の**性別"none"を欠損値に**しよう
+🔰 Convert "none" in `sex` to `NA` in `starwars`.
 
 ```{r, starwars-na-if}
 #| echo: false
