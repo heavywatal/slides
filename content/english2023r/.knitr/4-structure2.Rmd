@@ -8,7 +8,7 @@
 #| cache: false
 data(band_members, band_instruments, band_instruments2, package = "dplyr")
 data(relig_income, population, world_bank_pop, us_rent_income, fish_encounters,
-     table2, table3, table4a, table5, package = "tidyr")
+     table2, table3, table4a, table5, cms_patient_care, package = "tidyr")
 library(conflicted)
 library(dplyr)
 ```
@@ -126,9 +126,9 @@ band_members          band_instruments
 3  Paul Beatles       3 Keith guitar
 ```
 
-`right_join()` is the opposite.
-
 🔰 View the tables before and after joining.
+
+🔰 Try `right_join()` as well.
 
 ---
 ## `inner_join()` tables by common columns
@@ -181,7 +181,7 @@ See [`?join_by`](https://dplyr.tidyverse.org/reference/join_by.html) for more de
 
 
 ---
-## 🔰 Practice of joining: `nycflights13` dataset
+## Practice of joining: `nycflights13` dataset
 
 ```r
 # install.packages("nycflights13")
@@ -192,12 +192,24 @@ data(package = "nycflights13")
 
 <figure style="margin-block: 1em;">
 <a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
-<img src="/slides/image/r4ds/relational-nycflights.png" height="500">
+<img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>
 <figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
 </a>
 </figure>
 
+🔰 The most frequent destination of airplanes with >100 seats from JFK?
+
+```{r, nycflights13}
+#| echo: false
+library(nycflights13)
+flights |>
+  dplyr::filter(origin == "JFK") |>
+  dplyr::inner_join(planes, by = "tailnum") |>
+  dplyr::filter(seats > 100) |>
+  dplyr::count(origin, dest, sort = TRUE) |>
+  dplyr::left_join(airports, by = join_by(dest == faa))
+```
 
 ---
 ## tidyr --- transformer of data.frame
@@ -274,9 +286,9 @@ relig_long = relig_income |>
   print()
 ```
 
-🔰 The result looks like ↑
+🔰 Transform it like ↑
 
-🔰 Then ggplot like →
+🔰 Then ggplot it like →
 
 </div>
 <div class="column">
@@ -317,7 +329,7 @@ Columns to move can be selected like `-1` or `2:11` as well as `!religion`.
 ## [`pivot_wider()`](https://tidyr.tidyverse.org/reference/pivot_wider.html) widens data
 
 - `type` column is not a variable. → column names
-- `count` column stores values of two different variables → two columns
+- `count` column stores values of two different variables. → two columns
 
 <figure>
 <a href="https://r4ds.hadley.nz/data-tidy.html#widening-data">
@@ -337,31 +349,26 @@ pivot_wider(table2, names_from = type, values_from = count)
 ## Try `cms_patient_care |> pivot_wider()`
 
 - `type` column is not a variable. → column names
-- `score` column stores values of two different variables → two columns
+- `score` column stores values of two different variables. → two columns
 
 ```{r, cms-patient-care}
 print(cms_patient_care)
 ```
 
----
-## Try `cms_patient_care |> pivot_wider()`
-
-- `type` column is not a variable. → column names
-- `score` column stores values of two different variables → two columns
+🔰 Pivot wider ↓
 
 ```{r, cms-patient-care-wider}
 #| echo: false
-cms_patient_care |> pivot_wider(names_from=type, values_from=score)
+cms_patient_care |> tidyr::pivot_wider(names_from=type, values_from=score)
 ```
 
-🔰 The result looks like ↑
 
 
 ---
 ## Sometimes we want to widen already-tidy data
 
-- `station` column becomes new column names.
-- The values in `seen` get spread across multiple columns.
+- Turn `station` column into new column names.
+- Spread the values in `seen` across multiple columns.
 
 <div class="column-container">
 <div class="column">
@@ -374,7 +381,7 @@ print(fish_encounters)
 <div class="column">
 
 ```r
-print(fish_wide)
+|> tidyr::pivot_wider(???)
 ```
 ```{r, fish-wide}
 #| echo: false
@@ -385,20 +392,9 @@ fish_encounters |>
 </div>
 </div>
 
-🔰 Try pivoting above.
+🔰 Pivot wider →
 
----
-## Try `fish_encounters |> pivot_wider()`
-
-- `station` column becomes new column names.
-- The values in `seen` get spread across multiple columns.
-
-```{r, pivot-wider}
-fish_encounters |>
-  tidyr::pivot_wider(names_from = station, values_from = seen)
-```
-
-Optional `values_fill = 0` fills missing value `NA` with `0`.
+🔰 Try an option `values_fill = 0` and see the difference.
 
 ---
 ## Practice 1
@@ -407,8 +403,8 @@ Optional `values_fill = 0` fills missing value `NA` with `0`.
 print(population)
 ```
 
-🔰 `pivot_wider()` ↓
-```{r, wider-goal1}
+🔰 Pivot wider ↓
+```{r, population-wider-year}
 #| echo: false
 population |> tidyr::pivot_wider(names_from = "year", values_from = "population")
 ```
@@ -420,8 +416,8 @@ population |> tidyr::pivot_wider(names_from = "year", values_from = "population"
 print(population)
 ```
 
-🔰 `pivot_wider()` ↓
-```{r, wider-goal2}
+🔰 Pivot wider ↓
+```{r, population-wider-country}
 #| echo: false
 population |> tidyr::pivot_wider(names_from = "country", values_from = "population")
 ```
@@ -434,8 +430,8 @@ population |> tidyr::pivot_wider(names_from = "country", values_from = "populati
 print(us_rent_income)
 ```
 
-🔰 `pivot_wider()` ↓
-```{r, wider-goal3}
+🔰 Pivot wider ↓
+```{r, us-rent-income-wider}
 #| echo: false
 us_rent_income |>
   dplyr::select(!moe) |>
@@ -484,7 +480,7 @@ Note that the output column is always **character type**.
 🔰 View data before and after `unite()`.
 
 ---
-## `separate()` / `unite()` Practice 1
+## Practice `separate()` / `unite()` 1
 
 🔰 Separate `table3`'s `rate`, and unite them again.
 
@@ -492,16 +488,22 @@ Note that the output column is always **character type**.
 
 ```{r, table3-practice}
 print(table3)
+print(table5)
 ```
 
 ---
-## `separate()` / `unite()` Practice 2
+## Practice `separate()` / `unite()` 2
 
 🔰 Separate `world_bank_pop`'s `indicator` into 3 columns.<br>
    (Omit `sep = "."`. You will know the reason tomorrow)
 
-```{r, world-bank-pop-practice}
+```{r, world-bank-pop}
 print(world_bank_pop)
+```
+
+```{r, world-bank-pop-separate}
+#| echo: false
+world_bank_pop |> tidyr::separate(indicator, c("sp", "region", "stat"))
 ```
 
 ---
@@ -571,50 +573,15 @@ It is the shortest path to getting data transformation done.
 </a>
 </figure>
 
-
-
 ---
-## 🔰 Challenge 1: transform and plot `economics`
 
-```r
-print(economics)
-```
+<figure style="margin: 0;">
+<a href="https://tidyr.tidyverse.org/">
+<img src="/slides/image/cheatsheet/tidyr.png" width="100%">
+<figcaption class="url">https://tidyr.tidyverse.org/</figcaption>
+</a>
+</figure>
 
-```{r, economics-longer}
-#| echo: false
-#| fig.height: 4.5
-#| fig.width: 8
-wtl::printdf(economics, n = 4L)
-economics |>
-  tidyr::pivot_longer(!date) |>
-  ggplot() +
-  aes(date, value) +
-  geom_line() +
-  facet_grid(rows = vars(name), scales = "free_y")
-```
-
----
-## 🔰 Challenge 2: transform and plot `world_bank_pop`
-
-```r
-print(world_bank_pop)
-```
-```{r, world-bank-pop-pivot}
-#| fig.height: 4
-#| fig.width: 11.5
-#| echo: false
-wtl::printdf(world_bank_pop, n = 4L)
-wbp_tidy = world_bank_pop |>
-  tidyr::pivot_longer(!c(country, indicator), names_to = "year") |>
-  dplyr::mutate(year = as.numeric(year)) |>
-  dplyr::filter(country %in% c("DEU", "FIN", "JPN")) |>
-  tidyr::separate(indicator, c(NA, "region", "name"))
-
-ggplot(wbp_tidy) +
-  aes(year, value) +
-  geom_line(aes(color = country, group = country)) +
-  facet_grid(vars(name), vars(region), scale = "free_y")
-```
 
 ---
 ## Do you remember this dataset?
@@ -647,7 +614,7 @@ va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
 ```
 
 ---
-## 🔰 Challenge 3: transform and plot `VADeaths`
+## 🔰 Challenge 1: transform and plot `VADeaths`
 
 ```{r, vadeaths-rownames}
 VADeaths |> as.data.frame() |>       # was not data.frame
@@ -678,6 +645,50 @@ ggplot(va_deaths) +
 
   </div>
 </div>
+
+---
+## 🔰 Challenge 2: transform and plot `economics`
+
+```r
+print(economics)
+```
+
+```{r, economics-longer}
+#| echo: false
+#| fig.height: 4.5
+#| fig.width: 8
+wtl::printdf(economics, n = 4L)
+economics |>
+  tidyr::pivot_longer(!date) |>
+  ggplot() +
+  aes(date, value) +
+  geom_line() +
+  facet_grid(rows = vars(name), scales = "free_y")
+```
+
+---
+## 🔰 Challenge 3: transform and plot `world_bank_pop`
+
+```r
+print(world_bank_pop)
+```
+```{r, world-bank-pop-pivot}
+#| fig.height: 4
+#| fig.width: 11.5
+#| echo: false
+wtl::printdf(world_bank_pop, n = 4L)
+wbp_tidy = world_bank_pop |>
+  tidyr::pivot_longer(!c(country, indicator), names_to = "year") |>
+  dplyr::mutate(year = as.numeric(year)) |>
+  dplyr::filter(country %in% c("DEU", "FIN", "JPN")) |>
+  tidyr::separate(indicator, c(NA, "region", "stat"))
+
+ggplot(wbp_tidy) +
+  aes(year, value) +
+  geom_line(aes(color = country, group = country)) +
+  facet_grid(vars(stat), vars(region), scale = "free_y")
+```
+
 
 ---
 ## 🔰 Challenge 4: transform and plot `anscombe`
