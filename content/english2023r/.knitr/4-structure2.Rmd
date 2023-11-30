@@ -202,13 +202,14 @@ data(package = "nycflights13")
 
 ```{r, nycflights13}
 #| echo: false
-library(nycflights13)
-flights |>
-  dplyr::filter(origin == "JFK") |>
-  dplyr::inner_join(planes, by = "tailnum") |>
-  dplyr::filter(seats > 100) |>
-  dplyr::count(origin, dest, sort = TRUE) |>
-  dplyr::left_join(airports, by = join_by(dest == faa))
+withr::with_package("nycflights13", {
+  flights |>
+    dplyr::filter(origin == "JFK") |>
+    dplyr::inner_join(planes, by = "tailnum") |>
+    dplyr::filter(seats > 100) |>
+    dplyr::count(origin, dest, sort = TRUE) |>
+    dplyr::left_join(airports, by = join_by(dest == faa))
+})
 ```
 
 ---

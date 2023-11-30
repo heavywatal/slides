@@ -12,31 +12,34 @@ data(fruit, package = "stringr")
 ```
 
 ---
-## 前回までのまとめ
+## Purposes of this hands-on lectures
 
-### ✅ Rの基礎
+### ✅ <del>Every biological research involves data and models</del>
 
-- 調べ方さえわかれば、全部覚えなくても大丈夫
-- エラーは日常茶飯事。落ち着いて読み取ろう
-- まず**Rスクリプト**に書いてから、**コンソール**で実行
-- 便利な**パッケージ**を使おう
+### ✅ <del>You want to do reproducible analysis</del>
 
-### ✅ データ解析全体の流れ。可視化だいじ
+### ⬜ Learn how to do it and how to learn more
 
-### ✅ 一貫性のある文法で合理的に描けるggplot2
+- Overview what R can do.
+- Know where to consult when you have a problem.
 
-### ✅ 使える整然データにするための前処理がたいへん
+### ⬜ Glance at the basics of data analysis
+
+<hr>
+
+You don't have to remember every command.<br>
+Just repeat forgetting and searching.
 
 ---
-## データ解析のおおまかな流れ
+## Outline of data analysis
 
-1. コンピュータ環境の整備 ✅
-1. データの取得、読み込み
-1. 探索的データ解析
-    - **前処理、加工** (地味。意外と重い) 👈 今回の主題
-    - 可視化、仮説生成 (派手！だいじ！) ✅ 完全に理解した
-    - 統計解析、仮説検証 (みんな勉強したがる)
-1. 報告、発表 ✅ Quarto楽しい
+1. Setup computer environment ✅
+1. Get and read input data ⬜ day 6
+1. Exploratory data analysis
+    - **Preparation** (harder than it seems) ⬜ day 3--5 👈
+    - **Visualization**, generating hypotheses (fun!) ✅ day 2
+    - **Statistical analysis**, testing hypotheses ⬜ day 7--8
+1. Report ✅ day 2
 
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
@@ -200,8 +203,6 @@ normalized_minmax = diamonds |>
   print()
 ```
 
-外れ値の影響を大きく受けることに注意。
-
 
 ---
 ## Normalization (z-score)
@@ -214,14 +215,13 @@ normalized_z = diamonds |>
   print()
 ```
 
-`price = as.vector(scale(price))` でも可能。<br>
-`scale()` はmatrixを返すため `as.vector()` が必要。
+`price = as.vector(scale(price))` is equivalent.
 
 
 ---
-## Distribution shapes remain the same
+## The shapes of distributions remain the same
 
-z-scoreは正規分布前提。これだけ非対称だと使いにくい。
+Only the value ranges are changed.
 
 ```{r, normalize-plot}
 #| echo: false
@@ -237,9 +237,12 @@ dplyr::bind_rows(diamonds |> dplyr::mutate(normalize = "-"),
   theme_bw(base_size = 18)
 ```
 
+They are sensitive to outliers and asymmetric/skewed distributions.<br>
+Consider log transformation, outlier removal, and so on before normalization.
+
 
 ---
-## Remove outliers
+## Removing outliers
 
 An example to remove the observations out of average ± 3SD ($\lvert z \rvert \ge 3$):
 
@@ -249,8 +252,7 @@ result = diamonds |>
   print()
 ```
 
-This is not the only way or recommended way.
-唯一の方法ではないし、そもそもやるべきかどうかも要検討
+**Note**: Whether and how to remove outliers highly depend on the context.
 
 
 ---
@@ -267,7 +269,7 @@ df |> tidyr::drop_na()
 
 ```{r, starwars-drop}
 #| echo: false
-starwars
+starwars |> tidyr::drop_na(height, mass)
 ```
 
 ---
@@ -280,11 +282,13 @@ df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> tidyr::replace_na(list(x = 9999, y = "unknown"))
 ```
 
-🔰 Replace missing hair/eye colors with "UNKNOWN" in `starwars`.
+🔰 Replace missing hair color with "UNKNOWN" in `starwars`.
 
 ```{r, starwars-replacena}
 #| echo: false
-starwars
+starwars |>
+  dplyr::filter(is.na(hair_color)) |>
+  tidyr::replace_na(list(hair_color = "UNKNOWN"))
 ```
 
 ---
@@ -301,31 +305,33 @@ df |> dplyr::mutate(x = dplyr::na_if(x, 1), y = dplyr::na_if(y, "a"))
 
 ```{r, starwars-na-if}
 #| echo: false
-starwars
+starwars |>
+  dplyr::filter(sex == "none") |>
+  dplyr::mutate(sex = dplyr::na_if(sex, "none"))
 ```
 
 ---
-## 欠損値の補完 `dplyr::coalesce()`
+## `dplyr::coalesce()` complements missing values
 
-先に指定したvectorの値が `NA` なら次のvectorの値を採用:
+`NA` in the first vector is complemented with the value in the next vector:
 
 ```{r, coalesce}
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> dplyr::mutate(y_or_z = dplyr::coalesce(y, z))
 ```
 
-異なる型を混ぜると怒られる:
+Different types of variables cannot be used:
 ```{r, coalesce-type}
 #| error: true
 df |> dplyr::mutate(x_or_y = dplyr::coalesce(x, y))
 ```
 
-🔰 `starwars` で**髪色の欠損値を肌色で補おう**
+🔰 Complement missing values in `hair_color` with `skin_color` in `starwars`.
 
 ---
-## 条件に応じて値を選択 `dplyr::if_else()`
+## `dplyr::if_else()` is a vectorized switch
 
-`TRUE` の位置では `x` を採用、`FALSE` の位置では `y` を採用:
+returns a vector filled with elements from `x` or `y` depending on `condition`:
 
 ```{r, ifelse}
 condition = c(TRUE, TRUE, FALSE)
@@ -334,26 +340,26 @@ y = c(100, 200, 300)
 dplyr::if_else(condition, x, y)
 ```
 
-🔰 `starwars` で**種族がドロイドの行だけ身長を100倍**してみよう
-
+🔰 Increase the height of droids 100-fold in `starwars`.
 
 ```{r, starwars-ifelse}
 #| echo: false
-starwars
+starwars |>
+  dplyr::mutate(height = height * dplyr::if_else(species == "Droid", 100, 1))
 ```
 
 ---
-## 文字列: character型 (string)
+## character type (string)
 
-ダブルクォートで囲む。シングルクォートも使える。
+Using double quotes `"` is recommended:
 
 ```{r, string}
 x = "This is a string"
 y = 'If I want to include a "quote" inside a string, I use single quotes'
 ```
 
-閉じそびれると変な状態になるので、落ち着いて <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>
-
+Closing quotes are easily forgotten.
+Calm down, and push <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>.
 ```
 > "This is a string without a closing quote
 +
@@ -366,187 +372,204 @@ https://r4ds.hadley.nz/strings.html
 </a></div>
 
 ---
-## R備え付けの文字列機能は使いにくい
+## Base R character functions are hard to use
 
--   何をやる関数なのか名前から分かりにくい<br>
+-   Inconsistent and cryptic function names:<br>
     `grep`, `grepl`, `regexpr`, `gregexpr`, `regexec`<br>
     `sub`, `gsub`, `substr`, `substring`
--   対象文字列はいくつめに渡す？関数ごとに違う。e.g.,<br>
-
-    ```
+-   Inconsistent argument positions:<br>
+    ```r
     grep(pattern, x, ...)
     sub(pattern, replacement, x, ...)
     substr(x, start, stop)
     ```
-
--   欠損値 `NA` に対する挙動が微妙
-
+-   Inconsistent treatment of missing values `NA`.
+    ```{r, paste-na}
+    x = c(1, 2, NA)
+    y = c("a", NA, "c")
+    paste(x, y)  # NA is not distinguished from character "NA"
+    ```
 
 ---
-## stringr --- 文字列処理パッケージ
+## stringr: part of tidyverse for character processing
 
 <a href="https://stringr.tidyverse.org/">
 <img src="/_img/hex-stickers/stringr.webp" width="180" align="right">
 </a>
 
--   tidyverseの一部
--   何をやる関数なのか名前から分かりやすい
--   対象文字列が一貫して第一引数
--   引数オブジェクトの各要素の名前や位置を保持する
-    -   長さゼロの入力からは長さゼロの出力
-    -   入力に `NA` が含まれる場合は対応する出力も `NA`
--   [ICU正規表現](https://unicode-org.github.io/icu/userguide/strings/regexp.html)の仕様が明確
--   [公式ドキュメント](https://stringr.tidyverse.org/)を見れば全容が掴める
+-   Consistent function and argument names.
+-   `|>`able: 1st argument is always a `string` vector to modify.
+-   Respect input attributes and structures.
+    -   Zero-length input produces zero-length output.
+    -   A missing value `NA` in input remains `NA` in output.
+-   Well-documented on [the official website](https://stringr.tidyverse.org/).
 
 
 ---
-## stringr --- 文字列処理パッケージ
-
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/cheatsheet/strings.png" width="90%">
+<img src="/slides/image/cheatsheet/strings.png" width="100%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
 </a>
 </figure>
 
 
 ---
-## 文字列の基本操作
+## Basic operations on character strings
 
 ```{r, str-length}
 fruit4 = head(fruit, 4L) |> print()
-stringr::str_length(fruit4)            # 長さ
-stringr::str_sub(fruit4, 2, 4)         # 部分抽出
-stringr::str_c(1:4, " ", fruit4, "!")  # 結合
+stringr::str_length(fruit4)
+stringr::str_sub(fruit4, 2, 4)         # substring
+stringr::str_c(1:4, " ", fruit4, "!")  # concatenate
 ```
 
-🔰 `fruit` や `words` の一部を抜き出して上記の関数を試してみよう
+🔰 Get a subset of `words` longer than 9 characters.
+
+🔰 Apply `str_sub()` and `str_c()` to those long words.
 
 
 ---
-## パターンマッチング
+## Pattern matching
 
-単純な一致だけじゃなく、いろんな条件でマッチングできる:
+is not just exact match.
 
 ```{r, pattern}
-# aで始まる
+# starts with "a"
 stringr::str_subset(fruit, "^a")
 
-# rで終わる
+# ends with "r"
 stringr::str_subset(fruit, "r$")
 
-# 英数字3-4文字
+# 3-4 alphanumeric characters
 stringr::str_subset(fruit, "^\\w{3,4}$")
 ```
 
-この `^` とか `$` って何者？
+What do `^`, `$`, and other symbols mean?
 
 ---
-## 正規表現: 柔軟な検索・置換を可能にするツール
+## Regular expressions (regex, regexp)
 
-| メタ文字 | 意味 | &emsp;&emsp; | 演算子 | 意味 |
-| ---- | ---- | --- | ---- | ---- |
-| `\d` | 数字 (逆は `\D`) | | `?`  | 0回か1回 |
-| `\s` | 空白 (逆は `\S`) | | `*`  | 0回以上繰り返し |
-| `\w` | 英数字 (逆は `\W`) | | `+`  | 1回以上繰り返し |
-| `.`  | **何でも1文字** | | `{n,m}` | n回以上m回以下 |
-| `^`  | 行頭   | | `XXX(?=YYY)`  | YYYに先立つXXX |
-| `$`  | 行末   | | `(?<=YYY)XXX`  | YYYに続くXXX |
+<div class="column-container">
+  <div class="column" style="min-width: 0;">
+
+| meta | matches |
+| ---- | ---- |
+| `\d` | digit `[0-9]` |
+| `\s` | space `[ \t\n\r]` |
+| `\w` | word character `[a-zA-Z0-9_]` |
+| `.`  | **any character** |
+| `^`  | beginning of line |
+| `$`  | end of line |
+
+  </div>
+  <div class="column" style="flex-shrink: 1.2; min-width: 0;">
+
+| operator | matches |
+| ---- | ---- |
+| `a?`  | 0 or 1 time |
+| `a*`  | 0 or more times |
+| `a+`  | 1 or more times |
+| `a{n,m}` | n--m times |
+| `a(?=c)` | `a` followed by `c` |
+| `(?<=b)a` | `a` preceded by `b` |
+
+  </div>
+</div>
 
 <div style="text-align: right;"><a class="url" href="https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters">
 https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters
 </a></div>
 
-Rの`"普通の文字列"`ではバックスラッシュを重ねる必要がある: `"^\\d"`.
-<aside style="font-size: 0.9rem; color: #888888;">
+[escape sequence](https://duckduckgo.com/?q=escape+sequence)
+: `"\n"` is a line break; `"\t"` is a tab; **`"\d"` is invalid**.
+: `"\\"` is a backslash; **write `"\\d"` to mean regex `"\d"`**.
 
-改行 `\n` とかタブ `\t` のような[エスケープシーケンス](https://duckduckgo.com/?q=escape+sequence)と区別するため。<br>
-`r"(raw文字列)"`を使う場合はひとつでいい: `r"(^\d)"`.
-
-</aside>
 
 ---
-## 正規表現: チートシート
-
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
+<img src="/slides/image/cheatsheet/strings-regex.png" width="100%">
 <figcaption class="url">https://stringr.tidyverse.org/</figcaption>
 </a>
 </figure>
 
 ---
-## 正規表現: 練習問題
+## Practice of regular expressions
 
-🔰 `str_subset()` と `fruit` でパターンマッチを身に着けよう:
+🔰 Learn pattern matching by applying `str_subset()` to `fruit`:
 
-- "o" を含むもの
-- "o" で始まるもの
-- "berry" で終わるもの
-- "c" で始まり "r" で終わるもの
-- 空白を含むもの、含まないもの
+- contains "o"
+- starts with "o"
+- ends with "berry"
+- starts with "c" and ends with "r"
+- contains a space; does not contain any space
 
-🔰 `starnames = starwars[["name"]]` として次のマッチにも挑戦:
+🔰 `starnames = starwars[["name"]]`:
 
-- 数字を含むもの、含まないもの
-- 3語以上のもの
-- 小文字アルファベットを含まないもの
+- contains a digit; does not contain any digit
+- consists of 3 or more words
+- does not contain any lowercase letter
 
 
 ---
-## 検出 `str_detect()`
+## `str_detect()`
 
-マッチするかどうか `TRUE`/`FALSE` を返す。
+Returns `TRUE`/`FALSE`.
 ```{r, str-detect}
 fruit4 = head(fruit, 4L)
 stringr::str_detect(fruit4, "^a")
 ```
 
-🔰 `starwars` から `name` 列に空白を含まない行を抽出しよう
+🔰 From `starwars`, extract rows whose `name` does not contain space.
 
 ```{r, starwars-detect}
 #| echo: false
-starwars
+starwars |>
+  dplyr::filter(stringr::str_detect(name, "^\\S+$"))
 ```
 
 ---
-## 抽出 `str_extract()`
+## `str_extract()`
 
-マッチした部分文字列を取り出す。しなかった要素には `NA`。
+Returns matched substring or `NA`.
 ```{r, str-extract}
 fruit4 = head(fruit, 4L)
 stringr::str_extract(fruit4, "^a..")
 ```
 
-🔰 `diamonds` の `clarity` 列を数字なしにしてみよう
+🔰 Remove numeric characters from `clarity` column of `diamonds`.
 
 ```{r, diamonds-extract}
 #| echo: false
-diamonds
+diamonds |>
+  dplyr::mutate(clarity = stringr::str_extract(clarity, "\\D+"))
 ```
 
 
 ---
-## 置換 `str_replace()`, `str_replace_all()`
+## `str_replace()`, `str_replace_all()`
 
-カッコ `()` で囲んだマッチングは後で参照できる:
+Those captured by parentheses`()` can be used by back-reference `\1`:
 ```{r, str-replace}
 fruit4 = head(fruit, 4L)
 stringr::str_replace(fruit4, "..$", "!!")
 stringr::str_replace(fruit4, "(..)$", "_\\1_")
 ```
 
-🔰 `starwars` の `name` 列の数字を全部ゼロにしてみよう
+🔰 Replace all the numbers in `starwars$name` with zero.
 
 ```{r, starwars-replace}
 #| echo: false
-wtl::printdf(starwars, n = 6L)
+starwars |>
+  dplyr::filter(stringr::str_detect(name, "\\d")) |>
+  dplyr::mutate(name = stringr::str_replace_all(name, "\\d", "0"))
 ```
 
 ---
-## dplyr, tidyr の列選択などでも活躍
+## Regex for column selection with dplyr, tidyr
 
-`matches()` だけで `starts_with()`/`ends_with()` の役もこなせる:
+`matches()` can play the roles of `starts_with()`/`ends_with()`:
 
 ```{r, tidyselect}
 #| results: "hide"
@@ -556,7 +579,7 @@ diamonds |> dplyr::select(matches("^c"))
                         # ends_with("s")
 starwars |> dplyr::select(matches("s$"))
 
-                        # 数字だけ
+                        # digits only
 world_bank_pop |>
   tidyr::pivot_longer(matches("^\\d+$"), names_to = "year")
 ```
@@ -565,29 +588,30 @@ See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) fo
 
 
 ---
-## 形式を変える・整える
+## Formatting strings
 
 ```{r, upperlower}
 fruit4 = head(fruit, 4L)
-stringr::str_to_upper(fruit4)              # 大文字に
-stringr::str_pad(fruit4, 8, "left", "_")   # 幅を埋めて指定幅に
+stringr::str_to_upper(fruit4)
+stringr::str_pad(fruit4, 8, "left", "_")   # Fix width by filling spaces
 ```
 
-[`stringi`](http://www.gagolewski.com/software/stringi/) パッケージはさらに多機能
+`stringr` is built on top of a more comprehensive package,
+[`stringi`](https://stringi.gagolewski.com/):
 ```{r, stringi}
 stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角数字に対処
 ```
 
-🔰 `starwars` の `name` 列を全部小文字にしてみよう
+🔰 Turn `starwars`'s `name` column to lowercase.
 
 ---
-## 文字列から別の型に
+## Converting strings to something else
 
 <a href="https://readr.tidyverse.org/">
 <img src="/_img/hex-stickers/readr.webp" width="180" align="right">
 </a>
 
-これはstringrではなくreadrの担当:
+It is not stringr's job, but readr's:
 
 ```{r, parse-character}
 readr::parse_number(c("p = 0.02 *", "N_A = 6e23"))
@@ -596,64 +620,63 @@ readr::parse_logical(c("1", "true", "0", "false"))
 readr::parse_date("2020-06-03")
 ```
 
-`6e+23` は $6 \times 10 ^ {23}$ のプログラミング的表現。
-$6e^{23}$ ではない。
+`6e+23` means $6 \times 10 ^ {23}$, not $6e^{23}$.
 
 ---
-## 因子型 `factor`
+## `factor`
 
-**カテゴリカル変数**(質的変数)を扱うための型。文字列っぽいけど**実体は整数**。
+A type to represent **categorical/qualitative variable**.
+Looks like character, but actually **integer**.
 
 ```{r, factor}
-month_levels = c(                       # 取りうる値
+month_levels = c(                       # possible values
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
 )
-x1 = c("Dec", "Apr", "Jan", "Mar")      # ただの文字列vector
-y1 = factor(x1, levels = month_levels)  # 因子型に変換
+x1 = c("Dec", "Apr", "Jan", "Mar")      # normal string vector
+y1 = factor(x1, levels = month_levels)  # convert it to factor
 print(y1)
-as.integer(y1)                          # 整数型に変換可能
+as.integer(y1)                          # factor to integer
 ```
 
-🔰 `iris` に含まれる因子型を確認しよう: `str(iris)`
+🔰 See `str(iris)` for a factor variable at hand.
 
 <div style="text-align: right;"><a class="url" href="https://r4ds.hadley.nz/factors.html">
 https://r4ds.hadley.nz/factors.html
 </a></div>
 
 ---
-## 因子型 `factor`: 文字列との違い1
+## `factor`: difference from string 1
 
-取りうる値 (levels) が既知。
-
-typoなどによりlevels外になると `NA` 扱い。
+Possible values (levels) are known and fixed.<br>
+That is, a typo becomes `NA`.
 
 ```{r, factor-levels}
 x2 = c("Dec", "Apr", "Jam", "Mar")
 factor(x2, levels = month_levels)
 ```
 
-元の文字列vectorに全てのlevelsが含まれてるなら簡単に変換可能:
+A string vector including all the levels can be converted easily:
 ```{r, as-factor}
 as.factor(starwars[["gender"]])
 ```
 
 ---
-## 因子型 `factor`: 文字列との違い2
+## `factor`: difference from string 2
 
-アルファベット順じゃない順序がある:
+can be sorted in an arbitrary (non-alphabetical) order:
 
 ```{r, factor-sort}
 x1 = c("Dec", "Apr", "Jan", "Mar")
-sort(x1)     # 文字列としてソートするとアルファベット順
+sort(x1)     # alphabetical order as always
 y1 = factor(x1, levels = month_levels)
-sort(y1)     # 因子としてソートするとlevels順
+sort(y1)     # in the order of the levels
 ```
 
 ---
-## 因子型 `factor`: 順序の情報は作図で生きる
+## `factor`: categorical variables in figures
 
-文字列だと勝手にアルファベット順。因子型なら任意指定可能:
+can be sorted in an arbitrary (non-alphabetical) order:
 
 ```{r, factor-mpg}
 mpg_fct = mpg |>
@@ -677,9 +700,9 @@ cowplot::plot_grid(p1 + ggtitle("mpg"), p1 %+% mpg_fct + ggtitle("mpg_fct"), nro
 ```
 
 ---
-## 順序つき因子型 `ordered`
+## `ordered` factor
 
-大小の比較ができる。
+can be compared with inequality operators.
 
 ```{r, ordered}
 x1 = c("Dec", "Apr", "Jan", "Mar")
@@ -689,20 +712,20 @@ print(y3)
 y3 < "Sep"
 ```
 
-🔰 `diamonds` に含まれるordered型を確認しよう: `str(diamonds)`<br>
-🔰 `cut` がPremium以上の行だけ抜き出す、とか。
+🔰 See `str(diamonds)` for ordered variables at hand.<br>
+🔰 Extract rows whose `cut` is better than "Premium".
 
 ---
-## tidyverse の因子型担当は forcats
+## forcats: part of tidyverse for factor type
 
 <a href="https://forcats.tidyverse.org/">
 <img src="/_img/hex-stickers/forcats.webp" width="180" align="right">
 </a>
 
-- `fct_relevel()`: 手動で順序設定
-- `fct_reorder()`: 別の変数に応じて順序を並べ替え
-- `fct_infreq()`: 頻度に応じて順序を並べ替え
-- `fct_lump()`: 少なすぎるカテゴリを"その他"としてまとめる
+- `fct_reorder()`: by another variable.
+- `fct_infreq()`: to reorder by the frequency of values.
+- `fct_relevel()`: to change the order by hand.
+- `fct_lump()`: collapses the least frequent values into "other".
 
 ```{r, fct-infreq-data}
 diamonds_fct = diamonds |>
@@ -727,9 +750,9 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
 
 ---
-## factorで順序を変えて作図する練習
+## Practice to reorder variables in figures
 
-🔰 `mpg` で次のような図を描いてみよう
+🔰 Reproduce the following figure of `mpg`:
 
 ```{r, plot-factor}
 #| echo: false
@@ -749,9 +772,9 @@ mpg |>
 ```
 
 ---
-## 指示変数(ダミー変数)に変換
+## Converting a categorical variable to index variables
 
-イチゼロの値を持たせて横広に変形するのと等価。
+equivalent to pivoting a binary variable wider.
 
 ```{r, dummy}
 iris |> tibble::rowid_to_column() |>
@@ -760,14 +783,14 @@ iris |> tibble::rowid_to_column() |>
                      values_from = value, values_fill = 0L)
 ```
 
-🔰 これを元の `iris` に戻してみよう
+🔰 Try transforming back to the original `iris`.
 
 
 ---
-## 日時型: POSIXct, POSIXlt
+## Date-time type: POSIXct, POSIXlt
 
-- POSIXct: エポックからの経過秒数。比較や差分などを取りやすい。
-- POSIXlt: list(秒, 分, 時, 日, 月, 年, ...)。単位ごとに抜き出しやすい。
+- POSIXct: elapsed time since the epoch in seconds. machine-friendly.
+- POSIXlt: named list(sec, min, hour, mday, mon, year, ...). human-readable.
 
 ```{r, datetime}
 now = "2023-04-12 14:10:00"
@@ -777,31 +800,30 @@ lt = as.POSIXlt(now)
 unclass(lt) |> as_tibble()
 ```
 
-素のRでも扱えるけど lubridate パッケージを使うともっと楽に。
+Who is in charge of date-time in tidyverse?
 
 ---
-## lubridate --- 日時型処理パッケージ
+## lubridate --- tidyverse package for date and time
 
 <a href="https://lubridate.tidyverse.org/">
 <img src="/_img/hex-stickers/lubridate.webp" width="180" align="right">
 </a>
 
-日時型への変換:
+convert character/numeric vectors to POSIXct date times:
 ```{r, lubridate-parse}
 lubridate::ymd(c("20230412", "2023-04-12", "23/04/12"))
 ```
 
-日時型から単位ごとに値を取得:
+extract values from POSIXct in arbitrary unit:
 ```{r, lubridate-get}
 today = lubridate::ymd(20230412)
 lubridate::month(today)
 lubridate::wday(today, label = TRUE)
 ```
 
-🔰 [公式ドキュメント](https://lubridate.tidyverse.org/)を見て、未登場の機能を紹介してください。
 
 ---
-## データ内容を対象とする処理 | まとめ
+## Processing data contents | roundup
 
 <div style="float: right;">
 <a href="https://stringr.tidyverse.org/">
@@ -815,19 +837,17 @@ lubridate::wday(today, label = TRUE)
 </a><br>
 </div>
 
-- 正規化・欠損値処理は目的に応じて検討
-- vectorには**型**がある: 文字列、数値、因子、日時、etc.
-- 文字列を扱うには [stringr](https://stringr.tidyverse.org/)
-    - **正規表現**は一度習得すれば超強力
-- 因子を扱うには [forcats](https://forcats.tidyverse.org/)
-    - 知っておくとたまに便利。苦手なら全部文字列にしてもいい。
-- 日時を扱うには [lubridate](https://lubridate.tidyverse.org/)
+- Types of atomic vectors: character, numeric, factor, datetime, etc.
+- [stringr](https://stringr.tidyverse.org/) for character type
+    - **Regular expressions** are super-powerful.
+- [forcats](https://forcats.tidyverse.org/) for factor type
+- [lubridate](https://lubridate.tidyverse.org/) for date and time
 
-各パッケージの[チートシート.pdf](https://www.rstudio.com/resources/cheatsheets/)を手元に持っておくと便利。
-
+Print out [PDF cheat sheets](https://www.rstudio.com/resources/cheatsheets/),
+and keep them within reach.
 
 ---
-## 前処理に必要な道具はだいたい揃った
+## Now you have skills for data preparation
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
@@ -835,23 +855,23 @@ lubridate::wday(today, label = TRUE)
 </a><br>
 <a href="https://tidyr.tidyverse.org/">
 <img src="/_img/hex-stickers/tidyr.webp" width="180">
-</a><br>
+</a>
 <a href="https://stringr.tidyverse.org/">
 <img src="/_img/hex-stickers/stringr.webp" width="180">
 </a>
 </div>
 
-- データ構造を対象とする処理 — 第3, 4回
-    - 使いたい部分だけ抽出 --- `select()`, `filter()`
-    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
-    - 何かの順に並べ替え --- `arrange()`
-    - 異なるテーブルの結合 --- `*_join()`
-    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
-- **データ内容を対象とする処理** — 👈 第5回 本日の話題
-    - 数値の変換: 対数、正規化
-    - 外れ値・欠損値への対処
-    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
-    - 文字列処理: 正規表現によるパターンマッチ
+- Processing data structure day 3 and 4
+    - Extract subsets --- `select()`, `filter()`
+    - Summarize by group --- `group_by()`, `summarize()`
+    - Sort rows --- `arrange()`
+    - Combine tables --- `*_join()`
+    - Pivot longer ↔ wider --- `pivot_longer()`, `pivot_wider()`
+- **Processing data content** 👈 day 5
+    - Type conversion: continuous vs discrete, factors, time
+    - Mathematical conversion: logarithm, normalization
+    - Handling outliers and missing values
+    - Character manipulation: pattern matching
 
 <cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
@@ -859,7 +879,7 @@ lubridate::wday(today, label = TRUE)
 
 
 ---
-## 🔰 3日目の課題1: 組み込みデータをいじくり倒してみよう
+## 🔰 Challenge: play with built-in datasets
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
@@ -875,9 +895,6 @@ lubridate::wday(today, label = TRUE)
 <img src="/_img/hex-stickers/lubridate.webp" width="180">
 </a><br>
 </div>
-
-- データを1人1つ選び、作図して読み取れることを一言。
-- 前処理でいろいろなパッケージ・関数を駆使するほど良い。
 
 ```r
 dplyr::storms
