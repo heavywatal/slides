@@ -9,15 +9,15 @@
 ```
 
 ---
-## データ解析のおおまかな流れ
+## Outline of data analysis
 
-1. コンピュータ環境の整備 ✅
-1. データの取得、読み込み 👈 今回はここから
-1. 探索的データ解析
-    - 前処理、加工 ✅ 完全に理解した
-    - 可視化、仮説生成 ✅ 完全に理解した
-    - 統計解析、仮説検証 ⬜ 今日の終盤と次回
-1. 報告、発表 ✅ Quarto楽しい
+1. Setup computer environment ✅
+1. Get and read input data ⬜ day 6 👈
+1. Exploratory data analysis
+    - **Preparation** (harder than it seems) ✅ day 3--5
+    - **Visualization**, generating hypotheses (fun!) ✅ day 2
+    - **Statistical analysis**, testing hypotheses ⬜ day 7--8
+1. Report ✅ day 2
 
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
@@ -28,23 +28,23 @@
 
 
 ---
-## data.frameの読み書き
+## Read/write data.frame
 
 <a href="https://readr.tidyverse.org/">
 <img src="/_img/hex-stickers/readr.webp" width="180" align="right">
 </a>
 
-- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
-- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
-- R標準の関数ではなく readr パッケージを使う。
-- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+- `readxl` package helps reading `.xlsx`, but...
+- Prefer CSV (Comma-separated values) and TSV (Tab-).
+- Use `readr` package instead of base R functions.
+- Specify a file with the **relative path** from **working directory**.
 
     ```r
-    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
-    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
+    readr::write_tsv(iris, "data/iris.tsv")
+    iris2 = readr::read_tsv("data/iris.tsv")
     ```
 
-あれれー、エラーが出る？
+Oops, an error occurred:
 
 ```{r, cannot-open}
 #| error: true
@@ -53,13 +53,17 @@ readr::write_tsv(iris, "data/iris.tsv")
 ```
 
 ---
-## ファイル読み書きでありがちなエラー
+## Common errors when reading/writing files
 
-- 読みたいファイル名が間違っている。
-- 読みたいファイルが作業ディレクトリとは違うところにある。
-- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
+- Wrong file names
+- Wrong directory
+- Have not created the output directory.
 
-冷静に、現在の作業ディレクトリとその中身を確認しよう:
+See [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html).
+
+<hr>
+
+Check your current directory and its content:
 ```r
 getwd()                 # GET Working Directory
 fs::dir_ls(".")         # List files in "." (here)
@@ -67,12 +71,9 @@ fs::dir_ls("data")      # List files in "./data"
 fs::dir_create("data")  # Create directory
 ```
 
-[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html)
-を読んでおきましょう。
+🔰 Write some data.frames to `data/` directory.
 
-🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
-
-🔰 それらを別の名前で読み込み直してみよう。
+🔰 Read them and create objects with different names.
 
 ---
 ## 🔰 最終課題予告

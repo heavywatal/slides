@@ -9,8 +9,6 @@
 data(band_members, band_instruments, band_instruments2, package = "dplyr")
 data(relig_income, population, world_bank_pop, us_rent_income, fish_encounters,
      table2, table3, table4a, table5, cms_patient_care, package = "tidyr")
-library(conflicted)
-library(dplyr)
 ```
 
 ---
@@ -154,7 +152,7 @@ band_members          band_instruments
 if they have different names:
 ```{r, join-by}
 dplyr::inner_join(band_members, band_instruments2,
-                  by = join_by(name == artist))
+                  by = dplyr::join_by(name == artist))
 ```
 ```
 band_members          band_instruments2
@@ -208,7 +206,7 @@ withr::with_package("nycflights13", {
     dplyr::inner_join(planes, by = "tailnum") |>
     dplyr::filter(seats > 100) |>
     dplyr::count(origin, dest, sort = TRUE) |>
-    dplyr::left_join(airports, by = join_by(dest == faa))
+    dplyr::left_join(airports, by = dplyr::join_by(dest == faa))
 })
 ```
 

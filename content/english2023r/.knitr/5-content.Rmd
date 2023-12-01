@@ -60,7 +60,7 @@ Just repeat forgetting and searching.
 </a>
 </div>
 
-- Processing data structure day 3 and 4
+- Processing data structure <span style="opacity: 0.5;">— day 3--4</span>
     - Extract subsets --- `select()`, `filter()`
     - Summarize by group --- `group_by()`, `summarize()`
     - Sort rows --- `arrange()`
@@ -184,13 +184,14 @@ dia$price = 147 * dia$price
 # [["column name"]]
 dia[["price"]] = 147 * dia[["price"]]
 
-# dplyr::mutate
+# tidyverse with pipe
 dia = diamonds |>
-  dplyr::mutate(price = 147 * price)
+  dplyr::mutate(price = 147 * price) |>
+  dplyr::filter(carat > 1) |>
+  dplyr::summarize(avg_price = mean(price))
 ```
 
-The results are the same,<br>
-but `mutate()` is easy to incorporate into pipelines.
+`mutate()` is easy to incorporate into pipelines.
 
 ---
 ## Normalization (min-max)
@@ -372,7 +373,7 @@ https://r4ds.hadley.nz/strings.html
 </a></div>
 
 ---
-## Base R character functions are hard to use
+## Base R functions for characters are hard to use
 
 -   Inconsistent and cryptic function names:<br>
     `grep`, `grepl`, `regexpr`, `gregexpr`, `regexec`<br>
@@ -404,12 +405,10 @@ https://r4ds.hadley.nz/strings.html
     -   A missing value `NA` in input remains `NA` in output.
 -   Well-documented on [the official website](https://stringr.tidyverse.org/).
 
-
----
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/cheatsheet/strings.png" width="100%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<img src="/slides/image/cheatsheet/strings.png" width="40%">
+<img src="/slides/image/cheatsheet/strings-regex.png" width="40%">
 </a>
 </figure>
 
@@ -623,10 +622,7 @@ readr::parse_date("2020-06-03")
 `6e+23` means $6 \times 10 ^ {23}$, not $6e^{23}$.
 
 ---
-## `factor`
-
-A type to represent **categorical/qualitative variable**.
-Looks like character, but actually **integer**.
+## `factor` type to represent categorical variables
 
 ```{r, factor}
 month_levels = c(                       # possible values
@@ -636,14 +632,16 @@ month_levels = c(                       # possible values
 x1 = c("Dec", "Apr", "Jan", "Mar")      # normal string vector
 y1 = factor(x1, levels = month_levels)  # convert it to factor
 print(y1)
+```
+
+Looks like character, but they are internally **integer**:
+```{r, factor-int}
+typeof(y1)
 as.integer(y1)                          # factor to integer
 ```
 
 🔰 See `str(iris)` for a factor variable at hand.
 
-<div style="text-align: right;"><a class="url" href="https://r4ds.hadley.nz/factors.html">
-https://r4ds.hadley.nz/factors.html
-</a></div>
 
 ---
 ## `factor`: difference from string 1
