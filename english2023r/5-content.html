@@ -136,7 +136,7 @@ Just repeat forgetting and searching.
 </a>
 </div>
 <ul>
-<li>Processing data structure day 3 and 4
+<li>Processing data structure <span style="opacity: 0.5;">— day 3&ndash;4</span>
 <ul>
 <li>Extract subsets &mdash; <code>select()</code>, <code>filter()</code></li>
 <li>Summarize by group &mdash; <code>group_by()</code>, <code>summarize()</code></li>
@@ -258,11 +258,12 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 </span></span><span class="line"><span class="cl"><span class="c1"># [[&#34;column name&#34;]]</span>
 </span></span><span class="line"><span class="cl"><span class="n">dia[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span> <span class="o">=</span> <span class="m">147</span> <span class="o">*</span> <span class="n">dia[[</span><span class="s">&#34;price&#34;</span><span class="n">]]</span>
 </span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># dplyr::mutate</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># tidyverse with pipe</span>
 </span></span><span class="line"><span class="cl"><span class="n">dia</span> <span class="o">=</span> <span class="n">diamonds</span> <span class="o">|&gt;</span>
-</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="m">147</span> <span class="o">*</span> <span class="n">price</span><span class="p">)</span>
-</span></span></code></pre></div><p>The results are the same,<br>
-but <code>mutate()</code> is easy to incorporate into pipelines.</p>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">mutate</span><span class="p">(</span><span class="n">price</span> <span class="o">=</span> <span class="m">147</span> <span class="o">*</span> <span class="n">price</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">carat</span> <span class="o">&gt;</span> <span class="m">1</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">dplyr</span><span class="o">::</span><span class="nf">summarize</span><span class="p">(</span><span class="n">avg_price</span> <span class="o">=</span> <span class="nf">mean</span><span class="p">(</span><span class="n">price</span><span class="p">))</span>
+</span></span></code></pre></div><p><code>mutate()</code> is easy to incorporate into pipelines.</p>
 
 </section>
 <section>
@@ -441,7 +442,7 @@ https://r4ds.hadley.nz/strings.html
 </a></div>
 </section>
 <section>
-<h2 id="base-r-character-functions-are-hard-to-use">Base R character functions are hard to use</h2>
+<h2 id="base-r-functions-for-characters-are-hard-to-use">Base R functions for characters are hard to use</h2>
 <ul>
 <li>
 <p>Inconsistent and cryptic function names:<br>
@@ -480,13 +481,10 @@ https://r4ds.hadley.nz/strings.html
 </li>
 <li>Well-documented on <a href="https://stringr.tidyverse.org/">the official website</a>.</li>
 </ul>
-
-</section>
-<section>
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
-<img src="/slides/image/cheatsheet/strings.png" width="100%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<img src="/slides/image/cheatsheet/strings.png" width="40%">
+<img src="/slides/image/cheatsheet/strings-regex.png" width="40%">
 </a>
 </figure>
 
@@ -735,9 +733,7 @@ https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expressi
 
 </section>
 <section>
-<h2 id="factor"><code>factor</code></h2>
-<p>A type to represent <strong>categorical/qualitative variable</strong>.
-Looks like character, but actually <strong>integer</strong>.</p>
+<h2 id="factor-type-to-represent-categorical-variables"><code>factor</code> type to represent categorical variables</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">month_levels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span>                       <span class="c1"># possible values</span>
 </span></span><span class="line"><span class="cl">  <span class="s">&#34;Jan&#34;</span><span class="p">,</span> <span class="s">&#34;Feb&#34;</span><span class="p">,</span> <span class="s">&#34;Mar&#34;</span><span class="p">,</span> <span class="s">&#34;Apr&#34;</span><span class="p">,</span> <span class="s">&#34;May&#34;</span><span class="p">,</span> <span class="s">&#34;Jun&#34;</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">  <span class="s">&#34;Jul&#34;</span><span class="p">,</span> <span class="s">&#34;Aug&#34;</span><span class="p">,</span> <span class="s">&#34;Sep&#34;</span><span class="p">,</span> <span class="s">&#34;Oct&#34;</span><span class="p">,</span> <span class="s">&#34;Nov&#34;</span><span class="p">,</span> <span class="s">&#34;Dec&#34;</span>
@@ -747,12 +743,13 @@ Looks like character, but actually <strong>integer</strong>.</p>
 </span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] Dec Apr Jan Mar
 Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+</code></pre><p>Looks like character, but they are internally <strong>integer</strong>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">typeof</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;integer&#34;
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">as.integer</span><span class="p">(</span><span class="n">y1</span><span class="p">)</span>                          <span class="c1"># factor to integer</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 12  4  1  3
 </code></pre><p>🔰 See <code>str(iris)</code> for a factor variable at hand.</p>
-<div style="text-align: right;"><a class="url" href="https://r4ds.hadley.nz/factors.html">
-https://r4ds.hadley.nz/factors.html
-</a></div>
+
 </section>
 <section>
 <h2 id="factor-difference-from-string-1"><code>factor</code>: difference from string 1</h2>

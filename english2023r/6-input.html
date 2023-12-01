@@ -91,18 +91,18 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<h2 id="outline-of-data-analysis">Outline of data analysis</h2>
 <ol>
-<li>コンピュータ環境の整備 ✅</li>
-<li>データの取得、読み込み 👈 今回はここから</li>
-<li>探索的データ解析
+<li>Setup computer environment ✅</li>
+<li>Get and read input data ⬜ day 6 👈</li>
+<li>Exploratory data analysis
 <ul>
-<li>前処理、加工 ✅ 完全に理解した</li>
-<li>可視化、仮説生成 ✅ 完全に理解した</li>
-<li>統計解析、仮説検証 ⬜ 今日の終盤と次回</li>
+<li><strong>Preparation</strong> (harder than it seems) ✅ day 3&ndash;5</li>
+<li><strong>Visualization</strong>, generating hypotheses (fun!) ✅ day 2</li>
+<li><strong>Statistical analysis</strong>, testing hypotheses ⬜ day 7&ndash;8</li>
 </ul>
 </li>
-<li>報告、発表 ✅ Quarto楽しい</li>
+<li>Report ✅ day 2</li>
 </ol>
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
@@ -113,47 +113,47 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="dataframeの読み書き">data.frameの読み書き</h2>
+<h2 id="readwrite-dataframe">Read/write data.frame</h2>
 <a href="https://readr.tidyverse.org/">
 <img src="/_img/hex-stickers/readr.webp" width="180" align="right">
 </a>
 <ul>
 <li>
-<p>readxlパッケージを使えば <code>.xlsx</code> ファイルも読める、けど</p>
+<p><code>readxl</code> package helps reading <code>.xlsx</code>, but&hellip;</p>
 </li>
 <li>
-<p>カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。</p>
+<p>Prefer CSV (Comma-separated values) and TSV (Tab-).</p>
 </li>
 <li>
-<p>R標準の関数ではなく readr パッケージを使う。</p>
+<p>Use <code>readr</code> package instead of base R functions.</p>
 </li>
 <li>
-<p>ファイル名は<strong>作業ディレクトリ</strong>からの<strong>相対パス</strong>で指定。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>   <span class="c1"># 書き出し</span>
-</span></span><span class="line"><span class="cl"><span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>  <span class="c1"># 読み込み</span>
+<p>Specify a file with the <strong>relative path</strong> from <strong>working directory</strong>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">readr</span><span class="o">::</span><span class="nf">write_tsv</span><span class="p">(</span><span class="n">iris</span><span class="p">,</span> <span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">iris2</span> <span class="o">=</span> <span class="n">readr</span><span class="o">::</span><span class="nf">read_tsv</span><span class="p">(</span><span class="s">&#34;data/iris.tsv&#34;</span><span class="p">)</span>
 </span></span></code></pre></div></li>
 </ul>
-<p>あれれー、エラーが出る？</p>
+<p>Oops, an error occurred:</p>
 <pre tabindex="0"><code>Error: Cannot open file for writing:
 * &#39;data/iris.tsv&#39;
 </code></pre>
 </section>
 <section>
-<h2 id="ファイル読み書きでありがちなエラー">ファイル読み書きでありがちなエラー</h2>
+<h2 id="common-errors-when-readingwriting-files">Common errors when reading/writing files</h2>
 <ul>
-<li>読みたいファイル名が間違っている。</li>
-<li>読みたいファイルが作業ディレクトリとは違うところにある。</li>
-<li>書き込み先のディレクトリが存在しない。→ 予め作っておこう</li>
+<li>Wrong file names</li>
+<li>Wrong directory</li>
+<li>Have not created the output directory.</li>
 </ul>
-<p>冷静に、現在の作業ディレクトリとその中身を確認しよう:</p>
+<p>See <a href="https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>.</p>
+<hr>
+<p>Check your current directory and its content:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">getwd</span><span class="p">()</span>                 <span class="c1"># GET Working Directory</span>
 </span></span><span class="line"><span class="cl"><span class="n">fs</span><span class="o">::</span><span class="nf">dir_ls</span><span class="p">(</span><span class="s">&#34;.&#34;</span><span class="p">)</span>         <span class="c1"># List files in &#34;.&#34; (here)</span>
 </span></span><span class="line"><span class="cl"><span class="n">fs</span><span class="o">::</span><span class="nf">dir_ls</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>      <span class="c1"># List files in &#34;./data&#34;</span>
 </span></span><span class="line"><span class="cl"><span class="n">fs</span><span class="o">::</span><span class="nf">dir_create</span><span class="p">(</span><span class="s">&#34;data&#34;</span><span class="p">)</span>  <span class="c1"># Create directory</span>
-</span></span></code></pre></div><p><a href="https://comicalcommet.github.io/r-training-2023/R_training_2023_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
-を読んでおきましょう。</p>
-<p>🔰 これまでに登場したデータを <code>data/</code> 以下に書き出してみよう。</p>
-<p>🔰 それらを別の名前で読み込み直してみよう。</p>
+</span></span></code></pre></div><p>🔰 Write some data.frames to <code>data/</code> directory.</p>
+<p>🔰 Read them and create objects with different names.</p>
 
 </section>
 <section>
