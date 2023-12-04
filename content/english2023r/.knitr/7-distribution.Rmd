@@ -9,185 +9,46 @@
 ```
 
 ---
-## この実習の目標
+## Purposes of this hands-on lectures
 
-### ✅ <del>生物学研究にはデータとモデルが必須だと認識</del>
+### ✅ <del>Every biological research involves data and models</del>
 
-### ✅ <del>再現可能な解析を楽にやりたい気持ちになる</del>
+### ✅ <del>You want to do reproducible analysis</del>
 
-### ✅ <del>必要な方法を調べ、実践する力をつける</del>
+### ✅ <del>Learn how to do it and how to learn more</del>
 
-### ⬜ データ解析の基本に触れる
+### ⬜ Glance at the basics of data analysis
 
-<br>
-個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+<hr>
 
----
-## データを使ってやりたいこと
-
-- 現象を**理解**したい
-- 将来を**予測**したい
-- ものを**分類・判別**したい
-- 挙動を**制御**したい
-- 新しい何かを**生成**したい
-
-そのために解析は必要？
-未加工の生データこそ宝？
+You don't have to remember every command.<br>
+Just repeat forgetting and searching.
 
 ---
-## データ解析って必要？ 生の数字見ればよくない？
+## What do you want to do with data?
 
-生のままでは複雑過ぎ、情報多すぎ、何もわからない。
+- to **understand** phenomena
+- to **predict** future
+- to **classify** objects
+- to **control** behavior
+- to **generate** something new
 
-```{r, diamonds}
-print(ggplot2::diamonds)
-```
-
-ダイヤモンド53,940個について10項目の値を持つデータセット
-
----
-## 要約統計量を見てみよう
-
-各列の**平均**とか**標準偏差**とか:
-
-```{r, summary-diamonds}
-#| echo: false
-dia_cols = c("carat", "depth", "table", "price")
-diamonds |>
-  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
-  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
-```
-
-大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
-```{r, cov-diamonds}
-#| echo: false
-diamonds |>
-  dplyr::select(all_of(dia_cols)) |>
-  scale() |>
-  cov() |>
-  wtl::printmat("%.2f", upper = FALSE)
-```
-
-**生のままよりは把握しやすい**かも。
-
-しかし要注意...
-
+Is analysis necessary for that?<br>
+Why not just raw data?
 
 ---
-## 代表値ばかり見て可視化を怠ると構造を見逃す
+## Look back day 1
 
-<figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
-</a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
-     style="position: absolute; left: 0; top: 0; z-index: 255;">
-</figure>
-
+<iframe width="600" height="450" src="./1-introduction.html#/4"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/5"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/6"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/7"></iframe>
 
 ---
-## 作図してみると全体像・構造が見やすい
+## Mathematical models in data science
 
-情報をうまく絞って整理 → **直感的にわかる**
-
-```{r, simplify-diamonds}
-#| echo: false
-#| fig.height: 6
-#| fig.width: 7
-diamonds |>
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
-  ggplot(aes(carat, price, color = clarity)) +
-  geom_point(alpha = 0.4, size = 3) +
-  scale_color_viridis_d(
-    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
-  ) +
-  labs(title = "Diamonds") +
-  theme_gray(base_size = 22) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "#bbbbbb"),
-    legend.key = element_rect(fill = "#bbbbbb"),
-    axis.ticks = element_blank()
-  )
-```
-
-`carat` が大きいほど `price` も高いらしい。<br>
-その度合いは `clarity` によって異なるらしい。
-
----
-## 統計とは
-
-データをうまくまとめ、それに基づいて推論するための手法。
-
-- **記述統計**: データそのものを要約する
-    - 要約統計量 (e.g., 平均、標準偏差、etc.)
-    - 作図、作表
-- **推測統計**: データの背後にある母集団・生成過程を考える
-    - 数理モデル
-    - 確率分布
-    - パラメータ(母数)
-
-「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
-
-
----
-## モデルとは
-
-対象システムを単純化・理想化して扱いやすくしたもの
-
-Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="200" align="right" style="margin: 0 -5px;">
-: 数学的な方程式として記述されるもの。
-: e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
-: <br>
-
-Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="200" align="right">
-: 数値計算の手続きとして記述されるもの。
-: e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
-: <br>
-
-Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="320" align="right">
-: 具体的な事物で作られるもの。
-: e.g., San Francisco Bay-Delta Model
-
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
-
-???
-数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
-解析的に解くことを諦めて計算機にやらせるという点で実装方法は異なるが、
-数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
-
-プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
-
----
-## データ科学における数理モデル
-
-データ生成をうまく真似できそうな仮定の数式表現。<br>
-&nbsp;
-
-<figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1000"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
-
-???
-
-確率モデル: 決定論的なモデルじゃなくて確率論的なゆらぎを導入したもの。
-ただし、大塚淳さんの定義は異なる。
-帰納推論を可能にする枠組みとして自然の斉一性(ヒューム)を仮定した上で、
-データを生成している真の現象を確率用語で記述したものが確率モデルだ、という感じ。
-そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
-
----
-## データ科学における数理モデル
-
-データ生成をうまく真似できそうな仮定の数式表現。<br>
-e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
+Mathematical expression of assumptions to simulate data generation<br>
+e.g., the larger the more expensive: $\text{price} = A \times \text{carat} + B + \epsilon$
 
 ```{r, lm-diamonds}
 #| echo: false
@@ -203,57 +64,12 @@ diamonds |>
   theme_classic(base_size = 22)
 ```
 
-新しく採れたダイヤモンドの価格予想とかにも使える。
-
-このように「YをXの関数として表す」ようなモデルを**回帰**と呼ぶ。
-
-
----
-## 今回は回帰を軸とした統計モデリングの解説
-
-単純な直線あてはめから出発し、ちょっとずつ統計モデリング。
-
-<figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
-</a>
-</figure>
+Regression
+: express y as a function of x.
 
 
 ---
-## 回帰は教師あり機械学習の一種とも言える
-
-<figure>
-<img src="../tokiomarine2021/regression-in-ml.drawio.svg" width="1000">
-</figure>
-
-でも統計モデリングはいわゆる“機械学習”とは違う気もする...?
-
-
----
-## モデリングにおける2つのアプローチ
-
-<figure>
-<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
----
-## どっちも知っておいて使い分けたい
-
-項目       | 統計モデリング | 近年の機械学習
----------- | -------------- | ----------------
-例 | 一般化線形モデル<br>階層ベイズモデル | ランダムフォレスト<br>ニューラルネットワーク
-モデル構造 | 単純化したい | 性能のためなら複雑化
-モデル解釈 | **ここが強み** | 難しい。重視しない。途上。
-予測・生成 | うまくすれば頑健 | **主目的**。強力。高精度
-データ量   | 少なくてもそれなり | 大量に必要
-計算量     | 場合による  | 場合による
-
-
----
-## 統計モデリングのお品書き
+## Extending linear regression
 
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
@@ -261,37 +77,32 @@ diamonds |>
 </a>
 </figure>
 
-久保先生の"緑本"こと<br>
-「データ解析のための統計モデリング入門」<br>
-をベースに回帰分析の概要を紹介。
+**Linear Model (LM)** 👈 #7 today
 
-1. イントロ [(#7 今回)](7-distribution.html)
-1. 統計モデルの基本
-    - 確率変数・**確率分布** 👈 主役
-    - 尤度・最尤推定
-1. 一般化線形モデル、混合モデル [(#8 次回)](8-glm.html)
-1. <del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない
+<span style="color: #888888;">&nbsp; &nbsp; ↓ probability distribution</span>
 
-回帰のキモは**線ではなく分布**。
+**Generalized Linear Model (GLM)** [--- #8 next time](8-glm.html)
 
-<hr>
-<cite>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ individual difference, random effect</span>
 
-[Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
-の演習無し抜粋バージョン (~2時間 x 2回)。
+**Generalized Linear Mixed Model (GLMM)**
 
-</cite>
+<span style="color: #888888;">&nbsp; &nbsp; ↓ flexible modelling</span>
+
+**Hierarchical Bayesian Model (HBM)**
+
+<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
 
 
 ---
-## 回帰モデルの2段階
+## Two parts to a regression model
 
-1. Define a **family of models**: だいたいどんな形か、式をたてる
-    - 直線: $y = a_1 + a_2 x$
-    - 対数: $\log(y) = a_1 + a_2 x$
-    - 二次曲線: $y = a_1 + a_2 x^2$
+1. Define a **family of models**: express generic pattern
+    - straight line: $y = a_1 + a_2 x$
+    - log curve: $\log(y) = a_1 + a_2 x$
+    - quadratic curve: $y = a_1 + a_2 x^2$
 
-2. Generate a **fitted model**: データに合うようにパラメータを調整
+2. Generate a **fitted model**: adjust parameters to get closer to the data
     - $y = 3x + 7$
     - $y = 9x^2$
 
@@ -300,9 +111,9 @@ diamonds |>
 </cite>
 
 ---
-## たぶん身長が高いほど体重も重い
+## Can see a strong pattern: the taller the heavier
 
-なんとなく $y = a x + b$ でいい線が引けそう<br>
+The relationship looks linear, $y = a x + b$.<br>
 &nbsp;
 
 ```{r, df-linear}
@@ -329,10 +140,10 @@ p_weight
 
 
 ---
-## たぶん身長が高いほど体重も重い
+## Can see a strong pattern: the taller the heavier
 
-なんとなく $y = a x + b$ でいい線が引けそう<br>
-じゃあ傾き *a* と切片 *b*、どう決める？
+The relationship looks linear, $y = a x + b$.<br>
+OK, let's try random slope *a* and intersect *b*:
 
 ```{r, weight-lines}
 #| echo: false
@@ -345,11 +156,13 @@ p_weight +
   geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
 ```
 
+Need to find a good slope and intersect.
 
 ---
-## 最小二乗法 (Ordinary Least Square: OLS)
+## Ordinary Least Square (OLS)
 
-<span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。
+minimizes the <strong style="color: #E69F00">residual</strong> sum of squares (RSS)
+from <span style="color: #3366ff">the regression line</span>.
 
 ```{r, weight-residual}
 #| echo: false
@@ -390,10 +203,10 @@ cowplot::plot_grid(nrow = 1L,
 
 
 ---
-## 残差平方和(RSS)が最小となるパラメータを探せ
+## Searching for models to minimize RSS
 
-ランダムに試してみて、上位のものを採用。<br>
-この程度の試行回数では足りなそう。
+Try random values, and pick the best ones.<br>
+May need to generate much more to find good one.
 
 ```{r, weight-goodlines}
 #| echo: false
@@ -419,10 +232,10 @@ cowplot::plot_grid(p_ab, p2, nrow = 1L)
 ```
 
 ---
-## 残差平方和(RSS)が最小となるパラメータを探せ
+## Searching for models to minimize RSS
 
-**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。<br>
-さっきのランダムよりはちょっとマシか。
+**Grid search**: generate an evenly spaced grid of points.<br>
+Slightly more efficient than random search?
 
 ```{r, weight-grid}
 #| echo: false
@@ -441,11 +254,11 @@ p2 = p_weight + geom_abline(
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
 
-こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
+There are many other **optimization** techniques although not covered here.
 
 
 ---
-## これくらいなら一瞬で計算してもらえる
+## R can find the optimum in an instant
 
 ```{r, lm}
 par_init = c(intercept = 0, slope = 0)
@@ -463,11 +276,11 @@ p_weight +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label)
 ```
 
-上記コードは最適化一般の書き方。<br>
-回帰が目的なら次ページのようにするのが楽 →
+The code above is for general optimization.<br>
+For simple linear regression, an easier way is as follows...
 
 ---
-## `lm()` で直線あてはめしてみる
+## `lm()` function to fit linear models
 
 ```{r, lm-mpg}
 #| fig.height: 2.5
@@ -480,11 +293,11 @@ ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
   geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
 ```
 
-🔰 `diamonds` と `iris` でも `lm()` を試してみよう。
+🔰 Try `lm()` with `diamonds` and `iris`.
 
 
 ---
-## 何でもかんでも直線あてはめではよろしくない
+## Straight LM does not fit all
 
 ```{r, df-pois}
 #| echo: false
@@ -518,12 +331,12 @@ p_pois = ggplot(df_pois) +
 p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 ```
 
-- 観察データは常に**正の値**なのに予測が負に突入してない？
-- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
+- Prediction goes below zero whereas all the observations are **positive**.
+- Y values are **integer**. Their **dispersion** is larger when X is larger.
 
 
 ---
-## 何でもかんでも直線あてはめではよろしくない
+## Straight LM does not fit all
 
 ```{r, glm-better}
 #| echo: false
@@ -549,38 +362,44 @@ p_poisson = p_pois +
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 ```
 
-- 観察データは常に**正の値**なのに予測が負に突入してない？
-- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
-- **データに合わせた統計モデルを使うとマシ**
-
+- Prediction goes below zero whereas all the observations are **positive**.
+- Y values are **integer**. Their **dispersion** is larger when X is larger.
+- Let's learn statistical modelling for better fitting to the data.
 
 ---
-## ちょっとずつ線形モデルを発展させていく
+## Extending linear regression
 
-**線形モデル LM** (単純な直線あてはめ)
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
+**Linear Model (LM)** 👈 #7 today
 
-**一般化線形モデル GLM**
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span class="fragment highlight-blue custom bold">probability distribution</span></span>
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+**Generalized Linear Model (GLM)** [--- #8 next time](8-glm.html)
 
-**一般化線形混合モデル GLMM**
+<span style="color: #888888;">&nbsp; &nbsp; ↓ individual difference, random effect</span>
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+**Generalized Linear Mixed Model (GLMM)**
 
-**階層ベイズモデル HBM**
+<span style="color: #888888;">&nbsp; &nbsp; ↓ flexible modelling</span>
+
+**Hierarchical Bayesian Model (HBM)**
 
 <cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
 
 
 ---
-## 確率分布
+## Probability distribution
 
-発生する事象(値)と頻度の関係。
+The relationship between phenomena and their frequencies.
 
-手元のデータを数えて作るのが**経験分布**<br>
-e.g., サイコロを12回投げた結果、学生1000人の身長
+empirical distribution
+: created by collecting samples.<br>
+: e.g., rolling a dice 12 times, heights of 1000 students:
 
 ```{r, distribution}
 #| echo: false
@@ -607,16 +426,17 @@ p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) |>
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
 
-一方、少数のパラメータと数式で作るのが**理論分布**。<br>
-(こちらを単に「確率分布」と呼ぶことが多い印象）
+theoretical distribution
+: described with math equation and a few parameters.
+
 
 ---
-## 確率変数$X$はパラメータ$\theta$の確率分布$f$に従う...?
+## Random variable $X$ follows probability distribution $f$
 
 $X \sim f(\theta)$
 
 e.g.,<br>
-コインを3枚投げたうち表の出る枚数 $X$ は**二項分布に従う**。<br>
+The number of heads in tossing 3 fair coins $X$ **follows binomial distribution**.<br>
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 <div class="column-container">
@@ -646,16 +466,17 @@ k &\in \{0, 1, 2, \ldots, n\}
   </div>
 </div>
 
-一緒に実験してみよう。
+Let's experiment.
+
 
 ---
-## 試行を繰り返して記録してみる
+## Record repeated trials
 
-コインを3枚投げたうち表の出た枚数 $X$
+The number of heads observed in tossing 3 fair coins: $X$
 
-試行1: **表** 裏 **表** → $X = 2$<br>
-試行2: 裏 裏 裏 → $X = 0$<br>
-試行3: **表** 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$
+trial 1: **H** T **H** → $X = 2$<br>
+trial 2: T T T → $X = 0$<br>
+trial 3: **H** T T → $X = 1$, subsequently, $2, 1, 3, 0, 2, \ldots$
 
 ```{r, rbinom}
 #| echo: false
@@ -683,15 +504,15 @@ df_rbinom |>
 ```
 
 <div style="text-align: right;">
-試行回数を増やすほど<b>二項分布</b>の形に近づく。<br>
-0と3はレア。1と2が3倍ほど出やすいらしい。
+It approaches asymptotically to <b>binomial distribution</b>.<br>
+0 and 3 is rare. 1 and 2 are three times more likely.
 </div>
 
 ---
-## コイントスしなくても $X$ らしきものを生成できる
+## You can generate similar values without tossing coins
 
-- コインを3枚投げたうち表の出る枚数 $X$
-- $n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$
+- The number of heads $X$ observed in tossing 3 fair coins.
+- Random samples $X$ from the binomial distribution with $n = 3, p = 0.5$.
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
@@ -700,33 +521,33 @@ df_rbinom |>
   <div class="column" style="padding-top: 10px;">
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
-&nbsp;&nbsp; ↓ サンプル
+&nbsp;&nbsp; ↓ sample
 
 {2, 0, 1, 2, 1, 3, 0, 2, ...}
   </div>
 </div>
 
-これらはとてもよく似ているので<br>
-**「コインをn枚投げたうち表の出る枚数は二項分布に従う」**<br>
-みたいな言い方をする。逆に言うと<br>
-**「二項分布とはn回試行のうちの成功回数を確率変数とする分布」**<br>
-のように理解できる。
+These are so similar that we can say<br>
+"The number of heads in *n* tosses follows binary distribution."
+
+Conversely, we can understand it like<br>
+"Random variable of binomial distribution is the number of successes in *n* trials."
 
 ---
-## 統計モデリングの一環とも捉えられる
+## A kind of statistical modelling
 
-コイン3枚投げを繰り返して得たデータ {2, 0, 1, 2, 1, 3, 0, 2, ...}
+Tossing 3 fair coins repeatedly {2, 0, 1, 2, 1, 3, 0, 2, ...}
 
-&nbsp;&nbsp; ↓ たった2つのパラメータで記述。情報を圧縮。
+&nbsp;&nbsp; ↓ describe with only two parameters. information reduction.
 
-$n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
+Can reproduce with binary distribution with $n = 3, p = 0.5$
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
-こういうふうに現象と対応した確率分布、ほかにもある？
+Any other probability distributions related to real phenomena like this?
 
 ???
 ただし「これが3連コイントスの真理だ」ではない。<br>
@@ -738,29 +559,29 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 
 ---
-## 有名な確率分布、それに「従う」もの
+## Major probability distributions and related phenomena
 
-離散一様分布
+Discrete uniform distribution
 : コインの表裏、サイコロの出目1–6
 
-幾何分布
+Negative binomial distribution (Geometric distribution if n = 1)
 : 成功率pの試行が初めて成功するまでの失敗回数
 
-二項分布
+Binomial distribution
 : 成功率p、試行回数nのうちの成功回数
 
-ポアソン分布
+Poisson distribution
 : 単位時間あたり平均$\lambda$回起こる事象の発生回数
 
-ガンマ分布
+Gamma distribution (Exponential distribution if k = 1)
 : ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
 
-正規分布
+Normal/Gaussian distribution
 : 確率変数の和、平均値
 
+
 ---
-## 離散一様分布
+## Discrete uniform distribution
 
 同じ確率で起こるn通りの事象のうちXが起こる確率
 
@@ -786,7 +607,7 @@ dplyr::bind_rows(df_coin, df_dice) |>
 
 
 ---
-## 幾何分布 $~\text{Geom}(p)$
+## Geometric $~\text{Geom}(p)$
 
 成功率pの試行が初めて成功するまでの失敗回数
 
@@ -819,36 +640,6 @@ ggplot(df) +
 「初めて成功するまでの試行回数」とする定義もある。
 
 🔰 幾何分布になりそうな例を考えてみよう
-
----
-## 二項分布 $~\text{Binomial}(n,~p)$
-
-確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
-
-```{r, dbinom-n}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-p = 0.25
-df = purrr::map(2**seq.int(0, 4), \(n) {
-  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
-}) |> purrr::list_rbind()
-ggplot(df) +
-  aes(X, Prob) +
-  scale_x_continuous(breaks = df[["X"]]) +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  geom_col() +
-  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
-  labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
-
-\\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
-\\]
-
-🔰 二項分布になりそうな例を考えてみよう
 
 
 ---
@@ -888,6 +679,38 @@ ggplot(df) +
 平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
 ($k \to \infty$でポアソン分布と一致)
 -->
+
+
+---
+## 二項分布 $~\text{Binomial}(n,~p)$
+
+確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
+
+```{r, dbinom-n}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+p = 0.25
+df = purrr::map(2**seq.int(0, 4), \(n) {
+  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
+}) |> purrr::list_rbind()
+ggplot(df) +
+  aes(X, Prob) +
+  scale_x_continuous(breaks = df[["X"]]) +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  geom_col() +
+  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
+  labs(title = paste0("p = ", p)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+\\[
+\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\\]
+
+🔰 二項分布になりそうな例を考えてみよう
+
 
 ---
 ## ポアソン分布 $~\text{Poisson}(\lambda)$
@@ -1136,30 +959,29 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 
 
 ---
-## 有名な確率分布対応関係ふりかえり
+## Major probability distributions and related phenomena
 
 <figure style="float: right;">
 <img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
 </figure>
 
-離散一様分布
+Discrete uniform distribution
 : コインの表裏、サイコロの出目1–6
 
-幾何分布
+Negative binomial distribution (Geometric distribution if n = 1)
 : 成功率pの試行が初めて成功するまでの失敗回数
 
-二項分布
+Binomial distribution
 : 成功率p、試行回数nのうちの成功回数
 
-ポアソン分布
+Poisson distribution
 : 単位時間あたり平均$\lambda$回起こる事象の発生回数
 
-ガンマ分布
+Gamma distribution (Exponential distribution if k = 1)
 : ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
 
-正規分布
-: 確率変数の和、平均値。使い勝手が良く、よく登場する。
+Normal/Gaussian distribution
+: 確率変数の和、平均値
 
 
 ---
@@ -1176,7 +998,7 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 
 
 ---
-## 疑似乱数生成器 Pseudo Random Number Generator
+## Pseudo Random Number Generator
 
 コンピューター上でランダム**っぽい**数値を出力する装置。<br>
 実際には**決定論的**に計算されているので、<br>
@@ -1233,10 +1055,10 @@ table(x)
 ```
 
 ---
-## データに分布をあてはめたい
+## Fitting probability distributions to data
 
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
-個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
+The number of seeds were counted for each of 50 plant individuals.<br>
+Individual A has 2 seeds, B has 4 seeds, ...
 
 ```{r, df-poisson}
 #| echo: false
@@ -1262,16 +1084,16 @@ ggplot(df_rpois) +
   )
 ```
 
-カウントデータだから<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+This count data looks <span class="fragment custom blur">Poisson</span>-distributed.<br>
+What is the optimal $\lambda$ value?
 
 
 
 ---
-## データに分布をあてはめたい
+## Fitting probability distributions to data
 
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
-個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
+The number of seeds were counted for each of 50 plant individuals.<br>
+Individual A has 2 seeds, B has 4 seeds, ...
 
 ```{r, poisson-seed-lambda}
 #| echo: false
@@ -1290,59 +1112,57 @@ p_pois = ggplot(df_rpois) +
 p_pois
 ```
 
-カウントデータだからポアソン分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+This count data looks Poisson-distributed.<br>
+What is the optimal $\lambda$ value?
 
-黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
-よく重なるのは $\lambda \approx 3$ くらいか。
+Observations in black.
+<span style="color: #56B4E9;">Poisson distribution in blue</span>.
+$\lambda \approx 3$ looks good.
 
 
 ---
-## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
+## Likelihood: a measure for goodness-of-fit
 
-<ruby>尤<rt>もっと</rt></ruby>もらしさ。
-モデルのあてはまりの良さの尺度のひとつ。
-
-**あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
-定義通り素直に書くと<br>
+The probability to observe the data $D$ given the model $M$.<br>
 $\text{Prob}(D \mid M)$
 
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
-$L(M \mid D)$
+**Likelihood function** is the same probability from different viewpoints:
 
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
-$L(\theta \mid D)$ とか $L(\theta)$ とか
+- as a function of model $M$ given the data $D$,<br>
+  $L(M \mid D)$<br>
+- as a function of parameters $\theta$,<br>
+  $L(\theta \mid D)$ or $L(\theta)$
 
 
 ---
-## 尤度を手計算できる例
+## Example of likelihood calculation
 
-コインを5枚投げた結果 $D$: 表 4, 裏 1
+Data $D$: 4 heads (H) and 1 tail (T) in tossing a coin 5 times
 
-表が出る確率 $p = 0.5$ と仮定:
+Assuming the probability of coming up head $p = 0.5$:
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \text{Prob}(H \mid 0.5) ^ 4 \times \text{Prob}(T \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 
-表が出る確率 $p = 0.8$ と仮定:
+Assuming the probability of coming up head $p = 0.8$:
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \text{Prob}(H \mid 0.8) ^ 4 \times \text{Prob}(T \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 
 $L(0.8 \mid D) > L(0.5 \mid D)$
 
-$p = 0.8$ のほうがより尤もらしい。
+$p = 0.8$ is more likely.
 
 
 
 ---
-## 種子数ポアソン分布の例でも尤度を計算してみる
+## Likelihood in the example of Poisson distribution
 
-ある植物が作った種子を数える。$n = 50$個体ぶん。
+The number of seeds were counted for each of 50 plant individuals.
 
 <div>\[\begin{split}
 L(\lambda \mid D)
@@ -1364,13 +1184,13 @@ p_pois +
             x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 6)
 ```
 
-この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。
+OK, $\lambda = 3$ is better than the other two. What is the best.
 
 ---
-## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
+## <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
 
-扱いやすい **対数尤度** (log likelihood) にしてから計算する。<br>
-一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
+**Log likelihood** is often easier to handle.<br>
+Solving the differential equation for $\lambda$ ...... finds **the sample mean**
 
 <div>\[\begin{split}
 \log L(\lambda \mid D)
@@ -1422,10 +1242,12 @@ cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
 ```
 
 ---
-## 最尤推定を使っても“真のλ”は得られない
+## MLE does not give you “true λ”
 
-今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
-「50個体サンプル→最尤推定」を1,000回繰り返してみると:
+The data was actually generated from “$X \sim \text{Poisson}(\lambda = 3.0)$”.
+
+By replicating "sample 50 individuals → MLE" 1,000 times,<br>
+we find great variability in estimation and empirical distributions:
 
 ```{r, poisson-mle-repl}
 #| echo: false
@@ -1470,14 +1292,13 @@ p_minmax = df_repl |>
 cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 ```
 
-サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
-(標本データへのあてはまりはかなり良く見えるのに！)
+Note: Fitting to each sample looks not bad!
 
 
 ---
-## サンプルサイズを増やすほどマシにはなる
+## Alleviated by increasing sample size
 
-“$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:
+1,000 replications of MLE with $n$ individuals from $X \sim \text{Poisson}(\lambda = 3.0)$:
 
 ```{r, poisson-mle-nsam}
 #| echo: false
@@ -1503,56 +1324,49 @@ purrr::map(c(5, 50, 500, 5000), \(n) {
   )
 ```
 
-Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
-A. 推定したい統計量とか、許容できる誤差とかによる。
+Q. How much is enough?<br>
+A. Depends on what you estimate, acceptable error range, etc.
 
 
 ---
-## すべてのモデルは間違っている
-
-確率分布がいい感じに最尤推定できたとしても、<br>
-それはあくまでモデル。仮定。近似。
+## Mathematical models in data science
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
 
 ---
-## 統計モデリングの道具 --- まとめ
+## Toolbox of statistical modelling
 
-- 何はともあれ作図して俯瞰
-- **確率変数** $X$
-- **確率分布** $X \sim f(\theta)$
-    - **少ないパラメータ** $\theta$ でばらつきの様子を表現
-    - **この現象はこの分布を作りがち(〜に従う)** という知見がある
-- **尤度**
-    - あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$
-    - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
-    - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
-    - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**
+- **Random variable** $X$
+- **Probability distribution** $X \sim f(\theta)$
+    - **parameters** $\theta$
+- **Likelihood**
+    - The probability to observe the data given the model: $\text{Prob}(D \mid M)$
+    - as a function of model given the data → **likelihood function** $L(M \mid D),~L(\theta \mid D)$
+    - **Maximum Likelihood Estimation** to fit parameters $\hat \theta$
 
 
 ---
-## 🔰 4日目の課題1: 尤度
+## 🔰 Challenge 1: likelihood
 
-サイコロを10回振ったら6の目が3回出た。
+Rolling a dice 10 times, 3 sixes were observed.
 
-1. 6の目の出る確率が1/6だとした場合の尤度は?
+1. Calculate likelihood assuming the probability to come up 6 $p = 1/6$.
 
-1. 6の目の出る確率が0.2だとした場合の尤度は?
+1. Calculate likelihood assuming the probability to come up 6 $p = 0.2$.
 
-1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
+1. Draw a graph with $p$ as horizontal axis, log likelihood as vertical axis.
 
-1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
-   数学で解ければ優。Rで見つければ良。目分量・勘で可。
+1. Estimate $p$ with MLE.<br>
+   Excellent, if solved with math; Good, if solved with R; OK, by eye or intuition.
 
-ヒント
-: 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
-: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。
+Hint
+: $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ can be achieved with `choose(5, 2)` in R.
 
 
 ```{r, get-likelihood}
