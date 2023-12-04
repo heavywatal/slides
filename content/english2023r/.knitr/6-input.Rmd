@@ -76,18 +76,18 @@ fs::dir_create("data")  # Create directory
 🔰 Read them and create objects with different names.
 
 ---
-## 🔰 最終課題予告
+## 🔰 Reporting assignment for Tohoku Univ. students
 
 <iframe width="1200" height="810" src="./8-glm.html#/51"></iframe>
 
-読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？
+Read → Prepare → Visualize → a piece of cake ... hopefully?
 
 ---
-## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
+## Demo: [e-Stat national population census](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
 
 2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
 
-うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
+Population pyramids as follows can be drawn from this CSV file, but...
 
 <img `r src_alt_fig_chunk("estat-plot")`>
 
@@ -207,9 +207,8 @@ What should we care about when we are the primary data source?
 
 <br>
 
-総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
+Ministry of Internal affairs and Communication published a document in 2020.<br>
 [「統計表における機械判読可能なデータの表記方法の統一ルール」](https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html)
-から抜粋。
 
 ---
 ## Rule 1. One value in one cell
@@ -388,8 +387,8 @@ In other words, think about the future you analyze it.
 ---
 ## Be aware of Excel's kindness/betrayal
 
-表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
-しかし**親切設計がユーザーに牙を剥く**！
+Widely used as a software to view and edit table format data.<br>
+It has many nice features, but often brings chaos.
 
 - Some strings are converted to dates: `22-4`, `4-14`
 - Some gene names are converted to date: `MARCH1`, `SEPT1`<br>
@@ -408,16 +407,16 @@ SEPT1,4-14
 1.  Open it as plaintext, and check the content.
 
 ---
-## 今回のお品書き
+## Today's lesson
 
 ✅ Data input
 - Difficulty in reading data in the wild
 - What you should care about when you are the data source.
 
-⬜ データ解釈の心得 (理論や手法の詳細には触れない)
-- 誤差 (バイアス、ばらつき)
-- 統計的仮説検定
-- 因果関係と相関関係
+⬜ Data interpretation (very basic introduction)
+- Errors (bias and dispersion)
+- Statistical hypothesis testing
+- Correlation and causation
 
 
 
@@ -430,8 +429,7 @@ no matter how fantastic your statistical analysis is.
 <img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg" width="1200">
 </figure>
 
-- 目的に応じてちゃんとデータを採ることが重要！
-- 何がデータを悪くしてしまうのか、見ていこう
+What impairs data input?
 
 
 ---
@@ -472,37 +470,24 @@ e.g., Weigh yourself 10 times with your clothes on.
 <figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
 </a></figure>
 
-データの採れかたが結果に傾向をもたらしてしまう。
-
 Survivorship bias
-: 生き残ったものだけがデータとして観測される。
+: A kind of logical error based on incomplete data.
 : e.g., Damage distribution of surviving aircraft ✈️✈️<br>
   being shot → **<span style="color: #bb0000;">survived → observed</span>**<br>
   being shot → **crashed → not observed**<br>
-  損傷が観察されなかった場所をむしろ補強すべき。
+  Add armor to the {least or most} damaged areas?
 
 Sampling bias
-: サンプル対象を決めた時点で偏っている。
-: 📞電話でアンケート調査 →
-  電話機を持てる裕福な人、その時間に通話できる人、
-  知らない番号からでも出る人、調査している新聞社に共感している人。
+: Targets are already biased, not representing the population.
+: 📞 Phone survey by newspaper →
+  afford phones, has spare time,
+  answers an anonymous caller,
+  subscribing the newspaper.
 
-🔰 生物学研究における選択バイアスにはどういうものがありそう？
-
----
-## 測定基準に関するバイアスの例
-
-基準が揃っていない
-: 国民1人あたりの弁護士数を国際比較すると日本が少ない。<br>
-  諸外国では税理士や司法書士を弁護士に含めて集計している。
-
-基準が時間とともに変化
-: 自閉症と診断された児童の数は**見かけ上**年々増えている。<br>
-  診断基準の変更、病気の知名度向上が主な原因。<br>
-  (親の高齢化の寄与を示唆する研究もあるらしい)
+🔰 Selection bias in biological research?
 
 ---
-## データの扱いに起因するバイアス
+## Biased data collection + interpretation
 
 Cherry picking 🍒
 : to collect information that confirm/support a hypothesis<br>
@@ -567,19 +552,18 @@ tibble::tibble(x = runif(n), y = runif(n)) |>
 ## Cognitive bias related to data interpretation
 
 Availability heuristic
-: 思い浮かびやすいものほど過大評価しがち
-: e.g., 1文字目がkの単語、3文字目がkの単語、多いのはどっち？
+: overrating an immediate example that came to mind
+: e.g., words with leading "k" vs words with "k" at third; which exist more?
 
 Representativeness heuristic
-: ステレオタイプを過大評価しがち
-: e.g., リンダは31歳の独身女性。率直で聡明。大学では哲学専攻。
-  人種差別や社会正義などに深く関心を持ち、学生時代には反核デモにも参加。<br>
-  現在のリンダは次のどちらである可能性が高いか？
-  1. リンダは銀行員として働いている。
-  1. リンダは銀行員として働きながら、フェミニスト運動に参加している。
+: overrating stereotypes.
+: e.g., Linda is a 31 year-old single woman. Honest and smart. Majors in philosophy.
+  Interested in racial discrimination and justice. Attended anti-nuclear demonstration as a student.<br>
+  Which is more likly as current Linda?
+  1. Linda is a bank teller.
+  1. Linda is a bank teller and being feminist.
 
-認知バイアス・誤謬はほかにもいろいろある。<br>
-データ解析とは関係なく、知っておくのは悪くない。
+There are many other cognitive bias and errors.<br>
 
 ???
 
@@ -588,11 +572,11 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
 
 
 ---
-## 偶然誤差によるばらつき方 = Probability distribution
+## Variations by random errors → probability distribution
 
 We will learn it [next time](7-distribution.html).
 
-背後にあるメカニズムによっていろんな形になる。
+Various shapes depending on underlying mechanisms.
 
 <iframe width="600" height="450" src="./7-distribution.html#/33"></iframe>
 
@@ -621,11 +605,9 @@ mode
   </div>
 </div>
 
-目的や状況に応じて使い分けよう。
-
-外れ値に対する応答
-: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
-  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+Reponses to outliers
+: Suppose a trillionaire with 20 trillion yen assets moved into Tottori pref..<br>
+  → **Mean** assets increases by 40M yen while **median** and **mode** remain.
 
 ---
 ## Summary statistics to describe variability/dispersion
@@ -881,8 +863,8 @@ Multiple testing correction
 : e.g., math scores and physics scores.
 
 <span class="causality">Causation</span>
-: ある事象が別の事象に影響を与える。
-: e.g., 1時間勉強するごとに成績が3点伸びる。
+: one phonomenon affects another.
+: e.g., studying 1 hour longer leads to scoring 3 points more.
 
 </div>
 <div class="column" style="flex-shrink: 1.8;">
@@ -915,7 +897,7 @@ tibble::tibble(
 
 
 ---
-## 因果・相関を見誤るパターン1: confounding factor
+## Misjudgement 1: confounding factor
 
 **誤:** Increasing 🍦icecream sales causes increasing 🍺beer sales.
 
@@ -954,7 +936,7 @@ tibble::tibble(
 
 
 ---
-## 因果・相関を見誤るパターン2: reverse causation
+## Misjudgement 2: reverse causation
 
 **誤:** <span class="causality-wrong">Increasing police officer causes increase in crimes.</span>
 
@@ -962,7 +944,7 @@ tibble::tibble(
 
 <br>
 
-## 因果・相関を見誤るパターン3: selection bias
+## Misjudgement 3: selection bias
 
 Collecting (x + y) pairs that fall within a specific range.
 
@@ -986,7 +968,7 @@ tibble::tibble(x = runif(n), y = runif(n)) |>
 
 
 ---
-## 因果・相関を見誤るパターン4: Outliers, group structures
+## Misjudgement 4: Outliers and group structures
 
 Correlation coefficient can jump by **a few outliers** and **group structures**.
 
@@ -1027,7 +1009,7 @@ cowplot::plot_grid(
 
 
 ---
-## 因果・相関を見誤るパターン5: by chance
+## Misjudgement 5: by chance
 
 Number of drowned people and the films in which Nicolas Cage appeared.
 
@@ -1040,7 +1022,7 @@ Number of drowned people and the films in which Nicolas Cage appeared.
 
 
 ---
-## 変数間の関係性まとめ
+## Relationship between variables
 
 <figure>
 <img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="1200">
@@ -1051,10 +1033,10 @@ Number of drowned people and the films in which Nicolas Cage appeared.
 
 <hr>
 
-- **<span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない**。
-- <span class="causality-wrong">逆の因果関係</span>や<span class="spurious">見せかけの相関</span>にも要注意。
+- **<span class="correlation">Correlation</span> does not imply <span class="causality">causation</span>**.
+- Be aware of <span class="causality-wrong">reverse causation</span> and <span class="spurious">spurious correlation</span>.
 
-🔰 これら4つの関係性に該当する事例をそれぞれ1つ以上探してみよう。
+🔰 Find examples of these four types of relationships.
 
 ???
 16--17世紀、怪我をしたら武器に軟膏を塗ると早く治るという迷信。
