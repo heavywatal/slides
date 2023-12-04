@@ -91,257 +91,75 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="この実習の目標">この実習の目標</h2>
-<h3 id="-del生物学研究にはデータとモデルが必須だと認識del">✅ <del>生物学研究にはデータとモデルが必須だと認識</del></h3>
-<h3 id="-del再現可能な解析を楽にやりたい気持ちになるdel">✅ <del>再現可能な解析を楽にやりたい気持ちになる</del></h3>
-<h3 id="-del必要な方法を調べ実践する力をつけるdel">✅ <del>必要な方法を調べ、実践する力をつける</del></h3>
-<h3 id="-データ解析の基本に触れる">⬜ データ解析の基本に触れる</h3>
-<br>
-個々の方法は覚えなくても大丈夫！<br>
-忘れては調べ、を何度も繰り返しながら染み込ませていこう。
+<h2 id="purposes-of-this-hands-on-lectures">Purposes of this hands-on lectures</h2>
+<h3 id="-delevery-biological-research-involves-data-and-modelsdel">✅ <del>Every biological research involves data and models</del></h3>
+<h3 id="-delyou-want-to-do-reproducible-analysisdel">✅ <del>You want to do reproducible analysis</del></h3>
+<h3 id="-dellearn-how-to-do-it-and-how-to-learn-moredel">✅ <del>Learn how to do it and how to learn more</del></h3>
+<h3 id="-glance-at-the-basics-of-data-analysis">⬜ Glance at the basics of data analysis</h3>
+<hr>
+<p>You don&rsquo;t have to remember every command.<br>
+Just repeat forgetting and searching.
 </section>
 <section>
-<h2 id="データを使ってやりたいこと">データを使ってやりたいこと</h2>
+<h2 id="what-do-you-want-to-do-with-data">What do you want to do with data?</h2>
 <ul>
-<li>現象を<strong>理解</strong>したい</li>
-<li>将来を<strong>予測</strong>したい</li>
-<li>ものを<strong>分類・判別</strong>したい</li>
-<li>挙動を<strong>制御</strong>したい</li>
-<li>新しい何かを<strong>生成</strong>したい</li>
+<li>to <strong>understand</strong> phenomena</li>
+<li>to <strong>predict</strong> future</li>
+<li>to <strong>classify</strong> objects</li>
+<li>to <strong>control</strong> behavior</li>
+<li>to <strong>generate</strong> something new</li>
 </ul>
-<p>そのために解析は必要？
-未加工の生データこそ宝？
+<p>Is analysis necessary for that?<br>
+Why not just raw data?
 </section>
 <section>
-<h2 id="データ解析って必要-生の数字見ればよくない">データ解析って必要？ 生の数字見ればよくない？</h2>
-<p>生のままでは複雑過ぎ、情報多すぎ、何もわからない。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price    x    y    z
-    1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
-    2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
-    3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
-    4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
-   --                                                               
-53937  0.72      Good     D     SI1  63.1    55  2757 5.69 5.75 3.61
-53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
-53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
-53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
-</code></pre><p>ダイヤモンド53,940個について10項目の値を持つデータセット</p>
-
+<h2 id="look-back-day-1">Look back day 1</h2>
+<iframe width="600" height="450" src="./1-introduction.html#/4"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/5"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/6"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/7"></iframe>
 </section>
 <section>
-<h2 id="要約統計量を見てみよう">要約統計量を見てみよう</h2>
-<p>各列の<strong>平均</strong>とか<strong>標準偏差</strong>とか:</p>
-<pre tabindex="0"><code>  stat carat depth table    price
-1 mean  0.80 61.75 57.46  3932.80
-2   sd  0.47  1.43  2.23  3989.44
-3  max  5.01 79.00 95.00 18823.00
-4  min  0.20 43.00 43.00   326.00
-</code></pre><p>大きさ <code>carat</code> と価格 <code>price</code> の<strong>相関係数</strong>はかなり高い:</p>
-<pre tabindex="0"><code>      carat depth table price
-carat  1.00                  
-depth  0.03  1.00            
-table  0.18 -0.30  1.00      
-price  0.92 -0.01  0.13  1.00
-</code></pre><p><strong>生のままよりは把握しやすい</strong>かも。</p>
-<p>しかし要注意&hellip;</p>
-
-</section>
-<section>
-<h2 id="代表値ばかり見て可視化を怠ると構造を見逃す">代表値ばかり見て可視化を怠ると構造を見逃す</h2>
-<figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
-</a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
-     style="position: absolute; left: 0; top: 0; z-index: 255;">
-</figure>
-
-</section>
-<section>
-<h2 id="作図してみると全体像構造が見やすい">作図してみると全体像・構造が見やすい</h2>
-<p>情報をうまく絞って整理 → <strong>直感的にわかる</strong></p>
-<p><img src="./figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds"></p>
-<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
-その度合いは <code>clarity</code> によって異なるらしい。</p>
-
-</section>
-<section>
-<h2 id="統計とは">統計とは</h2>
-<p>データをうまくまとめ、それに基づいて推論するための手法。</p>
-<ul>
-<li><strong>記述統計</strong>: データそのものを要約する
-<ul>
-<li>要約統計量 (e.g., 平均、標準偏差、etc.)</li>
-<li>作図、作表</li>
-</ul>
-</li>
-<li><strong>推測統計</strong>: データの背後にある母集団・生成過程を考える
-<ul>
-<li>数理モデル</li>
-<li>確率分布</li>
-<li>パラメータ(母数)</li>
-</ul>
-</li>
-</ul>
-<p>「グラフを眺めてなんとなく分かる」以上の分析には<strong>モデル</strong>が必要</p>
-
-</section>
-<section>
-<h2 id="モデルとは">モデルとは</h2>
-<p>対象システムを単純化・理想化して扱いやすくしたもの</p>
-<dl>
-<dt>Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="200" align="right" style="margin: 0 -5px;"></dt>
-<dd>数学的な方程式として記述されるもの。</dd>
-<dd>e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span></dd>
-<dd><br>
-</dd>
-<dt>Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="200" align="right"></dt>
-<dd>数値計算の手続きとして記述されるもの。</dd>
-<dd>e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span></dd>
-<dd><br>
-</dd>
-<dt>Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="320" align="right"></dt>
-<dd>具体的な事物で作られるもの。</dd>
-<dd>e.g., San Francisco Bay-Delta Model</dd>
-</dl>
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
-
-</section>
-<section>
-<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
-<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
- </p>
-<figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1000"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
-</section>
-<section>
-<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
-<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
-e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$</p>
+<h2 id="mathematical-models-in-data-science">Mathematical models in data science</h2>
+<p>Mathematical expression of assumptions to simulate data generation<br>
+e.g., the larger the more expensive: $\text{price} = A \times \text{carat} + B + \epsilon$</p>
 <p><img src="./figure/lm-diamonds-1.png" alt="plot of chunk lm-diamonds"></p>
-<p>新しく採れたダイヤモンドの価格予想とかにも使える。</p>
-<p>このように「YをXの関数として表す」ようなモデルを<strong>回帰</strong>と呼ぶ。</p>
+<dl>
+<dt>Regression</dt>
+<dd>express y as a function of x.</dd>
+</dl>
 
 </section>
 <section>
-<h2 id="今回は回帰を軸とした統計モデリングの解説">今回は回帰を軸とした統計モデリングの解説</h2>
-<p>単純な直線あてはめから出発し、ちょっとずつ統計モデリング。</p>
-<figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
-</a>
-</figure>
-
-</section>
-<section>
-<h2 id="回帰は教師あり機械学習の一種とも言える">回帰は教師あり機械学習の一種とも言える</h2>
-<figure>
-<img src="../tokiomarine2021/regression-in-ml.drawio.svg" width="1000">
-</figure>
-<p>でも統計モデリングはいわゆる“機械学習”とは違う気もする&hellip;?
-</section>
-<section>
-<h2 id="モデリングにおける2つのアプローチ">モデリングにおける2つのアプローチ</h2>
-<figure>
-<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-</section>
-<section>
-<h2 id="どっちも知っておいて使い分けたい">どっちも知っておいて使い分けたい</h2>
-<table>
-<thead>
-<tr>
-<th>項目</th>
-<th>統計モデリング</th>
-<th>近年の機械学習</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>例</td>
-<td>一般化線形モデル<br>階層ベイズモデル</td>
-<td>ランダムフォレスト<br>ニューラルネットワーク</td>
-</tr>
-<tr>
-<td>モデル構造</td>
-<td>単純化したい</td>
-<td>性能のためなら複雑化</td>
-</tr>
-<tr>
-<td>モデル解釈</td>
-<td><strong>ここが強み</strong></td>
-<td>難しい。重視しない。途上。</td>
-</tr>
-<tr>
-<td>予測・生成</td>
-<td>うまくすれば頑健</td>
-<td><strong>主目的</strong>。強力。高精度</td>
-</tr>
-<tr>
-<td>データ量</td>
-<td>少なくてもそれなり</td>
-<td>大量に必要</td>
-</tr>
-<tr>
-<td>計算量</td>
-<td>場合による</td>
-<td>場合による</td>
-</tr>
-</tbody>
-</table>
-
-</section>
-<section>
-<h2 id="統計モデリングのお品書き">統計モデリングのお品書き</h2>
+<h2 id="extending-linear-regression">Extending linear regression</h2>
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
 <img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
 </a>
 </figure>
-<p>久保先生の&quot;緑本&quot;こと<br>
-「データ解析のための統計モデリング入門」<br>
-をベースに回帰分析の概要を紹介。</p>
-<ol>
-<li>イントロ <a href="7-distribution.html">(#7 今回)</a></li>
-<li>統計モデルの基本
-<ul>
-<li>確率変数・<strong>確率分布</strong> 👈 主役</li>
-<li>尤度・最尤推定</li>
-</ul>
-</li>
-<li>一般化線形モデル、混合モデル <a href="8-glm.html">(#8 次回)</a></li>
-<li><del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない</li>
-</ol>
-<p>回帰のキモは<strong>線ではなく分布</strong>。</p>
-<hr>
-<cite>
-<p><a href="https://heavywatal.github.io/slides/tokiomarine2021/">Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)</a>
-の演習無し抜粋バージョン (~2時間 x 2回)。</p>
-</cite>
+<p><strong>Linear Model (LM)</strong> 👈 #7 today</p>
+<p><span style="color: #888888;">    ↓ probability distribution</span></p>
+<p><strong>Generalized Linear Model (GLM)</strong> <a href="8-glm.html">&mdash; #8 next time</a></p>
+<p><span style="color: #888888;">    ↓ individual difference, random effect</span></p>
+<p><strong>Generalized Linear Mixed Model (GLMM)</strong></p>
+<p><span style="color: #888888;">    ↓ flexible modelling</span></p>
+<p><strong>Hierarchical Bayesian Model (HBM)</strong></p>
+<p><cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012 より改変</cite></p>
 
 </section>
 <section>
-<h2 id="回帰モデルの2段階">回帰モデルの2段階</h2>
+<h2 id="two-parts-to-a-regression-model">Two parts to a regression model</h2>
 <ol>
 <li>
-<p>Define a <strong>family of models</strong>: だいたいどんな形か、式をたてる</p>
+<p>Define a <strong>family of models</strong>: express generic pattern</p>
 <ul>
-<li>直線: $y = a_1 + a_2 x$</li>
-<li>対数: $\log(y) = a_1 + a_2 x$</li>
-<li>二次曲線: $y = a_1 + a_2 x^2$</li>
+<li>straight line: $y = a_1 + a_2 x$</li>
+<li>log curve: $\log(y) = a_1 + a_2 x$</li>
+<li>quadratic curve: $y = a_1 + a_2 x^2$</li>
 </ul>
 </li>
 <li>
-<p>Generate a <strong>fitted model</strong>: データに合うようにパラメータを調整</p>
+<p>Generate a <strong>fitted model</strong>: adjust parameters to get closer to the data</p>
 <ul>
 <li>$y = 3x + 7$</li>
 <li>$y = 9x^2$</li>
@@ -353,54 +171,56 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 </cite>
 </section>
 <section>
-<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
-<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
+<h2 id="can-see-a-strong-pattern-the-taller-the-heavier">Can see a strong pattern: the taller the heavier</h2>
+<p>The relationship looks linear, $y = a x + b$.<br>
  </p>
 <p><img src="./figure/weight-height-1.png" alt="plot of chunk weight-height"></p>
 
 </section>
 <section>
-<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
-<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
-じゃあ傾き <em>a</em> と切片 <em>b</em>、どう決める？</p>
+<h2 id="can-see-a-strong-pattern-the-taller-the-heavier">Can see a strong pattern: the taller the heavier</h2>
+<p>The relationship looks linear, $y = a x + b$.<br>
+OK, let&rsquo;s try random slope <em>a</em> and intersect <em>b</em>:</p>
 <p><img src="./figure/weight-lines-1.png" alt="plot of chunk weight-lines"></p>
+<p>Need to find a good slope and intersect.</p>
 
 </section>
 <section>
-<h2 id="最小二乗法-ordinary-least-square-ols">最小二乗法 (Ordinary Least Square: OLS)</h2>
-<p><span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。</p>
+<h2 id="ordinary-least-square-ols">Ordinary Least Square (OLS)</h2>
+<p>minimizes the <strong style="color: #E69F00">residual</strong> sum of squares (RSS)
+from <span style="color: #3366ff">the regression line</span>.</p>
 <p><img src="./figure/weight-residual-1.png" alt="plot of chunk weight-residual"></p>
 
 </section>
 <section>
-<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
-<p>ランダムに試してみて、上位のものを採用。<br>
-この程度の試行回数では足りなそう。</p>
+<h2 id="searching-for-models-to-minimize-rss">Searching for models to minimize RSS</h2>
+<p>Try random values, and pick the best ones.<br>
+May need to generate much more to find good one.</p>
 <p><img src="./figure/weight-goodlines-1.png" alt="plot of chunk weight-goodlines"></p>
 
 </section>
 <section>
-<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
-<p><strong>グリッドサーチ</strong>: パラメータ空間の一定範囲内を均等に試す。<br>
-さっきのランダムよりはちょっとマシか。</p>
+<h2 id="searching-for-models-to-minimize-rss">Searching for models to minimize RSS</h2>
+<p><strong>Grid search</strong>: generate an evenly spaced grid of points.<br>
+Slightly more efficient than random search?</p>
 <p><img src="./figure/weight-grid-1.png" alt="plot of chunk weight-grid"></p>
-<p>こうした<strong>最適化</strong>の手法はいろいろあるけど、ここでは扱わない。</p>
+<p>There are many other <strong>optimization</strong> techniques although not covered here.</p>
 
 </section>
 <section>
-<h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
+<h2 id="r-can-find-the-optimum-in-an-instant">R can find the optimum in an instant</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">par_init</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="n">intercept</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">slope</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="nf">optim</span><span class="p">(</span><span class="n">par_init</span><span class="p">,</span> <span class="n">fn</span> <span class="o">=</span> <span class="n">rss_weight</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">$</span><span class="n">par</span>
 </span></span></code></pre></div><pre tabindex="0"><code>intercept     slope 
 -69.68394  78.53490 
 </code></pre><p><img src="./figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
-<p>上記コードは最適化一般の書き方。<br>
-回帰が目的なら次ページのようにするのが楽 →</p>
+<p>The code above is for general optimization.<br>
+For simple linear regression, an easier way is as follows&hellip;</p>
 
 </section>
 <section>
-<h2 id="lm-で直線あてはめしてみる"><code>lm()</code> で直線あてはめしてみる</h2>
+<h2 id="lm-function-to-fit-linear-models"><code>lm()</code> function to fit linear models</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">lm</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">mpg</span><span class="p">,</span> <span class="n">formula</span> <span class="o">=</span> <span class="n">hwy</span> <span class="o">~</span> <span class="n">displ</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>         term  estimate std.error statistic       p.value
@@ -410,55 +230,65 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 </span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg_added</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">&#34;#3366ff&#34;</span><span class="p">)</span>
 </span></span></code></pre></div><p><img src="./figure/lm-mpg-1.png" alt="plot of chunk lm-mpg"></p>
-<p>🔰 <code>diamonds</code> と <code>iris</code> でも <code>lm()</code> を試してみよう。</p>
+<p>🔰 Try <code>lm()</code> with <code>diamonds</code> and <code>iris</code>.</p>
 
 </section>
 <section>
-<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<h2 id="straight-lm-does-not-fit-all">Straight LM does not fit all</h2>
 <p><img src="./figure/lm-bad-1.png" alt="plot of chunk lm-bad"></p>
 <ul>
-<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
-<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
+<li>Prediction goes below zero whereas all the observations are <strong>positive</strong>.</li>
+<li>Y values are <strong>integer</strong>. Their <strong>dispersion</strong> is larger when X is larger.</li>
 </ul>
 
 </section>
 <section>
-<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<h2 id="straight-lm-does-not-fit-all">Straight LM does not fit all</h2>
 <p><img src="./figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
 <ul>
-<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
-<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
-<li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
+<li>Prediction goes below zero whereas all the observations are <strong>positive</strong>.</li>
+<li>Y values are <strong>integer</strong>. Their <strong>dispersion</strong> is larger when X is larger.</li>
+<li>Let&rsquo;s learn statistical modelling for better fitting to the data.</li>
 </ul>
 
 </section>
 <section>
-<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
-<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
-<p><span style="color: #888888;">    ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span></p>
-<p><strong>一般化線形モデル GLM</strong></p>
-<p><span style="color: #888888;">    ↓ 個体差などの変量効果を扱いたい</span></p>
-<p><strong>一般化線形混合モデル GLMM</strong></p>
-<p><span style="color: #888888;">    ↓ もっと自由なモデリングを！</span></p>
-<p><strong>階層ベイズモデル HBM</strong></p>
+<h2 id="extending-linear-regression">Extending linear regression</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p><strong>Linear Model (LM)</strong> 👈 #7 today</p>
+<p><span style="color: #888888;">    ↓ <span class="fragment highlight-blue custom bold">probability distribution</span></span></p>
+<p><strong>Generalized Linear Model (GLM)</strong> <a href="8-glm.html">&mdash; #8 next time</a></p>
+<p><span style="color: #888888;">    ↓ individual difference, random effect</span></p>
+<p><strong>Generalized Linear Mixed Model (GLMM)</strong></p>
+<p><span style="color: #888888;">    ↓ flexible modelling</span></p>
+<p><strong>Hierarchical Bayesian Model (HBM)</strong></p>
 <p><cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012 より改変</cite></p>
 
 </section>
 <section>
-<h2 id="確率分布">確率分布</h2>
-<p>発生する事象(値)と頻度の関係。</p>
-<p>手元のデータを数えて作るのが<strong>経験分布</strong><br>
-e.g., サイコロを12回投げた結果、学生1000人の身長</p>
+<h2 id="probability-distribution">Probability distribution</h2>
+<p>The relationship between phenomena and their frequencies.</p>
+<dl>
+<dt>empirical distribution</dt>
+<dd>created by collecting samples.<br></dd>
+<dd>e.g., rolling a dice 12 times, heights of 1000 students:</dd>
+</dl>
 <p><img src="./figure/distribution-1.png" alt="plot of chunk distribution"></p>
-<p>一方、少数のパラメータと数式で作るのが<strong>理論分布</strong>。<br>
-(こちらを単に「確率分布」と呼ぶことが多い印象）</p>
+<dl>
+<dt>theoretical distribution</dt>
+<dd>described with math equation and a few parameters.</dd>
+</dl>
 
 </section>
 <section>
-<h2 id="確率変数xはパラメータthetaの確率分布fに従う">確率変数$X$はパラメータ$\theta$の確率分布$f$に従う&hellip;?</h2>
+<h2 id="random-variable-x-follows-probability-distribution-f">Random variable $X$ follows probability distribution $f$</h2>
 <p>$X \sim f(\theta)$</p>
 <p>e.g.,<br>
-コインを3枚投げたうち表の出る枚数 $X$ は<strong>二項分布に従う</strong>。<br>
+The number of heads in tossing 3 fair coins $X$ <strong>follows binomial distribution</strong>.<br>
 $X \sim \text{Binomial}(n = 3, p = 0.5)$</p>
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
@@ -471,26 +301,26 @@ k &\in \{0, 1, 2, \ldots, n\}
 \end{split}\]
   </div>
 </div>
-<p>一緒に実験してみよう。</p>
+<p>Let&rsquo;s experiment.</p>
 
 </section>
 <section>
-<h2 id="試行を繰り返して記録してみる">試行を繰り返して記録してみる</h2>
-<p>コインを3枚投げたうち表の出た枚数 $X$</p>
-<p>試行1: <strong>表</strong> 裏 <strong>表</strong> → $X = 2$<br>
-試行2: 裏 裏 裏 → $X = 0$<br>
-試行3: <strong>表</strong> 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$</p>
+<h2 id="record-repeated-trials">Record repeated trials</h2>
+<p>The number of heads observed in tossing 3 fair coins: $X$</p>
+<p>trial 1: <strong>H</strong> T <strong>H</strong> → $X = 2$<br>
+trial 2: T T T → $X = 0$<br>
+trial 3: <strong>H</strong> T T → $X = 1$, subsequently, $2, 1, 3, 0, 2, \ldots$</p>
 <p><img src="./figure/rbinom-1.png" alt="plot of chunk rbinom"></p>
 <div style="text-align: right;">
-試行回数を増やすほど<b>二項分布</b>の形に近づく。<br>
-0と3はレア。1と2が3倍ほど出やすいらしい。
+It approaches asymptotically to <b>binomial distribution</b>.<br>
+0 and 3 is rare. 1 and 2 are three times more likely.
 </div>
 </section>
 <section>
-<h2 id="コイントスしなくても-x-らしきものを生成できる">コイントスしなくても $X$ らしきものを生成できる</h2>
+<h2 id="you-can-generate-similar-values-without-tossing-coins">You can generate similar values without tossing coins</h2>
 <ul>
-<li>コインを3枚投げたうち表の出る枚数 $X$</li>
-<li>$n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$</li>
+<li>The number of heads $X$ observed in tossing 3 fair coins.</li>
+<li>Random samples $X$ from the binomial distribution with $n = 3, p = 0.5$.</li>
 </ul>
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
@@ -498,50 +328,48 @@ k &\in \{0, 1, 2, \ldots, n\}
   </div>
   <div class="column" style="padding-top: 10px;">
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
-<p>   ↓ サンプル</p>
+<p>   ↓ sample</p>
 <p>{2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
   </div>
 </div>
-<p>これらはとてもよく似ているので<br>
-<strong>「コインをn枚投げたうち表の出る枚数は二項分布に従う」</strong><br>
-みたいな言い方をする。逆に言うと<br>
-<strong>「二項分布とはn回試行のうちの成功回数を確率変数とする分布」</strong><br>
-のように理解できる。</p>
+<p>These are so similar that we can say<br>
+&ldquo;The number of heads in <em>n</em> tosses follows binary distribution.&rdquo;</p>
+<p>Conversely, we can understand it like<br>
+&ldquo;Random variable of binomial distribution is the number of successes in <em>n</em> trials.&rdquo;</p>
 
 </section>
 <section>
-<h2 id="統計モデリングの一環とも捉えられる">統計モデリングの一環とも捉えられる</h2>
-<p>コイン3枚投げを繰り返して得たデータ {2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
-<p>   ↓ たった2つのパラメータで記述。情報を圧縮。</p>
-<p>$n = 3, p = 0.5$ の二項分布で説明・再現できるぞ</p>
+<h2 id="a-kind-of-statistical-modelling">A kind of statistical modelling</h2>
+<p>Tossing 3 fair coins repeatedly {2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
+<p>   ↓ describe with only two parameters. information reduction.</p>
+<p>Can reproduce with binary distribution with $n = 3, p = 0.5$</p>
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
-<p>こういうふうに現象と対応した確率分布、ほかにもある？</p>
+<p>Any other probability distributions related to real phenomena like this?</p>
 
 </section>
 <section>
-<h2 id="有名な確率分布それに従うもの">有名な確率分布、それに「従う」もの</h2>
+<h2 id="major-probability-distributions-and-related-phenomena">Major probability distributions and related phenomena</h2>
 <dl>
-<dt>離散一様分布</dt>
+<dt>Discrete uniform distribution</dt>
 <dd>コインの表裏、サイコロの出目1–6</dd>
-<dt>幾何分布</dt>
+<dt>Negative binomial distribution (Geometric distribution if n = 1)</dt>
 <dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
-<dt>二項分布</dt>
+<dt>Binomial distribution</dt>
 <dd>成功率p、試行回数nのうちの成功回数</dd>
-<dt>ポアソン分布</dt>
+<dt>Poisson distribution</dt>
 <dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
-<dt>ガンマ分布</dt>
+<dt>Gamma distribution (Exponential distribution if k = 1)</dt>
 <dd>ポアソン過程でk回起こるまでの待ち時間</dd>
-<dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
-<dt>正規分布</dt>
+<dt>Normal/Gaussian distribution</dt>
 <dd>確率変数の和、平均値</dd>
 </dl>
 
 </section>
 <section>
-<h2 id="離散一様分布">離散一様分布</h2>
+<h2 id="discrete-uniform-distribution">Discrete uniform distribution</h2>
 <p>同じ確率で起こるn通りの事象のうちXが起こる確率</p>
 <p>e.g., コインの表裏、サイコロの出目1–6</p>
 <p><img src="./figure/dunif-1.png" alt="plot of chunk dunif"></p>
@@ -549,7 +377,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 </section>
 <section>
-<h2 id="幾何分布-textgeomp">幾何分布 $~\text{Geom}(p)$</h2>
+<h2 id="geometric-textgeomp">Geometric $~\text{Geom}(p)$</h2>
 <p>成功率pの試行が初めて成功するまでの失敗回数</p>
 <p>e.g., コイントスで表が出るまでに何回裏が出るか</p>
 <p><img src="./figure/geometric-1.png" alt="plot of chunk geometric"></p>
@@ -558,16 +386,6 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 \]</p>
 <p>「初めて成功するまでの試行回数」とする定義もある。</p>
 <p>🔰 幾何分布になりそうな例を考えてみよう</p>
-
-</section>
-<section>
-<h2 id="二項分布-textbinomialnp">二項分布 $~\text{Binomial}(n,~p)$</h2>
-<p>確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。</p>
-<p><img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
-<p>\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
-\]</p>
-<p>🔰 二項分布になりそうな例を考えてみよう</p>
 
 </section>
 <section>
@@ -584,6 +402,17 @@ n = 1 のとき幾何分布と一致。</p>
 平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
 ($k \to \infty$でポアソン分布と一致)
 -->
+
+</section>
+<section>
+<h2 id="二項分布-textbinomialnp">二項分布 $~\text{Binomial}(n,~p)$</h2>
+<p>確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。</p>
+<p><img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
+<p>\[
+\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\]</p>
+<p>🔰 二項分布になりそうな例を考えてみよう</p>
+
 </section>
 <section>
 <h2 id="ポアソン分布-textpoissonlambda">ポアソン分布 $~\text{Poisson}(\lambda)$</h2>
@@ -649,24 +478,23 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 
 </section>
 <section>
-<h2 id="有名な確率分布対応関係ふりかえり">有名な確率分布対応関係ふりかえり</h2>
+<h2 id="major-probability-distributions-and-related-phenomena">Major probability distributions and related phenomena</h2>
 <figure style="float: right;">
 <img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
 </figure>
 <dl>
-<dt>離散一様分布</dt>
+<dt>Discrete uniform distribution</dt>
 <dd>コインの表裏、サイコロの出目1–6</dd>
-<dt>幾何分布</dt>
+<dt>Negative binomial distribution (Geometric distribution if n = 1)</dt>
 <dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
-<dt>二項分布</dt>
+<dt>Binomial distribution</dt>
 <dd>成功率p、試行回数nのうちの成功回数</dd>
-<dt>ポアソン分布</dt>
+<dt>Poisson distribution</dt>
 <dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
-<dt>ガンマ分布</dt>
+<dt>Gamma distribution (Exponential distribution if k = 1)</dt>
 <dd>ポアソン過程でk回起こるまでの待ち時間</dd>
-<dd>(k = 1のとき<strong>指数分布</strong>と呼ばれる)</dd>
-<dt>正規分布</dt>
-<dd>確率変数の和、平均値。使い勝手が良く、よく登場する。</dd>
+<dt>Normal/Gaussian distribution</dt>
+<dd>確率変数の和、平均値</dd>
 </dl>
 
 </section>
@@ -681,7 +509,7 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 
 </section>
 <section>
-<h2 id="疑似乱数生成器-pseudo-random-number-generator">疑似乱数生成器 Pseudo Random Number Generator</h2>
+<h2 id="pseudo-random-number-generator">Pseudo Random Number Generator</h2>
 <p>コンピューター上でランダム<strong>っぽい</strong>数値を出力する装置。<br>
 実際には<strong>決定論的</strong>に計算されているので、<br>
 シード(出発点)と呼び出し回数が同じなら出る数も同じになる。</p>
@@ -720,73 +548,74 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 
 </section>
 <section>
-<h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
-<p>ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
-個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。</p>
+<h2 id="fitting-probability-distributions-to-data">Fitting probability distributions to data</h2>
+<p>The number of seeds were counted for each of 50 plant individuals.<br>
+Individual A has 2 seeds, B has 4 seeds, &hellip;</p>
 <p><img src="./figure/poisson-seed-1.png" alt="plot of chunk poisson-seed"></p>
-<p>カウントデータだから<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？</p>
+<p>This count data looks <span class="fragment custom blur">Poisson</span>-distributed.<br>
+What is the optimal $\lambda$ value?</p>
 
 </section>
 <section>
-<h2 id="データに分布をあてはめたい">データに分布をあてはめたい</h2>
-<p>ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
-個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。</p>
+<h2 id="fitting-probability-distributions-to-data">Fitting probability distributions to data</h2>
+<p>The number of seeds were counted for each of 50 plant individuals.<br>
+Individual A has 2 seeds, B has 4 seeds, &hellip;</p>
 <p><img src="./figure/poisson-seed-lambda-1.png" alt="plot of chunk poisson-seed-lambda"></p>
-<p>カウントデータだからポアソン分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？</p>
-<p>黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
-よく重なるのは $\lambda \approx 3$ くらいか。</p>
+<p>This count data looks Poisson-distributed.<br>
+What is the optimal $\lambda$ value?</p>
+<p>Observations in black.
+<span style="color: #56B4E9;">Poisson distribution in blue</span>.
+$\lambda \approx 3$ looks good.</p>
 
 </section>
 <section>
-<h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
-<p><ruby>尤<rt>もっと</rt></ruby>もらしさ。
-モデルのあてはまりの良さの尺度のひとつ。</p>
-<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>。<br>
-定義通り素直に書くと<br>
+<h2 id="likelihood-a-measure-for-goodness-of-fit">Likelihood: a measure for goodness-of-fit</h2>
+<p>The probability to observe the data $D$ given the model $M$.<br>
 $\text{Prob}(D \mid M)$</p>
-<p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
-$L(M \mid D)$</p>
-<p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
-$L(\theta \mid D)$ とか $L(\theta)$ とか</p>
+<p><strong>Likelihood function</strong> is the same probability from different viewpoints:</p>
+<ul>
+<li>as a function of model $M$ given the data $D$,<br>
+$L(M \mid D)$<br></li>
+<li>as a function of parameters $\theta$,<br>
+$L(\theta \mid D)$ or $L(\theta)$</li>
+</ul>
 
 </section>
 <section>
-<h2 id="尤度を手計算できる例">尤度を手計算できる例</h2>
-<p>コインを5枚投げた結果 $D$: 表 4, 裏 1</p>
-<p>表が出る確率 $p = 0.5$ と仮定:</p>
+<h2 id="example-of-likelihood-calculation">Example of likelihood calculation</h2>
+<p>Data $D$: 4 heads (H) and 1 tail (T) in tossing a coin 5 times</p>
+<p>Assuming the probability of coming up head $p = 0.5$:</p>
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \text{Prob}(H \mid 0.5) ^ 4 \times \text{Prob}(T \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
-<p>表が出る確率 $p = 0.8$ と仮定:</p>
+<p>Assuming the probability of coming up head $p = 0.8$:</p>
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \text{Prob}(H \mid 0.8) ^ 4 \times \text{Prob}(T \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 <p>$L(0.8 \mid D) &gt; L(0.5 \mid D)$</p>
-<p>$p = 0.8$ のほうがより尤もらしい。</p>
+<p>$p = 0.8$ is more likely.</p>
 
 </section>
 <section>
-<h2 id="種子数ポアソン分布の例でも尤度を計算してみる">種子数ポアソン分布の例でも尤度を計算してみる</h2>
-<p>ある植物が作った種子を数える。$n = 50$個体ぶん。</p>
+<h2 id="likelihood-in-the-example-of-poisson-distribution">Likelihood in the example of Poisson distribution</h2>
+<p>The number of seeds were counted for each of 50 plant individuals.</p>
 <div>\[\begin{split}
 L(\lambda \mid D)
   = \prod _i ^n \text{Prob}(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 <p><img src="./figure/poisson-seed-likelihood-1.png" alt="plot of chunk poisson-seed-likelihood"></p>
-<p>この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。</p>
+<p>OK, $\lambda = 3$ is better than the other two. What is the best.</p>
 
 </section>
 <section>
-<h2 id="最尤推定-umuaximum-uluikelihood-ueustimation">最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation</h2>
-<p>扱いやすい <strong>対数尤度</strong> (log likelihood) にしてから計算する。<br>
-一階微分が0になる $\lambda$ を求めると&hellip;<strong>標本平均</strong>と一致。</p>
+<h2 id="umuaximum-uluikelihood-ueustimation"><u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation</h2>
+<p><strong>Log likelihood</strong> is often easier to handle.<br>
+Solving the differential equation for $\lambda$ &hellip;&hellip; finds <strong>the sample mean</strong></p>
 <div>\[\begin{split}
 \log L(\lambda \mid D)
   &= \sum _i ^n \left[ X_i \log (\lambda) - \lambda - \log (X_i !) \right] \\
@@ -798,79 +627,73 @@ L(\lambda \mid D)
 
 </section>
 <section>
-<h2 id="最尤推定を使っても真のλは得られない">最尤推定を使っても“真のλ”は得られない</h2>
-<p>今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
-「50個体サンプル→最尤推定」を1,000回繰り返してみると:</p>
+<h2 id="mle-does-not-give-you-true-λ">MLE does not give you “true λ”</h2>
+<p>The data was actually generated from “$X \sim \text{Poisson}(\lambda = 3.0)$”.</p>
+<p>By replicating &ldquo;sample 50 individuals → MLE&rdquo; 1,000 times,<br>
+we find great variability in estimation and empirical distributions:</p>
 <p><img src="./figure/poisson-mle-repl-1.png" alt="plot of chunk poisson-mle-repl"></p>
-<p>サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
-(標本データへのあてはまりはかなり良く見えるのに！)</p>
+<p>Note: Fitting to each sample looks not bad!</p>
 
 </section>
 <section>
-<h2 id="サンプルサイズを増やすほどマシにはなる">サンプルサイズを増やすほどマシにはなる</h2>
-<p>“$X \sim \text{Poisson}(\lambda = 3.0)$”からnサンプル→最尤推定を1,000回繰り返す:</p>
+<h2 id="alleviated-by-increasing-sample-size">Alleviated by increasing sample size</h2>
+<p>1,000 replications of MLE with $n$ individuals from $X \sim \text{Poisson}(\lambda = 3.0)$:</p>
 <p><img src="./figure/poisson-mle-nsam-1.png" alt="plot of chunk poisson-mle-nsam"></p>
-<p>Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
-A. 推定したい統計量とか、許容できる誤差とかによる。</p>
+<p>Q. How much is enough?<br>
+A. Depends on what you estimate, acceptable error range, etc.</p>
 
 </section>
 <section>
-<h2 id="すべてのモデルは間違っている">すべてのモデルは間違っている</h2>
-<p>確率分布がいい感じに最尤推定できたとしても、<br>
-それはあくまでモデル。仮定。近似。</p>
+<h2 id="mathematical-models-in-data-science">Mathematical models in data science</h2>
 <blockquote>
 <p>All models are wrong, but some are useful. &mdash; George E. P. Box</p>
 </blockquote>
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
 </section>
 <section>
-<h2 id="統計モデリングの道具-----まとめ">統計モデリングの道具 &mdash; まとめ</h2>
+<h2 id="toolbox-of-statistical-modelling">Toolbox of statistical modelling</h2>
 <ul>
-<li>何はともあれ作図して俯瞰</li>
-<li><strong>確率変数</strong> $X$</li>
-<li><strong>確率分布</strong> $X \sim f(\theta)$
+<li><strong>Random variable</strong> $X$</li>
+<li><strong>Probability distribution</strong> $X \sim f(\theta)$
 <ul>
-<li><strong>少ないパラメータ</strong> $\theta$ でばらつきの様子を表現</li>
-<li><strong>この現象はこの分布を作りがち(〜に従う)</strong> という知見がある</li>
+<li><strong>parameters</strong> $\theta$</li>
 </ul>
 </li>
-<li><strong>尤度</strong>
+<li><strong>Likelihood</strong>
 <ul>
-<li>あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$</li>
-<li>データ固定でモデル探索 → <strong>尤度関数</strong> $L(M \mid D),~L(\theta \mid D)$</li>
-<li>対数を取ったほうが扱いやすい → <strong>対数尤度</strong> $\log L(M \mid D)$</li>
-<li>これを最大化するようなパラメータ $\hat \theta$ 探し ＝ <strong>最尤法</strong></li>
+<li>The probability to observe the data given the model: $\text{Prob}(D \mid M)$</li>
+<li>as a function of model given the data → <strong>likelihood function</strong> $L(M \mid D),~L(\theta \mid D)$</li>
+<li><strong>Maximum Likelihood Estimation</strong> to fit parameters $\hat \theta$</li>
 </ul>
 </li>
 </ul>
 
 </section>
 <section>
-<h2 id="-4日目の課題1-尤度">🔰 4日目の課題1: 尤度</h2>
-<p>サイコロを10回振ったら6の目が3回出た。</p>
+<h2 id="-challenge-1-likelihood">🔰 Challenge 1: likelihood</h2>
+<p>Rolling a dice 10 times, 3 sixes were observed.</p>
 <ol>
 <li>
-<p>6の目の出る確率が1/6だとした場合の尤度は?</p>
+<p>Calculate likelihood assuming the probability to come up 6 $p = 1/6$.</p>
 </li>
 <li>
-<p>6の目の出る確率が0.2だとした場合の尤度は?</p>
+<p>Calculate likelihood assuming the probability to come up 6 $p = 0.2$.</p>
 </li>
 <li>
-<p>横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。</p>
+<p>Draw a graph with $p$ as horizontal axis, log likelihood as vertical axis.</p>
 </li>
 <li>
-<p>このサイコロで6の目が出る確率を最尤推定しよう。<br>
-数学で解ければ優。Rで見つければ良。目分量・勘で可。</p>
+<p>Estimate $p$ with MLE.<br>
+Excellent, if solved with math; Good, if solved with R; OK, by eye or intuition.</p>
 </li>
 </ol>
 <dl>
-<dt>ヒント</dt>
-<dd>確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。</dd>
-<dd>数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは <code>choose(5, 2)</code> 。</dd>
+<dt>Hint</dt>
+<dd>$\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ can be achieved with <code>choose(5, 2)</code> in R.</dd>
 </dl>
 
 </section>
