@@ -91,41 +91,29 @@ Graduate School of Life Sciences, Tohoku University
 
 </section>
 <section>
-<h2 id="統計モデリングのお品書き">統計モデリングのお品書き</h2>
+<h2 id="extending-linear-regression">Extending linear regression</h2>
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
 <img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
 </a>
 </figure>
-<p>久保先生の&quot;緑本&quot;こと<br>
-「データ解析のための統計モデリング入門」<br>
-をベースに回帰分析の概要を紹介。</p>
-<ol>
-<li>イントロ <a href="7-distribution.html">(#7 前回)</a></li>
-<li>統計モデルの基本
-<ul>
-<li>確率変数・<strong>確率分布</strong> 👈 主役</li>
-<li>尤度・最尤推定</li>
-</ul>
-</li>
-<li>一般化線形モデル、混合モデル <a href="8-glm.html">(#8 今回)</a></li>
-<li><del>ベイズ統計、階層ベイズモデル</del> (今回はここまでやらない)</li>
-</ol>
-<p>回帰のキモは<strong>線ではなく分布</strong>。</p>
-<hr>
-<cite>
-<p><a href="https://heavywatal.github.io/slides/tokiomarine2021/">Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)</a>
-の演習無し抜粋バージョン (~2時間 x 2回)。</p>
-</cite>
+<p><strong>Linear Model (LM)</strong> <a href="7-distribution.html">&mdash; #7 yesterday</a></p>
+<p><span style="color: #888888;">    ↓ probability distribution</span></p>
+<p><strong>Generalized Linear Model (GLM)</strong> 👈 #8 today</p>
+<p><span style="color: #888888;">    ↓ individual difference, random effect</span></p>
+<p><strong>Generalized Linear Mixed Model (GLMM)</strong></p>
+<p><span style="color: #888888;">    ↓ flexible modelling</span></p>
+<p><strong>Hierarchical Bayesian Model (HBM)</strong></p>
+<p><cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012 より改変</cite></p>
 
 </section>
 <section>
-<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<h2 id="straight-lm-does-not-fit-all">Straight LM does not fit all</h2>
 <img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
 <ul>
-<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
-<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
-<li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
+<li>Prediction goes below zero whereas all the observations are <strong>positive</strong>.</li>
+<li>Y values are <strong>integer</strong>. Their <strong>dispersion</strong> is larger when X is larger.</li>
+<li>Let&rsquo;s learn statistical modelling for better fitting to the data.</li>
 </ul>
 
 </section>
@@ -155,7 +143,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 </section>
 <section>
-<h2 id="説明変数が1つある一般化線形モデル">説明変数が1つある一般化線形モデル</h2>
+<h2 id="glm-with-one-explanatory-variable">GLM with one explanatory variable</h2>
 <p>個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
 平均値の対数$\log(\lambda_i)$は<strong>その個体の大きさ$x_i$に比例</strong>する。</p>
 <div class="column-container">
@@ -168,11 +156,12 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 <p><img src="./figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
   </div>
 </div>
-<p>この場合は<strong>単回帰</strong>。説明変数が複数あると<strong>重回帰</strong>。</p>
+<p><strong>simple linear regression</strong> with a single expl. variable.<br>
+<strong>multiple linear regression</strong> with multiple expl. variables.</p>
 
 </section>
 <section>
-<h2 id="複数の説明変数を同時に扱う重回帰">複数の説明変数を同時に扱う重回帰</h2>
+<h2 id="multiple-regression-with-multiple-explanatory-variables">Multiple regression with multiple explanatory variables</h2>
 <p>\[\begin{split}
 y_i &\sim \text{Poisson}(\lambda_i) \\
 \log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
@@ -183,10 +172,10 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 </section>
 <section>
-<h2 id="ロジスティック回帰">ロジスティック回帰</h2>
+<h2 id="logistic-regression">Logistic regression</h2>
 <ul>
-<li>確率分布: <strong>二項分布</strong></li>
-<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+<li>Probability distribution: <strong>binomial distribution</strong></li>
+<li>Link function: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
@@ -198,7 +187,7 @@ y_i &\sim \text{Binomial}(n,~p_i) \\
 \text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
-<p>ロジスティック関数↑</p>
+<p>Logistic function ↑</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 <p><img src="./figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
@@ -207,10 +196,10 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 
 </section>
 <section>
-<h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
+<h2 id="logistic-regression-narrow-sense">Logistic regression (narrow sense)</h2>
 <ul>
-<li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
-<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+<li>Probability distribution: <strong>Bernoulli distribution</strong> (binomial with $n = 1$)</li>
+<li>Link function: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
@@ -222,7 +211,7 @@ y_i &\sim \text{Bernoulli}(p_i) \\
 \text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
-<p>ロジスティック関数↑</p>
+<p>Logistic function ↑</p>
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 <p><img src="./figure/wind-1.png" alt="plot of chunk wind"></p>
@@ -231,10 +220,10 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 
 </section>
 <section>
-<h2 id="一般線形モデル-化無し-はglmの一種">一般線形モデル (“化”無し) はGLMの一種</h2>
+<h2 id="lm-is-a-special-case-of-glm">LM is a special case of GLM</h2>
 <ul>
-<li>確率分布: <strong>正規分布</strong></li>
-<li>リンク関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
+<li>Probability distribution: <strong>Normal distribution</strong></li>
+<li>Link function: <strong>identity</strong> (does nothing)</li>
 </ul>
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
@@ -252,7 +241,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 
 </section>
 <section>
-<h2 id="分散分析-uanualysis-uouf-uvauriance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
+<h2 id="uanualysis-uouf-uvauriance-anova-as-glm"><u>An</u>alysis <u>o</u>f <u>va</u>riance (ANOVA) as GLM</h2>
 <p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等リンク</strong>のGLM、と解釈可能。<br>
 <span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
 <div class="column-container">
@@ -301,7 +290,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 </section>
 <section>
-<h2 id="共分散分析-uanualysis-of-ucovauriance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
+<h2 id="uanualysis-of-ucovauriance-ancova-as-glm"><u>An</u>alysis of <u>cova</u>riance (ANCOVA) as GLM</h2>
 <p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
 正規分布・等分散・恒等リンクなどが仮定される。</p>
 <div class="column-container">
@@ -349,7 +338,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 </section>
 <section>
-<h2 id="交互作用">交互作用</h2>
+<h2 id="interaction">Interaction</h2>
 <p>ある説明変数の効果が、別の説明変数によって異なる。<br>
 e.g., ビール売上の温度依存性が天気によって異なる。</p>
 <div class="column-container">
@@ -387,48 +376,48 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 </section>
 <section>
-<h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
+<h2 id="generalized-linear-model-glm-wrap-up">Generalized Linear Model (GLM) wrap-up</h2>
 <p>確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
 特定の組み合わせには名前がある。</p>
 <table>
 <thead>
 <tr>
-<th>名前</th>
-<th>確率分布</th>
-<th>リンク関数</th>
-<th>説明変数</th>
+<th>Name</th>
+<th>Distribution</th>
+<th>Link funcrtion</th>
+<th>expl. variables</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>ポアソン回帰</td>
-<td>ポアソン分布</td>
+<td>Poisson regression</td>
+<td>Poisson</td>
 <td>log</td>
 <td></td>
 </tr>
 <tr>
-<td>ロジスティック回帰</td>
-<td>二項分布</td>
+<td>Logistic regression</td>
+<td>Binomial</td>
 <td>logit</td>
 <td></td>
 </tr>
 <tr>
-<td>一般線形回帰</td>
-<td>正規分布</td>
-<td>恒等</td>
+<td>LM</td>
+<td>Normal</td>
+<td>identity</td>
 <td></td>
 </tr>
 <tr>
-<td>分散分析</td>
-<td>正規分布</td>
-<td>恒等</td>
-<td>質的変数</td>
+<td>ANOVA</td>
+<td>Normal</td>
+<td>identity</td>
+<td>qualitative</td>
 </tr>
 <tr>
-<td>共分散分析</td>
-<td>正規分布</td>
-<td>恒等</td>
-<td>質的変数+量的変数</td>
+<td>ANCOVA</td>
+<td>Normal</td>
+<td>identity</td>
+<td>qualitative+quantitative</td>
 </tr>
 </tbody>
 </table>
@@ -436,7 +425,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 </section>
 <section>
-<h2 id="リンク関数">リンク関数</h2>
+<h2 id="link-functions">Link functions</h2>
 <p>統計モデリングにおいて「まっすぐ以外も表現できる」意味</p>
 <dl>
 <dt>$\text{identity}(\mu_i)$</dt>
@@ -455,8 +444,8 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 
 </section>
 <section>
-<h2 id="rにおけるglmのやりかた">RにおけるGLMのやりかた</h2>
-<p>直線回帰のときの <code>lm</code> とほぼ同じ。</p>
+<h2 id="glm-in-r">GLM in R</h2>
+<p>Almost the same way as with <code>lm</code>:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">formula</span> <span class="o">=</span> <span class="n">weight</span> <span class="o">~</span> <span class="n">height</span>
 </span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_weight</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">coef</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
@@ -508,7 +497,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 
 </section>
 <section>
-<h2 id="-ポアソン回帰">🔰 ポアソン回帰</h2>
+<h2 id="-poisson-regression">🔰 Poisson regression</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">300L</span>
 </span></span><span class="line"><span class="cl"><span class="n">a</span> <span class="o">=</span> <span class="m">3</span>
 </span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="m">-3</span>
@@ -530,7 +519,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </code></pre>
 </section>
 <section>
-<h2 id="-重回帰">🔰 重回帰</h2>
+<h2 id="-multiple-regression">🔰 Multiple regression</h2>
 <p><code>pred</code> で回帰線を引くには <code>add_predictions()</code> の使い方に工夫が必要。<br>
 とりあえず <code>geom_point()</code> で&quot;回帰点々&quot;を表示してみるとこまでで可とする。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
@@ -554,7 +543,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </code></pre>
 </section>
 <section>
-<h2 id="-ロジスティック回帰">🔰 ロジスティック回帰</h2>
+<h2 id="-logistic-regression">🔰 Logistic regression</h2>
 <p>次ページにヒント。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sigmoid</span> <span class="o">=</span> <span class="kr">function</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">gain</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span> <span class="p">{</span><span class="m">1</span> <span class="o">/</span> <span class="p">(</span><span class="m">1</span> <span class="o">+</span> <span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">gain</span> <span class="o">*</span> <span class="n">x</span><span class="p">))}</span>
 </span></span><span class="line"><span class="cl"><span class="n">nrep</span> <span class="o">=</span> <span class="m">200L</span>
@@ -580,7 +569,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </code></pre>
 </section>
 <section>
-<h2 id="ロジスティック回帰のヒント">ロジスティック回帰のヒント</h2>
+<h2 id="hint-for-logistic-regression">Hint for Logistic regression</h2>
 <p>左辺の応答変数に指定できるのはだいたい次の2種類:</p>
 <ul>
 <li>成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)</li>
@@ -594,7 +583,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 
 </section>
 <section>
-<h2 id="-共分散分析-glm-with-質的変数--量的変数">🔰 共分散分析: GLM with 質的変数 + 量的変数</h2>
+<h2 id="-ancova-glm-with-qualitative--quantitative-vars">🔰 ANCOVA: GLM with qualitative + quantitative vars</h2>
 <p>まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
 </span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">70</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">20</span><span class="p">,</span> <span class="m">-20</span><span class="p">)</span>  <span class="c1"># true coef</span>
@@ -623,7 +612,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </code></pre>
 </section>
 <section>
-<h2 id="-交互作用">🔰 交互作用</h2>
+<h2 id="-interaction">🔰 Interaction</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">200L</span>
 </span></span><span class="line"><span class="cl"><span class="n">b</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">70</span><span class="p">,</span> <span class="m">3</span><span class="p">,</span> <span class="m">100</span><span class="p">,</span> <span class="m">-2</span><span class="p">)</span>  <span class="c1"># true coef</span>
 </span></span><span class="line"><span class="cl"><span class="n">weather_levels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;sunny&#34;</span><span class="p">,</span> <span class="s">&#34;rainy&#34;</span><span class="p">)</span>
@@ -649,8 +638,8 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 </code></pre>
 </section>
 <section>
-<h2 id="データはひとつモデルはたくさん">データはひとつ、モデルはたくさん</h2>
-<p>どう選ぶ？</p>
+<h2 id="one-data-many-possible-models">One data, many possible models</h2>
+<p>How can we choose?</p>
 <ol>
 <li>メカニズム的に納得できるものを選ぶ
 <ul>
@@ -671,14 +660,16 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 
 </section>
 <section>
-<h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
-<p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>:<br>
+<h2 id="likelihood-a-measure-for-goodness-of-fit">Likelihood: a measure for goodness-of-fit</h2>
+<p>The probability to observe the data $D$ given the model $M$.<br>
 $\text{Prob}(D \mid M)$</p>
-<p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
-$L(M \mid D)$</p>
-<p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
-$L(\theta \mid D)$ or $L(\theta)$</p>
-<p><strong>対数尤度</strong> $\log L$ の形にしたほうがいろいろ便利。</p>
+<p><strong>Likelihood function</strong> is the same probability from different viewpoints:</p>
+<ul>
+<li>as a function of model $M$ given the data $D$,<br>
+$L(M \mid D)$<br></li>
+<li>as a function of parameters $\theta$,<br>
+$L(\theta \mid D)$ or $L(\theta)$</li>
+</ul>
 <hr>
 <p>各モデルで最適なパラメータを探して、比較:<br>
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$</p>
@@ -697,13 +688,13 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <section>
 <h2 id="あてはまりが良ければいいってもんでもない">あてはまりが良ければいいってもんでもない</h2>
 <dl>
-<dt>過剰適合 / 過学習 / overfitting</dt>
+<dt>Overfitting</dt>
 <dd>パラメータを増やせば<strong>現データへの</strong>適合度・尤度を高くできるが、<br>
 予測・理解の役には立たなくなる。</dd>
 </dl>
 <p><img src="./figure/saturated-model-1.png" alt="plot of chunk saturated-model"></p>
-<p><strong>帰無モデル</strong>: 説明変数なし。切片のみ。<br>
-<strong>飽和モデル</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル</p>
+<p><strong>null model</strong>: 説明変数なし。切片のみ。<br>
+<strong>saturated model</strong>: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル</p>
 
 </section>
 <section>
@@ -714,7 +705,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="aic-赤池情報量基準">AIC: 赤池情報量基準</h2>
+<h2 id="aic-akaike-information-criterion">AIC: Akaike Information Criterion</h2>
 <p>\[\begin{split}
 \text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
 \end{split}\]</p>
@@ -812,7 +803,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<h2 id="penguins-dataset">penguins dataset</h2>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
 <cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
@@ -825,7 +816,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </span></span></code></pre></div>
 </section>
 <section>
-<h2 id="penguinsデータセット">penguinsデータセット</h2>
+<h2 id="penguins-dataset">penguins dataset</h2>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
 <cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
@@ -844,7 +835,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </code></pre>
 </section>
 <section>
-<h2 id="欠損値のある行を取り除いておく">欠損値のある行を取り除いておく</h2>
+<h2 id="remove-rows-with-missing-values-first">Remove rows with missing values first</h2>
 <p>性別はとりあえず使わないので、体長関連だけでも。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">if_any</span><span class="p">(</span><span class="nf">everything</span><span class="p">(),</span> <span class="n">is.na</span><span class="p">))</span>
 </span></span></code></pre></div><pre tabindex="0"><code>   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex year
@@ -863,7 +854,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </code></pre>
 </section>
 <section>
-<h2 id="-penguinsでglmの練習">🔰 penguinsでGLMの練習</h2>
+<h2 id="-practice-glm-with-penguins">🔰 Practice GLM with penguins</h2>
 <p>次の課題を解いてみよう。<br>
 (次ページ以降に解答。まずは自力で。)</p>
 <ol>
@@ -876,7 +867,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
+<h2 id="simple-regression-1-plot-data">Simple regression: 1. Plot data</h2>
 <p>どうやら、重いペンギンほど翼長も長い。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">,</span> <span class="n">flipper_length_mm</span><span class="p">)</span> <span class="o">+</span>
@@ -888,7 +879,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 
 </section>
 <section>
-<h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
+<h2 id="simple-regression-2-fit">Simple regression: 2. Fit</h2>
 <p>とりあえずデフォルトの正規分布・恒等リンク。
 $y = 136.7 + 0.0153 x$</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
@@ -902,7 +893,7 @@ $y = 136.7 + 0.0153 x$</p>
 </code></pre>
 </section>
 <section>
-<h2 id="単回帰の練習-3-フィッティング結果を作図">単回帰の練習: 3. フィッティング結果を作図</h2>
+<h2 id="simple-regression-3-plot-the-fitting-result">Simple regression: 3. Plot the fitting result</h2>
 <p>結果とデータから予測値を作って回帰線を引く。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added1</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit1</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span>
@@ -912,7 +903,7 @@ $y = 136.7 + 0.0153 x$</p>
 
 </section>
 <section>
-<h2 id="重回帰の練習-1-まず作図">重回帰の練習: 1. まず作図</h2>
+<h2 id="multiple-regression-1-plot-data">Multiple regression: 1. Plot data</h2>
 <p>種によって色分けしてみると、傾向の違いが見える。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight_color</span> <span class="o">=</span> <span class="n">p_penweight</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">species</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">scale_color_manual</span><span class="p">(</span><span class="n">values</span> <span class="o">=</span> <span class="n">penguins_colors</span><span class="p">)</span>
@@ -921,7 +912,7 @@ $y = 136.7 + 0.0153 x$</p>
 
 </section>
 <section>
-<h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
+<h2 id="multiple-regression-2-fit">Multiple regression: 2. Fit</h2>
 <p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
@@ -937,7 +928,7 @@ $y = 136.7 + 0.0153 x$</p>
 </code></pre>
 </section>
 <section>
-<h2 id="重回帰の練習-3-フィッティング結果を作図">重回帰の練習: 3. フィッティング結果を作図</h2>
+<h2 id="multiple-regression-3-plot-the-fitting-result">Multiple regression: 3. Plot the fitting result</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added2</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added2</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
@@ -947,7 +938,7 @@ $y = 136.7 + 0.0153 x$</p>
 
 </section>
 <section>
-<h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
+<h2 id="interaction-fit">Interaction: Fit</h2>
 <p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
@@ -965,7 +956,7 @@ $y = 136.7 + 0.0153 x$</p>
 </code></pre>
 </section>
 <section>
-<h2 id="交互作用の練習-フィッティング結果を作図">交互作用の練習: フィッティング結果を作図</h2>
+<h2 id="interaction-plot-the-fitting-result">Interaction: Plot the fitting result</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">added3</span> <span class="o">=</span> <span class="n">modelr</span><span class="o">::</span><span class="nf">add_predictions</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">,</span> <span class="n">fit3</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;response&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p_penweight_color</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">pred</span><span class="p">),</span> <span class="n">data</span> <span class="o">=</span> <span class="n">added3</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
@@ -974,7 +965,7 @@ $y = 136.7 + 0.0153 x$</p>
 
 </section>
 <section>
-<h2 id="ここまでの3つのモデルでどれがいいか">ここまでの3つのモデルでどれがいいか？</h2>
+<h2 id="which-is-the-best-of-three">Which is the best of three?</h2>
 <p>AICで選ぶなら交互作用入り重回帰が良さそう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">labels</span> <span class="o">=</span> <span class="nf">sprintf</span><span class="p">(</span><span class="s">&#34;AIC = %.1f&#34;</span><span class="p">,</span> <span class="nf">AIC</span><span class="p">(</span><span class="n">fit1</span><span class="p">,</span> <span class="n">fit2</span><span class="p">,</span> <span class="n">fit3</span><span class="p">)</span><span class="o">$</span><span class="n">AIC</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">p1</span> <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="n">labels[1]</span><span class="p">),</span>
@@ -990,7 +981,7 @@ $y = 136.7 + 0.0153 x$</p>
 
 </section>
 <section>
-<h2 id="-4日目の課題2-架空データでglm">🔰 4日目の課題2: 架空データでGLM</h2>
+<h2 id="-challenge-glm-with-fictional-data">🔰 Challenge: GLM with fictional data</h2>
 <p>宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。<br>
 冒険者の<strong>レベル</strong>、<strong>職業</strong>、通ってきた<strong>ルート</strong>、魔物との<strong>遭遇回数</strong>。<br>
 これらの変数の間に、なんらかの関係は見られるだろうか？</p>
@@ -1008,7 +999,7 @@ $y = 136.7 + 0.0153 x$</p>
 </code></pre>
 </section>
 <section>
-<h2 id="-最終課題-オープンデータを拾って解析しよう">🔰 最終課題: オープンデータを拾って解析しよう。</h2>
+<h2 id="-final-challenge-analyze-public-datasets">🔰 Final challenge: Analyze public datasets</h2>
 <ul>
 <li><a href="https://www.e-stat.go.jp/">e-Stat</a>: 政府統計の総合窓口</li>
 <li><a href="https://www.data.go.jp/data/dataset?res_format=CSV">data.go.jp データカタログサイト</a>: 中央省庁</li>
@@ -1026,7 +1017,7 @@ $y = 136.7 + 0.0153 x$</p>
 <p>週明けに班内で話し合ってベスト2を選び、全体に向けて発表。
 </section>
 <section>
-<h2 id="ここ以降は余裕があれば進む">ここ以降は余裕があれば進む</h2>
+<h2 id="i-guess-we-dont-have-time-to-go-further">I guess we don&rsquo;t have time to go further</h2>
 
 </section>
 <section>

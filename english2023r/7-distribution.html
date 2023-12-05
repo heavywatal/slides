@@ -313,11 +313,11 @@ trial 3: <strong>H</strong> T T → $X = 1$, subsequently, $2, 1, 3, 0, 2, \ldot
 <p><img src="./figure/rbinom-1.png" alt="plot of chunk rbinom"></p>
 <div style="text-align: right;">
 It approaches asymptotically to <b>binomial distribution</b>.<br>
-0 and 3 is rare. 1 and 2 are three times more likely.
+0 and 3 are rare. 1 and 2 are three times more likely.
 </div>
 </section>
 <section>
-<h2 id="you-can-generate-similar-values-without-tossing-coins">You can generate similar values without tossing coins</h2>
+<h2 id="similar-values-can-be-generated-without-tossing-coins">Similar values can be generated without tossing coins</h2>
 <ul>
 <li>The number of heads $X$ observed in tossing 3 fair coins.</li>
 <li>Random samples $X$ from the binomial distribution with $n = 3, p = 0.5$.</li>
@@ -333,7 +333,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
   </div>
 </div>
 <p>These are so similar that we can say<br>
-&ldquo;The number of heads in <em>n</em> tosses follows binary distribution.&rdquo;</p>
+&ldquo;The number of heads in <em>n</em> tosses follows binomial distribution.&rdquo;</p>
 <p>Conversely, we can understand it like<br>
 &ldquo;Random variable of binomial distribution is the number of successes in <em>n</em> trials.&rdquo;</p>
 
@@ -341,8 +341,8 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <section>
 <h2 id="a-kind-of-statistical-modelling">A kind of statistical modelling</h2>
 <p>Tossing 3 fair coins repeatedly {2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
-<p>   ↓ describe with only two parameters. information reduction.</p>
-<p>Can reproduce with binary distribution with $n = 3, p = 0.5$</p>
+<p>   ↑ simulate phenomena with a few parameters</p>
+<p>Sample from binomial distribution with $n = 3, p = 0.5$</p>
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
@@ -354,50 +354,50 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <h2 id="major-probability-distributions-and-related-phenomena">Major probability distributions and related phenomena</h2>
 <dl>
 <dt>Discrete uniform distribution</dt>
-<dd>コインの表裏、サイコロの出目1–6</dd>
-<dt>Negative binomial distribution (Geometric distribution if n = 1)</dt>
-<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
+<dd>tossing fair coins, rolling fair dice</dd>
+<dt>Negative binomial distribution<br>(Geometric distribution if n = 1)</dt>
+<dd>failures before the n-th success in trials with p</dd>
 <dt>Binomial distribution</dt>
-<dd>成功率p、試行回数nのうちの成功回数</dd>
+<dd>successes in n trials with p</dd>
 <dt>Poisson distribution</dt>
-<dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
+<dd>occurrences of a Poisson process with $\lambda$</dd>
 <dt>Gamma distribution (Exponential distribution if k = 1)</dt>
-<dd>ポアソン過程でk回起こるまでの待ち時間</dd>
+<dd>waiting time until k-th occurrence of a Poisson process with $\lambda$</dd>
 <dt>Normal/Gaussian distribution</dt>
-<dd>確率変数の和、平均値</dd>
+<dd>sum of random variables, sample means, etc.</dd>
 </dl>
 
 </section>
 <section>
 <h2 id="discrete-uniform-distribution">Discrete uniform distribution</h2>
-<p>同じ確率で起こるn通りの事象のうちXが起こる確率</p>
-<p>e.g., コインの表裏、サイコロの出目1–6</p>
+<p>Every X in n values has equal probability $1/n$.</p>
+<p>e.g., fair coin [0,1], fair dice [1,6]</p>
 <p><img src="./figure/dunif-1.png" alt="plot of chunk dunif"></p>
-<p>🔰 一様分布になりそうな例を考えてみよう</p>
+<p>🔰 Other examples of discrete uniform distribution?</p>
 
 </section>
 <section>
-<h2 id="geometric-textgeomp">Geometric $~\text{Geom}(p)$</h2>
-<p>成功率pの試行が初めて成功するまでの失敗回数</p>
-<p>e.g., コイントスで表が出るまでに何回裏が出るか</p>
+<h2 id="geometric-distribution-textgeomp">Geometric distribution $~\text{Geom}(p)$</h2>
+<p>$X$ failures before the first success with success probability $p$ for each trial.</p>
+<p>e.g., How many tails before first head with a coin?</p>
 <p><img src="./figure/geometric-1.png" alt="plot of chunk geometric"></p>
 <p>\[
 \text{Prob}(X = k \mid p) = p (1 - p)^k
 \]</p>
-<p>「初めて成功するまでの試行回数」とする定義もある。</p>
-<p>🔰 幾何分布になりそうな例を考えてみよう</p>
+<p>There is another definition: $X$ trials until the first success.</p>
+<p>🔰 Other examples?</p>
 
 </section>
 <section>
-<h2 id="負の二項分布-textnbn-p">負の二項分布 $~\text{NB}(n, p)$</h2>
-<p>成功率pの試行がn回成功するまでの失敗回数X。
-n = 1 のとき幾何分布と一致。</p>
+<h2 id="negative-binomial-distribution-textnbn-p">Negative binomial distribution $~\text{NB}(n, p)$</h2>
+<p>$X$ failures before the n-th success with success probability $p$ for each trial.<br>
+(identical to geometric distribution when n = 1)</p>
 <p><img src="./figure/nbinom-1.png" alt="plot of chunk nbinom"></p>
 <p>\[
 \text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \]</p>
-<p>失敗回数ではなく試行回数を変数とする定義もある。</p>
-<p>🔰 負の二項分布になりそうな例を考えてみよう</p>
+<p>There is another definition: $X$ trials until the n-th success.</p>
+<p>🔰 Other examples?</p>
 <!--
 平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
 ($k \to \infty$でポアソン分布と一致)
@@ -405,55 +405,57 @@ n = 1 のとき幾何分布と一致。</p>
 
 </section>
 <section>
-<h2 id="二項分布-textbinomialnp">二項分布 $~\text{Binomial}(n,~p)$</h2>
-<p>確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。</p>
+<h2 id="binomial-distribution-textbinomialnp">Binomial distribution $~\text{Binomial}(n,~p)$</h2>
+<p>$X$ successes in $n$ trials with success probability $p$ for each trial.</p>
 <p><img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
 <p>\[
 \text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \]</p>
-<p>🔰 二項分布になりそうな例を考えてみよう</p>
+<p>🔰 Other examples?</p>
 
 </section>
 <section>
-<h2 id="ポアソン分布-textpoissonlambda">ポアソン分布 $~\text{Poisson}(\lambda)$</h2>
-<p>平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。</p>
-<p>e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数</p>
+<h2 id="poisson-distribution-textpoissonlambda">Poisson distribution $~\text{Poisson}(\lambda)$</h2>
+<p>$X$ occurrences of a <strong>Poisson process</strong> in a fixed interval of time (space).<br>
+<strong>Poisson process</strong>: Events occur at a constant rate $\lambda$</p>
+<p>e.g., messages received per hour, number of individuals in a quadrat</p>
 <p><img src="./figure/dpoisson-1.png" alt="plot of chunk dpoisson"></p>
 <p>\[
 \text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \]</p>
-<p>二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
-めったに起きないことを何回も試行するような感じ。</p>
+<p>The limit of binomial distribution $(\lambda = np;~n \to \infty;~p \to 0)$<br>
+≈ many trials of extremely rare events.</p>
 
 </section>
 <section>
-<h2 id="指数分布-textexplambda">指数分布 $~\text{Exp}(\lambda)$</h2>
-<p>ポアソン過程の事象の発生間隔。平均は $1 / \lambda$ 。</p>
-<p>e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔</p>
+<h2 id="exponential-distribution-textexplambda">Exponential distribution $~\text{Exp}(\lambda)$</h2>
+<p>Interval $X$ between occurrences of a <strong>Poisson process</strong>.<br>
+<strong>Poisson process</strong>: Events occur at a constant rate $\lambda$</p>
+<p>e.g., intervals between messages received, between gloves left on a road</p>
 <p><img src="./figure/dexp-1.png" alt="plot of chunk dexp"></p>
 <p>\[
 \text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
 \]</p>
-<p>幾何分布の連続値版。</p>
-<p>🔰 ポアソン分布・指数分布になりそうな例を考えてみよう</p>
+<p>The continuous counterpart of geometric distribution.</p>
+<p>🔰 Other examples?</p>
 
 </section>
 <section>
-<h2 id="ガンマ分布-textgammaklambda">ガンマ分布 $~\text{Gamma}(k,~\lambda)$</h2>
-<p>ポアソン過程の事象k回発生までの待ち時間</p>
-<p>e.g., メッセージを2つ受信するまでの待ち時間</p>
+<h2 id="gamma-distribution-textgammaklambda">Gamma distribution $~\text{Gamma}(k,~\lambda)$</h2>
+<p>Waiting time $X$ until $k$-th occurrence of a <strong>Poisson process</strong>.
+<strong>Poisson process</strong>: Events occur at a constant rate $\lambda$</p>
+<p>e.g., Waiting time until receiving two messages</p>
 <p><img src="./figure/dgamma-1.png" alt="plot of chunk dgamma"></p>
 <p>\[
 \text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \]</p>
-<p>指数分布をkのぶん右に膨らませた感じ。<br>
-shapeパラメータ $k = 1$ のとき指数分布と一致。</p>
+<p>Identical when shape parameter $k = 1$.</p>
 
 </section>
 <section>
-<h2 id="正規分布-mathcalnmusigma">正規分布 $~\mathcal{N}(\mu,~\sigma)$</h2>
-<p>平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
-e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):</p>
+<h2 id="normalgaussian-distribution-mathcalnmusigma">Normal/Gaussian distribution $~\mathcal{N}(\mu,~\sigma)$</h2>
+<p>Beautiful distribution with two parameters: mean $\mu$, standard deviation $\sigma$.<br>
+e.g., $\mu = 50, ~\sigma = 10$:</p>
 <p><img src="./figure/gaussian-1.png" alt="plot of chunk gaussian"></p>
 <p>\[
 \text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
@@ -461,19 +463,19 @@ e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれ�
 
 </section>
 <section>
-<h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
-<p>標本平均の反復(<strong>中心極限定理</strong>);
-e.g., 一様分布 [0, 100) から40サンプル</p>
+<h2 id="many-distributions-approach-normal-distribution">Many distributions approach normal distribution</h2>
+<p>Distribution of sample means (<strong>central limit theorem</strong>);
+e.g., average of 40 samples from uniform distribution [0, 100):</p>
 <p><img src="./figure/central-limit-1.png" alt="plot of chunk central-limit"></p>
-<p>大きい$n$の二項分布</p>
+<p>Binomial distribution with large $n$:</p>
 <p><img src="./figure/binom-normal-1.png" alt="plot of chunk binom-normal"></p>
 
 </section>
 <section>
-<h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
-<p>大きい$\lambda$のポアソン分布</p>
+<h2 id="many-distributions-approach-normal-distribution">Many distributions approach normal distribution</h2>
+<p>Poisson distribution with large $\lambda$:</p>
 <p><img src="./figure/poisson-normal-1.png" alt="plot of chunk poisson-normal"></p>
-<p>平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布</p>
+<p>Gamma distribution with large $k$:</p>
 <p><img src="./figure/gamma-normal-1.png" alt="plot of chunk gamma-normal"></p>
 
 </section>
@@ -484,35 +486,35 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 </figure>
 <dl>
 <dt>Discrete uniform distribution</dt>
-<dd>コインの表裏、サイコロの出目1–6</dd>
-<dt>Negative binomial distribution (Geometric distribution if n = 1)</dt>
-<dd>成功率pの試行が初めて成功するまでの失敗回数</dd>
+<dd>tossing fair coins, rolling fair dice</dd>
+<dt>Negative binomial distribution<br>(Geometric distribution if n = 1)</dt>
+<dd>failures before the n-th success in trials with p</dd>
 <dt>Binomial distribution</dt>
-<dd>成功率p、試行回数nのうちの成功回数</dd>
+<dd>successes in n trials with p</dd>
 <dt>Poisson distribution</dt>
-<dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
+<dd>occurrences of a Poisson process with $\lambda$</dd>
 <dt>Gamma distribution (Exponential distribution if k = 1)</dt>
-<dd>ポアソン過程でk回起こるまでの待ち時間</dd>
+<dd>waiting time until k-th occurrence of a Poisson process with $\lambda$</dd>
 <dt>Normal/Gaussian distribution</dt>
-<dd>確率変数の和、平均値</dd>
+<dd>sum of random variables, sample means, etc.</dd>
 </dl>
 
 </section>
 <section>
-<h2 id="現実には確率分布に従わないことが多い">現実には、確率分布に「従わない」ことが多い</h2>
-<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
-極端な値(全部死亡、全部生存)が多かった。</p>
+<h2 id="real-data-rarely-follow-theoretical-distributions">Real data rarely follow theoretical distributions</h2>
+<p>Collect and sow 8 seeds from each of 100 plant individuals.<br>
+The number of survived seeds per parent should follow $\text{Binomial}(n = 8, p)$.<br>
+But extreme cases (all survived, all dead) were frequently observed.</p>
 <img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
-<p>「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
-<strong>「普通はこれに従うはず」を理解してこそ</strong>できる思考。</p>
+<p>&ldquo;Why? What other factors affect?&rdquo; is the question of statistical modelling.<br>
+It requires the understanding of the <strong>null distribution</strong>.</p>
 
 </section>
 <section>
 <h2 id="pseudo-random-number-generator">Pseudo Random Number Generator</h2>
-<p>コンピューター上でランダム<strong>っぽい</strong>数値を出力する装置。<br>
-実際には<strong>決定論的</strong>に計算されているので、<br>
-シード(出発点)と呼び出し回数が同じなら出る数も同じになる。</p>
+<p>Algorithm to generate a sequence of random**-ish** numbers.<br>
+Its computation is not stochastic, but <strong>deterministic</strong>.<br>
+Exactly same values are generated if the same <strong>seed</strong> is set.</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">3L</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># 0.9148060 0.9370754 0.2861395</span>
@@ -521,13 +523,13 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 </span></span><span class="line"><span class="cl"><span class="nf">set.seed</span><span class="p">(</span><span class="m">42</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">runif</span><span class="p">(</span><span class="m">6L</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959</span>
-</span></span></code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
-ただし「このシードじゃないと良い結果が出ない」はダメ。</p>
-<p>さまざまな「分布に従う」乱数を生成することもできる。</p>
+</span></span></code></pre></div><p>Reproducible results can be obtained by fixing a seed.<br>
+Do NOT search for the seeds that produce favorable results.</p>
+<p>Possible to generate various random numbers that follows probability distributions.</p>
 
 </section>
 <section>
-<h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
+<h2 id="generate-random-numbers-from-various-distributions">Generate random numbers from various distributions</h2>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">n</span> <span class="o">=</span> <span class="m">100</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">sample.int</span><span class="p">(</span><span class="m">6</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">replace</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="nf">runif</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">min</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">max</span> <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
@@ -540,11 +542,9 @@ e.g., 一様分布 [0, 100) から40サンプル</p>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="nf">data.frame</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_histogram</span><span class="p">()</span> <span class="c1"># for continuous values</span>
 </span></span><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">+</span> <span class="nf">geom_bar</span><span class="p">()</span>       <span class="c1"># for discrete values</span>
-</span></span></code></pre></div><p>🔰 小さい <code>n</code> から徐々に大きくして変化を確認しよう。</p>
-<p>🔰 ほかのオプションもいろいろ変えて変化を確認しよう。</p>
-<p>🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
-全部はずれ、1つ当たり、2つ当たり&hellip; の人はどれくらいいるか？</p>
-<p>(Quartoでどうまとめるか、腕の見せ所)</p>
+</span></span></code></pre></div><p>🔰 Observe the effects of altering sample size <code>n</code>.</p>
+<p>🔰 Observe the effects of altering parameters for each distribution.</p>
+<p>(Use Quarto effectively)</p>
 
 </section>
 <section>
@@ -565,7 +565,7 @@ Individual A has 2 seeds, B has 4 seeds, &hellip;</p>
 What is the optimal $\lambda$ value?</p>
 <p>Observations in black.
 <span style="color: #56B4E9;">Poisson distribution in blue</span>.
-$\lambda \approx 3$ looks good.</p>
+$\lambda = 3$ looks good.</p>
 
 </section>
 <section>
@@ -666,7 +666,8 @@ A. Depends on what you estimate, acceptable error range, etc.</p>
 <li><strong>Likelihood</strong>
 <ul>
 <li>The probability to observe the data given the model: $\text{Prob}(D \mid M)$</li>
-<li>as a function of model given the data → <strong>likelihood function</strong> $L(M \mid D),~L(\theta \mid D)$</li>
+<li>as a function of model given the data<br>
+→ <strong>likelihood function</strong> $L(M \mid D),~L(\theta \mid D)$</li>
 <li><strong>Maximum Likelihood Estimation</strong> to fit parameters $\hat \theta$</li>
 </ul>
 </li>
@@ -674,7 +675,7 @@ A. Depends on what you estimate, acceptable error range, etc.</p>
 
 </section>
 <section>
-<h2 id="-challenge-1-likelihood">🔰 Challenge 1: likelihood</h2>
+<h2 id="-challenge-likelihood-and-mle-by-hand">🔰 Challenge: likelihood and MLE by hand</h2>
 <p>Rolling a dice 10 times, 3 sixes were observed.</p>
 <ol>
 <li>
@@ -684,7 +685,7 @@ A. Depends on what you estimate, acceptable error range, etc.</p>
 <p>Calculate likelihood assuming the probability to come up 6 $p = 0.2$.</p>
 </li>
 <li>
-<p>Draw a graph with $p$ as horizontal axis, log likelihood as vertical axis.</p>
+<p><strong>Draw a graph</strong> with $p$ as horizontal axis, log likelihood as vertical axis.</p>
 </li>
 <li>
 <p>Estimate $p$ with MLE.<br>
