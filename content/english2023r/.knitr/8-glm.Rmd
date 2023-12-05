@@ -45,12 +45,12 @@
 
 
 ---
-## ここまで見てきた統計モデル
+## Statistical modelling in the previous session
 
-確率変数$X$はパラメータ$\theta$の確率分布$f$に“従う”:&nbsp;
+Random variable $X$ follows the probability distribution $f$ with parameters $\theta$.<br>
 $X \sim f(\theta) $
 
-e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分布に従う:
+e.g., Number of seeds $X$ follows Poisson distribution with mean $\lambda$:
 
 <div>\[\begin{split}
 X \sim \text{Poisson}(\lambda)
@@ -77,14 +77,12 @@ p_pois +
         panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
-これを一般化線形モデル(GLM)として見ることもできる。
-
 
 ---
-## 一般化線形モデル(GLM)として記述してみる
+## Viewing the same model as GLM
 
-個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
-平均値$\lambda_i$は**他のデータによらず$\beta_0$で一定**。
+The number of individual $i$'s seeds $y_i$ follows Poisson distribution with mean $\lambda_i$.<br>
+Mean $\lambda_i$ is **common constant $\beta_0$**.
 
 <div>\[\begin{split}
 y_i &\sim \text{Poisson}(\lambda_i) \\
@@ -102,14 +100,14 @@ p_pois +
         panel.grid.major.y = element_blank(), axis.ticks = element_blank())
 ```
 
-種子数をY軸にして、式を2つに分けただけ...?<br>
-**説明変数**を含むモデルを見ればご利益が分かるかも。
+Just separated the equation into two, and flipped X-Y axes...? Why?<br>
+The reason may be clearer in a model with **explanatory variables**.
 
 ---
 ## GLM with one explanatory variable
 
-個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
-平均値の対数$\log(\lambda_i)$は**その個体の大きさ$x_i$に比例**する。
+The number of individual $i$'s seeds $y_i$ follows Poisson distribution with mean $\lambda_i$.<br>
+Mean $\lambda_i$ is **a linear function of its body mass $\x_i$**.
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
@@ -160,19 +158,19 @@ p_pois +
   </div>
 </div>
 
-**simple linear regression** with a single expl. variable.<br>
-**multiple linear regression** with multiple expl. variables.
+**simple linear regression** with a single explanatory variable ↑ <br>
+**multiple linear regression** with multiple explanatory variables →
 
 
 ---
-## Multiple regression with multiple explanatory variables
+## Multiple regression with multiple expl. variables
 
 <p>\[\begin{split}
 y_i &\sim \text{Poisson}(\lambda_i) \\
 \log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
 \end{split}\]</p>
 
-気温も湿度も高いほどビールが売れる架空データ:
+🍺 Beer sells better on hot and humid days:
 
 ```{r, df-beer}
 #| include: false
@@ -215,7 +213,7 @@ p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
 
-ほかの**確率分布**と**リンク関数**を使う例を見てみよう。
+Let's see other **probability distributions** and **link functions** →
 
 
 ---
@@ -224,13 +222,13 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 - Probability distribution: **binomial distribution**
 - Link function: $\text{logit}(p) = \log \frac {p} {1 - p}$
 
-何かの成否に対する何かの因子の影響、とか
+estimates the probability of event occurrence based on some variables.
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 
-客10人中$y_i$人がビールを注文。<br>
-その日$i$の気温$x_i$によって割合が変化。
+$y_i$ in 10 customers ordered beer.<br>
+$p_i$ varies by temperature $x_i$.
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
@@ -303,12 +301,12 @@ Xが1増えるとオッズがe^a倍に増える。
 - Probability distribution: **Bernoulli distribution** (binomial with $n = 1$)
 - Link function: $\text{logit}(p) = \log \frac {p} {1 - p}$
 
-何かの成否に対する何かの因子の影響、とか
+estimates the probability of event occurrence based on some variables.
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 
-風が吹けば桶屋が儲かる。
+Buckets sells better on windy days.
 
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
@@ -366,7 +364,7 @@ df_wind |>
 ## LM is a special case of GLM
 
 - Probability distribution: **Normal distribution**
-- Link function: **identity** (does nothing)
+- Link function: **identity** (returns everything unchanged)
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
@@ -416,24 +414,23 @@ ggplot(df_weight) + aes(height, weight) +
   </div>
 </div>
 
-最小二乗法の直線あてはめと結果的に同じになる。
+resulting in the same regression line as OLS.
 
-<small style="color: #999999;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small>
 
 ---
 ## <u>An</u>alysis <u>o</u>f <u>va</u>riance (ANOVA) as GLM
 
-**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。<br>
-<span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
+with **qualitative** explanatory variables, **normal** distribution, **identity** link.<br>
+needs conversion to <span title="a.k.a dummy variables">**index variables**</span> (0 or 1).
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 
-| 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
-| ---- | :-: | :---: | :---: |
-| ☁️ くもり | | 0 | 0 |
-| ☀️ 晴れ | | 1 | 0 |
-| ☔️ 雨 | | 0 | 1 |
+| weather | → | $x_1$ ☀️ 晴 | $x_2$ ☔️ 雨 |
+| ------- | :-: | :---: | :---: |
+| ☁️ cloudy | | 0 | 0 |
+| ☀️ sunny | | 1 | 0 |
+| ☔️ rainy | | 0 | 1 |
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
@@ -520,26 +517,26 @@ df_ancova |>
   </div>
 </div>
 
-くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。
+The effects of sunny☀️ $\beta_1$ and rainy☔️ $\beta_2$ are relative to cloudy☁️ $\beta_0$.
 
-GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。
+GLM supports more flexible modelling with other distribution & link.
 
 
 ---
 ## <u>An</u>alysis of <u>cova</u>riance (ANCOVA) as GLM
 
-**質的変数と量的変数を両方**含むGLM、と解釈可能。<br>
-正規分布・等分散・恒等リンクなどが仮定される。
+with **both qualitative and quantitative** explanatory variables<br>
+assuming **normal** distribution, **homogeneity of variance**, **identity** link.
 
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 
-| 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
-| ---- | :-: | :---: | :---: |
-| ☁️ くもり | | 0 | 0 |
-| ☀️ 晴れ | | 1 | 0 |
-| ☔️ 雨 | | 0 | 1 |
+| weather | → | $x_1$ ☀️ 晴 | $x_2$ ☔️ 雨 |
+| ------- | :-: | :---: | :---: |
+| ☁️ cloudy | | 0 | 0 |
+| ☀️ sunny | | 1 | 0 |
+| ☔️ rainy | | 0 | 1 |
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
@@ -571,30 +568,30 @@ ggplot(df_ancova) + aes(temperature, beer_sales, color = weather) +
   </div>
 </div>
 
-GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。
+GLM supports more flexible modelling with other distribution & link.
 
 
 ---
 ## Interaction
 
-ある説明変数の効果が、別の説明変数によって異なる。<br>
-e.g., ビール売上の温度依存性が天気によって異なる。
+The effects of two or more variables are not additive.<br>
+e.g., The temperature dependency of beer sales differs by weather.
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
 
-| 天気 | $x_1$ |
-| ---- | :---: |
-| ☀️ 晴れ | 1 |
-| ☔️ 雨 | 0 |
+| weather | $x_1$ |
+| ------- | :---: |
+| ☀️ sunny | 1 |
+| ☔️ rainy | 0 |
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
 \end{split}\]</p>
 
-雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
-晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
+☀️ all $\beta$<br>
+☔️ only $\beta_0,~\beta_2$ because $x_{1i} = 0$.
 
   </div>
   <div class="column" style="flex-shrink: 1.3;">
@@ -637,26 +634,23 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
   </div>
 </div>
 
-
-解釈が一気に難しくなるのでむやみに使わない。
+Drawback: it makes interpretation difficult dramatically.
 
 
 
 ---
-## Generalized Linear Model (GLM) wrap-up
+## Roundup: Generalized Linear Model (GLM)
 
-確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
-特定の組み合わせには名前がある。
+supports flexible modelling with various distribution & link.<br>
+There are some named (frequently used) combinations.
 
-| Name | Distribution | Link funcrtion | expl. variables |
-| ---- | -------- | -------- | -------- |
+| Name | Distribution | Link | expl. variables |
+| ---- | ------------ | ---- | --------------- |
 |Poisson regression|Poisson|log| |
 |Logistic regression|Binomial|logit| |
-|LM|Normal|identity| |
-|ANOVA|Normal|identity|qualitative|
+|LM    |Normal|identity| |
+|ANOVA |Normal|identity|qualitative|
 |ANCOVA|Normal|identity|qualitative+quantitative|
-
-リンク関数をもう少しだけ掘り下げたい。
 
 
 ---
@@ -666,19 +660,19 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
 
 $\text{identity}(\mu_i)$
 : $\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
-: 説明変数の効果が**足し算**的に働く。
+: The effects of expl. variables are **additive**.
 
 $\log(\lambda_i)$
 : $\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$
-: 説明変数の効果が**掛け算**的に働く。<br>
-  e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる
+: The effects of expl. variables are **multiplicative**.<br>
+  e.g., adding $\Delta x_1$ brings multiplying $e^{\beta_1 \Delta x_{1}}$.
 
 $\text{logit}(p_i)$
-: $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)
-: 説明変数の効果が**頭打ち**になる。<br>
+: $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (logistic function)
+: The effects of expl. variables are **plateaued**.<br>
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
 
-ほかに `probit`, `inverse`, `sqrt`, etc.
+`probit`, `inverse`, `sqrt`, etc. are not covered here.
 
 
 ---
@@ -692,8 +686,8 @@ fit = glm(formula, data = df_weight)
 coef(fit)
 ```
 
-デフォルトは正規分布・恒等リンクで `lm` と同じ結果。<br>
-`family=` オプションで確率分布とリンク関数を明示的に指定:
+Normal distribution and identity link is selected by default.<br>
+Use `family=` option for modification:
 ```r
 glm(formula, family = gaussian(link = identity), data = mydata)
 glm(formula, family = poisson(link = log), data = mydata)
@@ -704,10 +698,9 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 
 
 ---
-## 🔰 とにかくGLMを使ってみる練習
+## 🔰 Practice of `glm()`
 
-とりあえず当てはめと作図だけ。<br>
-結果の解釈やモデルの評価はこの後。
+Express weight as a linear function of height.
 
 ```{r, generate-df-weight}
 #| ref.label: "df-weight"
@@ -715,8 +708,10 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 #| cache.vars: []
 ```
 
+Don't care about interpretation and goodness of fit for now.
+
 ---
-## 🔰 とにかくGLMを使ってみる練習 解答例
+## 🔰 Practice of `glm()`, example solution
 
 ```{r, glm-df-weight}
 #| fig.width: 4
@@ -731,7 +726,7 @@ ggplot(df_fit_wh) +
 ```
 
 ---
-## 🔰 Poisson regression
+## 🔰 Poisson regression 🌱
 
 ```{r, generate-df-seeds}
 #| ref.label: "df-seeds"
@@ -740,10 +735,10 @@ ggplot(df_fit_wh) +
 ```
 
 ---
-## 🔰 Multiple regression
+## 🔰 Multiple regression 🍺
 
-`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
-とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
+It requires minor tricks with `add_predictions()` to draw regression lines.<br>
+Compromise with "regression points" for now.
 
 ```{r, generate-df-beer}
 #| ref.label: "df-beer"
@@ -752,9 +747,7 @@ ggplot(df_fit_wh) +
 ```
 
 ---
-## 🔰 Logistic regression
-
-次ページにヒント。
+## 🔰 Logistic regression (hint on the next page →)
 
 ```{r, generate-df-logistic}
 #| ref.label: "df-logistic"
@@ -765,24 +758,24 @@ ggplot(df_fit_wh) +
 ---
 ## Hint for Logistic regression
 
-左辺の応答変数に指定できるのはだいたい次の2種類:
-- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
-- 1列目が成功回数、2列目が失敗回数の整数matrix
+Two types of response variables can be given to a formula:
+- Integer vector: success 1, failure 0 (logistic regression in narrow sense)
+- Integer matrix: # of successes in 1st column, # of failures in 2nd column
 
-今回の場合、成功回数 `y` だけをformulaに入れると怒られる
+i.e., giving only # of success (`y`) results in an error:
 ```{r, logistic-error}
 #| error: true
 glm(y ~ x, df_logistic, family = binomial)
 ```
-ので失敗回数もモデルに含むよう `response ~ x` とする。
+instead, the formula should be `response ~ x` to include failures as well.
 
-(今回のように試行回数が10回固定じゃなくても使える、ということ)
+(It also means the number of trials does not have to be constant.)
 
 
 ---
 ## 🔰 ANCOVA: GLM with qualitative + quantitative vars
 
-まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
+First, try ANOVA with only weather, then ANCOVA with temperature.
 
 ```{r, generate-df-ancova}
 #| ref.label: "df-ancova"
@@ -805,16 +798,15 @@ glm(y ~ x, df_logistic, family = binomial)
 
 How can we choose?
 
-1. メカニズム的に納得できるものを選ぶ
-    - ポアソン過程の**カウント**ならポアソン分布、**間隔**ならガンマ分布
-    - n回中k回のように**割合的なカウント**なら二項分布
-1. データを可視化してみて、それっぽい形・性質のものを選ぶ
-    - **左右対称のひと山**ならとりあえず正規分布
-    - **負の値を取らない**ならガンマ分布
-    - 直線的か、指数関数的か、頭打ちか、などなど
+1. Based on underlying mechanisms
+    - Poisson if **count** data, Gamma if **interval** data, from Poisson process.
+    - Binomial if **proportional count** like "k in n times".
+1. Visualize the data, and choose one with similar shape.
+    - Normal distribution if **symmetric**
+    - Gamma if **always positive**
+    - straight, exponential, plateaued, etc.
 
-客観的な指標もほしい。<br>
-モデルの尤もらしさといえば...
+There should be some measures for goodness-of-fit...
 
 
 ---
@@ -832,7 +824,7 @@ $\text{Prob}(D \mid M)$
 
 <hr>
 
-各モデルで最適なパラメータを探して、比較:<br>
+Compare maximum likelihood of competing models:<br>
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
 ```{r, llf}
@@ -840,9 +832,9 @@ broom::glance(fit)
 ```
 
 ---
-## たしかに尤度はあてはまりの良さを表してそう
+## The better fit, the higher likelihood
 
-この場合は直線回帰よりもポアソン回帰が良さそう:
+OK, makes sense in this case:
 
 ```{r, compare-loglik}
 #| echo: false
@@ -892,14 +884,15 @@ p_poisson = p_pois +
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 ```
 
-この調子で、より尤度の高いモデルを探していけばいいだろうか？
+Should we continue searching for higher likelihood?
 
 ---
 ## あてはまりが良ければいいってもんでもない
 
 Overfitting
-: パラメータを増やせば**現データへの**適合度・尤度を高くできるが、<br>
-  予測・理解の役には立たなくなる。
+: Too many parameters leads to fitting too closely **to the dataset**.<br>
+  → poor generalization on unseen data<br>
+  → useless for prediction and understanding
 
 ```{r, saturated-model}
 #| echo: false
@@ -946,15 +939,15 @@ p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated, ty
 cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ```
 
-**null model**: 説明変数なし。切片のみ。<br>
-**saturated model**: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
+**null model**: only intersect; without explanatory variable.<br>
+**saturated model**: # data points ≤ # parameters; just like connecting points.
 
 
 ---
-## 無駄な説明変数を加えても尤度は上がる
+## Higher likelihood by adding a useless parameter
 
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
-観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
+The number of seeds $y$ increases with the increasing body mass $x$.<br>
+Adding a variable $x_2$, sox color of the observer, improves likelihood......?
 
 ```{r, many-models}
 #| echo: false
@@ -1015,14 +1008,13 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 \text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
 \end{split}\]</p>
 
-- **AICが小さいほど予測精度の良いモデル**。
-    - 尤度は上げたい。
-    - パラメータ数 $k$ が増えるとペナルティ。
-- どのデータに対する当てはまりを目指すかという観点
-    - 「手元のデータ」に対する対数尤度は $\log L^*$<br>
-    - 「真のメカニズムから出てくる未来のデータ」に対する<br>
-      平均対数尤度の推定量は $(\log L^* - k)$<br>
-      (Kullback--Leibler情報量を使って導出するらしい)
+- **The model with the minimum AIC is preferred**
+    - higher likelihood $L$.
+    - smaller number of parameters $k$
+- Goodness of fit to which data?
+    - $\log L^*$ is for the given dataset.
+    - $(\log L^* - k)$ is the unbiased estimate of mean log likelihood to the future data generated by true mechanism.
+      (derived from Kullback--Leibler divergence)
 
 
 ```{r, print-llf}
@@ -1034,10 +1026,10 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 
 ---
-## 無駄な説明変数の追加でAIC増加
+## Higher AIC by adding a useless parameter
 
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
-観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
+The number of seeds $y$ increases with the increasing body mass $x$.<br>
+Adding a variable $x_2$, sox color of the observer, brings larger AIC.
 
 ```{r, many-models-aic}
 #| echo: false
@@ -1062,26 +1054,23 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ```
 
 ---
-## ほかの情報量基準
+## Other information criteria
 
 - $\text{BIC} = -2 \log L^* + k \log n$
-    - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
-    - データの観測数 $n$ に依存する点でAICと異なる。<br>
-      感覚としては「AICはデータサイズによるペナルティが無い」
-    - (周辺尤度の最大化という観点で導出するらしい)
-- [WAIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
-  [WBIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
-    - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
-      そうじゃない場合(現実的には常に)こちらが優位。
-    - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
+    - Similar to AIC: penalizes for parameters $k$.
+    - Different from AIC: depends on sample size $n$.<br>
+      (AIC lacks penalty by sample size.)
+    - (derived from maximization of marginal likelihood)
+- [WAIC and WBIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waicwbic_e.html)
+    - Widely Applicable variants of AIC and BIC.
+    - WAIC for better prediction. WBIC for identifying the true model.
 
 
 ---
-## モデル選択の心構え
+## Model selection by information criteria
 
-「正しい」ものを選べるわけではない。<br>
-予測・理解に useful なものを何らかの基準で選ぶだけ。
+does not select the "right" one;<br>
+selects useful one for prediction and understanding.
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
@@ -1092,14 +1081,14 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 
 
 ---
-## 現実的な注意点・悩みどころ
+## Pitfalls and notes
 
-- 多重共線性(multicollinearity):
-    - 説明変数同士が強い相関関係にある
-- 変数変換:
-    - 気安くやるべきじゃないけど、対数変換などしばしば有用
-    - 割り算した値は危険
-- 交互作用を入れると解釈が難しくなる。
+- Multicollinearity:
+    - Correlated explanatory variables cause problems.
+- Variable transformation should be avoided:
+    - Log transformation is often useful, though.
+    - Divided numbers are dangerous.
+- Interaction makes interpretation difficult dramatically.
 
 
 ---
