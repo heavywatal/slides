@@ -505,11 +505,11 @@ df_rbinom |>
 
 <div style="text-align: right;">
 It approaches asymptotically to <b>binomial distribution</b>.<br>
-0 and 3 is rare. 1 and 2 are three times more likely.
+0 and 3 are rare. 1 and 2 are three times more likely.
 </div>
 
 ---
-## You can generate similar values without tossing coins
+## Similar values can be generated without tossing coins
 
 - The number of heads $X$ observed in tossing 3 fair coins.
 - Random samples $X$ from the binomial distribution with $n = 3, p = 0.5$.
@@ -528,7 +528,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 </div>
 
 These are so similar that we can say<br>
-"The number of heads in *n* tosses follows binary distribution."
+"The number of heads in *n* tosses follows binomial distribution."
 
 Conversely, we can understand it like<br>
 "Random variable of binomial distribution is the number of successes in *n* trials."
@@ -538,9 +538,9 @@ Conversely, we can understand it like<br>
 
 Tossing 3 fair coins repeatedly {2, 0, 1, 2, 1, 3, 0, 2, ...}
 
-&nbsp;&nbsp; ↓ describe with only two parameters. information reduction.
+&nbsp;&nbsp; ↑ simulate phenomena with a few parameters
 
-Can reproduce with binary distribution with $n = 3, p = 0.5$
+Sample from binomial distribution with $n = 3, p = 0.5$
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
@@ -562,30 +562,30 @@ Any other probability distributions related to real phenomena like this?
 ## Major probability distributions and related phenomena
 
 Discrete uniform distribution
-: コインの表裏、サイコロの出目1–6
+: tossing fair coins, rolling fair dice
 
-Negative binomial distribution (Geometric distribution if n = 1)
-: 成功率pの試行が初めて成功するまでの失敗回数
+Negative binomial distribution<br>(Geometric distribution if n = 1)
+: failures before the n-th success in trials with p
 
 Binomial distribution
-: 成功率p、試行回数nのうちの成功回数
+: successes in n trials with p
 
 Poisson distribution
-: 単位時間あたり平均$\lambda$回起こる事象の発生回数
+: occurrences of a Poisson process with $\lambda$
 
 Gamma distribution (Exponential distribution if k = 1)
-: ポアソン過程でk回起こるまでの待ち時間
+: waiting time until k-th occurrence of a Poisson process with $\lambda$
 
 Normal/Gaussian distribution
-: 確率変数の和、平均値
+: sum of random variables, sample means, etc.
 
 
 ---
 ## Discrete uniform distribution
 
-同じ確率で起こるn通りの事象のうちXが起こる確率
+Every X in n values has equal probability $1/n$.
 
-e.g., コインの表裏、サイコロの出目1–6
+e.g., fair coin [0,1], fair dice [1,6]
 
 ```{r, dunif}
 #| echo: false
@@ -603,15 +603,15 @@ dplyr::bind_rows(df_coin, df_dice) |>
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
-🔰 一様分布になりそうな例を考えてみよう
+🔰 Other examples of discrete uniform distribution?
 
 
 ---
-## Geometric $~\text{Geom}(p)$
+## Geometric distribution $~\text{Geom}(p)$
 
-成功率pの試行が初めて成功するまでの失敗回数
+$X$ failures before the first success with success probability $p$ for each trial.
 
-e.g., コイントスで表が出るまでに何回裏が出るか
+e.g., How many tails before first head with a coin?
 
 ```{r, geometric}
 #| echo: false
@@ -637,16 +637,16 @@ ggplot(df) +
 \text{Prob}(X = k \mid p) = p (1 - p)^k
 \\]
 
-「初めて成功するまでの試行回数」とする定義もある。
+There is another definition: $X$ trials until the first success.
 
-🔰 幾何分布になりそうな例を考えてみよう
+🔰 Other examples?
 
 
 ---
-## 負の二項分布 $~\text{NB}(n, p)$
+## Negative binomial distribution $~\text{NB}(n, p)$
 
-成功率pの試行がn回成功するまでの失敗回数X。
-n = 1 のとき幾何分布と一致。
+$X$ failures before the n-th success with success probability $p$ for each trial.<br>
+(identical to geometric distribution when n = 1)
 
 ```{r, nbinom}
 #| echo: false
@@ -671,9 +671,9 @@ ggplot(df) +
 \text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \\]
 
-失敗回数ではなく試行回数を変数とする定義もある。
+There is another definition: $X$ trials until the n-th success.
 
-🔰 負の二項分布になりそうな例を考えてみよう
+🔰 Other examples?
 
 <!--
 平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
@@ -682,9 +682,9 @@ ggplot(df) +
 
 
 ---
-## 二項分布 $~\text{Binomial}(n,~p)$
+## Binomial distribution $~\text{Binomial}(n,~p)$
 
-確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
+$X$ successes in $n$ trials with success probability $p$ for each trial.
 
 ```{r, dbinom-n}
 #| echo: false
@@ -709,15 +709,16 @@ ggplot(df) +
 \text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \\]
 
-🔰 二項分布になりそうな例を考えてみよう
+🔰 Other examples?
 
 
 ---
-## ポアソン分布 $~\text{Poisson}(\lambda)$
+## Poisson distribution $~\text{Poisson}(\lambda)$
 
-平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。
+$X$ occurrences of a **Poisson process** in a fixed interval of time (space).<br>
+**Poisson process**: Events occur at a constant rate $\lambda$
 
-e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数
+e.g., messages received per hour, number of individuals in a quadrat
 
 ```{r, dpoisson}
 #| echo: false
@@ -760,16 +761,17 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 \text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \\]
 
-二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
-めったに起きないことを何回も試行するような感じ。
+The limit of binomial distribution $(\lambda = np;~n \to \infty;~p \to 0)$<br>
+≈ many trials of extremely rare events.
 
 
 ---
-## 指数分布 $~\text{Exp}(\lambda)$
+## Exponential distribution $~\text{Exp}(\lambda)$
 
-ポアソン過程の事象の発生間隔。平均は $1 / \lambda$ 。
+Interval $X$ between occurrences of a **Poisson process**.<br>
+**Poisson process**: Events occur at a constant rate $\lambda$
 
-e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔
+e.g., intervals between messages received, between gloves left on a road
 
 ```{r, dexp}
 #| echo: false
@@ -792,17 +794,18 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 \text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
 \\]
 
-幾何分布の連続値版。
+The continuous counterpart of geometric distribution.
 
-🔰 ポアソン分布・指数分布になりそうな例を考えてみよう
+🔰 Other examples?
 
 
 ---
-## ガンマ分布 $~\text{Gamma}(k,~\lambda)$
+## Gamma distribution $~\text{Gamma}(k,~\lambda)$
 
-ポアソン過程の事象k回発生までの待ち時間
+Waiting time $X$ until $k$-th occurrence of a **Poisson process**.
+**Poisson process**: Events occur at a constant rate $\lambda$
 
-e.g., メッセージを2つ受信するまでの待ち時間
+e.g., Waiting time until receiving two messages
 
 ```{r, dgamma}
 #| echo: false
@@ -825,15 +828,14 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 \text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \\]
 
-指数分布をkのぶん右に膨らませた感じ。<br>
-shapeパラメータ $k = 1$ のとき指数分布と一致。
+Identical when shape parameter $k = 1$.
 
 
 ---
-## 正規分布 $~\mathcal{N}(\mu,~\sigma)$
+## Normal/Gaussian distribution $~\mathcal{N}(\mu,~\sigma)$
 
-平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
-e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):
+Beautiful distribution with two parameters: mean $\mu$, standard deviation $\sigma$.<br>
+e.g., $\mu = 50, ~\sigma = 10$:
 
 ```{r, gaussian}
 #| echo: false
@@ -862,10 +864,10 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
 \\]
 
 ---
-## 正規分布に近づくものがいろいろある
+## Many distributions approach normal distribution
 
-標本平均の反復(**中心極限定理**);
-e.g., 一様分布 [0, 100) から40サンプル
+Distribution of sample means (**central limit theorem**);
+e.g., average of 40 samples from uniform distribution [0, 100):
 
 ```{r, central-limit}
 #| echo: false
@@ -889,7 +891,7 @@ purrr::map(c(10, 100, 1000, 10000), \(n) {
   )
 ```
 
-大きい$n$の二項分布
+Binomial distribution with large $n$:
 
 ```{r, binom-normal}
 #| echo: false
@@ -912,9 +914,9 @@ purrr::map(c(1, 4, 16, 64, 256), \(n) {
 ```
 
 ---
-## 正規分布に近づくものがいろいろある
+## Many distributions approach normal distribution
 
-大きい$\lambda$のポアソン分布
+Poisson distribution with large $\lambda$:
 
 ```{r, poisson-normal}
 #| echo: false
@@ -936,7 +938,7 @@ purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
   )
 ```
 
-平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布
+Gamma distribution with large $k$:
 
 ```{r, gamma-normal}
 #| echo: false
@@ -966,43 +968,43 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 </figure>
 
 Discrete uniform distribution
-: コインの表裏、サイコロの出目1–6
+: tossing fair coins, rolling fair dice
 
-Negative binomial distribution (Geometric distribution if n = 1)
-: 成功率pの試行が初めて成功するまでの失敗回数
+Negative binomial distribution<br>(Geometric distribution if n = 1)
+: failures before the n-th success in trials with p
 
 Binomial distribution
-: 成功率p、試行回数nのうちの成功回数
+: successes in n trials with p
 
 Poisson distribution
-: 単位時間あたり平均$\lambda$回起こる事象の発生回数
+: occurrences of a Poisson process with $\lambda$
 
 Gamma distribution (Exponential distribution if k = 1)
-: ポアソン過程でk回起こるまでの待ち時間
+: waiting time until k-th occurrence of a Poisson process with $\lambda$
 
 Normal/Gaussian distribution
-: 確率変数の和、平均値
+: sum of random variables, sample means, etc.
 
 
 ---
-## 現実には、確率分布に「従わない」ことが多い
+## Real data rarely follow theoretical distributions
 
-植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
-極端な値(全部死亡、全部生存)が多かった。
+Collect and sow 8 seeds from each of 100 plant individuals.<br>
+The number of survived seeds per parent should follow $\text{Binomial}(n = 8, p)$.<br>
+But extreme cases (all survived, all dead) were frequently observed.
 
 <img `r src_alt_fig_chunk("overdispersion")`>
 
-「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
-**「普通はこれに従うはず」を理解してこそ**できる思考。
+"Why? What other factors affect?" is the question of statistical modelling.<br>
+It requires the understanding of the **null distribution**.
 
 
 ---
 ## Pseudo Random Number Generator
 
-コンピューター上でランダム**っぽい**数値を出力する装置。<br>
-実際には**決定論的**に計算されているので、<br>
-シード(出発点)と呼び出し回数が同じなら出る数も同じになる。
+Algorithm to generate a sequence of random**-ish** numbers.<br>
+Its computation is not stochastic, but **deterministic**.<br>
+Exactly same values are generated if the same **seed** is set.
 
 ```r
 set.seed(42)
@@ -1015,13 +1017,13 @@ runif(6L)
 # 0.9148060 0.9370754 0.2861395 0.8304476 0.6417455 0.5190959
 ```
 
-シードに適当な固定値を与えておくことで再現性を保てる。<br>
-ただし「このシードじゃないと良い結果が出ない」はダメ。
+Reproducible results can be obtained by fixing a seed.<br>
+Do NOT search for the seeds that produce favorable results.
 
-さまざまな「分布に従う」乱数を生成することもできる。
+Possible to generate various random numbers that follows probability distributions.
 
 ---
-## いろんな乱数を生成・可視化して感覚を掴もう
+## Generate random numbers from various distributions
 
 ```r
 n = 100
@@ -1038,14 +1040,11 @@ p1 + geom_histogram() # for continuous values
 p1 + geom_bar()       # for discrete values
 ```
 
-🔰 小さい `n` から徐々に大きくして変化を確認しよう。
+🔰 Observe the effects of altering sample size `n`.
 
-🔰 ほかのオプションもいろいろ変えて変化を確認しよう。
+🔰 Observe the effects of altering parameters for each distribution.
 
-🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、<br>
-   全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
-
-(Quartoでどうまとめるか、腕の見せ所)
+(Use Quarto effectively)
 
 ```{r, hidden-gacha}
 #| include: false
@@ -1117,7 +1116,7 @@ What is the optimal $\lambda$ value?
 
 Observations in black.
 <span style="color: #56B4E9;">Poisson distribution in blue</span>.
-$\lambda \approx 3$ looks good.
+$\lambda = 3$ looks good.
 
 
 ---
@@ -1347,12 +1346,13 @@ A. Depends on what you estimate, acceptable error range, etc.
     - **parameters** $\theta$
 - **Likelihood**
     - The probability to observe the data given the model: $\text{Prob}(D \mid M)$
-    - as a function of model given the data → **likelihood function** $L(M \mid D),~L(\theta \mid D)$
+    - as a function of model given the data<br>
+      → **likelihood function** $L(M \mid D),~L(\theta \mid D)$
     - **Maximum Likelihood Estimation** to fit parameters $\hat \theta$
 
 
 ---
-## 🔰 Challenge 1: likelihood
+## 🔰 Challenge: likelihood and MLE by hand
 
 Rolling a dice 10 times, 3 sixes were observed.
 
@@ -1360,7 +1360,7 @@ Rolling a dice 10 times, 3 sixes were observed.
 
 1. Calculate likelihood assuming the probability to come up 6 $p = 0.2$.
 
-1. Draw a graph with $p$ as horizontal axis, log likelihood as vertical axis.
+1. **Draw a graph** with $p$ as horizontal axis, log likelihood as vertical axis.
 
 1. Estimate $p$ with MLE.<br>
    Excellent, if solved with math; Good, if solved with R; OK, by eye or intuition.
