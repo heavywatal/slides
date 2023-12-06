@@ -107,13 +107,13 @@ The reason may be clearer in a model with **explanatory variables**.
 ## GLM with one explanatory variable
 
 The number of individual $i$'s seeds $y_i$ follows Poisson distribution with mean $\lambda_i$.<br>
-Mean $\lambda_i$ is **a linear function of its body mass $\x_i$**.
+Mean $\lambda_i$ is **a linear function of its body mass $x_i$**.
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
 
 <figure style="margin-block: 1em 0;">
-<img src="../tokiomarine2021/glm.drawio.svg" width="600"><br>
+<img src="../english2023r/image/glm.drawio.svg" width="600"><br>
 </figure>
 
   </div>
@@ -656,18 +656,16 @@ There are some named (frequently used) combinations.
 ---
 ## Link functions
 
-統計モデリングにおいて「まっすぐ以外も表現できる」意味
-
-$\text{identity}(\mu_i)$
+$\text{identity}(\mu_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : $\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : The effects of expl. variables are **additive**.
 
-$\log(\lambda_i)$
+$\log(\lambda_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : $\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$
 : The effects of expl. variables are **multiplicative**.<br>
   e.g., adding $\Delta x_1$ brings multiplying $e^{\beta_1 \Delta x_{1}}$.
 
-$\text{logit}(p_i)$
+$\text{logit}(p_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (logistic function)
 : The effects of expl. variables are **plateaued**.<br>
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
@@ -884,63 +882,7 @@ p_poisson = p_pois +
 cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 ```
 
-Should we continue searching for higher likelihood?
-
----
-## あてはまりが良ければいいってもんでもない
-
-Overfitting
-: Too many parameters leads to fitting too closely **to the dataset**.<br>
-  → poor generalization on unseen data<br>
-  → useless for prediction and understanding
-
-```{r, saturated-model}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-#| cache.vars: []
-set.seed(19937)
-n = 16L
-true_coef = c(0.1, 0.2)
-df_plant = tibble::tibble(
-  x = runif(n, 7, 12.5),
-  lambda = exp(true_coef[1] + true_coef[2] * x),
-  y = rpois(n, lambda)
-) |> tibble::rownames_to_column("id")
-
-models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
-  null = ~ 1,
-  x = ~ x,
-  saturated = ~ id
-))
-labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
-
-p_plant = df_plant |>
-  modelr::add_predictions(models$null, type = "response") |>
-  ggplot() + aes(x, y) +
-  geom_line(aes(y = pred), color = "#3366ff", linewidth = 2, alpha = 0.7) +
-  geom_point(shape = 16, alpha = 0.6) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
-
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["null"]], color = "#3366ff", size = 6)
-p_x = p_plant %+% modelr::add_predictions(df_plant, models$x, type = "response") +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["x"]], color = "#3366ff", size = 6)
-p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated, type = "response") +
-  labs(title = "saturated model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["saturated"]], color = "#3366ff", size = 6)
-
-cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
-```
-
-**null model**: only intersect; without explanatory variable.<br>
-**saturated model**: # data points ≤ # parameters; just like connecting points.
+Should we continue searching for models with higher likelihood?
 
 
 ---
@@ -951,12 +893,12 @@ Adding a variable $x_2$, sox color of the observer, improves likelihood......?
 
 ```{r, many-models}
 #| echo: false
-#| fig.height: 7
-#| fig.width: 7
-#| cache.vars: ["df_plant", "models", "p_plant"]
-set.seed(24601)
-n = 120L
-true_coef = c(1, 0.12, 0)
+#| fig.height: 4
+#| fig.width: 11
+#| cache.vars: ["df_plant", "models", "labels", "p_plant"]
+set.seed(19937)
+n = 17L
+true_coef = c(0.1, 0.2, 0)
 df_plant = tibble::tibble(
   x = runif(n, 7, 12.5),
   x2 = sample(c(FALSE, TRUE), n, replace = TRUE),
@@ -967,7 +909,6 @@ df_plant = tibble::tibble(
 models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
   null = ~ 1,
   x = ~ x,
-  x2 = ~ x2,
   both = ~ x + x2,
   saturated = ~ id
 ))
@@ -982,23 +923,59 @@ p_plant = df_plant |>
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
-  labs(title = "null model") +
+  labs(title = expression(y %~% beta[0])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 6)
 p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x, type = "response")) +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2, type = "response")) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 6)
 p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both, type = "response")) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 6)
 
-cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
+cowplot::plot_grid(p_null, p_x, p_both, nrow = 1L)
 ```
 
+
+---
+## Best fit model does not fit for our purpose
+
+Overfitting
+: Too many parameters leads to fitting too closely **to the dataset**.<br>
+  → poor generalization on unseen data<br>
+  → useless for prediction and understanding
+
+```{r, saturated-model}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+#| cache.vars: []
+.p_plant = df_plant |>
+  modelr::add_predictions(models$null, type = "response") |>
+  ggplot() + aes(x, y) +
+  geom_line(aes(y = pred), color = "#3366ff", linewidth = 2, alpha = 0.7) +
+  geom_point(shape = 16, alpha = 0.6) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor = element_blank(), legend.position = "none")
+
+p_null = .p_plant +
+  labs(title = "null model") +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
+    label = labels[["null"]], color = "#3366ff", size = 6)
+p_x = .p_plant %+% modelr::add_predictions(df_plant, models$x, type = "response") +
+  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
+    label = labels[["x"]], color = "#3366ff", size = 6)
+p_saturated = .p_plant %+% modelr::add_predictions(df_plant, models$saturated, type = "response") +
+  labs(title = "saturated model") +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
+    label = labels[["saturated"]], color = "#3366ff", size = 6)
+
+cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
+```
+
+**null model**: only intersect; without explanatory variable.<br>
+**saturated model**: # parameters ≥ # data points; just like connecting points.
 
 
 ---
@@ -1033,8 +1010,8 @@ Adding a variable $x_2$, sox color of the observer, brings larger AIC.
 
 ```{r, many-models-aic}
 #| echo: false
-#| fig.height: 7
-#| fig.width: 7
+#| fig.height: 4
+#| fig.width: 11
 labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(models))
 p_null = p_plant +
   labs(title = "null model") +
@@ -1042,15 +1019,11 @@ p_null = p_plant +
 p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x, type = "response")) +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 6)
-p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2, type = "response")) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 6)
 p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both, type = "response")) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 6)
-cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
+cowplot::plot_grid(p_null, p_x, p_both, nrow = 1L)
 ```
 
 ---
@@ -1075,7 +1048,7 @@ selects useful one for prediction and understanding.
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
+<img src="../english2023r/image/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -1092,14 +1065,12 @@ selects useful one for prediction and understanding.
 
 
 ---
-## 一般化線形モデル座学まとめ
+## Steps to Generalized Linear Model (GLM)
 
-- 何はともあれ散布図を描く
-- 適切な確率分布・リンク関数・説明変数を考える
-- パラメータを最尤推定する
-- 尤度は「手元のデータへのあてはまり」
-- モデルを比較するときは情報量基準を参考にする
-
+- Above all, visualize the data to get a whole picture.
+- Select **variables**, probabitlity **distribution**, and **link** function.
+- Estimate parameters.
+- Compare models with information criteria.
 
 
 ---
@@ -1140,8 +1111,6 @@ print(penguins)
 ---
 ## Remove rows with missing values first
 
-性別はとりあえず使わないので、体長関連だけでも。
-
 ```{r, penguins-dropna}
 penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
 penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
@@ -1151,20 +1120,20 @@ dim(penguins_dropna)
 ---
 ## 🔰 Practice GLM with penguins
 
-次の課題を解いてみよう。<br>
-(次ページ以降に解答。まずは自力で。)
+Try doing by yourself first.
+Example code follows.
 
-1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
-1. 単回帰して、切片と傾きを求める。そして作図。
-1. `species` で色分けして作図。
-1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
-1. 余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。
+1. Plot with `x = body_mass_g`, `y = flipper_length_mm`.
+1. Get the slope and intersect with simple linear regression, and plot it.
+1. Color-code points with `species`.
+1. Perform multiple regression with additional `species`, and plot it.
+1. Apply the same analysis to bill shapes.
 
 
 ---
 ## Simple regression: 1. Plot data
 
-どうやら、重いペンギンほど翼長も長い。
+The heavier body, the longer flipper.
 
 ```{r, penguins-weight}
 #| fig.height: 4.5
@@ -1181,7 +1150,7 @@ p_penweight
 ---
 ## Simple regression: 2. Fit
 
-とりあえずデフォルトの正規分布・恒等リンク。
+Use normal distribution and identity link by default.
 $y = 136.7 + 0.0153 x$
 
 ```{r, penguins-fit1}
@@ -1193,7 +1162,7 @@ broom::glance(fit1)
 ---
 ## Simple regression: 3. Plot the fitting result
 
-結果とデータから予測値を作って回帰線を引く。
+Draw the regression line with the predicted values.
 
 ```{r, penguins-weight-glm}
 #| fig.height: 5
@@ -1207,7 +1176,7 @@ p1
 ---
 ## Multiple regression: 1. Plot data
 
-種によって色分けしてみると、傾向の違いが見える。
+Color-code points by species.
 
 ```{r, penguins-weight-sp}
 #| fig.height: 5
@@ -1221,8 +1190,8 @@ p_penweight_color
 ---
 ## Multiple regression: 2. Fit
 
-Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
-体重の効果は単回帰のとき(0.0153)より小さい。
+Chinstrap and Gentoo have longer flippers compared to Adelie.<br>
+The effect of body mass is smaller than that of simple regression (0.0153).
 
 ```{r, penguins-fit2}
 fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
@@ -1242,14 +1211,14 @@ p2 = p_penweight_color +
 p2
 ```
 
-**傾き**も種によって違うかも。**交互作用**を入れてみたい。
+**slope** may vary by species. Let's try adding **interaction** to the model.
 
 
 ---
 ## Interaction: Fit
 
-Adelieを基準に、Chinstrapの傾きが結構違う。<br>
-切片の違いは解釈しにくくなった。
+Chinstrap has larger slope than the others.<br>
+Now it is difficult to interpret the difference in intersects.
 
 ```{r, penguins-fit3}
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
@@ -1272,7 +1241,7 @@ p3
 ---
 ## Which is the best of three?
 
-AICで選ぶなら交互作用入り重回帰が良さそう。
+According to AIC, "multiple regression with interaction" is the best.
 
 ```{r, penguins-aic}
 #| fig.height: 4
@@ -1285,9 +1254,9 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 
 ---
-## 余裕があったら追加の練習
+## Additional practice
 
-🔰クチバシの長さと深さで同じ解析をやってみよう。
+🔰 Repeat the same steps with different data: bill length and depth.
 
 ```{r, penguins-bill}
 #| echo: false
@@ -1329,61 +1298,6 @@ p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
 
 
 ---
-## 🔰 Challenge: GLM with fictional data
-
-宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。<br>
-冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。<br>
-これらの変数の間に、なんらかの関係は見られるだろうか？
-
-[adventure.tsv](adventure.tsv)
-
-```{r, adventure-data}
-#| echo: false
-set.seed(19937)
-samplesize = 1000L
-b0 = 0.7
-b1 = 0.01
-b2 = -0.5
-b3 = 0.02
-b12 = 0.03
-
-dfraw = tibble::tibble(
-  level = sample.int(50L, samplesize, replace = TRUE),
-  is_mage = rbinom(samplesize, 1, 0.4),
-  via_cave = rbinom(samplesize, 1, ifelse(is_mage, 0.5, 0.3)),
-  lambda = exp(b0 + b1 * level + b2 * is_mage + b3 * via_cave + b12 * level * is_mage),
-  encounter = rpois(samplesize, lambda)
-)
-
-dfout = dfraw |> dplyr::mutate(
-    job = ifelse(is_mage, "mage", "fighter"),
-    route = ifelse(via_cave, "cave", "field"),
-    .before = encounter
-  ) |>
-  dplyr::select(!lambda & !is_mage & !via_cave)
-
-readr::write_tsv(dfout, "../adventure.tsv") |> print()
-```
-
-```{r, adventure-analysis}
-#| include: false
-fit = glm(encounter ~ level + job + route + level:job, data = dfout, family = poisson)
-summary(fit)
-df_pred = modelr::add_predictions(dfout, fit, type = "response")
-
-p_enc = ggplot(df_pred) +
-  aes(level, encounter, color = job) +
-  geom_point() +
-  geom_line(aes(y = pred)) +
-  facet_wrap(vars(route))
-
-p_route = ggplot(df_pred) +
-  aes(job, fill = job) +
-  geom_bar() +
-  facet_wrap(vars(route))
-```
-
----
 ## 🔰 Final challenge: Analyze public datasets
 
 - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
@@ -1391,348 +1305,60 @@ p_route = ggplot(df_pred) +
 - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
 - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
 - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
-- ほか、なんでも興味のあるデータ
-
-発表・レポートの条件
-: 最低1枚の図と、そこに至る前処理＋可視化のコード。
-: グラフから読み取れることを一言。
-: GLMで変数間の関係を考察できるとなおよし。
-
-週明けに班内で話し合ってベスト2を選び、全体に向けて発表。
+- anything else.
 
 
 ---
-## I guess we don't have time to go further
+## You have developed skills for data analysis
 
----
-## n個のうちy個生存。二項分布に従......わない！
-
-植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
-極端な値(全部死亡、全部生存)が多かった。個体差？
-
-```{r, df-seeds-od}
-#| echo: false
-set.seed(24601)
-samplesize = 100L
-df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
-  p = wtl::sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
-```
-```{r, overdispersion}
-#| echo: false
-#| fig.height: 5
-#| fig.width: 6
-sum_y = sum(df_seeds_od$y)
-p_hat = sum_y / 800
-label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
-tidy_od = df_seeds_od |>
-  dplyr::count(y, name = "observed") |>
-  dplyr::mutate(expected = samplesize * dbinom(y, 8, p_hat))
-ggplot(tidy_od) +
-  geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
-  geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
-  annotate("text", label = label, parse = TRUE, color = "#56B4E9",
-           x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 6) +
-  labs(x = "# survived seeds", y = "count") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-```
-
-
----
-## 個体差をモデルに組み込みたい
-
-各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。<br>
-「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
-i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
-
-```{r, saturated-glmm}
-#| echo: false
-#| fig.height: 3
-#| fig.width: 11
-df_seeds_od |>
-  tibble::rowid_to_column("id") |>
-  ggplot() + aes(id, y / 8) +
-  geom_col(width = 0.6, fill = "#56B4E9", alpha = 0.66) +
-  labs(y = expression(italic(p[i]))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-```
-
-個体の生存能力をもっと少ないパラメータで表現できないか？
-
-
----
-## 個体差をモデルに組み込みたい
-
-各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
-その能力値は全個体共通の正規分布に従うと仮定:
-$z_i \sim \mathcal{N}(\hat z, \sigma)$
-
-```{r, sigmoid}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-z_hat = wtl::logit(p_hat)
-p_sigmoid = df_seeds_od |>
-  ggplot() + aes(z, p) +
-  geom_line(linewidth = 2, alpha = 0.6, color = "#56B4E9") +
-  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#56B4E9") +
-  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = "#56B4E9") +
-  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
-  labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-p_normal = tibble::tibble(
-    z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 100),
-    Density = dnorm(z, z_hat, 3)
-  ) |>
-  ggplot() + aes(z, Density) +
-  geom_area(fill = "#56B4E9", alpha = 0.5) +
-  geom_vline(xintercept = z_hat, color = "#56B4E9") +
-  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
-  labs(x = expression(italic(z))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-
-cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
-```
-
-パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。
-
-前者は標本平均 $\hat p$ から求まるとして、後者どうする？
-
----
-## 個体能力のばらつき $\sigma$ が大きいと両端が増える
-
-普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
-
-```{r, alter-sigma}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 11
-sigma = c(0.5, 1.5, 3)
-breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
-.z = seq(min(df_seeds_od$z), max(df_seeds_od$z), 0.1)
-df_z = tidyr::crossing(sigma, z = .z) |>
-  dplyr::mutate(Density = dnorm(z, z_hat, sigma)) |>
-  dplyr::mutate(sigma = ifelse(sigma > 0.1, sigma, 0)) |>
-  dplyr::bind_rows(tibble::tibble(sigma = 0, z = .z, Density = ifelse(abs(z - z_hat) < 0.2, Inf, 0))) |>
-  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf)))
-
-p_z = df_z |>
-  ggplot() + aes(z, Density) +
-  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
-  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
-  labs(x = expression(italic(z))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-
-p_z + geom_col(aes(fill = sigma == 0), width = 0.1, alpha = 0.6)
-
-df_unmixed = tibble::tibble(z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 20)) |>
-  dplyr::mutate(p = wtl::sigmoid(z)) |>
-  purrr::pmap(function(z, p) {
-    tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))
-  }) |>
-  purrr::list_rbind() |>
-  dplyr::arrange(y)
-
-df_binom = tibble::tibble(
-  sigma = 0,
-  y = seq.int(0, 8),
-  z = z_hat,
-  Density = dbinom(y, 8, p_hat)
-)
-
-df_mixed = tibble::tibble(sigma) |>
-  dplyr::mutate(data = purrr::map(sigma, \(s) {
-    df_unmixed |>
-      dplyr::mutate(w = dnorm(z, z_hat, s), Density = w * Density) |>
-      dplyr::mutate(Density = Density / sum(Density))
-  })) |>
-  tidyr::unnest(data) |>
-  dplyr::bind_rows(df_binom) |>
-  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf)))
-
-p_mixed = df_mixed |>
-  ggplot() + aes(y, Density) +
-  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
-  labs(x = "# survived seeds") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-
-p_mixed + geom_col(aes(fill = sigma == 0), width = 0.4, alpha = 0.66)
-```
-
----
-## zの値で色分けしてみると想像しやすい
-
-正規分布と二項分布の混ぜ合わせ......?
-
-```{r, alter-sigma-z}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 11
-scale_fill_z = colorspace::scale_fill_discrete_divergingx("Zissou 1")
-p_z + geom_col(aes(fill = Z)) + scale_fill_z
-p_mixed + geom_col(aes(fill = Z), width = 0.4) + scale_fill_z
-```
-
----
-## 混合分布。ただの二項分布よりも良いあてはまり。
-
-パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
-
-```{r, before-mixing}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 11
-df_mixed |>
-  dplyr::filter(sigma == max(sigma)) |>
-  dplyr::group_by(Z) |>
-  dplyr::mutate(Density = Density / sum(Density)) |>
-  dplyr::ungroup() |>
-  ggplot() + aes(y, Density) +
-  geom_col(aes(fill = Z)) +
-  scale_fill_z +
-  facet_wrap(vars(Z), nrow = 1, labeller = label_both) +
-  labs(x = "# survived seeds") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-```
-
-<div align="center">
-
-```{r, after-mixing}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 7
-p1 = df_mixed |>
-  dplyr::filter(sigma == max(sigma)) |>
-  ggplot() + aes(y, Density) +
-  geom_col(aes(fill = Z)) +
-  scale_fill_z +
-  labs(x = "# survived seeds", title = "expected") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-
-p2 = tidy_od |>
-  ggplot() + aes(y, observed) +
-  geom_col() +
-  labs(x = "# survived seeds", y = "count", title = "observed") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
-
-</div>
-
----
-## 一般化線形混合モデル GLMM
-
-**固定効果(fixed effects)** のみ扱っていたGLMを拡張して、<br>
-**変量効果(random effect)** を混合したモデル。<br>
-<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small>
-
-<p>\[\begin{split}
-y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
-  + z_{1i} + \ldots \\
-z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
-\end{split}\]</p>
-
-e.g.,<br>
-個体$i$の種子生存率$p_i$は、<br>
-(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
-(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。
-
----
-## 固定効果にするか、変量効果にするか
-
-推定したパラメータを予測に使うなら固定効果
-
-予測に使えそうなので固定効果向き
-: - 観測・操作した連続値変数: 長さ、重さ、温度、etc.
-: - 観測・操作したカテゴリカル変数: 性別、投薬、etc.
-
-予測に使えないので変量効果向き
-: - 観測・操作できなかった個体差:<br>
-    たまたま集まってくれた学生15人 {A, B, C, ...}。<br>
-    Aさんの固定効果を推定できても、Zさんの予測には使えない。
-: - 観測・操作できなかったグループ差:<br>
-    ↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
-    いグループの固定効果を推定できても、また集まることはない。
-
----
-## どういうときに変量効果を考える必要があるか
-
-データに**擬似反復**が含まれるとき。<br>
-ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。
-
-| 植木鉢 | 個体/植木鉢 | 種子/個体 | 疑似反復 | 推定不可 |
-| -----  | ----------- | ----------| ---- | ------ |
-| 100個  | 1個体ずつ   | 1個ずつ   | – | 個体差・鉢差 |
-| 25個   | 1個体ずつ   | 4個ずつ   | 個体 | 鉢差 |
-| 20個   | 5個体ずつ   | 1個ずつ   | 植木鉢 | 個体差 |
-| 5個    | 5個体ずつ   | 4個ずつ   | 植木鉢・個体 | – |
-
-疑似反復あり<br>
-→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
-→ そのぶんを差し引いて固定効果を推定したい
-
-
----
-## GLMMの問題点・展望
-
-- 最尤推定の計算が難しくなるので、あまり複雑にはできない
-    - ベイズ推定を使えばクリアできる
-- GLMの拡張として理解はできても、実際に書くのは難しめ
-    - 階層ベイズモデルの一種として見るほうが便利
-
-→ ここでGLMMの練習はせず、階層ベイズモデルに進む。
+1. Setup computer environment ✅ day 1
+1. Get and read input data ✅ day 6
+1. Exploratory data analysis
+    - **Preparation** (harder than it seems) ✅ day 3--5
+    - **Visualization**, generating hypotheses (fun!) ✅ day 2
+    - **Statistical analysis**, testing hypotheses ✅ day 7--8
+1. Report ✅ day 2
 
 <figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<a href="https://r4ds.hadley.nz/intro">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
 
 
 ---
-## 一般化線形(混合)モデルまとめ
+## Purposes of this hands-on lectures
 
-- 何はともあれ作図して俯瞰
-- GLMは統計モデリングの考え方の根幹
-    - 確率分布・リンク関数・説明変数
-    - 尤度・最尤法によるパラメータ推定
-    - 情報量基準などによるモデル選択
-- GLMMは現実のデータ解析に向けた強化
-    - 疑似反復による変量効果を考慮
-    - 階層ベイズモデルとして扱うほうが楽
+### ✅ Every biological research involves data and models
 
+### ✅ You want to do reproducible analysis
 
----
-## 今日の残り時間
+### ✅ Learn how to do it and how to learn more
 
-- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
-- まずは個人で課題1と2に取り組み、ある程度できたら班内で見せ合う。
-- 最終課題に向けて話し合ったり。
+### ✅ Glance at the basics of data analysis
+
+<hr>
+
+You don't have to remember every command.<br>
+Just repeat forgetting and searching.
 
 
 ---
-## 参考文献
+## Reference
+
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/2tbRmVc),
+  [日本語版書籍](https://amzn.to/2yyFRKt)
+
+Official documents:
+: [tidyverse](https://www.tidyverse.org/),
+  [ggplot2](https://ggplot2.tidyverse.org/),
+  [dplyr](https://dplyr.tidyverse.org/),
+  [tidyr](https://tidyr.tidyverse.org/),
+  [stringr](https://stringr.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/)
 
 - [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
@@ -1741,4 +1367,6 @@ e.g.,<br>
 - [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
 
-`r .meta$next_link`
+<a href="." class="readmore">
+Go back to index
+</a>
