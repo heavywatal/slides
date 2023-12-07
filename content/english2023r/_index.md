@@ -4,8 +4,6 @@ date = 2023-11-27T16:00:00+09:00
 draft = false
 +++
 
-🚧 Translation in progress 🚧
-
 ## Summary
 
 -   Lecturer: Watal M Iwasaki, PhD
@@ -78,7 +76,5 @@ draft = false
 
 
 ## Slides
-
-🚧 Translation in progress 🚧
 
 <kbd>←</kbd><kbd>→</kbd> keys to go back and forth.
