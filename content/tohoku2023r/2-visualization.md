@@ -544,7 +544,7 @@ Windowsなら[Color Oracle](https://colororacle.org/)が使えそう。
 ---
 ## 多様性を前提によく考えられたパレットもある
 
-Sequantial palette:<br>
+Sequential palette:<br>
 ![plot of chunk palette-sequential](./figure/palette-sequential-1.png)![plot of chunk palette-sequential](./figure/palette-sequential-2.png)![plot of chunk palette-sequential](./figure/palette-sequential-3.png)
 
 Diverging palette:<br>
@@ -586,10 +586,10 @@ ggplot(diamonds) + aes(carat, price) +
 # scale_color_distiller(palette = "YlGnBu")
 ```
 
-![plot of chunk scale-color-continous](./figure/scale-color-continous-1.png)![plot of chunk scale-color-continous](./figure/scale-color-continous-2.png)
+![plot of chunk scale-color-continuous](./figure/scale-color-continuous-1.png)![plot of chunk scale-color-continuous](./figure/scale-color-continuous-2.png)
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
-- continous: `scale_color_viridis_c()`, `scale_color_distiller()`
+- continuous: `scale_color_viridis_c()`, `scale_color_distiller()`
 - binned: `scale_color_viridis_b()`, `scale_color_fermenter()`
 
 ---

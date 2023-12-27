@@ -413,7 +413,7 @@ filter(diamonds, carat > 1)     # これと同じ
 
 # 前処理の流れ作業に便利:
 diamonds %>% filter(carat > 1) %>% select(carat, price) %>% ...
-potatos %>% cut() %>% fry() %>% season() %>% eat()
+potatoes %>% cut() %>% fry() %>% season() %>% eat()
 ```
 
 🔰 パイプを使わない形に書き換え、出力を確認しよう:

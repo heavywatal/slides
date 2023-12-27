@@ -80,7 +80,7 @@ where
 
 
 ---
-## Genaral Linear Model (一般線形モデル)
+## General Linear Model (一般線形モデル)
 
 Estimates the coefficients (係数) and intercept (切片).<br>
 
@@ -114,7 +114,7 @@ summary(fit)
 ```
 
 ---
-## Genaral Linear Model (一般線形モデル)
+## General Linear Model (一般線形モデル)
 
 Estimates the coefficients (係数) and intercept (切片).<br>
 
@@ -131,7 +131,7 @@ ggplot(mpg) + aes(displ, cty) + geom_point() +
 ![plot of chunk lm-abline](figure/lm-abline-1.png)
 
 ---
-## Genaral Linear Model (一般線形モデル)
+## General Linear Model (一般線形モデル)
 
 Estimates the coefficients (係数) and intercept (切片).<br>
 
@@ -147,7 +147,7 @@ ggplot(mpg) + aes(displ, cty) + geom_point() +
 ![plot of chunk lm-predict](figure/lm-predict-1.png)
 
 ---
-## Genaral Linear Model (一般線形モデル)
+## General Linear Model (一般線形モデル)
 
 Estimates the coefficients (係数) and intercept (切片).<br>
 
@@ -162,7 +162,7 @@ ggplot(mpg) + aes(displ, cty) + geom_point() +
 ![plot of chunk lm-smooth](figure/lm-smooth-1.png)
 
 ---
-## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+## General<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
 
 <div>\[\begin{aligned}
 \text{link}(Y) &= c_0 + c_1 x_1 + c_2 x_2 + \ldots + \epsilon \\
@@ -178,7 +178,7 @@ LM is a special case of GLM:<br>
 
 
 ---
-## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+## General<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
 
 $\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344 + \epsilon$
 
@@ -214,7 +214,7 @@ summary(fit)
 ```
 
 ---
-## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+## General<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
 
 $\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344 + \epsilon$
 
@@ -227,7 +227,7 @@ ggplot(mpg) + aes(displ, cty) + geom_point() +
 ![plot of chunk glm-gamma-log-plot](figure/glm-gamma-log-plot-1.png)
 
 ---
-## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+## General<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
 
 $(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027 + \epsilon$
 
@@ -264,7 +264,7 @@ summary(fit)
 ```
 
 ---
-## Genaral<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
+## General<u>ized</u> Linear Model (一般<u>化</u>線形モデル)
 
 $(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027 + \epsilon$
 

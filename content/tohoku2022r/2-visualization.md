@@ -639,10 +639,10 @@ ggplot(diamonds) + aes(carat, price) +
 # scale_color_distiller(palette = "Spectral")
 ```
 
-![plot of chunk scale-color-continous](figure/scale-color-continous-1.png)
+![plot of chunk scale-color-continuous](figure/scale-color-continuous-1.png)
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
-- continous: `scale_color_viridis_c()`, `scale_color_distiller()`
+- continuous: `scale_color_viridis_c()`, `scale_color_distiller()`
 - binned: `scale_color_viridis_b()`, `scale_color_fermenter()`
 
 ---

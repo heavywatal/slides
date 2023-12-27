@@ -163,7 +163,7 @@ ggplot(mpg, aes(displ, cty)) + geom_point() +
 ![plot of chunk lm-smooth](figure/lm-smooth-1.png)
 
 ---
-## Genaralized Linear Model (一般化線形モデル)
+## Generalized Linear Model (一般化線形モデル)
 
 <div>\[\begin{aligned}
 \text{link}(Y) &= c_0 + c_1 x_1 + c_2 x_2 + \ldots + \epsilon \\
@@ -178,7 +178,7 @@ LM is a special case of GLM: `glm(..., family = gaussian("identity"))`
 
 
 ---
-## Genaralized Linear Model (一般化線形モデル)
+## Generalized Linear Model (一般化線形モデル)
 
 $\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344$
 
@@ -214,7 +214,7 @@ summary(fit)
 ```
 
 ---
-## Genaralized Linear Model (一般化線形モデル)
+## Generalized Linear Model (一般化線形モデル)
 
 $\log(\text{cty}) = -0.0155 \times \text{displ} + 3.344$
 
@@ -227,7 +227,7 @@ ggplot(mpg, aes(displ, cty)) + geom_point() +
 ![plot of chunk glm-gamma-log-plot](figure/glm-gamma-log-plot-1.png)
 
 ---
-## Genaralized Linear Model (一般化線形モデル)
+## Generalized Linear Model (一般化線形モデル)
 
 $(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027$
 
@@ -264,7 +264,7 @@ summary(fit)
 ```
 
 ---
-## Genaralized Linear Model (一般化線形モデル)
+## Generalized Linear Model (一般化線形モデル)
 
 $(\text{cty})^{-1} = 0.010 \times \text{displ} + 0.027$
 

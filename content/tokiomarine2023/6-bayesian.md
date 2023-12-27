@@ -563,7 +563,7 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 ## 収束・自己相関が悪い場合にどう改善するか
 
 - 小手先の対処
-    - iteration (warnup + sampling) をもっと長く
+    - iteration (warmup + sampling) をもっと長く
     - thinを大きくして間引く
 - ちょっと大掛かり
     - プログラムの書き方を改善する

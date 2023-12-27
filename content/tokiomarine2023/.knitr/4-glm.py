@@ -142,7 +142,7 @@ sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
 
 # %%
 # Parameters
-n_traials = 10
+n_trials = 10
 true_intercept = -3
 true_coef = 0.3
 sample_size = 200
@@ -150,11 +150,11 @@ sample_size = 200
 temperature = rng.uniform(-10, 35, sample_size)
 logit_p = true_intercept + true_coef * temperature
 p = special.expit(logit_p)
-beer_sales = rng.binomial(n_traials, p, sample_size)
+beer_sales = rng.binomial(n_trials, p, sample_size)
 _dic = {
     "temperature": temperature,
     "beer_sales": beer_sales,
-    "failures": n_traials - beer_sales,
+    "failures": n_trials - beer_sales,
 }
 df_binom = pd.DataFrame(_dic)
 print(df_binom)
@@ -176,7 +176,7 @@ print(result.params)
 # `predict()` は割合を返してくるので、
 # 作図するときは試行数をかけるか縦軸を割合にする。
 # %%
-df_pred = df_binom.assign(pred=lambda _: n_traials * result.predict(_))
+df_pred = df_binom.assign(pred=lambda _: n_trials * result.predict(_))
 grid = sns.FacetGrid(df_pred)
 grid.map(sns.scatterplot, "temperature", "beer_sales")
 grid.map(sns.lineplot, "temperature", "pred")
