@@ -67,7 +67,7 @@ draft = false
 
 1.  OSのソフトウェア・アップデートを基本的に全て適用して再起動。
     - Windows 11 (≥23H2)
-    - macOS Sonoma (≥14.3)
+    - macOS Sonoma (≥14.4)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
 1.  <https://cran.r-project.org/>
     から最新版の **R本体(≥ 4.3.3)** をダウンロードしてインストール。
