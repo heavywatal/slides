@@ -1,12 +1,40 @@
-```{r, setup-common}
-#| file: "setup.R"
-#| echo: false
-#| results: "asis"
-```
-```{r, setup-local}
-#| include: false
-#| cache: false
-```
++++
+url = "tohoku2024r/2-visualization.html"
+linktitle = "データの可視化、レポート作成。"
+title = "2. データの可視化、レポート作成。 — 進化学実習 2024 牧野研 東北大学"
+date = 2024-04-08T14:40:00+09:00
+draft = false
+css = "style.css"
+dpi = 108
++++
+
+# [進化学実習 2024 牧野研 東北大学](.)
+
+<div class="author">
+岩嵜 航
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li class="current-deck"><a href="2-visualization.html">データの可視化、レポート作成。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li><a href="6-input.html">データ入力、データ解釈</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li><a href="9-report.html">発表会</a>
+</ol>
+
+<div class="footnote">
+2024-04-08 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2024r/">https://heavywatal.github.io/slides/tohoku2024r/</a>
+</div>
+
 
 ---
 ## データ解析のおおまかな流れ
@@ -31,7 +59,7 @@
 
 情報の整理 → **正しい解析・新しい発見・仮説生成**
 
-<img `r src_alt_fig_chunk("simplify-diamonds")`>
+<img src="figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds">
 
 `carat` が大きいほど `price` も高いらしい。<br>
 その度合いは `clarity` によって異なるらしい。
@@ -79,10 +107,22 @@
 
 Rに最初から入ってて、例としてよく使われる。
 
-```{r, iris}
-#| echo: -1
-iris = tibble::as_tibble(iris)
+
+```r
 print(iris)
+```
+
+```
+    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
 ```
 
 長さ150の数値ベクトル4本と因子ベクトル1本。
@@ -92,14 +132,14 @@ print(iris)
 
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
-```{r, base-plot-iris}
-#| fig.show: "hold"
-#| fig.height: 4
-#| fig.width: 4
+
+```r
 boxplot(Petal.Width ~ Species, data = iris)
 plot(iris$Sepal.Length, iris$Sepal.Width)
 hist(iris$Petal.Length)
 ```
+
+![plot of chunk base-plot-iris](./figure/base-plot-iris-1.png)![plot of chunk base-plot-iris](./figure/base-plot-iris-2.png)![plot of chunk base-plot-iris](./figure/base-plot-iris-3.png)
 
 きれいなグラフを簡単に描けるパッケージを使いたい。
 
@@ -116,22 +156,7 @@ hist(iris$Petal.Length)
 
 <br>
 
-```{r, ggplot-iris}
-#| echo: false
-#| fig.show: "hold"
-#| fig.height: 4
-#| fig.width: 4
-set.seed(1)
-.theme = theme_classic(base_size = 20) + theme(legend.position = "none")
-ggplot(iris) + aes(Species, Petal.Width) +
-  geom_boxplot(aes(fill = Species), outlier.shape = NA) +
-  geom_jitter(width = 0.2, height = 0, shape = 16, size = 2, alpha = 0.33) +
-  .theme
-ggplot(iris) + aes(Sepal.Length, Sepal.Width) +
-  geom_point(aes(color = Species), shape = 16, size = 3, alpha = 0.66) + .theme
-ggplot(iris) + aes(Petal.Length) +
-  geom_histogram(aes(fill = Species), boundary = 1, binwidth = 0.5) + .theme
-```
+![plot of chunk ggplot-iris](./figure/ggplot-iris-1.png)![plot of chunk ggplot-iris](./figure/ggplot-iris-2.png)![plot of chunk ggplot-iris](./figure/ggplot-iris-3.png)
 
 
 ---
@@ -181,10 +206,8 @@ R標準のやつとは根本的に違うシステムで作図する。
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus1}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
+
+```r
 ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -194,13 +217,13 @@ ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus1](./figure/ggplot-plus1-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus2}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
@@ -210,13 +233,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus2](./figure/ggplot-plus2-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus3}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point()                      # 散布図を描く
@@ -226,13 +249,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus3](./figure/ggplot-plus3-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus4}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -242,14 +265,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus4](./figure/ggplot-plus4-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus5}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
-#| message: false
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -259,14 +281,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus5](./figure/ggplot-plus5-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus6}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
-#| message: false
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -276,14 +297,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus6](./figure/ggplot-plus6-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus7}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
-#| message: false
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -293,13 +313,13 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus7](./figure/ggplot-plus7-1.png)
+
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
 
-```{r, ggplot-plus8}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 7
+
+```r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
@@ -309,20 +329,22 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
 
+![plot of chunk ggplot-plus8](./figure/ggplot-plus8-1.png)
+
 
 ---
 ## 途中経過オブジェクトを取っておける
 
-```{r, ggplot-object}
-#| fig.show: "hold"
-#| fig.height: 5
-#| fig.width: 6
+
+```r
 p1 = ggplot(data = diamonds)
 p2 = p1 + aes(x = carat, y = price)
 p3 = p2 + geom_point()
 p4 = p3 + facet_wrap(vars(clarity))
 print(p3)
 ```
+
+![plot of chunk ggplot-object](./figure/ggplot-object-1.png)
 
 この `p3` は後で使います。
 
@@ -331,21 +353,19 @@ print(p3)
 
 自動車のスペックに関するデータ `mpg` を使って。
 
-```{r, mpg}
-#| echo: false
-wtl::printdf(mpg, n = 4)
+
+```
+    manufacturer  model displ year cyl      trans drv cty hwy fl   class
+  1         audi     a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+  2         audi     a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+ --                                                                     
+233   volkswagen passat   2.8 1999   6 manual(m5)   f  18  26  p midsize
+234   volkswagen passat   3.6 2008   6   auto(s6)   f  17  26  p midsize
 ```
 
 🔰 排気量 `displ` と市街地燃費 `cty` の関係を散布図で。
 
-```{r, ggplot-mpg}
-#| echo: false
-#| fig.height: 3
-#| fig.width: 3
-ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point()
-```
+![plot of chunk ggplot-mpg](./figure/ggplot-mpg-1.png)
 
 ---
 ## よくあるエラー
@@ -381,8 +401,22 @@ ggplot(diamonds)    # OK!
 - 1セルは1つの値
 - この列をX軸、この列をY軸、この列で色わけ、と指定できる！
 
-```{r, diamonds-again}
+
+```r
 print(diamonds)
+```
+
+```
+      carat       cut color clarity depth table price    x    y    z
+    1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+    2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+    3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+    4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+   --                                                               
+53937  0.72      Good     D     SI1  63.1    55  2757 5.69 5.75 3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
 ```
 
 <cite>
@@ -396,35 +430,35 @@ print(diamonds)
 
 `aes()` の中で列名を指定する。
 
-```{r, aes-map}
-#| fig.height: 5
-#| fig.width: 7
+
+```r
 ggplot(diamonds) +
   aes(x = carat, y = price) +
   geom_point(mapping = aes(color = clarity, size = cut))
 ```
+
+![plot of chunk aes-map](./figure/aes-map-1.png)
 
 ---
 ## データによらず一律でaestheticsを変える
 
 `aes()` の外で値を指定する。
 
-```{r, aes-nomap}
-#| fig.height: 5
-#| fig.width: 5.8
+
+```r
 ggplot(diamonds) +
   aes(x = carat, y = price) +
   geom_point(color = "darkorange", size = 6, alpha = 0.4)
 ```
 
+![plot of chunk aes-nomap](./figure/aes-nomap-1.png)
+
 
 ---
 ## 外の `aes()` は全ての `geom_*()` に波及する
 
-```{r, aes-global-local}
-#| fig.show: "hold"
-#| fig.height: 4.8
-#| fig.width: 6
+
+```r
 ggplot(diamonds) +
   aes(x = carat, y = price) +
   geom_point(aes(color = clarity)) +
@@ -434,6 +468,8 @@ ggplot(diamonds) +
   geom_point() +          # color
   geom_line()             # color
 ```
+
+![plot of chunk aes-global-local](./figure/aes-global-local-1.png)![plot of chunk aes-global-local](./figure/aes-global-local-2.png)
 
 ---
 ## [aesthetics一覧](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html)
@@ -458,44 +494,34 @@ ggplot(diamonds) +
 
 不透明度は `alpha`
 
-```{r, fill}
-#| fig.height: 5
-#| fig.width: 6
+
+```r
 ggplot(diamonds) +
   aes(cut, carat) +
   geom_boxplot(color = "royalblue", fill = "gold", alpha = 0.5, linewidth = 2)
 ```
+
+![plot of chunk fill](./figure/fill-1.png)
 
 ---
 ## 色の変え方の練習
 
 自動車のスペックに関するデータ `mpg` を使って。
 
-```{r, mpg2}
-#| echo: false
-wtl::printdf(mpg, n = 4)
+
+```
+    manufacturer  model displ year cyl      trans drv cty hwy fl   class
+  1         audi     a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+  2         audi     a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+ --                                                                     
+233   volkswagen passat   2.8 1999   6 manual(m5)   f  18  26  p midsize
+234   volkswagen passat   3.6 2008   6   auto(s6)   f  17  26  p midsize
 ```
 
 🔰 排気量 `displ` と市街地燃費 `cty` の関係を青い散布図で描こう<br>
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によって色を塗り分けしてみよう
 
-```{r, ggplot-mpg-color}
-#| echo: false
-#| fig.height: 3
-#| fig.width: 10
-pL = ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(color = "blue")
-pC = ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv)) +
-  scale_color_discrete(type = NULL)  # to show bad default
-pR = ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = cyl)) +
-  scale_color_continuous(type = NULL)  # to show bad default
-cowplot::plot_grid(pL, pC, pR, nrow = 1L)
-```
+![plot of chunk ggplot-mpg-color](./figure/ggplot-mpg-color-1.png)
 
 ---
 ## 色の見え方は人によって違う
@@ -510,18 +536,7 @@ cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 <span style="color: #00B5A0;">緑</span>
 <span style="color: #00B2C1;">青</span>の2色に見えている。
 
-```{r, color-vision-diversity}
-#| echo: false
-#| fig.height: 5
-#| fig.width: 4
-pmpg = ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66) +
-  theme_minimal(base_size = 18) + theme(legend.position = "bottom")
-pmpg + scale_color_discrete(type = NULL) + labs(title = "Original")
-pmpg + scale_color_discrete(type = colorspace::deutan(scales::hue_pal()(3L))) + labs(title = "Deuteranope")
-pmpg + scale_color_discrete(type = colorspace::tritan(scales::hue_pal()(3L))) + labs(title = "Tritanope")
-```
+![plot of chunk color-vision-diversity](./figure/color-vision-diversity-1.png)![plot of chunk color-vision-diversity](./figure/color-vision-diversity-2.png)![plot of chunk color-vision-diversity](./figure/color-vision-diversity-3.png)
 
 MacやiOSなら[Sim Daltonism](https://michelf.ca/projects/sim-daltonism/)というアプリでシミュレーションできる。<br>
 Windowsなら[Color Oracle](https://colororacle.org/)が使えそう。
@@ -530,37 +545,13 @@ Windowsなら[Color Oracle](https://colororacle.org/)が使えそう。
 ## 多様性を前提によく考えられたパレットもある
 
 Sequential palette:<br>
-```{r, palette-sequential}
-#| echo: false
-#| fig.width: 4
-#| fig.height: 1.95
-colorspace::swatchplot(viridis = scales::viridis_pal(option = "viridis")(7L), cvd = TRUE)
-colorspace::swatchplot(inferno = scales::viridis_pal(option = "inferno")(7L), cvd = TRUE)
-gradient_pal = scales::seq_gradient_pal("#132B43", "#56B1F7", "Lab")
-colorspace::swatchplot(`ggplot2 default` = gradient_pal(seq(0, 1, length.out = 7L)), cvd = TRUE)
-```
+![plot of chunk palette-sequential](./figure/palette-sequential-1.png)![plot of chunk palette-sequential](./figure/palette-sequential-2.png)![plot of chunk palette-sequential](./figure/palette-sequential-3.png)
 
 Diverging palette:<br>
-```{r, palette-diverging}
-#| echo: false
-#| fig.width: 4
-#| fig.height: 1.95
-colorspace::swatchplot(turbo = scales::viridis_pal(option = "turbo")(7L), cvd = TRUE)
-colorspace::swatchplot(`Zissou 1` = colorspace::divergingx_hcl(7, "Zissou 1"), cvd = TRUE)
-colorspace::swatchplot(`rainbow (very bad)` = rainbow(7), cvd = TRUE)
-# colorspace::swatchplot(Spectral = scales::brewer_pal(palette = "Spectral")(7L), cvd = TRUE)
-```
+![plot of chunk palette-diverging](./figure/palette-diverging-1.png)![plot of chunk palette-diverging](./figure/palette-diverging-2.png)![plot of chunk palette-diverging](./figure/palette-diverging-3.png)
 
 Qualitative (categorical, discrete) palette:<br>
-```{r, palette-qualitative}
-#| echo: false
-#| fig.width: 4
-#| fig.height: 1.95
-# colorspace::swatchplot(R4 = palette.colors(8L, "R4"), cvd = TRUE)
-colorspace::swatchplot(`Okabe-Ito` = palette(), cvd = TRUE)
-colorspace::swatchplot(`Set1 (not so good)` = scales::brewer_pal(palette = "Set1")(7L), cvd = TRUE)
-colorspace::swatchplot(`ggplot2 default (bad)` = scales::hue_pal()(7L), cvd = TRUE)
-```
+![plot of chunk palette-qualitative](./figure/palette-qualitative-1.png)![plot of chunk palette-qualitative](./figure/palette-qualitative-2.png)![plot of chunk palette-qualitative](./figure/palette-qualitative-3.png)
 
 ---
 ## 色パレットの変更 `scale_color_*()`
@@ -571,19 +562,15 @@ colorspace::swatchplot(`ggplot2 default (bad)` = scales::hue_pal()(7L), cvd = TR
 のパレットはggplot2に組み込まれているので簡単。<br>
 上記リンクから名前を探して、`option =` か `palette =` で指定。
 
-```{r, scale-color}
-#| echo: -3
-#| fig.show: "hold"
-#| fig.height: 4
-#| fig.width: 6
+
+```r
 ggplot(diamonds) + aes(carat, price) +
   geom_point(mapping = aes(color = clarity)) +
   scale_color_viridis_d(option = "inferno")
 # scale_color_brewer(palette = "YlGnBu")
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = clarity)) +
-  scale_color_brewer(palette = "YlGnBu")
 ```
+
+![plot of chunk scale-color](./figure/scale-color-1.png)![plot of chunk scale-color](./figure/scale-color-2.png)
 
 ---
 ## 連続値(continuous)と離散値(discrete)を区別する
@@ -591,19 +578,15 @@ ggplot(diamonds) + aes(carat, price) +
 渡す値とscale関数が合ってないと怒られる:<br>
 `Error: Continuous value supplied to discrete scale`
 
-```{r, scale-color-continous}
-#| echo: -3
-#| fig.show: "hold"
-#| fig.height: 4
-#| fig.width: 6
+
+```r
 ggplot(diamonds) + aes(carat, price) +
   geom_point(mapping = aes(color = price)) +
   scale_color_viridis_c(option = "inferno")
 # scale_color_distiller(palette = "YlGnBu")
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = price)) +
-  scale_color_distiller(palette = "YlGnBu")
 ```
+
+![plot of chunk scale-color-continous](./figure/scale-color-continous-1.png)![plot of chunk scale-color-continous](./figure/scale-color-continous-2.png)
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
 - continuous: `scale_color_viridis_c()`, `scale_color_distiller()`
@@ -616,11 +599,8 @@ R標準の `palette.colors()` や
 [colorspaceパッケージ](https://colorspace.r-forge.r-project.org/articles/ggplot2_color_scales.html)
 を使う。
 
-```{r, other-palettes}
-#| echo: !expr 1:4
-#| fig.show: "hold"
-#| fig.height: 3.2
-#| fig.width: 4
+
+```r
 okabe_ito = palette.colors(9L, "Okabe-Ito")
 ggplot(mpg) +
   aes(x = displ, y = cty) +
@@ -628,15 +608,9 @@ ggplot(mpg) +
   scale_color_discrete(type = unname(okabe_ito)[-1])
 # scale_color_discrete(type = palette.colors(8L, "R4")[-1])
 # colorspace::scale_colour_discrete_divergingx("Zissou 1")
-ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66) +
-  scale_color_discrete(type = palette.colors(8L, "R4")[-1])
-ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66) +
-  colorspace::scale_color_discrete_divergingx("Zissou 1")
 ```
+
+![plot of chunk other-palettes](./figure/other-palettes-1.png)![plot of chunk other-palettes](./figure/other-palettes-2.png)![plot of chunk other-palettes](./figure/other-palettes-3.png)
 
 自分で全色個別指定もできるが、専門家の考えたセットを使うのが無難。
 
@@ -664,11 +638,12 @@ options(
 ggplotの真骨頂！
 これをR標準機能でやるのは結構たいへん。
 
-```{r, facet-wrap}
-#| fig.height: 5.5
-#| fig.width: 8
+
+```r
 p3 + facet_wrap(vars(clarity), ncol = 4L)
 ```
+
+![plot of chunk facet-wrap](./figure/facet-wrap-1.png)
 
 ---
 ## 値に応じてパネル切り分け (≥2変数facet)
@@ -676,62 +651,43 @@ p3 + facet_wrap(vars(clarity), ncol = 4L)
 ggplotの真骨頂！
 これをR標準機能でやるのは結構たいへん。
 
-```{r, facet-grid}
-#| fig.height: 6.5
-#| fig.width: 9
+
+```r
 p3 + facet_grid(vars(clarity), vars(cut))
 ```
+
+![plot of chunk facet-grid](./figure/facet-grid-1.png)
 
 ---
 ## 多変量データの俯瞰、5次元くらいまで有効
 
-```{r, facet-diamonds}
-#| echo: false
-#| fig.height: 8
-#| fig.width: 12
-.levels = levels(diamonds$clarity) |>
-  stringr::str_remove("\\d+$") |> unique() |> rev()
-diamonds |>
-  dplyr::mutate(clarity = factor(stringr::str_remove(clarity, "\\d+$"), levels = .levels)) |>
-  ggplot() +
-  aes(carat, price) +
-  geom_point(aes(color = color), alpha = 0.5) +
-  facet_grid(vars(clarity), vars(cut), labeller = label_both) +
-  scale_color_viridis_d(guide = guide_legend(override.aes = list(alpha = 1))) +
-  labs(title = "Diamonds") +
-  theme_minimal(base_size = 18)
-```
+![plot of chunk facet-diamonds](./figure/facet-diamonds-1.png)
 
 ---
 ## 値に応じたfacetの練習
 
 自動車のスペックに関するデータ `mpg` を使って。
 
-```{r, mpg3}
-#| echo: false
-wtl::printdf(mpg, n = 4)
+
+```
+    manufacturer  model displ year cyl      trans drv cty hwy fl   class
+  1         audi     a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+  2         audi     a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+ --                                                                     
+233   volkswagen passat   2.8 1999   6 manual(m5)   f  18  26  p midsize
+234   volkswagen passat   3.6 2008   6   auto(s6)   f  17  26  p midsize
 ```
 
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によってfacetしてみよう
 
-```{r, ggplot-mpg-facet}
-#| echo: false
-#| fig.height: 3
-#| fig.width: 10
-ggplot(data = mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = cyl)) +
-  facet_wrap(vars(drv)) +
-  theme_gray(base_size = 18)
-```
+![plot of chunk ggplot-mpg-facet](./figure/ggplot-mpg-facet-1.png)
 
 
 ---
 ## 値を変えず座標軸を変える [`scale_*`](https://ggplot2.tidyverse.org/reference/#section-scales), [`coord_*`](https://ggplot2.tidyverse.org/reference/#section-coordinate-systems)
 
-```{r, scale-axis}
-#| fig.height: 4.8
-#| fig.width: 8
+
+```r
 ggplot(diamonds) + aes(carat, price) + geom_point(alpha = 0.25) +
   scale_x_log10() +
   scale_y_log10(breaks = c(1, 2, 5, 10) * 1000) +
@@ -739,15 +695,16 @@ ggplot(diamonds) + aes(carat, price) + geom_point(alpha = 0.25) +
   labs(title = "Diamonds", x = "Size (carat)", y = "Price (USD)")
 ```
 
+![plot of chunk scale-axis](./figure/scale-axis-1.png)
+
 ---
 ## データと関係ない部分の見た目を調整 `theme`
 
 [既存の `theme_*()`](https://ggplot2.tidyverse.org/reference/ggtheme.html)
 をベースに、[`theme()`](https://ggplot2.tidyverse.org/reference/theme.html)関数で微調整。
 
-```{r, theme}
-#| fig.height: 4
-#| fig.width: 6
+
+```r
 p3 + theme_bw(base_size = 18) + theme(
   panel.background = element_rect(fill = "khaki"),      # 箱
   panel.grid       = element_line(color = "royalblue"), # 線
@@ -755,6 +712,8 @@ p3 + theme_bw(base_size = 18) + theme(
   axis.text.y      = element_blank()                    # 消す
 )
 ```
+
+![plot of chunk theme](./figure/theme-1.png)
 
 ---
 ## 基本的な使い方: 指示を `+` で重ねていく
@@ -770,12 +729,13 @@ p3 + theme_bw(base_size = 18) + theme(
 [patchwork](https://patchwork.data-imaginist.com/))
 の助けを借りて
 
-```{r, cowplot}
-#| fig.height: 5.5
-#| fig.width: 6
+
+```r
 pAB = cowplot::plot_grid(p3, p3, labels = c("A", "B"), nrow = 1L)
 cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 ```
+
+![plot of chunk cowplot](./figure/cowplot-1.png)
 
 ---
 ## ファイル名もサイズも再現可能な作図
@@ -836,8 +796,8 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 
 うん。でもすべての点について後から確認できるし、使い回せる！
 
-```{r, long}
-#| eval: false
+
+```r
 set.seed(1)
 p = ggplot(diamonds) +
   aes(x = cut, y = price) +
@@ -882,37 +842,7 @@ ggplot2は3Dが苦手
 
 下図になるべく似るように作図・調整してください。<br>
 
-```{r, ggplot-homework}
-#| fig.height: 4
-#| fig.width: 12
-#| echo: false
-p_iris = ggplot(iris) +
-  aes(Sepal.Length, Sepal.Width, color = Species) +
-  stat_smooth(method = lm, formula = y ~ x, se = FALSE, linewidth = 1, alpha = 0.66) +
-  geom_point(shape = 16, size = 2, alpha = 0.66) +
-  scale_color_discrete(type = palette.colors(8L, "R4")[-1]) +
-  theme_gray(base_size = 14) +
-  theme(legend.position = "top", axis.ticks = element_blank())
-
-p_diamonds = ggplot(diamonds) +
-  aes(price) +
-  geom_histogram(binwidth = 1000, boundary = 0, fill = "darkorange") +
-  labs(title = "Distribution of diamonds price") +
-  theme_bw(base_size = 14) +
-  theme(panel.grid.minor = element_blank())
-
-set.seed(19937)
-p_mpg = ggplot(mpg) +
-  aes(class, cty) +
-  geom_boxplot(aes(fill = class), alpha = 0.8, outlier.shape = NA) +
-  geom_jitter(height = 0, width = 0.2, alpha = 0.5, shape = 16) +
-  scale_fill_viridis_d(option = "turbo", guide = "none", begin = 0.03, end = 0.97) +
-  coord_flip() +
-  theme_classic(base_size = 16) +
-  theme(axis.ticks.y = element_blank())
-
-cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
-```
+![plot of chunk ggplot-homework](./figure/ggplot-homework-1.png)
 
 - 細かい設定まで見逃さないように、班で協力しましょう。
 
@@ -961,14 +891,17 @@ cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
 
 → **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
 
-```{r, hello}
-#| results: "hold"
-#| fig.show: "hold"
-#| fig.height: 3.5
-#| fig.width: 5
+
+```r
 3 * 14
 ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ```
+
+```
+[1] 42
+```
+
+![plot of chunk hello](./figure/hello-1.png)
 
 
 ---
@@ -1059,19 +992,13 @@ e.g., **Markdown**, reStructuredText, 各種Wiki記法など
 ---
 ## Quartoする環境は既に整っているはず
 
-```{r, versions}
-#| include: false
-R_version = paste(R.version$major, R.version$minor, sep = ".")
-pkg_versions = installed.packages()[, "Version"]
-RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
-# quarto_version = system2("quarto", "--version", stdout = TRUE)
-```
 
-- **R (≥ `r R_version`)**: 最新版 – 0.1 くらいまでが許容範囲
-- **RStudio (≥ `r RStudio_version`)**: Quarto CLI を同梱
-- **tidyverse (≥ `r pkg_versions["tidyverse"]`)**: 次の2つを自動インストール
-  - rmarkdown (≥ `r pkg_versions["rmarkdown"]`)
-  - knitr (≥ `r pkg_versions["knitr"]`)
+
+- **R (≥ 4.3.3)**: 最新版 – 0.1 くらいまでが許容範囲
+- **RStudio (≥ 2023.12.1+402)**: Quarto CLI を同梱
+- **tidyverse (≥ 2.0.0)**: 次の2つを自動インストール
+  - rmarkdown (≥ 2.26)
+  - knitr (≥ 1.45)
 
 (示してあるバージョンは最低要件ではなく私の現在の環境の)
 
@@ -1202,4 +1129,6 @@ Older versions
 ggplot2公式ドキュメント
 : https://ggplot2.tidyverse.org/
 
-`r .meta$next_link`
+<a href="3-structure1.html" class="readmore">
+3. データ構造の処理1: 抽出、集約など。
+</a>

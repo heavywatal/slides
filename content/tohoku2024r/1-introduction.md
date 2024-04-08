@@ -1,12 +1,40 @@
-```{r, setup-common}
-#| file: "setup.R"
-#| echo: false
-#| results: "asis"
-```
-```{r, setup-local}
-#| include: false
-#| cache: false
-```
++++
+url = "tohoku2024r/1-introduction.html"
+linktitle = "導入: データ解析の全体像。Rの基本。"
+title = "1. 導入: データ解析の全体像。Rの基本。 — 進化学実習 2024 牧野研 東北大学"
+date = 2024-04-08T13:00:00+09:00
+draft = false
+css = "style.css"
+dpi = 108
++++
+
+# [進化学実習 2024 牧野研 東北大学](.)
+
+<div class="author">
+岩嵜 航
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+
+<ol>
+<li class="current-deck"><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li><a href="2-visualization.html">データの可視化、レポート作成。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li><a href="6-input.html">データ入力、データ解釈</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li><a href="9-report.html">発表会</a>
+</ol>
+
+<div class="footnote">
+2024-04-08 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2024r/">https://heavywatal.github.io/slides/tohoku2024r/</a>
+</div>
+
 
 ---
 ## 本実習のお品書き「データ取り扱いの基礎」
@@ -58,8 +86,22 @@
 
 生のままでは複雑過ぎ、情報多すぎ、何もわからない。
 
-```{r, diamonds}
+
+```r
 print(ggplot2::diamonds)
+```
+
+```
+      carat       cut color clarity depth table price    x    y    z
+    1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+    2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+    3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+    4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+   --                                                               
+53937  0.72      Good     D     SI1  63.1    55  2757 5.69 5.75 3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
 ```
 
 ダイヤモンド53,940個について10項目の値を持つデータセット
@@ -70,23 +112,23 @@ print(ggplot2::diamonds)
 
 各列の**平均**とか**標準偏差**とか:
 
-```{r, summary-diamonds}
-#| echo: false
-dia_cols = c("carat", "depth", "table", "price")
-diamonds |>
-  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
-  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
+
+```
+  stat carat depth table    price
+1 mean  0.80 61.75 57.46  3932.80
+2   sd  0.47  1.43  2.23  3989.44
+3  max  5.01 79.00 95.00 18823.00
+4  min  0.20 43.00 43.00   326.00
 ```
 
 大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
-```{r, cov-diamonds}
-#| echo: false
-diamonds |>
-  dplyr::select(all_of(dia_cols)) |>
-  scale() |>
-  cov() |>
-  wtl::printmat("%.2f", upper = FALSE)
+
+```
+      carat depth table price
+carat  1.00                  
+depth  0.03  1.00            
+table  0.18 -0.30  1.00      
+price  0.92 -0.01  0.13  1.00
 ```
 
 <hr>
@@ -113,26 +155,7 @@ diamonds |>
 
 情報をうまく絞って整理 → **直感的にわかる**
 
-```{r, simplify-diamonds}
-#| echo: false
-#| fig.height: 6
-#| fig.width: 7
-diamonds |>
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
-  ggplot(aes(carat, price, color = clarity)) +
-  geom_point(alpha = 0.4, size = 3) +
-  scale_color_viridis_d(
-    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
-  ) +
-  labs(title = "Diamonds") +
-  theme_gray(base_size = 22) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "#bbbbbb"),
-    legend.key = element_rect(fill = "#bbbbbb"),
-    axis.ticks = element_blank()
-  )
-```
+![plot of chunk simplify-diamonds](./figure/simplify-diamonds-1.png)
 
 `carat` が大きいほど `price` も高いらしい。<br>
 その度合いは `clarity` によって異なるらしい。
@@ -208,19 +231,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 データ生成をうまく真似できそうな仮定の数式表現。<br>
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
-```{r, lm-diamonds}
-#| echo: false
-#| fig.height: 5
-#| fig.width: 6
-diamonds |>
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
-  ggplot(aes(carat, price)) +
-  geom_point(alpha = 0.3, size = 3) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
-  coord_cartesian(ylim = c(0, 20000)) +
-  labs(title = "Diamonds") +
-  theme_classic(base_size = 22)
-```
+![plot of chunk lm-diamonds](./figure/lm-diamonds-1.png)
 
 ダイヤモンドの価格はこういう数式でおよそ表せる、という理解<br>
 → モデルをさらに改良していき、理解の精度を上げられるかも
@@ -523,17 +534,7 @@ source("https://scorpion.biology.tohoku.ac.jp/sice/report.R")
 
 <img src="/slides/image/rstudio/console.png" class="screenshot" width="90%">
 
-```{r, rstudio-demo}
-#| include: false
-#| eval: false
-1 + 2
-x = 2980
-y = 1.08 * x
-y
-z = "I love beer!"
-?sum
-hist(iris$Petal.Length)
-```
+
 
 
 ---
@@ -674,18 +675,35 @@ TAがいるならTAが、リモートならChat欄が随時受付中です。
 ---
 ## 変数/オブジェクトを作ってみよう
 
-```{r, objects}
+
+```r
 x = 2        # Create x
 x            # What's in x?
+```
+
+```
+[1] 2
+```
+
+```r
 y = 5        # Create y
 y            # What's in y?
+```
+
+```
+[1] 5
 ```
 
 Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。<br>
 `#` 記号より右はRに無視される。コメントを書くのに便利。
 
-```{r, sum}
+
+```r
 x + y
+```
+
+```
+[1] 7
 ```
 
 🔰 `x` と `y` の引き算、掛け算、割り算をやってみよう
@@ -713,14 +731,33 @@ x + y
 
 変数を受け取って、何か仕事して、返す命令セット
 
-```{r, function}
+
+```r
 x = seq(1, 3)  # 1と3を渡すとvectorが返ってくる
 x
+```
+
+```
+[1] 1 2 3
+```
+
+```r
 sum(x)         # vectorを渡すと足し算が返ってくる
+```
+
+```
+[1] 6
+```
+
+```r
 square = function(something) {  # 自分の関数を定義
   something ** 2
 }
 square(x)                       # 使ってみる
+```
+
+```
+[1] 1 4 9
 ```
 
 🔰 自分の関数を何か作ってみよう。
@@ -730,28 +767,70 @@ e.g., 2倍にする関数 `twice`
 ---
 ## 変数/オブジェクトを作ってみよう Part 2
 
-```{r, objects2}
+
+```r
 x = 42       # Create x
 x            # What's in x?
+```
+
+```
+[1] 42
+```
+
+```r
 y = "24601"  # Create y
 y            # What's in y?
 ```
 
+```
+[1] "24601"
+```
+
 この `x` と `y` を足そうとするとエラーになる。なぜ？
 
-```{r, error}
-#| error: true
+
+```r
 x + y        # Error! Why?
+```
+
+```
+Error in x + y: non-numeric argument to binary operator
 ```
 
 ---
 ## 変数/オブジェクトの型
 
-```{r, isas}
+
+```r
 class(x)
+```
+
+```
+[1] "numeric"
+```
+
+```r
 is.numeric(x)
+```
+
+```
+[1] TRUE
+```
+
+```r
 is.character(x)
+```
+
+```
+[1] FALSE
+```
+
+```r
 as.character(x)
+```
+
+```
+[1] "42"
 ```
 
 🔰 さっき作った `y` にも同じ関数を適用してみよう。
@@ -777,12 +856,31 @@ as.character(x)
 1個の値でもベクトル扱い。<br>
 同じ長さ(または長さ1)の相手との計算が得意。
 
-```{r, vector}
+
+```r
 x = c(1, 2, 9)  # 長さ3の数値ベクトル
 x + x           # 同じ長さ同士の計算
+```
+
+```
+[1]  2  4 18
+```
+
+```r
 y = 10          # 長さ1の数値ベクトル
 x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+```
+
+```
+[1] 11 12 19
+```
+
+```r
 x < 5           # 5より小さいか
+```
+
+```
+[1]  TRUE  TRUE FALSE
 ```
 
 🔰 この `x, y` を使っていろいろな演算を試してみよう
@@ -793,27 +891,63 @@ x < 5           # 5より小さいか
 
 `[]` を使う。番号は1から始まる。
 
-```{r, vector-index}
+
+```r
 letters
+```
+
+```
+ [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+```
+
+```r
 letters[3]
+```
+
+```
+[1] "c"
+```
+
+```r
 letters[seq(4, 6)]       # 4 5 6
+```
+
+```
+[1] "d" "e" "f"
+```
+
+```r
 letters[seq(1, 26) < 4]  # TRUE TRUE TRUE FALSE FALSE ...
+```
+
+```
+[1] "a" "b" "c"
 ```
 
 ---
 ## vectorを渡した結果は関数によって異なる
 
 各要素に適用するもの:
-```{r, vector-function}
+
+```r
 x = c(1, 2, 9)
 y = sqrt(x)     # square root
 y
 ```
 
+```
+[1] 1.000000 1.414214 3.000000
+```
+
 全要素を集約した値を返すもの:
-```{r, vector-forloop}
+
+```r
 z = sum(x)
 z
+```
+
+```
+[1] 12
 ```
 
 🔰 `log()`, `exp()`, `length()`, `max()`, `mean()`
@@ -826,12 +960,28 @@ z
 1本のvectorを折り曲げて長方形にしたもの。<br>
 中身は全て同じ型。機械学習とか画像処理とかで使う。
 
-```{r, matrix}
+
+```r
 v = seq(1, 8)              # c(1, 2, 3, 4, 5, 6, 7, 8)
 x = matrix(v, nrow = 2)    # 2行に畳む。列ごとに詰める
 x
+```
+
+```
+     [,1] [,2] [,3] [,4]
+[1,]    1    3    5    7
+[2,]    2    4    6    8
+```
+
+```r
 y = matrix(v, nrow = 2, byrow = TRUE)  # 行ごとに詰める
 y
+```
+
+```
+     [,1] [,2] [,3] [,4]
+[1,]    1    2    3    4
+[2,]    5    6    7    8
 ```
 
 🔰 結果を確認してみよう: `x + y`, `dim(x)`, `nrow(x)`, `ncol(x)`.
@@ -866,10 +1016,22 @@ y
 同じ長さの列vectorを複数束ねた長方形の表。<br>
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
-```{r, dataframe}
-#| echo: -1
-iris = tibble::as_tibble(iris)
+
+```r
 print(iris)
+```
+
+```
+    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
 ```
 
 `iris` はアヤメ属3種150個体に関する測定データ。<br>
@@ -887,8 +1049,18 @@ names(iris)     # 列名
 summary(iris)   # 要約
 View(iris)      # RStudioで閲覧
 ```
-```{r, str}
+
+```r
 str(iris)       # 構造が分かる形で表示
+```
+
+```
+tibble [150 × 5] (S3: tbl_df/tbl/data.frame)
+ $ Sepal.Length: num [1:150] 5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ $ Sepal.Width : num [1:150] 3.5 3 3.2 3.1 3.6 3.9 3.4 3.4 2.9 3.1 ...
+ $ Petal.Length: num [1:150] 1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ $ Petal.Width : num [1:150] 0.2 0.2 0.2 0.2 0.2 0.4 0.3 0.2 0.2 0.1 ...
+ $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
 ```
 
 🔰 ほかのデータもいろいろ見てみよう。
@@ -924,11 +1096,19 @@ iris[2, "Petal.Length"]    # 2行目Petal.Length列
 ## data.frameの新規作成
 
 同じ長さの **列(column) vector** を結合して作る:
-```{r, dataframe-new}
+
+```r
 x = c(1, 2, 3)
 y = c("A", "B", "C")
 mydata = data.frame(x, y)
 print(mydata)
+```
+
+```
+  x y
+1 1 A
+2 2 B
+3 3 C
 ```
 
 🔰 次のようなdata.frameを作って `theDF` と名付けよう:
@@ -1010,11 +1190,14 @@ install.packages("tidyverse")
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
-```{r, tidyverse-messasge}
-#| echo: false
-withr::with_namespace("tidyverse", {
-  cat(tidyverse_attach_message(core), sep = "\n")
-})
+
+```
+── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
 ```
 
 一貫したデザインでデータ解析の様々な工程をカバー
@@ -1120,4 +1303,6 @@ Other versions
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
    石川由希 2023 名古屋大学
 
-`r .meta$next_link`
+<a href="2-visualization.html" class="readmore">
+2. データの可視化、レポート作成。
+</a>
