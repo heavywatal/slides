@@ -244,39 +244,45 @@ window.addEventListener('DOMContentLoaded', function() {
 </section>
 <section>
 <h2 id="joinまとめ">joinまとめ</h2>
-<div class="column-container">
-<div class="column" style="flex-shrink: 1.4;">
-<figure>
-<a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
-<img src="/slides/image/r4ds/join.png" height="820">
+<figure style="margin-block: 1em;">
+<a href="https://r4ds.hadley.nz/joins.html">
+<img src="/slides/image/r4ds/join-venn.png" width="100%">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/joins.html</figcaption>
 </a>
 </figure>
-</div>
-<div class="column">
 <p>生命科学における <code>left_join()</code> の例</p>
 <p>左: <strong>興味のある遺伝子</strong>の発現データ<br>
 右: <strong>全遺伝子</strong>のアノテーション情報</p>
 <p>  ↓ <code>left_join</code>(by = &ldquo;遺伝子名&rdquo;)</p>
 <p><strong>興味のある遺伝子</strong>の発現+アノテーション</p>
-</div>
-</div>
+
 </section>
 <section>
 <h2 id="join例題-nycflights13-データセット">join例題: <code>nycflights13</code> データセット</h2>
-<p>🔰 関連するdata.frameをいろいろな方法で結合してみよう。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># install.packages(&#34;nycflights13&#34;)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">nycflights13</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">data</span><span class="p">(</span><span class="n">package</span> <span class="o">=</span> <span class="s">&#34;nycflights13&#34;</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="c1"># airlines, airports, flights, planes, weather</span>
-</span></span></code></pre></div><figure>
-<a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
-<img src="/slides/image/r4ds/relational-nycflights.png" height="480">
+</span></span></code></pre></div><figure style="margin-block: 1em;">
+<a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
+<img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
 </a>
 </figure>
+<p>🔰 The most frequent destination of airplanes with &gt;100 seats from JFK?</p>
+<pre tabindex="0"><code>   origin dest     n                           name      lat        lon  alt tz dst               tzone
+ 1    JFK  LAX 11065               Los Angeles Intl 33.94254 -118.40807  126 -8   A America/Los_Angeles
+ 2    JFK  SFO  7587             San Francisco Intl 37.61897 -122.37489   13 -8   A America/Los_Angeles
+ 3    JFK  MCO  4616                   Orlando Intl 28.42939  -81.30899   96 -5   A    America/New_York
+ 4    JFK  FLL  3683 Fort Lauderdale Hollywood Intl 26.07258  -80.15275    9 -5   A    America/New_York
+--                                                                                                     
+51    JFK  DCA     2  Ronald Reagan Washington Natl 38.85208  -77.03772   15 -5   A    America/New_York
+52    JFK  JAC     2           Jackson Hole Airport 43.60733 -110.73775 6451 -7   A      America/Denver
+53    JFK  BNA     1                 Nashville Intl 36.12447  -86.67819  599 -6   A     America/Chicago
+54    JFK  STL     1          Lambert St Louis Intl 38.74870  -90.37003  618 -6   A     America/Chicago
+</code></pre>
 </section>
 <section>
 <h2 id="tidyr-----dataframeの変形整形担当">tidyr &mdash; data.frameの変形・整形担当</h2>
