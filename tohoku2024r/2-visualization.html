@@ -3,9 +3,9 @@
 <head prefix="og: http://ogp.me/ns#">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-<title>2. データの可視化、レポート作成。 — 進化学実習 2024 牧野研 東北大学</title>
+<title>2. データの可視化。 — 進化学実習 2024 牧野研 東北大学</title>
 <meta name="author" content="Watal M. Iwasaki">
-<meta property="og:title" content="2. データの可視化、レポート作成。 — 進化学実習 2024 牧野研 東北大学">
+<meta property="og:title" content="2. データの可視化。 — 進化学実習 2024 牧野研 東北大学">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://heavywatal.github.io/slides/tohoku2024r/2-visualization.html">
 <meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
@@ -76,7 +76,7 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 <ol>
 <li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
-<li class="current-deck"><a href="2-visualization.html">データの可視化、レポート作成。</a>
+<li class="current-deck"><a href="2-visualization.html">データの可視化。</a>
 <li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
 <li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
 <li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
@@ -145,10 +145,9 @@ window.addEventListener('DOMContentLoaded', function() {
 知りさえすれば誰でも上達する。<br></p>
 </section>
 <section>
-<h2 id="おしながき-rによるデータ可視化とレポート作成">おしながき: Rによるデータ可視化とレポート作成</h2>
+<h2 id="おしながき-rによるデータ可視化">おしながき: Rによるデータ可視化</h2>
 <h3 id="-delデータ解析全体の流れ可視化だいじdel">✅ <del>データ解析全体の流れ。可視化だいじ</del></h3>
 <h3 id="-一貫性のある文法で合理的に描けるggplot2">⬜ 一貫性のある文法で合理的に描けるggplot2</h3>
-<h3 id="-rのコードと実行結果をレポートに埋め込むquarto">⬜ Rのコードと実行結果をレポートに埋め込むQuarto</h3>
 
 </section>
 <section>
@@ -720,7 +719,7 @@ Windowsなら<a href="https://colororacle.org/">Color Oracle</a>が使えそう�
 
 </section>
 <section>
-<h2 id="-1日目の課題2-未登場の関数オプションを紹介">🔰 1日目の課題2: 未登場の関数・オプションを紹介</h2>
+<h2 id="-1日目の課題2-未登場の関数オプションを1つ紹介">🔰 1日目の課題2: 未登場の関数・オプションを1つ紹介</h2>
 <ol>
 <li>ggplot2に関して本講義で説明されなかった関数やオプションを探す。<br>
 <a href="https://ggplot2.tidyverse.org/">公式サイト</a>や解説ブログなどを参考に。</li>
@@ -734,7 +733,7 @@ Windowsなら<a href="https://colororacle.org/">Color Oracle</a>が使えそう�
 それらをひとまとめに扱えるようなシステムがあるらしい&hellip;</p>
 </section>
 <section>
-<h2 id="おしながき-rによるデータ可視化とレポート作成">おしながき: Rによるデータ可視化とレポート作成</h2>
+<h2 id="おしながき-rによるデータ可視化">おしながき: Rによるデータ可視化</h2>
 <a href="https://ggplot2.tidyverse.org/">
 <img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
 </a>
@@ -744,218 +743,6 @@ Windowsなら<a href="https://colororacle.org/">Color Oracle</a>が使えそう�
 <li>aesthetic mapping が鍵</li>
 <li>色覚多様性を意識</li>
 <li>画像出力まできっちりプログラミング</li>
-</ul>
-<h3 id="-rのコードと実行結果をレポートに埋め込むquarto">⬜ Rのコードと実行結果をレポートに埋め込むQuarto</h3>
-
-</section>
-<section>
-<h2 id="rコードの実行結果をとっておきたい">Rコードの実行結果をとっておきたい</h2>
-<p>スクリプト.Rさえ保存しておけばいつでも実行できるけど&hellip; <strong>面倒</strong></p>
-<p><code>ggsave()</code> で画像を書き出しておけるけど&hellip; <strong>どのコードの結果か分からない</strong></p>
-<p>→ <strong>スクリプトと実行結果を一緒に見渡せる形式</strong>が欲しい。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="m">3</span> <span class="o">*</span> <span class="m">14</span>
-</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">displ</span><span class="p">,</span> <span class="n">hwy</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">drv</span><span class="p">))</span>
-</span></span></code></pre></div><pre tabindex="0"><code>[1] 42
-</code></pre><p><img src="./figure/hello-1.png" alt="plot of chunk hello"></p>
-
-</section>
-<section>
-<h2 id="quarto-document-として研究ノートを作る">Quarto Document として研究ノートを作る</h2>
-<a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
-</a>
-<p>プログラミングからレポート作成まで一元管理できて楽ちん。</p>
-<ul>
-<li>本文とRコードを含むテキストファイル.qmdを作る。</li>
-<li>HTML, PDFなどリッチな形式に変換して読む。
-<ul>
-<li>コードだけでなく実行結果の<strong>図</strong>や<strong>表</strong>も埋め込める。</li>
-</ul>
-</li>
-</ul>
-<hr>
-<a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
-</a>
-<dl>
-<dt>Quarto Markdown (<code>.qmd</code>)</dt>
-<dd><strong>Markdown</strong>亜種。RやPythonのコードと図表を埋め込める。</dd>
-<dd>Quarto登場前にほぼR専用だった <code>.Rmd</code> と使い勝手は同じ。</dd>
-<dt>Markdown (<code>.md</code>)</dt>
-<dd>最もよく普及している<strong>軽量マークアップ言語</strong>のひとつ。</dd>
-<dd>微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。</dd>
-</dl>
-<p>(どんなものが作れるのか
-<a href="https://quarto.org/docs/gallery/">作成例ギャラリー</a>
-を見てみよう。)</p>
-
-</section>
-<section>
-<h2 id="マークアップ言語">マークアップ言語</h2>
-<p>文書の構造や視覚的修飾を記述するための言語。<br>
-e.g., <strong>HTML</strong>+CSS, XML, LaTeX</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-html" data-lang="html"><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">h3</span><span class="p">&gt;</span>見出し3<span class="p">&lt;/</span><span class="nt">h3</span><span class="p">&gt;</span>
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>ここは段落。
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">em</span><span class="p">&gt;</span>強調(italic)<span class="p">&lt;/</span><span class="nt">em</span><span class="p">&gt;</span>、
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">strong</span><span class="p">&gt;</span>強い強調(bold)<span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;</span>、
-</span></span><span class="line"><span class="cl"><span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&#34;https://www.lifesci.tohoku.ac.jp/&#34;</span><span class="p">&gt;</span>リンク<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>とか。
-</span></span><span class="line"><span class="cl"><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
-</span></span></code></pre></div><div style="border: solid 1px #888888; padding: 0 4px;">
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-</div>
-<p>表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。</p>
-<p>(好きなウェブサイトのHTMLソースコードを見てみよう。)</p>
-
-</section>
-<section>
-<h2 id="軽量マークアップ言語">軽量マークアップ言語</h2>
-<p><strong>マークアップ言語</strong>の中でも人間が読み書きしやすいもの。<br>
-e.g., <strong>Markdown</strong>, reStructuredText, 各種Wiki記法など</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-md" data-lang="md"><span class="line"><span class="cl"><span class="gu">### 見出し3
-</span></span></span><span class="line"><span class="cl"><span class="gu"></span>
-</span></span><span class="line"><span class="cl">ここは段落。
-</span></span><span class="line"><span class="cl"><span class="ge">*強調(italic)*</span>、
-</span></span><span class="line"><span class="cl"><span class="gs">**強い強調(bold)**</span>、
-</span></span><span class="line"><span class="cl">[<span class="nt">リンク</span>](<span class="na">https://www.lifesci.tohoku.ac.jp/</span>)とか。
-</span></span></code></pre></div><div style="border: solid 1px #888888; padding: 0 4px;">
-<h3>見出し3</h3>
-<p>ここは段落。
-<em>強調(italic)</em>、
-<strong>強い強調(bold)</strong>、
-<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
-</p>
-</div>
-
-</section>
-<section>
-<h2 id="quartoする環境は既に整っているはず">Quartoする環境は既に整っているはず</h2>
-<ul>
-<li><strong>R (≥ 4.3.3)</strong>: 最新版 – 0.1 くらいまでが許容範囲</li>
-<li><strong>RStudio (≥ 2023.12.1+402)</strong>: Quarto CLI を同梱</li>
-<li><strong>tidyverse (≥ 2.0.0)</strong>: 次の2つを自動インストール
-<ul>
-<li>rmarkdown (≥ 2.26)</li>
-<li>knitr (≥ 1.45)</li>
-</ul>
-</li>
-</ul>
-<p>(示してあるバージョンは最低要件ではなく私の現在の環境の)</p>
-<hr>
-<ul>
-<li><a href="https://quarto.org/docs/get-started/">Quarto CLI</a>:
-最新版を求めるなら手動で入れる。</li>
-<li><a href="https://github.com/quarto-dev/quarto-r"><code>install.packages(&quot;quarto&quot;)</code></a>:
-多くの人には不要。
-Quarto CLIをRコマンドで呼べるようにするだけ。</li>
-<li><a href="https://pandoc.org/">pandoc</a>: Quarto CLI に同梱。
-手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。</li>
-</ul>
-</section>
-<section>
-<h2 id="markdown記法で書いてみよう">Markdown記法で書いてみよう</h2>
-<ol>
-<li>RStudio &gt; New File &gt; Markdown File
-<img src="/slides/image/rstudio/new-markdown.png" width="60%"></li>
-<li><a href="https://duckduckgo.com/?q=markdown+syntax">&ldquo;markdown 記法&quot;で検索</a>して何か書く。
-最低限、次の概念を含むように:
-<ul>
-<li>見出し1, 2, 3</li>
-<li>コードブロック、インラインコード</li>
-<li>箇条書き (番号あり・なし)</li>
-</ul>
-</li>
-<li><kbd>Preview</kbd>ボタンで確認</li>
-</ol>
-
-</section>
-<section>
-<h2 id="quarto-document-を作ってみよう">Quarto Document を作ってみよう</h2>
-<p>RStudio &gt; New File &gt; Quarto Document&hellip;<br>
-(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。</p>
-<img src="/slides/image/rstudio/new-quarto-document.png" width="100%">
-</section>
-<section>
-<h2 id="普通のmdには無いqmdの特徴">普通のmdには無いqmdの特徴</h2>
-<dl>
-<dt>ヘッダー (フロントマター)</dt>
-<dd>最上部の <code>---</code> で挟まれた部分。
-文書全体に関わるメタデータを入力。</dd>
-<dd>オプションは出力形式によって異なる。
-e.g., <a href="https://quarto.org/docs/output-formats/html-basics.html"><code>html</code></a></dd>
-<dt>R code chunk</dt>
-<dd><code>```{r}</code> のように始まるコードブロック。</dd>
-<dd>コードの実行結果を最終産物に埋め込める。</dd>
-<dd><a href="https://quarto.org/docs/computations/execution-options.html">オプションがいろいろある</a>。e.g.,
-<ul>
-<li><code>echo: false</code>: コードを非表示。結果は表示。</li>
-<li><code>eval: false</code>: コードを実行せず表示だけ。</li>
-<li><code>include: false</code>: コードも結果も表示せず、実行だけする。</li>
-<li><code>fig.width: 7</code>, <code>fig.height: 7</code>: 図の大きさを制御。</li>
-</ul>
-</dd>
-</dl>
-<p>まあ細かいことは必要になってから調べるとして&hellip;</p>
-</section>
-<section>
-<h2 id="qmdをhtmlに変換してみよう">qmdをHTMLに変換してみよう</h2>
-<p>左のqmdを &ldquo;→Render&rdquo; すると右のができる。手順は次スライド。</p>
-<div>
-<img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
-</div>
-</section>
-<section>
-<h2 id="qmdをhtmlに変換してみよう">qmdをHTMLに変換してみよう</h2>
-<ol>
-<li>ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
-e.g., <code>report.qmd</code></li>
-<li>⚙️ ボタンから &ldquo;Preview in Viewer Pane&rdquo; を選択。</li>
-<li>&ldquo;→Render&rdquo; を押す。
-<ul>
-<li>埋め込まれたRコードが実行される。</li>
-<li>実行結果を含むMarkdownが作られる。</li>
-<li>MarkdownからHTMLに変換される。 e.g., <code>report.html</code></li>
-<li>プレビューが自動的に開く。</li>
-</ul>
-</li>
-<li>編集 → 保存 → Render を繰り返して作り込む。</li>
-</ol>
-
-</section>
-<section>
-<h2 id="レポートの体裁の例">レポートの体裁の例</h2>
-<p>左のようなqmdを作ってRenderし、右のようなHTMLファイルを提出。</p>
-<div>
-<img src="../tohoku2023r/image/report-example.webp" width="90%"></img>
-</div>
-</section>
-<section>
-<h2 id="-レポート-締切-2024-05-13">🔰 レポート (締切: 2024-05-13)</h2>
-<ul>
-<li>課題: 講義資料の🔰若葉マークすべて。</li>
-<li>様式: Quarto Markdownで書き、Render済みHTMLを提出。
-<ul>
-<li>1日分で1ファイル、それぞれClassroomトピックに提出。計4つ。</li>
-<li><code>{ID}-{name}-day{d}.html</code>, e.g., <code>C0SB0000-iwasaki-day2.html</code></li>
-<li><code>embed-resources: true</code> で画像などを埋め込んだ独立HTML。</li>
-</ul>
-</li>
-<li>評価ポイント
-<ul>
-<li>エラーも警告も無くコードが走る。</li>
-<li>文書の構造や図が視覚的に見やすく整理されている。</li>
-<li>半年後の自分が読んでわかるような <code># 親切コメント</code>。</li>
-</ul>
-</li>
-<li>手抜きポイント
-<ul>
-<li>生物学的な意義があるか、みたいなのはほぼ不問。</li>
-</ul>
-</li>
 </ul>
 
 </section>
