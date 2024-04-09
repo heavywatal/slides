@@ -20,7 +20,7 @@ dpi = 108
 
 <ol>
 <li class="current-deck"><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
-<li><a href="2-visualization.html">データの可視化、レポート作成。</a>
+<li><a href="2-visualization.html">データの可視化。</a>
 <li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
 <li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
 <li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
@@ -506,7 +506,7 @@ See https://support.apple.com/HT201236
 
 
 ---
-## RStudioを起動して、環境チェック
+## RStudioを起動して、環境チェック（+ 出欠確認）
 
 次のコードをコピーして、左下のConsoleにペースト <kbd>return</kbd>
 
@@ -1304,5 +1304,5 @@ Other versions
    石川由希 2023 名古屋大学
 
 <a href="2-visualization.html" class="readmore">
-2. データの可視化、レポート作成。
+2. データの可視化。
 </a>

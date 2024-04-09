@@ -100,7 +100,7 @@ draft = false
     ```
     
     ```
-    ── Attaching core tidyverse packages ──────────────────────────────────────────────── tidyverse 2.0.0 ──
+    ── Attaching core tidyverse packages ─────────────────────────────── tidyverse 2.0.0 ──
     ✔ dplyr     1.1.4     ✔ readr     2.1.5
     ✔ forcats   1.0.0     ✔ stringr   1.5.1
     ✔ ggplot2   3.5.0     ✔ tibble    3.2.1
