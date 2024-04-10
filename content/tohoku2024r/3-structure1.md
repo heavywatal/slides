@@ -24,7 +24,7 @@ dpi = 108
 <li class="current-deck"><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
 <li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
 <li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
-<li><a href="6-input.html">データ入力、データ解釈</a>
+<li><a href="6-input.html">データ入力、レポート作成</a>
 <li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
 <li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
 <li><a href="9-report.html">発表会</a>
@@ -39,10 +39,12 @@ dpi = 108
 ---
 ## 作業再開、出欠確認
 
-1. `~/project/r-training-2024.Rproj` をダブルクリック。<br>
+1. `r-training-2024.Rproj` をダブルクリック。<br>
    正しい working directory でRStudioが起動される。
 1. [初日と同じ手順](1-introduction.html#/29)で出欠確認。
 1. 今日のぶんのスクリプトを新規作成し、好きな名前で保存。
+1. [tidyverseの読み込み](2-visualization.html#/23)や[パレット設定](2-visualization.html#/36)など、
+   おまじないをまず実行。
 
 
 ---
@@ -68,12 +70,12 @@ dpi = 108
 ## データ解析のおおまかな流れ
 
 1. コンピュータ環境の整備 ✅
-1. データの取得、読み込み
+1. データの取得、読み込み ⬜
 1. 探索的データ解析
     - **前処理、加工** (地味。意外と重い) 👈 今回の主題
     - 可視化、仮説生成 (派手！だいじ！) ✅ 完全に理解した
-    - 統計解析、仮説検証 (みんな勉強したがる)
-1. 報告、発表 ✅ Quarto楽しい
+    - 統計解析、仮説検証 (みんな勉強したがる) ⬜
+1. 報告、発表 ⬜ Quarto楽しい
 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
@@ -1265,8 +1267,8 @@ Older versions
 : 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
 : 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2022/)」
    岩嵜航 2022 東京医科歯科大
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
-   石川由希 2022 名古屋大学
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
+   石川由希 2023 名古屋大学
 
 <a href="4-structure2.html" class="readmore">
 4. データ構造の処理2: 結合、変形など。

@@ -24,7 +24,7 @@ dpi = 108
 <li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
 <li class="current-deck"><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
 <li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
-<li><a href="6-input.html">データ入力、データ解釈</a>
+<li><a href="6-input.html">データ入力、レポート作成</a>
 <li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
 <li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
 <li><a href="9-report.html">発表会</a>
@@ -245,19 +245,14 @@ band_members          band_instruments
 ---
 ## joinまとめ
 
-<div class="column-container">
-<div class="column" style="flex-shrink: 1.4;">
-
-<figure>
-<a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
-<img src="/slides/image/r4ds/join.png" height="820">
+<figure style="margin-block: 1em;">
+<a href="https://r4ds.hadley.nz/joins.html">
+<img src="/slides/image/r4ds/join-venn.png" width="100%">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/joins.html</figcaption>
 </a>
 </figure>
 
-</div>
-<div class="column">
 
 生命科学における `left_join()` の例
 
@@ -268,13 +263,8 @@ band_members          band_instruments
 
 **興味のある遺伝子**の発現+アノテーション
 
-</div>
-</div>
-
 ---
 ## join例題: `nycflights13` データセット
-
-🔰 関連するdata.frameをいろいろな方法で結合してみよう。
 
 ```r
 # install.packages("nycflights13")
@@ -283,13 +273,29 @@ data(package = "nycflights13")
 # airlines, airports, flights, planes, weather
 ```
 
-<figure>
-<a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
-<img src="/slides/image/r4ds/relational-nycflights.png" height="480">
+<figure style="margin-block: 1em;">
+<a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
+<img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
 </a>
 </figure>
+
+🔰 JFK空港発の100席以上の飛行機で最も多い目的地はどこ？
+
+
+```
+   origin dest     n                           name      lat        lon  alt tz dst               tzone
+ 1    JFK  LAX 11065               Los Angeles Intl 33.94254 -118.40807  126 -8   A America/Los_Angeles
+ 2    JFK  SFO  7587             San Francisco Intl 37.61897 -122.37489   13 -8   A America/Los_Angeles
+ 3    JFK  MCO  4616                   Orlando Intl 28.42939  -81.30899   96 -5   A    America/New_York
+ 4    JFK  FLL  3683 Fort Lauderdale Hollywood Intl 26.07258  -80.15275    9 -5   A    America/New_York
+--                                                                                                     
+51    JFK  DCA     2  Ronald Reagan Washington Natl 38.85208  -77.03772   15 -5   A    America/New_York
+52    JFK  JAC     2           Jackson Hole Airport 43.60733 -110.73775 6451 -7   A      America/Denver
+53    JFK  BNA     1                 Nashville Intl 36.12447  -86.67819  599 -6   A     America/Chicago
+54    JFK  STL     1          Lambert St Louis Intl 38.74870  -90.37003  618 -6   A     America/Chicago
+```
 
 
 ---
@@ -813,7 +819,7 @@ mpg_nested$data[[1]]
 - **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
     - 使いたい部分だけ抽出 --- `select()`, `filter()`
     - グループごとに特徴を要約 --- `group_by()`, `summarize()`
-    - 何かの順に並べ替え --- `arrange()`
+    - 何かの順に並べ替え --- `arrange()`, `relocate()`
     - 異なるテーブルの結合 --- `*_join()`
     - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
 - データ内容を対象とする処理 — 第5回
@@ -894,6 +900,7 @@ print(VADeaths)
 ```
 
 ↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" align="right" width="540" style="margin-block-start: 3em;">
 
 
 ```
@@ -907,40 +914,6 @@ print(VADeaths)
 18     70     74  Rural Female  54.3
 19     70     74  Urban   Male  71.1
 20     70     74  Urban Female  50.0
-```
-
----
-## ちょっと補足
-
-
-```r
-VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
-  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
-```
-
-```
-    age Rural Male Rural Female Urban Male Urban Female
-1 50-54       11.7          8.7       15.4          8.4
-2 55-59       18.1         11.7       24.3         13.6
-3 60-64       26.9         20.3       37.0         19.3
-4 65-69       41.0         30.9       54.6         35.1
-5 70-74       66.0         54.3       71.1         50.0
-```
-
-```r
-class(VADeaths)
-```
-
-```
-[1] "matrix" "array" 
-```
-
-```r
-rownames(VADeaths)
-```
-
-```
-[1] "50-54" "55-59" "60-64" "65-69" "70-74"
 ```
 
 ---
@@ -961,7 +934,33 @@ VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
 5 70-74       66.0         54.3       71.1         50.0
 ```
 
+<div class="column-container">
+  <div class="column" style="flex-shrink: 0.8; min-width: 0;">
+
+
+```r
+class(VADeaths)
+```
+
+```
+[1] "matrix" "array" 
+```
+
+```r
+rownames(VADeaths)
+```
+
+```
+[1] "50-54" "55-59" "60-64" "65-69" "70-74"
+```
+
+  </div>
+  <div class="column">
+
 ![plot of chunk vadeaths-plot](./figure/vadeaths-plot-1.png)
+
+  </div>
+</div>
 
 ---
 ## 🔰 課題4: `anscombe` を縦長にしてggplotしてみよう
@@ -981,10 +980,7 @@ anscombe |> tibble::rowid_to_column("id")   # IDをつけておく
 11 11  5  5  5  8  5.68 4.74  5.73 6.89
 ```
 
-<div class="figure">
-<img src="./figure/anscombe-plot-1.png" alt="plot of chunk anscombe-plot" width="98%" />
-<p class="caption">plot of chunk anscombe-plot</p>
-</div>
+![plot of chunk anscombe-plot](./figure/anscombe-plot-1.png)
 
 ---
 ## 🔰 課題5: `anscombe` の要約統計量を計算しよう
@@ -1031,8 +1027,8 @@ Older versions
 : 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
 : 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2022/)」
    岩嵜航 2022 東京医科歯科大
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
-   石川由希 2022 名古屋大学
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
+   石川由希 2023 名古屋大学
 
 <a href="5-content.html" class="readmore">
 5. データ内容の処理: 数値、文字列など。

@@ -1419,325 +1419,739 @@ p_route = ggplot(df_pred) +
 
 
 ---
-## ここ以降は余裕があれば進む
-
----
-## n個のうちy個生存。二項分布に従......わない！
-
-植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
-極端な値(全部死亡、全部生存)が多かった。個体差？
-
-```{r, df-seeds-od}
-#| echo: false
-set.seed(24601)
-samplesize = 100L
-df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
-  p = wtl::sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
-```
-```{r, overdispersion}
-#| echo: false
-#| fig.height: 5
-#| fig.width: 6
-sum_y = sum(df_seeds_od$y)
-p_hat = sum_y / 800
-label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
-tidy_od = df_seeds_od |>
-  dplyr::count(y, name = "observed") |>
-  dplyr::mutate(expected = samplesize * dbinom(y, 8, p_hat))
-ggplot(tidy_od) +
-  geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
-  geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
-  annotate("text", label = label, parse = TRUE, color = "#56B4E9",
-           x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 6) +
-  labs(x = "# survived seeds", y = "count") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-```
-
-
----
-## 個体差をモデルに組み込みたい
-
-各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。<br>
-「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
-i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
-
-```{r, saturated-glmm}
-#| echo: false
-#| fig.height: 3
-#| fig.width: 11
-df_seeds_od |>
-  tibble::rowid_to_column("id") |>
-  ggplot() + aes(id, y / 8) +
-  geom_col(width = 0.6, fill = "#56B4E9", alpha = 0.66) +
-  labs(y = expression(italic(p[i]))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-```
-
-個体の生存能力をもっと少ないパラメータで表現できないか？
-
-
----
-## 個体差をモデルに組み込みたい
-
-各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
-その能力値は全個体共通の正規分布に従うと仮定:
-$z_i \sim \mathcal{N}(\hat z, \sigma)$
-
-```{r, sigmoid}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-z_hat = wtl::logit(p_hat)
-p_sigmoid = df_seeds_od |>
-  ggplot() + aes(z, p) +
-  geom_line(linewidth = 2, alpha = 0.6, color = "#56B4E9") +
-  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#56B4E9") +
-  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = "#56B4E9") +
-  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
-  labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-p_normal = tibble::tibble(
-    z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 100),
-    Density = dnorm(z, z_hat, 3)
-  ) |>
-  ggplot() + aes(z, Density) +
-  geom_area(fill = "#56B4E9", alpha = 0.5) +
-  geom_vline(xintercept = z_hat, color = "#56B4E9") +
-  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
-  labs(x = expression(italic(z))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-
-cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
-```
-
-パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。
-
-前者は標本平均 $\hat p$ から求まるとして、後者どうする？
-
----
-## 個体能力のばらつき $\sigma$ が大きいと両端が増える
-
-普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
-
-```{r, alter-sigma}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 11
-sigma = c(0.5, 1.5, 3)
-breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
-.z = seq(min(df_seeds_od$z), max(df_seeds_od$z), 0.1)
-df_z = tidyr::crossing(sigma, z = .z) |>
-  dplyr::mutate(Density = dnorm(z, z_hat, sigma)) |>
-  dplyr::mutate(sigma = ifelse(sigma > 0.1, sigma, 0)) |>
-  dplyr::bind_rows(tibble::tibble(sigma = 0, z = .z, Density = ifelse(abs(z - z_hat) < 0.2, Inf, 0))) |>
-  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf)))
-
-p_z = df_z |>
-  ggplot() + aes(z, Density) +
-  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
-  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
-  labs(x = expression(italic(z))) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-
-p_z + geom_col(aes(fill = sigma == 0), width = 0.1, alpha = 0.6)
-
-df_unmixed = tibble::tibble(z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 20)) |>
-  dplyr::mutate(p = wtl::sigmoid(z)) |>
-  purrr::pmap(function(z, p) {
-    tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))
-  }) |>
-  purrr::list_rbind() |>
-  dplyr::arrange(y)
-
-df_binom = tibble::tibble(
-  sigma = 0,
-  y = seq.int(0, 8),
-  z = z_hat,
-  Density = dbinom(y, 8, p_hat)
-)
-
-df_mixed = tibble::tibble(sigma) |>
-  dplyr::mutate(data = purrr::map(sigma, \(s) {
-    df_unmixed |>
-      dplyr::mutate(w = dnorm(z, z_hat, s), Density = w * Density) |>
-      dplyr::mutate(Density = Density / sum(Density))
-  })) |>
-  tidyr::unnest(data) |>
-  dplyr::bind_rows(df_binom) |>
-  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf)))
-
-p_mixed = df_mixed |>
-  ggplot() + aes(y, Density) +
-  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
-  labs(x = "# survived seeds") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-
-p_mixed + geom_col(aes(fill = sigma == 0), width = 0.4, alpha = 0.66)
-```
-
----
-## zの値で色分けしてみると想像しやすい
-
-正規分布と二項分布の混ぜ合わせ......?
-
-```{r, alter-sigma-z}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 11
-scale_fill_z = colorspace::scale_fill_discrete_divergingx("Zissou 1")
-p_z + geom_col(aes(fill = Z)) + scale_fill_z
-p_mixed + geom_col(aes(fill = Z), width = 0.4) + scale_fill_z
-```
-
----
-## 混合分布。ただの二項分布よりも良いあてはまり。
-
-パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
-
-```{r, before-mixing}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 11
-df_mixed |>
-  dplyr::filter(sigma == max(sigma)) |>
-  dplyr::group_by(Z) |>
-  dplyr::mutate(Density = Density / sum(Density)) |>
-  dplyr::ungroup() |>
-  ggplot() + aes(y, Density) +
-  geom_col(aes(fill = Z)) +
-  scale_fill_z +
-  facet_wrap(vars(Z), nrow = 1, labeller = label_both) +
-  labs(x = "# survived seeds") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-```
-
-<div align="center">
-
-```{r, after-mixing}
-#| echo: false
-#| fig.height: 3.5
-#| fig.width: 7
-p1 = df_mixed |>
-  dplyr::filter(sigma == max(sigma)) |>
-  ggplot() + aes(y, Density) +
-  geom_col(aes(fill = Z)) +
-  scale_fill_z +
-  labs(x = "# survived seeds", title = "expected") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-
-p2 = tidy_od |>
-  ggplot() + aes(y, observed) +
-  geom_col() +
-  labs(x = "# survived seeds", y = "count", title = "observed") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.title = element_blank(), legend.position = "top")
-
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
-
-</div>
-
----
-## 一般化線形混合モデル GLMM
-
-**固定効果(fixed effects)** のみ扱っていたGLMを拡張して、<br>
-**変量効果(random effect)** を混合したモデル。<br>
-<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small>
-
-<p>\[\begin{split}
-y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
-  + z_{1i} + \ldots \\
-z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
-\end{split}\]</p>
-
-e.g.,<br>
-個体$i$の種子生存率$p_i$は、<br>
-(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
-(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。
-
----
-## 固定効果にするか、変量効果にするか
-
-推定したパラメータを予測に使うなら固定効果
-
-予測に使えそうなので固定効果向き
-: - 観測・操作した連続値変数: 長さ、重さ、温度、etc.
-: - 観測・操作したカテゴリカル変数: 性別、投薬、etc.
-
-予測に使えないので変量効果向き
-: - 観測・操作できなかった個体差:<br>
-    たまたま集まってくれた学生15人 {A, B, C, ...}。<br>
-    Aさんの固定効果を推定できても、Zさんの予測には使えない。
-: - 観測・操作できなかったグループ差:<br>
-    ↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
-    いグループの固定効果を推定できても、また集まることはない。
-
----
-## どういうときに変量効果を考える必要があるか
-
-データに**擬似反復**が含まれるとき。<br>
-ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。
-
-| 植木鉢 | 個体/植木鉢 | 種子/個体 | 疑似反復 | 推定不可 |
-| -----  | ----------- | ----------| ---- | ------ |
-| 100個  | 1個体ずつ   | 1個ずつ   | – | 個体差・鉢差 |
-| 25個   | 1個体ずつ   | 4個ずつ   | 個体 | 鉢差 |
-| 20個   | 5個体ずつ   | 1個ずつ   | 植木鉢 | 個体差 |
-| 5個    | 5個体ずつ   | 4個ずつ   | 植木鉢・個体 | – |
-
-疑似反復あり<br>
-→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
-→ そのぶんを差し引いて固定効果を推定したい
-
-
----
-## GLMMの問題点・展望
-
-- 最尤推定の計算が難しくなるので、あまり複雑にはできない
-    - ベイズ推定を使えばクリアできる
-- GLMの拡張として理解はできても、実際に書くのは難しめ
-    - 階層ベイズモデルの一種として見るほうが便利
-
-→ ここでGLMMの練習はせず、階層ベイズモデルに進む。
-
-<figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
-</a>
-</figure>
-
-
----
-## 一般化線形(混合)モデルまとめ
+## 一般化線形モデルまとめ
 
 - 何はともあれ作図して俯瞰
 - GLMは統計モデリングの考え方の根幹
     - 確率分布・リンク関数・説明変数
     - 尤度・最尤法によるパラメータ推定
     - 情報量基準などによるモデル選択
-- GLMMは現実のデータ解析に向けた強化
-    - 疑似反復による変量効果を考慮
-    - 階層ベイズモデルとして扱うほうが楽
+
+
+
+
+
+
+
+
+
+
+
+
+---
+## 今回のお品書き
+
+✅ データ入力の心得
+- 野良データを読み込む難しさ
+- 自分が一次データを作るときに気をつけること
+
+⬜ データ解釈の心得 (理論や手法の詳細には触れない)
+- 誤差 (バイアス、ばらつき)
+- 統計的仮説検定
+- 因果関係と相関関係
+
+
+
+---
+## Garbage in, garbage out
+
+どんなに素晴らしい統計処理をしようとも、データがゴミなら結論もゴミ。
+
+<figure>
+<img src="../tohoku2022r/image/garbage-in-garbage-out.drawio.svg" width="1200">
+</figure>
+
+- 目的に応じてちゃんとデータを採ることが重要！
+- 何がデータを悪くしてしまうのか、見ていこう
+
+
+---
+## 観測には必ず何らかの歪みがある
+
+現象・母集団の性質を知りたいけど、そのものは測れない。<br>
+: 質的な問題 → 測れる側面だけ測るしかない
+: 量的な問題 → 一部の標本を抽出して測るしかない
+
+<figure>
+<img src="../tohoku2022r/image/math-model-biased.drawio.svg" width="1080"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+---
+## 2種類の誤差
+
+系統的誤差 systematic error / バイアス bias
+: 一定の傾向をもって生じる誤差。原因を特定して対処。
+
+偶然誤差 random error
+: 偶然生じてしまうばらつき。計測を繰り返して対処。
+
+e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
+
+<figure>
+<img src="../tohoku2022r/image/error-random-systematic.drawio.svg" width="640"><br>
+<figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+
+
+---
+## 選択バイアス
+
+<figure style="position: absolute; top: 40px; right: 40px;"><a href="https://en.wikipedia.org/wiki/Survivorship_bias">
+<img src="/slides/image/free/Survivorship-bias.svg" width="400"><br>
+<figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
+</a></figure>
+
+データの採れかたが結果に傾向をもたらしてしまう。
+
+生存(者)バイアス
+: 生き残ったものだけがデータとして観測される。
+: 帰還した多数の戦闘機✈️✈️の損傷の分布(右図)。<br>
+  被弾 → **<span style="color: #bb0000;">生還 → 観測される</span>**<br>
+  被弾 → **墜落 → 観測されない**<br>
+  損傷が観察されなかった場所をむしろ補強すべき。
+
+サンプリングバイアス
+: サンプル対象を決めた時点で偏っている。
+: 📞電話でアンケート調査 →
+  電話機を持てる裕福な人、その時間に通話できる人、
+  知らない番号からでも出る人、調査している新聞社に共感している人。
+
+🔰 生物学研究における選択バイアスにはどういうものがありそう？
+
+---
+## 測定基準に関するバイアスの例
+
+基準が揃っていない
+: 国民1人あたりの弁護士数を国際比較すると日本が少ない。<br>
+  諸外国では税理士や司法書士を弁護士に含めて集計している。
+
+基準が時間とともに変化
+: 自閉症と診断された児童の数は**見かけ上**年々増えている。<br>
+  診断基準の変更、病気の知名度向上が主な原因。<br>
+  (親の高齢化の寄与を示唆する研究もあるらしい)
+
+---
+## データの扱いに起因するバイアス
+
+チェリー・ピッキング 🍒
+: 自分の仮説と矛盾する情報を無視し、都合のいい情報だけ集めること。
+: [研究活動における3つの不正](https://www.mext.go.jp/b_menu/shingi/gijyutu/gijyutu12/houkoku/attach/1334660.htm)のうち**改竄**にあたる。
+
+確証バイアス
+: 無意識にチェリー・ピッキングしてしまう心理的傾向。
+: 悪気なくやってしまわないよう、自覚を持つことが大事。
+
+表に数字、裏にアルファベットが書いてあるカード。<br>
+「偶数の裏は必ずA、という法則があるか？」<br>
+これを確かめるには次の4枚のうちどれを裏返せばいいか？
+
+```{r, four-cards}
+#| echo: false
+#| fig.width: 6
+#| fig.height: 2
+n = 20
+g = (1 + sqrt(5)) / 2
+card = tibble::tibble(x = c(0, 1, 1, 0), y = c(0, 0, g, g))
+dplyr::bind_rows(
+  card |> dplyr::mutate(id = 0),
+  card |> dplyr::mutate(id = 1, x = x + 1.1),
+  card |> dplyr::mutate(id = 2, x = x + 2.2),
+  card |> dplyr::mutate(id = 3, x = x + 3.3)
+) |>
+  ggplot() + aes(x, y) +
+  geom_polygon(aes(group = id), fill = NA, color = "#333333") +
+  scale_fill_identity() +
+  annotate("text", x = c(0.5, 1.6, 2.7, 3.8), y = g / 2, label = c("1", "2", "A", "B"), size = 20) +
+  coord_fixed() +
+  theme_void()
+```
+
+???
+論理学的な正解は2, B。
+
+
+
+---
+## たまたま生じたパターンにも意味を見出しがち
+
+前後即因果の誤謬
+: たまたま前後で生じた現象に因果関係があると思いがち
+
+ギャンブラーの誤謬
+: N回も連続で裏が出たら、次は表が出やすいと思いがち
+
+```{r, random-pattern}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
+set.seed(19937)
+n = 20
+tibble::tibble(x = runif(n), y = runif(n)) |>
+  ggplot() + aes(x, y) +
+  geom_point(shape = 16, size = 3, alpha = 0.66) +
+  coord_fixed(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE) +
+  theme_minimal()
+```
+
+---
+## データ解釈に関わる認知バイアス
+
+利用可能性ヒューリスティック
+: 思い浮かびやすいものほど過大評価しがち
+: e.g., 1文字目がkの単語、3文字目がkの単語、多いのはどっち？
+
+代表性ヒューリスティック
+: ステレオタイプを過大評価しがち
+: e.g., リンダは31歳の独身女性。率直で聡明。大学では哲学専攻。
+  人種差別や社会正義などに深く関心を持ち、学生時代には反核デモにも参加。<br>
+  現在のリンダは次のどちらである可能性が高いか？
+  1. リンダは銀行員として働いている。
+  1. リンダは銀行員として働きながら、フェミニスト運動に参加している。
+
+認知バイアス・誤謬はほかにもいろいろある。<br>
+データ解析とは関係なく、知っておくのは悪くない。
+
+???
+
+https://lambtani.hatenablog.jp/entry/2017/05/18/032108
+
+
+
+---
+## 偶然誤差によるばらつき方 = 確率分布
+
+次回 [7. 統計モデリング1](7-distribution.html) でやります。
+
+背後にあるメカニズムによっていろんな形になる。
+
+<iframe width="600" height="450" src="./7-distribution.html#/33"></iframe>
+
+
+---
+## 分布を特徴づける代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  </a>
+  </div>
+</div>
+
+目的や状況に応じて使い分けよう。
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+---
+## ばらつきを捉える記述統計量
+
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r, quantile}
+#| fig.width: 10
+#| fig.height: 4
+#| echo: false
+set.seed(24601)
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
+  dplyr::mutate(x = x + 3)
+probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
+dfq = df |>
+  dplyr::reframe(x = quantile(x, probs)) |>
+  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
+  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
+  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
+  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
+
+
+---
+## 記述統計量に頼りすぎず分布を可視化する
+
+同じデータでも見せ方で印象・情報量が変わる。
+
+```{r, visualize-distribution}
+#| echo: false
+#| fig.width: 9
+#| fig.height: 6
+df = mpg |> dplyr::mutate(y = hwy)
+df_mean = df |> dplyr::summarize(y = mean(y))
+p0 = ggplot(df) + aes(y = y) +
+  theme_classic() +
+  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+ylim = c(0, max(df$y))
+coord_y = coord_cartesian(ylim = ylim)
+coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
+
+pcol = p0 + aes(x = 0) +
+  geom_col(data = df_mean, fill = "#999999") +
+  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
+
+set.seed(1)
+cowplot::plot_grid(nrow = 2L,
+  pcol + coord_one,
+  p0 + geom_boxplot() + coord_one,
+  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
+  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66) + coord_y
+)
+```
+
+
+---
+## 2つの量の関係性: 大小の比較
+
+ばらつきの度合いも加味して判断する。
+
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1.1;">
+観測値1つずつ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき大きい。<br>
+Bが高いのもたまたま?
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+
+```{r, comparison}
+#| fig.width: 11
+#| fig.height: 4
+#| echo: false
+set.seed(19937)
+n = 20
+df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
+df2 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
+  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
+df3 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
+  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
+.lim = c(0, max(df2$y, df3$y))
+.th = list(coord_cartesian(ylim = .lim),
+  theme_classic(base_size = 20),
+  theme(legend.position = "none", axis.title = element_blank()))
+
+p1 = ggplot(df1) + aes(x, y, color = x) +
+  geom_point(shape = 16, size = 5) +
+  .th
+p2 = ggplot(df2) + aes(x, y, color = x) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
+  .th
+cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
+```
+
+「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが**統計的仮説検定**→
+
+
+---
+## 目的やデータに応じて正しい検定を選ぶ
+
+例えば「2つの量の大小を比較したい」だけでもいくつかある。<br>
+今回は選定には深入りせず、検定の考え方だけ触れておく。
+
+<figure><a href="https://comicalcommet.github.io/r-training-2023/">
+<img src="/slides/image/rstats/comicalcommet-test-chart.jpg" width="90%">
+<figcaption><cite>
+「Rを用いたデータ解析の基礎と応用」石川由希さん@名古屋大
+</cite></figcaption>
+</a></figure>
+
+
+---
+## 統計的仮説検定の考え方
+
+🎲サイコロを**10回**振ったら**9回**も6の目が出たぞ。イカサマじゃないか？
+
+帰無仮説
+: 6の目が出る確率 = 1/6。普通のサイコロです。
+
+対立仮説
+: 6の目が出る確率 ≠ 1/6。イカサマです。
+
+<div>\[\begin{split}
+p = \binom {10} {9} \times {\frac 1 6} ^ {9} \times {\frac 5 6} ^ 1 + {\frac 1 6} ^ {10}
+  = 8.43 \times 10 ^ {-7}
+\end{split}\]</div>
+
+1. 帰無仮説のもとで今回のデータ以上に極端な値が得られる確率*p*を計算
+1. この ***p*-value** が**有意水準(危険率)**$\alpha$より低い場合、帰無仮説を棄却<br>
+   (大概 $\alpha$ = 0.05 とか 0.01 とか。予め決めておく。)
+1. 対立仮説を採択。6の目の出る確率は1/6と**有意に異なる**。
+
+```{r, test-dice-hidden}
+#| include: false
+n = 10
+k = 9
+p = 1 / 6
+pbinom(k - 1, n, p, lower.tail = FALSE)
+x = seq(k, n)
+stopifnot(all.equal(dbinom(x, n, p), choose(n, x) * p ** x * (1 - p) ** (n - x)))
+stopifnot(all.equal(sum(dbinom(x, n, p)), pbinom(k - 1, n, p, lower.tail = FALSE)))
+```
+
+---
+## 統計的仮説検定の考え方
+
+🎲サイコロを**12回**振ったら**4回**も6の目が出たぞ。<br>
+これも1/6よりは高いけど、イカサマのダイスかな？
+
+<span style="color: #990000;">帰無仮説のもとで12回中4回以上6が出る確率: $p = 0.125 > \alpha$</span><br>
+
+帰無仮説を棄却できず。6の目の出る確率が1/6と**有意に異なるとは言えない**。
+
+```{r, test-dice}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
+X = 4L
+n = 12L
+tibble::tibble(x = seq.int(0L, n), Probability = dbinom(x, n, 1 / 6)) |>
+  dplyr::mutate(color = ifelse(x >= X, "#990000", "#666666")) |>
+  ggplot() + aes(x, Probability, fill = color) +
+  geom_col() +
+  scale_fill_identity() +
+  theme_classic(base_size = 20)
+# pbinom(X - 1L, n, 1 / 6, lower.tail = FALSE)
+# sum(dbinom(seq(X, n), n, 1 / 6))
+```
+
+平たく言えば「普通のサイコロでもそんなに珍しい出目じゃない」
+
+
+---
+## 多重検定で偽陽性のリスクが上昇
+
+危険率$\alpha=0.05$の検定は、最大5%の確率で誤って帰無仮説を棄却(**偽陽性**)。<br>
+同様の検定を10回やると、そのうち少なくとも1つで偽陽性になる確率は<br>
+$1 - (1 - 0.05)^{10} \approx 0.40$ まで上昇。<br>
+
+```{r, multiple-tests}
+#| fig.width: 11
+#| fig.height: 4.2
+#| echo: false
+# 1 - (1 - 0.05) ** 10
+set.seed(1279)
+nsam = 10L
+nrep = 20L
+y = split(rnorm(nsam * nrep * 2), ceiling(seq_len(nsam * nrep * 2) / nsam))
+df = tidyr::crossing(repl = seq_len(nrep), x = c("A", "B")) |>
+  dplyr::mutate(y = y) |>
+  tidyr::unnest(y)
+dfp = df |>
+  tidyr::nest(data = !repl) |>
+  dplyr::mutate(p = purrr::map_dbl(data, ~ t.test(y ~ x, data = .x)$p.value)) |>
+  dplyr::select(!data) |>
+  dplyr::mutate(x = 1.5, y = Inf, label = ifelse(p < 0.05, sprintf("p = %.3f", p), ""))
+df |>
+  ggplot() + aes(x, y) +
+  geom_boxplot(aes(fill = x)) +
+  geom_text(data = dfp, aes(label = label), hjust = 0.5, vjust = 1.2) +
+  facet_wrap(vars(repl), nrow = 2L) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+多重比較補正
+: 検定を繰り返したぶんだけ基準を厳しくして偽陽性率を抑えること。
+: Bonferroni法、Holm法、Benjamini and Hochberg法など。
+
+
+---
+## 広くて深い統計解析の世界
+
+> データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
+> 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
+> ------ [三中信宏「統計思考の世界」](https://amzn.to/3urpls1)
+
+<figure style="margin-top: -1em;">
+<a href="http://leeswijzer.org/R/R-top.html">
+<img src="/slides/image/rstats/Mandala2004-small.jpg" width="80%">
+<figcaption><cite>「大統計曼荼羅」三中信宏</cite></figcaption>
+</a>
+</figure>
+
+
+
+
+<!--  -->
+
+
+---
+## 2つの量の関係性: 相関関係と因果関係
+
+<style>
+.spurious {color: #fde725;}
+.correlation {color: #35B779;}
+.causality-wrong {color: #31688e;}
+.causality {color: #440154;}
+</style>
+
+<div class="column-container">
+<div class="column" style="flex-shrink: 1;">
+
+<span class="correlation">相関関係</span>
+: ある値が大きいほど、別の値も大きいor小さい。
+: e.g., 数学の成績と物理の成績。
+
+<span class="causality">因果関係</span>
+: ある事象が別の事象に影響を与える。
+: e.g., 1時間勉強するごとに成績が3点伸びる。
+
+</div>
+<div class="column" style="flex-shrink: 1.8;">
+
+```{r, causal-relationship}
+#| echo: false
+#| fig.width: 3.2
+#| fig.height: 3.2
+set.seed(19937)
+n = 40L
+tibble::tibble(
+  study_time = runif(n, 0, 40),
+  score = pmin(rnorm(n, 3 * study_time, 10), 100)) |>
+  ggplot() +
+  aes(study_time, score) +
+  geom_point(shape = 16, alpha = 0.66, size = 3) +
+  stat_smooth(method = lm, formula = y ~ x + 0, se = FALSE, color = "#440154", size = 2, alpha = 0.7) +
+  theme_classic(base_size = 20) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+</div>
+</div>
+
+
+<hr>
+
+- <span class="causality">因果関係</span>があれば<span class="correlation">相関関係</span>として表れる
+- **<span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない**→
+
+
+---
+## 因果・相関を見誤るパターン1: 交絡因子
+
+**誤:** 🍦アイスの売り上げが増えるほど🍺ビールの売り上げが増える。
+
+**正:** 🍦アイスも🍺ビールも**気温が高いほど**売れる。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.2;">
+
+```{r, confounding-factor}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
+set.seed(19937)
+n = 40L
+tibble::tibble(
+  temperature = runif(n, 0, 40),
+  beer_sales = rpois(n, temperature * 1.3),
+  icecream_sales = rpois(n, temperature)) |>
+  ggplot() +
+  aes(icecream_sales, beer_sales) +
+  geom_point(shape = 16, alpha = 0.66, size = 3) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, color = "#358779", size = 2, alpha = 0.7) +
+  theme_classic(base_size = 20) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+</div>
+<div class="column" style="flex-shrink: 1;">
+
+<figure>
+<img src="../tohoku2022r/image/hermeneutics-4-1-3.drawio.svg" width="750">
+</figure>
+
+</div>
+</div>
+
+
+---
+## 因果・相関を見誤るパターン2: 逆の因果関係
+
+**誤:** <span class="causality-wrong">警察官が多いほど犯罪が増える。</span>
+
+**正:** <span class="causality">犯罪が多いから警察官が多く配備される。</span>
+
+<br>
+
+## 因果・相関を見誤るパターン3: 選択バイアス
+
+(x + y) が一定の幅に収まるようなペアだけを集めてしまうとか
+
+```{r, spurious-correlation-selection-bias}
+#| echo: false
+#| fig.width: 4
+#| fig.height: 4
+set.seed(19937)
+n = 256
+tibble::tibble(x = runif(n), y = runif(n)) |>
+  dplyr::mutate(sampled = abs(x + y - 1) < 0.2) |>
+  dplyr::mutate(color = ifelse(sampled, "#fde725", "#aaaaaa")) |>
+  ggplot() +
+  aes(x, y) +
+  geom_point(aes(color = color), shape = 16, size = 3, alpha = 1) +
+  scale_color_identity() +
+  coord_fixed() +
+  theme_classic(base_size = 20) +
+  theme(axis.text = element_blank(), axis.ticks = element_blank())
+```
+
+
+---
+## 因果・相関を見誤るパターン4: 外れ値・グループ構造
+
+**少数の外れ値**や**グループ構造**によって相関係数rが跳ね上がりうる。
+
+```{r, correlation-lies}
+#| echo: false
+#| fig.width: 11
+#| fig.height: 3.6
+set.seed(19937)
+n = 32
+df = tibble::tibble(x = rnorm(n), y = rnorm(n))
+df_outlier = df |> dplyr::bind_rows(data.frame(x = 10, y = 10))
+df_subgroups = df |> dplyr::bind_rows(df + 8)
+.lim = range(df_outlier, df_subgroups)
+
+.make_label_cor = function(df) {
+  r = cor(df[["x"]], df[["y"]])
+  sprintf("r = %.2f", r)
+}
+# .make_label_cor(df_usbb)
+
+.plot_cor = function(df) {
+  ggplot(df) + aes(x, y) +
+    geom_point(shape = 16, size = 3, alpha = 0.66) +
+    stat_smooth(method = lm, formula = y ~ x, se = FALSE, size = 3, color = "#fde725") +
+    annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 8, label = .make_label_cor(df)) +
+    coord_fixed(xlim = .lim, ylim = .lim) +
+    theme_classic(base_size = 20) +
+    theme(axis.text = element_blank(), axis.ticks = element_blank())
+}
+
+cowplot::plot_grid(
+  .plot_cor(df),
+  .plot_cor(df_outlier),
+  .plot_cor(df_subgroups),
+  nrow = 1L
+)
+```
+
+
+---
+## 因果・相関を見誤るパターン5: 偶然
+
+ニコラス・ケイジの映画出演が増えるほど溺死する人が増える？
+
+<figure>
+<img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="1200">
+<figcaption><cite>
+<a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
+</cite></figcaption>
+</figure>
+
+このウェブサイトにはジョークとしてこうした例が多数集められている↑
+
+
+---
+## 変数間の関係性まとめ
+
+<figure>
+<img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="1200">
+<figcaption><cite>
+<a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
+</cite></figcaption>
+</figure>
+
+<hr>
+
+- **<span class="correlation">相関関係</span>があるからといって<span class="causality">因果関係</span>もあるとは限らない**。
+- <span class="causality-wrong">逆の因果関係</span>や<span class="spurious">見せかけの相関</span>にも要注意。
+
+🔰 これら4つの関係性に該当する事例をそれぞれ1つ以上探してみよう。
+
+???
+16--17世紀、怪我をしたら武器に軟膏を塗ると早く治るという迷信。
+質の低い軟膏を傷口に塗らないことがプラスに働いたというのが真相。
+
+
+
+---
+## 🔰 3日目の課題2
+
+書籍、ニュースサイト、ブログ記事などを検索し、<br>
+**良くないデータ解析の例**を探して**改善案**を挙げよう。
+
+1. データの集め方(サンプルの選び方)が偏っていて良くない例
+1. データの解釈(相関や因果)を誤っている例
+1. 図の描き方で嘘をついている例 (誇張、印象操作)
+1. 生データを公開してくれるのはいいけど形式が汚くて使いにくい例
+
+それぞれの例について、下記の項目を報告してください:
+
+- 出典。URLや書籍名。
+- データの概要、書き手の主張。
+- ここが良くないので、こう改善すべき。
+
+
+
+
+
+
+
+
+
+
 
 
 ---

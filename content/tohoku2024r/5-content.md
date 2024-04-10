@@ -1,15 +1,40 @@
-```{r, setup-common}
-#| file: "setup.R"
-#| echo: false
-#| results: "asis"
-```
-```{r, setup-local}
-#| include: false
-#| cache: false
-data(starwars, package = "dplyr")
-data(world_bank_pop, package = "tidyr")
-data(fruit, package = "stringr")
-```
++++
+url = "tohoku2024r/5-content.html"
+linktitle = "データ内容の処理: 数値、文字列など。"
+title = "5. データ内容の処理: 数値、文字列など。 — 進化学実習 2024 牧野研 東北大学"
+date = 2024-04-10T13:00:00+09:00
+draft = true
+css = "style.css"
+dpi = 108
++++
+
+# [進化学実習 2024 牧野研 東北大学](.)
+
+<div class="author">
+岩嵜 航
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li><a href="2-visualization.html">データの可視化。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li class="current-deck"><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li><a href="6-input.html">データ入力、レポート作成</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li><a href="9-report.html">発表会</a>
+</ol>
+
+<div class="footnote">
+2024-04-10 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2024r/">https://heavywatal.github.io/slides/tohoku2024r/</a>
+</div>
+
 
 ---
 ## 作業再開、出欠確認
@@ -96,11 +121,14 @@ install.packages("tidyverse")
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
-```{r, tidyverse-messasge}
-#| echo: false
-withr::with_namespace("tidyverse", {
-  cat(tidyverse_attach_message(core), sep = "\n")
-})
+
+```
+── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.1
+✔ purrr     1.0.2     
 ```
 
 一貫したデザインでデータ解析の様々な工程をカバー
@@ -133,12 +161,31 @@ withr::with_namespace("tidyverse", {
 1個の値でもベクトル扱い。<br>
 ベクトルの各要素に一気に計算を適用できる。
 
-```{r, vector}
+
+```r
 x = c(1, 2, 9)  # 長さ3の数値ベクトル
 x + x           # 同じ長さ同士の計算
+```
+
+```
+[1]  2  4 18
+```
+
+```r
 y = 10          # 長さ1の数値ベクトル
 x + y           # 長さ3 + 長さ1 = 長さ3 (それぞれ足し算)
+```
+
+```
+[1] 11 12 19
+```
+
+```r
 x < 5           # それぞれの要素を比較
+```
+
+```
+[1]  TRUE  TRUE FALSE
 ```
 
 ---
@@ -146,17 +193,34 @@ x < 5           # それぞれの要素を比較
 
 普通は倍精度浮動小数点型 `double` として扱われる:
 
-```{r, numeric}
+
+```r
 answer = 42
 typeof(answer)
 ```
 
+```
+[1] "double"
+```
+
 明示的に変換したり末尾にLを付けることで整数扱いもできる:
 
-```{r, integer}
+
+```r
 typeof(as.integer(answer))
+```
+
+```
+[1] "integer"
+```
+
+```r
 whoami = 24601L
 typeof(whoami)
+```
+
+```
+[1] "integer"
 ```
 Rではほとんど気にする必要はない。
 
@@ -165,12 +229,38 @@ Rではほとんど気にする必要はない。
 
 ベクトルを受け取り、それぞれの要素に適用
 
-```{r, math}
+
+```r
 x = c(1, 2, 3)
 sqrt(x)
+```
+
+```
+[1] 1.000000 1.414214 1.732051
+```
+
+```r
 log(x)
+```
+
+```
+[1] 0.0000000 0.6931472 1.0986123
+```
+
+```r
 log10(x)
+```
+
+```
+[1] 0.0000000 0.3010300 0.4771213
+```
+
+```r
 exp(x)
+```
+
+```
+[1]  2.718282  7.389056 20.085537
 ```
 
 <div style="text-align: right;"><a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
@@ -183,7 +273,8 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 内容を変更する方法はいくつかある。<br>
 `diamonds` の `price` 列をドルから円に変換する例:
 
-```{r, dfcolumn}
+
+```r
 dia = diamonds    # 別名コピー
 
 # dollar演算子 $ で指定
@@ -207,10 +298,24 @@ dia = diamonds |>
 
 平均値から標準偏差の3倍以上離れているもの($\lvert z \rvert \ge 3$)を取り除く例:
 
-```{r, outlier}
+
+```r
 result = diamonds |>
   dplyr::filter(abs(price - mean(price)) / sd(price) < 3) |>
   print()
+```
+
+```
+      carat       cut color clarity depth table price    x    y    z
+    1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+    2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+    3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+    4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+   --                                                               
+52731  0.72      Good     D     SI1  63.1    55  2757 5.69 5.75 3.61
+52732  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
+52733  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
+52734  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
 ```
 
 唯一の方法ではないし、そもそもやるべきかどうかも要検討
@@ -221,16 +326,31 @@ result = diamonds |>
 
 (指定した列に) `NA` が含まれてる行を削除する。
 
-```{r, drop-na}
+
+```r
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> tidyr::drop_na()
 ```
 
+```
+  x y z
+1 1 a D
+```
+
 🔰 `starwars` で**身長体重データのある行だけ抽出**してみよう
 
-```{r, starwars-drop}
-#| echo: false
-starwars
+
+```
+             name height mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+ 1 Luke Skywalker    172   77      blond        fair      blue       19.0   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
+ 2          C-3PO    167   75       <NA>        gold    yellow      112.0   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 3          R2-D2     96   32       <NA> white, blue       red       33.0   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+ 4    Darth Vader    202  136       none       white    yellow       41.9   male masculine  Tatooine   Human <chr [4]> <chr [0]> <chr [1]>
+--                                                                                                                                        
+84            Rey     NA   NA      brown       light     hazel         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+85    Poe Dameron     NA   NA      brown       light     brown         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [1]>
+86            BB8     NA   NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
+87 Captain Phasma     NA   NA       none        none   unknown         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
@@ -238,16 +358,33 @@ starwars
 
 欠損値 `NA` を任意の値で置き換える。
 
-```{r, replace-na}
+
+```r
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> tidyr::replace_na(list(x = 9999, y = "unknown"))
 ```
 
+```
+     x       y    z
+1    1       a    D
+2    2 unknown    E
+3 9999       c <NA>
+```
+
 🔰 `starwars` で**髪や目の色が不明の部分を"UNKNOWN"に置換**しよう
 
-```{r, starwars-replacena}
-#| echo: false
-starwars
+
+```
+             name height mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+ 1 Luke Skywalker    172   77      blond        fair      blue       19.0   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
+ 2          C-3PO    167   75       <NA>        gold    yellow      112.0   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 3          R2-D2     96   32       <NA> white, blue       red       33.0   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+ 4    Darth Vader    202  136       none       white    yellow       41.9   male masculine  Tatooine   Human <chr [4]> <chr [0]> <chr [1]>
+--                                                                                                                                        
+84            Rey     NA   NA      brown       light     hazel         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+85    Poe Dameron     NA   NA      brown       light     brown         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [1]>
+86            BB8     NA   NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
+87 Captain Phasma     NA   NA       none        none   unknown         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
@@ -255,16 +392,33 @@ starwars
 
 特定の値を `NA` に置き換える:
 
-```{r, na-if}
+
+```r
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> dplyr::mutate(x = dplyr::na_if(x, 1), y = dplyr::na_if(y, "a"))
 ```
 
+```
+   x    y    z
+1 NA <NA>    D
+2  2 <NA>    E
+3 NA    c <NA>
+```
+
 🔰 `starwars` の**性別"none"を欠損値に**しよう
 
-```{r, starwars-na-if}
-#| echo: false
-starwars
+
+```
+             name height mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+ 1 Luke Skywalker    172   77      blond        fair      blue       19.0   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
+ 2          C-3PO    167   75       <NA>        gold    yellow      112.0   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 3          R2-D2     96   32       <NA> white, blue       red       33.0   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+ 4    Darth Vader    202  136       none       white    yellow       41.9   male masculine  Tatooine   Human <chr [4]> <chr [0]> <chr [1]>
+--                                                                                                                                        
+84            Rey     NA   NA      brown       light     hazel         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+85    Poe Dameron     NA   NA      brown       light     brown         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [1]>
+86            BB8     NA   NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
+87 Captain Phasma     NA   NA       none        none   unknown         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
@@ -272,15 +426,30 @@ starwars
 
 先に指定したvectorの値が `NA` なら次のvectorの値を採用:
 
-```{r, coalesce}
+
+```r
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
 df |> dplyr::mutate(y_or_z = dplyr::coalesce(y, z))
 ```
 
+```
+   x    y    z y_or_z
+1  1    a    D      a
+2  2 <NA>    E      E
+3 NA    c <NA>      c
+```
+
 異なる型を混ぜると怒られる:
-```{r, coalesce-type}
-#| error: true
+
+```r
 df |> dplyr::mutate(x_or_y = dplyr::coalesce(x, y))
+```
+
+```
+Error in `dplyr::mutate()`:
+ℹ In argument: `x_or_y = dplyr::coalesce(x, y)`.
+Caused by error in `dplyr::coalesce()`:
+! Can't combine `..1` <double> and `..2` <character>.
 ```
 
 🔰 `starwars` で**髪色の欠損値を肌色で補おう**
@@ -290,19 +459,33 @@ df |> dplyr::mutate(x_or_y = dplyr::coalesce(x, y))
 
 `TRUE` の位置では `x` を採用、`FALSE` の位置では `y` を採用:
 
-```{r, ifelse}
+
+```r
 condition = c(TRUE, TRUE, FALSE)
 x = c(1, 2, 3)
 y = c(100, 200, 300)
 dplyr::if_else(condition, x, y)
 ```
 
+```
+[1]   1   2 300
+```
+
 🔰 `starwars` で**種族がドロイドの行だけ身長を100倍**してみよう
 
 
-```{r, starwars-ifelse}
-#| echo: false
-starwars
+
+```
+             name height mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+ 1 Luke Skywalker    172   77      blond        fair      blue       19.0   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
+ 2          C-3PO    167   75       <NA>        gold    yellow      112.0   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 3          R2-D2     96   32       <NA> white, blue       red       33.0   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+ 4    Darth Vader    202  136       none       white    yellow       41.9   male masculine  Tatooine   Human <chr [4]> <chr [0]> <chr [1]>
+--                                                                                                                                        
+84            Rey     NA   NA      brown       light     hazel         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+85    Poe Dameron     NA   NA      brown       light     brown         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [1]>
+86            BB8     NA   NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
+87 Captain Phasma     NA   NA       none        none   unknown         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
@@ -310,7 +493,8 @@ starwars
 
 ダブルクォートで囲む。シングルクォートも使える。
 
-```{r, string}
+
+```r
 x = "This is a string"
 y = 'If I want to include a "quote" inside a string, I use single quotes'
 ```
@@ -344,10 +528,15 @@ https://r4ds.had.co.nz/strings.html
 
 -   欠損値 `NA` に対する挙動が微妙
 
-    ```{r, base-str-na}
+    
+    ```r
     x = c(1, 2, NA)
     y = c("a", NA, "c")
     paste(x, y)  # NA is not distinguished from character "NA"
+    ```
+    
+    ```
+    [1] "1 a"  "2 NA" "NA c"
     ```
 
 ---
@@ -375,11 +564,37 @@ https://r4ds.had.co.nz/strings.html
 ---
 ## 文字列の基本操作
 
-```{r, str-length}
+
+```r
 fruit4 = head(fruit, 4L) |> print()
+```
+
+```
+[1] "apple"   "apricot" "avocado" "banana" 
+```
+
+```r
 stringr::str_length(fruit4)            # 長さ
+```
+
+```
+[1] 5 7 7 6
+```
+
+```r
 stringr::str_sub(fruit4, 2, 4)         # 部分抽出
+```
+
+```
+[1] "ppl" "pri" "voc" "ana"
+```
+
+```r
 stringr::str_c(1:4, " ", fruit4, "!")  # 結合
+```
+
+```
+[1] "1 apple!"   "2 apricot!" "3 avocado!" "4 banana!" 
 ```
 
 🔰 `words` の中で9文字より長いものを抜き出してみよう
@@ -391,15 +606,32 @@ stringr::str_c(1:4, " ", fruit4, "!")  # 結合
 
 単純な一致だけじゃなく、いろんな条件でマッチングできる:
 
-```{r, pattern}
+
+```r
 # aで始まる
 stringr::str_subset(fruit, "^a")
+```
 
+```
+[1] "apple"   "apricot" "avocado"
+```
+
+```r
 # rで終わる
 stringr::str_subset(fruit, "r$")
+```
 
+```
+[1] "bell pepper"  "chili pepper" "cucumber"     "pear"        
+```
+
+```r
 # 英数字3-4文字
 stringr::str_subset(fruit, "^\\w{3,4}$")
+```
+
+```
+[1] "date" "fig"  "lime" "nut"  "pear" "plum"
 ```
 
 この `^` とか `$` って何者？
@@ -460,34 +692,60 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 ## 検出 `str_detect()`
 
 マッチするかどうか `TRUE`/`FALSE` を返す。
-```{r, str-detect}
+
+```r
 fruit4 = head(fruit, 4L)
 stringr::str_detect(fruit4, "^a")
 ```
 
+```
+[1]  TRUE  TRUE  TRUE FALSE
+```
+
 🔰 `starwars` から `name` 列に空白を含まない行を抽出しよう
 
-```{r, starwars-detect}
-#| echo: false
-starwars |>
-  dplyr::filter(stringr::str_detect(name, "^\\S+$"))
+
+```
+        name height mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+ 1     C-3PO    167   75       <NA>        gold    yellow        112   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 2     R2-D2     96   32       <NA> white, blue       red         33   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+ 3     R5-D4     97   32       <NA>  white, red       red         NA   none masculine  Tatooine   Droid <chr [1]> <chr [0]> <chr [0]>
+ 4 Chewbacca    228  112      brown     unknown      blue        200   male masculine  Kashyyyk Wookiee <chr [5]> <chr [1]> <chr [2]>
+--                                                                                                                                   
+21   Tarfful    234  136      brown       brown      blue         NA   male masculine  Kashyyyk Wookiee <chr [1]> <chr [0]> <chr [0]>
+22      Finn     NA   NA      black        dark      dark         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+23       Rey     NA   NA      brown       light     hazel         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+24       BB8     NA   NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
 ## 抽出 `str_extract()`
 
 マッチした部分文字列を取り出す。しなかった要素には `NA`。
-```{r, str-extract}
+
+```r
 fruit4 = head(fruit, 4L)
 stringr::str_extract(fruit4, "^a..")
 ```
 
+```
+[1] "app" "apr" "avo" NA   
+```
+
 🔰 `diamonds` の `clarity` 列を数字なしにしてみよう
 
-```{r, diamonds-extract}
-#| echo: false
-diamonds |>
-  dplyr::mutate(clarity = stringr::str_extract(clarity, "\\D+"))
+
+```
+      carat       cut color clarity depth table price    x    y    z
+    1  0.23     Ideal     E      SI  61.5    55   326 3.95 3.98 2.43
+    2  0.21   Premium     E      SI  59.8    61   326 3.89 3.84 2.31
+    3  0.23      Good     E      VS  56.9    65   327 4.05 4.07 2.31
+    4  0.29   Premium     I      VS  62.4    58   334 4.20 4.23 2.63
+   --                                                               
+53937  0.72      Good     D      SI  63.1    55  2757 5.69 5.75 3.61
+53938  0.70 Very Good     D      SI  62.8    60  2757 5.66 5.68 3.56
+53939  0.86   Premium     H      SI  61.0    58  2757 6.15 6.12 3.74
+53940  0.75     Ideal     D      SI  62.2    55  2757 5.83 5.87 3.64
 ```
 
 
@@ -495,19 +753,35 @@ diamonds |>
 ## 置換 `str_replace()`, `str_replace_all()`
 
 カッコ `()` で囲んだマッチングは後で参照できる:
-```{r, str-replace}
+
+```r
 fruit4 = head(fruit, 4L)
 stringr::str_replace(fruit4, "..$", "!!")
+```
+
+```
+[1] "app!!"   "apric!!" "avoca!!" "bana!!" 
+```
+
+```r
 stringr::str_replace(fruit4, "(..)$", "_\\1_")
+```
+
+```
+[1] "app_le_"   "apric_ot_" "avoca_do_" "bana_na_" 
 ```
 
 🔰 `starwars` の `name` 列の数字を全部ゼロにしてみよう
 
-```{r, starwars-replace}
-#| echo: false
-starwars |>
-  dplyr::filter(stringr::str_detect(name, "\\d")) |>
-  dplyr::mutate(name = stringr::str_replace_all(name, "\\d", "0"))
+
+```
+    name height mass hair_color  skin_color eye_color birth_year  sex    gender homeworld species     films  vehicles starships
+1  C-0PO    167   75       <NA>        gold    yellow        112 none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+2  R0-D0     96   32       <NA> white, blue       red         33 none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+3  R0-D0     97   32       <NA>  white, red       red         NA none masculine  Tatooine   Droid <chr [1]> <chr [0]> <chr [0]>
+4  IG-00    200  140       none       metal       red         15 none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
+5 R0-P00     96   NA       none silver, red red, blue         NA none  feminine      <NA>   Droid <chr [2]> <chr [0]> <chr [0]>
+6    BB0     NA   NA       none        none     black         NA none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
@@ -515,8 +789,8 @@ starwars |>
 
 `matches()` だけで `starts_with()`/`ends_with()` の役もこなせる:
 
-```{r, tidyselect}
-#| results: "hide"
+
+```r
                         # starts_with("c")
 diamonds |> dplyr::select(matches("^c"))
 
@@ -534,23 +808,48 @@ See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) fo
 ---
 ## 形式を変える・整える
 
-```{r, upperlower}
+
+```r
 fruit4 = head(fruit, 4L)
 stringr::str_to_upper(fruit4)              # 大文字に
+```
+
+```
+[1] "APPLE"   "APRICOT" "AVOCADO" "BANANA" 
+```
+
+```r
 stringr::str_pad(fruit4, 8, "left", "_")   # 幅を埋めて指定幅に
 ```
 
+```
+[1] "___apple" "_apricot" "_avocado" "__banana"
+```
+
 [`stringi`](http://www.gagolewski.com/software/stringi/) パッケージはさらに多機能
-```{r, stringi}
+
+```r
 stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角数字に対処
+```
+
+```
+[1] "カタカナ" "42"      
 ```
 
 🔰 `starwars` の `name` 列を全部小文字にしてみよう
 
-```{r, starwars-tolower}
-#| echo: false
-starwars |>
-  dplyr::mutate(name = stringr::str_to_lower(name))
+
+```
+             name height mass hair_color  skin_color eye_color birth_year    sex    gender homeworld species     films  vehicles starships
+ 1 luke skywalker    172   77      blond        fair      blue       19.0   male masculine  Tatooine   Human <chr [5]> <chr [2]> <chr [2]>
+ 2          c-3po    167   75       <NA>        gold    yellow      112.0   none masculine  Tatooine   Droid <chr [6]> <chr [0]> <chr [0]>
+ 3          r2-d2     96   32       <NA> white, blue       red       33.0   none masculine     Naboo   Droid <chr [7]> <chr [0]> <chr [0]>
+ 4    darth vader    202  136       none       white    yellow       41.9   male masculine  Tatooine   Human <chr [4]> <chr [0]> <chr [1]>
+--                                                                                                                                        
+84            rey     NA   NA      brown       light     hazel         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
+85    poe dameron     NA   NA      brown       light     brown         NA   male masculine      <NA>   Human <chr [1]> <chr [0]> <chr [1]>
+86            bb8     NA   NA       none        none     black         NA   none masculine      <NA>   Droid <chr [1]> <chr [0]> <chr [0]>
+87 captain phasma     NA   NA       none        none   unknown         NA female  feminine      <NA>   Human <chr [1]> <chr [0]> <chr [0]>
 ```
 
 ---
@@ -562,11 +861,37 @@ starwars |>
 
 これはstringrではなくreadrの担当:
 
-```{r, parse-character}
+
+```r
 readr::parse_number(c("p = 0.02 *", "N_A = 6e23"))
+```
+
+```
+[1] 2e-02 6e+23
+```
+
+```r
 readr::parse_double(c("0.02", "6e+23"))
+```
+
+```
+[1] 2e-02 6e+23
+```
+
+```r
 readr::parse_logical(c("1", "true", "0", "false"))
+```
+
+```
+[1]  TRUE  TRUE FALSE FALSE
+```
+
+```r
 readr::parse_date("2020-06-03")
+```
+
+```
+[1] "2020-06-03"
 ```
 
 `6e+23` は $6 \times 10 ^ {23}$ のプログラミング的表現。
@@ -575,7 +900,8 @@ $6e^{23}$ ではない。
 ---
 ## 因子型 `factor` でカテゴリカル変数(質的変数)を扱う
 
-```{r, factor}
+
+```r
 month_levels = c(                       # 取りうる値
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -585,10 +911,27 @@ y1 = factor(x1, levels = month_levels)  # 因子型に変換
 print(y1)
 ```
 
+```
+[1] Dec Apr Jan Mar
+Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+```
+
 文字列っぽいけど**実体は整数**:
-```{r, factor-int}
+
+```r
 typeof(y1)
+```
+
+```
+[1] "integer"
+```
+
+```r
 as.integer(y1)                          # 整数型に変換可能
+```
+
+```
+[1] 12  4  1  3
 ```
 
 🔰 `iris` に含まれる因子型を確認しよう: `str(iris)`
@@ -604,14 +947,26 @@ https://r4ds.had.co.nz/factors.html
 
 typoなどによりlevels外になると `NA` 扱い。
 
-```{r, factor-levels}
+
+```r
 x2 = c("Dec", "Apr", "Jam", "Mar")
 factor(x2, levels = month_levels)
 ```
 
+```
+[1] Dec  Apr  <NA> Mar 
+Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
+```
+
 元の文字列vectorに全てのlevelsが含まれてるなら簡単に変換可能:
-```{r, as-factor}
+
+```r
 as.factor(starwars[["gender"]])
+```
+
+```
+ [1] masculine masculine masculine masculine feminine  masculine feminine  masculine masculine masculine masculine masculine masculine masculine masculine masculine masculine <NA>      masculine masculine masculine masculine masculine masculine masculine masculine feminine  masculine masculine masculine masculine masculine masculine feminine  masculine masculine masculine masculine masculine masculine masculine feminine  masculine masculine feminine  masculine masculine masculine masculine masculine masculine masculine masculine feminine  masculine masculine masculine masculine <NA>      <NA>      masculine masculine feminine  feminine  feminine  masculine masculine masculine feminine  masculine masculine feminine  feminine  feminine  masculine masculine feminine  masculine masculine masculine <NA>      masculine masculine feminine  masculine masculine feminine 
+Levels: feminine masculine
 ```
 
 ---
@@ -619,11 +974,24 @@ as.factor(starwars[["gender"]])
 
 アルファベット順じゃない順序がある:
 
-```{r, factor-sort}
+
+```r
 x1 = c("Dec", "Apr", "Jan", "Mar")
 sort(x1)     # 文字列としてソートするとアルファベット順
+```
+
+```
+[1] "Apr" "Dec" "Jan" "Mar"
+```
+
+```r
 y1 = factor(x1, levels = month_levels)
 sort(y1)     # 因子としてソートするとlevels順
+```
+
+```
+[1] Jan Mar Apr Dec
+Levels: Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
 ```
 
 ---
@@ -631,38 +999,45 @@ sort(y1)     # 因子としてソートするとlevels順
 
 文字列だと勝手にアルファベット順。因子型なら任意指定可能:
 
-```{r, factor-mpg}
+
+```r
 mpg_fct = mpg |>
   dplyr::mutate(drv = factor(drv, levels = c("f", "r", "4")))
 ```
 
-```{r, factor-plot}
-#| fig.width: 7
-#| fig.height: 5
-#| echo: false
-set.seed(1)
-p1 = mpg |>
-  ggplot() +
-  aes(drv, hwy) +
-  geom_boxplot(aes(fill = drv), outlier.alpha = 0) +
-  geom_jitter(height = 0, width = 0.25, alpha = 0.5) +
-  labs(x = "drv") +
-  theme_classic(base_size = 18) +
-  theme(legend.position = "none")
-cowplot::plot_grid(p1 + ggtitle("mpg"), p1 %+% mpg_fct + ggtitle("mpg_fct"), nrow = 1L)
-```
+![plot of chunk factor-plot](./figure/factor-plot-1.png)
 
 ---
 ## 順序つき因子型 `ordered`
 
 大小の比較ができる。
 
-```{r, ordered}
+
+```r
 x1 = c("Dec", "Apr", "Jan", "Mar")
 y3 = factor(x1, levels = month_levels, ordered = TRUE)
 class(y3)
+```
+
+```
+[1] "ordered" "factor" 
+```
+
+```r
 print(y3)
+```
+
+```
+[1] Dec Apr Jan Mar
+Levels: Jan < Feb < Mar < Apr < May < Jun < Jul < Aug < Sep < Oct < Nov < Dec
+```
+
+```r
 y3 < "Sep"
+```
+
+```
+[1] FALSE  TRUE  TRUE  TRUE
 ```
 
 🔰 `diamonds` に含まれるordered型を確認しよう: `str(diamonds)`<br>
@@ -680,60 +1055,47 @@ y3 < "Sep"
 - `fct_infreq()`: 頻度に応じて順序を並べ替え
 - `fct_lump()`: 少なすぎるカテゴリを"その他"としてまとめる
 
-```{r, fct-infreq-data}
+
+```r
 diamonds_fct = diamonds |>
   dplyr::mutate(color = forcats::fct_infreq(color))
 mpg_fct = mpg |>
   dplyr::mutate(fl = forcats::fct_lump(fl, n = 2))
 ```
 
-```{r, fct-infreq}
-#| fig.width: 8
-#| fig.height: 3
-#| echo: false
-p1 = diamonds_fct |>
-  ggplot() + aes(x = color) + geom_bar() + coord_flip() +
-  theme_minimal(base_size = 16)
-p2 = mpg_fct |>
-  ggplot() + aes(fl, cty, fill = fl) +
-  geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.5, stroke = 0) +
-  theme_minimal(base_size = 16) +
-  theme(legend.position = "none")
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
+![plot of chunk fct-infreq](./figure/fct-infreq-1.png)
 
 ---
 ## factorで順序を変えて作図する練習
 
 🔰 `mpg` で次のような図を描いてみよう
 
-```{r, plot-factor}
-#| echo: false
-#| fig.width: 5
-#| fig.height: 5
-mpg |>
-  dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
-  dplyr::mutate(class = forcats::fct_rev(forcats::fct_infreq(class))) |>
-  ggplot() +
-  aes(class) +
-  geom_bar(aes(fill = drv)) +
-  coord_flip() +
-  theme_classic(base_size = 18) +
-  theme(panel.grid = element_blank(), axis.title.y = element_blank(),
-        axis.line.y = element_blank(), axis.ticks.y = element_blank(),
-        legend.position = "top")
-```
+![plot of chunk plot-factor](./figure/plot-factor-1.png)
 
 ---
 ## 指示変数(ダミー変数)に変換
 
 イチゼロの値を持たせて横広に変形するのと等価。
 
-```{r, dummy}
+
+```r
 iris |> tibble::rowid_to_column() |>
   dplyr::mutate(value = 1L) |>
   tidyr::pivot_wider(names_from = Species,
                      values_from = value, values_fill = 0L)
+```
+
+```
+    rowid Sepal.Length Sepal.Width Petal.Length Petal.Width setosa versicolor virginica
+  1     1          5.1         3.5          1.4         0.2      1          0         0
+  2     2          4.9         3.0          1.4         0.2      1          0         0
+  3     3          4.7         3.2          1.3         0.2      1          0         0
+  4     4          4.6         3.1          1.5         0.2      1          0         0
+ --                                                                                    
+147   147          6.3         2.5          5.0         1.9      0          0         1
+148   148          6.5         3.0          5.2         2.0      0          0         1
+149   149          6.2         3.4          5.4         2.3      0          0         1
+150   150          5.9         3.0          5.1         1.8      0          0         1
 ```
 
 🔰 これを元の `iris` に戻してみよう
@@ -745,12 +1107,27 @@ iris |> tibble::rowid_to_column() |>
 - POSIXct: エポックからの経過秒数。比較や差分などを取りやすい。
 - POSIXlt: list(秒, 分, 時, 日, 月, 年, ...)。単位ごとに抜き出しやすい。
 
-```{r, datetime}
+
+```r
 now = "2024-04-10 14:10:00"
 ct = as.POSIXct(now)
 unclass(ct)
+```
+
+```
+[1] 1712725800
+attr(,"tzone")
+[1] ""
+```
+
+```r
 lt = as.POSIXlt(now)
 unclass(lt) |> as_tibble()
+```
+
+```
+  sec min hour mday mon year wday yday isdst zone gmtoff
+1   0  10   14   10   3  124    3  100     0  JST     NA
 ```
 
 素のRでも扱えるけど lubridate パッケージを使うともっと楽に。
@@ -763,15 +1140,33 @@ unclass(lt) |> as_tibble()
 </a>
 
 日時型への変換:
-```{r, lubridate-parse}
+
+```r
 lubridate::ymd(c("20240410", "2024-04-10", "24/04/10"))
 ```
 
+```
+[1] "2024-04-10" "2024-04-10" "2024-04-10"
+```
+
 日時型から単位ごとに値を取得:
-```{r, lubridate-get}
+
+```r
 today = lubridate::ymd(20230412)
 lubridate::month(today)
+```
+
+```
+[1] 4
+```
+
+```r
 lubridate::wday(today, label = TRUE)
+```
+
+```
+[1] Wed
+Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
 ```
 
 ---
@@ -900,4 +1295,6 @@ Older versions
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
    石川由希 2023 名古屋大学
 
-`r .meta$next_link`
+<a href="6-input.html" class="readmore">
+6. データ入力、レポート作成
+</a>

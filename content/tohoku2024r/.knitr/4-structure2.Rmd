@@ -165,19 +165,14 @@ band_members          band_instruments
 ---
 ## joinまとめ
 
-<div class="column-container">
-<div class="column" style="flex-shrink: 1.4;">
-
-<figure>
-<a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
-<img src="/slides/image/r4ds/join.png" height="820">
+<figure style="margin-block: 1em;">
+<a href="https://r4ds.hadley.nz/joins.html">
+<img src="/slides/image/r4ds/join-venn.png" width="100%">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/joins.html</figcaption>
 </a>
 </figure>
 
-</div>
-<div class="column">
 
 生命科学における `left_join()` の例
 
@@ -188,13 +183,8 @@ band_members          band_instruments
 
 **興味のある遺伝子**の発現+アノテーション
 
-</div>
-</div>
-
 ---
 ## join例題: `nycflights13` データセット
-
-🔰 関連するdata.frameをいろいろな方法で結合してみよう。
 
 ```r
 # install.packages("nycflights13")
@@ -203,13 +193,27 @@ data(package = "nycflights13")
 # airlines, airports, flights, planes, weather
 ```
 
-<figure>
-<a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
-<img src="/slides/image/r4ds/relational-nycflights.png" height="480">
+<figure style="margin-block: 1em;">
+<a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
+<img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
 </a>
 </figure>
+
+🔰 JFK空港発の100席以上の飛行機で最も多い目的地はどこ？
+
+```{r, nycflights13}
+#| echo: false
+withr::with_package("nycflights13", {
+  flights |>
+    dplyr::filter(origin == "JFK") |>
+    dplyr::inner_join(planes, by = "tailnum") |>
+    dplyr::filter(seats > 100) |>
+    dplyr::count(origin, dest, sort = TRUE) |>
+    dplyr::left_join(airports, by = dplyr::join_by(dest == faa))
+})
+```
 
 
 ---
@@ -538,7 +542,7 @@ mpg_nested$data[[1]]
 - **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
     - 使いたい部分だけ抽出 --- `select()`, `filter()`
     - グループごとに特徴を要約 --- `group_by()`, `summarize()`
-    - 何かの順に並べ替え --- `arrange()`
+    - 何かの順に並べ替え --- `arrange()`, `relocate()`
     - 異なるテーブルの結合 --- `*_join()`
     - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
 - データ内容を対象とする処理 — 第5回
@@ -615,47 +619,19 @@ print(VADeaths)
 ```
 
 ↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+<img `r src_alt_fig_chunk("vadeaths-plot")` align="right" width="540" style="margin-block-start: 3em;">
 
 ```{r, after-tidy}
 #| echo: false
-VADeaths |>
-  as.data.frame() |>
-  tibble::rownames_to_column("age") |>
-  tidyr::pivot_longer(!age, names_to = c("region", "sex"), names_sep = " ", values_to = "death") |>
-  tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
-```
-
----
-## ちょっと補足
-
-```{r, vadeaths-class}
-VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
-  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
-class(VADeaths)
-rownames(VADeaths)
-```
-
----
-## 🔰 課題3: `VADeaths` を縦長にしてggplotしてみよう
-
-```{r, vadeaths-rownames}
-#| results: "hold"
-VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
-  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
-```
-
-```{r, vadeaths-plot}
-#| fig.height: 4
-#| fig.width: 6
-#| echo: false
 va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
-  tibble::rownames_to_column("age") |>          # 行名を列に
-  tidyr::pivot_longer(                         # 縦長に変形したい
+  tibble::rownames_to_column("age") |>  # 行名を列に
+  tidyr::pivot_longer(                  # 縦長に変形したい
     !age,                               # age以外の列に入ってる値を移動
     names_to = c("region", "sex"),      # 元の列名を2つに分離
     names_sep = " ",                    # スペースで切る
     values_to = "death") |>             # 値の行き先の列名
-  tidyr::separate(age, c("lbound", "ubound"), "-", convert = TRUE)
+  tidyr::separate(age, c("lbound", "ubound"), "-", convert = TRUE) |>
+  print()
 
 # 別解
 .devnull = as.data.frame(VADeaths) |>
@@ -663,12 +639,39 @@ va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
   tidyr::pivot_longer(!age, names_to = "region_sex", values_to = "death") |>
   tidyr::separate(region_sex, c("region", "sex")) |>
   tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
+```
 
+---
+## 🔰 課題3: `VADeaths` を縦長にしてggplotしてみよう
+
+```{r, vadeaths-rownames}
+VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
+  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
+```
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 0.8; min-width: 0;">
+
+```{r, vadeaths-class}
+class(VADeaths)
+rownames(VADeaths)
+```
+
+  </div>
+  <div class="column">
+
+```{r, vadeaths-plot}
+#| fig.height: 3.8
+#| fig.width: 5.7
+#| echo: false
 ggplot(va_deaths) +
   aes(lbound, death) +
   geom_point(aes(color = sex, shape = region), size = 5) +
   theme_classic(base_size = 18)
 ```
+
+  </div>
+</div>
 
 ---
 ## 🔰 課題4: `anscombe` を縦長にしてggplotしてみよう
@@ -682,9 +685,8 @@ anscombe |> tibble::rowid_to_column("id") |> wtl::printdf(n = 6L)
 ```
 
 ```{r, anscombe-plot}
-#| fig.height: 3
-#| fig.width: 10
-#| out.width: "98%"
+#| fig.height: 3.6
+#| fig.width: 12
 #| echo: false
 tidy_anscombe = anscombe |>
   tidyr::pivot_longer(                       # 縦長に変形したい
@@ -706,7 +708,7 @@ ggplot(tidy_anscombe) + aes(x, y) +
   geom_point(size = 3) +
   stat_smooth(method = lm, formula = y ~ x, se = FALSE, fullrange = TRUE) +
   facet_wrap(vars(group), nrow = 1L) +
-  theme_bw(base_size = 16)
+  theme_bw(base_size = 20)
 ```
 
 ---
@@ -758,7 +760,7 @@ Older versions
 : 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
 : 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2022/)」
    岩嵜航 2022 東京医科歯科大
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
-   石川由希 2022 名古屋大学
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
+   石川由希 2023 名古屋大学
 
 `r .meta$next_link`
