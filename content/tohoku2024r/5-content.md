@@ -3,7 +3,7 @@ url = "tohoku2024r/5-content.html"
 linktitle = "データ内容の処理: 数値、文字列など。"
 title = "5. データ内容の処理: 数値、文字列など。 — 進化学実習 2024 牧野研 東北大学"
 date = 2024-04-10T13:00:00+09:00
-draft = true
+draft = false
 css = "style.css"
 dpi = 108
 +++

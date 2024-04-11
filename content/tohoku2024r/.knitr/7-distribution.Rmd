@@ -6,8 +6,19 @@
 ```{r, setup-local}
 #| include: false
 #| cache: false
-knitr::knit_exit()
 ```
+
+
+---
+## 作業再開、出欠確認
+
+1. `r-training-2024.Rproj` をダブルクリック。<br>
+   正しい working directory でRStudioが起動される。
+1. [初日と同じ手順](1-introduction.html#/29)で出欠確認。
+1. 今日のぶんのスクリプトを新規作成し、好きな名前で保存。<br>
+1. [tidyverseの読み込み](2-visualization.html#/23)や[パレット設定](2-visualization.html#/36)など、
+   おまじないをまず実行。
+
 
 ---
 ## この実習の目標
@@ -36,153 +47,15 @@ knitr::knit_exit()
 そのために解析は必要？
 未加工の生データこそ宝？
 
----
-## データ解析って必要？ 生の数字見ればよくない？
-
-生のままでは複雑過ぎ、情報多すぎ、何もわからない。
-
-```{r, diamonds}
-print(ggplot2::diamonds)
-```
-
-ダイヤモンド53,940個について10項目の値を持つデータセット
 
 ---
-## 要約統計量を見てみよう
+## 初日を振り返る
 
-各列の**平均**とか**標準偏差**とか:
+<iframe width="600" height="450" src="./1-introduction.html#/5"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/6"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/7"></iframe>
+<iframe width="600" height="450" src="./1-introduction.html#/8"></iframe>
 
-```{r, summary-diamonds}
-#| echo: false
-dia_cols = c("carat", "depth", "table", "price")
-diamonds |>
-  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
-  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
-  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
-```
-
-大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
-```{r, cov-diamonds}
-#| echo: false
-diamonds |>
-  dplyr::select(all_of(dia_cols)) |>
-  scale() |>
-  cov() |>
-  wtl::printmat("%.2f", upper = FALSE)
-```
-
-**生のままよりは把握しやすい**かも。
-
-しかし要注意...
-
-
----
-## 代表値ばかり見て可視化を怠ると構造を見逃す
-
-<figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
-<img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
-</a>
-<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
-     style="position: absolute; left: 0; top: 0; z-index: 255;">
-</figure>
-
-
----
-## 作図してみると全体像・構造が見やすい
-
-情報をうまく絞って整理 → **直感的にわかる**
-
-```{r, simplify-diamonds}
-#| echo: false
-#| fig.height: 6
-#| fig.width: 7
-diamonds |>
-  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
-  ggplot(aes(carat, price, color = clarity)) +
-  geom_point(alpha = 0.4, size = 3) +
-  scale_color_viridis_d(
-    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
-  ) +
-  labs(title = "Diamonds") +
-  theme_gray(base_size = 22) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.background = element_rect(fill = "#bbbbbb"),
-    legend.key = element_rect(fill = "#bbbbbb"),
-    axis.ticks = element_blank()
-  )
-```
-
-`carat` が大きいほど `price` も高いらしい。<br>
-その度合いは `clarity` によって異なるらしい。
-
----
-## 統計とは
-
-データをうまくまとめ、それに基づいて推論するための手法。
-
-- **記述統計**: データそのものを要約する
-    - 要約統計量 (e.g., 平均、標準偏差、etc.)
-    - 作図、作表
-- **推測統計**: データの背後にある母集団・生成過程を考える
-    - 数理モデル
-    - 確率分布
-    - パラメータ(母数)
-
-「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
-
-
----
-## モデルとは
-
-対象システムを単純化・理想化して扱いやすくしたもの
-
-Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="200" align="right" style="margin: 0 -5px;">
-: 数学的な方程式として記述されるもの。
-: e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
-: <br>
-
-Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="200" align="right">
-: 数値計算の手続きとして記述されるもの。
-: e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
-: <br>
-
-Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="320" align="right">
-: 具体的な事物で作られるもの。
-: e.g., San Francisco Bay-Delta Model
-
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
-
-???
-数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
-解析的に解くことを諦めて計算機にやらせるという点で実装方法は異なるが、
-数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
-
-プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
-
----
-## データ科学における数理モデル
-
-データ生成をうまく真似できそうな仮定の数式表現。<br>
-&nbsp;
-
-<figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1000"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
-
-???
-
-確率モデル: 決定論的なモデルじゃなくて確率論的なゆらぎを導入したもの。
-ただし、大塚淳さんの定義は異なる。
-帰納推論を可能にする枠組みとして自然の斉一性(ヒューム)を仮定した上で、
-データを生成している真の現象を確率用語で記述したものが確率モデルだ、という感じ。
-そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
 
 ---
 ## データ科学における数理モデル
@@ -210,76 +83,35 @@ diamonds |>
 
 
 ---
-## 今回は回帰を軸とした統計モデリングの解説
-
-単純な直線あてはめから出発し、ちょっとずつ統計モデリング。
-
-<figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
-</a>
-</figure>
-
-
----
-## 回帰は教師あり機械学習の一種とも言える
-
-<figure>
-<img src="../tokiomarine2021/regression-in-ml.drawio.svg" width="1000">
-</figure>
-
-でも統計モデリングはいわゆる“機械学習”とは違う気もする...?
-
-
----
-## モデリングにおける2つのアプローチ
-
-<figure>
-<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
-</figure>
-
----
-## どっちも知っておいて使い分けたい
-
-項目       | 統計モデリング | 近年の機械学習
----------- | -------------- | ----------------
-例 | 一般化線形モデル<br>階層ベイズモデル | ランダムフォレスト<br>ニューラルネットワーク
-モデル構造 | 単純化したい | 性能のためなら複雑化
-モデル解釈 | **ここが強み** | 難しい。重視しない。途上。
-予測・生成 | うまくすれば頑健 | **主目的**。強力。高精度
-データ量   | 少なくてもそれなり | 大量に必要
-計算量     | 場合による  | 場合による
-
-
----
-## 統計モデリングのお品書き
+## ちょっとずつ線形モデルを発展させていく
 
 <figure style="float: right;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
-<img src="../tokiomarine2021/image/kubo-book.jpg" width="280" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
 </a>
 </figure>
 
-久保先生の"緑本"こと<br>
-「データ解析のための統計モデリング入門」<br>
-をベースに回帰分析の概要を紹介。
+**線形モデル LM** (単純な直線あてはめ)　[(👈 #7 今回)](7-distribution.html)
 
-1. イントロ [(#7 今回)](7-distribution.html)
-1. 統計モデルの基本
-    - 確率変数・**確率分布** 👈 主役
-    - 尤度・最尤推定
-1. 一般化線形モデル、混合モデル [(#8 次回)](8-glm.html)
-1. <del>ベイズ統計、階層ベイズモデル</del> 今回はここまでやらない
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
 
-回帰のキモは**線ではなく分布**。
+**一般化線形モデル GLM** [(#8 次回)](8-glm.html)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
 
 <hr>
 <cite>
 
-[Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
-の演習無し抜粋バージョン (~2時間 x 2回)。
+[Data Science Hill Climb 2023 (東京海上) での講義 (~12時間)](https://heavywatal.github.io/slides/tokiomarine2023/)
+の抜粋バージョン (~2時間)。
 
 </cite>
 
@@ -611,6 +443,118 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 一方、少数のパラメータと数式で作るのが**理論分布**。<br>
 (こちらを単に「確率分布」と呼ぶことが多い印象）
 
+
+---
+## 分布を特徴づける代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  </a>
+  </div>
+</div>
+
+目的や状況に応じて使い分けよう。
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+---
+## ばらつきを捉える記述統計量
+
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r, quantile}
+#| fig.width: 10
+#| fig.height: 4
+#| echo: false
+set.seed(24601)
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
+  dplyr::mutate(x = x + 3)
+probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
+dfq = df |>
+  dplyr::reframe(x = quantile(x, probs)) |>
+  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
+  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
+  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
+  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
+
+---
+## 記述統計量に頼りすぎず分布を可視化する
+
+同じデータでも見せ方で印象・情報量が変わる。
+
+```{r, visualize-distribution}
+#| echo: false
+#| fig.width: 9
+#| fig.height: 6
+df = mpg |> dplyr::mutate(y = hwy)
+df_mean = df |> dplyr::summarize(y = mean(y))
+p0 = ggplot(df) + aes(y = y) +
+  theme_classic() +
+  theme(axis.title = element_blank(), axis.text.x = element_blank(), axis.ticks = element_blank())
+
+ylim = c(0, max(df$y))
+coord_y = coord_cartesian(ylim = ylim)
+coord_one = coord_cartesian(ylim = ylim, xlim = c(-1, 1))
+
+pcol = p0 + aes(x = 0) +
+  geom_col(data = df_mean, fill = "#999999") +
+  stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
+
+set.seed(1)
+cowplot::plot_grid(nrow = 2L,
+  pcol + coord_one,
+  p0 + geom_boxplot() + coord_one,
+  p0 + geom_density(fill = "#999999", color = NA) + coord_y,
+  p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
+  p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
+    stroke = 0, alpha = 0.66) + coord_y
+)
+```
+
+
 ---
 ## 確率変数$X$はパラメータ$\theta$の確率分布$f$に従う...?
 
@@ -744,8 +688,8 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 離散一様分布
 : コインの表裏、サイコロの出目1–6
 
-幾何分布
-: 成功率pの試行が初めて成功するまでの失敗回数
+負の二項分布 (幾何分布 if n = 1)
+: 成功率pの試行がn回成功するまでの失敗回数
 
 二項分布
 : 成功率p、試行回数nのうちの成功回数
@@ -753,12 +697,11 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 ポアソン分布
 : 単位時間あたり平均$\lambda$回起こる事象の発生回数
 
-ガンマ分布
+ガンマ分布 (指数分布 if k = 1)
 : ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
 
 正規分布
-: 確率変数の和、平均値
+: 確率変数の和、平均値など。
 
 ---
 ## 離散一様分布
@@ -822,37 +765,6 @@ ggplot(df) +
 🔰 幾何分布になりそうな例を考えてみよう
 
 ---
-## 二項分布 $~\text{Binomial}(n,~p)$
-
-確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
-
-```{r, dbinom-n}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-p = 0.25
-df = purrr::map(2**seq.int(0, 4), \(n) {
-  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
-}) |> purrr::list_rbind()
-ggplot(df) +
-  aes(X, Prob) +
-  scale_x_continuous(breaks = df[["X"]]) +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  geom_col() +
-  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
-  labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
-
-\\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
-\\]
-
-🔰 二項分布になりそうな例を考えてみよう
-
-
----
 ## 負の二項分布 $~\text{NB}(n, p)$
 
 成功率pの試行がn回成功するまでの失敗回数X。
@@ -889,6 +801,37 @@ ggplot(df) +
 平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
 ($k \to \infty$でポアソン分布と一致)
 -->
+
+---
+## 二項分布 $~\text{Binomial}(n,~p)$
+
+確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。
+
+```{r, dbinom-n}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+p = 0.25
+df = purrr::map(2**seq.int(0, 4), \(n) {
+  tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
+}) |> purrr::list_rbind()
+ggplot(df) +
+  aes(X, Prob) +
+  scale_x_continuous(breaks = df[["X"]]) +
+  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
+  geom_col() +
+  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
+  labs(title = paste0("p = ", p)) +
+  theme_bw(base_size = 18) +
+  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
+```
+
+\\[
+\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\\]
+
+🔰 二項分布になりそうな例を考えてみよう
+
 
 ---
 ## ポアソン分布 $~\text{Poisson}(\lambda)$
@@ -1146,8 +1089,8 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 離散一様分布
 : コインの表裏、サイコロの出目1–6
 
-幾何分布
-: 成功率pの試行が初めて成功するまでの失敗回数
+負の二項分布 (幾何分布 if n = 1)
+: 成功率pの試行がn回成功するまでの失敗回数
 
 二項分布
 : 成功率p、試行回数nのうちの成功回数
@@ -1155,9 +1098,8 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 ポアソン分布
 : 単位時間あたり平均$\lambda$回起こる事象の発生回数
 
-ガンマ分布
+ガンマ分布 (指数分布 if k = 1)
 : ポアソン過程でk回起こるまでの待ち時間
-: (k = 1のとき**指数分布**と呼ばれる)
 
 正規分布
 : 確率変数の和、平均値。使い勝手が良く、よく登場する。
@@ -1170,7 +1112,35 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
 極端な値(全部死亡、全部生存)が多かった。
 
-<img `r src_alt_fig_chunk("overdispersion")`>
+```{r, df-seeds-od}
+#| echo: false
+set.seed(24601)
+samplesize = 100L
+df_seeds_od = tibble::tibble(
+  z = rnorm(samplesize, 0.5, 3),
+  p = wtl::sigmoid(z),
+  y = rbinom(samplesize, 8L, p))
+```
+```{r, overdispersion}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+sum_y = sum(df_seeds_od$y)
+p_hat = sum_y / 800
+label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
+tidy_od = df_seeds_od |>
+  dplyr::count(y, name = "observed") |>
+  dplyr::mutate(expected = samplesize * dbinom(y, 8, p_hat))
+ggplot(tidy_od) +
+  geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
+  geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
+  annotate("text", label = label, parse = TRUE, color = "#56B4E9",
+           x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 6) +
+  labs(x = "# survived seeds", y = "count") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
 
 「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
 **「普通はこれに従うはず」を理解してこそ**できる思考。
@@ -1205,12 +1175,12 @@ runif(6L)
 ```{r, try-prng}
 #| eval: false
 n = 100
-x = sample.int(6, n, replace = TRUE)
-x = runif(n, min = 0, max = 1)
-x = rgeom(n, prob = 0.5)
-x = rbinom(n, size = 3, prob = 0.5)
-x = rpois(n, lambda = 10)
-x = rnorm(n, mean = 50, sd = 10)
+x = sample.int(6, n, replace = TRUE)  # 一様分布(整数)
+x = runif(n, min = 0, max = 1)        # 一様分布
+x = rgeom(n, prob = 0.5)              # 幾何分布
+x = rbinom(n, size = 3, prob = 0.5)   # 二項分布
+x = rpois(n, lambda = 10)             # ポアソン分布
+x = rnorm(n, mean = 50, sd = 10)      # 正規分布
 print(x)
 
 p1 = ggplot(data.frame(x)) + aes(x)
@@ -1518,7 +1488,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 

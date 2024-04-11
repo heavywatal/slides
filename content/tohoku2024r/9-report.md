@@ -1,12 +1,40 @@
-```{r, setup-common}
-#| file: "setup.R"
-#| echo: false
-#| results: "asis"
-```
-```{r, setup-local}
-#| include: false
-#| cache: false
-```
++++
+url = "tohoku2024r/9-report.html"
+linktitle = "発表会"
+title = "9. 発表会 — 進化学実習 2024 牧野研 東北大学"
+date = 2024-04-15T13:00:00+09:00
+draft = false
+css = "style.css"
+dpi = 108
++++
+
+# [進化学実習 2024 牧野研 東北大学](.)
+
+<div class="author">
+岩嵜 航
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li><a href="2-visualization.html">データの可視化。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li><a href="6-input.html">データ入力、レポート作成</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li class="current-deck"><a href="9-report.html">発表会</a>
+</ol>
+
+<div class="footnote">
+2024-04-15 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2024r/">https://heavywatal.github.io/slides/tohoku2024r/</a>
+</div>
+
 
 ---
 ## 最終日のお品書き

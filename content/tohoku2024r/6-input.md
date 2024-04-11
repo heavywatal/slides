@@ -3,7 +3,7 @@ url = "tohoku2024r/6-input.html"
 linktitle = "データ入力、レポート作成"
 title = "6. データ入力、レポート作成 — 進化学実習 2024 牧野研 東北大学"
 date = 2024-04-10T14:40:00+09:00
-draft = true
+draft = false
 css = "style.css"
 dpi = 108
 +++
