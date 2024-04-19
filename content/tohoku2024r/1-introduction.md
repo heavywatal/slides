@@ -512,7 +512,7 @@ See https://support.apple.com/HT201236
 
 ```r
 student_id = "C2SB0000"   # 自分のIDに書き換えてください
-source("https://scorpion.biology.tohoku.ac.jp/sice/report.R")
+source("https://example.com/sice/report.R")
 ```
 
 `Hello, C2SB0000.`

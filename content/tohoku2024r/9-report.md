@@ -48,9 +48,10 @@ dpi = 108
 - 解散、質疑応答
 
 <br>
-<hr>
+<hr
 
-🚧 発表会用のリンクをこのへんに貼る 🚧
+🚧 発表会用のリンクを当日限りこのへんに貼る 🚧
+
 
 ---
 ## QuartoでHTML出力したものを皆で閲覧する
@@ -90,6 +91,8 @@ dpi = 108
 
 <iframe width="600" height="450" src="./6-input.html#/40"></iframe>
 <iframe width="600" height="450" src="./6-input.html#/41"></iframe>
+
+🔰最終課題は発表会を踏まえた改良版を3日目のぶんに掲載。
 
 
 ---
