@@ -18,7 +18,7 @@ https://heavywatal.github.io/slides/
 4.  The output and libraries are published via
     [`gh-pages` branch of this repository](https://github.com/heavywatal/slides/tree/gh-pages).
 
-But I recommend using [Quarto Presentation](https://quarto.org/docs/presentations/) via [RStudio IDE](https://www.rstudio.com/products/rstudio/).
+But I recommend using [Quarto Presentation](https://quarto.org/docs/presentations/) via [RStudio IDE](https://posit.co/products/open-source/rstudio/).
 It is user-friendly and has decent defaults compared to older alternatives such as
 [`xaringan`](https://slides.yihui.org/xaringan/),
 [`rstudio/revealjs`](https://bookdown.org/yihui/rmarkdown/revealjs.html),
@@ -28,19 +28,19 @@ and [others supported in `rmarkdown` package](https://bookdown.org/yihui/rmarkdo
 ## R packages used in `*.Rmd`
 
 ```r
-install.packages("knitr")
-install.packages("tidyverse")
-install.packages("cowplot")
-install.packages("ggrepel", "ggridges")
-install.packages("tidymodels")
-install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-install.packages("bayesplot")
-install.packages(c("rstan", "rstanarm", "tidybayes"))
-install.packages("gifski")
-install.packages("palmerpenguins")
-install.packages("nycflights13")
-install.packages("remotes")
-remotes::install_github("heavywatal/rwtl")
+install.packages("pak")
+pak::repo_add(stan = "https://stan-dev.r-universe.dev")
+pak::pkg_install("knitr")
+pak::pkg_install("tidyverse")
+pak::pkg_install("tidymodels")
+pak::pkg_install("cowplot")
+pak::pkg_install("ggrepel", "ggridges")
+pak::pkg_install("palmerpenguins")
+pak::pkg_install("nycflights13")
+pak::pkg_install("gifski")
+pak::pkg_install(c("cmdstanr", "bayesplot"))
+pak::pkg_install(c("rstan", "rstanarm", "tidybayes"))
+pak::pkg_install("heavywatal/rwtl")
 ```
 
 
@@ -54,8 +54,8 @@ remotes::install_github("heavywatal/rwtl")
 1.  Run decktape:
 
     ```sh
-    npm run decktape https://heavywatal.github.io/slides/tmd2021/1-introduction.html 1-introduction.pdf
+    npm run decktape https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
     # or manually
-    npx decktape -s 960x720 --chrome-arg=--disable-web-security reveal https://heavywatal.github.io/slides/tohoku2022r/1-introduction.html 1-introduction.pdf
-    npx decktape -s 800x600 --chrome-arg=--disable-web-security generic https://comicalcommet.github.io/r-training-2021/R_training_2021_1.html R_training_2021_1.pdf
+    npx decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
+    npx decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2023/R_training_2023_1.html R_training_1.pdf
     ```
