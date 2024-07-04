@@ -1067,7 +1067,7 @@ Create qmd on the left; push "Render" and submit HTML on the right.
 
 R for Data Science --- Hadley Wickham et al.
 : <https://r4ds.hadley.nz>
-: [Book](https://amzn.to/2tbRmVc)
+: [Paperback](https://amzn.to/4cpL6w8)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 Older versions

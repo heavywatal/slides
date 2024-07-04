@@ -1048,7 +1048,7 @@ anscombe |> tibble::rowid_to_column("id")   # add ID first
 
 R for Data Science --- Hadley Wickham et al.
 : <https://r4ds.hadley.nz>,
-  [Paperback](https://amzn.to/2tbRmVc),
+  [Paperback](https://amzn.to/4cpL6w8),
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>

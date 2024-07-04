@@ -1241,9 +1241,9 @@ Other versions
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
    石川由希 2022 名古屋大学
 
-R for Data Science --- Hadley Wickham and Garrett Grolemund
-: <https://r4ds.had.co.nz/>,
-  [Book](https://amzn.to/2tbRmVc),
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>
+  [Paperback](https://amzn.to/4cpL6w8),
   [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020

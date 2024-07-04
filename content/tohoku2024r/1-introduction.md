@@ -405,9 +405,9 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 - やれば上達する。どんどん楽になる！
 
 <figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/data-science.png" width="750">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<a href="https://r4ds.hadley.nz/intro">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
 
@@ -546,10 +546,10 @@ source("https://example.com/sice/report.R")
 "Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
 
 <figure style="margin: 0;">
-<a href="https://r4ds.had.co.nz/workflow-projects.html">
+<a href="https://r4ds.hadley.nz/workflow-scripts.html#fig-blank-slate">
 <img src="/slides/image/rstudio/preferences-workspace.png"
   style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
-<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/workflow-scripts.html#fig-blank-slate</figcaption>
 </a>
 </figure>
 
@@ -1203,9 +1203,9 @@ library(tidyverse)  # 一挙に読み込み
 一貫したデザインでデータ解析の様々な工程をカバー
 
 <figure style="margin-block: 0;">
-<a href="https://r4ds.had.co.nz/introduction.html">
+<a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="800">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
 
@@ -1265,9 +1265,9 @@ library(tidyverse)  # 一挙に読み込み
 1. 報告、発表
 
 <figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
+<a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
 
@@ -1287,9 +1287,9 @@ library(tidyverse)  # 一挙に読み込み
 ---
 ## Reference
 
-R for Data Science --- Hadley Wickham and Garrett Grolemund
-: https://r4ds.had.co.nz/
-: [Book](https://amzn.to/2tbRmVc)
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>
+: [Paperback](https://amzn.to/4cpL6w8)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020

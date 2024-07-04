@@ -330,10 +330,10 @@ data(package = "nycflights13")
 そのラベルも合わせて移動。
 
 <figure>
-<a href="https://r4ds.had.co.nz/tidy-data.html#longer">
+<a href="https://r4ds.hadley.nz/data-tidy.html#sec-pivoting">
 <img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#longer</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/data-tidy.html#sec-pivoting</figcaption>
 </a>
 </figure>
 
@@ -440,10 +440,10 @@ relig_long = relig_income[1:2, 1:4] |> print() |>
 そのラベルを列の名前にする。
 
 <figure>
-<a href="https://r4ds.had.co.nz/tidy-data.html#wider">
+<a href="https://r4ds.hadley.nz/data-tidy.html#widening-data">
 <img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="840">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/data-tidy.html#widening-data</figcaption>
 </a>
 </figure>
 
@@ -1009,9 +1009,9 @@ anscombe |> tibble::rowid_to_column("id")   # IDをつけておく
 ---
 ## Reference
 
-R for Data Science --- Hadley Wickham and Garrett Grolemund
-: <https://r4ds.had.co.nz/>,
-  [Paperback](https://amzn.to/2tbRmVc),
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/4cpL6w8),
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>

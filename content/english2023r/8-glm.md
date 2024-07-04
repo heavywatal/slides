@@ -1129,7 +1129,7 @@ Just repeat forgetting and searching.
 
 R for Data Science --- Hadley Wickham et al.
 : <https://r4ds.hadley.nz>,
-  [Paperback](https://amzn.to/2tbRmVc),
+  [Paperback](https://amzn.to/4cpL6w8),
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 Official documents:

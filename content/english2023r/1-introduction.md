@@ -1231,7 +1231,7 @@ Just repeat forgetting and searching.
 
 R for Data Science --- Hadley Wickham et al.
 : <https://r4ds.hadley.nz>
-: [Book](https://amzn.to/2tbRmVc)
+: [Paperback](https://amzn.to/4cpL6w8)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020

@@ -78,9 +78,9 @@ dpi = 108
 1. 報告、発表 ⬜ Quarto楽しい
 
 <figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
+<a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
 
@@ -91,9 +91,9 @@ dpi = 108
 情報の整理 → **正しい解析・新しい発見・仮説生成**
 
 <figure>
-<a href="https://r4ds.had.co.nz/explore-intro.html">
+<a href="https://r4ds.hadley.nz/whole-game">
 <img src="/slides/image/r4ds/data-science-explore.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/whole-game</figcaption>
 </a>
 </figure>
 
@@ -215,7 +215,7 @@ dpi = 108
 - **1セル**は1つの**値**
 
 <cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
+<a class="url" href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>
 </cite>
 
 
@@ -328,9 +328,9 @@ library(tidyverse)  # 一挙に読み込み
 一貫したデザインでデータ解析の様々な工程をカバー
 
 <figure style="margin-block: 0;">
-<a href="https://r4ds.had.co.nz/introduction.html">
+<a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
 </a>
 </figure>
 
@@ -1249,9 +1249,9 @@ result = diamonds |>
 ---
 ## Reference
 
-R for Data Science --- Hadley Wickham and Garrett Grolemund
-: <https://r4ds.had.co.nz/>,
-  [Paperback](https://amzn.to/2tbRmVc),
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/4cpL6w8),
   [日本語版書籍](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
