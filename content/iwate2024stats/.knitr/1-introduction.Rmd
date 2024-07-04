@@ -154,6 +154,7 @@ AとBには差がありそう。
 #| fig.width: 11
 #| fig.height: 4
 #| echo: false
+set.seed(19937)
 n = 20
 df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
 df2 = dplyr::bind_rows(
@@ -202,6 +203,7 @@ pcol = p0 + aes(x = 0) +
   geom_col(data = df_mean, fill = "#999999") +
   stat_summary(fun.data = wtl::mean_sd, geom = "linerange")
 
+set.seed(1)
 cowplot::plot_grid(nrow = 2L,
   pcol + coord_one,
   p0 + geom_boxplot() + coord_one,
@@ -311,7 +313,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 &nbsp;
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1100"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1200"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -356,7 +358,7 @@ diamonds |>
 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="1200">
 <figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
 </a>
 </figure>
@@ -375,7 +377,7 @@ diamonds |>
 ## 回帰は教師あり機械学習の一種とも言える
 
 <figure>
-<img src="../tokiomarine2021/regression-in-ml.drawio.svg" width="1000">
+<img src="../tokiomarine2021/regression-in-ml.drawio.svg" width="1200">
 </figure>
 
 でも統計モデリングはいわゆる“機械学習”とは違う気もする...?
@@ -385,7 +387,7 @@ diamonds |>
 ## モデリングにおける2つのアプローチ
 
 <figure>
-<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1100"><br>
+<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1200"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -433,15 +435,33 @@ diamonds |>
 をベースに回帰分析の概要を紹介。
 
 1. イントロ 👈 いまここ
-1. Rの基礎を駆け足で
 1. 統計モデルの基本
     - 直線回帰
-    - 確率変数・**確率分布** 👈 次回の主役
+    - 確率変数・**確率分布** 👈 本日の主役
     - 尤度・最尤推定
 1. 一般化線形モデル、混合モデル
 1. ベイズ統計（、階層ベイズモデル）
 
-<!-- 回帰のキモは**線ではなく分布** -->
+回帰のキモは**線ではなく分布**
+
+
+---
+## 余裕があれば、手元でRを動かして体感しよう！
+
+1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
+    ```r
+    head(iris)
+    ```
+1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
+    `Error` や `Warning` があったらよく読んで対処する。<br>
+1.  🔰若葉マークの練習問題があれば解いてみる。<br>
+    そこまでのコードの**コピペ＋改変**でできるはず。
+
+<br>
+<hr>
+
+Rの基礎、データ前処理、データ可視化などについては別資料を参照:<br>
+<https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html>
 
 
 
@@ -469,35 +489,6 @@ diamonds |>
 
 他のプログラミング言語でもいいよ:
 [Python](https://www.python.org/)とか[Julia](https://julialang.org/)とか。
-
-
----
-## この実習の取り組み方
-
-とにかく手を動かして体感しよう！
-
-1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
-    ```r
-    head(iris)
-    ```
-1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
-    `Error` や `Warning` があったらよく読んで対処する。<br>
-    (無視していい `Warning` もたまーにあるけど)
-1.  🔰若葉マークの練習問題があれば解いてみる。<br>
-    そこまでのコードの**コピペ＋改変**でできるはず。
-
-疑問・困りごとがある場合は**気軽にChat欄に**書き込んでください。
-
-
----
-## [Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2022/)は別の講義で
-
-2022年9月に開講。おそらくe-なんとかで視聴可能。
-
-<iframe width="100%" height="600" src="../tmd2022/"></iframe>
-
-2023年もおそらく同じ時期に開講予定...?
-
 
 
 ---
@@ -554,7 +545,6 @@ diamonds |>
 
 ```{r, df-linear}
 #| echo: false
-#| cache: true
 set.seed(19937)
 n = 50
 df_weight = tibble::tibble(
@@ -586,6 +576,7 @@ p_weight
 #| echo: false
 #| fig.height: 5
 #| fig.width: 5
+set.seed(19937)
 df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
   dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
 p_weight +
@@ -645,6 +636,7 @@ cowplot::plot_grid(nrow = 1L,
 #| echo: false
 #| fig.height: 5
 #| fig.width: 10
+set.seed(19937)
 n = 200
 df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) |>
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
@@ -755,7 +747,7 @@ ggplot(df) +
 fit = lm(data = mpg, formula = hwy ~ displ)
 coef(fit)
 
-mpg_added = modelr::add_predictions(mpg, fit)
+mpg_added = modelr::add_predictions(mpg, fit, type = "response")
 ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
   geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
 ```
@@ -1483,12 +1475,12 @@ runif(6L)
 ```{r, try-prng}
 #| eval: false
 n = 100
-x = sample.int(6, n, replace = TRUE)
-x = runif(n, min = 0, max = 1)
-x = rgeom(n, prob = 0.5)
-x = rbinom(n, size = 3, prob = 0.5)
-x = rpois(n, lambda = 10)
-x = rnorm(n, mean = 50, sd = 10)
+x = sample.int(6, n, replace = TRUE)  # 一様分布(整数)
+x = runif(n, min = 0, max = 1)        # 一様分布
+x = rgeom(n, prob = 0.5)              # 幾何分布
+x = rbinom(n, size = 3, prob = 0.5)   # 二項分布
+x = rpois(n, lambda = 10)             # ポアソン分布
+x = rnorm(n, mean = 50, sd = 10)      # 正規分布
 print(x)
 
 p1 = ggplot(data.frame(x)) + aes(x)
@@ -1524,13 +1516,12 @@ table(x)
 をベースに回帰分析の概要を紹介。
 
 1. イントロ
-1. Rの基礎を駆け足で
 1. 統計モデルの基本
     - 直線回帰
     - 確率変数・**確率分布** 👈 ここまでやった
     - 尤度・最尤推定
 1. 一般化線形モデル、混合モデル
-1. ベイズ統計、階層ベイズモデル
+1. ベイズ統計（、階層ベイズモデル）
 
 回帰のキモは**線ではなく分布**
 

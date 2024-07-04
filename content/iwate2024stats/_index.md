@@ -44,14 +44,14 @@ draft = false
     - macOS Sonoma (≥14.5)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
 1.  <https://cran.r-project.org/>
-    から最新版の **R本体(≥ 4.4.0)** をダウンロードしてインストール。
+    から最新版の **R本体(≥ 4.4.1)** をダウンロードしてインストール。
     OK連打のデフォルト設定で。
     古いものが既に入っている場合は念のため削除してから。
     - [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.*.*-win.exe`
     - [Mac](https://cran.r-project.org/bin/macosx/)
       → `R-4.*.*-arm64.pkg` (Apple Silicon) or `R-4.*.*.pkg` (Intel)
 1.  <https://posit.co/download/rstudio-desktop/>
-    から最新版の **RStudio (≥ 2024.04.1)** をダウンロードしてインストール。
+    から最新版の **RStudio (≥ 2024.04.2)** をダウンロードしてインストール。
     古いものが既に入っている場合は念のため削除してから。
 1.  開発者ツールをインストール。
     ここでは必須ではないけどいずれ使うことになる。
@@ -74,7 +74,7 @@ draft = false
     ```
     
     ```
-    ── Attaching core tidyverse packages ────────────────────────── tidyverse 2.0.0 ──
+    ── Attaching core tidyverse packages ────────── tidyverse 2.0.0 ──
     ✔ dplyr     1.1.4     ✔ readr     2.1.5
     ✔ forcats   1.0.0     ✔ stringr   1.5.1
     ✔ ggplot2   3.5.1     ✔ tibble    3.2.1
