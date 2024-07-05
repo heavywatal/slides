@@ -80,17 +80,17 @@ diamonds |>
   </div>
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
-  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
+  <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="840">
   <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
   </a>
   </div>
 </div>
 
-目的や状況に応じて使い分けよう。
-
 外れ値に対する応答
 : もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
   → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+目的や状況に応じて使い分けよう。
 
 ---
 ## ばらつきを捉える記述統計量
@@ -104,7 +104,7 @@ Percentile, Quantile (四分位)
 : 中央値 = 50th percentile = 第二四分位(Q2)
 
 ```{r, quantile}
-#| fig.width: 10
+#| fig.width: 12
 #| fig.height: 4
 #| echo: false
 df = tibble::tibble(x = rnorm(200)) |>
@@ -125,8 +125,8 @@ p_box = ggplot(df) + aes(x) +
   geom_boxplot() +
   geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
   geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
-  geom_text(data = dfq, aes(y = -0.75, label = name), size = 5) +
-  geom_text(data = dfq, aes(y = -0.95, label = percent), size = 5) +
+  geom_text(data = dfq, aes(y = -0.78, label = name), size = 6) +
+  geom_text(data = dfq, aes(y = -1.0, label = percent), size = 6) +
   coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
   theme_void()
 cowplot::plot_grid(p_hist, p_box, ncol = 1L)
@@ -136,13 +136,13 @@ cowplot::plot_grid(p_hist, p_box, ncol = 1L)
 ## ばらつきの様子は大小の判断にも重要
 
 <div class="column-container" style="padding-left: 10px;">
-<div class="column" style="flex-shrink: 1.1;">
+<div class="column" style="flex-shrink: 1;">
 観測値1つずつ。<br>
 たまたまかも。
 </div>
 <div class="column" style="flex-shrink: 1;">
-ばらつき大きい。<br>
-Bが高いのもたまたま?
+群内のばらつき大きい。<br>
+群間の差は微妙か。
 </div>
 <div class="column" style="flex-shrink: 1;">
 ばらつき小さい。<br>
@@ -151,7 +151,7 @@ AとBには差がありそう。
 </div>
 
 ```{r, comparison}
-#| fig.width: 11
+#| fig.width: 12
 #| fig.height: 4
 #| echo: false
 set.seed(19937)
@@ -187,8 +187,8 @@ cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
 
 ```{r, visualize-distribution}
 #| echo: false
-#| fig.width: 9
-#| fig.height: 6
+#| fig.width: 11
+#| fig.height: 7
 df = mpg |> dplyr::mutate(y = hwy)
 df_mean = df |> dplyr::summarize(y = mean(y))
 p0 = ggplot(df) + aes(y = y) +
@@ -555,12 +555,12 @@ df_weight = tibble::tibble(
 ```
 ```{r, weight-height}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 5
+#| fig.height: 5.5
+#| fig.width: 5.5
 p_weight = ggplot(df_weight) +
   aes(height, weight) +
   geom_point(alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid = element_blank())
 p_weight
 ```
@@ -574,8 +574,8 @@ p_weight
 
 ```{r, weight-lines}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 5
+#| fig.height: 5.5
+#| fig.width: 5.5
 set.seed(19937)
 df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
   dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
@@ -591,8 +591,8 @@ p_weight +
 
 ```{r, weight-residual}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 10
+#| fig.height: 5.5
+#| fig.width: 11
 predict_weight = function(parameters, data) {
   parameters[1] + parameters[2] * data$height
 }
@@ -634,8 +634,8 @@ cowplot::plot_grid(nrow = 1L,
 
 ```{r, weight-goodlines}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 10
+#| fig.height: 5.5
+#| fig.width: 11
 set.seed(19937)
 n = 200
 df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) |>
@@ -665,8 +665,8 @@ cowplot::plot_grid(p_ab, p2, nrow = 1L)
 
 ```{r, weight-grid}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 10
+#| fig.height: 5.5
+#| fig.width: 11
 df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) |>
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
 
@@ -694,8 +694,8 @@ result$par
 
 ```{r, weight-lm}
 #| echo: false
-#| fig.height: 3.7
-#| fig.width: 3.7
+#| fig.height: 4
+#| fig.width: 4
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
@@ -742,8 +742,8 @@ ggplot(df) +
 ## 🔰 ほかのデータでも `lm()` を試してみよう
 
 ```{r, lm-mpg}
-#| fig.height: 2.5
-#| fig.width: 2.5
+#| fig.height: 3
+#| fig.width: 3
 fit = lm(data = mpg, formula = hwy ~ displ)
 coef(fit)
 
@@ -771,8 +771,8 @@ df_pois = tibble::tibble(
 ```
 ```{r, lm-bad}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 5
+#| fig.height: 5.5
+#| fig.width: 5.5
 x_breaks = c(0.5, 1.0, 1.5)
 coeff = lm(num_seeds ~ body_mass, data = df_pois)$coefficients
 df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
@@ -799,8 +799,8 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 
 ```{r, glm-better}
 #| echo: false
-#| fig.height: 5
-#| fig.width: 10
+#| fig.height: 5.5
+#| fig.width: 11
 p_lm = p_pois +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
@@ -856,15 +856,15 @@ e.g., サイコロを12回投げた結果、学生1000人の身長
 
 ```{r, distribution}
 #| echo: false
-#| fig.height: 4
-#| fig.width: 8
+#| fig.height: 4.4
+#| fig.width: 8.8
 set.seed(19937)
 p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
   ggplot() +
   aes(face) +
   geom_bar(aes(y = after_stat(prop))) +
   scale_x_continuous(breaks = seq_len(6L)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -874,7 +874,7 @@ p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) |>
   ggplot() +
   aes(height) +
   geom_histogram(aes(y = after_stat(density)), binwidth = 1, boundary = 0) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(), axis.ticks = element_blank())
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
@@ -896,8 +896,8 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 ```{r, dbinom}
 #| echo: false
-#| fig.height: 3
-#| fig.width: 3
+#| fig.height: 3.5
+#| fig.width: 3.5
 size = 3L
 p = 0.5
 tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) |>
@@ -905,7 +905,7 @@ tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) |>
   aes(X, Prob) +
   geom_col() +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -932,7 +932,7 @@ k &\in \{0, 1, 2, \ldots, n\}
 ```{r, rbinom}
 #| echo: false
 #| fig.height: 3
-#| fig.width: 11
+#| fig.width: 12
 set.seed(19937)
 size = 3L
 p = 0.5
@@ -950,7 +950,7 @@ df_rbinom |>
   geom_col() +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
   facet_wrap(vars(Repl), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -994,7 +994,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="960"><br>
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -1049,7 +1049,7 @@ dplyr::bind_rows(df_coin, df_dice) |>
   geom_col() +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
   facet_grid(cols = vars(group), scale = "free_x", space = "free_x") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -1066,7 +1066,7 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 ```{r, geometric}
 #| echo: false
 #| fig.height: 4
-#| fig.width: 11
+#| fig.width: 12
 df = purrr::map(c(0.2, 0.5, 0.9), \(p) {
   tibble::tibble(p, X = seq(0, 25), Prob = dgeom(X, p))
 }) |>
@@ -1079,7 +1079,7 @@ ggplot(df) +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
   geom_col() +
   facet_grid(cols = vars(p), scales = "free_x", space = "free_x", labeller = label_both) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -1100,7 +1100,7 @@ n = 1 のとき幾何分布と一致。
 ```{r, nbinom}
 #| echo: false
 #| fig.height: 3.8
-#| fig.width: 11
+#| fig.width: 12
 p = 0.5
 df = purrr::map(seq.int(1, 3), function(n) {
   tibble::tibble(X = seq.int(0, 10), Prob = dnbinom(X, n, p), n = n)
@@ -1112,7 +1112,7 @@ ggplot(df) +
   geom_col() +
   facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
   labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -1138,7 +1138,7 @@ ggplot(df) +
 ```{r, dbinom-n}
 #| echo: false
 #| fig.height: 4
-#| fig.width: 11
+#| fig.width: 12
 p = 0.25
 df = purrr::map(2**seq.int(0, 4), \(n) {
   tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, p), n = n)
@@ -1150,7 +1150,7 @@ ggplot(df) +
   geom_col() +
   facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
   labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -1170,8 +1170,8 @@ e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の�
 
 ```{r, dpoisson}
 #| echo: false
-#| fig.height: 4
-#| fig.width: 11
+#| fig.height: 3.9
+#| fig.width: 12
 set.seed(19937)
 lambda = c(1, 5, 10)
 .arrow = grid::arrow(length = unit(0.1, "inches"), type = "closed")
@@ -1186,7 +1186,7 @@ p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
   scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
   scale_y_continuous(limits = c(0.5, 3.5), breaks = NULL) +
   labs(y = NULL, x = "time (space)") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     axis.text.y = element_blank(), axis.ticks = element_blank(), panel.border = element_blank(),
     panel.grid.minor = element_blank(), legend.position = "top"
@@ -1197,7 +1197,7 @@ p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) |>
   ggplot() +
   aes(X, Prob) +
   geom_col(aes(fill = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -1222,14 +1222,14 @@ e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間�
 
 ```{r, dexp}
 #| echo: false
-#| fig.height: 4
-#| fig.width: 11
+#| fig.height: 3.9
+#| fig.width: 12
 p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   dplyr::mutate(Prob = dexp(x, rate = lambda)) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -1255,14 +1255,14 @@ e.g., メッセージを2つ受信するまでの待ち時間
 
 ```{r, dgamma}
 #| echo: false
-#| fig.height: 4
-#| fig.width: 11
+#| fig.height: 3.9
+#| fig.width: 12
 p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   dplyr::mutate(Prob = dgamma(x, rate = lambda, shape = 3)) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -1287,7 +1287,7 @@ e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれ�
 ```{r, gaussian}
 #| echo: false
 #| fig.height: 5
-#| fig.width: 11
+#| fig.width: 12
 ci = qnorm(c(0.005, 0.025, 0.975, 0.995), 50, 10)
 tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
   ggplot() +
@@ -1299,7 +1299,7 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
   geom_area(data = function(.x) {
     dplyr::filter(.x, dplyr::between(x, ci[1], ci[4]))
   }, alpha = 0.4) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -1319,7 +1319,7 @@ e.g., 一様分布 [0, 100) から40サンプル
 ```{r, central-limit}
 #| echo: false
 #| fig.height: 3
-#| fig.width: 11
+#| fig.width: 12
 set.seed(19937)
 n = 40L
 X = replicate(10000L, mean(runif(n, 0, 100)))
@@ -1331,7 +1331,7 @@ purrr::map(c(10, 100, 1000, 10000), \(n) {
   aes(X) +
   geom_histogram(bins = 25) +
   facet_wrap(vars(Repl), nrow = 1L, scale = "free_y", labeller = label_both) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1343,7 +1343,7 @@ purrr::map(c(10, 100, 1000, 10000), \(n) {
 ```{r, binom-normal}
 #| echo: false
 #| fig.height: 3
-#| fig.width: 11
+#| fig.width: 12
 purrr::map(c(1, 4, 16, 64, 256), \(n) {
   tibble::tibble(X = seq(0, n), Prob = dbinom(X, n, 0.25), n = n) |>
     dplyr::filter(Prob > 1e-5)
@@ -1353,7 +1353,7 @@ purrr::map(c(1, 4, 16, 64, 256), \(n) {
   aes(X, Prob) +
   geom_col(width = 1) +
   facet_wrap(vars(n), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1368,7 +1368,7 @@ purrr::map(c(1, 4, 16, 64, 256), \(n) {
 ```{r, poisson-normal}
 #| echo: false
 #| fig.height: 2.5
-#| fig.width: 11
+#| fig.width: 12
 purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
   tibble::tibble(X = seq(0, 4 * lambda), Prob = dpois(X, lambda), lambda) |>
     dplyr::filter(Prob > 1e-5)
@@ -1378,7 +1378,7 @@ purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
   aes(X, Prob) +
   geom_col(width = 1) +
   facet_wrap(vars(lambda), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1389,8 +1389,8 @@ purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
 
 ```{r, gamma-normal}
 #| echo: false
-#| fig.height: 4
-#| fig.width: 11
+#| fig.height: 3.8
+#| fig.width: 12
 .guide = guide_legend(reverse = TRUE, label.position = "left", label.hjust = 1)
 tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
   dplyr::mutate(Prob = dgamma(x, rate = k / 10, shape = k)) |>
@@ -1535,7 +1535,7 @@ table(x)
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
-- 「[進化学実習2023](/slides/tohoku2024r/)」
+- 「[進化学実習2024](/slides/tohoku2024r/)」
   東北大学 理学部生物学科 (2024-04)
 - 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
   石川由希 2023 名古屋大学

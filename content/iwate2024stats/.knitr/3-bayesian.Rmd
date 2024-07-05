@@ -43,13 +43,13 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
   geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#56B4E9") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -92,7 +92,7 @@ df_coin |>
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
   geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#56B4E9") +
   facet_wrap(vars(label), nrow = 1L) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -107,7 +107,7 @@ df_coin |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
   facet_wrap(vars(label), nrow = 1L) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -268,34 +268,34 @@ devnull = tibble::tibble(
 
 ```{r, prior-beta}
 #| include: false
-#| fig.width: 3
-#| fig.height: 3
+#| fig.width: 3.2
+#| fig.height: 3.2
 prior_beta = df_coin |>
   dplyr::filter(i == 0) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
   coord_cartesian(ylim = c(0, 3)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 prior_beta + labs(title = "Prior")
 ```
 ```{r, likelihood-binom}
 #| include: false
-#| fig.width: 3
-#| fig.height: 3
+#| fig.width: 3.2
+#| fig.height: 3.2
 df_coin |>
   dplyr::filter(i == 4) |>
   dplyr::mutate(Lik = exp(logLik)) |>
   ggplot() + aes(p, Lik) +
   geom_line(color = "#56B4E9", linewidth = 2) +
   labs(title = "Likelihood") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
 ```{r, posterior-beta}
 #| include: false
-#| fig.width: 3
-#| fig.height: 3
+#| fig.width: 3.2
+#| fig.height: 3.2
 prior_beta %+%
   (df_coin |> dplyr::filter(i == 4)) +
   labs(title = "Posterior")
@@ -434,7 +434,7 @@ df_density = tibble::tibble(
   p = seq(0, 1, 0.001),
   Density = dbeta(p, n_head, n_total - n_head))
 
-.theme = theme_minimal(base_size = 18) + theme(
+.theme = theme_minimal(base_size = 20) + theme(
   panel.grid.minor = element_blank(),
   panel.grid.major.y = element_blank(),
   axis.text = element_blank())
@@ -520,7 +520,7 @@ cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
     - 広がり具合によって不確実性も表現できる。
     - **逐次学習**で尖っていき、確信が強まる。
 
-<img `r src_alt_fig_chunk("coin-bayesian")` width="70%">
+<img `r src_alt_fig_chunk("coin-bayesian")` width="75%">
 
 <hr>
 
@@ -535,7 +535,7 @@ cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
 ## MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo
 
 <a href="https://en.wikipedia.org/wiki/Andrey_Markov">
-<img src="../tokiomarine2021/image/AAMarkov.jpg" height="240" align="right"></a>
+<img src="../tokiomarine2021/image/AAMarkov.jpg" height="270" align="right"></a>
 
 マルコフ連鎖
 : 次の時点の挙動が現在の値だけで決定されるような確率過程。
@@ -546,13 +546,13 @@ cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
 モンテカルロ法
 : 乱数を用いた計算方法の総称。
 : <a href="https://en.wikipedia.org/wiki/Monte_Carlo_Casino">
-  <img src="../tokiomarine2021/image/Real_Monte_Carlo_Casino.jpg" height="300"></a>
+  <img src="../tokiomarine2021/image/Real_Monte_Carlo_Casino.jpg" height="320"></a>
   <a href="https://en.wikipedia.org/wiki/Stanislaw_Ulam">
-  <img src="../tokiomarine2021/image/Stanislaw_Ulam.jpg" height="300"></a>
+  <img src="../tokiomarine2021/image/Stanislaw_Ulam.jpg" height="320"></a>
   <a href="https://en.wikipedia.org/wiki/John_von_Neumann">
-  <img src="../tokiomarine2021/image/John_von_Neumann.jpg" height="300"></a>
+  <img src="../tokiomarine2021/image/John_von_Neumann.jpg" height="320"></a>
   <a href="https://en.wikipedia.org/wiki/Nicholas_Metropolis">
-  <img src="../tokiomarine2021/image/Nicholas_Metropolis.png" height="300"></a>
+  <img src="../tokiomarine2021/image/Nicholas_Metropolis.png" height="320"></a>
 
 ???
 スタニスワフ・ウラムがソリテアの成功率を考えてた時に思いついて、
@@ -586,8 +586,8 @@ $4 \times \frac {318} {400} = 3.18$
 
 ```{r, circle}
 #| echo: false
-#| fig.width: 4
-#| fig.height: 4
+#| fig.width: 4.2
+#| fig.height: 4.2
 set.seed(19937)
 .n = 200L
 .theta = seq(0, 2 * pi, length.out = 100)
@@ -690,8 +690,8 @@ n_total = 20
 ```
 ```{r, metropolis}
 #| echo: false
-#| fig.width: 11
-#| fig.height: 3.5
+#| fig.width: 12
+#| fig.height: 3.6
 .logLik = function(p) dbinom(n_head, n_total, p, log = TRUE)
 .delta = 0.02
 df_point = tibble::tibble(p = seq(0.48, 0.64, .delta), logLik = .logLik(p))
@@ -721,7 +721,7 @@ df_point |>
     position = position_nudge(0, -0.009), arrow = .ar2, alpha = 0.33) +
   geom_point(size = 6, alpha = 0.6, shape = 16) +
   labs(x = expression(theta)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -772,7 +772,7 @@ p_traj = df_traj |>
   geom_line(linewidth = 0.8, alpha = 0.66) +
   coord_cartesian(xlim = c(0, .n), ylim = c(0, 1)) +
   labs(title = "traceplot", y = expression(theta), x = "iterations") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 p_hist = df_traj |>
@@ -780,7 +780,7 @@ p_hist = df_traj |>
   geom_bar() +
   coord_flip(xlim = c(0, 1)) +
   labs(title = "MCMC samples") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         axis.title.y = element_blank(), axis.text.y = element_blank())
 
@@ -806,7 +806,7 @@ for (i in seq.int(40, .n, 40)) {
 #| include: false
 #| fig.width: 3.5
 #| fig.height: 3.5
-.theme = theme_bw(base_size = 18) +
+.theme = theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(), panel.border = element_blank())
 
@@ -916,7 +916,7 @@ p_trace = ggplot(df_trace) + aes(t, p, group = init) +
   scale_color_discrete(guide = NULL) +
   labs(title = "traceplot", y = expression(theta), x = "iterations") +
   coord_cartesian(ylim = c(0, 1)) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
 p_hist = df_trace |>
@@ -925,7 +925,7 @@ p_hist = df_trace |>
   geom_bar(aes(fill = init), position = position_stack(reverse = TRUE)) +
   coord_flip(xlim = c(0, 1)) +
   labs(title = "MCMC samples") +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
         axis.title.y = element_blank(), axis.text.y = element_blank(),
         legend.position = "none")
@@ -1024,7 +1024,7 @@ myplot_trace = function(fit) {
   bayesplot::mcmc_trace(fit$draws("lambda")) +
     scale_color_discrete(guide = "none") +
     labs(title = ifelse(s[["rhat"]] < 1.05, "Good", "Bad"), subtitle = stats) +
-    theme_bw(base_size = 18) +
+    theme_bw(base_size = 20) +
     theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
       axis.title.y = element_blank(), axis.text.y = element_blank())
 }
