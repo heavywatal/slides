@@ -363,59 +363,6 @@ get_likelihood = function(p, k = 3, n = 10) {
 get_likelihood(0.2)
 ```
 
----
-## 🔰 分布を当てはめる練習問題
-
-1. データの分布を描いてみる
-1. 理論分布のどれが当てはまりそうか検討する
-1. 理論分布を適当なパラメータで描いてみる
-1. 尤度を計算しつつ擦り寄せる
-
-```{r, distribution-datasets}
-#| include: false
-fs::dir_create("../data")
-
-set.seed(19937)
-n = 600L
-rate = 2.5
-df = tibble::tibble(
-  time = cumsum(rexp(n, rate)),
-  label = sample(LETTERS[1:3], n, replace = TRUE)
-)
-readr::write_tsv(df, "../data/radiation.tsv")
-
-set.seed(19937)
-n = 600L
-trials = 10
-p = 0.1
-df = tibble::tibble(
-  trials,
-  hit = rbinom(n, trials, p)
-)
-readr::write_csv(df, "../data/gacha.csv")
-```
-
-<div class="column-container">
-  <div class="column">
-
-[`radiation.tsv`](data/radiation.tsv)
-```{r, radiation-tsv}
-#| echo: false
-readr::read_tsv("../data/radiation.tsv")
-```
-
-  </div>
-  <div class="column">
-
-[`gacha.csv`](data/gacha.csv)
-```{r, gacha-csv}
-#| echo: false
-readr::read_csv("../data/gacha.csv")
-```
-
-  </div>
-</div>
-
 
 ---
 ## ちょっとずつ線形モデルを発展させていく
@@ -1135,66 +1082,8 @@ ggplot(df_fit_wh) +
 #| cache.vars: []
 ```
 
----
-## 🔰 重回帰
+そのほかの練習問題は末尾に。
 
-`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
-とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
-
-```{r, generate-df-beer}
-#| ref.label: "df-beer"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 ロジスティック回帰
-
-次ページにヒント。
-
-```{r, generate-df-logistic}
-#| ref.label: "df-logistic"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## ロジスティック回帰のヒント
-
-左辺の応答変数に指定できるのはだいたい次の2種類:
-- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
-- 1列目が成功回数、2列目が失敗回数の整数matrix
-
-今回の場合、成功回数 `y` だけをformulaに入れると怒られる
-```{r, logistic-error}
-#| error: true
-glm(y ~ x, df_logistic, family = binomial)
-```
-ので失敗回数もモデルに含むよう `response ~ x` とする。
-
-(今回のように試行回数が10回固定じゃなくても使える、ということ)
-
-
----
-## 🔰 共分散分析: GLM with 質的変数 + 量的変数
-
-まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
-
-```{r, generate-df-ancova}
-#| ref.label: "df-ancova"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 交互作用
-
-
-```{r, generate-df-interact}
-#| ref.label: "df-interact"
-#| echo: -1
-#| cache.vars: []
-```
 
 ---
 ## データはひとつ、モデルはたくさん
@@ -1330,15 +1219,15 @@ p_plant = df_plant |>
 p_null = p_plant +
   labs(title = "null model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-           label = labels[["null"]], color = "#3366ff", size = 7)
+           label = labels[["null"]], color = "#3366ff", size = 8)
 p_x = p_plant %+% modelr::add_predictions(df_plant, models$x, type = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-           label = labels[["x"]], color = "#3366ff", size = 7)
+           label = labels[["x"]], color = "#3366ff", size = 8)
 p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated, type = "response") +
   labs(title = "saturated model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-           label = labels[["saturated"]], color = "#3366ff", size = 7)
+           label = labels[["saturated"]], color = "#3366ff", size = 8)
 
 cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ```
@@ -1382,23 +1271,24 @@ p_plant = df_plant |>
   ggplot() + aes(x, y) +
   geom_line(aes(y = pred), linewidth = 1.5, alpha = 0.6) +
   geom_point(shape = 16, alpha = 0.6) +
+  annotate("point", x = 9, y = 16, alpha = 0) +
   theme_bw(base_size = 19) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
   labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["null"]], color = "#3366ff", size = 7)
 p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x, type = "response")) +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x"]], color = "#3366ff", size = 7)
 p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2, type = "response")) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x2"]], color = "#3366ff", size = 7)
 p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both, type = "response")) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["both"]], color = "#3366ff", size = 7)
 
 cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ```
@@ -1443,18 +1333,18 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(models))
 p_null = p_plant +
   labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["null"]], color = "#3366ff", size = 7)
 p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x, type = "response")) +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x"]], color = "#3366ff", size = 7)
 p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2, type = "response")) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x2"]], color = "#3366ff", size = 7)
 p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both, type = "response")) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["both"]], color = "#3366ff", size = 7)
 cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ```
 
@@ -1508,232 +1398,6 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 - 尤度は「手元のデータへのあてはまり」
 - モデルを比較するときは情報量基準を参考にする
 
-
-
----
-## penguinsデータセット
-
-<a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
-<img src="/slides/image/rstats/lter_penguins.png" width="45%">
-<img src="/slides/image/rstats/culmen_depth.png" width="45%">
-</a>
-
-```r
-install.packages("palmerpenguins")
-library(palmerpenguins)
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
-print(penguins)
-```
-```{r, penguins}
-#| include: false
-withr::local_package("palmerpenguins")
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
-```
-
----
-## penguinsデータセット
-
-<a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
-<img src="/slides/image/rstats/lter_penguins.png" width="45%">
-<img src="/slides/image/rstats/culmen_depth.png" width="45%">
-</a>
-
-```{r, penguins-print}
-#| echo: false
-print(penguins)
-```
-
----
-## 欠損値のある行を取り除いておく
-
-性別はとりあえず使わないので、体長関連だけでも。
-
-```{r, penguins-dropna}
-penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
-penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
-dim(penguins_dropna)
-```
-
----
-## 🔰 penguinsでGLMの練習
-
-次の課題を解いてみよう。<br>
-(次ページ以降に解答。まずは自力で。)
-
-1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
-1. 単回帰して、切片と傾きを求める。そして作図。
-1. `species` で色分けして作図。
-1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
-1. 余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。
-
-
----
-## 単回帰の練習: 1. まず作図
-
-どうやら、重いペンギンほど翼長も長い。
-
-```{r, penguins-weight}
-#| fig.height: 4.5
-#| fig.width: 4.5
-p_penweight = ggplot(penguins_dropna) +
-  aes(body_mass_g, flipper_length_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-p_penweight
-```
-
-
----
-## 単回帰の練習: 2. モデル作成、フィッティング
-
-とりあえずデフォルトの正規分布・恒等リンク。
-$y = 136.7 + 0.0153 x$
-
-```{r, penguins-fit1}
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
-broom::tidy(fit1)
-broom::glance(fit1)
-```
-
----
-## 単回帰の練習: 3. フィッティング結果を作図
-
-結果とデータから予測値を作って回帰線を引く。
-
-```{r, penguins-weight-glm}
-#| fig.height: 5
-#| fig.width: 5
-added1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
-p1 = p_penweight +
-  geom_line(aes(y = pred), data = added1, linewidth = 1, color = "#3366ff")
-p1
-```
-
----
-## 重回帰の練習: 1. まず作図
-
-種によって色分けしてみると、傾向の違いが見える。
-
-```{r, penguins-weight-sp}
-#| fig.height: 5
-#| fig.width: 7
-p_penweight_color = p_penweight + aes(color = species) +
-  scale_color_manual(values = penguins_colors)
-p_penweight_color
-```
-
-
----
-## 重回帰の練習: 2. モデル作成、フィッティング
-
-Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
-体重の効果は単回帰のとき(0.0153)より小さい。
-
-```{r, penguins-fit2}
-fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
-broom::tidy(fit2)
-broom::glance(fit2)
-```
-
----
-## 重回帰の練習: 3. フィッティング結果を作図
-
-```{r, penguins-weight-sp-glm}
-#| fig.height: 5
-#| fig.width: 7
-added2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
-p2 = p_penweight_color +
-  geom_line(aes(y = pred), data = added2, linewidth = 1)
-p2
-```
-
-**傾き**も種によって違うかも。**交互作用**を入れてみたい。
-
-
----
-## 交互作用の練習: モデル作成、フィッティング
-
-Adelieを基準に、Chinstrapの傾きが結構違う。<br>
-切片の違いは解釈しにくくなった。
-
-```{r, penguins-fit3}
-fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
-broom::tidy(fit3)
-broom::glance(fit3)
-```
-
----
-## 交互作用の練習: フィッティング結果を作図
-
-```{r, penguins-interaction}
-#| fig.height: 5
-#| fig.width: 7
-added3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
-p3 = p_penweight_color +
-  geom_line(aes(y = pred), data = added3, linewidth = 1)
-p3
-```
-
----
-## ここまでの3つのモデルでどれがいいか？
-
-AICで選ぶなら交互作用入り重回帰が良さそう。
-
-```{r, penguins-aic}
-#| fig.height: 4
-#| fig.width: 11
-labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
-cowplot::plot_grid(p1 + labs(title = labels[1]),
-                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
-                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
-```
-
-
----
-## 余裕があったら追加の練習
-
-🔰クチバシの長さと深さで同じ解析をやってみよう。
-
-```{r, penguins-bill}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-#| cache.vars: [p_bill]
-p_bill = penguins_dropna |>
-  ggplot() + aes(bill_length_mm, bill_depth_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
-  scale_color_manual(values = penguins_colors) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank())
-
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
-d1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
-d2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
-d3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
-p1 = p_bill + geom_line(aes(y = pred), d1, linewidth = 1, color = "#3366ff")
-p2 = p_bill + aes(color = species) + geom_line(aes(y = pred), d2, linewidth = 1)
-p3 = p_bill + aes(color = species) + geom_line(aes(y = pred), d3, linewidth = 1)
-labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
-cowplot::plot_grid(p1 + labs(title = labels[1]),
-                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
-                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
-```
-
-```{r, penguins-multiple}
-#| echo: false
-#| include: false
-fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
-broom::tidy(fit4)
-broom::glance(fit4)
-added4 = modelr::add_predictions(penguins, fit4)
-p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
-  scale_color_discrete()
-```
 
 
 ---
@@ -2174,6 +1838,318 @@ e.g.,<br>
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
+
+`r .meta$next_link`
+
+
+
+
+
+
+
+---
+## penguinsデータセット
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```r
+install.packages("palmerpenguins")
+library(palmerpenguins)
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+print(penguins)
+```
+```{r, penguins}
+#| include: false
+withr::local_package("palmerpenguins")
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+```
+
+---
+## penguinsデータセット
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+```{r, penguins-print}
+#| echo: false
+print(penguins)
+```
+
+---
+## 欠損値のある行を取り除いておく
+
+性別はとりあえず使わないので、体長関連だけでも。
+
+```{r, penguins-dropna}
+penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
+penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+dim(penguins_dropna)
+```
+
+---
+## 🔰 penguinsでGLMの練習
+
+次の課題を解いてみよう。<br>
+(次ページ以降に解答。まずは自力で。)
+
+1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
+1. 単回帰して、切片と傾きを求める。そして作図。
+1. `species` で色分けして作図。
+1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
+1. 余裕があれば、クチバシの長さと深さを縦横軸にして同様の解析。
+
+
+---
+## 単回帰の練習: 1. まず作図
+
+どうやら、重いペンギンほど翼長も長い。
+
+```{r, penguins-weight}
+#| fig.height: 4.5
+#| fig.width: 4.5
+p_penweight = ggplot(penguins_dropna) +
+  aes(body_mass_g, flipper_length_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+p_penweight
+```
+
+
+---
+## 単回帰の練習: 2. モデル作成、フィッティング
+
+とりあえずデフォルトの正規分布・恒等リンク。
+$y = 136.7 + 0.0153 x$
+
+```{r, penguins-fit1}
+fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
+broom::tidy(fit1)
+broom::glance(fit1)
+```
+
+---
+## 単回帰の練習: 3. フィッティング結果を作図
+
+結果とデータから予測値を作って回帰線を引く。
+
+```{r, penguins-weight-glm}
+#| fig.height: 5
+#| fig.width: 5
+added1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
+p1 = p_penweight +
+  geom_line(aes(y = pred), data = added1, linewidth = 1, color = "#3366ff")
+p1
+```
+
+---
+## 重回帰の練習: 1. まず作図
+
+種によって色分けしてみると、傾向の違いが見える。
+
+```{r, penguins-weight-sp}
+#| fig.height: 5
+#| fig.width: 7
+p_penweight_color = p_penweight + aes(color = species) +
+  scale_color_manual(values = penguins_colors)
+p_penweight_color
+```
+
+
+---
+## 重回帰の練習: 2. モデル作成、フィッティング
+
+Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+体重の効果は単回帰のとき(0.0153)より小さい。
+
+```{r, penguins-fit2}
+fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
+broom::tidy(fit2)
+broom::glance(fit2)
+```
+
+---
+## 重回帰の練習: 3. フィッティング結果を作図
+
+```{r, penguins-weight-sp-glm}
+#| fig.height: 5
+#| fig.width: 7
+added2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
+p2 = p_penweight_color +
+  geom_line(aes(y = pred), data = added2, linewidth = 1)
+p2
+```
+
+**傾き**も種によって違うかも。**交互作用**を入れてみたい。
+
+
+---
+## 交互作用の練習: モデル作成、フィッティング
+
+Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+切片の違いは解釈しにくくなった。
+
+```{r, penguins-fit3}
+fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
+broom::tidy(fit3)
+broom::glance(fit3)
+```
+
+---
+## 交互作用の練習: フィッティング結果を作図
+
+```{r, penguins-interaction}
+#| fig.height: 5
+#| fig.width: 7
+added3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
+p3 = p_penweight_color +
+  geom_line(aes(y = pred), data = added3, linewidth = 1)
+p3
+```
+
+---
+## ここまでの3つのモデルでどれがいいか？
+
+AICで選ぶなら交互作用入り重回帰が良さそう。
+
+```{r, penguins-aic}
+#| fig.height: 4
+#| fig.width: 11
+labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
+cowplot::plot_grid(p1 + labs(title = labels[1]),
+                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
+                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
+```
+
+
+---
+## 余裕があったら追加の練習
+
+🔰クチバシの長さと深さで同じ解析をやってみよう。
+
+```{r, penguins-bill}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+#| cache.vars: [p_bill]
+p_bill = penguins_dropna |>
+  ggplot() + aes(bill_length_mm, bill_depth_mm) +
+  geom_point(shape = 16, alpha = 0.66) +
+  scale_color_manual(values = penguins_colors) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+
+fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
+fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
+fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
+d1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
+d2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
+d3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
+p1 = p_bill + geom_line(aes(y = pred), d1, linewidth = 1, color = "#3366ff")
+p2 = p_bill + aes(color = species) + geom_line(aes(y = pred), d2, linewidth = 1)
+p3 = p_bill + aes(color = species) + geom_line(aes(y = pred), d3, linewidth = 1)
+labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
+cowplot::plot_grid(p1 + labs(title = labels[1]),
+                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
+                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
+```
+
+```{r, penguins-multiple}
+#| echo: false
+#| include: false
+fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
+broom::tidy(fit4)
+broom::glance(fit4)
+added4 = modelr::add_predictions(penguins, fit4)
+p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
+  scale_color_discrete()
+```
+
+
+---
+## 🔰 重回帰
+
+`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
+とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
+
+```{r, generate-df-beer}
+#| ref.label: "df-beer"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 ロジスティック回帰
+
+次ページにヒント。
+
+```{r, generate-df-logistic}
+#| ref.label: "df-logistic"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## ロジスティック回帰のヒント
+
+左辺の応答変数に指定できるのはだいたい次の2種類:
+- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
+- 1列目が成功回数、2列目が失敗回数の整数matrix
+
+今回の場合、成功回数 `y` だけをformulaに入れると怒られる
+```{r, logistic-error}
+#| error: true
+glm(y ~ x, df_logistic, family = binomial)
+```
+ので失敗回数もモデルに含むよう `response ~ x` とする。
+
+(今回のように試行回数が10回固定じゃなくても使える、ということ)
+
+
+---
+## 🔰 共分散分析: GLM with 質的変数 + 量的変数
+
+まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
+
+```{r, generate-df-ancova}
+#| ref.label: "df-ancova"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 交互作用
+
+
+```{r, generate-df-interact}
+#| ref.label: "df-interact"
+#| echo: -1
+#| cache.vars: []
+```
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- 「[進化学実習2024](/slides/tohoku2024r/)」
+  東北大学 理学部生物学科 (2024-04)
+- 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
+  石川由希 2023 名古屋大学
+- 「[統計モデリング概論 DSHC 2023](/slides/tokiomarine2023/)」
+  東京海上 [DSHC](https://tokiomarine-dshc.com/) (2023-08)
 
 `r .meta$next_link`
 
