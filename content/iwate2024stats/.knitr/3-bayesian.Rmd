@@ -42,7 +42,7 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#56B4E9") +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
 
@@ -90,7 +90,7 @@ df_coin |>
   ggplot() + aes(p, logLik) +
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), color = "#56B4E9") +
+  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
@@ -893,7 +893,7 @@ for (i in seq.int(2L, nrow(df_gibbs), 2L)) {
   df_i = head(df_gibbs, i)
   p = p_tile +
     geom_path(data = df_i, color = "#56B4E9", alpha = 0.66, linewidth = 1) +
-    geom_point(data = df_i, color = "#56B4E9", alpha = 0.66, shape = 16)
+    geom_point(data = df_i, color = "#56B4E9", alpha = 0.66, shape = 16, size = 2)
   print(p)
 }
 ```

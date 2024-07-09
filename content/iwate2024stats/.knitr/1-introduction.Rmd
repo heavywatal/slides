@@ -559,7 +559,7 @@ df_weight = tibble::tibble(
 #| fig.width: 5.5
 p_weight = ggplot(df_weight) +
   aes(height, weight) +
-  geom_point(alpha = 0.5) +
+  geom_point(size = 3, alpha = 0.5, shape = 16) +
   theme_bw(base_size = 22) +
   theme(panel.grid = element_blank())
 p_weight
@@ -580,7 +580,7 @@ set.seed(19937)
 df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
   dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
 p_weight +
-  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
+  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", linewidth = 1, alpha = 0.5)
 ```
 
 
@@ -616,8 +616,8 @@ stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
 
 p1 = p_weight %+%
   add_pred_weight(df_weight, param1) +
-  geom_line(aes(y = pred), color = "#3366ff") +
-  geom_linerange(aes(ymin = weight, ymax = pred), color = "#E69F00")
+  geom_line(aes(y = pred), color = "#3366ff", linewidth = 1) +
+  geom_linerange(aes(ymin = weight, ymax = pred), color = "#E69F00", linewidth = 1, alpha = 0.8)
 p2 = p1 %+%
   (df_weight |> modelr::add_predictions(lm_weight))
 cowplot::plot_grid(nrow = 1L,
@@ -644,15 +644,15 @@ p_ab = ggplot(df_ab_random) +
   aes(intercept, slope) +
   geom_point(data = function(x) {
     dplyr::filter(x, rank(rss) < 6)
-  }, shape = 1, size = 4) +
-  geom_point(aes(color = log10(rss))) +
+  }, shape = 1, size = 6) +
+  geom_point(aes(color = log10(rss)), shape = 16, size = 3) +
   theme_bw(base_size = 20) +
   theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
 
 df_randmin = df_ab_random |> dplyr::slice_min(rss, n = 5)
 p2 = p_weight + geom_abline(
   aes(slope = slope, intercept = intercept),
-  data = df_randmin, color = "#3366ff", alpha = 0.5
+  data = df_randmin, color = "#3366ff", alpha = 0.5, linewidth = 1
 )
 cowplot::plot_grid(p_ab, p2, nrow = 1L)
 ```
@@ -675,7 +675,7 @@ p1 = p_ab %+% df_ab_grid
 df_gridmin = df_ab_grid |> dplyr::slice_min(rss, n = 5)
 p2 = p_weight + geom_abline(
   aes(slope = slope, intercept = intercept),
-  data = df_gridmin, color = "#3366ff", alpha = 0.5
+  data = df_gridmin, color = "#3366ff", alpha = 0.5, linewidth = 1
 )
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
@@ -1181,7 +1181,7 @@ p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
   ggplot() +
   aes(time, y) +
   annotate("segment", x = -0.1, xend = 3.1, y = 1:3, yend = 1:3, linewidth = 2, arrow = .arrow, linejoin = "mitre") +
-  geom_point(aes(color = lambda, fill = lambda), size = 8, shape = 124, key_glyph = draw_key_rect) +
+  geom_point(aes(color = lambda, fill = lambda), size = 10, shape = 124, key_glyph = draw_key_rect) +
   scale_color_continuous(guide = NULL) +
   scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
   scale_y_continuous(limits = c(0.5, 3.5), breaks = NULL) +
