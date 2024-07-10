@@ -43,14 +43,16 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
   geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+  theme(panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
 
 tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, 2, 4)) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+  theme(panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
 ```
 
   </div>
@@ -91,9 +93,11 @@ df_coin |>
   geom_line() +
   geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
   geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+  theme(panel.spacing.x = grid::unit(1, "lines"),
+        panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
 ```
 
 **ベイズ推定**: 確率分布がどんどん尖り、確信が強まる
@@ -106,9 +110,11 @@ df_coin |>
   dplyr::filter(i %in% coin_show) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+  theme(panel.spacing.x = grid::unit(1, "lines"),
+        panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
 ```
 
 ---
@@ -274,9 +280,10 @@ prior_beta = df_coin |>
   dplyr::filter(i == 0) |>
   ggplot() + aes(p, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   coord_cartesian(ylim = c(0, 3)) +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+  theme(panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
 prior_beta + labs(title = "Prior")
 ```
 ```{r, likelihood-binom}
@@ -288,9 +295,10 @@ df_coin |>
   dplyr::mutate(Lik = exp(logLik)) |>
   ggplot() + aes(p, Lik) +
   geom_line(color = "#56B4E9", linewidth = 2) +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   labs(title = "Likelihood") +
   theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank())
+  theme(panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
 ```
 ```{r, posterior-beta}
 #| include: false
@@ -376,7 +384,7 @@ prior_beta %+%
 
 データを加えるたびに更新していける:
 
-<img `r src_alt_fig_chunk("coin-bayesian")` width="85%">
+<img `r src_alt_fig_chunk("coin-bayesian")` width="90%">
 
 ---
 ## 共役事前分布
@@ -520,7 +528,7 @@ cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
     - 広がり具合によって不確実性も表現できる。
     - **逐次学習**で尖っていき、確信が強まる。
 
-<img `r src_alt_fig_chunk("coin-bayesian")` width="75%">
+<img `r src_alt_fig_chunk("coin-bayesian")` width="80%">
 
 <hr>
 
@@ -807,13 +815,14 @@ for (i in seq.int(40, .n, 40)) {
 #| fig.width: 3.5
 #| fig.height: 3.5
 .theme = theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+  theme(panel.grid.minor.y = element_blank(), axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(), panel.border = element_blank())
 
 p_lik = tibble::tibble(p = seq(0, 1, 0.01), Lik = dbinom(n_head, n_total, p, log = FALSE)) |>
   ggplot() + aes(p, Lik) +
   geom_hline(yintercept = 0) +
   geom_line(linewidth = 2) +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   labs(title = "Likelihood", x = expression(theta)) +
   .theme
 
@@ -821,6 +830,7 @@ p_dens = tibble::tibble(p = seq(0, 1, 0.01), Density = dbeta(p, n_head, n_total 
   ggplot() + aes(p, Density) +
   geom_hline(yintercept = 0) +
   geom_area(alpha = 0.5) +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   labs(title = "Posterior", x = expression(theta)) +
   .theme
 
@@ -828,6 +838,7 @@ p_hist = df_traj |> tail(-100) |>
   ggplot() + aes(p) +
   geom_hline(yintercept = 0) +
   geom_bar() +
+  scale_x_continuous(breaks = c(0, 0.5, 1)) +
   coord_cartesian(xlim = c(0, 1)) +
   labs(title = "MCMC samples", x = expression(theta), y = "Count") +
   .theme
@@ -1052,7 +1063,7 @@ p_no = myplot_trace(fit_no)
 cowplot::plot_grid(p_yes, p_no, nrow = 1L)
 ```
 
-[`diagnose()`](https://mc-stan.org/docs/cmdstan-guide/diagnose.html)
+[`diagnose()`](https://mc-stan.org/docs/cmdstan-guide/diagnose_utility.html)
 みたいな機能が提供されていれば利用する。
 
 実行時に[警告してもらえること](https://mc-stan.org/misc/warnings.html)もある。
@@ -1549,7 +1560,7 @@ bayesplot::ppc_ribbon(y = df_lm[["y"]], yrep = yrep,
 
 
 ---
-## 変数と[ブロック](6-bayesian.html#/37)をうまく使って可読性アップ
+## 変数とブロックをうまく使って可読性アップ
 
 途中計算に名前をつけることでモデルが読みやすくなる:
 
@@ -1859,7 +1870,7 @@ tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) |>
 ---
 ## 🔰 Stanで一般化線形モデル
 
-[GLM回のデータ](3-glm.html#/31)をStanでモデリングしてみよう。
+GLM回のデータをStanでモデリングしてみよう。
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 2.0;">
@@ -2013,7 +2024,7 @@ model {
 
 <img `r src_alt_fig_chunk("penguins-interaction")` height="300">
 
-[第3回GLM回](3-glm.html#/51)を参照。
+GLMの練習を参照しつつ。
 
 ---
 ## 🔰 Stanでpenguinsの回帰分析をしてみよう

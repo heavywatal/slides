@@ -53,6 +53,8 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 .meta$footnote = .meta$data |> dplyr::filter(this) |>
   dplyr::pull(date) |> as.Date() |>
   paste0(" 岩手大学 連合農学研究科<br>")
+.meta$href_prev = with(.meta$data, {outfile[id[this] - 1]})
+.meta$href_next = with(.meta$data, {outfile[id[this] + 1]})
 .meta$next_link = '<a href="{outfile}" class="readmore">\n{id}. {linktitle}\n</a>' |>
   stringr::str_glue(.envir = dplyr::filter(.meta$data, id == id[this] + 1))
 .meta$front_matter = .meta$data |>
