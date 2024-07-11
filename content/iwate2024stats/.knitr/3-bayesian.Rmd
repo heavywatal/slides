@@ -121,13 +121,13 @@ df_coin |>
 ## 確率おさらい
 
 同時分布/結合確率: <span style="font-weight: normal;"> <span style="color: #E69F00;">A</span>かつ<span style="color: #0072B2;">B</span>の確率</span>
-: $\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \cap \textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A}) \text{Prob}(\textcolor{#0072B2}{B})$
+: $\Pr(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B}) = \Pr(\textcolor{#E69F00}{A} \cap \textcolor{#0072B2}{B}) = \Pr(\textcolor{#E69F00}{A}) \Pr(\textcolor{#0072B2}{B})$
 
 周辺確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>によらず<span style="color: #E69F00;">A</span>になる確率</span>
-: $\text{Prob}(\textcolor{#E69F00}{A}) = \sum_{\textcolor{#0072B2}{B}} \text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})$
+: $\Pr(\textcolor{#E69F00}{A}) = \sum_{\textcolor{#0072B2}{B}} \Pr(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})$
 
 条件付き確率: <span style="font-weight: normal;"> <span style="color: #0072B2;">B</span>である条件の下で<span style="color: #E69F00;">A</span>になる確率。重要。</span>
-: $\text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\text{Prob}(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\text{Prob}(\textcolor{#0072B2}{B})}$
+: $\Pr(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B}) = \frac {\Pr(\textcolor{#E69F00}{A}, \textcolor{#0072B2}{B})} {\Pr(\textcolor{#0072B2}{B})}$
 
 ```{r, venn}
 #| echo: false
@@ -152,11 +152,11 @@ ggplot() + aes(x, y) +
 ## 条件付き確率がよくわかる具体例
 
 <span style="color: #0072B2;">B Brewery</span>のビールが<span style="color: #E69F00;">Awesome</span>な確率
-: $\text{Prob}(\textcolor{#E69F00}{\text{Awesome}} \mid \textcolor{#0072B2}{\text{B Brewery}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}})}$
+: $\Pr(\textcolor{#E69F00}{\text{Awesome}} \mid \textcolor{#0072B2}{\text{B Brewery}}) = \frac {\Pr(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\Pr(\textcolor{#0072B2}{\text{B Brewery}})}$
 : かなり高い確率。良い醸造所。
 
 <span style="color: #E69F00;">Awesome</span>なビールが<span style="color: #0072B2;">B Brewery</span>のものである確率
-: $\text{Prob}(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\text{Prob}(\textcolor{#E69F00}{\text{Awesome}})}$
+: $\Pr(\textcolor{#0072B2}{\text{B Brewery}} \mid \textcolor{#E69F00}{\text{Awesome}}) = \frac {\Pr(\textcolor{#E69F00}{\text{Awesome}},~\textcolor{#0072B2}{\text{B Brewery}})} {\Pr(\textcolor{#E69F00}{\text{Awesome}})}$
 : かなり低い確率。Awesomeなビールはほかにもたっくさんある。
 
 <img `r src_alt_fig_chunk("venn")`>
@@ -166,7 +166,7 @@ ggplot() + aes(x, y) +
 ## ベイズの定理
 
 乗法定理
-: $\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$
+: $\Pr(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \Pr(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\Pr(\textcolor{#0072B2}{B}) = \Pr(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\Pr(\textcolor{#E69F00}{A})$
 
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
 <img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="200" align="right"></a>
@@ -176,11 +176,11 @@ ggplot() + aes(x, y) +
 
 宴会場にビールが運ばれてきた。これはどこのブルワリーの？
 
-事前確率: $\text{Prob}(\textcolor{#0072B2}{B})$
+事前確率: $\Pr(\textcolor{#0072B2}{B})$
 : 飲む前、手元のビールが<span style="color: #0072B2;">B Brewery</span>のである確率。
 : ↓ 🍻 飲んでみて更新
 
-事後確率: $\text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$
+事後確率: $\Pr(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})$
 : 飲んでみて<span style="color: #E69F00;">Awesome</span>だったビールが
   <span style="color: #0072B2;">B Brewery</span>のである確率。
 
@@ -188,23 +188,23 @@ ggplot() + aes(x, y) +
 ---
 ## ベイズの定理 in 感染症検査
 
-- 有病率 $\text{Prob}(I)$ : 0.3% (この地域の感染者の割合; 事前確率)
-- 感度 $\text{Prob}(P \mid I)$ : 90% (感染してる人に陽性判定が出る)
-- 特異度 $\text{Prob}(\lnot P \mid \lnot I)$: 99% (感染してない人に陰性判定が出る)
+- 有病率 $\Pr(I)$ : 0.3% (この地域の感染者の割合; 事前確率)
+- 感度 $\Pr(P \mid I)$ : 90% (感染してる人に陽性判定が出る)
+- 特異度 $\Pr(\lnot P \mid \lnot I)$: 99% (感染してない人に陰性判定が出る)
 
 さて、陽性適中率(検査陽性の人が実際に感染者である確率)は？
 
 <div>\[\begin{split}
-\text{Prob}(I \mid P)
-  &= \frac {\text{Prob}(P \mid I)~\text{Prob}(I)} {\text{Prob}(P)} \\
-  &= \frac {\text{Prob}(P \mid I)~\text{Prob}(I)}
-           {\text{Prob}(P \mid I)~\text{Prob}(I) + \text{Prob}(P \mid \lnot I)~\text{Prob}(\lnot I)} \\
+\Pr(I \mid P)
+  &= \frac {\Pr(P \mid I)~\Pr(I)} {\Pr(P)} \\
+  &= \frac {\Pr(P \mid I)~\Pr(I)}
+           {\Pr(P \mid I)~\Pr(I) + \Pr(P \mid \lnot I)~\Pr(\lnot I)} \\
   &= \frac {0.9 \times 0.003} {0.9 \times 0.003 + 0.01 \times 0.997} \approx 0.21
 \end{split}\]</div>
 
 感染者を隔離するスクリーニング目的では使いものにならない性能。
 
-🔰 同様に $\text{Prob}(\lnot I \mid \lnot P)$ 陰性的中率を計算してみよう<br>
+🔰 同様に $\Pr(\lnot I \mid \lnot P)$ 陰性的中率を計算してみよう<br>
 🔰 計算結果が検査性能だけでなく有病率にも依存することを確認しよう
 
 ```{r, infection-test}
@@ -237,9 +237,9 @@ devnull = tibble::tibble(
 **周辺尤度**は「確率分布の積分は1」を満たすための正規化定数とみなせる。<br>
 比例関係だけ抜き出してこう書くことが多い:
 <div>\[\begin{align}
-\text{Prob}(M \mid D) &\propto \text{Prob}(D \mid M)~\text{Prob}(M) \tag{Model}\\
-\text{Prob}(H \mid D) &\propto \text{Prob}(D \mid H)~\text{Prob}(H) \tag{Hypothesis} \\
-\text{Prob}(\theta \mid D) &\propto \text{Prob}(D \mid \theta)~\text{Prob}(\theta) \tag{Parameter}
+\Pr(M \mid D) &\propto \Pr(D \mid M)~\Pr(M) \tag{Model}\\
+\Pr(H \mid D) &\propto \Pr(D \mid H)~\Pr(H) \tag{Hypothesis} \\
+\Pr(\theta \mid D) &\propto \Pr(D \mid \theta)~\Pr(\theta) \tag{Parameter}
 \end{align}\]</div>
 
 
@@ -548,7 +548,7 @@ cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
 マルコフ連鎖
 : 次の時点の挙動が現在の値だけで決定されるような確率過程。
 : $\ldots \to X_{t - 2} \to X_{t - 1} \to X_{t} \to X_{t + 1}$
-: $\text{Prob}(X_{t+1} \mid X_{t}, X_{t-1}, X_{t-2}, \ldots) = \text{Prob}(X_{t+1} \mid X_{t})$
+: $\Pr(X_{t+1} \mid X_{t}, X_{t-1}, X_{t-2}, \ldots) = \Pr(X_{t+1} \mid X_{t})$
 : e.g., すごろく
 
 モンテカルロ法
@@ -1156,9 +1156,9 @@ $\;\propto\;$
 実行の前後にRを再起動してまっさらにすることを推奨。
 
 1. C++言語を扱うためのツールを用意。
-    - <img height=24 width=24 src="https://cdn.simpleicons.org/apple"></img>
+    - <iconify-icon icon="mdi:apple"></iconify-icon>
       macOS: Command Line Tools (`xcode-select --install`)
-    - <img height=24 width=24 src="https://cdn.simpleicons.org/windows"></img>
+    - <iconify-icon icon="mdi:microsoft"></iconify-icon>
       Windows: [RTools](https://cran.r-project.org/bin/windows/Rtools/)
       (Rのバージョンに合わせる)
 1. [CmdStanR](https://mc-stan.org/cmdstanr/)パッケージをインストール。
@@ -2277,7 +2277,7 @@ df_beer_od = tibble::tibble(
 ---
 ## ベイズ推定まとめ
 
-- 条件付き確率 $\text{Prob}(B \mid A)$ の理解が大事。
+- 条件付き確率 $\Pr(B \mid A)$ の理解が大事。
     - 事後分布 $\propto$ 尤度 ⨉ 事前分布
     - 確信度合いをデータで更新していく。
 - 推定結果は分布そのもの。
