@@ -584,7 +584,7 @@ ggplot(diamonds) + aes(carat, price) +
 # scale_color_distiller(palette = "YlGnBu")
 ```
 
-![plot of chunk scale-color-continous](./figure/scale-color-continous-1.png)![plot of chunk scale-color-continous](./figure/scale-color-continous-2.png)
+![plot of chunk scale-color-continuous](./figure/scale-color-continuous-1.png)![plot of chunk scale-color-continuous](./figure/scale-color-continuous-2.png)
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
 - continuous: `scale_color_viridis_c()`, `scale_color_distiller()`
