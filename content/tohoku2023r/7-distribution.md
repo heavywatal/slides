@@ -473,7 +473,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
   </div>
   <div class="column" style="padding-top: 10px;">
 \[\begin{split}
-\text{Prob}(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+\Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
 k &\in \{0, 1, 2, \ldots, n\}
 \end{split}\]
   </div>
@@ -591,7 +591,7 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 ![plot of chunk geometric](./figure/geometric-1.png)
 
 \\[
-\text{Prob}(X = k \mid p) = p (1 - p)^k
+\Pr(X = k \mid p) = p (1 - p)^k
 \\]
 
 「初めて成功するまでの試行回数」とする定義もある。
@@ -606,7 +606,7 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 ![plot of chunk dbinom-n](./figure/dbinom-n-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\Pr(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \\]
 
 🔰 二項分布になりそうな例を考えてみよう
@@ -621,7 +621,7 @@ n = 1 のとき幾何分布と一致。
 ![plot of chunk nbinom](./figure/nbinom-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \\]
 
 失敗回数ではなく試行回数を変数とする定義もある。
@@ -643,7 +643,7 @@ e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の�
 ![plot of chunk dpoisson](./figure/dpoisson-1.png)
 
 \\[
-\text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\Pr(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \\]
 
 二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
@@ -660,7 +660,7 @@ e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間�
 ![plot of chunk dexp](./figure/dexp-1.png)
 
 \\[
-\text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
+\Pr(x \mid \lambda) = \lambda e^{-\lambda x}
 \\]
 
 幾何分布の連続値版。
@@ -678,7 +678,7 @@ e.g., メッセージを2つ受信するまでの待ち時間
 ![plot of chunk dgamma](./figure/dgamma-1.png)
 
 \\[
-\text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\Pr(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \\]
 
 指数分布をkのぶん右に膨らませた感じ。<br>
@@ -694,7 +694,7 @@ e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれ�
 ![plot of chunk gaussian](./figure/gaussian-1.png)
 
 \\[
-\text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\Pr(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
 \\]
 
 ---
@@ -851,7 +851,7 @@ p1 + geom_bar()       # for discrete values
 
 **あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
 定義通り素直に書くと<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
 $L(M \mid D)$
@@ -868,14 +868,14 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか
 表が出る確率 $p = 0.5$ と仮定:
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.5) ^ 4 \times \Pr(\text{裏} \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 
 表が出る確率 $p = 0.8$ と仮定:
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.8) ^ 4 \times \Pr(\text{裏} \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 
@@ -892,7 +892,7 @@ $p = 0.8$ のほうがより尤もらしい。
 
 <div>\[\begin{split}
 L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \Pr(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 
@@ -963,7 +963,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
     - **少ないパラメータ** $\theta$ でばらつきの様子を表現
     - **この現象はこの分布を作りがち(〜に従う)** という知見がある
 - **尤度**
-    - あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$
+    - あるモデルでこのデータになる確率 $\Pr(D \mid M)$
     - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
     - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
     - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**

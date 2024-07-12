@@ -157,7 +157,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 ## ロジスティック回帰
 
 - 確率分布: **二項分布**
-- リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$
+- リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
 
 何かの成否に対する何かの因子の影響、とか
 
@@ -169,7 +169,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 
@@ -194,7 +194,7 @@ Xが1増えるとオッズがe^a倍に増える。
 ## ロジスティック回帰 (狭義)
 
 - 確率分布: **ベルヌーイ分布** ($n = 1$ の二項分布)
-- リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$
+- リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
 
 何かの成否に対する何かの因子の影響、とか
 
@@ -206,7 +206,7 @@ Xが1増えるとオッズがe^a倍に増える。
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
   &= \text{Binomial}(1,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 
@@ -384,7 +384,7 @@ $\log(\lambda_i)$
 : 説明変数の効果が**掛け算**的に働く。<br>
   e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる
 
-$\text{logit}(p_i)$
+$\operatorname{logit}(p_i)$
 : $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)
 : 説明変数の効果が**頭打ち**になる。<br>
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
@@ -677,7 +677,7 @@ df_interact = tibble::tibble(
 ## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
 
 **あるモデル$M$の下でそのデータ$D$が観察される確率**:<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
 $L(M \mid D)$
@@ -1218,7 +1218,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
   + z_{1i} + \ldots \\
 z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
 \end{split}\]</p>

@@ -95,7 +95,7 @@ dpi = 100
 
 **あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
 定義通り素直に書くと<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
 $L(M \mid D)$
@@ -112,14 +112,14 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか
 表が出る確率 $p = 0.5$ と仮定:
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.5) ^ 4 \times \Pr(\text{裏} \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 
 表が出る確率 $p = 0.8$ と仮定:
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.8) ^ 4 \times \Pr(\text{裏} \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 
@@ -136,7 +136,7 @@ $n = 50$個体ぶん、且つ、且つ、且つ、と確率を掛けていく:
 
 <div>\[\begin{split}
 L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \Pr(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 
@@ -207,7 +207,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
     - **少ないパラメータ** $\theta$ でばらつきの様子を表現
     - **この現象はこの分布を作りがち(〜に従う)** という知見がある
 - **尤度**
-    - あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$
+    - あるモデルでこのデータになる確率 $\Pr(D \mid M)$
     - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
     - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
     - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**
@@ -383,7 +383,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 ## ロジスティック回帰
 
 - 確率分布: **二項分布**
-- リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$
+- リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
 
 何かの成否に対する何かの因子の影響、とか
 
@@ -395,7 +395,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 
@@ -420,7 +420,7 @@ Xが1増えるとオッズがe^a倍に増える。
 ## ロジスティック回帰 (狭義)
 
 - 確率分布: **ベルヌーイ分布** ($n = 1$ の二項分布)
-- リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$
+- リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
 
 何かの成否に対する何かの因子の影響、とか
 
@@ -432,7 +432,7 @@ Xが1増えるとオッズがe^a倍に増える。
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
   &= \text{Binomial}(1,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 
@@ -611,7 +611,7 @@ $\log(\lambda_i)$
 : 説明変数の効果が**掛け算**的に働く。<br>
   e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる
 
-$\text{logit}(p_i)$
+$\operatorname{logit}(p_i)$
 : $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)
 : 説明変数の効果が**頭打ち**になる。<br>
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
@@ -904,7 +904,7 @@ df_interact = tibble::tibble(
 ## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
 
 **あるモデル$M$の下でそのデータ$D$が観察される確率**:<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
 $L(M \mid D)$
@@ -1456,7 +1456,7 @@ n = 1 のとき幾何分布と一致。
 ![plot of chunk nbinom](./figure/nbinom-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \\]
 
 失敗回数ではなく試行回数を変数とする定義もある。
@@ -1473,7 +1473,7 @@ n = 1 のとき幾何分布と一致。
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
   + z_{1i} + \ldots \\
 z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
 \end{split}\]</p>

@@ -99,7 +99,7 @@ dpi = 100
 
 **あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
 定義通り素直に書くと<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
 $L(M \mid D)$
@@ -116,14 +116,14 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか
 表が出る確率 $p = 0.5$ と仮定:
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.5) ^ 4 \times \Pr(\text{裏} \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 
 表が出る確率 $p = 0.8$ と仮定:
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.8) ^ 4 \times \Pr(\text{裏} \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 
@@ -140,7 +140,7 @@ $n = 50$個体ぶん、且つ、且つ、且つ、と確率を掛けていく:
 
 <div>\[\begin{split}
 L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \Pr(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 
@@ -211,7 +211,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
     - **少ないパラメータ** $\theta$ でばらつきの様子を表現
     - **この現象はこの分布を作りがち(〜に従う)** という知見がある
 - **尤度**
-    - あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$
+    - あるモデルでこのデータになる確率 $\Pr(D \mid M)$
     - データ固定でモデル探索 → **尤度関数** $L(M \mid D),~L(\theta \mid D)$
     - 対数を取ったほうが扱いやすい → **対数尤度** $\log L(M \mid D)$
     - これを最大化するようなパラメータ $\hat \theta$ 探し ＝ **最尤法**

@@ -150,7 +150,7 @@ Let's see other **probability distributions** and **link functions** →
 ## Logistic regression
 
 - Probability distribution: **binomial distribution**
-- Link function: $\text{logit}(p) = \log \frac {p} {1 - p}$
+- Link function: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
 
 estimates the probability of event occurrence based on some variables.
 
@@ -162,7 +162,7 @@ $p_i$ varies by temperature $x_i$.
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 
@@ -187,7 +187,7 @@ Xが1増えるとオッズがe^a倍に増える。
 ## Logistic regression (narrow sense)
 
 - Probability distribution: **Bernoulli distribution** (binomial with $n = 1$)
-- Link function: $\text{logit}(p) = \log \frac {p} {1 - p}$
+- Link function: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
 
 estimates the probability of event occurrence based on some variables.
 
@@ -199,7 +199,7 @@ Buckets sells better on windy days.
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
   &= \text{Binomial}(1,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 
@@ -371,7 +371,7 @@ $\log(\lambda_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : The effects of expl. variables are **multiplicative**.<br>
   e.g., adding $\Delta x_1$ brings multiplying $e^{\beta_1 \Delta x_{1}}$.
 
-$\text{logit}(p_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
+$\operatorname{logit}(p_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (logistic function)
 : The effects of expl. variables are **plateaued**.<br>
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
@@ -662,7 +662,7 @@ There should be some measures for goodness-of-fit...
 ## Likelihood: a measure for goodness-of-fit
 
 The probability to observe the data $D$ given the model $M$.<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 **Likelihood function** is the same probability from different viewpoints:
 

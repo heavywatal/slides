@@ -164,7 +164,7 @@ n = 1 のとき幾何分布と一致。
 ![plot of chunk nbinom](./figure/nbinom-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \\]
 
 失敗回数ではなく試行回数を変数とする定義もある。
@@ -181,7 +181,7 @@ n = 1 のとき幾何分布と一致。
 
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
   + z_{1i} + \ldots \\
 z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
 \end{split}\]</p>

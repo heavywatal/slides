@@ -297,7 +297,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
   </div>
   <div class="column" style="padding-top: 10px;">
 \[\begin{split}
-\text{Prob}(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+\Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
 k &\in \{0, 1, 2, \ldots, n\}
 \end{split}\]
   </div>
@@ -416,7 +416,7 @@ e.g., How many tails before first head with a coin?
 ![plot of chunk geometric](./figure/geometric-1.png)
 
 \\[
-\text{Prob}(X = k \mid p) = p (1 - p)^k
+\Pr(X = k \mid p) = p (1 - p)^k
 \\]
 
 There is another definition: $X$ trials until the first success.
@@ -433,7 +433,7 @@ $X$ failures before the n-th success with success probability $p$ for each trial
 ![plot of chunk nbinom](./figure/nbinom-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \\]
 
 There is another definition: $X$ trials until the n-th success.
@@ -454,7 +454,7 @@ $X$ successes in $n$ trials with success probability $p$ for each trial.
 ![plot of chunk dbinom-n](./figure/dbinom-n-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\Pr(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \\]
 
 🔰 Other examples?
@@ -471,7 +471,7 @@ e.g., messages received per hour, number of individuals in a quadrat
 ![plot of chunk dpoisson](./figure/dpoisson-1.png)
 
 \\[
-\text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\Pr(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \\]
 
 The limit of binomial distribution $(\lambda = np;~n \to \infty;~p \to 0)$<br>
@@ -489,7 +489,7 @@ e.g., intervals between messages received, between gloves left on a road
 ![plot of chunk dexp](./figure/dexp-1.png)
 
 \\[
-\text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
+\Pr(x \mid \lambda) = \lambda e^{-\lambda x}
 \\]
 
 The continuous counterpart of geometric distribution.
@@ -508,7 +508,7 @@ e.g., Waiting time until receiving two messages
 ![plot of chunk dgamma](./figure/dgamma-1.png)
 
 \\[
-\text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\Pr(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \\]
 
 Identical when shape parameter $k = 1$.
@@ -523,7 +523,7 @@ e.g., $\mu = 50, ~\sigma = 10$:
 ![plot of chunk gaussian](./figure/gaussian-1.png)
 
 \\[
-\text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\Pr(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
 \\]
 
 ---
@@ -672,7 +672,7 @@ $\lambda = 3$ looks good.
 ## Likelihood: a measure for goodness-of-fit
 
 The probability to observe the data $D$ given the model $M$.<br>
-$\text{Prob}(D \mid M)$
+$\Pr(D \mid M)$
 
 **Likelihood function** is the same probability from different viewpoints:
 
@@ -690,14 +690,14 @@ Data $D$: 4 heads (H) and 1 tail (T) in tossing a coin 5 times
 Assuming the probability of coming up head $p = 0.5$:
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(H \mid 0.5) ^ 4 \times \text{Prob}(T \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \Pr(H \mid 0.5) ^ 4 \times \Pr(T \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 
 Assuming the probability of coming up head $p = 0.8$:
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(H \mid 0.8) ^ 4 \times \text{Prob}(T \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \Pr(H \mid 0.8) ^ 4 \times \Pr(T \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 
@@ -714,7 +714,7 @@ The number of seeds were counted for each of 50 plant individuals.
 
 <div>\[\begin{split}
 L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \Pr(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 
@@ -781,7 +781,7 @@ A. Depends on what you estimate, acceptable error range, etc.
 - **Probability distribution** $X \sim f(\theta)$
     - **parameters** $\theta$
 - **Likelihood**
-    - The probability to observe the data given the model: $\text{Prob}(D \mid M)$
+    - The probability to observe the data given the model: $\Pr(D \mid M)$
     - as a function of model given the data<br>
       → **likelihood function** $L(M \mid D),~L(\theta \mid D)$
     - **Maximum Likelihood Estimation** to fit parameters $\hat \theta$

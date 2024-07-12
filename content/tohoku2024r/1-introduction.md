@@ -477,7 +477,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 ---
 ## Keyboard shortcuts
 
-Action | <img height=22 width=22 src="https://cdn.simpleicons.org/apple"> Mac | <img height=22 width=22 src="https://cdn.simpleicons.org/windows"> Windows
+Action | <iconify-icon icon="mdi:apple"></iconify-icon> Mac | <iconify-icon icon="mdi:microsoft"></iconify-icon> Windows
 ------ | ------- | ----
 Switch apps | <kbd>command</kbd><kbd>tab</kbd> | <kbd>alt</kbd><kbd>tab</kbd>
 Quit apps | <kbd>command</kbd><kbd>q</kbd>     | <kbd>alt</kbd><kbd>F4</kbd>
@@ -540,8 +540,8 @@ source("https://example.com/sice/report.R")
 ---
 ## 毎回まっさらなワークスペースで始める設定
 
-<img height=22 width=22 src="https://cdn.simpleicons.org/apple"> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
-<img height=22 width=22 src="https://cdn.simpleicons.org/windows"> Tools → Global options
+<iconify-icon icon="mdi:apple"></iconify-icon> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
+<iconify-icon icon="mdi:microsoft"></iconify-icon> Tools → Global options
 
 "Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
 
@@ -1221,7 +1221,7 @@ library(tidyverse)  # 一挙に読み込み
 - エラー文やパッケージ名をコピペしてウェブ検索<br>
   → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
   や個人サイトに解決策
-- Slack <img height=22 width=22 src="https://cdn.simpleicons.org/slack">
+- Slack <iconify-icon icon="mdi:slack"></iconify-icon>
   [r-wakalang](https://github.com/tokyor/r-wakalang)
   で質問を投稿する。<br>
   (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)

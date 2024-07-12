@@ -294,7 +294,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
   </div>
   <div class="column" style="padding-top: 10px;">
 \[\begin{split}
-\text{Prob}(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+\Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
 k &\in \{0, 1, 2, \ldots, n\}
 \end{split}\]
   </div>
@@ -411,7 +411,7 @@ e.g., コイントスで表が出るまでに何回裏が出るか
 ![plot of chunk geometric](./figure/geometric-1.png)
 
 \\[
-\text{Prob}(X = k \mid p) = p (1 - p)^k
+\Pr(X = k \mid p) = p (1 - p)^k
 \\]
 
 「初めて成功するまでの試行回数」とする定義もある。
@@ -427,7 +427,7 @@ n = 1 のとき幾何分布と一致。
 ![plot of chunk nbinom](./figure/nbinom-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \\]
 
 失敗回数ではなく試行回数を変数とする定義もある。
@@ -448,7 +448,7 @@ n = 1 のとき幾何分布と一致。
 ![plot of chunk dbinom-n](./figure/dbinom-n-1.png)
 
 \\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\Pr(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \\]
 
 🔰 二項分布になりそうな例を考えてみよう
@@ -464,7 +464,7 @@ e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の�
 ![plot of chunk dpoisson](./figure/dpoisson-1.png)
 
 \\[
-\text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\Pr(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \\]
 
 二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
@@ -481,7 +481,7 @@ e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間�
 ![plot of chunk dexp](./figure/dexp-1.png)
 
 \\[
-\text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
+\Pr(x \mid \lambda) = \lambda e^{-\lambda x}
 \\]
 
 幾何分布の連続値版。
@@ -499,7 +499,7 @@ e.g., メッセージを2つ受信するまでの待ち時間
 ![plot of chunk dgamma](./figure/dgamma-1.png)
 
 \\[
-\text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\Pr(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \\]
 
 指数分布をkのぶん右に膨らませた感じ。<br>
@@ -515,7 +515,7 @@ e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれ�
 ![plot of chunk gaussian](./figure/gaussian-1.png)
 
 \\[
-\text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\Pr(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
 \\]
 
 ---
