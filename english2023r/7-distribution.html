@@ -291,7 +291,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$</p>
   </div>
   <div class="column" style="padding-top: 10px;">
 \[\begin{split}
-\text{Prob}(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+\Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
 k &\in \{0, 1, 2, \ldots, n\}
 \end{split}\]
   </div>
@@ -377,7 +377,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>e.g., How many tails before first head with a coin?</p>
 <p><img src="./figure/geometric-1.png" alt="plot of chunk geometric"></p>
 <p>\[
-\text{Prob}(X = k \mid p) = p (1 - p)^k
+\Pr(X = k \mid p) = p (1 - p)^k
 \]</p>
 <p>There is another definition: $X$ trials until the first success.</p>
 <p>🔰 Other examples?</p>
@@ -389,7 +389,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 (identical to geometric distribution when n = 1)</p>
 <p><img src="./figure/nbinom-1.png" alt="plot of chunk nbinom"></p>
 <p>\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \]</p>
 <p>There is another definition: $X$ trials until the n-th success.</p>
 <p>🔰 Other examples?</p>
@@ -404,7 +404,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>$X$ successes in $n$ trials with success probability $p$ for each trial.</p>
 <p><img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
 <p>\[
-\text{Prob}(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\Pr(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
 \]</p>
 <p>🔰 Other examples?</p>
 
@@ -416,7 +416,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>e.g., messages received per hour, number of individuals in a quadrat</p>
 <p><img src="./figure/dpoisson-1.png" alt="plot of chunk dpoisson"></p>
 <p>\[
-\text{Prob}(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\Pr(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \]</p>
 <p>The limit of binomial distribution $(\lambda = np;~n \to \infty;~p \to 0)$<br>
 ≈ many trials of extremely rare events.</p>
@@ -429,7 +429,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>e.g., intervals between messages received, between gloves left on a road</p>
 <p><img src="./figure/dexp-1.png" alt="plot of chunk dexp"></p>
 <p>\[
-\text{Prob}(x \mid \lambda) = \lambda e^{-\lambda x}
+\Pr(x \mid \lambda) = \lambda e^{-\lambda x}
 \]</p>
 <p>The continuous counterpart of geometric distribution.</p>
 <p>🔰 Other examples?</p>
@@ -442,7 +442,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 <p>e.g., Waiting time until receiving two messages</p>
 <p><img src="./figure/dgamma-1.png" alt="plot of chunk dgamma"></p>
 <p>\[
-\text{Prob}(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\Pr(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \]</p>
 <p>Identical when shape parameter $k = 1$.</p>
 
@@ -453,7 +453,7 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 e.g., $\mu = 50, ~\sigma = 10$:</p>
 <p><img src="./figure/gaussian-1.png" alt="plot of chunk gaussian"></p>
 <p>\[
-\text{Prob}(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\Pr(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
 \]</p>
 
 </section>
@@ -566,7 +566,7 @@ $\lambda = 3$ looks good.</p>
 <section>
 <h2 id="likelihood-a-measure-for-goodness-of-fit">Likelihood: a measure for goodness-of-fit</h2>
 <p>The probability to observe the data $D$ given the model $M$.<br>
-$\text{Prob}(D \mid M)$</p>
+$\Pr(D \mid M)$</p>
 <p><strong>Likelihood function</strong> is the same probability from different viewpoints:</p>
 <ul>
 <li>as a function of model $M$ given the data $D$,<br>
@@ -582,13 +582,13 @@ $L(\theta \mid D)$ or $L(\theta)$</li>
 <p>Assuming the probability of coming up head $p = 0.5$:</p>
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(H \mid 0.5) ^ 4 \times \text{Prob}(T \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \Pr(H \mid 0.5) ^ 4 \times \Pr(T \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 <p>Assuming the probability of coming up head $p = 0.8$:</p>
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(H \mid 0.8) ^ 4 \times \text{Prob}(T \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \Pr(H \mid 0.8) ^ 4 \times \Pr(T \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 <p>$L(0.8 \mid D) &gt; L(0.5 \mid D)$</p>
@@ -600,7 +600,7 @@ L(0.8 \mid D)
 <p>The number of seeds were counted for each of 50 plant individuals.</p>
 <div>\[\begin{split}
 L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \Pr(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 <p><img src="./figure/poisson-seed-likelihood-1.png" alt="plot of chunk poisson-seed-likelihood"></p>
@@ -659,7 +659,7 @@ A. Depends on what you estimate, acceptable error range, etc.</p>
 </li>
 <li><strong>Likelihood</strong>
 <ul>
-<li>The probability to observe the data given the model: $\text{Prob}(D \mid M)$</li>
+<li>The probability to observe the data given the model: $\Pr(D \mid M)$</li>
 <li>as a function of model given the data<br>
 → <strong>likelihood function</strong> $L(M \mid D),~L(\theta \mid D)$</li>
 <li><strong>Maximum Likelihood Estimation</strong> to fit parameters $\hat \theta$</li>

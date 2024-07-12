@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", function() {
 モデルのあてはまりの良さの尺度のひとつ。</p>
 <p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>。<br>
 定義通り素直に書くと<br>
-$\text{Prob}(D \mid M)$</p>
+$\Pr(D \mid M)$</p>
 <p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
 $L(M \mid D)$</p>
 <p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
@@ -144,13 +144,13 @@ $L(\theta \mid D)$ とか $L(\theta)$ とか</p>
 <p>表が出る確率 $p = 0.5$ と仮定:</p>
 <div>\[\begin{split}
 L(0.5 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.5) ^ 4 \times \text{Prob}(裏 \mid 0.5) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.5) ^ 4 \times \Pr(\text{裏} \mid 0.5) ^ 1 \\
   &= 5 \times 0.5 ^ 4 \times 0.5 ^ 1 = 0.15625
 \end{split}\]</div>
 <p>表が出る確率 $p = 0.8$ と仮定:</p>
 <div>\[\begin{split}
 L(0.8 \mid D)
-  &= \binom 5 1 \times \text{Prob}(表 \mid 0.8) ^ 4 \times \text{Prob}(裏 \mid 0.8) ^ 1 \\
+  &= \binom 5 1 \times \Pr(\text{表} \mid 0.8) ^ 4 \times \Pr(\text{裏} \mid 0.8) ^ 1 \\
   &= 5 \times 0.8 ^ 4 \times 0.2 ^ 1 = 0.4096
 \end{split}\]</div>
 <p>$L(0.8 \mid D) &gt; L(0.5 \mid D)$</p>
@@ -162,7 +162,7 @@ L(0.8 \mid D)
 <p>$n = 50$個体ぶん、且つ、且つ、且つ、と確率を掛けていく:</p>
 <div>\[\begin{split}
 L(\lambda \mid D)
-  = \prod _i ^n \text{Prob}(X_i \mid \lambda)
+  = \prod _i ^n \Pr(X_i \mid \lambda)
   = \prod _i ^n \frac {\lambda ^ {X_i} e ^ {-\lambda}} {X_i !}
 \end{split}\]</div>
 <p><img src="./figure/poisson-seed-likelihood-1.png" alt="plot of chunk poisson-seed-likelihood"></p>
@@ -226,7 +226,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。</p>
 </li>
 <li><strong>尤度</strong>
 <ul>
-<li>あるモデルでこのデータになる確率 $\text{Prob}(D \mid M)$</li>
+<li>あるモデルでこのデータになる確率 $\Pr(D \mid M)$</li>
 <li>データ固定でモデル探索 → <strong>尤度関数</strong> $L(M \mid D),~L(\theta \mid D)$</li>
 <li>対数を取ったほうが扱いやすい → <strong>対数尤度</strong> $\log L(M \mid D)$</li>
 <li>これを最大化するようなパラメータ $\hat \theta$ 探し ＝ <strong>最尤法</strong></li>
@@ -360,7 +360,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 <h2 id="ロジスティック回帰">ロジスティック回帰</h2>
 <ul>
 <li>確率分布: <strong>二項分布</strong></li>
-<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+<li>リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$</li>
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
@@ -369,7 +369,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 その日$i$の気温$x_i$によって割合が変化。</p>
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 <p>ロジスティック関数↑</p>
@@ -384,7 +384,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 <h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
 <ul>
 <li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
-<li>リンク関数: $\text{logit}(p) = \log \frac {p} {1 - p}$</li>
+<li>リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$</li>
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
@@ -393,7 +393,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
   &= \text{Binomial}(1,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 <p>ロジスティック関数↑</p>
@@ -621,7 +621,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 <dd>$\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$</dd>
 <dd>説明変数の効果が<strong>掛け算</strong>的に働く。<br>
 e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる</dd>
-<dt>$\text{logit}(p_i)$</dt>
+<dt>$\operatorname{logit}(p_i)$</dt>
 <dd>$p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)</dd>
 <dd>説明変数の効果が<strong>頭打ち</strong>になる。<br>
 e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
@@ -847,7 +847,7 @@ e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$</dd>
 <section>
 <h2 id="ruby尤rtゆうrt度ruby-likelihood"><ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)</h2>
 <p><strong>あるモデル$M$の下でそのデータ$D$が観察される確率</strong>:<br>
-$\text{Prob}(D \mid M)$</p>
+$\Pr(D \mid M)$</p>
 <p>データ$D$を固定し、モデル$M$の関数とみなしたものが<strong>尤度関数</strong>:<br>
 $L(M \mid D)$</p>
 <p>モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
@@ -1256,7 +1256,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
 n = 1 のとき幾何分布と一致。</p>
 <p><img src="./figure/nbinom-1.png" alt="plot of chunk nbinom"></p>
 <p>\[
-\text{Prob}(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
 \]</p>
 <p>失敗回数ではなく試行回数を変数とする定義もある。</p>
 <p>平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
@@ -1270,7 +1270,7 @@ n = 1 のとき幾何分布と一致。</p>
 <small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small></p>
 <p>\[\begin{split}
 y_i &\sim \text{Binomial}(n,~p_i) \\
-\text{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
   + z_{1i} + \ldots \\
 z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
 \end{split}\]</p>
