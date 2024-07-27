@@ -1,0 +1,946 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+#| cache: false
+wtl::knit_engines_set_cache_stan("stan/")
+```
+
+
+---
+## 🔰 とりあえずStanを動かしてみよう
+
+```{r, library-bayesplot}
+#| message: !expr 'NA'
+#| echo: false
+withr::with_namespace("cmdstanr", {
+  utils::capture.output(startup_messages(), type = "message") |> cat(sep = "\n")
+})
+withr::with_namespace("bayesplot", {
+  utils::capture.output(.onAttach(), type = "message")[1] |> cat(sep = "\n")
+})
+```
+
+おおまかな流れ:
+
+1. データ準備
+1. Stan言語でモデルを書く
+1. モデルをコンパイルして機械語に翻訳 → 実行ファイル
+1. 実行ファイルにデータを渡してMCMCサンプリング
+1. 結果を見る
+
+🔰
+[`6-bayesian.ipynb`](6-bayesian.ipynb)
+を開き、スライド説明に沿って実行しよう。
+
+
+---
+## 説明変数なしのベイズ推定: データ準備
+
+表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。
+
+```{r, stan-binom}
+#| echo: -1
+set.seed(19937)
+true_p = 0.7
+N = 40L
+coin_data = list(N = N, x = rbinom(N, 1, true_p))
+print(coin_data)
+```
+
+Rならlist型、Pythonならdict型にまとめてStanに渡す。
+
+
+---
+## 説明変数なしのベイズ推定: Stan言語でモデル定義
+
+別ファイルに書いておく。
+e.g., `coin.stan`:
+
+```{stan, coin}
+#| cache_stan: true
+data {
+  int<lower=0> N;
+  array[N] int x;
+}
+parameters {
+  real<lower=0,upper=1> p;
+}
+model {
+  x ~ binomial(1, p);
+}
+```
+
+- いくつかのブロックに分けて記述する:<br>
+  R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
+- [変数には型や制約を設定できる](https://mc-stan.org/docs/reference-manual/overview-of-data-types.html)
+- [関数もたくさん用意されている](https://mc-stan.org/docs/functions-reference/)
+
+---
+## Stan言語の7種のブロック
+
+順番厳守。よく使うのは**太字のやつ**。
+
+1. `functions {...}`
+1. **`data {...}`**
+1. `transformed data {...}`
+1. **`parameters {...}`**
+1. `transformed parameters {...}`
+1. **`model {...}`**
+1. `generated quantities {...}`
+
+<https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html>
+
+
+---
+## 説明変数なしのベイズ推定: MCMCサンプル
+
+予め実行速度の速い機械語に翻訳(コンパイル):
+```{r, stan-binom-model}
+#| cache_stan: "coin"
+model = cmdstanr::cmdstan_model("stan/coin.stan")
+```
+
+モデルとデータを使ってMCMCサンプリング:
+
+```{r, stan-binom-sample}
+#| cache_stan: "coin"
+#| results: "hide"
+#| stan_save_output_files: "fit"
+fit = model$sample(coin_data, seed = 24601L)
+```
+
+いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
+`chains`, `inits`, `iter_warmup`, `iter_samples`, `thin`, ...
+
+問題があったら警告してくれるので**ちゃんと読む**。
+
+---
+## 説明変数なしのベイズ推定: 結果を眺める
+
+`parameters` ブロックに書いた変数の情報が出てくる。<br>
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
+
+```{r, stan-binom-fit}
+#| echo: -1
+summary_p = fit$summary("p") |> tibble::as_tibble()
+print(fit)
+```
+
+真の値に近い $p \approx `r true_p`$ が得られた
+(`r round(summary_p[["q5"]], 2)` から
+`r round(summary_p[["q95"]], 2)` である確率が90%)。<br>
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。
+
+`lp__` はlog posterior(対数事後確率)。後述。
+
+念のため trace plot も確認しておこう→
+
+
+---
+## 説明変数なしのベイズ推定: trace plot 確認
+
+どのchainも似た範囲を動いていて、しっかり毛虫っぽい:
+
+```{r, stan-binom-traceplot}
+#| fig.width: 11
+#| fig.height: 4
+draws = fit$draws()
+params = names(model$variables()$parameters)
+bayesplot::mcmc_trace(draws, pars = params)
+```
+
+---
+## 説明変数なしのベイズ推定: 自己相関の確認
+
+2--3ステップくらいで自己相関がほぼ消えるので問題なし:
+
+```{r, stan-binom-ac}
+#| fig.width: 6
+#| fig.height: 5
+bayesplot::mcmc_acf_bar(draws, pars = params)
+```
+
+---
+## 説明変数なしのベイズ推定: 推定結果確認
+
+サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:
+
+```{r, stan-binom-hist}
+#| fig.width: 4
+#| fig.height: 4
+bayesplot::mcmc_hist(draws, bins = 20, pars = params)
+```
+
+
+---
+## `lp__`: log posterior とは?
+
+`model` ブロックに次のように書いてあると:
+```stan
+model {
+  mu ~ normal(0.0, 10.0);  // prior
+  x ~ normal(mu, 1.0);     // likelihood
+}
+```
+
+内部的には次のような処理が行われている:
+```stan
+target += normal_lpdf(theta | 0.0, 10.0)  // prior
+target += normal_lpdf(x | theta, 1.0);    // likelihood
+```
+
+つまり、事前確率と尤度の対数の和を取っている。<br>
+ベイズの定理により、事後確率はこれに比例する。<br>
+`lp__` はこの `target` 変数を記録しておいたようなもの。
+
+
+---
+## Stanで回帰じゃないパラメータ推定、まとめ
+
+別ファイルに書いておく。
+e.g., `coin.stan`:
+
+```{stan, binom}
+#| cache_stan: true
+data {
+  int<lower=0> N;
+  array[N] int x;
+}
+parameters {
+  real<lower=0,upper=1> p;
+}
+model {
+  x ~ binomial(1, p);
+}
+```
+
+Rからデータを渡して走らせる:
+```{r, stan-coin-binom}
+#| cache_stan: "binom"
+#| results: "hide"
+#| stan_save_output_files: "coin_fit"
+coin_data = tibble::lst(N = 50L, x = rbinom(N, 1, 0.7))
+coin_model = cmdstanr::cmdstan_model("stan/binom.stan")
+coin_fit = coin_model$sample(coin_data, seed = 24601L)
+```
+
+
+---
+## 直線回帰するStanコードの例
+
+受け渡しするデータや推定するパラメータがちょっと増えただけ。
+
+```{stan, lm}
+#| cache_stan: true
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  vector[N] y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+}
+```
+
+Rと同様、 `slope * x` のようなベクトル演算ができる。
+
+---
+## 直線回帰っぽいデータに当てはめてみる
+
+```{r, df-lm}
+#| echo: -1
+set.seed(19937)
+samplesize = 50L
+df_lm = tibble::tibble(
+  x = rnorm(samplesize, 1.70, 0.05),
+  bmi = rnorm(samplesize, 22, 1),
+  y = bmi * (x**2)
+)
+```
+
+<img `r src_alt_fig_chunk("weight-lm")`>
+
+
+---
+## 操作は回帰じゃないモデルと同じ
+
+
+```{r, stan-lm}
+#| cache_stan: "lm"
+#| stan_save_output_files: "lm_fit"
+#| results: "hide"
+# リストに入れて渡す:
+lm_data = as.list(df_lm)
+lm_data[["N"]] = samplesize
+# モデルを実行速度の速い機械語に翻訳(コンパイル):
+lm_model = cmdstanr::cmdstan_model("stan/lm.stan")
+# モデルとデータを使ってMCMCサンプリング:
+lm_fit = lm_model$sample(lm_data, seed = 19937L, refresh = 0)
+```
+```{r, print-stan-lm}
+print(lm_fit)
+```
+
+切片と傾きはそれらしき値。
+$\hat R$ や $N_{eff}$ も良さそう。
+もう少し確認しよう。
+
+---
+## CmdStanによる診断
+
+```{r, cmdstan-diagnose}
+#| results: "hide"
+lm_fit$cmdstan_diagnose()
+```
+
+satisfactory とか no problems ばかりであることを確認
+```
+Treedepth satisfactory for all transitions.
+
+No divergent transitions found.
+
+E-BFMI satisfactory.
+
+Effective sample size satisfactory.
+
+Split R-hat values satisfactory all parameters.
+
+Processing complete, no problems detected.
+```
+
+---
+## `draws`: 生のMCMCサンプル
+
+```{r, draws-stan-lm}
+lm_draws_array = lm_fit$draws()
+dim(lm_draws_array)
+print(lm_draws_array)
+```
+
+---
+## `draws`: data.frameのほうが見やすいかも
+
+```{r, draws-stan-lm-tibble}
+lm_draws = lm_fit$draws(format = "df") |> print()
+```
+
+実体はCmdStanが書き出したCSVファイル:
+
+```{r, fit-output-files}
+#| results: "hide"
+lm_fit$output_files()
+```
+```
+[1] "/var/folders/**/***/T/Rtmp******/*-2023****-1-******.csv"
+[2] "/var/folders/**/***/T/Rtmp******/*-2023****-2-******.csv"
+[3] "/var/folders/**/***/T/Rtmp******/*-2023****-3-******.csv"
+[4] "/var/folders/**/***/T/Rtmp******/*-2023****-4-******.csv"
+```
+
+---
+## `traceplot`: サンプル順に `draws` を並べたもの
+
+どの chain も同じところをうろうろしていればOK。
+
+```{r, stan-lm-traceplot}
+#| fig.width: 11
+#| fig.height: 6
+params = names(lm_model$variables()$parameters)
+bayesplot::mcmc_trace(lm_draws, pars = params, facet_args = list(ncol = 1))
+```
+
+---
+## 各パラメータの事後分布
+
+```{r, stan-lm-hist}
+#| fig.width: 11
+#| fig.height: 5
+bayesplot::mcmc_hist(lm_draws, pars = params, bins = 30)
+```
+
+---
+## Posterior Predictive Checking (PPC)
+
+サイズ $S$ のパラメータdrawsと $N$ 個の観察値から
+$S \times N$ 行列の $y_{rep}$ を生成:
+
+```{r, stan-lm-ppc}
+#| echo: [2, 3, 4]
+#| fig.width: 6
+#| fig.height: 4.5
+set.seed(19937)
+mu_rep = lm_draws$intercept + lm_draws$slope %o% df_lm$x
+yrep = mu_rep + rnorm(prod(dim(mu_rep)), 0, lm_draws$sigma)
+bayesplot::ppc_intervals(y = df_lm[["y"]], yrep = yrep,
+  x = df_lm[["x"]], prob = 0.5, prob_outer = 0.9)
+bayesplot::ppc_ribbon(y = df_lm[["y"]], yrep = yrep,
+  x = df_lm[["x"]], prob = 0.5, prob_outer = 0.9, y_draw = "points")
+```
+
+<http://mc-stan.org/bayesplot/reference/PPC-overview.html>
+
+
+---
+## 変数と[ブロック](6-bayesian.html#/37)をうまく使って可読性アップ
+
+途中計算に名前をつけることでモデルが読みやすくなる:
+
+```stan
+model {
+  vector[N] mu = intercept + slope * x;
+  y ~ normal(mu, sigma);
+}
+```
+
+`transformed parameters` ブロックに書くとさらに見通しがよくなる:
+
+```stan
+transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+
+model {
+  y ~ normal(mu, sigma);
+}
+```
+
+見た目が変わるだけでなくMCMCサンプルが記録されるようになる。
+
+---
+## drawsは嵩むが頭は使わずに済む
+
+```{stan, lm-transformed}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  vector[N] y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+
+model {
+  y ~ normal(mu, sigma);
+}
+```
+```{r, stan-lmtr}
+#| cache_stan: "lm-transformed"
+#| stan_save_output_files: "lmtr_fit"
+#| results: "hide"
+lmtr_model = cmdstanr::cmdstan_model("stan/lm-transformed.stan")
+lmtr_fit = lmtr_model$sample(lm_data, seed = 19937L, refresh = 0)
+lmtr_draws = lmtr_fit$draws(format = "df") |> print()
+```
+```{r, stan-lmgr-draws}
+#| echo: false
+print(lmtr_draws, max_draws = 6, max_variables = 60, digits = 3)
+```
+
+この右側の `mu` 行列はさっき苦労して作った `mu_rep` と同じ。
+
+ひょっとして `yrep` もStanで作れる？
+
+---
+## `generated quantities` ブロックで乱数生成
+
+(`data` と `parameters` のブロックは同じなので省略)
+
+```{stan, lm-generated}
+#| cache_stan: true
+#| echo: !expr -(1:12)
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  vector[N] y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+
+model {
+  y ~ normal(mu, sigma);
+}
+
+generated quantities {
+  array[N] real yrep = normal_rng(mu, sigma);
+}
+```
+
+[`normal_rng()`](https://mc-stan.org/docs/functions-reference/normal-distribution.html)
+のような乱数生成が使えるのは<br>
+`generated quantities` ブロックだけ。
+
+(`yrep` を `vector[N]` 型で作ろうとすると怒られる。)
+
+
+---
+## drawsはさらに嵩むがコードは美しくなった
+
+```{r, stan-lm-generated}
+#| cache_stan: "lm-generated"
+#| stan_save_output_files: "lmgen_fit"
+#| results: "hide"
+lmgen_model = cmdstanr::cmdstan_model("stan/lm-generated.stan")
+lmgen_fit = lmgen_model$sample(lm_data, seed = 19937L, refresh = 0)
+lmgen_draws = lmgen_fit$draws(format = "df") |> print()
+```
+```{r, stan-lmgen-draws}
+#| echo: false
+print(lmgen_draws, max_draws = 6, max_variables = 120, digits = 3)
+```
+
+`yrep = lmgen_fit$draws("yrep", format = "matrix")`
+を取り出したらあとは `bayesplot::ppc_*()` に渡すだけ。
+
+
+---
+## 観察値とは違うXを使ってPredictionすることも可能
+
+観察値の外側とか、均等間隔とか `x_tilde` を好きに作って渡せる。
+
+```stan
+data {
+  // ...
+  int<lower=0> N_tilde
+  vector[N_tilde] x_tilde;
+}
+// ...
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+```
+
+```{stan, lm-credible}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  vector[N] y;
+  int<lower=0> N_tilde;
+  vector[N_tilde] x_tilde;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+}
+
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+```
+
+```{r, stan-lm-credible-prep}
+#| include: false
+#| cache_stan: "lm-credible"
+#| stan_save_output_files: "fit_cred"
+set.seed(24601)
+n = 300L
+a = 3
+b = -3
+df_pois = tibble::tibble(x = runif(n, 0.4, 1.7), y = rpois(n, exp(a * x + b)))
+data_cred = as.list(df_pois)
+data_cred[["N"]] = n
+data_cred[["x_tilde"]] = seq(0.4, 1.7, 0.1)
+data_cred[["N_tilde"]] = length(data_cred[["x_tilde"]])
+
+model_cred = cmdstanr::cmdstan_model("stan/lm-credible.stan")
+fit_cred = model_cred$sample(data_cred, seed = 19937L, refresh = 0, step_size = 0.1)
+draws_cred = fit_cred$draws(format = "df") |> print()
+
+.probs = c(lower = 0.025, median = 0.5, upper = 0.975)
+df_quant = draws_cred |>
+  dplyr::reframe(dplyr::across(starts_with("y_tilde"), quantile, probs = .probs)) |>
+  dplyr::mutate(label = names(.probs)) |>
+  tidyr::pivot_longer(!label, names_to = "x", values_to = "y") |>
+  dplyr::mutate(x = data_cred[["x_tilde"]][readr::parse_number(x)]) |>
+  tidyr::pivot_wider(names_from = label, values_from = y)
+```
+
+```{r, stan-lm-credible}
+#| include: false
+#| fig.height: 4.5
+#| fig.width: 6
+ggplot(df_pois) +
+  aes(x) +
+  geom_point(aes(y = y), shape = 16L, alpha = 0.5) +
+  geom_ribbon(aes(ymin = lower, ymax = upper), data = df_quant, alpha = 0.3) +
+  geom_line(aes(y = median), data = df_quant) +
+  theme_bw(18)
+```
+
+
+---
+## 変数の型: `vector` vs `array`
+
+`vector`, `row_vector`, `matrix` は実数 `real` のみで、行列演算できる:
+
+```stan
+real x;
+vector[3] v;
+row_vector[3] r;
+matrix[3, 3] m;
+
+x * v  // vector[3]
+r * v  // real
+v * r  // matrix[3, 3]
+m * v  // vector[3]
+m * m  // matrix[3, 3]
+m[1]   // row_vector[3]
+```
+
+`array` に型の制約は無いが、行列演算はできないので自力forループ:
+```stan
+array[3] int a;
+array[3] int b;
+for (i in 1:3) {
+  b[i] = 2 * a[i] + 1
+}
+```
+
+---
+## パラメータの事前分布を明示的に設定できる
+
+が、省略してもStanがデフォルトでうまくやってくれる。<br>
+そのせいで収束が悪いかも、となってから考えても遅くない。
+
+```stan
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  sigma ~ student_t(3, 0, 10);
+}
+```
+
+設定したくなったら、どう選ぶか？
+
+---
+## 事前分布の選別
+
+1.  とりあえず**無情報事前分布** $[-\infty, \infty]$。Stanのデフォルト。
+
+1.  収束が悪かったら**弱情報事前分布**を試す。<br>
+    事後分布を更新していったとき**事前分布っぽさが残らない**のが良い。
+
+    - 取りうる値を逃すような狭すぎる分布はダメ。
+    - 狭すぎるよりはマシだが、広すぎても良くない。
+    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+      事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。
+
+    おすすめ: [**正規分布**](https://mc-stan.org/docs/functions-reference/normal-distribution.html)
+    or [**Student's t分布**](https://mc-stan.org/docs/functions-reference/student-t-distribution.html)
+
+<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
+
+
+---
+## Stanおすすめ弱情報事前分布: Student's t分布
+
+Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
+
+- 自由度 $3 \le \nu_0 \le 7 $ で適当に固定。
+  - $\nu = 1$ でコーシー分布。裾野が広すぎて良くないらしい。
+  - $\nu \to \infty$ で**正規分布**。だいたいこれでいいらしい。
+- スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。
+
+```{r, studentt}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 9
+tidyr::crossing(x = seq(-5, 5, 0.05), df = c(1, 3, 7, Inf)) |>
+  dplyr::mutate(nu = as.factor(df), Density = dt(x, df)) |>
+  ggplot() + aes(x, Density, group = df) +
+  geom_line(aes(color = nu), linewidth = 1, alpha = 0.7) +
+  scale_color_viridis_d(end = 0.88, direction = 1, guide = guide_legend(reverse = TRUE)) +
+  scale_x_continuous(breaks = c(-1, 0, 1), labels = c(expression(-sigma), 0, expression(sigma))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), axis.ticks = element_blank(),
+        panel.grid.major.y = element_blank())
+```
+
+
+---
+## 🔰 Stanで一般化線形モデル
+
+🔰
+[`7-stan.ipynb`](7-stan.ipynb)
+を開いて実行していこう。
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+
+- 直線回帰
+- ポアソン回帰
+- ロジスティック回帰
+- 重回帰
+- 分散分析
+- 共分散分析
+
+  </div>
+  <div class="column" style="flex-shrink: 1.0;">
+<figure>
+<img `r src_alt_fig_chunk("lm-bad")` height=240>
+<img `r src_alt_fig_chunk("glm-poisson")` height=240>
+<img `r src_alt_fig_chunk("glm-logistic")` height=240>
+<img `r src_alt_fig_chunk("multiple-regression")` height=240>
+<img `r src_alt_fig_chunk("glm-anova")` height=240>
+<img `r src_alt_fig_chunk("glm-ancova")` height=240>
+</figure>
+  </div>
+</div>
+
+
+```{stan, poisson}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] x;
+  array[N] int<lower=0> y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+}
+
+model {
+  vector[N] lambda = exp(intercept + slope * x);
+  y ~ poisson(lambda);
+}
+```
+
+
+```{stan, multiple}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector[N] temperature;
+  vector[N] humidity;
+  array[N] int<lower=0> beer_sales;
+}
+
+parameters {
+  real intercept;
+  real coef_t;
+  real coef_h;
+}
+
+model {
+  vector[N] lambda = exp(intercept + coef_t * temperature + coef_h * humidity);
+  beer_sales ~ poisson(lambda);
+}
+```
+
+
+```{stan, logistic}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  int<lower=0> n_trials;
+  vector[N] temperature;
+  array[N] int<lower=0,upper=n_trials> beer_sales;
+}
+
+parameters {
+  real intercept;
+  real slope;
+}
+
+model {
+  vector[N] p = inv_logit(intercept + slope * temperature);
+  beer_sales ~ binomial(n_trials, p);
+}
+```
+
+```{stan, anova}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0,upper=1>[N] sunny;
+  vector<lower=0,upper=1>[N] rainy;
+  vector<lower=0>[N] beer_sales;
+}
+
+parameters {
+  real intercept;
+  real coef_s;
+  real coef_r;
+  real sigma;
+}
+
+model {
+  vector[N] mu = intercept + coef_s * sunny + coef_r * rainy;
+  beer_sales ~ normal(mu, sigma);
+}
+```
+
+```{stan, ancova}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0,upper=1>[N] sunny;
+  vector<lower=0,upper=1>[N] rainy;
+  vector<lower=0>[N] temperature;
+  vector<lower=0>[N] beer_sales;
+}
+
+parameters {
+  real intercept;
+  real coef_s;
+  real coef_r;
+  real coef_t;
+  real sigma;
+}
+
+model {
+  vector[N] mu = intercept +
+                 coef_s * sunny +
+                 coef_r * rainy +
+                 coef_t * temperature;
+  beer_sales ~ normal(mu, sigma);
+}
+```
+
+
+---
+## 🔰 Stanでpenguinsの回帰分析をしてみよう
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+<img `r src_alt_fig_chunk("penguins-interaction")` height="300">
+
+[第3回GLM回](3-glm.html#/51)を参照。
+
+---
+## 🔰 Stanでpenguinsの回帰分析をしてみよう
+
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+
+`Stan does not support NA` と怒られるので欠損値を取り除いておく:
+
+```python
+penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
+penguins_dropna = penguins.dropna()
+```
+```{r, penguins-dropna-stan}
+#| echo: false
+withr::local_package("palmerpenguins")
+penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
+penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+```
+
+```{stan, penguins-lm}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] body_mass_g;
+  vector<lower=0>[N] flipper_length_mm;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real<lower=0> sigma;
+}
+
+model {
+  flipper_length_mm ~ normal(intercept + slope * body_mass_g, sigma);
+}
+```
+
+```{stan, penguins-multiple}
+#| cache_stan: true
+#| echo: false
+data {
+  int<lower=0> N;
+  vector<lower=0>[N] body_mass_g;
+  vector<lower=0>[N] flipper_length_mm;
+  array[N] int<lower=0,upper=1> sp_Chinstrap;
+  array[N] int<lower=0,upper=1> sp_Gentoo;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real b_chinstrap;
+  real b_gentoo;
+  real<lower=0> sigma;
+}
+
+model {
+  array[N] real mu;
+  for (i in 1:N) {
+    mu[i] = intercept + slope * body_mass_g[i] + b_chinstrap * sp_Chinstrap[i] + b_gentoo * sp_Gentoo[i];
+  }
+  flipper_length_mm ~ normal(mu, sigma);
+}
+```
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+
+`r .meta$next_link`

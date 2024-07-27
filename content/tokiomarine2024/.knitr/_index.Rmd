@@ -1,0 +1,103 @@
++++
+title = "統計モデリング概論 DSHC 2023"
+date = 2023-08-23T09:30:00+09:00
+draft = false
+unlisted = false
++++
+
+[東京海上 Data Science Hill Climb](https://tokiomarine-dshc.com/)
+
+- 講師: 岩嵜航 (東北大学生命科学研究科)
+- 日程: 2023-08-23&30 09:30--17:30
+- 場所: zoom.us
+
+```{r schedule, echo = FALSE, fig.width = 8, fig.height = 8, dev="svg"}
+library(ggplot2)
+
+day_start = lubridate::ymd_hms("2023-08-23 09:30:00")
+day_end = day_start + lubridate::hours("8")
+.breaks = day_start - lubridate::minutes(30) + lubridate::hours(seq(0, 9))
+
+csv_text = "label,run,rest,day
+導入,40,5,1
+直線回帰+可視化,20,5,1
+確率分布,55,5,1
+擬似乱数,20,60,1
+尤度、最尤推定,30,10,1
+GLM説明、可視化,50,10,1
+モデル評価,50,10,1
+GLM練習,30,10,1
+個体差、GLMM,45,0,1
+ベイズの定理、事後分布,55,10,2
+MCMC、Stan,30,10,2
+Stanで直線回帰,45,60,2
+StanでGLM,60,15,2
+StanでGLM続き,60,15,2
+階層ベイズモデル,60,10,2
+全体まとめ,25,0,2
+"
+
+df_raw = readr::read_csv(csv_text, show_col_types = FALSE)
+df = df_raw |>
+  dplyr::group_by(day) |>
+  dplyr::mutate(elapsed = dplyr::lag(cumsum(run + rest), 1L, default = 0)) |>
+  dplyr::mutate(run = lubridate::minutes(run), elapsed = lubridate::minutes(elapsed)) |>
+  dplyr::mutate(start = day_start + elapsed, end = start + run)
+
+ggplot(df) +
+  aes(1, start) +
+  geom_segment(aes(xend = 1, yend = end), size = 3, alpha = 0.6) +
+  geom_text(aes(label = label), hjust = 0, nudge_x = 0.05, nudge_y = 500,
+            family = "Hiragino Sans W3", size = 5.4) +
+  facet_grid(cols = vars(day), labeller = label_both) +
+  scale_x_continuous(breaks = 1) +
+  scale_y_datetime(breaks = .breaks, date_labels = "%H:%M") +
+  coord_cartesian(xlim = c(1, 2), ylim = c(day_end, day_start)) +
+  theme_minimal(base_size = 21) +
+  theme(panel.grid.minor.x = element_blank(),
+        axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        strip.text = element_text(hjust = 0))
+```
+
+## 実行環境の準備
+
+DSHC 2023 参加者はほかの講義で使っている環境をなるべくそのまま使う。
+いくつかのパッケージを追加するため
+[`preparation.ipynb`](./preparation.ipynb) をダウンロードして実行。
+
+ほかの講義を受講していない私が追いつくために実行したコマンド
+(macOSに講義用の仮想環境を用意する一例として):
+```sh
+brew install pyenv
+env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.7.13
+# Rscript -e 'reticulate::install_python("3.7.13")'
+$(pyenv prefix 3.7.13)/bin/python3 -m venv ~/.virtualenvs/dshc2023
+source ~/.virtualenvs/dshc2023/bin/activate
+pip3 install -U setuptools pip wheel
+pip3 install -r requirements.txt
+jupyter-notebook preparation.ipynb
+```
+
+DSHC 2023 に参加せずこの資料に辿り着いた人はわざわざ古い3.7を入れる必要はない。
+最新版(≥3.11)をインストールする。
+`requirements.txt` の代わりに個別指定で
+`pip3 install -U seaborn scikit-learn jupyter`
+を実行する。
+
+
+## 演習資料
+
+- [`preparation.ipynb`](./preparation.ipynb)
+- [`2-distribution.ipynb`](./2-distribution.ipynb)
+- [`3-likelihood.ipynb`](./3-likelihood.ipynb)
+- [`4-glm.ipynb`](4-glm.ipynb)
+- [`6-bayesian.ipynb`](6-bayesian.ipynb)
+- [`7-stan.ipynb`](7-stan.ipynb)
+- [`8-hbm.ipynb`](8-hbm.ipynb)
+
+
+## 講義資料
+
+リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。
