@@ -24,9 +24,10 @@ knitr::opts_chunk$set(comment = "")
 knitr::opts_chunk$set(message = NA)
 knitr::opts_chunk$set(warning = NA)
 knitr::opts_chunk$set(dev = "ragg_png")
-knitr::opts_chunk$set(dpi = 100)
+knitr::opts_chunk$set(dpi = 108)
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
+knitr::dep_auto()
 set.seed(24601)
 
 src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
@@ -35,7 +36,7 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 }
 
 .meta = list()
-.meta$course = "統計モデリング概論 DSHC 2023"
+.meta$course = "統計モデリング概論 DSHC 2024"
 .meta$prefix = normalizePath("..") |> basename()
 .meta$data = "metadata.csv" |>
   readr::read_csv(locale = readr::locale(tz = "Asia/Tokyo")) |>
@@ -53,6 +54,8 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 .meta$footnote = .meta$data |> dplyr::filter(this) |>
   dplyr::pull(date) |> as.Date() |>
   paste0(" 東京海上 Data Science Hill Climb<br>")
+.meta$href_prev = with(.meta$data, {outfile[id[this] - 1]})
+.meta$href_next = with(.meta$data, {outfile[id[this] + 1]})
 .meta$next_link = '<a href="{outfile}" class="readmore">\n{id}. {linktitle}\n</a>' |>
   stringr::str_glue(.envir = dplyr::filter(.meta$data, id == id[this] + 1))
 .meta$front_matter = .meta$data |>

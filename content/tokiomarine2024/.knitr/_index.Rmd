@@ -1,6 +1,6 @@
 +++
-title = "統計モデリング概論 DSHC 2023"
-date = 2023-08-23T09:30:00+09:00
+title = "統計モデリング概論 DSHC 2024"
+date = 2024-08-21T09:30:00+09:00
 draft = false
 unlisted = false
 +++
@@ -8,13 +8,13 @@ unlisted = false
 [東京海上 Data Science Hill Climb](https://tokiomarine-dshc.com/)
 
 - 講師: 岩嵜航 (東北大学生命科学研究科)
-- 日程: 2023-08-23&30 09:30--17:30
+- 日程: 2024-08-21&28 09:30--17:30
 - 場所: zoom.us
 
 ```{r schedule, echo = FALSE, fig.width = 8, fig.height = 8, dev="svg"}
 library(ggplot2)
 
-day_start = lubridate::ymd_hms("2023-08-23 09:30:00")
+day_start = lubridate::ymd_hms("2024-08-21 09:30:00")
 day_end = day_start + lubridate::hours("8")
 .breaks = day_start - lubridate::minutes(30) + lubridate::hours(seq(0, 9))
 
@@ -63,7 +63,7 @@ ggplot(df) +
 
 ## 実行環境の準備
 
-DSHC 2023 参加者はほかの講義で使っている環境をなるべくそのまま使う。
+DSHC 2024 参加者はほかの講義で使っている環境をなるべくそのまま使う。
 いくつかのパッケージを追加するため
 [`preparation.ipynb`](./preparation.ipynb) をダウンロードして実行。
 
@@ -71,19 +71,19 @@ DSHC 2023 参加者はほかの講義で使っている環境をなるべくそ�
 (macOSに講義用の仮想環境を用意する一例として):
 ```sh
 brew install pyenv
-env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.7.13
-# Rscript -e 'reticulate::install_python("3.7.13")'
-$(pyenv prefix 3.7.13)/bin/python3 -m venv ~/.virtualenvs/dshc2023
-source ~/.virtualenvs/dshc2023/bin/activate
-pip3 install -U setuptools pip wheel
+env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.10
+# Rscript -e 'reticulate::install_python("3.10:latest")'
+$(pyenv prefix 3.10)/bin/python3 -m venv ~/.virtualenvs/dshc2024
+source ~/.virtualenvs/dshc2024/bin/activate
+pip3 install -U setuptools pip
 pip3 install -r requirements.txt
 jupyter-notebook preparation.ipynb
 ```
 
-DSHC 2023 に参加せずこの資料に辿り着いた人はわざわざ古い3.7を入れる必要はない。
-最新版(≥3.11)をインストールする。
+DSHC 2024 に参加せずこの資料に辿り着いた人はわざわざ古い3.10を入れる必要はない。
+最新版(≥3.12)をインストールする。
 `requirements.txt` の代わりに個別指定で
-`pip3 install -U seaborn scikit-learn jupyter`
+`pip3 install -U seaborn scikit-learn jupyter statsmodels cmdstanpy arviz`
 を実行する。
 
 

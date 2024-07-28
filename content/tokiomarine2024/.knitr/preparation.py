@@ -1,15 +1,16 @@
 # %% [markdown]
-# # 環境構築 for 統計モデリング概論 DSHC 2023
+# # 統計モデリング概論 DSHC 2024
 #
 # 岩嵜 航 (Watal M. Iwasaki, PhD)<br>
 # 東北大学 生命科学研究科 進化ゲノミクス分野 特任助教
 #
-# 2023-08-23 東京海上 Data Science Hill Climb<br>
+# 2024-08-21 東京海上 Data Science Hill Climb<br>
+# https://heavywatal.github.io/slides/tokiomarine2024/
 #
 # ## 方針
 # ほかの講義で使っている環境をなるべくそのまま使う。
 
-# ### Google Colab (Python 3.7.13) を使っている場合
+# ### Google Colab (Python 3.10.12) を使っている場合
 # 各ipynbファイルの頭に `%pip install` コマンドを置いておくので、事前準備は不要。
 # 念のため、このファイルが最後まで問題なく動くことを確認する。
 
@@ -22,6 +23,7 @@
 
 # %%
 import sys
+
 print(sys.version)
 
 # %% [markdown]
@@ -29,23 +31,25 @@ print(sys.version)
 
 # ほかの講義でインストール済みだが古すぎるものを更新:
 # %%
-# %pip install -U 'seaborn>=0.11'
-# %pip install -U 'matplotlib>=3.1'
+# %pip install -U 'seaborn>=0.13'
+# %pip install -U 'matplotlib>=3.9'
 
 # %% [markdown]
 # ### [statsmodels](https://www.statsmodels.org)
 
 # %%
-# %pip install 'statsmodels>=0.13.2'
+# %pip install 'statsmodels>=0.14'
 import statsmodels.api as sm  # noqa: E402
+
 sm.show_versions()
 
 # %% [markdown]
 # ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
 
 # %%
-# %pip install 'cmdstanpy>=1.0.4'
+# %pip install 'cmdstanpy>=1.2.4'
 import cmdstanpy
+
 print(cmdstanpy.__version__)
 
 # %% [markdown]
@@ -64,11 +68,12 @@ cmdstanpy.install_cmdstan()
 
 # %%
 import os
-from cmdstanpy import cmdstan_path, CmdStanModel
+
+from cmdstanpy import CmdStanModel, cmdstan_path
 
 # specify locations of Stan program file and data
-stan_file = os.path.join(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.stan')
-data_file = os.path.join(cmdstan_path(), 'examples', 'bernoulli', 'bernoulli.data.json')
+stan_file = os.path.join(cmdstan_path(), "examples", "bernoulli", "bernoulli.stan")
+data_file = os.path.join(cmdstan_path(), "examples", "bernoulli", "bernoulli.data.json")
 
 # instantiate a model; compiles the Stan program by default
 model = CmdStanModel(stan_file=stan_file)
@@ -84,8 +89,9 @@ fit.summary()
 # ### [ArviZ](https://python.arviz.org/)
 
 # %%
-# %pip install 'arviz>=0.12.1'
+# %pip install 'arviz>=0.19'
 import arviz as az  # noqa: E402
+
 print(az.__version__)
 
 # %% [markdown]

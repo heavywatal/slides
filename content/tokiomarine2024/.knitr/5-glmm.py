@@ -1,17 +1,17 @@
 # %% [markdown]
-# # 統計モデリング概論 DSHC 2023
+# # 統計モデリング概論 DSHC 2024
 #
 # 岩嵜 航 (Watal M. Iwasaki, PhD)<br>
 # 東北大学 生命科学研究科 進化ゲノミクス分野 特任助教
 #
-# 2023-08-23 東京海上 Data Science Hill Climb<br>
-# https://heavywatal.github.io/slides/tokiomarine2023/
+# 2024-08-21 東京海上 Data Science Hill Climb<br>
+# https://heavywatal.github.io/slides/tokiomarine2024/
 #
 # ## 環境セットアップ
 
 # Google Colab の場合はインストールから:
 # ```
-# %pip install 'matplotlib>=3.1' 'seaborn>=0.11' 'statsmodels'
+# %pip install 'matplotlib>=3.9' 'seaborn>=0.13' 'statsmodels>=0.14'
 # ```
 
 # %%
@@ -44,10 +44,12 @@ sns.histplot(x=z, bins=20)
 
 # %%
 
+
 # dfz = pd.DataFrame(z=z)
 # print(dfz)
 def sigmoid(x, gain=1):
     return 1 / (1 + np.exp(-gain * x))
+
 
 p = sigmoid(z)
 sns.histplot(x=p, bins=20)
@@ -67,7 +69,6 @@ sns.countplot(x=y)
 # 4. 能力の平均や分散の値を変えたらどうなるか見てみる。
 
 # %%
-
 
 
 # %%

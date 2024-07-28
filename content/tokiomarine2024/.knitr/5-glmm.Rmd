@@ -113,20 +113,20 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 z_hat = wtl::logit(p_hat)
 p_sigmoid = df_seeds_od |>
   ggplot() + aes(z, p) +
-  geom_line(linewidth = 2, alpha = 0.6, color = "#56B4E9") +
-  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#56B4E9") +
-  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 3, color = "#56B4E9") +
+  geom_line(linewidth = 3, alpha = 0.6, color = "#56B4E9") +
+  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#56B4E9", linewidth = 1) +
+  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 5, color = "#56B4E9") +
   scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
   labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor = element_blank())
 p_normal = tibble::tibble(
-  z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 100),
-  Density = dnorm(z, z_hat, 3)
-) |>
+    z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 100),
+    Density = dnorm(z, z_hat, 3)
+  ) |>
   ggplot() + aes(z, Density) +
   geom_area(fill = "#56B4E9", alpha = 0.5) +
-  geom_vline(xintercept = z_hat, color = "#56B4E9") +
+  geom_vline(xintercept = z_hat, color = "#56B4E9", linewidth = 1) +
   scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
   labs(x = expression(italic(z))) +
   theme_bw(base_size = 20) +
@@ -316,7 +316,7 @@ df_beer_od |>
   aes(X, freq) +
   geom_col(data = df_beer_od_exp, fill = "#56B4E9", alpha = 0.66) +
   geom_col(width = 0.5) +
-  theme_bw(base_size = 18) +
+  theme_bw(base_size = 20) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -334,24 +334,7 @@ df_beer_od |>
 成功率pの試行がn回成功するまでの失敗回数X。
 n = 1 のとき幾何分布と一致。
 
-```{r, nbinom}
-#| echo: false
-#| fig.height: 3.8
-#| fig.width: 11
-p = 0.5
-df = purrr::map(seq.int(1, 3), function(n) {
-  tibble::tibble(X = seq.int(0, 10), Prob = dnbinom(X, n, p), n = n)
-}) |>  purrr::list_rbind()
-ggplot(df) +
-  aes(X, Prob) +
-  scale_x_continuous(breaks = df[["X"]]) +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  geom_col() +
-  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
-  labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 18) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+<img `r src_alt_fig_chunk("nbinom")`>
 
 \\[
 \Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
