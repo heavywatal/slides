@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>8. 階層ベイズモデル(HBM) — 統計モデリング概論 DSHC 2024</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="8. 階層ベイズモデル(HBM) — 統計モデリング概論 DSHC 2024">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2024/8-hbm.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes/notes.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/search/search.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1440, height: 1080});
+  document.querySelector('html').style.fontSize = '240%';
+})
+</script>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script src="/slides/lib/katex/katex.min.js"></script>
+<script src="/slides/lib/iconify.js"></script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="統計モデリング概論-dshc-2024"><a href=".">統計モデリング概論 DSHC 2024</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-distribution.html">直線回帰、確率分布、擬似乱数生成</a>
+<li><a href="3-likelihood.html">尤度、最尤推定</a>
+<li><a href="4-glm.html">一般化線形モデル(GLM)</a>
+<li><a href="5-glmm.html">個体差、一般化線形混合モデル(GLMM)</a>
+<li><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
+<li><a href="7-stan.html">StanでGLM</a>
+<li class="current-deck"><a href="8-hbm.html">階層ベイズモデル(HBM)</a>
+</ol>
+<div class="footnote">
+2024-08-28 東京海上 Data Science Hill Climb<br>
+<a href="https://heavywatal.github.io/slides/tokiomarine2024/">https://heavywatal.github.io/slides/tokiomarine2024/</a>
+</div>
+
+</section>
+<section>
+<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">データ解析のための統計モデリング入門</a>」<br>
+をベースに回帰分析の概要を紹介。</p>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p><span style="color: #888888;">    ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span></p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p><span style="color: #888888;">    ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span></p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p><span style="color: #888888;">    ↓ もっと<span style="font-weight: bold; color: #B2001D;">自由なモデリング</span>を！</span></p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+
+</section>
+<section>
+<h2 id="glmmで登場した個体差を階層ベイズモデルで">GLMMで登場した個体差を階層ベイズモデルで</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+</section>
+<section>
+<h2 id="個体差をモデルに組み込みたい">個体差をモデルに組み込みたい</h2>
+<p>各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$</p>
+<img src="figure/sigmoid-1.png" alt="plot of chunk sigmoid">
+<p>パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。</p>
+
+</section>
+<section>
+<h2 id="個体能力のばらつき-sigma-が大きいと両端が増える">個体能力のばらつき $\sigma$ が大きいと両端が増える</h2>
+<p>普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。</p>
+<img src="figure/alter-sigma-z-1.png" alt="plot of chunk alter-sigma-z">
+<img src="figure/alter-sigma-z-2.png" alt="plot of chunk alter-sigma-z">
+</section>
+<section>
+<h2 id="階層ベイズモデルのイメージ図">階層ベイズモデルのイメージ図</h2>
+<p>事前分布のパラメータに、さらに事前分布を設定するので階層ベイズ</p>
+<figure>
+<img src="../tokiomarine2022/hbm.drawio.svg" width="800">
+</figure>
+</section>
+<section>
+<h2 id="さっきの図をstan言語で記述すると">さっきの図をStan言語で記述すると</h2>
+<p><code>10</code> とか <code>3</code> とか、エイヤっと決めてるやつが超パラメータ。</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=0&gt; N;
+  array[N] int&lt;lower=0&gt; y;
+}
+
+parameters {
+  real z_hat;           // mean ability
+  real&lt;lower=0&gt; sigma;  // sd of r
+  vector[N] r;          // individual difference
+}
+
+transformed parameters {
+  vector[N] z = z_hat + r;
+  vector[N] p = inv_logit(z);
+}
+
+model {
+  y ~ binomial(8, p);
+  z_hat ~ normal(0, 10);
+  r ~ normal(0, sigma);
+  sigma ~ student_t(3, 0, 1);
+}
+
+generated quantities {
+  array[N] int yrep = binomial_rng(8, p);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="変量効果が入った推定結果">変量効果が入った推定結果</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">seeds_data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">df_seeds_od</span><span class="o">$</span><span class="n">y</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">samplesize</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/glmm.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">seeds_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">19937L</span><span class="p">,</span> <span class="n">step_size</span> <span class="o">=</span> <span class="m">0.1</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="s">&#34;z_hat&#34;</span><span class="p">,</span> <span class="s">&#34;sigma&#34;</span><span class="p">,</span> <span class="s">&#34;r[1]&#34;</span><span class="p">,</span> <span class="s">&#34;r[2]&#34;</span><span class="p">))</span>
+</span></span></code></pre></div><pre tabindex="0"><code> variable    mean  median   sd  mad      q5     q95 rhat ess_bulk ess_tail
+    lp__  -455.85 -455.48 9.21 9.27 -471.57 -441.72 1.00      834     1563
+    z_hat    0.25    0.25 0.31 0.29   -0.25    0.74 1.00      729     1431
+    sigma    2.77    2.74 0.34 0.34    2.26    3.35 1.00     1182     2360
+    r[1]    -0.24   -0.24 0.77 0.78   -1.47    1.02 1.00     2869     2766
+    r[2]     1.76    1.66 1.07 1.06    0.16    3.67 1.00     4692     2672
+    r[3]     1.77    1.69 1.09 1.03    0.17    3.75 1.00     4713     2417
+    r[4]    -3.74   -3.55 1.57 1.53   -6.53   -1.45 1.00     4865     3015
+    r[5]    -2.21   -2.11 1.07 1.03   -4.14   -0.65 1.00     4223     2252
+    r[6]    -2.19   -2.11 1.03 0.99   -4.00   -0.60 1.00     4408     2463
+    r[7]     0.93    0.88 0.89 0.88   -0.43    2.48 1.00     4135     3151
+
+ # showing 10 of 403 rows (change via &#39;max_rows&#39; argument or &#39;cmdstanr_max_rows&#39; option)
+</code></pre>
+</section>
+<section>
+<h2 id="抜粋して作図悪くない">抜粋して作図。悪くない。</h2>
+<p>データ生成の真のパラメータ値は $\hat z = 0.5,~\sigma = 3.0$ だった。</p>
+<p><img src="./figure/stan-glmm-1.png" alt="plot of chunk stan-glmm"></p>
+
+</section>
+<section>
+<h2 id="-階層ベイズモデルの練習問題-種の数">🔰 階層ベイズモデルの練習問題: 種の数</h2>
+<p><a href="8-hbm.ipynb"><code>8-hbm.ipynb</code></a>
+をJupyterで開き、スライド説明に沿って実行していこう。</p>
+<p>100個体の植物から8つずつ種を取り、発芽した数を観察。</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+<img src="figure/stan-glmm-ppc-1.png" alt="plot of chunk stan-glmm-ppc">
+
+</section>
+<section>
+<h2 id="-階層ベイズモデルの練習問題-ビール注文数">🔰 階層ベイズモデルの練習問題: ビール注文数</h2>
+<!-- TODO: 時間が余った場合の練習問題 -->
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">samplesize</span> <span class="o">=</span> <span class="m">300L</span>
+</span></span><span class="line"><span class="cl"><span class="n">lambda</span> <span class="o">=</span> <span class="m">3</span>
+</span></span><span class="line"><span class="cl"><span class="n">overdisp</span> <span class="o">=</span> <span class="m">4</span>
+</span></span><span class="line"><span class="cl"><span class="n">.n</span> <span class="o">=</span> <span class="n">lambda</span> <span class="o">/</span> <span class="p">(</span><span class="n">overdisp</span> <span class="o">-</span> <span class="m">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">.p</span> <span class="o">=</span> <span class="m">1</span> <span class="o">/</span> <span class="n">overdisp</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_beer_od</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">X</span> <span class="o">=</span> <span class="nf">rnbinom</span><span class="p">(</span><span class="n">samplesize</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">.n</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="n">.p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><img src="figure/beer-overdispersion-1.png" alt="plot of chunk beer-overdispersion">
+<img src="figure/stan-beer-od-ppc-1.png" alt="plot of chunk stan-beer-od-ppc">
+</section>
+<section>
+<h2 id="ベイズ推定まとめ">ベイズ推定まとめ</h2>
+<ul>
+<li>条件付き確率 $\Pr(B \mid A)$ の理解が大事。
+<ul>
+<li>事後分布 $\propto$ 尤度 ⨉ 事前分布</li>
+<li>確信度合いをデータで更新していく。</li>
+</ul>
+</li>
+<li>推定結果は分布そのもの。
+<ul>
+<li>そこから点推定も区間推定も可能。</li>
+</ul>
+</li>
+<li>解析的に解けない問題は計算機に乱数を振らせて解く。
+<ul>
+<li>MCMCサンプル $\sim$ 解きにくい事後分布</li>
+<li>理論・技術の進歩が目覚ましい。</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="回帰分析ふりかえり">回帰分析ふりかえり</h2>
+<p>より柔軟にモデルを記述できるようになった。計算方法も変化。</p>
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="全体まとめ">全体まとめ</h2>
+<ul>
+<li>統計とは、データをうまくまとめ、それに基づいて推論するための手法。</li>
+<li>モデルには<strong>理解志向</strong>と<strong>応用志向</strong>があり、統計モデルは前者寄り。
+<ul>
+<li>どちらも多少は分かった上で使い分けたい。</li>
+<li>どっちにしろ真の正しい何かではない。</li>
+</ul>
+</li>
+<li><strong>確率分布</strong>とその背後にある<strong>確率過程</strong>の理解が重要。
+<ul>
+<li>乱数生成→作図を繰り返してイメージを掴もう。</li>
+<li>MCMCサンプリングも事後分布からの乱数生成。</li>
+</ul>
+</li>
+<li>本講義で「統計モデリングを完全に理解した」とは言えない。
+<ul>
+<li>理論も実践もほとんど説明していない。</li>
+<li>本を読む準備ができた、くらいの気持ち？</li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="." class="readmore">
+目次に戻る
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>

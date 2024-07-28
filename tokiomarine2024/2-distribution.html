@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>2. 直線回帰、確率分布、擬似乱数生成 — 統計モデリング概論 DSHC 2024</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="2. 直線回帰、確率分布、擬似乱数生成 — 統計モデリング概論 DSHC 2024">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2024/2-distribution.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script defer src="/slides/lib/reveal.js/reveal.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/notes/notes.js"></script>
+<script defer src="/slides/lib/reveal.js/plugin/search/search.js"></script>
+<script defer src="/slides/lib/reveal-initialize.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', function() {
+  Reveal.configure({width: 1440, height: 1080});
+  document.querySelector('html').style.fontSize = '240%';
+})
+</script>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script src="/slides/lib/katex/katex.min.js"></script>
+<script src="/slides/lib/iconify.js"></script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="統計モデリング概論-dshc-2024"><a href=".">統計モデリング概論 DSHC 2024</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li class="current-deck"><a href="2-distribution.html">直線回帰、確率分布、擬似乱数生成</a>
+<li><a href="3-likelihood.html">尤度、最尤推定</a>
+<li><a href="4-glm.html">一般化線形モデル(GLM)</a>
+<li><a href="5-glmm.html">個体差、一般化線形混合モデル(GLMM)</a>
+<li><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
+<li><a href="7-stan.html">StanでGLM</a>
+<li><a href="8-hbm.html">階層ベイズモデル(HBM)</a>
+</ol>
+<div class="footnote">
+2024-08-21 東京海上 Data Science Hill Climb<br>
+<a href="https://heavywatal.github.io/slides/tokiomarine2024/">https://heavywatal.github.io/slides/tokiomarine2024/</a>
+</div>
+
+</section>
+<section>
+<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p><span style="color: #888888;">    ↓ いろんな確率分布を扱いたい</span></p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p><span style="color: #888888;">    ↓ 個体差などの変量効果を扱いたい</span></p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p><span style="color: #888888;">    ↓ もっと自由なモデリングを！</span></p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+<p><cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012 より改変</cite></p>
+
+</section>
+<section>
+<h2 id="直線あてはめ-統計モデルの出発点">直線あてはめ: 統計モデルの出発点</h2>
+<img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
+<ul>
+<li>身長が高いほど体重も重い。いい感じ。</li>
+</ul>
+<p>(説明のために作った架空のデータ。今後もほぼそうです)</p>
+</section>
+<section>
+<h2 id="回帰モデルの2段階">回帰モデルの2段階</h2>
+<ol>
+<li>
+<p>Define a <strong>family of models</strong>: だいたいどんな形か、式をたてる</p>
+<ul>
+<li>直線: $y = a_1 + a_2 x$</li>
+<li>対数: $\log(y) = a_1 + a_2 x$</li>
+<li>二次曲線: $y = a_1 + a_2 x^2$</li>
+</ul>
+</li>
+<li>
+<p>Generate a <strong>fitted model</strong>: データに合うようにパラメータを調整</p>
+<ul>
+<li>$y = 3x + 7$</li>
+<li>$y = 9x^2$</li>
+</ul>
+</li>
+</ol>
+<p><a href="https://r4ds.had.co.nz/model-basics.html" class="url"><a href="https://r4ds.had.co.nz/model-basics.html">https://r4ds.had.co.nz/model-basics.html</a></a></p>
+
+</section>
+<section>
+<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
+<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
+ </p>
+<p><img src="./figure/weight-height-1.png" alt="plot of chunk weight-height"></p>
+
+</section>
+<section>
+<h2 id="たぶん身長が高いほど体重も重い">たぶん身長が高いほど体重も重い</h2>
+<p>なんとなく $y = a x + b$ でいい線が引けそう<br>
+じゃあ傾き <em>a</em> と切片 <em>b</em>、どう決める？</p>
+<p><img src="./figure/weight-lines-1.png" alt="plot of chunk weight-lines"></p>
+
+</section>
+<section>
+<h2 id="最小二乗法-ordinary-least-square-ols">最小二乗法 (Ordinary Least Square: OLS)</h2>
+<p><span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。</p>
+<p><img src="./figure/weight-residual-1.png" alt="plot of chunk weight-residual"></p>
+
+</section>
+<section>
+<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
+<p>ランダムに試してみて、上位のものを採用。<br>
+この程度の試行回数では足りなそう。</p>
+<p><img src="./figure/weight-goodlines-1.png" alt="plot of chunk weight-goodlines"></p>
+
+</section>
+<section>
+<h2 id="残差平方和rssが最小となるパラメータを探せ">残差平方和(RSS)が最小となるパラメータを探せ</h2>
+<p><strong>グリッドサーチ</strong>: パラメータ空間の一定範囲内を均等に試す。<br>
+さっきのランダムよりはちょっとマシか。</p>
+<p><img src="./figure/weight-grid-1.png" alt="plot of chunk weight-grid"></p>
+<p>こうした<strong>最適化</strong>の手法はいろいろあるけど、ここでは扱わない。</p>
+
+</section>
+<section>
+<h2 id="これくらいなら一瞬で計算してもらえる">これくらいなら一瞬で計算してもらえる</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">statsmodels.formula.api</span> <span class="k">as</span> <span class="nn">smf</span>
+</span></span><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">smf</span><span class="o">.</span><span class="n">ols</span><span class="p">(</span><span class="s2">&#34;weight ~ height&#34;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">df_weight</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">result</span><span class="o">.</span><span class="n">params</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Intercept   -69.852224
+height       78.634439
+dtype: float64
+</code></pre><p><img src="./figure/weight-lm-1.png" alt="plot of chunk weight-lm"></p>
+</section>
+<section>
+<h2 id="-直線あてはめしてみる">🔰 直線あてはめしてみる</h2>
+<p>回帰に使えるPythonパッケージ2選:</p>
+<dl>
+<dt><a href="https://www.statsmodels.org">statsmodels</a></dt>
+<dd>統計モデリング寄り。今回はこちらを紹介。</dd>
+<dd>Rに似た書き方や統計量の計算などいろいろ楽。</dd>
+<dt><a href="https://scikit-learn.org">scikit-learn</a></dt>
+<dd>機械学習寄り</dd>
+<dd>回帰以外のさまざまな手法も統一的な書き方で使える</dd>
+</dl>
+<p>🔰
+<a href="./2-distribution.ipynb"><code>2-distribution.ipynb</code></a>
+をJupyterで開き、順々に実行してみよう。</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<p><img src="./figure/lm-bad-1.png" alt="plot of chunk lm-bad"></p>
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
+</ul>
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<p><img src="./figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
+<li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
+</ul>
+</section>
+<section>
+<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p><span style="color: #888888;">    ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span></p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p><span style="color: #888888;">    ↓ 個体差などの変量効果を扱いたい</span></p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p><span style="color: #888888;">    ↓ もっと自由なモデリングを！</span></p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+<p><cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012 より改変</cite></p>
+
+</section>
+<section>
+<h2 id="確率分布">確率分布</h2>
+<p>発生する事象(値)と頻度の関係。</p>
+<p>手元のデータを数えて作るのが<strong>経験分布</strong><br>
+e.g., サイコロを12回投げた結果、学生1000人の身長</p>
+<p><img src="./figure/distribution-1.png" alt="plot of chunk distribution"></p>
+<p>一方、少数のパラメータと数式で作るのが<strong>理論分布</strong>。<br>
+(こちらを単に「確率分布」と呼ぶことが多い印象）</p>
+
+</section>
+<section>
+<h2 id="確率変数xはパラメータthetaの確率分布fに従う">確率変数$X$はパラメータ$\theta$の確率分布$f$に従う&hellip;?</h2>
+<p>$X \sim f(\theta)$</p>
+<p>e.g.,<br>
+コインを3枚投げたうち表の出る枚数 $X$ は<strong>二項分布に従う</strong>。<br>
+$X \sim \text{Binomial}(n = 3, p = 0.5)$</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<p><img src="./figure/dbinom-1.png" alt="plot of chunk dbinom"></p>
+  </div>
+  <div class="column" style="padding-top: 10px;">
+\[\begin{split}
+\Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
+k &\in \{0, 1, 2, \ldots, n\}
+\end{split}\]
+  </div>
+</div>
+<p>一緒に実験してみよう。</p>
+
+</section>
+<section>
+<h2 id="試行を繰り返して記録してみる">試行を繰り返して記録してみる</h2>
+<p>コインを3枚投げたうち表の出た枚数 $X$</p>
+<p>試行1: <strong>表</strong> 裏 <strong>表</strong> → $X = 2$<br>
+試行2: 裏 裏 裏 → $X = 0$<br>
+試行3: <strong>表</strong> 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$</p>
+<p><img src="./figure/rbinom-1.png" alt="plot of chunk rbinom"></p>
+<div style="text-align: right;">
+試行回数を増やすほど<b>二項分布</b>の形に近づく。<br>
+0と3はレア。1と2が3倍ほど出やすいらしい。
+</div>
+</section>
+<section>
+<h2 id="コイントスしなくても-x-らしきものを生成できる">コイントスしなくても $X$ らしきものを生成できる</h2>
+<ul>
+<li>コインを3枚投げたうち表の出る枚数 $X$</li>
+<li>$n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$</li>
+</ul>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<img src="figure/dbinom-1.png" alt="plot of chunk dbinom">
+  </div>
+  <div class="column" style="padding-top: 10px;">
+$X \sim \text{Binomial}(n = 3, p = 0.5)$
+<p>   ↓ サンプル</p>
+<p>{2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
+  </div>
+</div>
+<p>これらはとてもよく似ているので<br>
+<strong>「コインをn枚投げたうち表の出る枚数は二項分布に従う」</strong><br>
+みたいな言い方をする。逆に言うと<br>
+<strong>「二項分布とはn回試行のうちの成功回数を確率変数とする分布」</strong><br>
+のように理解できる。</p>
+
+</section>
+<section>
+<h2 id="統計モデリングの一環とも捉えられる">統計モデリングの一環とも捉えられる</h2>
+<p>コイン3枚投げを繰り返して得たデータ {2, 0, 1, 2, 1, 3, 0, 2, &hellip;}</p>
+<p>   ↓ たった2つのパラメータで記述。情報を圧縮。</p>
+<p>$n = 3, p = 0.5$ の二項分布で説明・再現できるぞ</p>
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="960"><br>
+<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+</figure>
+<p>こういうふうに現象と対応した確率分布、ほかにもある？</p>
+
+</section>
+<section>
+<h2 id="有名な確率分布それに従うもの">有名な確率分布、それに「従う」もの</h2>
+<dl>
+<dt>離散一様分布</dt>
+<dd>コインの表裏、サイコロの出目1–6</dd>
+<dt>負の二項分布 (幾何分布 if n = 1)</dt>
+<dd>成功率pの試行がn回成功するまでの失敗回数</dd>
+<dt>二項分布</dt>
+<dd>成功率p、試行回数nのうちの成功回数</dd>
+<dt>ポアソン分布</dt>
+<dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
+<dt>ガンマ分布 (指数分布 if k = 1)</dt>
+<dd>ポアソン過程でk回起こるまでの待ち時間</dd>
+<dt>正規分布</dt>
+<dd>確率変数の和、平均値など。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="離散一様分布">離散一様分布</h2>
+<p>同じ確率で起こるn通りの事象のうちXが起こる確率</p>
+<p>e.g., コインの表裏、サイコロの出目1–6</p>
+<p><img src="./figure/dunif-1.png" alt="plot of chunk dunif"></p>
+<p>🔰 一様分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="幾何分布-textgeomp">幾何分布 $~\text{Geom}(p)$</h2>
+<p>成功率pの試行が初めて成功するまでの失敗回数</p>
+<p>e.g., コイントスで表が出るまでに何回裏が出るか</p>
+<p><img src="./figure/geometric-1.png" alt="plot of chunk geometric"></p>
+<p>\[
+\Pr(X = k \mid p) = p (1 - p)^k
+\]</p>
+<p>「初めて成功するまでの試行回数」とする定義もある。</p>
+<p>🔰 幾何分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="負の二項分布-textnbn-p">負の二項分布 $~\text{NB}(n, p)$</h2>
+<p>成功率pの試行がn回成功するまでの失敗回数X。
+n = 1 のとき幾何分布と一致。</p>
+<p><img src="./figure/nbinom-1.png" alt="plot of chunk nbinom"></p>
+<p>\[
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\]</p>
+<p>失敗回数ではなく試行回数を変数とする定義もある。</p>
+<p>🔰 負の二項分布になりそうな例を考えてみよう</p>
+<!--
+平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+($k \to \infty$でポアソン分布と一致)
+-->
+
+</section>
+<section>
+<h2 id="二項分布-textbinomialnp">二項分布 $~\text{Binomial}(n,~p)$</h2>
+<p>確率$p$で当たるクジを$n$回引いてX回当たる確率。平均は$np$。</p>
+<p><img src="./figure/dbinom-n-1.png" alt="plot of chunk dbinom-n"></p>
+<p>\[
+\Pr(X = k \mid n,~p) = \binom n k p^k (1 - p)^{n - k}
+\]</p>
+<p>🔰 二項分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="ポアソン分布-textpoissonlambda">ポアソン分布 $~\text{Poisson}(\lambda)$</h2>
+<p>平均$\lambda$で単位時間(空間)あたりに発生する事象の回数。</p>
+<p>e.g., 1時間あたりのメッセージ受信件数、メッシュ区画内の生物個体数</p>
+<p><img src="./figure/dpoisson-1.png" alt="plot of chunk dpoisson"></p>
+<p>\[
+\Pr(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
+\]</p>
+<p>二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
+めったに起きないことを何回も試行するような感じ。</p>
+
+</section>
+<section>
+<h2 id="指数分布-textexplambda">指数分布 $~\text{Exp}(\lambda)$</h2>
+<p>ポアソン過程の事象の発生間隔。平均は $1 / \lambda$ 。</p>
+<p>e.g., メッセージの受信間隔、道路沿いに落ちてる手袋の間隔</p>
+<p><img src="./figure/dexp-1.png" alt="plot of chunk dexp"></p>
+<p>\[
+\Pr(x \mid \lambda) = \lambda e^{-\lambda x}
+\]</p>
+<p>幾何分布の連続値版。</p>
+<p>🔰 ポアソン分布・指数分布になりそうな例を考えてみよう</p>
+
+</section>
+<section>
+<h2 id="ガンマ分布-textgammaklambda">ガンマ分布 $~\text{Gamma}(k,~\lambda)$</h2>
+<p>ポアソン過程の事象k回発生までの待ち時間</p>
+<p>e.g., メッセージを2つ受信するまでの待ち時間</p>
+<p><img src="./figure/dgamma-1.png" alt="plot of chunk dgamma"></p>
+<p>\[
+\Pr(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
+\]</p>
+<p>指数分布をkのぶん右に膨らませた感じ。<br>
+shapeパラメータ $k = 1$ のとき指数分布と一致。</p>
+
+</section>
+<section>
+<h2 id="正規分布-mathcalnmusigma">正規分布 $~\mathcal{N}(\mu,~\sigma)$</h2>
+<p>平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
+e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):</p>
+<p><img src="./figure/gaussian-1.png" alt="plot of chunk gaussian"></p>
+<p>\[
+\Pr(x \mid \mu,~\sigma) = \frac 1 {\sqrt{2 \pi \sigma^2}} \exp \left(\frac {-(x - \mu)^2} {2\sigma^2} \right)
+\]</p>
+
+</section>
+<section>
+<h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
+<p>標本平均の反復(<strong>中心極限定理</strong>);
+e.g., 一様分布 [0, 100) から40サンプル</p>
+<p><img src="./figure/central-limit-1.png" alt="plot of chunk central-limit"></p>
+<p>大きい$n$の二項分布</p>
+<p><img src="./figure/binom-normal-1.png" alt="plot of chunk binom-normal"></p>
+
+</section>
+<section>
+<h2 id="正規分布に近づくものがいろいろある">正規分布に近づくものがいろいろある</h2>
+<p>大きい$\lambda$のポアソン分布</p>
+<p><img src="./figure/poisson-normal-1.png" alt="plot of chunk poisson-normal"></p>
+<p>平均値固定なら$k$が大きくなるほど左右対称に尖るガンマ分布</p>
+<p><img src="./figure/gamma-normal-1.png" alt="plot of chunk gamma-normal"></p>
+
+</section>
+<section>
+<h2 id="有名な確率分布対応関係ふりかえり">有名な確率分布対応関係ふりかえり</h2>
+<figure style="float: right;">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
+</figure>
+<dl>
+<dt>離散一様分布</dt>
+<dd>コインの表裏、サイコロの出目1–6</dd>
+<dt>負の二項分布 (幾何分布 if n = 1)</dt>
+<dd>成功率pの試行がn回成功するまでの失敗回数</dd>
+<dt>二項分布</dt>
+<dd>成功率p、試行回数nのうちの成功回数</dd>
+<dt>ポアソン分布</dt>
+<dd>単位時間あたり平均$\lambda$回起こる事象の発生回数</dd>
+<dt>ガンマ分布 (指数分布 if k = 1)</dt>
+<dd>ポアソン過程でk回起こるまでの待ち時間</dd>
+<dt>正規分布</dt>
+<dd>確率変数の和、平均値。使い勝手が良く、よく登場する。</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="現実には確率分布に従わないことが多い">現実には、確率分布に「従わない」ことが多い</h2>
+<p>植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。</p>
+<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+<p>「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
+<strong>「普通はこれに従うはず」を理解してこそ</strong>できる思考。</p>
+
+</section>
+<section>
+<h2 id="疑似乱数生成器-pseudo-random-number-generator">疑似乱数生成器 Pseudo Random Number Generator</h2>
+<p>コンピューター上でランダム<strong>っぽい</strong>数値を出力する装置。<br>
+実際には<strong>決定論的</strong>に計算されているので、<br>
+シード(出発点)と呼び出し回数が同じなら出る数も同じになる。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>  <span class="c1"># initialize</span>
+</span></span><span class="line"><span class="cl"><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># array([1, 4, 4, 3])</span>
+</span></span><span class="line"><span class="cl"><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># array([3, 5, 1, 4])</span>
+</span></span><span class="line"><span class="cl"><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>  <span class="c1"># re-initialize</span>
+</span></span><span class="line"><span class="cl"><span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># array([1, 4, 4, 3, 3, 5, 1, 4])</span>
+</span></span></code></pre></div><p>シードに適当な固定値を与えておくことで再現性を保てる。<br>
+ただし「このシードじゃないと良い結果が出ない」はダメ。</p>
+<p>さまざまな「分布に従う」乱数を生成することもできる。</p>
+
+</section>
+<section>
+<h2 id="いろんな乱数を生成可視化して感覚を掴もう">いろんな乱数を生成・可視化して感覚を掴もう</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">24601</span><span class="p">)</span>  <span class="c1"># Random Number Generator</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">x</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># x = rng.binomial(3, 0.5, 100)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># x = rng.poisson(3, 100)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># x = rng.normal(50, 10, 100)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># sns.histplot(x)   # for continuous values</span>
+</span></span><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">countplot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>    <span class="c1"># for discrete values</span>
+</span></span></code></pre></div><p>🔰
+<a href="./2-distribution.ipynb"><code>2-distribution.ipynb</code></a>
+をJupyterで開き、順々に実行してみよう。</p>
+<hr>
+<p>☕️ 休憩 + 質疑応答</p>
+
+</section>
+<section>
+<h2 id="本講義のお品書き">本講義のお品書き</h2>
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+<p>久保先生の&quot;緑本&quot;こと<br>
+「データ解析のための統計モデリング入門」<br>
+をベースに回帰分析の概要を紹介。</p>
+<ol>
+<li>イントロ</li>
+<li>統計モデルの基本
+<ul>
+<li>直線回帰</li>
+<li>確率変数・<strong>確率分布</strong> 👈 ここまでやった</li>
+<li>尤度・最尤推定</li>
+</ul>
+</li>
+<li>一般化線形モデル、混合モデル</li>
+<li>ベイズ統計、階層ベイズモデル</li>
+</ol>
+<p>回帰のキモは<strong>線ではなく分布</strong></p>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li>「<a href="/slides/tohoku2024r/">進化学実習2024</a>」
+東北大学 理学部生物学科 (2024-04)</li>
+<li>「<a href="https://comicalcommet.github.io/r-training-2023/">Rを用いたデータ解析の基礎と応用</a>」
+石川由希 2023 名古屋大学</li>
+</ul>
+<a href="3-likelihood.html" class="readmore">
+3. 尤度、最尤推定
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>

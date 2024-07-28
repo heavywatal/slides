@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>統計モデリング概論 DSHC 2024</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="統計モデリング概論 DSHC 2024">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tokiomarine2024/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script src="/slides/lib/katex/katex.min.js"></script>
+<script src="/slides/lib/iconify.js"></script>
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-plain.css">
+</head>
+<body>
+<main>
+<header>
+<h1>統計モデリング概論 DSHC 2024</h1>
+</header>
+<p><a href="https://tokiomarine-dshc.com/">東京海上 Data Science Hill Climb</a></p>
+<ul>
+<li>講師: 岩嵜航 (東北大学生命科学研究科)</li>
+<li>日程: 2024-08-21&amp;28 09:30&ndash;17:30</li>
+<li>場所: zoom.us</li>
+</ul>
+<p><img src="figure/schedule-1.svg" alt="plot of chunk schedule"></p>
+<h2 id="実行環境の準備">実行環境の準備</h2>
+<p>DSHC 2024 参加者はほかの講義で使っている環境をなるべくそのまま使う。
+いくつかのパッケージを追加するため
+<a href="./preparation.ipynb"><code>preparation.ipynb</code></a> をダウンロードして実行。</p>
+<p>ほかの講義を受講していない私が追いつくために実行したコマンド
+(macOSに講義用の仮想環境を用意する一例として):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-sh" data-lang="sh"><span class="line"><span class="cl">brew install pyenv
+</span></span><span class="line"><span class="cl">env <span class="nv">PYTHON_CONFIGURE_OPTS</span><span class="o">=</span><span class="s2">&#34;--enable-shared&#34;</span> pyenv install 3.10
+</span></span><span class="line"><span class="cl"><span class="c1"># Rscript -e &#39;reticulate::install_python(&#34;3.10:latest&#34;)&#39;</span>
+</span></span><span class="line"><span class="cl"><span class="k">$(</span>pyenv prefix 3.10<span class="k">)</span>/bin/python3 -m venv ~/.virtualenvs/dshc2024
+</span></span><span class="line"><span class="cl"><span class="nb">source</span> ~/.virtualenvs/dshc2024/bin/activate
+</span></span><span class="line"><span class="cl">pip3 install -U setuptools pip
+</span></span><span class="line"><span class="cl">pip3 install -r requirements.txt
+</span></span><span class="line"><span class="cl">jupyter-notebook preparation.ipynb
+</span></span></code></pre></div><p>DSHC 2024 に参加せずこの資料に辿り着いた人はわざわざ古い3.10を入れる必要はない。
+最新版(≥3.12)をインストールする。
+<code>requirements.txt</code> の代わりに個別指定で
+<code>pip3 install -U seaborn scikit-learn jupyter statsmodels cmdstanpy arviz</code>
+を実行する。</p>
+<h2 id="演習資料">演習資料</h2>
+<ul>
+<li><a href="./preparation.ipynb"><code>preparation.ipynb</code></a></li>
+<li><a href="./2-distribution.ipynb"><code>2-distribution.ipynb</code></a></li>
+<li><a href="./3-likelihood.ipynb"><code>3-likelihood.ipynb</code></a></li>
+<li><a href="4-glm.ipynb"><code>4-glm.ipynb</code></a></li>
+<li><a href="6-bayesian.ipynb"><code>6-bayesian.ipynb</code></a></li>
+<li><a href="7-stan.ipynb"><code>7-stan.ipynb</code></a></li>
+<li><a href="8-hbm.ipynb"><code>8-hbm.ipynb</code></a></li>
+</ul>
+<h2 id="講義資料">講義資料</h2>
+<p>リンク先では<kbd>←</kbd><kbd>→</kbd>キーで戻る・進む。</p>
+
+<ul>
+<li>2024-08-21 09:30 | <a href="/slides/tokiomarine2024/1-introduction.html">導入</a></li>
+<li>2024-08-21 10:30 | <a href="/slides/tokiomarine2024/2-distribution.html">直線回帰、確率分布、擬似乱数生成</a></li>
+<li>2024-08-21 13:00 | <a href="/slides/tokiomarine2024/3-likelihood.html">尤度、最尤推定</a></li>
+<li>2024-08-21 14:00 | <a href="/slides/tokiomarine2024/4-glm.html">一般化線形モデル(GLM)</a></li>
+<li>2024-08-21 16:00 | <a href="/slides/tokiomarine2024/5-glmm.html">個体差、一般化線形混合モデル(GLMM)</a></li>
+<li>2024-08-28 09:30 | <a href="/slides/tokiomarine2024/6-bayesian.html">ベイズの定理、事後分布、MCMC</a></li>
+<li>2024-08-28 13:00 | <a href="/slides/tokiomarine2024/7-stan.html">StanでGLM</a></li>
+<li>2024-08-28 15:00 | <a href="/slides/tokiomarine2024/8-hbm.html">階層ベイズモデル(HBM)</a></li>
+</ul>
+</main>
+</body>
+</html>
