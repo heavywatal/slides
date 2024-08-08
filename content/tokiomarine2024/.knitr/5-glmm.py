@@ -81,3 +81,4 @@ sns.countplot(x=y)
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownParameterType=false
 # pyright: reportUnknownVariableType=false
+# ruff: noqa: E402 ANN001 ANN201

@@ -236,7 +236,7 @@ az.plot_trace(stan_data)
 # %%
 az.plot_posterior(stan_data)
 # %%
-from itertools import product  # noqa: E402
+from itertools import product
 
 post_mean = stan_data.posterior.mean().to_pandas()
 it = product(range(8, 33, 4), range(20, 90, 10))
@@ -352,7 +352,7 @@ grid.add_legend()
 
 # ## Stanでpenguins単回帰
 # %%
-penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
+penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", cache=True).data
 penguins_dropna = penguins.dropna()
 print(penguins_dropna)
 pen_data = {
@@ -481,3 +481,4 @@ grid.add_legend()
 # pyright: reportUnknownLambdaType=false
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownVariableType=false
+# ruff: noqa: E402

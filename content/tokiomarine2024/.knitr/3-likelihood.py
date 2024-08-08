@@ -22,9 +22,9 @@
 import sys
 
 import numpy as np
+import pandas as pd
 import seaborn as sns
 
-rng = np.random.default_rng(seed=24601)
 print(sys.version)
 
 # %% [markdown]
@@ -40,7 +40,7 @@ print(sys.version)
 #
 # ヒント: 次のような部品を使って `get_likelihood()` 関数を作るとか。
 # %%
-from scipy import special  # noqa: E402
+from scipy import special
 
 n = 5
 k = 2
@@ -74,10 +74,40 @@ sns.lineplot(x=p, y=lik)
 
 
 # %% tags=["remove_cell"]
-from scipy import stats  # noqa: E402
+from scipy import stats
 
 lik = stats.binom.pmf(k, n, p)
 sns.lineplot(x=p, y=lik)
+
+# %% [markdown]
+# ---
+# ## 🔰 分布を当てはめる練習問題
+#
+# 植物25個体から8個ずつ種をとって植え、生き残ったものを数えた。
+#
+# 1. データの分布を描いてみて、当てはまりそうな確率分布を検討する
+# 1. 理論分布を適当なパラメータで描いてみる
+# 1. パラメータや分布を変えてみて、データの分布にすり寄せる
+# 1. 対数尤度の変化を可視化し、パラメータを最尤推定する
+
+# %%
+# Observation (read the data on the slide or generate new one)
+sample_size = 25
+trials = 8
+true_p = 0.8
+rng = np.random.default_rng(seed=24601)
+_y = rng.binomial(trials, true_p, sample_size)
+df_seeds = pd.DataFrame({"trials": trials, "survived": _y})
+print(df_seeds)
+
+# %%
+# Plot data distribution
+
+# %%
+# Plot theoretical distribution
+
+# %%
+# Plot loglik and perform MLE
 
 # %%
 # pyright: reportMissingTypeStubs=false
@@ -87,3 +117,4 @@ sns.lineplot(x=p, y=lik)
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownParameterType=false
 # pyright: reportUnknownVariableType=false
+# ruff: noqa: E402 ANN001 ANN201

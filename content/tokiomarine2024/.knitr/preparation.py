@@ -39,7 +39,7 @@ print(sys.version)
 
 # %%
 # %pip install 'statsmodels>=0.14'
-import statsmodels.api as sm  # noqa: E402
+import statsmodels.api as sm
 
 sm.show_versions()
 
@@ -90,7 +90,7 @@ fit.summary()
 
 # %%
 # %pip install 'arviz>=0.19'
-import arviz as az  # noqa: E402
+import arviz as az
 
 print(az.__version__)
 
@@ -107,3 +107,4 @@ az.plot_trace(cmdstanpy_data)
 # pyright: reportUnknownArgumentType=false
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownVariableType=false
+# ruff: noqa: E402

@@ -63,8 +63,8 @@ print(df_pred)
 # %% [markdown]
 # `assign()` や `lambda` に不慣れなら次のようにも書いても同じ:
 # ```py
-# df_pred = df.copy()
-# df_pred["pred"] = result.predict(df)
+# df_pred = df_pois.copy()
+# df_pred["pred"] = result.predict(df_pred)
 # ```
 
 # %%

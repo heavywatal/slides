@@ -124,7 +124,7 @@ model = smf.glm("beer_sales ~ temperature + humidity", df_mul, family=poisson)
 result = model.fit()
 print(result.params)
 # %%
-from itertools import product  # noqa: E402
+from itertools import product
 
 it = product(range(8, 33, 4), range(20, 90, 10))
 df_pred = pd.DataFrame(list(it), columns=["temperature", "humidity"])
@@ -255,7 +255,7 @@ true_intercept = 100
 true_coefs = {"sunny": -30, "temp": 3, "sunny:temp": 2}
 weather_levels = ["rainy", "sunny"]
 temperature = rng.uniform(8, 32, sample_size)
-weather = rng.choice(weather_levels, sample_size, True)
+weather = rng.choice(weather_levels, sample_size, replace=True)
 _dic = {
     "temperature": rng.uniform(8, 32, sample_size),
     "weather": pd.Categorical(weather, categories=weather_levels),
@@ -302,7 +302,7 @@ grid.add_legend()
 # まずデータをダウンロード。
 
 # %%
-penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
+penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", cache=True).data
 print(penguins)
 
 
@@ -429,3 +429,4 @@ sns.lmplot(
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownParameterType=false
 # pyright: reportUnknownVariableType=false
+# ruff: noqa: E402
