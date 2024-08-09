@@ -35,3 +35,9 @@ content/%/image: ${DROPBOX}/%
 
 ${DROPBOX}/%: | content/%
 	mkdir $@
+
+.PHONY: working
+working:
+	@ls -l $@
+	$(MAKE) -C $@/.knitr
+	$(MAKE) all
