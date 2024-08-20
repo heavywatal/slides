@@ -7,8 +7,16 @@
 # 2024-08-28 東京海上 Data Science Hill Climb<br>
 # https://heavywatal.github.io/slides/tokiomarine2024/
 #
-# # StanでベイジアンGLM
-
+# # PythonからStanを使ってみる
+#
+# おおまかな流れ:
+#
+# - データ準備
+# - Stan言語でモデルを書く
+# - それをコンパイルして機械語に翻訳→実行ファイル
+# - 実行ファイルにデータを渡してMCMCサンプリング
+# - 結果を見る
+#
 # ## 環境セットアップ
 
 # Google Colab の場合はインストールから:
@@ -22,6 +30,8 @@
 # %%
 # %matplotlib inline
 
+from pathlib import Path
+
 import arviz as az
 import matplotlib.pyplot as plt
 import numpy as np
@@ -31,13 +41,110 @@ import statsmodels.api as sm
 from cmdstanpy import CmdStanModel
 from scipy import special
 
+# %% [markdown]
+# ## 説明変数なしのベイズ推定
+#
+# ### データ準備
+#
+# 表が出る確率70%のイカサマコインをN回投げたデータを作る。
+#
+# %%
 rng = np.random.default_rng(seed=24601)
+true_p = 0.7
+sample_size = 40
+coin_data = {"N": sample_size, "x": rng.binomial(1, true_p, sample_size)}
+print(coin_data)
+# %%
+sns.countplot(x="x", data=coin_data)
 
 # %% [markdown]
+# ### モデルの定義
+# スライドにあるコードを `coin.stan` というファイルに保存しておき、読み込む。
+# ここでは `stan/` ディレクトリにまとめるが、それはお好みで。
+# %%
+stan_dir = Path("stan")
+stan_dir.mkdir(0o755, exist_ok=True)
+stan_file = stan_dir / "coin.stan"
+
+# Create and edit `stan_file` (see below).
+
+# Then, read it:
+model = CmdStanModel(stan_file=stan_file)
+
+# %% [markdown]
+# Colabではipynb以外のファイルを直接編集することができないので、
+# 手元のエディタで書いてからアップロードするか、
+# 次のようなコードを実行して文字列からファイルに書き出す。
+# ```py
+# stan_code = """
+# data {
+#   int<lower=0> N;
+#   array[N] int x;
+# }
+# parameters {
+#   real<lower=0,upper=1> p;
+# }
+# model {
+#   x ~ binomial(1, p);
+# }
+# """
+#
+# with stan_file.open("wt") as fout:
+#     fout.write(stan_code)
+# ```
+
+# %% [markdown]
+# ### MCMCサンプル
+# %%
+fit = model.sample(coin_data, chains=4, iter_sampling=2000)
+
+# %% [markdown]
+# 結果はchainごとにファイル出力されているらしい。
+# %%
+print(fit)
+
+# %% [markdown]
+# `numpy.ndarray` 型か `pandas.DataFrame` 型で全部参照できる。
+# が、生の値を見たところであまりよくわからない。
+# %%
+print(fit.draws().shape)  # Array
+# %%
+print(fit.draws_pd())  # DataFrame
+
+# %% [markdown]
+# ### 推定結果の要約と収束診断
+# %%
+fit.summary()
+# %%
+print(fit.diagnose())
+
+# %% [markdown]
+# ### トレースプロット確認
+# 分布はきれいなひと山、軌跡はきれいな毛虫
+# %%
+stan_data = az.from_cmdstanpy(fit)
+az.plot_trace(stan_data)
+
+# %% [markdown]
+#
+# ### 推定結果の事後分布を確認
+# - 点推定: 事後分布平均
+# - 区間推定: HDI(Highest Density Interval)
+# %%
+az.plot_posterior(stan_data)
+
+# %%
+stan_data.posterior.mean()
+
+
+# %% [markdown]
+# ---
+# # StanでベイジアンGLM
 #
 # ## Stanで直線回帰
 #
 # %%
+rng = np.random.default_rng(seed=24601)
 sample_size = 300
 true_intercept = -3
 true_coef = 3
@@ -148,6 +255,7 @@ grid.add_legend()
 # ## Stanでロジスティック回帰
 #
 # %%
+rng = np.random.default_rng(seed=24601)
 n_trials = 10
 true_intercept = -3
 true_coef = 0.3
@@ -198,6 +306,7 @@ grid.add_legend()
 # ## 重回帰: 複数の説明変数を同時に扱う
 # ビールの注文数が気温と湿度の両方に依存して増加するデータを作る。
 # %%
+rng = np.random.default_rng(seed=24601)
 sample_size = 200
 true_intercept = 3
 true_coefs = {"temperature": 0.05, "humidity": 0.006}
@@ -259,6 +368,7 @@ sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
 # ## 分散分析: GLM with 質的(カテゴリカル)変数
 #
 # %% Parameters
+rng = np.random.default_rng(seed=24601)
 sample_size = 200
 true_intercept = 70
 true_coefs = {"temp": 3, "sunny": 20, "rainy": -20}
