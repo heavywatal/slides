@@ -50,12 +50,13 @@ pak::pkg_install("heavywatal/rwtl")
 1. Install node: `nvm install --lts --latest-npm`
 1. Setup node: `nvm use stable`
 1. Change directory to this repo: `cd ~/git/slides/`
-1. `npm install` ([decktape](https://github.com/astefanutti/decktape) via `package.json`)
+1. Install [decktape](https://github.com/astefanutti/decktape):
+   `npm install -g decktape`
 1.  Run decktape:
 
     ```sh
-    npm run decktape https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
+    decktape https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
     # or manually
-    npx decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
-    npx decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2023/R_training_2023_1.html R_training_1.pdf
+    decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
+    decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2023/R_training_2023_1.html R_training_1.pdf
     ```
