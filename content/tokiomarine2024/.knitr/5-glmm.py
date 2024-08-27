@@ -62,7 +62,7 @@ sns.histplot(x=p, bins=20)
 
 n = 8
 y = rng.binomial(n, p)
-sns.countplot(x=y)
+sns.histplot(x=y, discrete=True)
 
 # %% [markdown]
 #

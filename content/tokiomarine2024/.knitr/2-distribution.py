@@ -96,42 +96,42 @@ grid.map(sns.lineplot, "x", "pred")
 # %%
 x = rng.integers(low=1, high=7, size=100)
 print(x)
-sns.countplot(x=x)  # for discrete values
+sns.histplot(x=x, discrete=True)
 
 # %% [markdown]
 # ### 一様分布 (実数・連続値)
 # %%
 x = rng.uniform(low=0, high=1, size=100)
 print(x)
-sns.histplot(x=x)  # for continuous values
+sns.histplot(x=x)
 
 # %% [markdown]
 # ### 幾何分布
 # %%
 x = rng.geometric(p=0.3, size=100)
 print(x)
-sns.histplot(x=x)  # for continuous values
+sns.histplot(x=x)
 
 # %% [markdown]
 # ### 二項分布
 # %%
 x = rng.binomial(n=3, p=0.5, size=100)
 print(x)
-sns.countplot(x=x)  # for discrete values
+sns.histplot(x=x, discrete=True)
 
 # %% [markdown]
 # ### ポアソン分布
 # %%
 x = rng.poisson(lam=3, size=100)
 print(x)
-sns.countplot(x=x)  # for discrete values
+sns.histplot(x=x, discrete=True)
 
 # %% [markdown]
 # ### 正規分布
 # %%
 x = rng.normal(loc=50, scale=10, size=100)
 print(x)
-sns.histplot(x=x)  # for continuous values
+sns.histplot(x=x)
 
 # %% [markdown]
 # ### 🔰 自由課題

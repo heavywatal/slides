@@ -121,17 +121,18 @@ generated quantities {
 #| echo: false
 set.seed(24601)
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
-samplesize = 100L
+sample_size = 100L
 df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
+  z = rnorm(sample_size, 0.5, 3),
   p = sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
+  y = rbinom(sample_size, 8L, p)
+)
 ```
 ```{r, stan-glmm-prep}
 #| cache_stan: "glmm"
 #| stan_save_output_files: "fit"
 #| results: "hide"
-seeds_data = list(y = df_seeds_od$y, N = samplesize)
+seeds_data = list(y = df_seeds_od$y, N = sample_size)
 model = cmdstanr::cmdstan_model("stan/glmm.stan")
 fit = model$sample(data = seeds_data, seed = 19937L, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
@@ -202,13 +203,13 @@ bayesplot::ppc_intervals(
 ```{r, beer-overdispersion-data-re}
 #| echo: -1
 set.seed(24601)
-samplesize = 300L
+sample_size = 300L
 lambda = 3
 overdisp = 4
 .n = lambda / (overdisp - 1)
 .p = 1 / overdisp
 df_beer_od = tibble::tibble(
-  X = rnbinom(samplesize, size = .n, prob = .p)
+  X = rnbinom(sample_size, size = .n, prob = .p)
 )
 ```
 
@@ -240,7 +241,7 @@ generated quantities {
 #| cache_stan: "beer-od"
 #| stan_save_output_files: "fit_b"
 #| include: false
-beer_data = list(X = df_beer_od$X, N = samplesize)
+beer_data = list(X = df_beer_od$X, N = sample_size)
 model_b = cmdstanr::cmdstan_model("stan/beer-od.stan")
 fit_b = model_b$sample(data = beer_data, seed = 19937L, step_size = 0.1, refresh = 0)
 #draws = fit_b$draws(c("alpha", "beta"), format = "df") |> print()

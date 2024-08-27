@@ -114,8 +114,8 @@ df_mul = pd.DataFrame(_dic)
 print(df_mul)
 # %%
 fig, ax = plt.subplots(ncols=2)
-sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df_mul, ax=ax[0])
-sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df_mul, ax=ax[1])
+sns.scatterplot(df_mul, x="temperature", y="beer_sales", hue="humidity", ax=ax[0])
+sns.scatterplot(df_mul, x="humidity", y="beer_sales", hue="temperature", ax=ax[1])
 # %% [markdown]
 # 縦軸は上限が無さそうなカウントデータで、x軸に対して指数的な増加。
 # %%
@@ -130,10 +130,10 @@ it = product(range(8, 33, 4), range(20, 90, 10))
 df_pred = pd.DataFrame(list(it), columns=["temperature", "humidity"])
 df_pred = df_pred.assign(pred=lambda _: result.predict(_))
 fig, ax = plt.subplots(ncols=2)
-sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df_mul, ax=ax[0])
-sns.lineplot(x="temperature", y="pred", hue="humidity", data=df_pred, ax=ax[0])
-sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df_mul, ax=ax[1])
-sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
+sns.scatterplot(df_mul, y="beer_sales", x="temperature", hue="humidity", ax=ax[0])
+sns.scatterplot(df_mul, y="beer_sales", x="humidity", hue="temperature", ax=ax[1])
+sns.lineplot(df_pred, y="pred", x="temperature", hue="humidity", ax=ax[0])
+sns.lineplot(df_pred, y="pred", x="humidity", hue="temperature", ax=ax[1])
 
 # %% [markdown]
 # ## ロジスティック回帰
@@ -199,7 +199,7 @@ _dic = {
 _df = pd.DataFrame(_dic)
 
 df_aov = (
-    _df.join(pd.get_dummies(_df["weather"]))
+    _df.join(pd.get_dummies(_df["weather"]).reset_index())
     .drop("cloudy", axis=1)
     .assign(
         mu=lambda _: true_intercept
@@ -262,7 +262,7 @@ _dic = {
 }
 _df = pd.DataFrame(_dic)
 df_int = (
-    _df.join(pd.get_dummies(_df["weather"]))
+    _df.join(pd.get_dummies(_df["weather"]).reset_index())
     .assign(
         mu=lambda _: true_intercept
         + true_coefs["temp"] * _["temperature"]
@@ -416,7 +416,7 @@ grid.add_legend()
 # 🔰クチバシの長さと深さで同じ解析をやってみよう。
 # %%
 sns.lmplot(
-    x="bill_length_mm", y="bill_depth_mm", hue="species", palette=palette, data=penguins
+    penguins, x="bill_length_mm", y="bill_depth_mm", hue="species", palette=palette
 )
 
 # %%

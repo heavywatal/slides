@@ -47,11 +47,12 @@
 ```{r, df-seeds-od}
 #| echo: false
 set.seed(24601)
-samplesize = 100L
+sample_size = 100L
 df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
+  z = rnorm(sample_size, 0.5, 3),
   p = wtl::sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
+  y = rbinom(sample_size, 8L, p)
+)
 ```
 ```{r, overdispersion}
 #| echo: false
@@ -62,7 +63,7 @@ p_hat = sum_y / 800
 label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
 tidy_od = df_seeds_od |>
   dplyr::count(y, name = "observed") |>
-  dplyr::mutate(expected = samplesize * dbinom(y, 8, p_hat))
+  dplyr::mutate(expected = sample_size * dbinom(y, 8, p_hat))
 ggplot(tidy_od) +
   geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
   geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
@@ -288,17 +289,17 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ```{r, beer-overdispersion-data}
 #| echo: false
 set.seed(24601)
-samplesize = 300L
+sample_size = 300L
 lambda = 3
 overdisp = 4
 .n = lambda / (overdisp - 1)
 .p = 1 / overdisp
-df_beer_od = tibble::tibble(X = rnbinom(samplesize, size = .n, prob = .p))
+df_beer_od = tibble::tibble(X = rnbinom(sample_size, size = .n, prob = .p))
 lambda_obs = mean(df_beer_od$X)
 df_beer_od_exp = tibble::tibble(
   X = seq.int(0L, 15L),
   prop = dpois(X, lambda_obs),
-  freq = samplesize * prop
+  freq = sample_size * prop
 )
 ```
 

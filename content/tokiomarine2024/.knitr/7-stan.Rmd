@@ -263,10 +263,10 @@ Rと同様、 `slope * x` のようなベクトル演算ができる。
 ```{r, df-lm}
 #| echo: -1
 set.seed(19937)
-samplesize = 50L
+sample_size = 50L
 df_lm = tibble::tibble(
-  x = rnorm(samplesize, 1.70, 0.05),
-  bmi = rnorm(samplesize, 22, 1),
+  x = rnorm(sample_size, 1.70, 0.05),
+  bmi = rnorm(sample_size, 22, 1),
   y = bmi * (x**2)
 )
 ```
@@ -284,7 +284,7 @@ df_lm = tibble::tibble(
 #| results: "hide"
 # リストに入れて渡す:
 lm_data = as.list(df_lm)
-lm_data[["N"]] = samplesize
+lm_data[["N"]] = sample_size
 # モデルを実行速度の速い機械語に翻訳(コンパイル):
 lm_model = cmdstanr::cmdstan_model("stan/lm.stan")
 # モデルとデータを使ってMCMCサンプリング:

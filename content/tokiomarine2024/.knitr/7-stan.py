@@ -55,7 +55,7 @@ sample_size = 40
 coin_data = {"N": sample_size, "x": rng.binomial(1, true_p, sample_size)}
 print(coin_data)
 # %%
-sns.countplot(x="x", data=coin_data)
+sns.histplot(coin_data, x="x", discrete=True)
 
 # %% [markdown]
 # ### モデルの定義
@@ -327,8 +327,8 @@ df_mul = pd.DataFrame(_dic)
 print(df_mul)
 # %%
 fig, ax = plt.subplots(ncols=2)
-sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df_mul, ax=ax[0])
-sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df_mul, ax=ax[1])
+sns.scatterplot(df_mul, x="temperature", y="beer_sales", hue="humidity", ax=ax[0])
+sns.scatterplot(df_mul, x="humidity", y="beer_sales", hue="temperature", ax=ax[1])
 # %%
 multiple_data = {"N": sample_size}
 multiple_data.update(df_mul.to_dict("list"))
@@ -358,10 +358,10 @@ df_pred = df_pred.assign(
     )
 )
 fig, ax = plt.subplots(ncols=2)
-sns.scatterplot(x="temperature", y="beer_sales", hue="humidity", data=df_mul, ax=ax[0])
-sns.lineplot(x="temperature", y="pred", hue="humidity", data=df_pred, ax=ax[0])
-sns.scatterplot(x="humidity", y="beer_sales", hue="temperature", data=df_mul, ax=ax[1])
-sns.lineplot(x="humidity", y="pred", hue="temperature", data=df_pred, ax=ax[1])
+sns.scatterplot(df_mul, y="beer_sales", x="temperature", hue="humidity", ax=ax[0])
+sns.scatterplot(df_mul, y="beer_sales", x="humidity", hue="temperature", ax=ax[1])
+sns.lineplot(df_pred, y="pred", x="temperature", hue="humidity", ax=ax[0])
+sns.lineplot(df_pred, y="pred", x="humidity", hue="temperature", ax=ax[1])
 
 # %% [markdown]
 # ---
@@ -383,7 +383,7 @@ _dic = {
 _df = pd.DataFrame(_dic)
 
 df_aov = (
-    _df.join(pd.get_dummies(_df["weather"], dtype=int))
+    _df.join(pd.get_dummies(_df["weather"], dtype=int).reset_index())
     .drop("cloudy", axis=1)
     .assign(
         mu=lambda _: true_intercept

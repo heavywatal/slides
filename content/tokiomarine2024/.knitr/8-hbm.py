@@ -49,7 +49,7 @@ mydata = {
 }
 df_obs = pd.DataFrame({"z": z, "p": p, "y": y})
 # %%
-sns.countplot(x="y", data=df_obs, color="#333")
+sns.histplot(df_obs, x="y", discrete=True, color="#333")
 
 # %%
 model = CmdStanModel(stan_file="stan/glmm.stan")
@@ -86,8 +86,8 @@ for y_i in y:
     count_exp.append(sample_size * np.mean(freqs))
 
 df_exp = pd.DataFrame({"y": y, "count": count_exp})
-sns.countplot(x="y", data=df_obs, color="#333")
-sns.scatterplot(x="y", y="count", data=df_exp, color="#56B4E9", s=120)
+sns.histplot(df_obs, x="y", discrete=True, color="#333")
+sns.scatterplot(df_exp, x="y", y="count", color="#56B4E9", s=120)
 # %% [markdown]
 # 事後予測分布を描いてみる。
 # %%
@@ -103,15 +103,15 @@ sns.scatterplot(np.bincount(df_obs["y"]), color="black")
 #
 # まずデータ生成
 # %%
-samplesize = 300
+sample_size = 300
 lambda_ = 3
 overdisp = 4
 n_ = lambda_ / (overdisp - 1)
 p_ = 1 / overdisp
-X = rng.negative_binomial(n_, p_, size=samplesize)
+X = rng.negative_binomial(n_, p_, size=sample_size)
 df_beer_od = pd.DataFrame({"X": X})
-data_beer_od = {"X": X, "N": samplesize}
-sns.countplot(x="X", data=df_beer_od, color="#333")
+data_beer_od = {"X": X, "N": sample_size}
+sns.histplot(df_beer_od, x="X", discrete=True, color="#333")
 
 # %% [markdown]
 # Stanでモデルを記述し、コンパイルして、MCMCサンプリング
