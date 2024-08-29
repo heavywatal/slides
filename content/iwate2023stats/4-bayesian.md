@@ -112,7 +112,7 @@ dpi = 100
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
 <img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="200" align="right"></a>
 
-移項するだけで**ベイズの定理**:
+移項するだけで**ベイズの定理**:<br>
 <img src="../iwate2023stats/bayes.drawio.svg" style="padding-left: 1rem;">
 
 宴会場にビールが運ばれてきた。これはどこのブルワリーの？

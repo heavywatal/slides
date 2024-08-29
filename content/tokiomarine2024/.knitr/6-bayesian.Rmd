@@ -199,9 +199,47 @@ ggplot() + aes(x, y) +
 
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
 <img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="200" align="right"></a>
+<style>
+[class^=bubble] {
+  position: relative;
+  font-size: 0.9em;
+  padding: 0.2em 0.6em;
+  border-radius: 0.2em;
+  background: #8885;
+}
+[class^=bubble]::after {
+  content: "";
+  position: absolute;
+  bottom: -0.5em;
+  left: 50%;
+  width: 0.5em;
+  aspect-ratio: 1;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  background: #8885;
+}
+[class^=bubble-top]::after {
+  bottom: unset;
+  top: -0.5em;
+  transform: scaleY(-1);
+}
+.after-flipX::after {
+  transform: translateX(-0.5em) scaleX(-1);
+}
+.after-l25::after {left: 25%;}
+.after-l75::after {left: 75%;}
+</style>
 
 移項するだけで**ベイズの定理**:
-<img src="../iwate2023stats/bayes.drawio.svg" style="padding-left: 1rem;">
+<div>
+<div style="margin-block: -0.5em;">
+<span class="bubble after-l25" style="margin-inline-start: 2rem;">事後確率</span>
+<span class="bubble after-flipX" style="margin-inline-start: 4.7rem;">事前確率</span>
+</div>
+\[
+\Pr(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A}) =
+\frac {\Pr(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\Pr(\textcolor{#0072B2}{B})} {\Pr(\textcolor{#E69F00}{A})}
+\]
+</div>
 
 宴会場にビールが運ばれてきた。これはどこのブルワリーの？
 
