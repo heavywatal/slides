@@ -22,6 +22,8 @@
 # %%
 # %matplotlib inline
 
+from pathlib import Path
+
 import arviz as az
 import numpy as np
 import pandas as pd

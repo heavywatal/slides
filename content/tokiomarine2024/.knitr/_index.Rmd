@@ -16,28 +16,30 @@ library(ggplot2)
 
 day_start = lubridate::ymd_hms("2024-08-21 09:30:00")
 day_end = day_start + lubridate::hours("8")
-.breaks = day_start - lubridate::minutes(30) + lubridate::hours(seq(0, 9))
 
 csv_text = "label,run,rest,day
-導入,40,5,1
-直線回帰+可視化,20,5,1
-確率分布,55,5,1
-擬似乱数,20,60,1
+導入,35,5,1
+直線回帰+確率分布,35,10,1
+有名な確率分布,45,5,1
+擬似乱数,15,60,1
 尤度、最尤推定,30,10,1
-GLM説明、可視化,50,10,1
-モデル評価,50,10,1
+GLM説明,35,0,1
+GLM実演,15,10,1
+モデル評価,30,10,1
 GLM練習,30,10,1
-個体差、GLMM,45,0,1
-ベイズの定理、事後分布,55,10,2
-MCMC、Stan,30,10,2
+GLM解答、個体差,35,10,1
+個体差解答、GLMM,35,0,1
+ベイズの定理、事後分布,45,10,2
+MCMC、Stan,40,10,2
 Stanで直線回帰,45,60,2
-StanでGLM,60,15,2
-StanでGLM続き,60,15,2
-階層ベイズモデル,60,10,2
-全体まとめ,25,0,2
+StanでGLM,50,40,2
+StanでGLM続き,40,10,2
+階層ベイズモデル,35,20,2
+Stan練習解答,30,10,2
+全体まとめ,15,0,2
 "
 
-df_raw = readr::read_csv(csv_text, show_col_types = FALSE)
+df_raw = readr::read_csv(I(csv_text), show_col_types = FALSE)
 df = df_raw |>
   dplyr::group_by(day) |>
   dplyr::mutate(elapsed = dplyr::lag(cumsum(run + rest), 1L, default = 0)) |>
@@ -46,12 +48,12 @@ df = df_raw |>
 
 ggplot(df) +
   aes(1, start) +
-  geom_segment(aes(xend = 1, yend = end), size = 3, alpha = 0.6) +
+  geom_segment(aes(xend = 1, yend = end), linewidth = 3, alpha = 0.6) +
   geom_text(aes(label = label), hjust = 0, nudge_x = 0.05, nudge_y = 500,
             family = "Hiragino Sans W3", size = 5.4) +
   facet_grid(cols = vars(day), labeller = label_both) +
   scale_x_continuous(breaks = 1) +
-  scale_y_datetime(breaks = .breaks, date_labels = "%H:%M") +
+  scale_y_datetime(date_breaks = "1 hour", date_labels = "%H:%M") +
   coord_cartesian(xlim = c(1, 2), ylim = c(day_end, day_start)) +
   theme_minimal(base_size = 21) +
   theme(panel.grid.minor.x = element_blank(),

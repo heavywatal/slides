@@ -312,7 +312,7 @@ print(penguins)
 # Step 1. まず作図
 #
 # どうやら、重いペンギンほど翼長も長い。
-# %%
+# %% tags=["remove_cell"]
 grid = sns.FacetGrid(penguins)
 grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
 
@@ -320,19 +320,17 @@ grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
 # Step 2. モデル作成、フィッティング
 #
 # とりあえず正規分布・恒等リンクで。
-# %%
+# %% tags=["remove_cell"]
 formula = "flipper_length_mm ~ body_mass_g"
 model1 = smf.glm(formula, data=penguins)
 results1 = model1.fit()
 print(results1.params)
-# %%
 print(results1.llf)
-# %%
 print(results1.aic)
 
 # %% [markdown]
 # Step 3. フィッティング結果を作図
-# %%
+# %% tags=["remove_cell"]
 pen_pred = penguins.assign(pred=results1.predict(penguins))
 grid = sns.FacetGrid(pen_pred)
 grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
@@ -345,10 +343,11 @@ grid.map(sns.lineplot, "body_mass_g", "pred")
 # Step 1. まず作図
 #
 # 種によって色分けしてみると、傾向の違いが見える。
-
 # %%
 palette = {"Adelie": "#ff6600", "Gentoo": "#c35bcc", "Chinstrap": "#007174"}
-grid = sns.FacetGrid(pen_pred, hue="species", palette=palette)
+
+# %% tags=["remove_cell"]
+grid = sns.FacetGrid(penguins, hue="species", palette=palette)
 grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
 grid.add_legend()
 
@@ -358,20 +357,18 @@ grid.add_legend()
 # Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 # 体重の効果は単回帰のときより小さい。
 
-# %%
+# %% tags=["remove_cell"]
 formula = "flipper_length_mm ~ body_mass_g + species"
 model2 = smf.glm(formula, data=penguins)
 results2 = model2.fit()
 print(results2.params)
-# %%
 print(results2.llf)
-# %%
 print(results2.aic)
 
 # %% [markdown]
 # Step 3. フィッティング結果を作図
 
-# %%
+# %% tags=["remove_cell"]
 pen_pred = penguins.assign(pred=results2.predict(penguins))
 grid = sns.FacetGrid(pen_pred, hue="species", palette=palette)
 grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
@@ -388,20 +385,18 @@ grid.add_legend()
 # Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 # 切片の違いは解釈しにくくなった。
 
-# %%
+# %% tags=["remove_cell"]
 formula = "flipper_length_mm ~ body_mass_g + species + body_mass_g:species"
 model3 = smf.glm(formula, data=penguins)
 results3 = model3.fit()
 print(results3.params)
-# %%
 print(results3.llf)
-# %%
 print(results3.aic)
 
 # %% [markdown]
 # Step 3. フィッティング結果を作図
 
-# %%
+# %% tags=["remove_cell"]
 pen_pred = penguins.assign(pred=results3.predict(penguins))
 grid = sns.FacetGrid(pen_pred, hue="species", palette=palette)
 grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
@@ -416,7 +411,12 @@ grid.add_legend()
 # 🔰クチバシの長さと深さで同じ解析をやってみよう。
 # %%
 sns.lmplot(
-    penguins, x="bill_length_mm", y="bill_depth_mm", hue="species", palette=palette
+    penguins,
+    x="bill_length_mm",
+    y="bill_depth_mm",
+    hue="species",
+    palette=palette,
+    ci=None,
 )
 
 # %%

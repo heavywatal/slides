@@ -5,12 +5,12 @@ PYPERCENT := $(wildcard *.py)
 NOTEBOOKS := $(addprefix ${DESTINATION}/,$(PYPERCENT:.py=.ipynb))
 PARENTDIR = $(dir $(CURDIR))
 SLUG := $(notdir $(PARENTDIR:/=))
-SHARE_DIR := "${HOME}/My Drive/Colab Notebooks/${SLUG}"
+SHARE_DIR := ${HOME}/My Drive/Colab Notebooks/${SLUG}
 
 .DEFAULT_GOAL := all
 .PHONY: all clean stan
 
-all: ${KNITTED} ${NOTEBOOKS}
+all: ${KNITTED} ${NOTEBOOKS} stan
 	@:
 
 ${DESTINATION}/%.md: %.Rmd setup.R metadata.csv header.md
@@ -28,13 +28,23 @@ stan:
 	rsync -auvC --include='*.stan' --exclude='*' stan/ ${DESTINATION}/stan/
 	rsync -auvC --include='*.stan' --exclude='*' stan/ "${SHARE_DIR}/stan/"
 
-BASEURL := https://heavywatal.github.io/slides
-PDFNAMES := $(filter-out _%,$(SOURCES:.Rmd=.pdf))
-EXPORTED := $(addprefix ../../../pdf/${SLUG}/,${PDFNAMES})
-.PHONY: pdf
+NB_HTML := $(addprefix nb/,$(PYPERCENT:.py=.html))
+.PHONY: nb
 
-pdf: ${EXPORTED}
+nb: ${NB_HTML}
 	@:
 
-../../../pdf/${SLUG}/%.pdf: %.Rmd
-	npm run decktape ${BASEURL}/${SLUG}/$(<:.Rmd=.html) pdf/${SLUG}/$(<:.Rmd=.pdf)
+nb/%.html: ${DESTINATION}/%.ipynb
+	jupyter nbconvert --execute --to html --embed-images --output-dir nb $<
+
+BASEURL := https://heavywatal.github.io/slides
+PDFNAMES := $(filter-out _%,$(SOURCES:.Rmd=.pdf))
+PRODUCT_PDFS := $(addprefix pdf/,${PDFNAMES})
+.PHONY: pdf
+
+pdf: ${PRODUCT_PDFS}
+	@:
+
+pdf/%.pdf: %.Rmd
+	decktape -s 960x720 reveal ${BASEURL}/${SLUG}/$(<:.Rmd=.html) pdf/$(<:.Rmd=.pdf)
+	cp -av $@ "${SHARE_DIR}"
