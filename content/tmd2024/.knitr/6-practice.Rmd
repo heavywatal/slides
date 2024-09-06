@@ -1,0 +1,194 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+#| cache: false
+if (dir.exists(knitr::opts_chunk$get("cache.path"))) knitr::dep_auto()
+```
+
+
+---
+## 最終回のお品書き
+
+-   🔰 1週目の課題
+    - 3–5人ずつの班に分かれ、画面共有しつつ討論
+    - メインルームに戻り、各班代表が解答・感想を発表
+-   🔰 2週目の課題
+    - 同様に。時間が無ければ討論省略。
+-   パブリックデータで実演 + 質疑応答
+
+
+---
+## 🔰 1週目の課題
+
+<iframe width="400" height="300" src="./2-visualization.html#/53"></iframe>
+<iframe width="400" height="300" src="./2-visualization.html#/54"></iframe>
+
+---
+## 🔰 2週目の課題
+
+<iframe width="400" height="300" src="./4-structure2.html#/32"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/33"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/35"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/36"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/37"></iframe>
+
+
+---
+## 🔰 3日目の課題1: 好きなデータをいじくり倒してみよう
+
+- 自分がこれから解析したいデータ (もし手元にあれば)
+- 何か適当なパブリックデータ。例えば:
+    - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
+    - [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+    - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
+    - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+    - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
+- (苦肉の策) Rやパッケージに付属のデータ
+    - `diamonds`, `starwars`, `mpg`, etc. See `data()`
+
+---
+## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
+
+2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
+
+うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
+
+<img `r src_alt_fig_chunk("estat-plot")`>
+
+---
+## オープンデータを入手できても簡単には読み込めない
+
+初手エラー:
+```{r, estat-read-error}
+#| error: true
+infile = "tblT001082C04.txt"
+readr::read_csv(infile)
+```
+
+RStudioでテキストとして開いてみると文字化け:
+
+```{r, estat-as-text}
+#| echo: false
+readLines(infile, 5L) |> t() |> t() |>
+  prmatrix(rowlab = rep("", 5), collab = "", quote = FALSE)
+```
+
+メニューから "File → **Reopen with Encoding...**" を選択。<br>
+たいてい、古い日本語ファイルにありがちな**SHIFT-JIS**が正解。<br>
+(もっと古いファイルならEUC-JPとかの場合もある。)
+
+---
+## 文字コードを指定して読み込み
+
+よく見ると、8列目以降の列名が2行にまたがっている:
+```{r, estat-sjis}
+sjis = readr::locale(encoding = "SHIFT-JIS")
+readr::read_csv(infile, locale = sjis)
+```
+
+---
+## 左側と右側を分けて読み、それぞれ削ってからbind
+
+なんか数値の列のはずなのに `-` という文字が混じっている。(中には `X` も):
+```{r, estat-lr}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L)
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+---
+## 数値のはずの列に混じる `-` と `X` を `NA` 扱い
+
+これでようやくスタート地点。。。
+```{r, estat-lr-na}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"))
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+<!-- dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"), name_repair = "minimal") -->
+
+---
+## あとはdplyrとtidyrでお掃除
+
+まだ罠はたくさん: 列名の頭にスペース。全角数字。変な区分。
+
+```{r, estat-tidy}
+tidy_miyagi = raw_miyagi |>
+  dplyr::rename_with(stringr::str_trim) |>
+  dplyr::filter(HYOSYO == 1) |>
+  dplyr::select(CITYNAME, matches("[男女].+歳")) |>
+  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
+  tidyr::separate(category, c("sex", "age"), 1) |>
+  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
+  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  dplyr::mutate(lower = readr::parse_number(lower),
+                upper = readr::parse_number(upper)) |>
+  dplyr::filter((upper - lower) < 5 | lower == 75) |>
+  dplyr::mutate(age = (lower + upper) / 2) |>
+  print()
+```
+
+---
+## ここまでくれば作図は簡単
+
+```{r, estat-factor}
+#| include: false
+total_miyagi = tidy_miyagi |>
+  dplyr::count(CITYNAME, wt = count, name = "count") |>
+  dplyr::arrange(desc(count))
+tidy_miyagi = tidy_miyagi |>
+  dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
+```
+
+```{r, estat-plot}
+#| fig.height: 5.5
+#| fig.width: 12
+tidy_miyagi |>
+  dplyr::mutate(count = ifelse(sex == "男", -1, 1) * count) |>
+  ggplot() +
+  geom_col(aes(age, count, fill = sex)) +
+  facet_wrap(vars(CITYNAME), nrow = 4L) +
+  coord_flip() + theme_minimal(base_size = 15)
+```
+
+---
+## 参考
+
+R for Data Science --- Hadley Wickham and Garrett Grolemund
+: <https://r4ds.had.co.nz/>,
+  [Paperback](https://amzn.to/2tbRmVc),
+  [日本語版書籍](https://amzn.to/2yyFRKt)
+
+[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
+[RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
+
+Official documents:
+: [tidyverse](https://www.tidyverse.org/),
+  [ggplot2](https://ggplot2.tidyverse.org/),
+  [dplyr](https://dplyr.tidyverse.org/),
+  [tidyr](https://tidyr.tidyverse.org/),
+  [stringr](https://stringr.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/)
+
+Older versions
+: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
+   岩嵜航 2018
+: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2020/)」
+   岩嵜航 2020 東京医科歯科大
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
+   石川由希 2022 名古屋大学
+
+<a href="." class="readmore">
+目次に戻る
+</a>
