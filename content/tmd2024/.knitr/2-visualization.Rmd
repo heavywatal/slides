@@ -572,17 +572,12 @@ colorspace::swatchplot(`ggplot2 default (bad)` = scales::hue_pal()(7L), cvd = TR
 上記リンクから名前を探して、`option =` か `palette =` で指定。
 
 ```{r, scale-color}
-#| echo: -3
 #| fig.show: "hold"
 #| fig.height: 4
 #| fig.width: 6
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = clarity)) +
-  scale_color_viridis_d(option = "inferno")
-# scale_color_brewer(palette = "YlGnBu")
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = clarity)) +
-  scale_color_brewer(palette = "YlGnBu")
+p = ggplot(diamonds) + aes(carat, price, color = clarity) + geom_point()
+p + scale_color_viridis_d(option = "inferno")         + labs(title = "inferno")
+p + scale_color_brewer(palette = "YlGnBu")            + labs(title = "YlGnBu")
 ```
 
 ---
@@ -592,17 +587,12 @@ ggplot(diamonds) + aes(carat, price) +
 `Error: Continuous value supplied to discrete scale`
 
 ```{r, scale-color-continuous}
-#| echo: -3
 #| fig.show: "hold"
 #| fig.height: 4
 #| fig.width: 6
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = price)) +
-  scale_color_viridis_c(option = "inferno")
-# scale_color_distiller(palette = "YlGnBu")
-ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = price)) +
-  scale_color_distiller(palette = "YlGnBu")
+p = ggplot(diamonds) + aes(carat, price, color = price) + geom_point()
+p + scale_color_viridis_c(option = "inferno")         + labs(title = "inferno")
+p + scale_color_distiller(palette = "YlGnBu")         + labs(title = "YlGnBu")
 ```
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
@@ -617,25 +607,15 @@ R標準の `palette.colors()` や
 を使う。
 
 ```{r, other-palettes}
-#| echo: !expr 1:4
 #| fig.show: "hold"
-#| fig.height: 3.2
+#| fig.height: 3.5
 #| fig.width: 4
 okabe_ito = palette.colors(9L, "Okabe-Ito")
-ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66) +
-  scale_color_discrete(type = unname(okabe_ito)[-1])
-# scale_color_discrete(type = palette.colors(8L, "R4")[-1])
-# colorspace::scale_colour_discrete_divergingx("Zissou 1")
-ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66) +
-  scale_color_discrete(type = palette.colors(8L, "R4")[-1])
-ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66) +
-  colorspace::scale_color_discrete_divergingx("Zissou 1")
+p = ggplot(mpg) + aes(x = displ, y = cty, color = drv) +
+    geom_point(size = 4, alpha = 0.66)
+p + scale_color_discrete(type = unname(okabe_ito)[-1])          + labs(title = "Okabe-Ito")
+p + scale_color_discrete(type = palette.colors(8L, "R4")[-1])   + labs(title = "R4")
+p + colorspace::scale_colour_discrete_divergingx("Zissou 1")    + labs(title = "Zissou 1")
 ```
 
 自分で全色個別指定もできるが、専門家の考えたセットを使うのが無難。
@@ -646,6 +626,8 @@ ggplot(mpg) +
 
 連続値viridis, 離散値Okabe-Itoをデフォルトにする例:
 ```r
+library(conflicted) # 安全のおまじない
+library(tidyverse)  # including ggplot2
 grDevices::palette("Okabe-Ito")
 options(
   ggplot2.continuous.colour = "viridis",
@@ -656,6 +638,9 @@ options(
 ```
 
 `options()` による設定はRを終了するまで有効。
+
+<img `r src_alt_fig_chunk("palette-sequential")`>
+<img `r src_alt_fig_chunk("palette-qualitative")`>
 
 
 ---
