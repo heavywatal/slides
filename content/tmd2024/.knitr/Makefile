@@ -29,8 +29,9 @@ ${SHARE_DIR}/%.pdf: pdf/%.pdf | ${SHARE_DIR}
 	cp -av $< "$@"
 
 pdf/%.pdf: %.Rmd
+	mkdir -p pdf
 	decktape -s 960x720 reveal ${BASEURL}/${SLUG}/$(<:.Rmd=.html) pdf/$(<:.Rmd=.pdf)
-	cp -av $@ "${SHARE_DIR}"
+	cp -av $@ ${SHARE_DIR}
 
 ${SHARE_DIR}:
 	mkdir -p "$@"
