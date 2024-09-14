@@ -11,34 +11,96 @@ if (dir.exists(knitr::opts_chunk$get("cache.path"))) knitr::dep_auto()
 
 
 ---
-## 最終回のお品書き
+## データ解析のおおまかな流れ
 
--   🔰 1週目の課題
-    - 3–5人ずつの班に分かれ、画面共有しつつ討論
-    - メインルームに戻り、各班代表が解答・感想を発表
--   🔰 2週目の課題
-    - 同様に。時間が無ければ討論省略。
--   パブリックデータで実演 + 質疑応答
+1. コンピュータ環境の整備 ✅
+1. データの取得、読み込み ⬜ 👈 今回はここから
+1. 探索的データ解析
+    - **前処理、加工** ✅ 完全に理解した
+    - 可視化、仮説生成 ✅ 完全に理解した
+    - 統計解析、仮説検証
+1. 報告、発表
 
-
----
-## 🔰 1週目の課題
-
-<iframe width="400" height="300" src="./2-visualization.html#/53"></iframe>
-<iframe width="400" height="300" src="./2-visualization.html#/54"></iframe>
-
----
-## 🔰 2週目の課題
-
-<iframe width="400" height="300" src="./4-structure2.html#/32"></iframe>
-<iframe width="400" height="300" src="./4-structure2.html#/33"></iframe>
-<iframe width="400" height="300" src="./4-structure2.html#/35"></iframe>
-<iframe width="400" height="300" src="./4-structure2.html#/36"></iframe>
-<iframe width="400" height="300" src="./4-structure2.html#/37"></iframe>
+<figure>
+<a href="https://r4ds.had.co.nz/introduction.html">
+<img src="/slides/image/r4ds/whole-game.png" width="800">
+<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+</a>
+</figure>
 
 
 ---
-## 🔰 3日目の課題1: 好きなデータをいじくり倒してみよう
+## data.frameの読み書き
+
+<a href="https://readr.tidyverse.org/">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+</a>
+
+- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- R標準の関数ではなく [readr](https://readr.tidyverse.org/) パッケージを使う。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+    ```r
+    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
+    ```
+
+あれれー、エラーが出る？
+
+```{r, cannot-open}
+#| error: true
+#| echo: false
+readr::write_tsv(iris, "data/iris.tsv")
+```
+
+---
+## ファイル読み書きでありがちなエラー
+
+- 読みたいファイル名が間違っている。
+- 読みたいファイルが作業ディレクトリとは違うところにある。
+- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
+
+冷静に、現在の作業ディレクトリとその中身を確認しよう:
+```r
+getwd()                 # GET Working Directory
+fs::dir_ls(".")         # List files in "." (here)
+fs::dir_ls("data")      # List files in "./data"
+fs::dir_create("data")  # Create directory
+```
+
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2024/R_training_2024_7.html)
+を読んでおきましょう。
+
+🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
+
+🔰 それらを別の名前で読み込み直してみよう。
+
+
+---
+## Excelの親切あるいは裏切りに要注意
+
+表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
+しかし**親切設計がユーザーに牙を剥く**！
+
+- 文字列が勝手に日付になる: `22-4`, `4-14`
+- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
+  ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
+
+🔰 CSVファイルを読み書きして恐怖を体感しよう:
+
+```
+gene,label
+MARCH1,22-4
+SEPT1,4-14
+```
+1.  ↑からのコピペで `excel.csv` という名のプレーンテキストを作成。
+1.  Excelでそれで開き、日付になることを確認。
+1.  それを別名のCSVとして保存し、テキストの中身を確認。
+
+
+---
+## 🔰 3日目の課題: オープンデータを拾って可視化しよう。
 
 - 自分がこれから解析したいデータ (もし手元にあれば)
 - 何か適当なパブリックデータ。例えば:
@@ -49,6 +111,11 @@ if (dir.exists(knitr::opts_chunk$get("cache.path"))) knitr::dep_auto()
     - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
 - (苦肉の策) Rやパッケージに付属のデータ
     - `diamonds`, `starwars`, `mpg`, etc. See `data()`
+
+<hr>
+
+読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？
+
 
 ---
 ## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
@@ -162,12 +229,50 @@ tidy_miyagi |>
 ```
 
 ---
+## 残り時間のお品書き
+
+-   🔰 **2週目の課題**: 前処理→可視化
+    - 3–5人ずつの班に分かれ、画面共有しつつ討論
+    - メインルームに戻り、各班代表が解答・感想を発表
+-   🔰 1週目の課題: ggplot2模写
+    - 同様に。時間次第では省略 (可視化の実習ではないので)
+-   🔰 **3週目の課題**: 野良データ→可視化
+    - 時間の許す限り取り組み、質問、報告
+
+
+---
+## 🔰 1週目の課題
+
+<iframe width="400" height="300" src="./2-visualization.html#/53"></iframe>
+<iframe width="400" height="300" src="./2-visualization.html#/54"></iframe>
+
+---
+## 🔰 2週目の課題
+
+<iframe width="400" height="300" src="./4-structure2.html#/32"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/33"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/35"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/36"></iframe>
+<iframe width="400" height="300" src="./4-structure2.html#/37"></iframe>
+
+
+---
+## 講義全体のメッセージ
+
+### ✅ 面倒なことはRにやらせて、楽をしよう
+
+### ✅ 調べ方さえわかれば、全部覚えなくても大丈夫
+
+### ✅ エラーは日常茶飯事。落ち着いて読み取ろう
+
+
+---
 ## 参考
 
-R for Data Science --- Hadley Wickham and Garrett Grolemund
-: <https://r4ds.had.co.nz/>,
-  [Paperback](https://amzn.to/2tbRmVc),
-  [日本語版書籍](https://amzn.to/2yyFRKt)
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/4cpL6w8)
+: [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 [前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
 [RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
@@ -177,17 +282,16 @@ Official documents:
   [ggplot2](https://ggplot2.tidyverse.org/),
   [dplyr](https://dplyr.tidyverse.org/),
   [tidyr](https://tidyr.tidyverse.org/),
+  [readr](https://readr.tidyverse.org/),
   [stringr](https://stringr.tidyverse.org/),
-  [readr](https://readr.tidyverse.org/)
+  [forcats](https://forcats.tidyverse.org/),
+  [lubridate](https://lubridate.tidyverse.org/),
 
-Older versions
+Other versions
 : 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
    岩嵜航 2018
-: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
-: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2020/)」
-   岩嵜航 2020 東京医科歯科大
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2022/)」
-   石川由希 2022 名古屋大学
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2024/)」
+   石川由希 2024 名古屋大学
 
 <a href="." class="readmore">
 目次に戻る
