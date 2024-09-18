@@ -993,7 +993,36 @@ Collect and sow 8 seeds from each of 100 plant individuals.<br>
 The number of survived seeds per parent should follow $\text{Binomial}(n = 8, p)$.<br>
 But extreme cases (all survived, all dead) were frequently observed.
 
-<img `r src_alt_fig_chunk("overdispersion")`>
+```{r, df-seeds-od}
+#| echo: false
+set.seed(24601)
+sample_size = 100L
+df_seeds_od = tibble::tibble(
+  z = rnorm(sample_size, 0.5, 3),
+  p = wtl::sigmoid(z),
+  y = rbinom(sample_size, 8L, p)
+)
+```
+```{r, overdispersion}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+sum_y = sum(df_seeds_od$y)
+p_hat = sum_y / 800
+label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
+tidy_od = df_seeds_od |>
+  dplyr::count(y, name = "observed") |>
+  dplyr::mutate(expected = sample_size * dbinom(y, 8, p_hat))
+ggplot(tidy_od) +
+  geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
+  geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
+  annotate("text", label = label, parse = TRUE, color = "#56B4E9",
+           x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 6) +
+  labs(x = "# survived seeds", y = "count") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
 
 "Why? What other factors affect?" is the question of statistical modelling.<br>
 It requires the understanding of the **null distribution**.

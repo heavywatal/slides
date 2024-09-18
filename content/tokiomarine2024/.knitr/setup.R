@@ -27,7 +27,6 @@ knitr::opts_chunk$set(dev = "ragg_png")
 knitr::opts_chunk$set(dpi = 108)
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
-knitr::dep_auto()
 set.seed(24601)
 
 src_alt_fig_chunk = function(label, ext = "png", number = 1L) {

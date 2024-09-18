@@ -383,17 +383,19 @@ $\operatorname{logit}(p_i)$
 の使い方は直線回帰のOLSとほぼ同じ
 
 
-```python
+``` python
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 formula = "weight ~ height"
 model = smf.glm(formula, data=r.df_weight)
 result = model.fit()
-print(model.family)
+print(model.family.__class__)
+print(model.family.link.__class__)
 ```
 
 ```
-<statsmodels.genmod.families.family.Gaussian object at 0x11cdc69b0>
+<class 'statsmodels.genmod.families.family.Gaussian'>
+<class 'statsmodels.genmod.families.links.Identity'>
 ```
 
 何も指定しない場合は正規分布・恒等リンク。<br>
@@ -403,7 +405,7 @@ print(model.family)
 [リンク関数](https://www.statsmodels.org/stable/glm.html#link-functions)
 を明示的に指定:
 
-```python
+``` python
 identity = sm.families.links.Identity()
 gaussian = sm.families.Gaussian(link=identity)
 model = smf.glm(formula, data=r.df_weight, family=gaussian)
@@ -670,7 +672,7 @@ grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
 $y = 136.7 + 0.0153 x$
 
 
-```python
+``` python
 formula = "flipper_length_mm ~ body_mass_g"
 model1 = smf.glm(formula, data=penguins)
 results1 = model1.fit()
@@ -683,7 +685,7 @@ body_mass_g      0.015276
 dtype: float64
 ```
 
-```python
+``` python
 print(results1.llf)
 ```
 
@@ -691,7 +693,7 @@ print(results1.llf)
 -1145.5175473095946
 ```
 
-```python
+``` python
 print(results1.aic)
 ```
 
@@ -736,7 +738,7 @@ Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。
 
 
-```python
+``` python
 formula = "flipper_length_mm ~ body_mass_g + species"
 model2 = smf.glm(formula, data=penguins)
 results2 = model2.fit()
@@ -751,7 +753,7 @@ body_mass_g               0.008402
 dtype: float64
 ```
 
-```python
+``` python
 print(results2.llf)
 ```
 
@@ -759,7 +761,7 @@ print(results2.llf)
 -1059.7183131897373
 ```
 
-```python
+``` python
 print(results2.aic)
 ```
 
@@ -791,7 +793,7 @@ Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
 
-```python
+``` python
 formula = "flipper_length_mm ~ body_mass_g + species + body_mass_g:species"
 model3 = smf.glm(formula, data=penguins)
 results3 = model3.fit()
@@ -808,7 +810,7 @@ body_mass_g:species[T.Gentoo]         0.002362
 dtype: float64
 ```
 
-```python
+``` python
 print(results3.llf)
 ```
 
@@ -816,7 +818,7 @@ print(results3.llf)
 -1055.7107640450004
 ```
 
-```python
+``` python
 print(results3.aic)
 ```
 

@@ -133,7 +133,7 @@ dpi = 108
 ## これくらいなら一瞬で計算してもらえる
 
 
-```python
+``` python
 import statsmodels.formula.api as smf
 model = smf.ols("weight ~ height", r.df_weight)
 result = model.fit()

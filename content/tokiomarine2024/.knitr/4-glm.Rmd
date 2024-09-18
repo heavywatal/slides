@@ -8,6 +8,7 @@
 #| cache: false
 library(reticulate)
 reticulate::use_virtualenv("dshc2024")
+if (dir.exists(knitr::opts_chunk$get("cache.path"))) knitr::dep_auto()
 ```
 
 
@@ -677,12 +678,14 @@ $\operatorname{logit}(p_i)$
 の使い方は直線回帰のOLSとほぼ同じ
 
 ```{python smf-glm}
+#| results: hold
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 formula = "weight ~ height"
 model = smf.glm(formula, data=r.df_weight)
 result = model.fit()
-print(model.family)
+print(model.family.__class__)
+print(model.family.link.__class__)
 ```
 
 何も指定しない場合は正規分布・恒等リンク。<br>

@@ -583,7 +583,8 @@ Collect and sow 8 seeds from each of 100 plant individuals.<br>
 The number of survived seeds per parent should follow $\text{Binomial}(n = 8, p)$.<br>
 But extreme cases (all survived, all dead) were frequently observed.
 
-<img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
+
+![plot of chunk overdispersion](./figure/overdispersion-1.png)
 
 "Why? What other factors affect?" is the question of statistical modelling.<br>
 It requires the understanding of the **null distribution**.
