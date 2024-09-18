@@ -205,12 +205,12 @@ R標準のやつとは根本的に違うシステムで作図する。
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 # aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
-# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # stat_smooth(method = lm) +        # 直線回帰を追加
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -221,12 +221,12 @@ ggplot(data = diamonds)             # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price)         # carat,price列をx,y軸にmapping
 # geom_point() +                    # 散布図を描く
-# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # stat_smooth(method = lm) +        # 直線回帰を追加
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -237,12 +237,12 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point()                      # 散布図を描く
-# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # stat_smooth(method = lm) +        # 直線回帰を追加
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -253,12 +253,12 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
-  facet_wrap(vars(clarity))         # clarity列に応じてパネル分割
-# stat_smooth(method = lm) +        # 直線回帰を追加
+  stat_smooth(method = lm)          # 直線回帰を追加
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -269,12 +269,12 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
-  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
-  stat_smooth(method = lm)          # 直線回帰を追加
+  stat_smooth(method = lm) +        # 直線回帰を追加
+  facet_wrap(vars(clarity))         # clarity列に応じてパネル分割
 # coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -285,12 +285,12 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
-  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
   stat_smooth(method = lm) +        # 直線回帰を追加
+  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
   coord_cartesian(ylim = c(0, 2e4))   # y軸の表示範囲を狭く
 # theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -301,12 +301,12 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
-  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
   stat_smooth(method = lm) +        # 直線回帰を追加
+  facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
   coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -317,12 +317,12 @@ ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
 ## 基本的な使い方: 指示を `+` で重ねていく
 
 
-```r
+``` r
 ggplot(data = diamonds) +           # diamondsデータでキャンバス準備
   aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping
   geom_point() +                    # 散布図を描く
-# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # stat_smooth(method = lm) +        # 直線回帰を追加
+# facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割
 # coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く
   theme_classic(base_size = 20)     # クラシックなテーマで
 ```
@@ -577,7 +577,7 @@ ggplot(diamonds) + aes(carat, price) +
 `Error: Continuous value supplied to discrete scale`
 
 
-```r
+``` r
 ggplot(diamonds) + aes(carat, price) +
   geom_point(mapping = aes(color = price)) +
   scale_color_viridis_c(option = "inferno")
@@ -890,8 +890,8 @@ ggplot2は3Dが苦手
 ## 参考
 
 R for Data Science --- Hadley Wickham et al.
-: <https://r4ds.hadley.nz>
-: [Paperback](https://amzn.to/4cpL6w8)
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/4cpL6w8)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 Older versions

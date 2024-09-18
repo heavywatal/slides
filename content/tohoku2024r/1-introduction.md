@@ -1195,7 +1195,7 @@ library(tidyverse)  # 一挙に読み込み
 ── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
 ✔ dplyr     1.1.4     ✔ readr     2.1.5
 ✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.0     ✔ tibble    3.2.1
+✔ ggplot2   3.5.1     ✔ tibble    3.2.1
 ✔ lubridate 1.9.3     ✔ tidyr     1.3.1
 ✔ purrr     1.0.2     
 ```
@@ -1288,8 +1288,8 @@ library(tidyverse)  # 一挙に読み込み
 ## Reference
 
 R for Data Science --- Hadley Wickham et al.
-: <https://r4ds.hadley.nz>
-: [Paperback](https://amzn.to/4cpL6w8)
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/4cpL6w8)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
