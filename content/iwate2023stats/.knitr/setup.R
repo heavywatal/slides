@@ -54,7 +54,7 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
   dplyr::pull(date) |> as.Date() |>
   paste0(" 岩手大学 連合農学研究科<br>")
 .meta$next_link = '<a href="{outfile}" class="readmore">\n{id}. {linktitle}\n</a>' |>
-  stringr::str_glue(.envir = dplyr::filter(.meta$data, id == id[this] + 1))
+  stringr::str_glue_data(.x = dplyr::filter(.meta$data, id == id[this] + 1))
 .meta$front_matter = .meta$data |>
   dplyr::filter(this) |>
   dplyr::select(url, linktitle, title, date, draft) |>
@@ -65,5 +65,5 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
   wtl::toTOML()
 
 readr::read_file("header.md") |>
-  stringr::str_glue(.envir = .meta) |>
+  stringr::str_glue_data(.x = .meta) |>
   cat()
