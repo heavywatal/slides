@@ -279,7 +279,7 @@ boxplot(Petal.Width ~ Species, data = iris)
 </a>
 
 - tidyverseパッケージ群のひとつ
-- "The <strong><u>G</u></strong>rammer of <strong><u>G</u></strong>raphics" という体系に基づく設計
+- "The <strong><u>G</u></strong>rammar of <strong><u>G</u></strong>raphics" という体系に基づく設計
 - 単にいろんなグラフを「描ける」だけじゃなく<br>
   **一貫性のある文法で合理的に描ける**
 
