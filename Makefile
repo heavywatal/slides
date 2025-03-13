@@ -1,8 +1,9 @@
-DROPBOX := ${HOME}/Library/CloudStorage/Dropbox/slides/image
+DROPBOX := ${HOME}/Library/CloudStorage/Dropbox
+SYNC_ROOT := ${DROPBOX}/slides/image
 DECKS := $(wildcard content/*)
 NAMES := $(notdir ${DECKS})
-IMGDSTS := $(addsuffix /image,${DECKS})
-IMGSRCS := $(addprefix ${DROPBOX}/,${NAMES})
+IMG_DSTS := $(addsuffix /image,${DECKS})
+IMG_SRCS := $(addprefix ${SYNC_ROOT}/,${NAMES})
 
 .PHONY: all clean development public watch server image
 
@@ -27,13 +28,13 @@ clean:
 public:
 	hugo --cleanDestinationDir --environment public
 
-image: ${IMGDSTS}
-	rsync -auvC ${DROPBOX}-static/ static/
+image: ${IMG_DSTS}
+	rsync -auvC ${SYNC_ROOT}-static/ static/
 
-content/%/image: ${DROPBOX}/%
+content/%/image: ${SYNC_ROOT}/%
 	rsync -auvC $^/ $@/
 
-${DROPBOX}/%: | content/%
+${SYNC_ROOT}/%: | content/%
 	mkdir $@
 
 .PHONY: working
