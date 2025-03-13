@@ -46,17 +46,31 @@ pak::pkg_install("heavywatal/rwtl")
 
 ## Save as PDF
 
-1. Install [nvm](https://github.com/nvm-sh/nvm)
-1. Install node: `nvm install --lts --latest-npm`
-1. Setup node: `nvm use stable`
-1. Change directory to this repo: `cd ~/git/slides/`
+Use [decktape](https://github.com/astefanutti/decktape):
+```sh
+nvm use stable
+decktape --help
+
+URL=https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html
+PDF=1-introduction.pdf
+decktape -s 960x720 reveal "$URL" "$PDF"
+
+# or directly
+decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
+decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2024/R_training_2024_1.html R_training_1.pdf
+```
+
+### Install decktape with node
+
+1. Install [nvm](https://github.com/nvm-sh/nvm).
+   Your shell profile (e.g., `~/.bashrc`) will be updated automatically to add following lines:
+   ```sh
+   export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
+   ```
+1. Restart your shell/terminal to reload the updated profile.
+1. Install [node](https://nodejs.org/): `nvm install --lts --latest-npm`
+1. Activate the installed node temporarily: `nvm use stable`
 1. Install [decktape](https://github.com/astefanutti/decktape):
    `npm install -g decktape`
-1.  Run decktape:
-
-    ```sh
-    decktape https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
-    # or manually
-    decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
-    decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2023/R_training_2023_1.html R_training_1.pdf
-    ```
+1. Run `hash -r` or restart your shell/terminal to reload `$PATH`.
