@@ -123,7 +123,7 @@ fs::dir_create("data")  # Create directory
 
 初手エラー:
 
-```r
+``` r
 infile = "tblT001082C04.txt"
 readr::read_csv(infile)
 ```
@@ -153,7 +153,7 @@ RStudioでテキストとして開いてみると文字化け:
 
 よく見ると、8列目以降の列名が2行にまたがっている:
 
-```r
+``` r
 sjis = readr::locale(encoding = "SHIFT-JIS")
 readr::read_csv(infile, locale = sjis)
 ```
@@ -176,7 +176,7 @@ readr::read_csv(infile, locale = sjis)
 
 なんか数値の列のはずなのに `-` という文字が混じっている。(中には `X` も):
 
-```r
+``` r
 dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
   dplyr::slice(-1)
 dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
@@ -202,7 +202,7 @@ raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
 
 これでようやくスタート地点。。。
 
-```r
+``` r
 dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
   dplyr::slice(-1)
 dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
@@ -232,7 +232,7 @@ raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
 まだ罠はたくさん: 列名の頭にスペース。全角数字。変な区分。
 
 
-```r
+``` r
 tidy_miyagi = raw_miyagi |>
   dplyr::rename_with(stringr::str_trim) |>
   dplyr::filter(HYOSYO == 1) |>
@@ -267,7 +267,7 @@ tidy_miyagi = raw_miyagi |>
 
 
 
-```r
+``` r
 tidy_miyagi |>
   dplyr::mutate(count = ifelse(sex == "男", -1, 1) * count) |>
   ggplot() +
@@ -520,7 +520,7 @@ SEPT1,4-14
 → **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
 
 
-```r
+``` r
 3 * 14
 ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ```
@@ -622,11 +622,11 @@ e.g., **Markdown**, reStructuredText, 各種Wiki記法など
 
 
 
-- **R (≥ 4.3.3)**: 最新版 – 0.1 くらいまでが許容範囲
-- **RStudio (≥ 2023.12.1+402)**: Quarto CLI を同梱
+- **R (≥ 4.4.3)**: 最新版 – 0.1 くらいまでが許容範囲
+- **RStudio (≥ 2024.12.0+467)**: Quarto CLI を同梱
 - **tidyverse (≥ 2.0.0)**: 次の2つを自動インストール
-  - rmarkdown (≥ 2.26)
-  - knitr (≥ 1.45)
+  - rmarkdown (≥ 2.29)
+  - knitr (≥ 1.49)
 
 (示してあるバージョンは最低要件ではなく私の現在の環境の)
 

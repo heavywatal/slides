@@ -920,7 +920,7 @@ print(VADeaths)
 ## 🔰 課題3: `VADeaths` を縦長にしてggplotしてみよう
 
 
-```r
+``` r
 VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
   tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
 ```
@@ -938,7 +938,7 @@ VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
   <div class="column" style="flex-shrink: 0.8; min-width: 0;">
 
 
-```r
+``` r
 class(VADeaths)
 ```
 
@@ -946,7 +946,7 @@ class(VADeaths)
 [1] "matrix" "array" 
 ```
 
-```r
+``` r
 rownames(VADeaths)
 ```
 

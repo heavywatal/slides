@@ -199,7 +199,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 ## これくらいなら一瞬で計算してもらえる
 
 
-```r
+``` r
 par_init = c(intercept = 0, slope = 0)
 result = optim(par_init, fn = rss_weight, data = df_weight)
 result$par
@@ -219,7 +219,7 @@ intercept     slope
 ## `lm()` で直線あてはめしてみる
 
 
-```r
+``` r
 fit = lm(data = mpg, formula = hwy ~ displ)
 broom::tidy(fit)
 ```
@@ -230,7 +230,7 @@ broom::tidy(fit)
 2       displ -3.530589 0.1945137 -18.15085  2.038974e-46
 ```
 
-```r
+``` r
 mpg_added = modelr::add_predictions(mpg, fit, type = "response")
 ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
   geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
@@ -678,7 +678,7 @@ runif(6L)
 ## いろんな乱数を生成・可視化して感覚を掴もう
 
 
-```r
+``` r
 n = 100
 x = sample.int(6, n, replace = TRUE)  # 一様分布(整数)
 x = runif(n, min = 0, max = 1)        # 一様分布

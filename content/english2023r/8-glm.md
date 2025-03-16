@@ -226,7 +226,7 @@ Logistic function ↑
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
-\text{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\operatorname{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
 \end{split}\]</p>
 
   </div>
@@ -362,7 +362,7 @@ There are some named (frequently used) combinations.
 ---
 ## Link functions
 
-$\text{identity}(\mu_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
+$\operatorname{identity}(\mu_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : $\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : The effects of expl. variables are **additive**.
 
@@ -799,7 +799,7 @@ selects useful one for prediction and understanding.
 ## Steps to Generalized Linear Model (GLM)
 
 - Above all, visualize the data to get a whole picture.
-- Select **variables**, probabitlity **distribution**, and **link** function.
+- Select **variables**, probability **distribution**, and **link** function.
 - Estimate parameters.
 - Compare models with information criteria.
 

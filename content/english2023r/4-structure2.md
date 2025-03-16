@@ -87,7 +87,7 @@ Join/bind
 
 An example to combine the extracted first and last 6 rows:
 
-```r
+``` r
 dplyr::bind_rows(head(diamonds), tail(diamonds))
 ```
 
@@ -113,7 +113,7 @@ dplyr::bind_rows(head(diamonds), tail(diamonds))
 
 An example to combine two tables side-by-side:
 
-```r
+``` r
 dplyr::bind_cols(band_members, band_instruments2)
 ```
 
@@ -141,7 +141,7 @@ To join tables **by common columns**, use `*_join()` →
 
 keeping all observations in **both sides**:
 
-```r
+``` r
 dplyr::full_join(band_members, band_instruments, by = "name")
 ```
 
@@ -168,7 +168,7 @@ band_members          band_instruments
 
 keeping all observations in **the left hand side**:
 
-```r
+``` r
 dplyr::left_join(band_members, band_instruments, by = "name")
 ```
 
@@ -196,7 +196,7 @@ band_members          band_instruments
 
 keeping **only matched observations**:
 
-```r
+``` r
 dplyr::inner_join(band_members, band_instruments, by = "name")
 ```
 
@@ -221,7 +221,7 @@ band_members          band_instruments
 
 if they have different names:
 
-```r
+``` r
 dplyr::inner_join(band_members, band_instruments2,
                   by = dplyr::join_by(name == artist))
 ```
@@ -345,7 +345,7 @@ pivot_longer(table4a, !country, names_to = "year", values_to = "cases")
 - The number of households (`27`, `12`, ...) are in multiple columns.
 
 
-```r
+``` r
 print(relig_income)
 ```
 
@@ -404,7 +404,7 @@ print(relig_income)
 - The number of households (`27`, `12`, ...) are in multiple columns. → `count`
 
 
-```r
+``` r
 relig_long = relig_income |>
   tidyr::pivot_longer(!religion, names_to = "income", values_to = "count") |>
   print()
@@ -453,7 +453,7 @@ pivot_wider(table2, names_from = type, values_from = count)
 - `score` column stores values of two different variables. → two columns
 
 
-```r
+``` r
 print(cms_patient_care)
 ```
 
@@ -498,7 +498,7 @@ print(cms_patient_care)
 <div class="column">
 
 
-```r
+``` r
 print(fish_encounters)
 ```
 
@@ -546,7 +546,7 @@ print(fish_encounters)
 ## Practice 1
 
 
-```r
+``` r
 print(population)
 ```
 
@@ -582,7 +582,7 @@ print(population)
 ## Practice 2
 
 
-```r
+``` r
 print(population)
 ```
 
@@ -619,7 +619,7 @@ print(population)
 ## Practice 3
 
 
-```r
+``` r
 print(us_rent_income)
 ```
 
@@ -664,7 +664,7 @@ print(us_rent_income)
 </figure>
 
 
-```r
+``` r
 table3 |> tidyr::separate(rate, into = c("cases", "population"), sep = "/")
 ```
 
@@ -695,7 +695,7 @@ table3 |> tidyr::separate(rate, into = c("cases", "population"), sep = "/")
 </figure>
 
 
-```r
+``` r
 table5 |> tidyr::unite(YEAR, century, year, sep = "") |>
   dplyr::mutate(YEAR = as.integer(YEAR))
 ```
@@ -722,7 +722,7 @@ Note that the output column is always **character type**.
 🔰 Reproduce `table5` by separating `table3`'s `year`.
 
 
-```r
+``` r
 print(table3)
 ```
 
@@ -736,7 +736,7 @@ print(table3)
 6       China 2000 213766/1280428583
 ```
 
-```r
+``` r
 print(table5)
 ```
 
@@ -757,7 +757,7 @@ print(table5)
    (Omit `sep = "."`. You will know the reason tomorrow)
 
 
-```r
+``` r
 print(world_bank_pop)
 ```
 
@@ -809,7 +809,7 @@ purrr package</a> is a powerful tool to handle nested data.frames.
 ## `nest()`, `unnest()` for advanced users
 
 
-```r
+``` r
 mpg_nested = mpg |> tidyr::nest(data = !drv) |> print()
 ```
 
@@ -820,7 +820,7 @@ mpg_nested = mpg |> tidyr::nest(data = !drv) |> print()
 3   r  <tbl_df [25 x 10]>
 ```
 
-```r
+``` r
 mpg_nested$data[[1]]
 ```
 
@@ -893,7 +893,7 @@ It is the shortest path to getting data transformation done.
 ## Do you remember this dataset?
 
 
-```r
+``` r
 print(VADeaths)
 ```
 
@@ -927,7 +927,7 @@ print(VADeaths)
 ## 🔰 Challenge 1: transform and plot `VADeaths`
 
 
-```r
+``` r
 VADeaths |> as.data.frame() |>       # was not data.frame
   tibble::rownames_to_column("age")  # rownames are irregular
 ```
@@ -946,7 +946,7 @@ VADeaths |> as.data.frame() |>       # was not data.frame
 
 Convert it to a regular data.frame first.
 
-```r
+``` r
 class(VADeaths)
 ```
 
@@ -954,7 +954,7 @@ class(VADeaths)
 [1] "matrix" "array" 
 ```
 
-```r
+``` r
 rownames(VADeaths)
 ```
 

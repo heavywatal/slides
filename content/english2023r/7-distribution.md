@@ -178,7 +178,7 @@ There are many other **optimization** techniques although not covered here.
 ## R can find the optimum in an instant
 
 
-```r
+``` r
 par_init = c(intercept = 0, slope = 0)
 result = optim(par_init, fn = rss_weight, data = df_weight)
 result$par
@@ -198,7 +198,7 @@ For simple linear regression, an easier way is as follows...
 ## `lm()` function to fit linear models
 
 
-```r
+``` r
 fit = lm(data = mpg, formula = hwy ~ displ)
 broom::tidy(fit)
 ```
@@ -209,7 +209,7 @@ broom::tidy(fit)
 2       displ -3.530589 0.1945137 -18.15085  2.038974e-46
 ```
 
-```r
+``` r
 mpg_added = modelr::add_predictions(mpg, fit, type = "response")
 ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
   geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")

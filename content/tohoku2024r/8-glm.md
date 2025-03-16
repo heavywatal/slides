@@ -236,7 +236,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
-\text{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\operatorname{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
 \end{split}\]</p>
 
   </div>
@@ -378,7 +378,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 
 統計モデリングにおいて「まっすぐ以外も表現できる」意味
 
-$\text{identity}(\mu_i)$
+$\operatorname{identity}(\mu_i)$
 : $\mu_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots$
 : 説明変数の効果が**足し算**的に働く。
 
@@ -401,7 +401,7 @@ $\operatorname{logit}(p_i)$
 直線回帰のときの `lm` とほぼ同じ。
 
 
-```r
+``` r
 formula = weight ~ height
 fit = glm(formula, data = df_weight)
 coef(fit)
@@ -430,7 +430,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 結果の解釈やモデルの評価はこの後。
 
 
-```r
+``` r
 n = 50
 df_weight = tibble::tibble(
   height = rnorm(n, 1.70, 0.05),
@@ -457,7 +457,7 @@ df_weight = tibble::tibble(
 ## 🔰 とにかくGLMを使ってみる練習 解答例
 
 
-```r
+``` r
 fit_wh = glm(weight ~ height, family = gaussian(link = identity), data = df_weight)
 coef(fit_wh)
 ```
@@ -467,7 +467,7 @@ coef(fit_wh)
   -69.85222    78.63444 
 ```
 
-```r
+``` r
 df_fit_wh = modelr::add_predictions(df_weight, fit_wh, type = "response")
 ggplot(df_fit_wh) +
   aes(height, weight) +
@@ -481,7 +481,7 @@ ggplot(df_fit_wh) +
 ## 🔰 ポアソン回帰
 
 
-```r
+``` r
 n = 300L
 a = 3
 b = -3
@@ -551,7 +551,7 @@ $L(\theta \mid D)$ or $L(\theta)$
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
 
-```r
+``` r
 broom::glance(fit)
 ```
 
@@ -610,7 +610,7 @@ broom::glance(fit)
 
 
 
-```r
+``` r
 broom::glance(fit)
 ```
 
@@ -729,7 +729,7 @@ print(penguins)
 性別はとりあえず使わないので、体長関連だけでも。
 
 
-```r
+``` r
 penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
 ```
 
@@ -746,7 +746,7 @@ penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
 11  Gentoo    Biscoe             NA            NA                NA          NA  NA 2009
 ```
 
-```r
+``` r
 penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
 dim(penguins_dropna)
 ```
@@ -774,7 +774,7 @@ dim(penguins_dropna)
 どうやら、重いペンギンほど翼長も長い。
 
 
-```r
+``` r
 p_penweight = ggplot(penguins_dropna) +
   aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, alpha = 0.66) +
@@ -793,7 +793,7 @@ p_penweight
 $y = 136.7 + 0.0153 x$
 
 
-```r
+``` r
 fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
 broom::tidy(fit1)
 ```
@@ -804,7 +804,7 @@ broom::tidy(fit1)
 2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
 ```
 
-```r
+``` r
 broom::glance(fit1)
 ```
 
@@ -819,7 +819,7 @@ broom::glance(fit1)
 結果とデータから予測値を作って回帰線を引く。
 
 
-```r
+``` r
 added1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
 p1 = p_penweight +
   geom_line(aes(y = pred), data = added1, linewidth = 1, color = "#3366ff")
@@ -834,7 +834,7 @@ p1
 種によって色分けしてみると、傾向の違いが見える。
 
 
-```r
+``` r
 p_penweight_color = p_penweight + aes(color = species) +
   scale_color_manual(values = penguins_colors)
 p_penweight_color
@@ -850,7 +850,7 @@ Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。
 
 
-```r
+``` r
 fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
 broom::tidy(fit2)
 ```
@@ -863,7 +863,7 @@ broom::tidy(fit2)
 4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
 ```
 
-```r
+``` r
 broom::glance(fit2)
 ```
 
@@ -876,7 +876,7 @@ broom::glance(fit2)
 ## 重回帰の練習: 3. フィッティング結果を作図
 
 
-```r
+``` r
 added2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
 p2 = p_penweight_color +
   geom_line(aes(y = pred), data = added2, linewidth = 1)
@@ -895,7 +895,7 @@ Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。
 
 
-```r
+``` r
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
 broom::tidy(fit3)
 ```
@@ -910,7 +910,7 @@ broom::tidy(fit3)
 6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
 ```
 
-```r
+``` r
 broom::glance(fit3)
 ```
 
@@ -923,7 +923,7 @@ broom::glance(fit3)
 ## 交互作用の練習: フィッティング結果を作図
 
 
-```r
+``` r
 added3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
 p3 = p_penweight_color +
   geom_line(aes(y = pred), data = added3, linewidth = 1)
@@ -938,7 +938,7 @@ p3
 AICで選ぶなら交互作用入り重回帰が良さそう。
 
 
-```r
+``` r
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
@@ -1016,7 +1016,7 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
 
 
-```r
+``` r
 n = 200L
 true_coef = c(3, 0.05, 0.006)
 df_beer = tibble::tibble(
@@ -1046,7 +1046,7 @@ df_beer = tibble::tibble(
 次ページにヒント。
 
 
-```r
+``` r
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
 nrep = 200L
 n = 10L
@@ -1082,7 +1082,7 @@ df_logistic = tibble::tibble(
 
 今回の場合、成功回数 `y` だけをformulaに入れると怒られる
 
-```r
+``` r
 glm(y ~ x, df_logistic, family = binomial)
 ```
 
@@ -1100,7 +1100,7 @@ Error in eval(family$initialize): y values must be 0 <= y <= 1
 まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
 
 
-```r
+``` r
 n = 200L
 b = c(70, 3, 20, -20)  # true coef
 weather_levels = c("sunny", "cloudy", "rainy")
@@ -1135,7 +1135,7 @@ df_ancova = tibble::tibble(
 
 
 
-```r
+``` r
 n = 200L
 b = c(70, 3, 100, -2)  # true coef
 weather_levels = c("sunny", "rainy")
