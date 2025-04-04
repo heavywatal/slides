@@ -1,0 +1,704 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+#| cache: false
+```
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備 ✅
+1. データの取得、読み込み 👈 今回はここから
+1. 探索的データ解析
+    - 前処理、加工 ✅ 完全に理解した
+    - 可視化、仮説生成 ✅ 完全に理解した
+    - 統計解析、仮説検証 ⬜ 次回
+1. 報告、発表 ⬜ Quarto楽しい
+
+<figure>
+<a href="https://r4ds.hadley.nz/intro">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+</a>
+</figure>
+
+
+---
+## data.frameの読み書き
+
+<a href="https://readr.tidyverse.org/">
+<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+</a>
+
+- readxlパッケージを使えば `.xlsx` ファイルも読める、けど
+- カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
+- R標準の関数ではなく readr パッケージを使う。
+- ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
+
+    ```r
+    readr::write_tsv(iris, "data/iris.tsv")   # 書き出し
+    iris2 = readr::read_tsv("data/iris.tsv")  # 読み込み
+    ```
+
+あれれー、エラーが出る？
+
+```{r, cannot-open}
+#| error: true
+#| echo: false
+readr::write_tsv(iris, "data/iris.tsv")
+```
+
+---
+## ファイル読み書きでありがちなエラー
+
+- 読みたいファイル名が間違っている。
+- 読みたいファイルが作業ディレクトリとは違うところにある。
+- 書き込み先のディレクトリが存在しない。→ 予め作っておこう
+
+冷静に、現在の作業ディレクトリとその中身を確認しよう:
+```r
+getwd()                 # GET Working Directory
+fs::dir_ls(".")         # List files in "." (here)
+fs::dir_ls("data")      # List files in "./data"
+fs::dir_create("data")  # Create directory
+```
+
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2024/R_training_2024_7.html)
+を読んでおきましょう。
+
+🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
+
+🔰 それらを別の名前で読み込み直してみよう。
+
+---
+## 🔰 最終課題予告
+
+<iframe width="1080" height="810" src="#/29"></iframe>
+
+読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？
+
+---
+## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
+
+2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
+
+うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
+
+<img `r src_alt_fig_chunk("estat-plot")`>
+
+---
+## オープンデータを入手できても簡単には読み込めない
+
+初手エラー:
+```{r, estat-read-error}
+#| error: true
+infile = "tblT001082C04.txt"
+readr::read_csv(infile)
+```
+
+RStudioでテキストとして開いてみると文字化け:
+
+```{r, estat-as-text}
+#| echo: false
+readLines(infile, 5L) |> t() |> t() |>
+  prmatrix(rowlab = rep("", 5), collab = "", quote = FALSE)
+```
+
+メニューから "File → **Reopen with Encoding...**" を選択。<br>
+たいてい、古い日本語ファイルにありがちな**SHIFT-JIS**が正解。<br>
+(もっと古いファイルならEUC-JPとかの場合もある。)
+
+---
+## 文字コードを指定して読み込み
+
+よく見ると、8列目以降の列名が2行にまたがっている:
+```{r, estat-sjis}
+sjis = readr::locale(encoding = "SHIFT-JIS")
+readr::read_csv(infile, locale = sjis)
+```
+
+---
+## 左側と右側を分けて読み、それぞれ削ってからbind
+
+なんか数値の列のはずなのに `-` という文字が混じっている。(中には `X` も):
+```{r, estat-lr}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L)
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+---
+## 数値のはずの列に混じる `-` と `X` を `NA` 扱い
+
+これでようやくスタート地点。。。
+```{r, estat-lr-na}
+dfL = readr::read_csv(infile, locale = sjis, col_select = seq(1, 7)) |>
+  dplyr::slice(-1)
+dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"))
+raw_miyagi = dplyr::bind_cols(dfL, dfR) |> print()
+```
+
+<!-- dfR = readr::read_csv(infile, locale = sjis, col_select = -seq(1, 7),
+  skip = 1L, na = c("-", "X"), name_repair = "minimal") -->
+
+---
+## あとはdplyrとtidyrでお掃除
+
+まだ罠はたくさん: 列名の頭にスペース。全角数字。変な区分。
+
+```{r, estat-tidy}
+tidy_miyagi = raw_miyagi |>
+  dplyr::rename_with(stringr::str_trim) |>
+  dplyr::filter(HYOSYO == 1) |>
+  dplyr::select(CITYNAME, matches("[男女].+歳")) |>
+  tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
+  tidyr::separate(category, c("sex", "age"), 1) |>
+  dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
+  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  dplyr::mutate(lower = readr::parse_number(lower),
+                upper = readr::parse_number(upper)) |>
+  dplyr::filter((upper - lower) < 5 | lower == 75) |>
+  dplyr::mutate(age = (lower + upper) / 2) |>
+  print()
+```
+
+---
+## ここまでくれば作図は簡単
+
+```{r, estat-factor}
+#| include: false
+total_miyagi = tidy_miyagi |>
+  dplyr::count(CITYNAME, wt = count, name = "count") |>
+  dplyr::arrange(desc(count))
+tidy_miyagi = tidy_miyagi |>
+  dplyr::mutate(CITYNAME = factor(CITYNAME, levels = total_miyagi$CITYNAME))
+```
+
+```{r, estat-plot}
+#| fig.height: 5.5
+#| fig.width: 12
+tidy_miyagi |>
+  dplyr::mutate(count = ifelse(sex == "男", -1, 1) * count) |>
+  ggplot() +
+  geom_col(aes(age, count, fill = sex)) +
+  facet_wrap(vars(CITYNAME), nrow = 4L) +
+  coord_flip() + theme_minimal(base_size = 15)
+```
+
+---
+## 前処理の前処理が必要になるようなデータは困る
+
+Rを使ったデータ前処理を習得した✨<br>
+雑然データからでも下ごしらえして解析できるぞ！
+
+とはいえ...
+
+- まず、読み込めないと始まらない。
+- dplyrやtidyrで手に負えないほど不規則では困る。
+
+自分が一次データを作る立場なら、どう気をつけたらいいか？
+
+<br>
+
+総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
+[「統計表における機械判読可能なデータの表記方法の統一ルール」](https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html)
+から抜粋。
+
+---
+## データ入力の心得 1. 1つのセルに1つの値
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::separate()`, `stringr::str_split()`, `stringr::str_extract()`
+
+---
+## データ入力の心得 1. 1つのセルに1つの値
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::separate()`, `stringr::str_split()`, `stringr::str_extract()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 2. 余計な文字列が数値扱いを妨げる
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+いやいや、欄外に記載するのも不規則でダメですよ。別シートか、別カラムに。
+
+悪い形に遭遇したときに使える関数:
+`readr::parse_number()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 3. 空白や改行で見た目を整えない
+
+機械にとって `"　A"` と `"A"` は違う値。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringr::str_trim()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 3. 空白や改行で見た目を整えない
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringr::str_trim()`, `stringr::str_remove()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 4. セルを結合しない、絶対に
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`
+
+---
+## データ入力の心得 4. セルを結合しない、絶対に
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`
+
+---
+## データ入力の心得 5. 同じものが続いても省略しない
+
+人が見れば分かるけど、機械も同じように読んではくれない。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`tidyr::fill()`, `tidyr::separate()`, `stringr::str_replace()`
+
+---
+## データ入力の心得 6. 機種依存文字を避ける
+
+できれば全角・日本語も避けてすべて半角英数で。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+悪い形に遭遇したときに使える関数:
+`stringi::stri_trans_nfkc()`
+
+---
+## データ入力の心得 7. 1つのシートには1つの表
+
+もっと言うと、複数シートのファイルを作らず、それぞれ別ファイルに。
+
+<figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
+<img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
+<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+</a></figure>
+
+---
+## データ入力の心得 8. その他
+
+- 1行目ではすべての列に名前を与える。
+  - なんとなく**1行目は空行**、**1列目は名前無し**とかやりがち。ダメ。
+  - 2行目以降に列名がハミ出してもダメ。
+  - プログラム内で参照される変数名として成立するように。
+    - アンダースコア_以外の**記号・空白を入れない**のが安全。
+    - **先頭は数字も避ける**。
+- 保存形式はプレーンテキスト推奨。Excel形式(.xlsx)は扱いにくい。
+    - タブ区切り(.tsv) or カンマ区切り(.csv)
+    - ファイル名、フォルダ名も機械処理するつもりで規則的に。
+
+[熊谷直喜さんのブログ「R解析用データフォーマット例」](https://nhkuma.blogspot.com/2012/12/r_5.html)
+も一読を。
+
+---
+## データ入力の心得おさらい
+
+つまり、Rで前処理・可視化・解析するぞという気持ち:
+
+1. 1つのセルに1つの値
+1. 余計な文字列が数値扱いを妨げる
+1. 空白や改行で見た目を整えない
+1. セルを結合しない、絶対に
+1. 同じものが続いても省略しない
+1. 機種依存文字、というか半角英数以外を避ける
+1. 1つのシート(ファイル)には1つの表
+1. 1行目は列名
+
+🔰 総務省ルールの「修正後」にまだ残る改善点を最大3つ列挙しよう。
+
+
+---
+## Excelの親切あるいは裏切りに要注意
+
+表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
+しかし**親切設計がユーザーに牙を剥く**！
+
+- 文字列が勝手に日付になる: `22-4`, `4-14`
+- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
+  ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
+
+🔰 CSVファイルを読み書きして恐怖を体感しよう:
+
+```
+gene,label
+MARCH1,22-4
+SEPT1,4-14
+```
+1.  ↑からのコピペで `excel.csv` という名のプレーンテキストを作成。
+1.  Excelでそれで開き、日付になることを確認。
+1.  それを別名のCSVとして保存し、テキストの中身を確認してレポート。
+
+
+---
+## 🔰 最終課題: オープンデータを拾って解析しよう。
+
+- [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
+- [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+- [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
+- [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+- [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
+- ほか、なんでも興味のあるデータ
+
+発表・レポートの条件
+: 最低1枚の図と、そこに至る前処理＋可視化のコード。
+: グラフから読み取れることを一言。
+: 4日目に習う統計解析も組み込めるとなおよし。
+
+週明けに発表会をやります。
+
+
+
+---
+## Rコードの実行結果をとっておきたい
+
+スクリプト.Rさえ保存しておけばいつでも実行できるけど... **面倒**
+
+`ggsave()` で画像を書き出しておけるけど... **どのコードの結果か分からない**
+
+→ **スクリプトと実行結果を一緒に見渡せる形式**が欲しい。
+
+```{r, hello}
+#| results: "hold"
+#| fig.show: "hold"
+#| fig.height: 3.5
+#| fig.width: 5
+3 * 14
+ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
+```
+
+
+---
+## Quarto Document として研究ノートを作る
+
+<a href="https://quarto.org/">
+<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+</a>
+
+プログラミングからレポート作成まで一元管理できて楽ちん。
+
+- 本文とRコードを含むテキストファイル.qmdを作る。
+- HTML, PDFなどリッチな形式に変換して読む。
+  - コードだけでなく実行結果の**図**や**表**も埋め込める。
+
+<hr>
+
+<a href="https://rmarkdown.rstudio.com/">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+</a>
+
+Quarto Markdown (`.qmd`)
+: **Markdown**亜種。RやPythonのコードと図表を埋め込める。
+: Quarto登場前にほぼR専用だった `.Rmd` と使い勝手は同じ。
+
+Markdown (`.md`)
+: 最もよく普及している**軽量マークアップ言語**のひとつ。
+: 微妙に異なる方言がある。qmdで使うのは Pandoc Markdown 。
+
+(どんなものが作れるのか
+[作成例ギャラリー](https://quarto.org/docs/gallery/)
+を見てみよう。)
+
+---
+## マークアップ言語
+
+文書の構造や視覚的修飾を記述するための言語。<br>
+e.g., **HTML**+CSS, XML, LaTeX
+
+```html
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
+
+(好きなウェブサイトのHTMLソースコードを見てみよう。)
+
+
+---
+## 軽量マークアップ言語
+
+**マークアップ言語**の中でも人間が読み書きしやすいもの。<br>
+e.g., **Markdown**, reStructuredText, 各種Wiki記法など
+
+```md
+### 見出し3
+
+ここは段落。
+*強調(italic)*、
+**強い強調(bold)**、
+[リンク](https://www.lifesci.tohoku.ac.jp/)とか。
+```
+
+<div style="border: solid 1px #888888; padding: 0 4px;">
+<h3>見出し3</h3>
+<p>ここは段落。
+<em>強調(italic)</em>、
+<strong>強い強調(bold)</strong>、
+<a href="https://www.lifesci.tohoku.ac.jp/">リンク</a>とか。
+</p>
+</div>
+
+
+---
+## Quartoする環境は既に整っているはず
+
+```{r, versions}
+#| include: false
+R_version = paste(R.version$major, R.version$minor, sep = ".")
+pkg_versions = installed.packages()[, "Version"]
+RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "--version", stdout = TRUE)
+# quarto_version = system2("quarto", "--version", stdout = TRUE)
+```
+
+- **R (≥ `r R_version`)**: 最新版 – 0.1 くらいまでが許容範囲
+- **RStudio (≥ `r RStudio_version`)**: Quarto CLI を同梱
+- **tidyverse (≥ `r pkg_versions["tidyverse"]`)**: 次の2つを自動インストール
+  - rmarkdown (≥ `r pkg_versions["rmarkdown"]`)
+  - knitr (≥ `r pkg_versions["knitr"]`)
+
+(示してあるバージョンは最低要件ではなく私の現在の環境の)
+
+<hr>
+
+- [Quarto CLI](https://quarto.org/docs/get-started/):
+  最新版を求めるなら手動で入れる。
+- [`install.packages("quarto")`](https://github.com/quarto-dev/quarto-r):
+  多くの人には不要。
+  Quarto CLIをRコマンドで呼べるようにするだけ。
+- [pandoc](https://pandoc.org/): Quarto CLI に同梱。
+  手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。
+
+---
+## Markdown記法で書いてみよう
+
+1. RStudio > New File > Markdown File
+   <img src="/slides/image/rstudio/new-markdown.png" width="60%">
+1. ["markdown 記法"で検索](https://duckduckgo.com/?q=markdown+syntax)して何か書く。
+   最低限、次の概念を含むように:
+   - 見出し1, 2, 3
+   - コードブロック、インラインコード
+   - 箇条書き (番号あり・なし)
+1. <kbd>Preview</kbd>ボタンで確認
+
+---
+## Quarto Document を作ってみよう
+
+RStudio > New File > Quarto Document...<br>
+(DocumentとHTMLを選択し、)タイトルと著者を埋めて、OK。
+
+<img src="/slides/image/rstudio/new-quarto-document.png" width="100%">
+
+---
+## 普通のmdには無いqmdの特徴
+
+ヘッダー (フロントマター)
+: 最上部の `---` で挟まれた部分。
+  文書全体に関わるメタデータを入力。
+: オプションは出力形式によって異なる。
+  e.g., [`html`](https://quarto.org/docs/output-formats/html-basics.html)
+
+R code chunk
+: `` ```{r} `` のように始まるコードブロック。
+: コードの実行結果を最終産物に埋め込める。
+: [オプションがいろいろある](https://quarto.org/docs/computations/execution-options.html)。e.g.,
+  - `echo: false`: コードを非表示。結果は表示。
+  - `eval: false`: コードを実行せず表示だけ。
+  - `include: false`: コードも結果も表示せず、実行だけする。
+  - `fig.width: 7`, `fig.height: 7`: 図の大きさを制御。
+
+まあ細かいことは必要になってから調べるとして...
+
+---
+## qmdをHTMLに変換してみよう
+
+左のqmdを "→Render" すると右のができる。手順は次スライド。
+
+<div>
+<img src="/slides/image/rstudio/quarto-viewer.png" width="100%">
+</div>
+
+---
+## qmdをHTMLに変換してみよう
+
+1. ソースコードに名前をつけて保存 <kbd>command</kbd><kbd>s</kbd><br>
+   e.g., `report.qmd`
+1. ⚙️ ボタンから "Preview in Viewer Pane" を選択。
+1. "→Render" を押す。
+   - 埋め込まれたRコードが実行される。
+   - 実行結果を含むMarkdownが作られる。
+   - MarkdownからHTMLに変換される。 e.g., `report.html`
+   - プレビューが自動的に開く。
+1. 編集 → 保存 → Render を繰り返して作り込む。
+
+
+---
+## 🔰 レポート (締切: 2025-05-13)
+
+- 課題: 講義資料の🔰若葉マークすべて。
+- 様式: Quarto Markdownで書き、Render済みHTMLを提出。
+  - 1日分で1ファイル、それぞれClassroomトピックに提出。計4つ。
+  - `{ID}-{name}-day{d}.html`, e.g., `C0SB0000-iwasaki-day2.html`
+  - `embed-resources: true` で画像などを埋め込んだ独立HTML。
+- 評価ポイント
+  - エラーも警告も無くコードが走る。
+  - 文書の構造や図が視覚的に見やすく整理されている。
+  - 半年後の自分が読んでわかるような `# 親切コメント`。
+- 手抜きポイント
+  - 生物学的な意義があるか、みたいなのはほぼ不問。
+
+
+---
+## レポートの体裁の例
+
+左のようなqmdを作ってRenderし、右のようなHTMLファイルを提出。
+
+<div>
+<img src="../tohoku2024r/image/report-example.webp" width="90%"></img>
+</div>
+
+
+---
+## ヘッダーとおまじないコードの例
+
+```yaml
+---
+title: "進化学実習 day 2"
+author: "C0SB0000 9班 Jean Sibelius"
+date: "2025-04-10"
+format:
+  html:
+    embed-resources: true
+    toc: true
+---
+```
+
+```r
+library(conflicted)
+library(tidyverse)
+grDevices::palette("Okabe-Ito")
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis",
+  ggplot2.discrete.colour = grDevices::palette()[-1],
+  ggplot2.discrete.fill = grDevices::palette()[-1]
+)
+knitr::opts_chunk$set(dev = "ragg_png")  # ggplot 日本語
+```
+
+
+---
+## 今日の残り時間
+
+- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
+- まずは個人で課題1(組み込みデータの可視化)に取り組む。
+- ある程度できたら班内で見せ合い、よかった部分を自分のに取り込む。
+- TAが評価して合格した班から解散。
+- 最終課題は週明け月曜に発表してもらえればいいので今日は未完成でOK。
+- 居残って取り組んでもOK。
+
+
+---
+## 参考文献
+
+- 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2024/)」
+   石川由希 2024 名古屋大学
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- [統計思考の世界](https://amzn.to/3urpls1) 三中信宏 2018
+- Quarto / R Markdown
+  - [Cheat sheet (PDF)](https://raw.githubusercontent.com/rstudio/cheatsheets/main/rmarkdown.pdf)
+  - [R for Data Science --- Quarto](https://r4ds.hadley.nz/quarto)
+  - [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
+
+`r .meta$next_link`
