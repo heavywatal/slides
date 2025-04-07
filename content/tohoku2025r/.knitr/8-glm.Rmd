@@ -91,7 +91,7 @@ p_pois +
 ---
 ## 一般化線形モデル(GLM)として記述してみる
 
-個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。\
 平均値$\lambda_i$は**他のデータによらず$\beta_0$で一定**。
 
 <div>\[\begin{split}
@@ -110,13 +110,13 @@ p_pois +
         panel.grid.major.y = element_blank(), axis.ticks = element_blank())
 ```
 
-種子数をY軸にして、式を2つに分けただけ...?<br>
+種子数をY軸にして、式を2つに分けただけ...?\
 **説明変数**を含むモデルを見ればご利益が分かるかも。
 
 ---
 ## 説明変数が1つある一般化線形モデル
 
-個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。<br>
+個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。\
 平均値の対数$\log(\textcolor{#3366ff}{\lambda_i})$は**その個体の大きさ$x_i$に比例**する。
 
 <div class="column-container">
@@ -236,7 +236,7 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 
-客10人中$y_i$人がビールを注文。<br>
+客10人中$y_i$人がビールを注文。\
 その日$i$の気温$x_i$によって割合が変化。
 
 <p>\[\begin{split}
@@ -430,7 +430,7 @@ ggplot(df_weight) + aes(height, weight) +
 ---
 ## 分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM
 
-**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。<br>
+**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。\
 <span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
 
 <div class="column-container">
@@ -535,7 +535,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 ---
 ## 共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM
 
-**質的変数と量的変数を両方**含むGLM、と解釈可能。<br>
+**質的変数と量的変数を両方**含むGLM、と解釈可能。\
 正規分布・等分散・恒等リンクなどが仮定される。
 
 
@@ -584,7 +584,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 ---
 ## 交互作用
 
-ある説明変数の効果が、別の説明変数によって異なる。<br>
+ある説明変数の効果が、別の説明変数によって異なる。\
 e.g., ビール売上の温度依存性が天気によって異なる。
 
 <div class="column-container">
@@ -600,7 +600,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
 \end{split}\]</p>
 
-雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。\
 晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
 
   </div>
@@ -652,7 +652,7 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
 ---
 ## 一般化線形モデル(GLM)ふりかえり
 
-確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
+確率分布・リンク関数を変えて柔軟にモデリングできる。\
 特定の組み合わせには名前がある。
 
 | 名前 | 確率分布 | リンク関数 | 説明変数 |
@@ -677,12 +677,12 @@ $\operatorname{identity}(\mu_i)$
 
 $\log(\lambda_i)$
 : $\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$
-: 説明変数の効果が**掛け算**的に働く。<br>
+: 説明変数の効果が**掛け算**的に働く。\
   e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる
 
 $\operatorname{logit}(p_i)$
 : $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)
-: 説明変数の効果が**頭打ち**になる。<br>
+: 説明変数の効果が**頭打ち**になる。\
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
 
 ほかに `probit`, `inverse`, `sqrt`, etc.
@@ -699,7 +699,7 @@ fit = glm(formula, data = df_weight)
 coef(fit)
 ```
 
-デフォルトは正規分布・恒等リンクで `lm` と同じ結果。<br>
+デフォルトは正規分布・恒等リンクで `lm` と同じ結果。\
 `family=` オプションで確率分布とリンク関数を明示的に指定:
 ```r
 glm(formula, family = gaussian(link = identity), data = mydata)
@@ -713,7 +713,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ---
 ## 🔰 とにかくGLMを使ってみる練習
 
-とりあえず当てはめと作図だけ。<br>
+とりあえず当てはめと作図だけ。\
 結果の解釈やモデルの評価はこの後。
 
 ```{r, generate-df-weight}
@@ -768,27 +768,27 @@ ggplot(df_fit_wh) +
     - **負の値を取らない**ならガンマ分布
     - 直線的か、指数関数的か、頭打ちか、などなど
 
-客観的な指標もほしい。<br>
+客観的な指標もほしい。\
 モデルの尤もらしさといえば...
 
 
 ---
 ## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
 
-**あるモデル$M$の下でそのデータ$D$が観察される確率**:<br>
+**あるモデル$M$の下でそのデータ$D$が観察される確率**:\
 $\Pr(D \mid M)$
 
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
+データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:\
 $L(M \mid D)$
 
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:\
 $L(\theta \mid D)$ or $L(\theta)$
 
 **対数尤度** $\log L$ の形にしたほうがいろいろ便利。
 
 <hr>
 
-各モデルで最適なパラメータを探して、比較:<br>
+各モデルで最適なパラメータを探して、比較:\
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
 ```{r, llf}
@@ -854,7 +854,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 ## あてはまりが良ければいいってもんでもない
 
 過剰適合 / 過学習 / overfitting
-: パラメータを増やせば**現データへの**適合度・尤度を高くできるが、<br>
+: パラメータを増やせば**現データへの**適合度・尤度を高くできるが、\
   予測・理解の役には立たなくなる。
 
 ```{r, saturated-model}
@@ -902,14 +902,14 @@ p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated, ty
 cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ```
 
-**帰無モデル**: 説明変数なし。切片のみ。<br>
+**帰無モデル**: 説明変数なし。切片のみ。\
 **飽和モデル**: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
 
 
 ---
 ## 無駄な説明変数を加えても尤度は上がる
 
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
 観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
 
 ```{r, many-models}
@@ -975,9 +975,9 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
     - 尤度は上げたい。
     - パラメータ数 $k$ が増えるとペナルティ。
 - どのデータに対する当てはまりを目指すかという観点
-    - 「手元のデータ」に対する対数尤度は $\log L^*$<br>
-    - 「真のメカニズムから出てくる未来のデータ」に対する<br>
-      平均対数尤度の推定量は $(\log L^* - k)$<br>
+    - 「手元のデータ」に対する対数尤度は $\log L^*$\
+    - 「真のメカニズムから出てくる未来のデータ」に対する\
+      平均対数尤度の推定量は $(\log L^* - k)$\
       (Kullback--Leibler情報量を使って導出するらしい)
 
 
@@ -992,7 +992,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ---
 ## 無駄な説明変数の追加でAIC増加
 
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
 観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
 
 ```{r, many-models-aic}
@@ -1022,13 +1022,13 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 
 - $\text{BIC} = -2 \log L^* + k \log n$
     - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
-    - データの観測数 $n$ に依存する点でAICと異なる。<br>
+    - データの観測数 $n$ に依存する点でAICと異なる。\
       感覚としては「AICはデータサイズによるペナルティが無い」
     - (周辺尤度の最大化という観点で導出するらしい)
 - [WAIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
   [WBIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
     - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
+    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。\
       そうじゃない場合(現実的には常に)こちらが優位。
     - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
 
@@ -1036,13 +1036,13 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ---
 ## モデル選択の心構え
 
-「正しい」ものを選べるわけではない。<br>
+「正しい」ものを選べるわけではない。\
 予測・理解に useful なものを何らかの基準で選ぶだけ。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -1118,7 +1118,7 @@ dim(penguins_dropna)
 ---
 ## 🔰 penguinsでGLMの練習
 
-次の課題を解いてみよう。<br>
+次の課題を解いてみよう。\
 (次ページ以降に解答。まずは自力で。)
 
 1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
@@ -1188,7 +1188,7 @@ p_penweight_color
 ---
 ## 重回帰の練習: 2. モデル作成、フィッティング
 
-Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+Adelieを基準に、ChinstrapとGentooはそれより長め。\
 体重の効果は単回帰のとき(0.0153)より小さい。
 
 ```{r, penguins-fit2}
@@ -1215,7 +1215,7 @@ p2
 ---
 ## 交互作用の練習: モデル作成、フィッティング
 
-Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+Adelieを基準に、Chinstrapの傾きが結構違う。\
 切片の違いは解釈しにくくなった。
 
 ```{r, penguins-fit3}
@@ -1298,8 +1298,8 @@ p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
 ---
 ## 🔰 4日目の課題2: 架空データでGLM
 
-宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。<br>
-冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。<br>
+宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。\
+冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。\
 これらの変数の間に、なんらかの関係は見られるだろうか？
 
 [adventure.tsv](adventure.tsv)
@@ -1372,14 +1372,14 @@ p_route = ggplot(df_pred) +
 ---
 ## 補遺
 
-ここ以降の練習問題はレポートに入れなくてもいいです。<br>
+ここ以降の練習問題はレポートに入れなくてもいいです。\
 入れてもいいですが。
 
 
 ---
 ## 🔰 重回帰
 
-`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
+`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。\
 とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
 
 ```{r, generate-df-beer}
@@ -1445,7 +1445,7 @@ glm(y ~ x, df_logistic, family = binomial)
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
-- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
+- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017\
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
 
 `r .meta$next_link`
