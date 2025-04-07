@@ -496,11 +496,11 @@ See https://support.apple.com/HT201236
 次のコードをコピーして、左下のConsoleにペースト <kbd>return</kbd>
 
 ```r
-student_id = "C2SB0000"   # 自分のIDに書き換えてください
-source("https://example.com/sice/report.R")
+student_id = "C3SB0000"   # 自分のIDに書き換えてください
+source("https://scorpion.biology.tohoku.ac.jp/sice/report.R")
 ```
 
-`Hello, C2SB0000.`
+`Hello, C3SB0000.`
 のような返事が返ってきていればOK。
 
 なんらかのエラーが出た人は申し出てください。
