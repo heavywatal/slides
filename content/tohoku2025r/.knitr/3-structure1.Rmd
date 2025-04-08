@@ -546,18 +546,6 @@ result = diamonds |>
 ---
 ## 行の抽出: `filter()`
 
-複数の値のうち**どれかに一致する行**のみ残す:
-```{r, filter-in}
-result = diamonds |>
-  dplyr::filter(cut %in% c("Ideal", "Good")) |>
-  print()
-```
-
-🔰 `starwars` の**目の色が青か赤のキャラクタ**を抽出してみよう
-
----
-## 行の抽出: `filter()`
-
 2つの条件を**両方満たす行**のみ残す (AND):
 ```{r, filter-and}
 result = diamonds |>
@@ -579,6 +567,18 @@ result = diamonds |>
 ```
 
 🔰 `starwars` の**身長200以上または体重100以上のキャラ**を抽出しよう
+
+---
+## 行の抽出: `filter()`
+
+複数の値のうち**どれかに一致する行**のみ残す:
+```{r, filter-in}
+result = diamonds |>
+  dplyr::filter(cut %in% c("Ideal", "Good")) |>
+  print()
+```
+
+🔰 `starwars` の**目の色が青か赤のキャラクタ**を抽出してみよう
 
 ---
 ## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
@@ -608,19 +608,6 @@ result = diamonds |>
 
 🔰 `starwars` の**ジェンダーごとに身長が低い3名ずつ**抽出してみよう
 
----
-## 先頭/末尾の行の抽出: `slice_head()`, `slice_tail()`
-
-**各グループの先頭**を `n` 行または割合 `prop` で抽出:
-```{r, group-slice-head}
-result = diamonds |>
-  dplyr::group_by(cut) |>
-  dplyr::slice_head(n = 3L) |>
-  print()
-```
-
-🔰 `starwars` の**ジェンダーごとに先頭3名ずつ**抽出してみよう
-
 
 ---
 ## そのほかの `slice*()` 系
@@ -637,6 +624,7 @@ result = diamonds |>
 
 **任意のX番目の行**を抽出: `dplyr::slice(X)`
 
+**先頭/末尾のn行**の抽出: `slice_head()`, `slice_tail()`
 
 ---
 ## 要約・集計: `summarize()`
@@ -711,22 +699,6 @@ result = diamonds |>
 
 
 ---
-## 重複行の除去: `distinct()`
-
-指定した列に関してユニークな行のみ残す:
-```{r, distinct}
-result = diamonds |>
-  dplyr::distinct(cut, color) |>
-  print()
-```
-
-`.keep_all = TRUE`
-オプションを付けると指定しなかった列も残せる。
-
-🔰 `starwars` の**性とジェンダーの組み合わせ**だけ残してみよう
-
-
----
 ## 行の並べ替え: `arrange()`
 
 指定した列の**昇順(または降順 `desc()`)で**行を並べ替える:
@@ -760,11 +732,12 @@ result = diamonds |>
 ```{r, mutate}
 result = diamonds |>
   dplyr::mutate(ratio = price / carat,
-                price = 105.59 * price) |>
+                price = 146.8 * price) |>
   print()
 ```
 
-🔰 `starwars` の**身長をメートルで表してBMIを計算**してみよう
+🔰 `starwars` の**身長をメートルで表してBMIを計算**してみよう\
+(右端に追加されると結果を確認しにくいですね？)
 
 
 ---
