@@ -527,7 +527,8 @@ ggplot(diamonds) +
 <span style="color: #F8766D;">赤</span>
 <span style="color: #00BA38;">緑</span>
 <span style="color: #619CFF;">青</span>の3色を使った先ほどの図は多くの人には問題なさそう。<br>
-しかし5%くらいの人には右のように<span style="color: #B6A86A;">赤</span>
+しかし5%くらいの人には右のように
+<span style="color: #B6A86A;">赤</span>
 <span style="color: #AC9C45;">緑</span>
 <span style="color: #5A96FD;">青</span> や
 <span style="color: #FF6074;">赤</span>
