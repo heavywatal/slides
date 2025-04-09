@@ -1172,7 +1172,7 @@ update.packages()          # たまには更新しよう
 </a>
 
 ```r
-install.packages("tidyverse")
+# install.packages("tidyverse") # 済んでるはず
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```

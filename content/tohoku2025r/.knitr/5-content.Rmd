@@ -92,7 +92,7 @@ data(fruit, package = "stringr")
 </a>
 
 ```r
-install.packages("tidyverse")
+# install.packages("tidyverse") # 済んでるはず
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
@@ -188,14 +188,14 @@ https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
 dia = diamonds    # 別名コピー
 
 # dollar演算子 $ で指定
-dia$price = 105.59 * dia$price
+dia$price = 146.8 * dia$price
 
 # 名前を [[文字列]] で指定
-dia[["price"]] = 105.59 * dia[["price"]]
+dia[["price"]] = 146.8 * dia[["price"]]
 
 # dplyr::mutate with pipe
 dia = diamonds |>
-  dplyr::mutate(price = 105.59 * price) |>
+  dplyr::mutate(price = 146.8 * price) |>
   dplyr::filter(carat > 1) |>
   dplyr::summarize(avg_price = mean(price))
 ```
@@ -220,7 +220,7 @@ result = diamonds |>
 ---
 ## 欠損値の除去 `tidyr::drop_na()`
 
-(指定した列に) `NA` が含まれてる行を削除する。
+(指定した列に) 欠損値 `NA` が含まれてる行を削除する。
 
 ```{r, drop-na}
 df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
@@ -332,10 +332,10 @@ https://r4ds.hadley.nz/strings.html
 ---
 ## R備え付けの文字列機能は使いにくい
 
--   何をやる関数なのか名前から分かりにくい\
+-   何をやる関数なのか名前から分かりにくい:\
     `grep`, `grepl`, `regexpr`, `gregexpr`, `regexec`\
     `sub`, `gsub`, `substr`, `substring`
--   対象文字列はいくつめに渡す？関数ごとに違う。e.g.,\
+-   対象文字列はいくつめに渡す？関数ごとに違う:
 
     ```r
     grep(pattern, x, ...)
@@ -343,7 +343,7 @@ https://r4ds.hadley.nz/strings.html
     substr(x, start, stop)
     ```
 
--   欠損値 `NA` に対する挙動が微妙
+-   欠損値 `NA` に対する挙動が微妙:
 
     ```{r, base-str-na}
     x = c(1, 2, NA)
@@ -694,10 +694,12 @@ mpg_fct = mpg |>
 #| echo: false
 p1 = diamonds_fct |>
   ggplot() + aes(x = color) + geom_bar() + coord_flip() +
+  labs(title = "diamonds_fct") +
   theme_minimal(base_size = 16)
 p2 = mpg_fct |>
   ggplot() + aes(fl, cty, fill = fl) +
   geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.5, stroke = 0) +
+  labs(title = "mpg_fct") +
   theme_minimal(base_size = 16) +
   theme(legend.position = "none")
 cowplot::plot_grid(p1, p2, nrow = 1L)
@@ -716,10 +718,9 @@ mpg |>
   dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
   dplyr::mutate(class = forcats::fct_rev(forcats::fct_infreq(class))) |>
   ggplot() +
-  aes(class) +
+  aes(y = class) +
   geom_bar(aes(fill = drv)) +
-  coord_flip() +
-  theme_classic(base_size = 18) +
+  theme_classic(base_size = 20) +
   theme(panel.grid = element_blank(), axis.title.y = element_blank(),
         axis.line.y = element_blank(), axis.ticks.y = element_blank(),
         legend.position = "top")
