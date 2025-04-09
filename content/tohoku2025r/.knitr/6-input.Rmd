@@ -84,7 +84,11 @@ fs::dir_create("data")  # Create directory
 ---
 ## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
 
-2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
+2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県\
+<small style="opacity: 0.7;">
+(今はe-Statの不具合で落とせないっぽいので
+<a href="tblT001082C04.txt" download="tblT001082C04.txt">📄ここに置いときます</a>)
+</small>
 
 うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
 
@@ -116,7 +120,7 @@ readLines(infile, 5L) |> t() |> t() |>
 ```
 
 メニューから "File → **Reopen with Encoding...**" を選択。\
-たいてい、古い日本語ファイルにありがちな**SHIFT-JIS**が正解。\
+古い日本語ファイルにありがちなのは**SHIFT-JIS**。\
 <small style="opacity: 0.7;">(もっと古いファイルならEUC-JPとかの場合もある。)</small>
 
 ---
@@ -208,7 +212,8 @@ Rを使ったデータ前処理を習得した✨\
 とはいえ...
 
 - まず、読み込めないと始まらない。
-- dplyrやtidyrで手に負えないほど不規則では困る。
+- dplyrやtidyrで手に負えないほど不規則では困る。\
+  Excelで手作業するなんて言語道断！
 
 自分が一次データを作る立場なら、どう気をつけたらいいか？
 
@@ -416,16 +421,16 @@ SEPT1,4-14
 ## 🔰 最終課題: オープンデータを拾って解析しよう。
 
 - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
-- [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+- [e-gov データポータル](https://data.e-gov.go.jp/data/dataset?res_format=CSV): 中央行政
 - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
 - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
 - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
 - ほか、なんでも興味のあるデータ
 
 発表・レポートの条件
-: 最低1枚の図と、そこに至る前処理＋可視化のコード。
+: 最低1枚の図と、そこに至る読み込み→前処理→可視化のコード。
 : グラフから読み取れることを一言。
-: 4日目に習う統計解析も組み込めるとなおよし。
+: 4日目に習う統計解析も組み込めたら理想的だが。
 
 週明けに発表会をやります。
 
@@ -505,7 +510,7 @@ e.g., **HTML**+CSS, XML, LaTeX
 </p>
 </div>
 
-表現力豊かで強力だが人間が読み書きするには複雑すぎ、機械寄り。
+表現力豊かで強力だが**人間が読み書きするには複雑すぎ**、機械向け。
 
 (好きなウェブサイトのHTMLソースコードを見てみよう。)
 
@@ -513,7 +518,7 @@ e.g., **HTML**+CSS, XML, LaTeX
 ---
 ## 軽量マークアップ言語
 
-**マークアップ言語**の中でも人間が読み書きしやすいもの。\
+マークアップ言語の中でも人間が読み書きしやすいもの。\
 e.g., **Markdown**, reStructuredText, 各種Wiki記法など
 
 ```md
@@ -556,6 +561,8 @@ RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "-
 
 <hr>
 
+<aside style="opacity: 0.66">
+
 - [Quarto CLI](https://quarto.org/docs/get-started/):
   最新版を求めるなら手動で入れる。
 - [`install.packages("quarto")`](https://github.com/quarto-dev/quarto-r):
@@ -563,6 +570,8 @@ RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "-
   Quarto CLIをRコマンドで呼べるようにするだけ。
 - [pandoc](https://pandoc.org/): Quarto CLI に同梱。
   手動で最新版を入れてもRStudio+Quartoがそれを使うかは不明。
+
+</aside>
 
 ---
 ## Markdown記法で書いてみよう
@@ -686,11 +695,11 @@ knitr::opts_chunk$set(dev = "ragg_png")  # ggplot 日本語
 ## 今日の残り時間
 
 - 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
-- まずは個人で課題1(組み込みデータの可視化)に取り組む。
-- ある程度できたら班内で見せ合い、よかった部分を自分のに取り込む。
-- TAが評価して合格した班から解散。
-- 最終課題は週明け火曜に発表してもらえればいいので今日は未完成でOK。
-- 居残って取り組んでもOK。
+- **個人で課題1(組み込みデータの可視化)に取り組む。**
+  - ある程度できたら班内で見せ合い、よかった部分を自分のに取り込む。
+  - TAが評価して合格した班から解散。
+- **最終課題は週明け火曜に発表してもらえればいいので今日は未完成でOK**。
+  - 居残って取り組んでもOK。
 - 遅くとも17:50には部屋を閉めたい。
 
 
