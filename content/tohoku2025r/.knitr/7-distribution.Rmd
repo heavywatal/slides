@@ -36,6 +36,26 @@
 個々の方法は覚えなくても大丈夫！\
 忘れては調べ、を何度も繰り返しながら染み込ませていこう。
 
+
+---
+## データ解析のおおまかな流れ
+
+1. コンピュータ環境の整備 ✅
+1. データの取得、読み込み ✅ readr簡単
+1. 探索的データ解析
+    - 前処理、加工 ✅ dplyr, tidyr, stringr手放せない
+    - 可視化、仮説生成 ✅ ggplot楽しい
+    - 統計解析、仮説検証 ⬜ 👈今回
+1. 報告、発表 ✅ Quarto楽しい
+
+<figure>
+<a href="https://r4ds.hadley.nz/intro">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+</a>
+</figure>
+
+
 ---
 ## データを使ってやりたいこと
 
@@ -189,17 +209,17 @@ p_weight +
 #| echo: false
 #| fig.height: 5.5
 #| fig.width: 11
-predict_weight = function(parameters, data) {
+fit_weight = function(parameters, data) {
   parameters[1] + parameters[2] * data$height
 }
 
-add_pred_weight = function(data, parameters) {
-  dplyr::mutate(data, pred = predict_weight(param1, data = data))
+add_fitted_weight = function(data, parameters) {
+  dplyr::mutate(data, .fitted = fit_weight(param1, data = data))
 }
 
 rss_weight = function(parameters, data) {
-  pred = predict_weight(parameters, data)
-  sqdev = (data[["weight"]] - pred)**2
+  fitted = fit_weight(parameters, data)
+  sqdev = (data[["weight"]] - fitted)**2
   sum(sqdev)
 }
 # rss_weight(c(40, -5), df_weight)
@@ -211,11 +231,10 @@ rss2 = rss_weight(lm_weight$coefficients, df_weight)
 stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
 
 p1 = p_weight %+%
-  add_pred_weight(df_weight, param1) +
-  geom_line(aes(y = pred), color = "#3366ff") +
-  geom_linerange(aes(ymin = weight, ymax = pred), color = "#E69F00")
-p2 = p1 %+%
-  (df_weight |> modelr::add_predictions(lm_weight))
+  add_fitted_weight(df_weight, param1) +
+  geom_line(aes(y = .fitted), color = "#3366ff") +
+  geom_linerange(aes(ymin = weight, ymax = .fitted), color = "#E69F00")
+p2 = p1 %+% broom::augment(lm_weight)
 cowplot::plot_grid(nrow = 1L,
   p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
   p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2))
@@ -309,9 +328,9 @@ p_weight +
 fit = lm(data = mpg, formula = hwy ~ displ)
 broom::tidy(fit)
 
-mpg_added = modelr::add_predictions(mpg, fit, type = "response")
-ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+mpg_aug = broom::augment(fit, type.predict = "response")
+ggplot(mpg_aug) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = .fitted), linewidth = 1, color = "#3366ff")
 ```
 
 🔰 `diamonds` と `iris` でも `lm()` を試してみよう。
