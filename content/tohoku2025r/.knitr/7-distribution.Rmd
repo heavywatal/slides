@@ -91,7 +91,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 diamonds |>
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price)) +
-  geom_point(alpha = 0.3, size = 3) +
+  geom_point(shape = 16, size = 3, alpha = 0.3) +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   coord_cartesian(ylim = c(0, 20000)) +
   labs(title = "Diamonds") +
@@ -175,7 +175,7 @@ df_weight = tibble::tibble(
 #| fig.width: 5.5
 p_weight = ggplot(df_weight) +
   aes(height, weight) +
-  geom_point(alpha = 0.5) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   theme_bw(base_size = 22) +
   theme(panel.grid = element_blank())
 p_weight
@@ -196,7 +196,7 @@ set.seed(19937)
 df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
   dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
 p_weight +
-  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", alpha = 0.5)
+  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", linewidth = 1, alpha = 0.5)
 ```
 
 
@@ -232,8 +232,8 @@ stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
 
 p1 = p_weight %+%
   add_fitted_weight(df_weight, param1) +
-  geom_line(aes(y = .fitted), color = "#3366ff") +
-  geom_linerange(aes(ymin = weight, ymax = .fitted), color = "#E69F00")
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 1) +
+  geom_linerange(aes(ymin = weight, ymax = .fitted), color = "#E69F00", linewidth = 1, alpha = 0.8)
 p2 = p1 %+% broom::augment(lm_weight)
 cowplot::plot_grid(nrow = 1L,
   p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
@@ -258,15 +258,15 @@ df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
 p_ab = ggplot(df_ab_random) +
   aes(intercept, slope) +
-  geom_point(data = \(x) dplyr::filter(x, rank(rss) < 6), shape = 1, size = 4) +
-  geom_point(aes(color = log10(rss))) +
-  theme_bw(base_size = 20) +
+  geom_point(data = \(x) dplyr::filter(x, rank(rss) < 6), shape = 1, size = 6) +
+  geom_point(aes(color = log10(rss)), shape = 16, size = 3) +
+  theme_bw(base_size = 22) +
   theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
 
 df_randmin = df_ab_random |> dplyr::slice_min(rss, n = 5)
 p2 = p_weight + geom_abline(
   aes(slope = slope, intercept = intercept),
-  data = df_randmin, color = "#3366ff", alpha = 0.5
+  data = df_randmin, color = "#3366ff", alpha = 0.5, linewidth = 1
 )
 cowplot::plot_grid(p_ab, p2, nrow = 1L)
 ```
@@ -289,7 +289,7 @@ p1 = p_ab %+% df_ab_grid
 df_gridmin = df_ab_grid |> dplyr::slice_min(rss, n = 5)
 p2 = p_weight + geom_abline(
   aes(slope = slope, intercept = intercept),
-  data = df_gridmin, color = "#3366ff", alpha = 0.5
+  data = df_gridmin, color = "#3366ff", alpha = 0.5, linewidth = 1
 )
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
@@ -363,12 +363,12 @@ df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
 p_pois = ggplot(df_pois) +
   aes(body_mass, num_seeds) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   scale_x_continuous(breaks = x_breaks) +
   coord_cartesian(ylim = c(-5, 15)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
-p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
+p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2)
 ```
 
 - 観察データは常に**正の値**なのに予測が負に突入してない？
@@ -383,7 +383,7 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 #| fig.height: 5.5
 #| fig.width: 11
 p_lm = p_pois +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
                             fill = "#56B4E9AA", linetype = 0)
 # p_lm
@@ -394,7 +394,7 @@ df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L)
 df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
 
 p_poisson = p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass), df_bars,
                             fill = "#56B4E9AA", linetype = 0)
 # p_poisson
@@ -445,7 +445,7 @@ p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
   aes(face) +
   geom_bar(aes(y = after_stat(prop))) +
   scale_x_continuous(breaks = seq_len(6L)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -455,7 +455,7 @@ p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) |>
   ggplot() +
   aes(height) +
   geom_histogram(aes(y = after_stat(density)), binwidth = 1, boundary = 0) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), axis.ticks = element_blank())
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
@@ -526,10 +526,10 @@ bdata = built$data[[1]]
 xlim = bdata |> dplyr::select(xmin, xmax) |> range()
 p_box = ggplot(df) + aes(x) +
   geom_boxplot() +
-  geom_rug(sides = "t", length = unit(0.06, "npc"), alpha = 0.66) +
-  geom_point(data = dfq, aes(y = -0.6), shape = 17, size = 4) +
-  geom_text(data = dfq, aes(y = -0.78, label = name), size = 6) +
-  geom_text(data = dfq, aes(y = -1.00, label = percent), size = 6) +
+  geom_rug(sides = "t", length = unit(0.08, "npc"), alpha = 0.66) +
+  geom_point(aes(y = -0.6), data = dfq, shape = 17, size = 6) +
+  geom_text(aes(y = -0.84, label = name), data = dfq, size = 8) +
+  geom_text(aes(y = -1.16, label = percent), data = dfq, size = 8) +
   coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
   theme_void()
 cowplot::plot_grid(p_hist, p_box, ncol = 1L)
@@ -565,7 +565,7 @@ cowplot::plot_grid(nrow = 2L,
   p0 + geom_boxplot() + coord_one,
   p0 + geom_density(fill = "#999999", color = NA) + coord_y,
   p0 + geom_histogram(fill = "#999999", bins = 30L) + coord_y,
-  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, alpha = 0.3, stroke = 0) + coord_one,
+  p0 + geom_jitter(aes(x = 0), height = 0, shape = 16, size = 3, alpha = 0.3, stroke = 0) + coord_one,
   p0 + geom_violin(aes(x = 0), fill = "#999999", color = NA) + coord_one,
   p0 + geom_dotplot(aes(x = 0), binaxis = "y", binwidth = 1, stackratio = 0.8,
     stroke = 0, alpha = 0.66, stackdir = "center") + coord_y,
@@ -643,7 +643,7 @@ df_rbinom |>
   geom_col() +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
   facet_wrap(vars(Repl), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -742,7 +742,7 @@ dplyr::bind_rows(df_coin, df_dice) |>
   geom_col() +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
   facet_grid(cols = vars(group), scale = "free_x", space = "free_x") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -772,7 +772,7 @@ ggplot(df) +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
   geom_col() +
   facet_grid(cols = vars(p), scales = "free_x", space = "free_x", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -805,7 +805,7 @@ ggplot(df) +
   geom_col() +
   facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
   labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -842,7 +842,7 @@ ggplot(df) +
   geom_col() +
   facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
   labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -873,12 +873,12 @@ p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
   ggplot() +
   aes(time, y) +
   annotate("segment", x = -0.1, xend = 3.1, y = 1:3, yend = 1:3, linewidth = 2, arrow = .arrow, linejoin = "mitre") +
-  geom_point(aes(color = lambda, fill = lambda), size = 8, shape = 124, key_glyph = draw_key_rect) +
+  geom_point(aes(color = lambda, fill = lambda), size = 10, shape = 124, key_glyph = draw_key_rect) +
   scale_color_continuous(guide = NULL) +
   scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
   scale_y_continuous(limits = c(0.5, 3.5), breaks = NULL) +
   labs(y = NULL, x = "time (space)") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     axis.text.y = element_blank(), axis.ticks = element_blank(), panel.border = element_blank(),
     panel.grid.minor = element_blank(), legend.position = "top"
@@ -889,7 +889,7 @@ p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) |>
   ggplot() +
   aes(X, Prob) +
   geom_col(aes(fill = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -921,7 +921,7 @@ p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -954,7 +954,7 @@ p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -991,7 +991,7 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
   geom_area(data = function(.x) {
     dplyr::filter(.x, dplyr::between(x, ci[1], ci[4]))
   }, alpha = 0.4) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -1023,7 +1023,7 @@ purrr::map(c(10, 100, 1000, 10000), \(n) {
   aes(X) +
   geom_histogram(bins = 25) +
   facet_wrap(vars(Repl), nrow = 1L, scale = "free_y", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1045,7 +1045,7 @@ purrr::map(c(1, 4, 16, 64, 256), \(n) {
   aes(X, Prob) +
   geom_col(width = 1) +
   facet_wrap(vars(n), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1070,7 +1070,7 @@ purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
   aes(X, Prob) +
   geom_col(width = 1) +
   facet_wrap(vars(lambda), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1091,7 +1091,7 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
   geom_area(aes(fill = k, group = k), position = "identity", alpha = 0.5) +
   scale_fill_viridis_c(trans = "log10", guide = .guide) +
   coord_cartesian(xlim = c(0, 20)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
@@ -1157,7 +1157,7 @@ ggplot(tidy_od) +
   annotate("text", label = label, parse = TRUE, color = "#56B4E9",
            x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 6) +
   labs(x = "# survived seeds", y = "count") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(),
         legend.title = element_blank(), legend.position = "top")
 ```
@@ -1247,7 +1247,7 @@ ggplot(df_rpois) +
   aes(X) +
   geom_bar(width = 0.4) +
   coord_cartesian(xlim = c(0, max_x)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -1274,7 +1274,7 @@ p_pois = ggplot(df_rpois) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_blank(), axis.ticks = element_blank()
@@ -1353,7 +1353,7 @@ df_likelihood = df_rpois |>
   dplyr::mutate(logL = log(L), label = sprintf("L(%.0f|D) = %.1e", lambda, L))
 p_pois +
   geom_text(data = df_likelihood, aes(label = label), color = "#56B4E9",
-            x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 6)
+            x = Inf, y = Inf, hjust = 1.1, vjust = 1.3, size = 7)
 ```
 
 この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。
@@ -1387,13 +1387,13 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
   dplyr::mutate(logL = log(L)) |>
   ggplot() +
   aes(lambda, logL) +
-  geom_line() +
-  geom_vline(xintercept = X_mle, color = "#56B4E9") +
-  annotate("point", x = X_mle, y = log(L_mle), size = 3, color = "#56B4E9") +
+  geom_line(linewidth = 1) +
+  geom_vline(xintercept = X_mle, color = "#56B4E9", linewidth = 2) +
+  annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#56B4E9") +
   annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
-           x = Inf, y = Inf, hjust = 1.1, vjust = 1.2, size = 5) +
+           x = Inf, y = Inf, hjust = 1.1, vjust = 1.2, size = 7) +
   labs(y = "log L") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
@@ -1404,7 +1404,7 @@ p_pois = ggplot(df_rpois) +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     panel.grid.major.x = element_blank(), axis.ticks = element_blank()
@@ -1437,7 +1437,7 @@ p_repl = df_sum |>
   geom_histogram(bins = 25, center = 3) +
   annotate("point", x = df_minmax$lambda, y = 0, color = "#56B4E9", size = 8, alpha = 0.5) +
   labs(x = "estimated_lambda") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
@@ -1453,7 +1453,7 @@ p_minmax = df_repl |>
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     panel.grid.major.x = element_blank(), axis.ticks = element_blank()
@@ -1488,7 +1488,7 @@ purrr::map(c(5, 50, 500, 5000), \(n) {
   aes(estimated_lambda) +
   geom_histogram(bins = 25, center = 3) +
   facet_wrap(vars(n), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()

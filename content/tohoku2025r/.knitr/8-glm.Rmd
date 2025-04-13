@@ -79,7 +79,7 @@ df_dpois = tibble(X = seq(0, max_x), Prob = dpois(X, mean(df_rpois$X)))
 p_pois = ggplot(df_rpois) + aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.3) +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  theme_bw(base_size = 20)
+  theme_bw(base_size = 22)
 p_pois +
   theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
         panel.grid.major.x = element_blank(), axis.ticks = element_blank())
@@ -154,13 +154,13 @@ df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) |>
 df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 2, alpha = 0.5) +
   scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
 p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(x, y, width = density * 0.5, group = x),
     data = df_bars, fill = "#56B4E9AA", linetype = 0)
 ```
@@ -205,17 +205,17 @@ df_aug = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5))
   broom::augment(glm_multi, newdata = _, type.predict = "response")
 
 p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
-  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7) +
-  geom_point(alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   scale_color_viridis_c(option = "cividis", direction = -1) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(),
         legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
 p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
-  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7) +
-  geom_point(alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   scale_color_viridis_c(option = "turbo") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(),
         legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
 
@@ -284,13 +284,13 @@ df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) |>
 df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 ggplot(df_aug) + aes(x, y_prop) +
-  geom_point(alpha = 0.5, shape = 16) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   ggridges::geom_vridgeline(aes(y = y / n, width = density * 6, group = x), df_bars, fill = "#56B4E9AA", linetype = 0) +
-  geom_line(aes(y = .fitted), linewidth = 2, color = "#3366ff") +
+  geom_line(aes(y = .fitted), linewidth = 2, color = "#3366ff", alpha = 0.8) +
   scale_x_continuous(breaks = x_breaks) +
   scale_y_continuous(breaks = seq(0, 1, 0.2)) +
   labs(x = "temperature", y = "beer_sales") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 ```
 
@@ -354,12 +354,12 @@ df_bars = df_ridges |> wtl::ridges2bars(y, density, width = 0.2)
 
 broom::augment(glm_bernoulli, type.predict = "response") |>
   ggplot() + aes(max_wind, bucket_sales) +
-  geom_point(alpha = 0.3, shape = 124, size = 6) +
+  geom_point(shape = 124, size = 8, alpha = 0.3) +
   ggridges::geom_vridgeline(aes(x, y, width = density * 6, group = x),
     data = df_bars, fill = "#56B4E9AA", linetype = 0) +
-  geom_line(aes(y = .fitted), color = "#3366ff") +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.8) +
   scale_y_continuous(breaks = c(0, 1)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 ```
 
@@ -410,12 +410,12 @@ df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
   dplyr::filter(density > 1e-4)
 
 ggplot(df_weight) + aes(height, weight) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   ggridges::geom_vridgeline(aes(width = density * 0.08, group = height),
     data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
-  stat_smooth(method = lm, formula = y ~ x, se = FALSE) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, linewidth = 2) +
   scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+  theme_bw(base_size = 22) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 ```
 
   </div>
@@ -505,18 +505,18 @@ dfs = tibble::tribble(
 )
 
 set.seed(1)
-.arr = grid::arrow(length = grid::unit(0.1, "inches"))
+.arr = grid::arrow(length = grid::unit(0.15, "inches"))
 df_ancova |>
   ggplot() + aes(weather, beer_sales, color = weather) +
   ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
     data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
-  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#56B4E9AA") +
-  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#56B4E9AA") +
-  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 6, color = "#56B4E9AA") +
+  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#56B4E9AA", linewidth = 2) +
+  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#56B4E9AA", linewidth = 1.5) +
+  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 8, color = "#56B4E9AA") +
   geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
   scale_color_viridis_d() +
   scale_x_discrete(limits = c("cloudy", "sunny", "rainy")) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         legend.position = "none")
 ```
@@ -564,9 +564,9 @@ df_aug = broom::augment(lm_ancova, type.predict = "response")
 
 ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
   geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
   scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(),
         legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
 ```
@@ -629,9 +629,9 @@ df_aug = broom::augment(lm_int)
 
 ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
   geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
   scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(),
         legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
 ```
@@ -811,16 +811,16 @@ df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
 
 p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 2, alpha = 0.5) +
   scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
 label = sprintf("logLik = %.1f", broom::glance(models[["gaussian"]])$logLik)
 p_lm = p_pois +
   labs(title = "gaussian, identity link") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass),
     data = df_lm, fill = "#56B4E9AA", linetype = 0)
 # p_lm
@@ -835,7 +835,7 @@ label = sprintf("logLik = %.1f", broom::glance(models[["poisson"]])$logLik)
 p_poisson = p_pois +
   labs(title = "poisson, log link") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass),
     data = df_bars, fill = "#56B4E9AA", linetype = 0)
 # p_poisson
@@ -876,8 +876,8 @@ labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), name
 p_plant = broom::augment(models$null, type.predict = "response", data = df_plant) |>
   ggplot() + aes(x, y) +
   geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.7) +
-  geom_point(shape = 16, alpha = 0.6) +
-  theme_bw(base_size = 20) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
@@ -933,9 +933,10 @@ labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), name
 p_plant = df_plant |>
   broom::augment(models$null, data = _, type.predict = "response") |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = .fitted), linewidth = 1.5, alpha = 0.6) +
-  geom_point(shape = 16, alpha = 0.6) +
-  theme_bw(base_size = 20) +
+  geom_line(aes(y = .fitted), linewidth = 1.6, alpha = 0.6) +
+  geom_point(shape = 16, size = 2, alpha = 0.6) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.32))) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
@@ -1132,8 +1133,8 @@ dim(penguins_dropna)
 #| fig.width: 4.5
 p_penweight = ggplot(penguins_dropna) +
   aes(body_mass_g, flipper_length_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
-  theme_bw(base_size = 20) +
+  geom_point(shape = 16, size = 2, alpha = 0.66) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 p_penweight
 ```
@@ -1257,9 +1258,9 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| cache.vars: [p_bill]
 p_bill = penguins_dropna |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
+  geom_point(shape = 16, size = 2, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
 fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
