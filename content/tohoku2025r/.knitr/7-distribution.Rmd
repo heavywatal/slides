@@ -313,7 +313,7 @@ result$par
 label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
 p_weight +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, size = 6, color = "#3366ff")
 ```
 
 上記コードは最適化一般の書き方。\
@@ -1198,8 +1198,8 @@ n = 100
 x = sample.int(6, n, replace = TRUE)  # 一様分布(整数)
 x = runif(n, min = 0, max = 1)        # 一様分布
 x = rgeom(n, prob = 0.5)              # 幾何分布
-x = rbinom(n, size = 3, prob = 0.5)   # 二項分布
-x = rpois(n, lambda = 10)             # ポアソン分布
+x = rbinom(n, size = 5, prob = 0.5)   # 二項分布
+x = rpois(n, lambda = 2.1)            # ポアソン分布
 x = rnorm(n, mean = 50, sd = 10)      # 正規分布
 print(x)
 
@@ -1208,12 +1208,12 @@ p1 + geom_histogram() # for continuous values
 p1 + geom_bar()       # for discrete values
 ```
 
-🔰 小さい `n` から徐々に大きくして変化を確認しよう。
+🔰 正規分布の `n`, `mean`, `sd` を変えて作図し、それぞれの影響を確認しよう。
 
-🔰 ほかのオプションもいろいろ変えて変化を確認しよう。
+🔰 ポアソン分布の `n`, `lambda` を変えて作図し、それぞれの影響を確認しよう。
 
 🔰 1%の当たりを狙って10連ガチャを回す人が100万人いたら、\
-   全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
+ &nbsp; &nbsp; 全部はずれ、1つ当たり、2つ当たり... の人はどれくらいいるか？
 
 (Quartoでどうまとめるか、腕の見せ所)
 
@@ -1243,18 +1243,19 @@ df_dpois = purrr::map(c(1, 3, 5), \(lambda) {
 #| echo: false
 #| fig.height: 4
 #| fig.width: 4.4
-ggplot(df_rpois) +
+p_rpois = ggplot(df_rpois) +
   aes(X) +
-  geom_bar(width = 0.4) +
+  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   coord_cartesian(xlim = c(0, max_x)) +
   theme_bw(base_size = 22) +
   theme(
-    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
-    axis.ticks = element_blank()
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
   )
+p_rpois
 ```
 
-カウントデータだから<span class="fragment custom blur">ポアソン</span>分布っぽい。\
+カウントデータだし形も<span class="fragment custom blur">ポアソン</span>分布っぽい。\
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？
 
 
@@ -1269,20 +1270,13 @@ ggplot(df_rpois) +
 #| echo: false
 #| fig.height: 4
 #| fig.width: 12
-p_pois = ggplot(df_rpois) +
-  aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
+p_pois = p_rpois +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  facet_wrap(vars(lambda), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 22) +
-  theme(
-    panel.grid.minor = element_blank(),
-    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
-  )
+  facet_wrap(vars(lambda), nrow = 1L, labeller = label_both)
 p_pois
 ```
 
-カウントデータだからポアソン分布っぽい。\
+カウントデータだし形もポアソン分布っぽい。\
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？
 
 黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
@@ -1334,7 +1328,7 @@ $p = 0.8$ のほうがより尤もらしい。
 ---
 ## 種子数ポアソン分布の例でも尤度を計算してみる
 
-ある植物が作った種子を数える。$n = 50$個体ぶん。
+$n = 50$個体ぶん、且つ、且つ、且つ、と確率を掛けていく:
 
 <div>\[\begin{split}
 L(\lambda \mid D)
@@ -1391,7 +1385,7 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
   geom_vline(xintercept = X_mle, color = "#56B4E9", linewidth = 2) +
   annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#56B4E9") +
   annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
-           x = Inf, y = Inf, hjust = 1.1, vjust = 1.2, size = 7) +
+           x = Inf, y = -Inf, hjust = 1.2, vjust = -0.8, size = 7) +
   labs(y = "log L") +
   theme_bw(base_size = 22) +
   theme(
@@ -1399,18 +1393,11 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
     axis.ticks = element_blank()
   )
 
-df_dpois = tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
-p_pois = ggplot(df_rpois) +
-  aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  theme_bw(base_size = 22) +
-  theme(
-    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
-  )
+.df_mle = tibble::tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
+.p_pois_mle = p_rpois +
+  geom_col(data = .df_mle, aes(y = Prob), alpha = 0.5, fill = "#56B4E9")
 
-cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
+cowplot::plot_grid(p_mle, .p_pois_mle, nrow = 1L, rel_widths = c(2, 1))
 ```
 
 ---
@@ -1443,7 +1430,7 @@ p_repl = df_sum |>
     axis.ticks = element_blank()
   )
 
-df_dpois = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) |>
+.df_dminmax = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) |>
   dplyr::mutate(Prob = dpois(X, lambda))
 p_minmax = df_repl |>
   dplyr::filter(repl %in% df_minmax$repl) |>
@@ -1451,7 +1438,7 @@ p_minmax = df_repl |>
   ggplot() +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  geom_col(data = .df_dminmax, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
   theme_bw(base_size = 22) +
   theme(
@@ -1540,7 +1527,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
 
 1. このサイコロで6の目が出る確率を最尤推定しよう。\
-   数学で解ければ優。Rで見つければ良。目分量・勘で可。
+   数学で解ければ**優**。Rで見つければ**良**。目分量・勘で**可**。
 
 ヒント
 : 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
@@ -1556,6 +1543,90 @@ get_likelihood = function(p, k = 3, n = 10) {
 
 get_likelihood(0.2)
 ```
+
+---
+## 🔰 4日目の課題2: 分布を当てはめる
+
+植物25個体から8個ずつ種をとって植え、生き残ったものを数えた。
+
+1. データの分布を描いてみて、当てはまりそうな確率分布を検討する
+1. <span style="color: #56B4E9;">理論分布</span>を適当なパラメータで描いてみる
+1. パラメータや分布を変えてみて、データの分布にすり寄せる
+1. 対数尤度の変化を可視化し、パラメータを最尤推定する
+
+```{r, distribution-datasets}
+#| include: false
+set.seed(19937)
+sample_size = 25L
+trials = 8
+true_p = 0.8
+df_seeds = tibble::tibble(
+  trials,
+  survived = rbinom(sample_size, trials, true_p)
+)
+
+p_hat = sum(df_seeds$survived) / (sample_size * trials)
+.df_exp = tibble::tibble(
+  y = seq.int(0, trials),
+  expected = sample_size * dbinom(y, trials, p_hat)
+)
+tidy_seeds = df_seeds |>
+  dplyr::rename(y = survived) |>
+  dplyr::count(y, name = "observed") |>
+  dplyr::full_join(.df_exp, by = "y")
+```
+
+<div class="column-container">
+  <div class="column" style="height: 440px; overflow: scroll; flex-shrink: 1.2;">
+
+```{r, distribution-datasets-print}
+#| echo: false
+df_seeds |> readr::write_csv(stdout())
+# knitr::kable(df_seeds)
+```
+
+  </div>
+  <div class="column">
+
+```{r, distribution-datasets-plot}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 4
+ggplot(tidy_seeds) +
+  geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
+  geom_col(aes(y, expected), tidy_seeds, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
+  labs(x = "# survived seeds", y = "count") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
+
+  </div>
+  <div class="column">
+
+```{r, distribution-datasets-mle}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 4
+fun_loglik = function(p) {
+  purrr::map_dbl(p, \(x) sum(dbinom(df_seeds$survived, trials, x, log = TRUE)))
+}
+.delta = 0.02
+.df_loglik = tibble::tibble(
+  p = seq(.delta, 1 - .delta, .delta),
+  loglik = fun_loglik(p)
+)
+ggplot(.df_loglik) +
+  aes(p, loglik) +
+  geom_line(linewidth = 1) +
+  geom_vline(xintercept = p_hat, linewidth = 1, color = "#56B4E9") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+```
+
+  </div>
+</div>
+
 
 ---
 ## 参考文献

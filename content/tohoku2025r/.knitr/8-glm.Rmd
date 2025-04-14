@@ -19,7 +19,7 @@
 
 **線形モデル LM** (単純な直線あてはめ)　[(#7 前回)](7-distribution.html)
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span>
 
 **一般化線形モデル GLM** [(👈 #8 今回)](8-glm.html)
 
@@ -34,6 +34,9 @@
 <cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
 
 <hr>
+
+<span style="font-weight: bold; color: #56B4E9;">確率分布</span>に長い時間を割いたけど、元はと言えば**回帰**したいのでした。
+
 <cite>
 
 [Data Science Hill Climb 2024 (東京海上) での講義 (~12時間)](https://heavywatal.github.io/slides/tokiomarine2024/)
@@ -85,7 +88,7 @@ p_pois +
         panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
-これを一般化線形モデル(GLM)として見ることもできる。
+これを一般化線形モデル(GLM)として見ることもできる→
 
 
 ---
@@ -743,14 +746,6 @@ ggplot(df_fit_wh) +
 
 
 ---
-## 追加のGLM練習
-
-いくつか末尾に掲載。
-
-興味ある人は取り組んでもいいですが、レポートには入れなくてもいいです。
-
-
----
 ## データはひとつ、モデルはたくさん
 
 どう選ぶ？
@@ -854,8 +849,8 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 
 ```{r, saturated-model}
 #| echo: false
-#| fig.height: 4
-#| fig.width: 11
+#| fig.height: 4.4
+#| fig.width: 12
 #| cache.vars: []
 set.seed(19937)
 n = 16L
@@ -883,15 +878,15 @@ p_plant = broom::augment(models$null, type.predict = "response", data = df_plant
 p_null = p_plant +
   labs(title = "null model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["null"]], color = "#3366ff", size = 7)
+    label = labels[["null"]], color = "#3366ff", size = 8)
 p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["x"]], color = "#3366ff", size = 7)
+    label = labels[["x"]], color = "#3366ff", size = 8)
 p_saturated = p_plant %+% broom::augment(models$saturated, type.predict = "response", data = df_plant) +
   labs(title = "saturated model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["saturated"]], color = "#3366ff", size = 7)
+    label = labels[["saturated"]], color = "#3366ff", size = 8)
 
 cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ```
@@ -935,24 +930,24 @@ p_plant = df_plant |>
   ggplot() + aes(x, y) +
   geom_line(aes(y = .fitted), linewidth = 1.6, alpha = 0.6) +
   geom_point(shape = 16, size = 2, alpha = 0.6) +
-  scale_y_continuous(expand = expansion(mult = c(0.05, 0.32))) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.30))) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
   labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["null"]], color = "#3366ff", size = 7)
 p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["x"]], color = "#3366ff", size = 7)
 p_x2 = p_plant %+% broom::augment(models$x2, type.predict = "response", data = df_plant) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["x2"]], color = "#3366ff", size = 7)
 p_both = p_plant %+% broom::augment(models$both, type.predict = "response") %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["both"]], color = "#3366ff", size = 7)
 
 cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ```
@@ -970,7 +965,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
     - 尤度は上げたい。
     - パラメータ数 $k$ が増えるとペナルティ。
 - どのデータに対する当てはまりを目指すかという観点
-    - 「手元のデータ」に対する対数尤度は $\log L^*$\
+    - 「手元のデータ」に対する対数尤度は $\log L^*$
     - 「真のメカニズムから出てくる未来のデータ」に対する\
       平均対数尤度の推定量は $(\log L^* - k)$\
       (Kullback--Leibler情報量を使って導出するらしい)
@@ -1017,13 +1012,13 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 
 - $\text{BIC} = -2 \log L^* + k \log n$
     - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
-    - データの観測数 $n$ に依存する点でAICと異なる。\
+    - データの観測数 $n$ に依存する点でAICと異なる。<br>
       感覚としては「AICはデータサイズによるペナルティが無い」
     - (周辺尤度の最大化という観点で導出するらしい)
-- [WAIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
-  [WBIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
+- [WAIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
+  [WBIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
     - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。\
+    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
       そうじゃない場合(現実的には常に)こちらが優位。
     - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
 
@@ -1037,7 +1032,7 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="900">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="960">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -1045,12 +1040,14 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ---
 ## 現実的な注意点・悩みどころ
 
-- 多重共線性(multicollinearity):
-    - 説明変数同士が強い相関関係にある
+- **多重共線性**(multicollinearity):
+  - 説明変数同士が強い相関関係にあるとマズいので予め取り除く。
 - 変数変換:
-    - 気安くやるべきじゃないけど、対数変換などしばしば有用
-    - 割り算した値は危険
-- 交互作用を入れると解釈が難しくなる。
+  - 気安くやるべきじゃない。でも対数変換などはしばしば有用。
+  - **割り算はなるべく避ける**。二項分布やオフセット項を検討。
+    - 誤差のある観測値同士を割った値、その確率分布は扱いにくい。
+    - 情報が失われる:「5打数2安打」と「500打数200安打」
+- **交互作用**を入れると解釈が難しくなる。
 
 
 ---
@@ -1114,7 +1111,7 @@ dim(penguins_dropna)
 ## 🔰 penguinsでGLMの練習
 
 次の課題を解いてみよう。\
-(次ページ以降に解答。まずは自力で。)
+(次ページ以降に解答があるけど、まずは自力で。)
 
 1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
 1. 単回帰して、切片と傾きを求める。そして作図。
@@ -1160,9 +1157,9 @@ broom::glance(fit1)
 ```{r, penguins-weight-glm}
 #| fig.height: 5
 #| fig.width: 5
-added1 = broom::augment(fit1, type.predict = "response")
+aug1 = broom::augment(fit1, type.predict = "response")
 p1 = p_penweight +
-  geom_line(aes(y = .fitted), data = added1, linewidth = 1, color = "#3366ff")
+  geom_line(aes(y = .fitted), data = aug1, linewidth = 1, color = "#3366ff")
 p1
 ```
 
@@ -1198,9 +1195,9 @@ broom::glance(fit2)
 ```{r, penguins-weight-sp-glm}
 #| fig.height: 5
 #| fig.width: 7
-added2 = broom::augment(fit2, type.predict = "response")
+aug2 = broom::augment(fit2, type.predict = "response")
 p2 = p_penweight_color +
-  geom_line(aes(y = .fitted), data = added2, linewidth = 1)
+  geom_line(aes(y = .fitted), data = aug2, linewidth = 1)
 p2
 ```
 
@@ -1225,9 +1222,9 @@ broom::glance(fit3)
 ```{r, penguins-interaction}
 #| fig.height: 5
 #| fig.width: 7
-added3 = broom::augment(fit3, type.predict = "response")
+aug3 = broom::augment(fit3, type.predict = "response")
 p3 = p_penweight_color +
-  geom_line(aes(y = .fitted), data = added3, linewidth = 1)
+  geom_line(aes(y = .fitted), data = aug3, linewidth = 1)
 p3
 ```
 
@@ -1284,8 +1281,8 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
 broom::tidy(fit4)
 broom::glance(fit4)
-added4 = broom::augment(fit4, type.predict = "response")
-p_bill + geom_line(aes(y = .fitted, color = sex), data = added4, linewidth = 1) +
+aug4 = broom::augment(fit4, type.predict = "response")
+p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
   scale_color_discrete()
 ```
 
