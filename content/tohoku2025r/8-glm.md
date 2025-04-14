@@ -1,12 +1,40 @@
-```{r, setup-common}
-#| file: "setup.R"
-#| echo: false
-#| results: "asis"
-```
-```{r, setup-local}
-#| include: false
-#| cache: false
-```
++++
+url = "tohoku2025r/8-glm.html"
+linktitle = "統計モデリング2: 一般化線形モデル"
+title = "8. 統計モデリング2: 一般化線形モデル — 進化学実習 2025 牧野研 東北大学"
+date = 2025-04-14T14:40:00+09:00
+draft = true
+css = "style.css"
+dpi = 108
++++
+
+# [進化学実習 2025 牧野研 東北大学](.)
+
+<div class="author">
+岩嵜 航
+</div>
+
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+
+<ol>
+<li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li><a href="2-visualization.html">データの可視化。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li><a href="6-input.html">データ入力、レポート作成</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li class="current-deck"><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li><a href="9-report.html">発表会</a>
+</ol>
+
+<div class="footnote">
+2025-04-14 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2025r/">https://heavywatal.github.io/slides/tohoku2025r/</a>
+</div>
+
 
 ---
 ## ちょっとずつ線形モデルを発展させていく
@@ -48,7 +76,7 @@
 ---
 ## 何でもかんでも直線あてはめではよろしくない
 
-<img `r src_alt_fig_chunk("glm-better")`>
+<img src="figure/glm-better-1.png" alt="plot of chunk glm-better">
 
 - 観察データは常に**正の値**なのに予測が負に突入してない？
 - **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
@@ -67,26 +95,9 @@ e.g., ある植物が作る種の数$X$は平均値$\lambda$のポアソン分�
 X \sim \text{Poisson}(\lambda)
 \end{split}\]</div>
 
-```{r, df-poisson-playback}
-#| echo: false
-set.seed(24601)
-df_rpois = tibble::tibble(X = rpois(50L, 3))
-max_x = 11L
-df_dpois = tibble(X = seq(0, max_x), Prob = dpois(X, mean(df_rpois$X)))
-```
 
-```{r, only-dist}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 4
-p_pois = ggplot(df_rpois) + aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.3) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  theme_bw(base_size = 22)
-p_pois +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+
+![plot of chunk only-dist](./figure/only-dist-1.png)
 
 これを一般化線形モデル(GLM)として見ることもできる→
 
@@ -102,16 +113,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 \lambda_i &= \beta_0
 \end{split}\]</div>
 
-```{r, glm-without-x}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 4
-p_pois +
-  labs(x = "y") +
-  coord_flip() +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-        panel.grid.major.y = element_blank(), axis.ticks = element_blank())
-```
+![plot of chunk glm-without-x](./figure/glm-without-x-1.png)
 
 種子数をY軸にして、式を2つに分けただけ...?\
 **説明変数**を含むモデルを見ればご利益が分かるかも。
@@ -132,41 +134,8 @@ p_pois +
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r, df-seeds}
-#| include: false
-#| cache.vars: ["df_seeds", "a", "b"]
-set.seed(24601)
-n = 300L
-a = 3
-b = -3
-df_seeds = tibble::tibble(
-  body_mass = runif(n, 0.4, 1.7),
-  num_seeds = rpois(n, exp(a * body_mass + b))
-) |>
-  print()
-```
-```{r, glm-poisson}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 5
-#| fig.width: 5
-x_breaks = c(0.5, 1.0, 1.5)
-df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) |>
-  dplyr::mutate(density = dpois(y, exp(a * x + b))) |>
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
-p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
-  geom_point(shape = 16, size = 2, alpha = 0.5) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank())
-
-p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
-  ggridges::geom_vridgeline(aes(x, y, width = density * 0.5, group = x),
-    data = df_bars, fill = "#56B4E9AA", linetype = 0)
-```
+![plot of chunk glm-poisson](./figure/glm-poisson-1.png)
 
   </div>
 </div>
@@ -184,46 +153,8 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 気温も湿度も高いほどビールが売れる架空データ:
 
-```{r, df-beer}
-#| include: false
-#| cache.vars: "df_beer"
-set.seed(24601)
-n = 200L
-true_coef = c(3, 0.05, 0.006)
-df_beer = tibble::tibble(
-  temperature = runif(n, 8, 32),
-  humidity = runif(n, 20, 80),
-  beer_sales = rpois(n, exp(true_coef[1] + true_coef[2] * temperature + true_coef[3] * humidity))
-) |>
-  print()
-```
-```{r, multiple-regression}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 5
-#| fig.width: 10
-glm_multi = glm(beer_sales ~ temperature + humidity, family = poisson, data = df_beer)
 
-df_aug = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) |>
-  broom::augment(glm_multi, newdata = _, type.predict = "response")
-
-p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
-  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
-  geom_point(shape = 16, size = 3, alpha = 0.5) +
-  scale_color_viridis_c(option = "cividis", direction = -1) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
-  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
-  geom_point(shape = 16, size = 3, alpha = 0.5) +
-  scale_color_viridis_c(option = "turbo") +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-
-cowplot::plot_grid(p1, p2, nrow = 1L)
-```
+![plot of chunk multiple-regression](./figure/multiple-regression-1.png)
 
 ほかの**確率分布**と**リンク関数**を使う例を見てみよう。
 
@@ -253,49 +184,8 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r, df-logistic}
-#| include: false
-#| cache.vars: ["df_logistic", "n"]
-set.seed(24601)
-sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
-nrep = 200L
-n = 10L
-df_logistic = tibble::tibble(
-  x = runif(nrep, -10, 35),
-  logit_p = -3 + 0.3 * x,
-  p = sigmoid(logit_p),
-  y = rbinom(nrep, n, p),
-  response = matrix(c(y, n - y), ncol = 2)
-) |>
-  print()
-```
-```{r, glm-logistic}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 5
-#| fig.width: 5
-glm_logistic = glm(response ~ x, df_logistic, family = binomial)
-df_aug = broom::augment(glm_logistic, type.predict = "response") |>
-  dplyr::mutate(y_prop = response[, 1] / rowSums(response))
 
-coef = glm_logistic$coefficients
-
-x_breaks = c(-10, 0, 10, 20, 30)
-df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) |>
-  dplyr::mutate(p = sigmoid(coef[1] + coef[2] * x), density = dbinom(y, n, p)) |>
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges |> wtl::ridges2bars(y, density)
-
-ggplot(df_aug) + aes(x, y_prop) +
-  geom_point(shape = 16, size = 3, alpha = 0.5) +
-  ggridges::geom_vridgeline(aes(y = y / n, width = density * 6, group = x), df_bars, fill = "#56B4E9AA", linetype = 0) +
-  geom_line(aes(y = .fitted), linewidth = 2, color = "#3366ff", alpha = 0.8) +
-  scale_x_continuous(breaks = x_breaks) +
-  scale_y_continuous(breaks = seq(0, 1, 0.2)) +
-  labs(x = "temperature", y = "beer_sales") +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-```
+![plot of chunk glm-logistic](./figure/glm-logistic-1.png)
 
   </div>
 </div>
@@ -331,40 +221,8 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r, df-wind}
-#| include: false
-#| cache.vars: "df_wind"
-set.seed(24601)
-n = 200
-df_wind = tibble::tibble(
-  max_wind = runif(n, 0, 40),
-  bucket_sales = rbinom(n, 1L, sigmoid(max_wind - 20, 0.2)) + 0L) |>
-  print()
-```
-```{r, wind}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 4
-#| fig.width: 5
-glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = "binomial")
 
-coef = glm_bernoulli$coefficients
-x_breaks = c(0, 10, 20, 30, 40)
-df_ridges = tidyr::crossing(x = x_breaks, y = c(0, 1)) |>
-  dplyr::mutate(p = sigmoid(coef[1] + coef[2] * x), density = dbinom(y, 1, p)) |>
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges |> wtl::ridges2bars(y, density, width = 0.2)
-
-broom::augment(glm_bernoulli, type.predict = "response") |>
-  ggplot() + aes(max_wind, bucket_sales) +
-  geom_point(shape = 124, size = 8, alpha = 0.3) +
-  ggridges::geom_vridgeline(aes(x, y, width = density * 6, group = x),
-    data = df_bars, fill = "#56B4E9AA", linetype = 0) +
-  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.8) +
-  scale_y_continuous(breaks = c(0, 1)) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-```
+![plot of chunk wind](./figure/wind-1.png)
 
   </div>
 </div>
@@ -387,39 +245,8 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.0;">
 
-```{r, df-weight}
-#| include: false
-#| cache.vars: "df_weight"
-set.seed(19937)
-n = 50
-df_weight = tibble::tibble(
-  height = rnorm(n, 1.70, 0.05),
-  bmi = rnorm(n, 22, 1),
-  weight = bmi * (height**2)
-) |>
-  print()
-```
-```{r, glm-weight}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 4
-#| fig.width: 4
-fit = lm(weight ~ height, df_weight)
-coef = coef(fit)
 
-x_breaks = c(1.65, 1.7, 1.75)
-df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
-  dplyr::mutate(density = dnorm(weight, coef[1] + coef[2] * height, 1.8)) |>
-  dplyr::filter(density > 1e-4)
-
-ggplot(df_weight) + aes(height, weight) +
-  geom_point(shape = 16, size = 3, alpha = 0.5) +
-  ggridges::geom_vridgeline(aes(width = density * 0.08, group = height),
-    data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
-  stat_smooth(method = lm, formula = y ~ x, se = FALSE, linewidth = 2) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 22) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
-```
+![plot of chunk glm-weight](./figure/glm-weight-1.png)
 
   </div>
 </div>
@@ -451,78 +278,9 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r, df-ancova}
-#| include: false
-#| cache.vars: ["df_ancova", "weather_levels"]
-set.seed(19937)
-n = 200L
-b = c(70, 3, 20, -20)  # true coef
-weather_levels = c("rainy", "cloudy", "sunny")
-df_ancova = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) |>
-  dplyr::mutate(name = weather, value = 1L) |>
-  tidyr::pivot_wider(values_fill = 0L) |>
-  dplyr::select(!cloudy) |>
-  dplyr::mutate(mu = b[1] + b[2] * temperature + b[3] * sunny + b[4] * rainy) |>
-  dplyr::mutate(beer_sales = rnorm(n, mu, 10)
-) |>
-  print()
-```
 
-```{r, glm-anova}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 4.5
-#| fig.width: 4.5
-lm_anova = lm(beer_sales ~ weather, df_ancova)
 
-df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels), beer_sales = seq(50, 200, 1)) |>
-  broom::augment(lm_anova, newdata = _, type.predict = "response") |>
-  dplyr::mutate(density = dnorm(beer_sales, .fitted, 10)) |>
-  dplyr::filter(density > 1e-4)
-
-.avg_rainy = coef(lm_anova)[1L]
-.avg_cloudy = sum(coef(lm_anova)[c(1L, 2L)])
-.avg_sunny = sum(coef(lm_anova)[c(1L, 3L)])
-
-dfl = tibble::tribble(
-  ~x, ~xend, ~y, ~yend,
-  -Inf, Inf, .avg_cloudy, .avg_cloudy,
-  1.5, 2.5, .avg_sunny, .avg_sunny,
-  2.5, 3.5, .avg_rainy, .avg_rainy
-)
-
-dfa = tibble::tribble(
-  ~x, ~xend, ~y, ~yend,
-  1.75, 1.75, .avg_cloudy, .avg_sunny,
-  2.75, 2.75, .avg_cloudy, .avg_rainy
-)
-
-dfs = tibble::tribble(
-  ~x, ~y, ~label,
-  0.6, .avg_cloudy + (.avg_sunny - .avg_cloudy) * 0.3, "beta[0]",
-  1.55, (.avg_cloudy + .avg_sunny) / 2, "beta[1]",
-  2.55, (.avg_cloudy + .avg_rainy) / 2, "beta[2]"
-)
-
-set.seed(1)
-.arr = grid::arrow(length = grid::unit(0.15, "inches"))
-df_ancova |>
-  ggplot() + aes(weather, beer_sales, color = weather) +
-  ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
-    data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
-  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#56B4E9AA", linewidth = 2) +
-  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#56B4E9AA", linewidth = 1.5) +
-  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 8, color = "#56B4E9AA") +
-  geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
-  scale_color_viridis_d() +
-  scale_x_discrete(limits = c("cloudy", "sunny", "rainy")) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
-        legend.position = "none")
-```
+![plot of chunk glm-anova](./figure/glm-anova-1.png)
 
   </div>
 </div>
@@ -557,22 +315,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
   <div class="column" style="flex-shrink: 1.3;">
 
 
-```{r, glm-ancova}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 4.5
-#| fig.width: 4.5
-lm_ancova = lm(beer_sales ~ temperature + weather, df_ancova)
-df_aug = broom::augment(lm_ancova, type.predict = "response")
-
-ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
-  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
-  geom_point(shape = 16, size = 3, alpha = 0.6) +
-  scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-```
+![plot of chunk glm-ancova](./figure/glm-ancova-1.png)
 
   </div>
 </div>
@@ -605,39 +348,8 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
   </div>
   <div class="column" style="flex-shrink: 1.3;">
 
-```{r, df-interact}
-#| include: false
-#| cache.vars: ["df_interact", "weather_levels"]
-set.seed(19937)
-n = 200L
-b = c(70, 3, 100, -2)  # true coef
-weather_levels = c("rainy", "sunny")
-df_interact = tibble::tibble(
-    temperature = runif(n, 8, 32),
-    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
-  ) |>
-  dplyr::mutate(name = weather, value = 1L) |>
-  tidyr::pivot_wider(values_fill = 0L) |>
-  dplyr::mutate(mu = b[1] * sunny + b[2] * temperature + b[3] * rainy + b[4] * temperature * rainy) |>
-  dplyr::mutate(beer_sales = rnorm(n, mu, 10)) |>
-  print()
-```
-```{r, interaction}
-#| echo: false
-#| cache.vars: []
-#| fig.height: 4.5
-#| fig.width: 4.5
-lm_int = lm(beer_sales ~ temperature * weather, df_interact)
-df_aug = broom::augment(lm_int)
 
-ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
-  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
-  geom_point(shape = 16, size = 3, alpha = 0.6) +
-  scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
-```
+![plot of chunk interaction](./figure/interaction-1.png)
 
   </div>
 </div>
@@ -691,10 +403,16 @@ $\operatorname{logit}(p_i)$
 
 直線回帰のときの `lm` とほぼ同じ。
 
-```{r, glm}
+
+``` r
 formula = weight ~ height
 fit = glm(formula, data = df_weight)
 coef(fit)
+```
+
+```
+(Intercept)      height 
+  -69.85222    78.63444 
 ```
 
 デフォルトは正規分布・恒等リンクで `lm` と同じ結果。\
@@ -714,20 +432,46 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 とりあえず当てはめと作図だけ。\
 結果の解釈やモデルの評価はこの後。
 
-```{r, generate-df-weight}
-#| ref.label: "df-weight"
-#| echo: -1
-#| cache.vars: []
+
+``` r
+n = 50
+df_weight = tibble::tibble(
+  height = rnorm(n, 1.70, 0.05),
+  bmi = rnorm(n, 22, 1),
+  weight = bmi * (height**2)
+) |>
+  print()
+```
+
+```
+     height      bmi   weight
+ 1 1.718019 21.55500 63.62151
+ 2 1.782862 22.83775 72.59199
+ 3 1.617464 22.43569 58.69604
+ 4 1.678291 23.37245 65.83231
+--                           
+47 1.762930 21.78337 67.70106
+48 1.744133 21.47257 65.31960
+49 1.730495 19.72866 59.07966
+50 1.676496 22.85824 64.24627
 ```
 
 ---
 ## 🔰 とにかくGLMを使ってみる練習 解答例
 
-```{r, glm-df-weight}
-#| fig.width: 4
-#| fig.height: 4
+
+``` r
 fit_wh = glm(weight ~ height, family = gaussian(link = identity), data = df_weight)
 broom::tidy(fit_wh)
+```
+
+```
+         term  estimate std.error statistic      p.value
+1 (Intercept) -69.85222 13.622977 -5.127530 5.214312e-06
+2      height  78.63444  8.001338  9.827661 4.460964e-13
+```
+
+``` r
 df_fit_wh = broom::augment(fit_wh, type.predict = "response")
 ggplot(df_fit_wh) +
   aes(height, weight) +
@@ -735,13 +479,34 @@ ggplot(df_fit_wh) +
   geom_line(aes(y = .fitted), linewidth = 1, color = "#3366ff")
 ```
 
+![plot of chunk glm-df-weight](./figure/glm-df-weight-1.png)
+
 ---
 ## 🔰 ポアソン回帰
 
-```{r, generate-df-seeds}
-#| ref.label: "df-seeds"
-#| echo: -1
-#| cache.vars: []
+
+``` r
+n = 300L
+a = 3
+b = -3
+df_seeds = tibble::tibble(
+  body_mass = runif(n, 0.4, 1.7),
+  num_seeds = rpois(n, exp(a * body_mass + b))
+) |>
+  print()
+```
+
+```
+    body_mass num_seeds
+  1 0.9185923         1
+  2 0.5154446         0
+  3 1.3362802         4
+  4 1.6858125        11
+ --                    
+297 1.3407210         3
+298 1.3357421         1
+299 0.8928759         0
+300 0.4583795         0
 ```
 
 
@@ -781,8 +546,14 @@ $L(\theta \mid D)$ or $L(\theta)$
 各モデルで最適なパラメータを探して、比較:\
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
-```{r, llf}
+
+``` r
 broom::glance(fit)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      1305.043      49 -124.9298 255.8597 261.5957 433.2606          48   50
 ```
 
 ---
@@ -790,53 +561,7 @@ broom::glance(fit)
 
 この場合は直線回帰よりもポアソン回帰が良さそう:
 
-```{r, compare-loglik}
-#| echo: false
-#| fig.height: 5
-#| fig.width: 9
-models = setNames(nm = c("gaussian", "poisson")) |> purrr::map(~{
-  glm(num_seeds ~ body_mass, family = .x, data = df_seeds)
-})
-
-x_breaks = c(0.5, 1.0, 1.5)
-df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
-  broom::augment(models[["gaussian"]], type.predict = "response", newdata = _) |>
-  dplyr::mutate(density = dnorm(num_seeds, .fitted, 1.4)) |>
-  dplyr::filter(density > 1e-4)
-
-p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
-  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
-  geom_point(shape = 16, size = 2, alpha = 0.5) +
-  scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank())
-
-label = sprintf("logLik = %.1f", broom::glance(models[["gaussian"]])$logLik)
-p_lm = p_pois +
-  labs(title = "gaussian, identity link") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2) +
-  ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass),
-    data = df_lm, fill = "#56B4E9AA", linetype = 0)
-# p_lm
-
-df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
-  broom::augment(models[["poisson"]], type.predict = "response", newdata = _) |>
-  dplyr::mutate(density = dpois(num_seeds, .fitted)) |>
-  dplyr::filter(density > 1e-4)
-df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
-
-label = sprintf("logLik = %.1f", broom::glance(models[["poisson"]])$logLik)
-p_poisson = p_pois +
-  labs(title = "poisson, log link") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
-  ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass),
-    data = df_bars, fill = "#56B4E9AA", linetype = 0)
-# p_poisson
-
-cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
-```
+![plot of chunk compare-loglik](./figure/compare-loglik-1.png)
 
 この調子で、より尤度の高いモデルを探していけばいいだろうか？
 
@@ -847,49 +572,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 : パラメータを増やせば**現データへの**適合度・尤度を高くできるが、\
   予測・理解の役には立たなくなる。
 
-```{r, saturated-model}
-#| echo: false
-#| fig.height: 4.4
-#| fig.width: 12
-#| cache.vars: []
-set.seed(19937)
-n = 16L
-true_coef = c(0.1, 0.2)
-df_plant = tibble::tibble(
-  x = runif(n, 7, 12.5),
-  lambda = exp(true_coef[1] + true_coef[2] * x),
-  y = rpois(n, lambda)
-) |> tibble::rownames_to_column("id")
-
-models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
-  null = ~ 1,
-  x = ~ x,
-  saturated = ~ id
-))
-labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
-
-p_plant = broom::augment(models$null, type.predict = "response", data = df_plant) |>
-  ggplot() + aes(x, y) +
-  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.7) +
-  geom_point(shape = 16, size = 3, alpha = 0.6) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
-
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["null"]], color = "#3366ff", size = 8)
-p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["x"]], color = "#3366ff", size = 8)
-p_saturated = p_plant %+% broom::augment(models$saturated, type.predict = "response", data = df_plant) +
-  labs(title = "saturated model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-    label = labels[["saturated"]], color = "#3366ff", size = 8)
-
-cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
-```
+![plot of chunk saturated-model](./figure/saturated-model-1.png)
 
 **帰無モデル**: 説明変数なし。切片のみ。\
 **飽和モデル**: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
@@ -901,56 +584,7 @@ cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
 観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
 
-```{r, many-models}
-#| echo: false
-#| fig.height: 7
-#| fig.width: 7
-#| cache.vars: ["df_plant", "models", "p_plant"]
-set.seed(24601)
-n = 120L
-true_coef = c(1, 0.12, 0)
-df_plant = tibble::tibble(
-  x = runif(n, 7, 12.5),
-  x2 = sample(c(FALSE, TRUE), n, replace = TRUE),
-  lambda = exp(true_coef[1] + true_coef[2] * x + true_coef[3] * x2),
-  y = rpois(n, lambda)
-) |> tibble::rownames_to_column("id")
-
-models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(~y,
-  null = ~ 1,
-  x = ~ x,
-  x2 = ~ x2,
-  both = ~ x + x2,
-  saturated = ~ id
-))
-labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
-
-p_plant = df_plant |>
-  broom::augment(models$null, data = _, type.predict = "response") |>
-  ggplot() + aes(x, y) +
-  geom_line(aes(y = .fitted), linewidth = 1.6, alpha = 0.6) +
-  geom_point(shape = 16, size = 2, alpha = 0.6) +
-  scale_y_continuous(expand = expansion(mult = c(0.05, 0.30))) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank(), legend.position = "none")
-
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["null"]], color = "#3366ff", size = 7)
-p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["x"]], color = "#3366ff", size = 7)
-p_x2 = p_plant %+% broom::augment(models$x2, type.predict = "response", data = df_plant) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["x2"]], color = "#3366ff", size = 7)
-p_both = p_plant %+% broom::augment(models$both, type.predict = "response") %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["both"]], color = "#3366ff", size = 7)
-
-cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
-```
+![plot of chunk many-models](./figure/many-models-1.png)
 
 
 
@@ -971,8 +605,14 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
       (Kullback--Leibler情報量を使って導出するらしい)
 
 
-```{r, print-llf}
-#| ref.label: "llf"
+
+``` r
+broom::glance(fit)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      1305.043      49 -124.9298 255.8597 261.5957 433.2606          48   50
 ```
 
 ???
@@ -985,27 +625,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
 観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
 
-```{r, many-models-aic}
-#| echo: false
-#| fig.height: 7
-#| fig.width: 7
-labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(models))
-p_null = p_plant +
-  labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 7)
-p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
-  labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 7)
-p_x2 = p_plant %+% broom::augment(models$x2, type.predict = "response", data = df_plant) %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 7)
-p_both = p_plant %+% broom::augment(models$both, type.predict = "response") %+%
-  aes(color = x2, group = x2) +
-  labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 7)
-cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
-```
+![plot of chunk many-models-aic](./figure/many-models-aic-1.png)
 
 ---
 ## ほかの情報量基準
@@ -1076,11 +696,7 @@ library(palmerpenguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 print(penguins)
 ```
-```{r, penguins}
-#| include: false
-withr::local_package("palmerpenguins")
-penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
-```
+
 
 ---
 ## penguinsデータセット
@@ -1091,9 +707,18 @@ penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
 </a>
 
-```{r, penguins-print}
-#| echo: false
-print(penguins)
+
+```
+      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
+  1    Adelie Torgersen           39.1          18.7               181        3750   male 2007
+  2    Adelie Torgersen           39.5          17.4               186        3800 female 2007
+  3    Adelie Torgersen           40.3          18.0               195        3250 female 2007
+  4    Adelie Torgersen             NA            NA                NA          NA     NA 2007
+ --                                                                                           
+341 Chinstrap     Dream           43.5          18.1               202        3400 female 2009
+342 Chinstrap     Dream           49.6          18.2               193        3775   male 2009
+343 Chinstrap     Dream           50.8          19.0               210        4100   male 2009
+344 Chinstrap     Dream           50.2          18.7               198        3775 female 2009
 ```
 
 ---
@@ -1101,10 +726,31 @@ print(penguins)
 
 性別はとりあえず使わないので、体長関連だけでも。
 
-```{r, penguins-dropna}
+
+``` r
 penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
+```
+
+```
+   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex year
+ 1  Adelie Torgersen             NA            NA                NA          NA  NA 2007
+ 2  Adelie Torgersen           34.1          18.1               193        3475  NA 2007
+ 3  Adelie Torgersen           42.0          20.2               190        4250  NA 2007
+ 4  Adelie Torgersen           37.8          17.1               186        3300  NA 2007
+--                                                                                      
+ 8  Gentoo    Biscoe           46.2          14.4               214        4650  NA 2008
+ 9  Gentoo    Biscoe           47.3          13.8               216        4725  NA 2009
+10  Gentoo    Biscoe           44.5          15.7               217        4875  NA 2009
+11  Gentoo    Biscoe             NA            NA                NA          NA  NA 2009
+```
+
+``` r
 penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
 dim(penguins_dropna)
+```
+
+```
+[1] 342   8
 ```
 
 ---
@@ -1125,9 +771,8 @@ dim(penguins_dropna)
 
 どうやら、重いペンギンほど翼長も長い。
 
-```{r, penguins-weight}
-#| fig.height: 4.5
-#| fig.width: 4.5
+
+``` r
 p_penweight = ggplot(penguins_dropna) +
   aes(body_mass_g, flipper_length_mm) +
   geom_point(shape = 16, size = 2, alpha = 0.66) +
@@ -1136,6 +781,8 @@ p_penweight = ggplot(penguins_dropna) +
 p_penweight
 ```
 
+![plot of chunk penguins-weight](./figure/penguins-weight-1.png)
+
 
 ---
 ## 単回帰の練習: 2. モデル作成、フィッティング
@@ -1143,10 +790,25 @@ p_penweight
 とりあえずデフォルトの正規分布・恒等リンク。
 $y = 136.7 + 0.0153 x$
 
-```{r, penguins-fit1}
+
+``` r
 fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
 broom::tidy(fit1)
+```
+
+```
+         term     estimate   std.error statistic       p.value
+1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
+2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
+```
+
+``` r
 broom::glance(fit1)
+```
+
+```
+  null.deviance df.null    logLik      AIC     BIC deviance df.residual nobs
+1      67426.54     341 -1145.518 2297.035 2308.54  16250.3         340  342
 ```
 
 ---
@@ -1154,27 +816,29 @@ broom::glance(fit1)
 
 結果とデータから予測値を作って回帰線を引く。
 
-```{r, penguins-weight-glm}
-#| fig.height: 5
-#| fig.width: 5
+
+``` r
 aug1 = broom::augment(fit1, type.predict = "response")
 p1 = p_penweight +
   geom_line(aes(y = .fitted), data = aug1, linewidth = 1, color = "#3366ff")
 p1
 ```
 
+![plot of chunk penguins-weight-glm](./figure/penguins-weight-glm-1.png)
+
 ---
 ## 重回帰の練習: 1. まず作図
 
 種によって色分けしてみると、傾向の違いが見える。
 
-```{r, penguins-weight-sp}
-#| fig.height: 5
-#| fig.width: 7
+
+``` r
 p_penweight_color = p_penweight + aes(color = species) +
   scale_color_manual(values = penguins_colors)
 p_penweight_color
 ```
+
+![plot of chunk penguins-weight-sp](./figure/penguins-weight-sp-1.png)
 
 
 ---
@@ -1183,23 +847,41 @@ p_penweight_color
 Adelieを基準に、ChinstrapとGentooはそれより長め。\
 体重の効果は単回帰のとき(0.0153)より小さい。
 
-```{r, penguins-fit2}
+
+``` r
 fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
 broom::tidy(fit2)
+```
+
+```
+              term     estimate    std.error statistic       p.value
+1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
+2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
+4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
+```
+
+``` r
 broom::glance(fit2)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      67426.54     341 -1059.718 2129.437 2148.611 9839.073         338  342
 ```
 
 ---
 ## 重回帰の練習: 3. フィッティング結果を作図
 
-```{r, penguins-weight-sp-glm}
-#| fig.height: 5
-#| fig.width: 7
+
+``` r
 aug2 = broom::augment(fit2, type.predict = "response")
 p2 = p_penweight_color +
   geom_line(aes(y = .fitted), data = aug2, linewidth = 1)
 p2
 ```
+
+![plot of chunk penguins-weight-sp-glm](./figure/penguins-weight-sp-glm-1.png)
 
 **傾き**も種によって違うかも。**交互作用**を入れてみたい。
 
@@ -1210,37 +892,58 @@ p2
 Adelieを基準に、Chinstrapの傾きが結構違う。\
 切片の違いは解釈しにくくなった。
 
-```{r, penguins-fit3}
+
+``` r
 fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
 broom::tidy(fit3)
+```
+
+```
+                          term      estimate    std.error statistic       p.value
+1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
+2                  body_mass_g   0.006676867 0.0009522935  7.011354  1.301783e-11
+3             speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
+4                speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
+5 body_mass_g:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
+6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
+```
+
+``` r
 broom::glance(fit3)
+```
+
+```
+  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
+1      67426.54     341 -1055.711 2125.422 2152.265 9611.166         336  342
 ```
 
 ---
 ## 交互作用の練習: フィッティング結果を作図
 
-```{r, penguins-interaction}
-#| fig.height: 5
-#| fig.width: 7
+
+``` r
 aug3 = broom::augment(fit3, type.predict = "response")
 p3 = p_penweight_color +
   geom_line(aes(y = .fitted), data = aug3, linewidth = 1)
 p3
 ```
 
+![plot of chunk penguins-interaction](./figure/penguins-interaction-1.png)
+
 ---
 ## ここまでの3つのモデルでどれがいいか？
 
 AICで選ぶなら交互作用入り重回帰が良さそう → 傾きが種によって違う。
 
-```{r, penguins-aic}
-#| fig.height: 4
-#| fig.width: 11
+
+``` r
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
                    p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
 ```
+
+![plot of chunk penguins-aic](./figure/penguins-aic-1.png)
 
 
 ---
@@ -1248,43 +951,9 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 
 🔰クチバシの長さと深さで同じ解析をやってみよう。
 
-```{r, penguins-bill}
-#| echo: false
-#| fig.height: 4
-#| fig.width: 11
-#| cache.vars: [p_bill]
-p_bill = penguins_dropna |>
-  ggplot() + aes(bill_length_mm, bill_depth_mm) +
-  geom_point(shape = 16, size = 2, alpha = 0.66) +
-  scale_color_manual(values = penguins_colors) +
-  theme_bw(base_size = 22) +
-  theme(panel.grid.minor = element_blank())
+![plot of chunk penguins-bill](./figure/penguins-bill-1.png)
 
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
-d1 = broom::augment(fit1, type.predict = "response")
-d2 = broom::augment(fit2, type.predict = "response")
-d3 = broom::augment(fit3, type.predict = "response")
-p1 = p_bill + geom_line(aes(y = .fitted), d1, linewidth = 1, color = "#3366ff")
-p2 = p_bill + aes(color = species) + geom_line(aes(y = .fitted), d2, linewidth = 1)
-p3 = p_bill + aes(color = species) + geom_line(aes(y = .fitted), d3, linewidth = 1)
-labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
-cowplot::plot_grid(p1 + labs(title = labels[1]),
-                   p2 + labs(title = labels[2]) + theme(legend.position = "none"),
-                   p3 + labs(title = labels[3]) + theme(legend.position = "none"), nrow = 1L)
-```
 
-```{r, penguins-multiple}
-#| echo: false
-#| include: false
-fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
-broom::tidy(fit4)
-broom::glance(fit4)
-aug4 = broom::augment(fit4, type.predict = "response")
-p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
-  scale_color_discrete()
-```
 
 
 
@@ -1321,10 +990,29 @@ p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
 均等に回帰線を引くには `broom::augment()` の使い方に工夫が必要。\
 とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
 
-```{r, generate-df-beer}
-#| ref.label: "df-beer"
-#| echo: -1
-#| cache.vars: []
+
+``` r
+n = 200L
+true_coef = c(3, 0.05, 0.006)
+df_beer = tibble::tibble(
+  temperature = runif(n, 8, 32),
+  humidity = runif(n, 20, 80),
+  beer_sales = rpois(n, exp(true_coef[1] + true_coef[2] * temperature + true_coef[3] * humidity))
+) |>
+  print()
+```
+
+```
+    temperature humidity beer_sales
+  1    17.57401 54.68339         67
+  2    10.13129 67.34727         55
+  3    25.28517 40.93855        104
+  4    31.73808 32.14308        113
+ --                                
+197    26.28116 41.89173        105
+198    23.53532 73.12257        113
+199    13.87494 41.92560         51
+200    31.60519 61.47984        140
 ```
 
 ---
@@ -1332,10 +1020,32 @@ p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
 
 次ページにヒント。
 
-```{r, generate-df-logistic}
-#| ref.label: "df-logistic"
-#| echo: -1
-#| cache.vars: []
+
+``` r
+sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
+nrep = 200L
+n = 10L
+df_logistic = tibble::tibble(
+  x = runif(nrep, -10, 35),
+  logit_p = -3 + 0.3 * x,
+  p = sigmoid(logit_p),
+  y = rbinom(nrep, n, p),
+  response = matrix(c(y, n - y), ncol = 2)
+) |>
+  print()
+```
+
+```
+            x    logit_p          p  y response[,1] [,2]
+  1  7.951271 -0.6146188 0.35100632  4            4    6
+  2 -6.003840 -4.8011520 0.00815325  0            0   10
+  3 22.409698  3.7229095 0.97640654 10           10    0
+  4 34.508895  7.3526686 0.99935953 10           10    0
+ --                                                     
+197 24.277180  4.2831541 0.98638875 10           10    0
+198 19.128721  2.7386162 0.93926720  8            8    2
+199  1.015520 -2.6953441 0.06324865  0            0   10
+200 34.259733  7.2779199 0.99930986 10           10    0
 ```
 
 ---
@@ -1346,9 +1056,13 @@ p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
 - 1列目が成功回数、2列目が失敗回数の整数matrix
 
 今回の場合、成功回数 `y` だけをformulaに入れると怒られる
-```{r, logistic-error}
-#| error: true
+
+``` r
 glm(y ~ x, df_logistic, family = binomial)
+```
+
+```
+Error in eval(family$initialize): y values must be 0 <= y <= 1
 ```
 ので失敗回数もモデルに含むよう `response ~ x` とする。
 
@@ -1360,20 +1074,68 @@ glm(y ~ x, df_logistic, family = binomial)
 
 まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
 
-```{r, generate-df-ancova}
-#| ref.label: "df-ancova"
-#| echo: -1
-#| cache.vars: []
+
+``` r
+n = 200L
+b = c(70, 3, 20, -20)  # true coef
+weather_levels = c("rainy", "cloudy", "sunny")
+df_ancova = tibble::tibble(
+    temperature = runif(n, 8, 32),
+    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
+  ) |>
+  dplyr::mutate(name = weather, value = 1L) |>
+  tidyr::pivot_wider(values_fill = 0L) |>
+  dplyr::select(!cloudy) |>
+  dplyr::mutate(mu = b[1] + b[2] * temperature + b[3] * sunny + b[4] * rainy) |>
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10)
+) |>
+  print()
+```
+
+```
+    temperature weather rainy sunny        mu beer_sales
+  1   23.377217  cloudy     0     0 140.13165  129.36288
+  2   26.043088  cloudy     0     0 148.12926  138.26966
+  3   30.830351  cloudy     0     0 162.49105  141.46190
+  4   15.022311  cloudy     0     0 115.06693  108.18593
+ --                                                     
+197    8.277514  cloudy     0     0  94.83254   74.38321
+198   28.675228   sunny     0     1 176.02568  180.34777
+199   27.310881   sunny     0     1 171.93264  162.31587
+200   24.064285   rainy     1     0 122.19286  104.89368
 ```
 
 ---
 ## 🔰 交互作用
 
 
-```{r, generate-df-interact}
-#| ref.label: "df-interact"
-#| echo: -1
-#| cache.vars: []
+
+``` r
+n = 200L
+b = c(70, 3, 100, -2)  # true coef
+weather_levels = c("rainy", "sunny")
+df_interact = tibble::tibble(
+    temperature = runif(n, 8, 32),
+    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
+  ) |>
+  dplyr::mutate(name = weather, value = 1L) |>
+  tidyr::pivot_wider(values_fill = 0L) |>
+  dplyr::mutate(mu = b[1] * sunny + b[2] * temperature + b[3] * rainy + b[4] * temperature * rainy) |>
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10)) |>
+  print()
+```
+
+```
+    temperature weather sunny rainy       mu beer_sales
+  1   23.377217   sunny     1     0 140.1316   133.0540
+  2   26.043088   sunny     1     0 148.1293   155.9879
+  3   30.830351   sunny     1     0 162.4911   162.3405
+  4   15.022311   sunny     1     0 115.0669   117.6067
+ --                                                    
+197    8.277514   rainy     0     1 108.2775   117.7023
+198   28.675228   rainy     0     1 128.6752   127.9629
+199   27.310881   sunny     1     0 151.9326   155.6515
+200   24.064285   rainy     0     1 124.0643   124.6956
 ```
 
 
@@ -1386,51 +1148,21 @@ glm(y ~ x, df_logistic, family = binomial)
 
 [adventure.tsv](adventure.tsv)
 
-```{r, adventure-data}
-#| echo: false
-set.seed(19937)
-samplesize = 1000L
-b0 = 0.7
-b1 = 0.01
-b2 = -0.5
-b3 = 0.02
-b12 = 0.03
 
-dfraw = tibble::tibble(
-  level = sample.int(50L, samplesize, replace = TRUE),
-  is_mage = rbinom(samplesize, 1, 0.4),
-  via_cave = rbinom(samplesize, 1, ifelse(is_mage, 0.5, 0.3)),
-  lambda = exp(b0 + b1 * level + b2 * is_mage + b3 * via_cave + b12 * level * is_mage),
-  encounter = rpois(samplesize, lambda)
-)
-
-dfout = dfraw |> dplyr::mutate(
-    job = ifelse(is_mage, "mage", "fighter"),
-    route = ifelse(via_cave, "cave", "field"),
-    .before = encounter
-  ) |>
-  dplyr::select(!lambda & !is_mage & !via_cave)
-
-readr::write_tsv(dfout, "../adventure.tsv") |> print()
+```
+     level     job route encounter
+   1     7 fighter field         2
+   2     7 fighter field         0
+   3    40    mage  cave         9
+   4    38    mage field         3
+  --                              
+ 997    17 fighter  cave         4
+ 998    49    mage field         8
+ 999    43 fighter field         6
+1000    37    mage field        11
 ```
 
-```{r, adventure-analysis}
-#| include: false
-fit = glm(encounter ~ level + job + route + level:job, data = dfout, family = poisson)
-summary(fit)
-df_aug = broom::augment(fit, type.predict = "response")
 
-p_enc = ggplot(df_aug) +
-  aes(level, encounter, color = job) +
-  geom_point() +
-  geom_line(aes(y = .fitted)) +
-  facet_wrap(vars(route))
-
-p_route = ggplot(df_aug) +
-  aes(job, fill = job) +
-  geom_bar() +
-  facet_wrap(vars(route))
-```
 
 
 ---
@@ -1443,4 +1175,6 @@ p_route = ggplot(df_aug) +
 - [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017\
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
 
-`r .meta$next_link`
+<a href="9-report.html" class="readmore">
+9. 発表会
+</a>
