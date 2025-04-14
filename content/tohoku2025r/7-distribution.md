@@ -3,7 +3,7 @@ url = "tohoku2025r/7-distribution.html"
 linktitle = "統計モデリング1: 確率分布、尤度"
 title = "7. 統計モデリング1: 確率分布、尤度 — 進化学実習 2025 牧野研 東北大学"
 date = 2025-04-14T13:00:00+09:00
-draft = true
+draft = false
 css = "style.css"
 dpi = 108
 +++

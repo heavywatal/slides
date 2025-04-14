@@ -3,7 +3,7 @@ url = "tohoku2025r/9-report.html"
 linktitle = "発表会"
 title = "9. 発表会 — 進化学実習 2025 牧野研 東北大学"
 date = 2025-04-15T13:00:00+09:00
-draft = true
+draft = false
 css = "style.css"
 dpi = 108
 +++

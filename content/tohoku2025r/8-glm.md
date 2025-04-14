@@ -3,7 +3,7 @@ url = "tohoku2025r/8-glm.html"
 linktitle = "統計モデリング2: 一般化線形モデル"
 title = "8. 統計モデリング2: 一般化線形モデル — 進化学実習 2025 牧野研 東北大学"
 date = 2025-04-14T14:40:00+09:00
-draft = true
+draft = false
 css = "style.css"
 dpi = 108
 +++
