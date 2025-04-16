@@ -218,8 +218,8 @@ add_fitted_weight = function(data, parameters) {
 }
 
 rss_weight = function(parameters, data) {
-  fitted = fit_weight(parameters, data)
-  sqdev = (data[["weight"]] - fitted)**2
+  .fitted = fit_weight(parameters, data)
+  sqdev = (data[["weight"]] - .fitted)**2
   sum(sqdev)
 }
 # rss_weight(c(40, -5), df_weight)
@@ -237,7 +237,8 @@ p1 = p_weight %+%
 p2 = p1 %+% broom::augment(lm_weight)
 cowplot::plot_grid(nrow = 1L,
   p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
-  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2))
+  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2)
+)
 ```
 
 
@@ -261,7 +262,8 @@ p_ab = ggplot(df_ab_random) +
   geom_point(data = \(x) dplyr::filter(x, rank(rss) < 6), shape = 1, size = 6) +
   geom_point(aes(color = log10(rss)), shape = 16, size = 3) +
   theme_bw(base_size = 22) +
-  theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
+  theme(panel.grid = element_blank(), legend.justification = c(1, 1),
+    legend.position = "inside", legend.position.inside = c(0.99, 0.99))
 
 df_randmin = df_ab_random |> dplyr::slice_min(rss, n = 5)
 p2 = p_weight + geom_abline(

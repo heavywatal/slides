@@ -797,14 +797,14 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 
 ``` r
 p = ggplot(diamonds) +
-  aes(x = cut, y = price) +
-  geom_jitter(aes(color = cut), height = 0, width = 0.2, alpha = 0.1, stroke = 0) +
+  aes(price, cut) +
+  geom_jitter(aes(color = cut), height = 0.2, width = 0, alpha = 0.1, stroke = 0) +
   geom_boxplot(fill = NA, outlier.shape = NA) +
   scale_color_viridis_d(option = "plasma") +
   facet_wrap(vars(clarity)) +
-  coord_flip(xlim = c(0.5, 5.5), ylim = c(0, 20000), expand = FALSE) +
+  coord_cartesian(xlim = c(0, 20000), ylim = c(0.5, 5.5), expand = FALSE) +
   labs(title = "Diamonds", x = "Cut", y = "Price (USD)") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 16) +
   theme(legend.position = "none",
         axis.ticks = element_blank(),
         panel.grid.major.y = element_blank(),

@@ -305,11 +305,10 @@ relig_income |>
   dplyr::mutate(income = dplyr::na_if(income, "Don't know/refused")) |>
   dplyr::mutate(income = factor(income, levels = rev(unique(income)))) |>
   ggplot() +
-  aes(religion, count) +
-  geom_col(aes(fill = income), position = "fill") +
+  aes(count, religion) +
+  geom_col(aes(fill = income), position = "fill", orientation = "y") +
   scale_fill_viridis_d(na.value = "#cccccc") +
-  scale_x_discrete(limits = rev(relig_income$religion)) +
-  coord_flip() +
+  scale_y_discrete(limits = rev(relig_income$religion)) +
   theme_classic() +
   theme(axis.title = element_blank())
 ```
