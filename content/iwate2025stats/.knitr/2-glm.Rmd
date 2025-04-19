@@ -6,7 +6,6 @@
 ```{r, setup-local}
 #| include: false
 #| cache: false
-knitr::knit_exit()
 ```
 
 
@@ -14,7 +13,7 @@ knitr::knit_exit()
 ## 有名な確率分布対応関係ふりかえり
 
 <figure style="float: right;">
-<img src="../tokiomarine2021/math-model.drawio.svg" width="450"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="450">
 </figure>
 
 離散一様分布
@@ -39,7 +38,7 @@ knitr::knit_exit()
 ---
 ## データに分布をあてはめたい
 
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
+ある植物を50個体調べて、それぞれの種子数Xを数えた。\
 個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
 
 ```{r, df-poisson}
@@ -55,45 +54,39 @@ df_dpois = purrr::map(c(1, 3, 5), \(lambda) {
 #| echo: false
 #| fig.height: 4
 #| fig.width: 4.4
-ggplot(df_rpois) +
+p_rpois = ggplot(df_rpois) +
   aes(X) +
-  geom_bar(width = 0.4) +
+  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   coord_cartesian(xlim = c(0, max_x)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
-    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
-    axis.ticks = element_blank()
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
   )
+p_rpois
 ```
 
-カウントデータだし形も<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
+カウントデータだし形も<span class="fragment custom blur">ポアソン</span>分布っぽい。\
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？
 
 
 ---
 ## データに分布をあてはめたい
 
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
+ある植物を50個体調べて、それぞれの種子数Xを数えた。\
 個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
 
 ```{r, poisson-seed-lambda}
 #| echo: false
 #| fig.height: 4
 #| fig.width: 12
-p_pois = ggplot(df_rpois) +
-  aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
+p_pois = p_rpois +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  facet_wrap(vars(lambda), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
-  theme(
-    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
-  )
+  facet_wrap(vars(lambda), nrow = 1L, labeller = label_both)
 p_pois
 ```
 
-カウントデータだし形もポアソン分布っぽい。<br>
+カウントデータだし形もポアソン分布っぽい。\
 分布のパラメータ $\lambda$ はどれくらいがいいだろう？
 
 黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
@@ -106,14 +99,14 @@ p_pois
 <ruby>尤<rt>もっと</rt></ruby>もらしさ。
 モデルのあてはまりの良さの尺度のひとつ。
 
-**あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
-定義通り素直に書くと<br>
+**あるモデル$M$の下でそのデータ$D$が観察される確率**。\
+定義通り素直に書くと\
 $\Pr(D \mid M)$
 
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
+データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:\
 $L(M \mid D)$
 
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:\
 $L(\theta \mid D)$ とか $L(\theta)$ とか
 
 
@@ -172,7 +165,7 @@ p_pois +
 ---
 ## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
 
-扱いやすい **対数尤度** (log likelihood) にしてから計算する。<br>
+扱いやすい **対数尤度** (log likelihood) にしてから計算する。\
 一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
 
 <div>\[\begin{split}
@@ -198,36 +191,29 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
   dplyr::mutate(logL = log(L)) |>
   ggplot() +
   aes(lambda, logL) +
-  geom_line() +
-  geom_vline(xintercept = X_mle, color = "#56B4E9", linewidth = 1) +
+  geom_line(linewidth = 1) +
+  geom_vline(xintercept = X_mle, color = "#56B4E9", linewidth = 2) +
   annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#56B4E9") +
   annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
            x = Inf, y = -Inf, hjust = 1.2, vjust = -0.8, size = 7) +
   labs(y = "log L") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
   )
 
-df_dpois = tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
-p_pois = ggplot(df_rpois) +
-  aes(X) +
-  geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  theme_bw(base_size = 20) +
-  theme(
-    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
-    panel.grid.major.x = element_blank(), axis.ticks = element_blank()
-  )
+.df_mle = tibble::tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
+.p_pois_mle = p_rpois +
+  geom_col(data = .df_mle, aes(y = Prob), alpha = 0.5, fill = "#56B4E9")
 
-cowplot::plot_grid(p_mle, p_pois, nrow = 1L, rel_widths = c(2, 1))
+cowplot::plot_grid(p_mle, .p_pois_mle, nrow = 1L, rel_widths = c(2, 1))
 ```
 
 ---
 ## 最尤推定を使っても“真のλ”は得られない
 
-今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
+今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。\
 「50個体サンプル→最尤推定」を1,000回繰り返してみると:
 
 ```{r, poisson-mle-repl}
@@ -248,13 +234,13 @@ p_repl = df_sum |>
   geom_histogram(bins = 25, center = 3) +
   annotate("point", x = df_minmax$lambda, y = 0, color = "#56B4E9", size = 8, alpha = 0.5) +
   labs(x = "estimated_lambda") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
   )
 
-df_dpois = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) |>
+.df_dminmax = tidyr::crossing(lambda = df_minmax$lambda, X = seq(0, 11)) |>
   dplyr::mutate(Prob = dpois(X, lambda))
 p_minmax = df_repl |>
   dplyr::filter(repl %in% df_minmax$repl) |>
@@ -262,9 +248,9 @@ p_minmax = df_repl |>
   ggplot() +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
-  geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  geom_col(data = .df_dminmax, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     panel.grid.major.x = element_blank(), axis.ticks = element_blank()
@@ -273,7 +259,7 @@ p_minmax = df_repl |>
 cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 ```
 
-サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
+サンプルの取れ方によってはかなりズレた推定をしてしまう。\
 (標本データへのあてはまりはかなり良く見えるのに！)
 
 
@@ -285,7 +271,7 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 ```{r, poisson-mle-nsam}
 #| echo: false
 #| fig.height: 4
-#| fig.width: 11
+#| fig.width: 12
 set.seed(19937)
 nrep = 1000L
 purrr::map(c(5, 50, 500, 5000), \(n) {
@@ -299,27 +285,27 @@ purrr::map(c(5, 50, 500, 5000), \(n) {
   aes(estimated_lambda) +
   geom_histogram(bins = 25, center = 3) +
   facet_wrap(vars(n), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
   )
 ```
 
-Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
+Q. じゃあどれくらいのサンプル数nを確保すればいいのか？\
 A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 ---
 ## すべてのモデルは間違っている
 
-確率分布がいい感じに最尤推定できたとしても、<br>
+確率分布がいい感じに最尤推定できたとしても、\
 それはあくまでモデル。仮定。近似。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1080"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1080">\
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -347,7 +333,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 1. 6の目の出る確率が1/6だとした場合の尤度は?
 1. 6の目の出る確率が0.2だとした場合の尤度は?
 1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
-1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
+1. このサイコロで6の目が出る確率を最尤推定しよう。\
    数学で解ければ**優**。Rで見つければ**良**。目分量・勘で**可**。
 
 ヒント
@@ -370,15 +356,15 @@ get_likelihood(0.2)
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな<span style="font-weight: bold; color: #56B4E9;">確率分布</span>を扱いたい</span>
 
 **一般化線形モデル GLM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
 
 **一般化線形混合モデル GLMM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
 
 **階層ベイズモデル HBM**
 
@@ -416,7 +402,7 @@ df_dpois = tibble(X = seq(0, max_x), Prob = dpois(X, mean(df_rpois$X)))
 p_pois = ggplot(df_rpois) + aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.3) +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
-  theme_bw(base_size = 20)
+  theme_bw(base_size = 22)
 p_pois +
   theme(panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
         panel.grid.major.x = element_blank(), axis.ticks = element_blank())
@@ -427,7 +413,7 @@ p_pois +
 ---
 ## 一般化線形モデル(GLM)として記述してみる
 
-個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。<br>
+個体$i$の種子数$y_i$は平均値$\lambda_i$のポアソン分布に従う。\
 平均値$\lambda_i$は**他のデータによらず$\beta_0$で一定**。
 
 <div>\[\begin{split}
@@ -437,7 +423,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 
 ```{r, glm-without-x}
 #| echo: false
-#| fig.height: 3.9
+#| fig.height: 4
 #| fig.width: 4
 p_pois +
   labs(x = "y") +
@@ -446,20 +432,20 @@ p_pois +
         panel.grid.major.y = element_blank(), axis.ticks = element_blank())
 ```
 
-種子数をY軸にして、式を2つに分けただけ...?<br>
+種子数をY軸にして、式を2つに分けただけ...?\
 **説明変数**を含むモデルを見ればご利益が分かるかも。
 
 ---
 ## 説明変数が1つある一般化線形モデル
 
-個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。<br>
+個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。\
 平均値の対数$\log(\textcolor{#3366ff}{\lambda_i})$は**その個体の大きさ$x_i$に比例**する。
 
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0;">
 
 <figure style="margin-block: 1rem;">
-<img src="../iwate2023stats/glm.drawio.svg" width="600"><br>
+<img src="../iwate2023stats/glm.drawio.svg" width="640">
 </figure>
 
   </div>
@@ -490,13 +476,13 @@ df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) |>
 df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
 p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 2, alpha = 0.5) +
   scale_x_continuous(breaks = x_breaks) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
 p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(x, y, width = density * 0.5, group = x),
     data = df_bars, fill = "#56B4E9AA", linetype = 0)
 ```
@@ -537,23 +523,23 @@ df_beer = tibble::tibble(
 #| fig.width: 10
 glm_multi = glm(beer_sales ~ temperature + humidity, family = poisson, data = df_beer)
 
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) |>
-  modelr::add_predictions(glm_multi, type = "response")
+df_aug = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) |>
+  broom::augment(glm_multi, newdata = _, type.predict = "response")
 
 p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
-  geom_line(data = df_pred, aes(y = pred, group = humidity), alpha = 0.7) +
-  geom_point(alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   scale_color_viridis_c(option = "cividis", direction = -1) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
 p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
-  geom_line(data = df_pred, aes(y = pred, group = temperature), alpha = 0.7) +
-  geom_point(alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   scale_color_viridis_c(option = "turbo") +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
 
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
@@ -572,11 +558,11 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 <div class="column-container">
   <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
 
-客10人中$y_i$人がビールを注文。<br>
+客$n_i$人中$y_i$人がビールを注文。\
 その日$i$の気温$x_i$によって割合が変化。
 
 <p>\[\begin{split}
-y_i &\sim \text{Binomial}(n,~p_i) \\
+y_i &\sim \text{Binomial}(n_i,~p_i) \\
 \operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
 p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
@@ -608,9 +594,8 @@ df_logistic = tibble::tibble(
 #| fig.height: 5
 #| fig.width: 5
 glm_logistic = glm(response ~ x, df_logistic, family = binomial)
-df_pred = df_logistic |>
-  modelr::add_predictions(glm_logistic, type = "response") |>
-  dplyr::mutate(pred = n * pred)
+df_aug = broom::augment(glm_logistic, type.predict = "response") |>
+  dplyr::mutate(y_prop = response[, 1] / rowSums(response))
 
 coef = glm_logistic$coefficients
 
@@ -620,14 +605,14 @@ df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) |>
   dplyr::filter(density > 1e-4)
 df_bars = df_ridges |> wtl::ridges2bars(y, density)
 
-ggplot(df_pred) + aes(x, y) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
-  ggridges::geom_vridgeline(data = df_bars, aes(width = density * 6, group = x), fill = "#56B4E9AA", linetype = 0) +
-  geom_line(aes(y = pred), linewidth = 2, color = "#3366ff") +
+ggplot(df_aug) + aes(x, y_prop) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  ggridges::geom_vridgeline(aes(y = y / n, width = density * 6, group = x), df_bars, fill = "#56B4E9AA", linetype = 0) +
+  geom_line(aes(y = .fitted), linewidth = 2, color = "#3366ff", alpha = 0.8) +
   scale_x_continuous(breaks = x_breaks) +
-  scale_y_continuous(breaks = seq.int(0, 10)) +
+  scale_y_continuous(breaks = seq(0, 1, 0.2)) +
   labs(x = "temperature", y = "beer_sales") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 ```
 
@@ -689,15 +674,14 @@ df_ridges = tidyr::crossing(x = x_breaks, y = c(0, 1)) |>
   dplyr::filter(density > 1e-4)
 df_bars = df_ridges |> wtl::ridges2bars(y, density, width = 0.2)
 
-df_wind |>
-  modelr::add_predictions(glm_bernoulli, type = "response") |>
+broom::augment(glm_bernoulli, type.predict = "response") |>
   ggplot() + aes(max_wind, bucket_sales) +
-  geom_point(alpha = 0.3, shape = 124, size = 7) +
+  geom_point(shape = 124, size = 8, alpha = 0.3) +
   ggridges::geom_vridgeline(aes(x, y, width = density * 6, group = x),
     data = df_bars, fill = "#56B4E9AA", linetype = 0) +
-  geom_line(aes(y = pred), color = "#3366ff", linewidth = 1) +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.8) +
   scale_y_continuous(breaks = c(0, 1)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 ```
 
@@ -737,8 +721,8 @@ df_weight = tibble::tibble(
 ```{r, glm-weight}
 #| echo: false
 #| cache.vars: []
-#| fig.height: 4.2
-#| fig.width: 4.2
+#| fig.height: 4
+#| fig.width: 4
 fit = lm(weight ~ height, df_weight)
 coef = coef(fit)
 
@@ -748,12 +732,12 @@ df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
   dplyr::filter(density > 1e-4)
 
 ggplot(df_weight) + aes(height, weight) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   ggridges::geom_vridgeline(aes(width = density * 0.08, group = height),
     data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
-  stat_smooth(method = lm, formula = y ~ x, se = FALSE) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, linewidth = 2) +
   scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+  theme_bw(base_size = 22) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
 ```
 
   </div>
@@ -761,12 +745,12 @@ ggplot(df_weight) + aes(height, weight) +
 
 最小二乗法の直線あてはめと結果的に同じになる。
 
-<small style="color: #999999;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small>
+<small style="opacity: 0.7;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small>
 
 ---
 ## 分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM
 
-**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。<br>
+**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。\
 <span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
 
 <div class="column-container">
@@ -784,7 +768,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \end{split}\]</p>
 
   </div>
-  <div class="column" style="flex-shrink: 1.35;">
+  <div class="column" style="flex-shrink: 1.3;">
 
 ```{r, df-ancova}
 #| include: false
@@ -792,7 +776,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 set.seed(19937)
 n = 200L
 b = c(70, 3, 20, -20)  # true coef
-weather_levels = c("sunny", "cloudy", "rainy")
+weather_levels = c("rainy", "cloudy", "sunny")
 df_ancova = tibble::tibble(
     temperature = runif(n, 8, 32),
     weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
@@ -809,53 +793,52 @@ df_ancova = tibble::tibble(
 ```{r, glm-anova}
 #| echo: false
 #| cache.vars: []
-#| fig.height: 4.8
-#| fig.width: 4.8
+#| fig.height: 4.5
+#| fig.width: 4.5
 lm_anova = lm(beer_sales ~ weather, df_ancova)
+
 df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels), beer_sales = seq(50, 200, 1)) |>
-  modelr::add_predictions(lm_anova) |>
-  dplyr::mutate(density = dnorm(beer_sales, pred, 10)) |>
+  broom::augment(lm_anova, newdata = _, type.predict = "response") |>
+  dplyr::mutate(density = dnorm(beer_sales, .fitted, 10)) |>
   dplyr::filter(density > 1e-4)
 
-tidy_anova = broom::tidy(lm_anova)
-
-avgs = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels)) |>
-  modelr::add_predictions(lm_anova) |>
-  tibble::deframe()
+.avg_rainy = coef(lm_anova)[1L]
+.avg_cloudy = sum(coef(lm_anova)[c(1L, 2L)])
+.avg_sunny = sum(coef(lm_anova)[c(1L, 3L)])
 
 dfl = tibble::tribble(
   ~x, ~xend, ~y, ~yend,
-  -Inf, Inf, avgs["cloudy"], avgs["cloudy"],
-  1.5, 2.5, avgs["sunny"], avgs["sunny"],
-  2.5, 3.5, avgs["rainy"], avgs["rainy"]
+  -Inf, Inf, .avg_cloudy, .avg_cloudy,
+  1.5, 2.5, .avg_sunny, .avg_sunny,
+  2.5, 3.5, .avg_rainy, .avg_rainy
 )
 
 dfa = tibble::tribble(
   ~x, ~xend, ~y, ~yend,
-  1.75, 1.75, avgs["cloudy"], avgs["sunny"],
-  2.75, 2.75, avgs["cloudy"], avgs["rainy"]
+  1.75, 1.75, .avg_cloudy, .avg_sunny,
+  2.75, 2.75, .avg_cloudy, .avg_rainy
 )
 
 dfs = tibble::tribble(
   ~x, ~y, ~label,
-  0.6, avgs["cloudy"] + (avgs["sunny"] - avgs["cloudy"]) * 0.3, "beta[0]",
-  1.55, (avgs["cloudy"] + avgs["sunny"]) / 2, "beta[1]",
-  2.55, (avgs["cloudy"] + avgs["rainy"]) / 2, "beta[2]"
+  0.6, .avg_cloudy + (.avg_sunny - .avg_cloudy) * 0.3, "beta[0]",
+  1.55, (.avg_cloudy + .avg_sunny) / 2, "beta[1]",
+  2.55, (.avg_cloudy + .avg_rainy) / 2, "beta[2]"
 )
 
 set.seed(1)
-.arr = grid::arrow(length = grid::unit(0.1, "inches"))
+.arr = grid::arrow(length = grid::unit(0.15, "inches"))
 df_ancova |>
   ggplot() + aes(weather, beer_sales, color = weather) +
   ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
     data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
-  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#56B4E9AA", linewidth = 1) +
-  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#56B4E9AA", linewidth = 1) +
+  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#56B4E9AA", linewidth = 2) +
+  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#56B4E9AA", linewidth = 1.5) +
   annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 8, color = "#56B4E9AA") +
   geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
+  scale_color_viridis_d() +
   scale_x_discrete(limits = c("cloudy", "sunny", "rainy")) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
         legend.position = "none")
 ```
@@ -871,7 +854,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 ---
 ## 共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM
 
-**質的変数と量的変数を両方**含むGLM、と解釈可能。<br>
+**質的変数と量的変数を両方**含むGLM、と解釈可能。\
 正規分布・等分散・恒等リンクなどが仮定される。
 
 
@@ -890,25 +873,24 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \end{split}\]</p>
 
   </div>
-  <div class="column" style="flex-shrink: 1.35;">
+  <div class="column" style="flex-shrink: 1.3;">
 
 
 ```{r, glm-ancova}
 #| echo: false
 #| cache.vars: []
-#| fig.height: 4.8
-#| fig.width: 4.8
+#| fig.height: 4.5
+#| fig.width: 4.5
 lm_ancova = lm(beer_sales ~ temperature + weather, df_ancova)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) |>
-  modelr::add_predictions(lm_ancova, type = "response")
+df_aug = broom::augment(lm_ancova, type.predict = "response")
 
-ggplot(df_ancova) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = pred, group = weather), alpha = 0.7, linewidth = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
+ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
+  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
+  scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
 ```
 
   </div>
@@ -920,7 +902,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 ---
 ## 交互作用
 
-ある説明変数の効果が、別の説明変数によって異なる。<br>
+ある説明変数の効果が、別の説明変数によって異なる。\
 e.g., ビール売上の温度依存性が天気によって異なる。
 
 <div class="column-container">
@@ -936,11 +918,11 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_{1,2} x_{1i} x_{2i}
 \end{split}\]</p>
 
-雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
+雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。\
 晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
 
   </div>
-  <div class="column" style="flex-shrink: 1.35;">
+  <div class="column" style="flex-shrink: 1.3;">
 
 ```{r, df-interact}
 #| include: false
@@ -948,7 +930,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 set.seed(19937)
 n = 200L
 b = c(70, 3, 100, -2)  # true coef
-weather_levels = c("sunny", "rainy")
+weather_levels = c("rainy", "sunny")
 df_interact = tibble::tibble(
     temperature = runif(n, 8, 32),
     weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
@@ -962,19 +944,18 @@ df_interact = tibble::tibble(
 ```{r, interaction}
 #| echo: false
 #| cache.vars: []
-#| fig.height: 4.8
-#| fig.width: 4.8
+#| fig.height: 4.5
+#| fig.width: 4.5
 lm_int = lm(beer_sales ~ temperature * weather, df_interact)
-df_pred = tidyr::crossing(temperature = seq(8, 32, 2), weather = factor(weather_levels, levels = weather_levels)) |>
-  modelr::add_predictions(lm_int, type = "response")
+df_aug = broom::augment(lm_int)
 
-ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
-  geom_line(data = df_pred, aes(y = pred, group = weather), alpha = 0.7, linewidth = 2) +
-  geom_point(alpha = 0.6, shape = 16, size = 3) +
-  scale_color_viridis_d(direction = -1, guide = guide_legend(title = NULL)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor = element_blank(),
-        legend.position = c(0.01, 0.99), legend.justification = c(0, 1))
+ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
+  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
+  scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
 ```
 
   </div>
@@ -988,7 +969,7 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
 ---
 ## 一般化線形モデル(GLM)ふりかえり
 
-確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
+確率分布・リンク関数を変えて柔軟にモデリングできる。\
 特定の組み合わせには名前がある。
 
 | 名前 | 確率分布 | リンク関数 | 説明変数 |
@@ -999,7 +980,7 @@ ggplot(df_interact) + aes(temperature, beer_sales, color = weather) +
 |分散分析|正規分布|恒等|質的変数|
 |共分散分析|正規分布|恒等|質的変数+量的変数|
 
-確率分布については[前章を参照](`r .meta$href_prev`)。<br>
+確率分布については[前章を参照](`r .meta$href_prev`)。\
 リンク関数をもう少しだけ掘り下げたい。
 
 
@@ -1014,12 +995,12 @@ $\operatorname{identity}(\mu_i)$
 
 $\log(\lambda_i)$
 : $\lambda_i = e^{\beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots} = e^{\beta_0} \times e^{\beta_1 x_{1i}} \times e^{\beta_2 x_{2i}} \times \ldots$
-: 説明変数の効果が**掛け算**的に働く。<br>
+: 説明変数の効果が**掛け算**的に働く。\
   e.g., $\Delta x_1$ 増えると $e^{\beta_1 \Delta x_{1}}$ 倍になる
 
 $\operatorname{logit}(p_i)$
 : $p_i = \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i + \ldots)}} $ (ロジスティック関数)
-: 説明変数の効果が**頭打ち**になる。<br>
+: 説明変数の効果が**頭打ち**になる。\
   e.g., $\lim_{x \to -\infty} p = 0;~\lim_{x \to \infty} p = 1$
 
 ほかに `probit`, `inverse`, `sqrt`, etc.
@@ -1036,7 +1017,7 @@ fit = glm(formula, data = df_weight)
 coef(fit)
 ```
 
-デフォルトは正規分布・恒等リンクで `lm` と同じ結果。<br>
+デフォルトは正規分布・恒等リンクで `lm` と同じ結果。\
 `family=` オプションで確率分布とリンク関数を明示的に指定:
 ```r
 glm(formula, family = gaussian(link = identity), data = mydata)
@@ -1050,7 +1031,7 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ---
 ## 🔰 とにかくGLMを使ってみる練習
 
-とりあえず当てはめと作図だけ。<br>
+とりあえず当てはめと作図だけ。\
 結果の解釈やモデルの評価はこの後。
 
 ```{r, generate-df-weight}
@@ -1063,15 +1044,15 @@ See [`?family`](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/famil
 ## 🔰 とにかくGLMを使ってみる練習 解答例
 
 ```{r, glm-df-weight}
-#| fig.width: 3.8
-#| fig.height: 3.8
+#| fig.width: 4
+#| fig.height: 4
 fit_wh = glm(weight ~ height, family = gaussian(link = identity), data = df_weight)
-coef(fit_wh)
-df_fit_wh = modelr::add_predictions(df_weight, fit_wh, type = "response")
+broom::tidy(fit_wh)
+df_fit_wh = broom::augment(fit_wh, type.predict = "response")
 ggplot(df_fit_wh) +
   aes(height, weight) +
   geom_point() +
-  geom_line(aes(y = pred), linewidth = 1, color = "#3366ff")
+  geom_line(aes(y = .fitted), linewidth = 1, color = "#3366ff")
 ```
 
 ---
@@ -1099,27 +1080,27 @@ ggplot(df_fit_wh) +
     - **負の値を取らない**ならガンマ分布
     - 直線的か、指数関数的か、頭打ちか、などなど
 
-客観的な指標もほしい。<br>
+客観的な指標もほしい。\
 モデルの尤もらしさといえば...
 
 
 ---
 ## <ruby>尤<rt>ゆう</rt>度</ruby> (likelihood)
 
-**あるモデル$M$の下でそのデータ$D$が観察される確率**:<br>
+**あるモデル$M$の下でそのデータ$D$が観察される確率**:\
 $\Pr(D \mid M)$
 
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
+データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:\
 $L(M \mid D)$
 
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:\
 $L(\theta \mid D)$ or $L(\theta)$
 
 **対数尤度** $\log L$ の形にしたほうがいろいろ便利。
 
 <hr>
 
-各モデルで最適なパラメータを探して、比較:<br>
+各モデルで最適なパラメータを探して、比較:\
 $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$
 
 ```{r, llf}
@@ -1141,29 +1122,29 @@ models = setNames(nm = c("gaussian", "poisson")) |> purrr::map(~{
 
 x_breaks = c(0.5, 1.0, 1.5)
 df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
-  modelr::add_predictions(models[["gaussian"]], type = "response") |>
-  dplyr::mutate(density = dnorm(num_seeds, pred, 1.4)) |>
+  broom::augment(models[["gaussian"]], type.predict = "response", newdata = _) |>
+  dplyr::mutate(density = dnorm(num_seeds, .fitted, 1.4)) |>
   dplyr::filter(density > 1e-4)
 
 p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 2, alpha = 0.5) +
   scale_x_continuous(breaks = x_breaks) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
 label = sprintf("logLik = %.1f", broom::glance(models[["gaussian"]])$logLik)
 p_lm = p_pois +
   labs(title = "gaussian, identity link") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass),
     data = df_lm, fill = "#56B4E9AA", linetype = 0)
 # p_lm
 
 df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
-  modelr::add_predictions(models[["poisson"]], type = "response") |>
-  dplyr::mutate(density = dpois(num_seeds, pred)) |>
+  broom::augment(models[["poisson"]], type.predict = "response", newdata = _) |>
+  dplyr::mutate(density = dpois(num_seeds, .fitted)) |>
   dplyr::filter(density > 1e-4)
 df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
 
@@ -1171,7 +1152,7 @@ label = sprintf("logLik = %.1f", broom::glance(models[["poisson"]])$logLik)
 p_poisson = p_pois +
   labs(title = "poisson, log link") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, color = "#3366ff", size = 8) +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass),
     data = df_bars, fill = "#56B4E9AA", linetype = 0)
 # p_poisson
@@ -1185,7 +1166,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 ## あてはまりが良ければいいってもんでもない
 
 過剰適合 / 過学習 / overfitting
-: パラメータを増やせば**現データへの**適合度・尤度を高くできるが、<br>
+: パラメータを増やせば**現データへの**適合度・尤度を高くできるが、\
   予測・理解の役には立たなくなる。
 
 ```{r, saturated-model}
@@ -1209,38 +1190,37 @@ models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(
 ))
 labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
 
-p_plant = df_plant |>
-  modelr::add_predictions(models$null, type = "response") |>
+p_plant = broom::augment(models$null, type.predict = "response", data = df_plant) |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = pred), color = "#3366ff", linewidth = 2, alpha = 0.7) +
-  geom_point(shape = 16, alpha = 0.6, size = 3) +
-  theme_bw(base_size = 20) +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.7) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
   labs(title = "null model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-           label = labels[["null"]], color = "#3366ff", size = 8)
-p_x = p_plant %+% modelr::add_predictions(df_plant, models$x, type = "response") +
+    label = labels[["null"]], color = "#3366ff", size = 8)
+p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-           label = labels[["x"]], color = "#3366ff", size = 8)
-p_saturated = p_plant %+% modelr::add_predictions(df_plant, models$saturated, type = "response") +
+    label = labels[["x"]], color = "#3366ff", size = 8)
+p_saturated = p_plant %+% broom::augment(models$saturated, type.predict = "response", data = df_plant) +
   labs(title = "saturated model") +
   annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2,
-           label = labels[["saturated"]], color = "#3366ff", size = 8)
+    label = labels[["saturated"]], color = "#3366ff", size = 8)
 
 cowplot::plot_grid(p_null, p_x, p_saturated, nrow = 1L)
 ```
 
-**帰無モデル**: 説明変数なし。切片のみ。<br>
+**帰無モデル**: 説明変数なし。切片のみ。\
 **飽和モデル**: データ点の数 ≤ パラメータの数。“データ読み上げ”的モデル
 
 
 ---
 ## 無駄な説明変数を加えても尤度は上がる
 
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
 観察時に着てた服の色 $x_2$ を追加すると尤度が上がる......?
 
 ```{r, many-models}
@@ -1268,28 +1248,28 @@ models = df_plant |> modelr::fit_with(glm, family = "poisson", modelr::formulas(
 labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), names(models))
 
 p_plant = df_plant |>
-  modelr::add_predictions(models$null, type = "response") |>
+  broom::augment(models$null, data = _, type.predict = "response") |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = pred), linewidth = 1.5, alpha = 0.6) +
-  geom_point(shape = 16, alpha = 0.6) +
-  annotate("point", x = 9, y = 16, alpha = 0) +
-  theme_bw(base_size = 19) +
+  geom_line(aes(y = .fitted), linewidth = 1.6, alpha = 0.6) +
+  geom_point(shape = 16, size = 2, alpha = 0.6) +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.30))) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
   labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["null"]], color = "#3366ff", size = 7)
-p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x, type = "response")) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["null"]], color = "#3366ff", size = 7)
+p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x"]], color = "#3366ff", size = 7)
-p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2, type = "response")) %+%
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["x"]], color = "#3366ff", size = 7)
+p_x2 = p_plant %+% broom::augment(models$x2, type.predict = "response", data = df_plant) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x2"]], color = "#3366ff", size = 7)
-p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both, type = "response")) %+%
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["x2"]], color = "#3366ff", size = 7)
+p_both = p_plant %+% broom::augment(models$both, type.predict = "response") %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["both"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.5, label = labels[["both"]], color = "#3366ff", size = 7)
 
 cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ```
@@ -1307,9 +1287,9 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
     - 尤度は上げたい。
     - パラメータ数 $k$ が増えるとペナルティ。
 - どのデータに対する当てはまりを目指すかという観点
-    - 「手元のデータ」に対する対数尤度は $\log L^*$<br>
-    - 「真のメカニズムから出てくる未来のデータ」に対する<br>
-      平均対数尤度の推定量は $(\log L^* - k)$<br>
+    - 「手元のデータ」に対する対数尤度は $\log L^*$
+    - 「真のメカニズムから出てくる未来のデータ」に対する\
+      平均対数尤度の推定量は $(\log L^* - k)$\
       (Kullback--Leibler情報量を使って導出するらしい)
 
 
@@ -1324,7 +1304,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ---
 ## 無駄な説明変数の追加でAIC増加
 
-ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
+ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
 観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
 
 ```{r, many-models-aic}
@@ -1334,18 +1314,18 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 labels = setNames(sprintf("AIC = %.1f", purrr::map_dbl(models, AIC)), names(models))
 p_null = p_plant +
   labs(title = "null model") +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["null"]], color = "#3366ff", size = 7)
-p_x = p_plant %+% (df_plant |> modelr::add_predictions(models$x, type = "response")) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["null"]], color = "#3366ff", size = 7)
+p_x = p_plant %+% broom::augment(models$x, type.predict = "response") +
   labs(title = expression(y %~% beta[0] + beta[1] * x)) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x"]], color = "#3366ff", size = 7)
-p_x2 = p_plant %+% (df_plant |> modelr::add_predictions(models$x2, type = "response")) %+%
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x"]], color = "#3366ff", size = 7)
+p_x2 = p_plant %+% broom::augment(models$x2, type.predict = "response", data = df_plant) %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["x2"]], color = "#3366ff", size = 7)
-p_both = p_plant %+% (df_plant |> modelr::add_predictions(models$both, type = "response")) %+%
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["x2"]], color = "#3366ff", size = 7)
+p_both = p_plant %+% broom::augment(models$both, type.predict = "response") %+%
   aes(color = x2, group = x2) +
   labs(title = expression(y %~% beta[0] + beta[1] * x + beta[2] * x[2])) +
-  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 1.4, label = labels[["both"]], color = "#3366ff", size = 7)
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = labels[["both"]], color = "#3366ff", size = 7)
 cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ```
 
@@ -1354,13 +1334,13 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 
 - $\text{BIC} = -2 \log L^* + k \log n$
     - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
-    - データの観測数 $n$ に依存する点でAICと異なる。<br>
+    - データの観測数 $n$ に依存する点でAICと異なる。\
       感覚としては「AICはデータサイズによるペナルティが無い」
     - (周辺尤度の最大化という観点で導出するらしい)
-- [WAIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
-  [WBIC](http://watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
+- [WAIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
+  [WBIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
     - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
+    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。\
       そうじゃない場合(現実的には常に)こちらが優位。
     - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
 
@@ -1368,13 +1348,13 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ---
 ## モデル選択の心構え
 
-「正しい」ものを選べるわけではない。<br>
+「正しい」ものを選べるわけではない。\
 予測・理解に useful なものを何らかの基準で選ぶだけ。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="960"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="960">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -1382,12 +1362,14 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ---
 ## 現実的な注意点・悩みどころ
 
-- 多重共線性(multicollinearity):
-    - 説明変数同士が強い相関関係にある
+- **多重共線性**(multicollinearity):
+  - 説明変数同士が強い相関関係にあるとマズいので予め取り除く。
 - 変数変換:
-    - 気安くやるべきじゃないけど、対数変換などしばしば有用
-    - 割り算した値は危険
-- 交互作用を入れると解釈が難しくなる。
+  - 気安くやるべきじゃない。でも対数変換などはしばしば有用。
+  - **割り算はなるべく避ける**。二項分布やオフセット項を検討。
+    - 誤差のある観測値同士を割った値、その確率分布は扱いにくい。
+    - 情報が失われる:「5打数2安打」と「500打数200安打」
+- **交互作用**を入れると解釈が難しくなる。
 
 
 ---
@@ -1410,21 +1392,21 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 </a>
 </figure>
 
-久保先生の"緑本"こと<br>
-「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
+久保先生の"緑本"こと\
+「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」\
 をベースに回帰分析の概要を紹介。
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな**確率分布**を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな**確率分布**を扱いたい</span>
 
 **一般化線形モデル GLM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span>
 
 **一般化線形混合モデル GLMM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
 
 **階層ベイズモデル HBM**
 
@@ -1432,8 +1414,8 @@ cowplot::plot_grid(p_null, p_x, p_x2, p_both, nrow = 2L)
 ---
 ## n個のうちy個生存。二項分布に従......わない！
 
-植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。\
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、\
 極端な値(全部死亡、全部生存)が多かった。個体差？
 
 ```{r, df-seeds-od}
@@ -1470,8 +1452,8 @@ ggplot(tidy_od) +
 ---
 ## 個体差をモデルに組み込みたい
 
-各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。<br>
-「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。\
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。\
 i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
 
 ```{r, saturated-glmm}
@@ -1494,7 +1476,7 @@ df_seeds_od |>
 ---
 ## 個体差をモデルに組み込みたい
 
-各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。\
 その能力値は全個体共通の正規分布に従うと仮定:
 $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
@@ -1696,7 +1678,7 @@ df_beer_od_exp = tibble::tibble(
 )
 ```
 
-お客さんたちが注文したビールの杯数X。平均`r lambda_obs`杯。<br>
+お客さんたちが注文したビールの杯数X。平均`r lambda_obs`杯。\
 はいはい、<span style="color: #56B4E9;">ポアソン分布</span>でしょ......
 いや、分散が大きいぞ。
 
@@ -1717,7 +1699,7 @@ df_beer_od |>
   )
 ```
 
-全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。<br>
+全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。
 
 🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。
 
@@ -1753,14 +1735,14 @@ ggplot(df) +
 
 失敗回数ではなく試行回数を変数とする定義もある。
 
-平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。\
 ($k \to \infty$でポアソン分布と一致)
 
 ---
 ## 一般化線形混合モデル GLMM
 
-**固定効果(fixed effects)** のみ扱っていたGLMを拡張して、<br>
-**変量効果(random effect)** を混合したモデル。<br>
+**固定効果(fixed effects)** のみ扱っていたGLMを拡張して、\
+**変量効果(random effect)** を混合したモデル。\
 <small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small>
 
 <p>\[\begin{split}
@@ -1770,9 +1752,9 @@ y_i &\sim \text{Binomial}(n,~p_i) \\
 z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
 \end{split}\]</p>
 
-e.g.,<br>
-個体$i$の種子生存率$p_i$は、<br>
-(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
+e.g.,\
+個体$i$の種子生存率$p_i$は、\
+(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、\
 (変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。
 
 ---
@@ -1785,17 +1767,17 @@ e.g.,<br>
 : - 観測・操作したカテゴリカル変数: 性別、投薬、etc.
 
 予測に使えないので変量効果向き
-: - 観測・操作できなかった個体差:<br>
-    たまたま集まってくれた学生15人 {A, B, C, ...}。<br>
+: - 観測・操作できなかった個体差:\
+    たまたま集まってくれた学生15人 {A, B, C, ...}。\
     Aさんの固定効果を推定できても、Zさんの予測には使えない。
-: - 観測・操作できなかったグループ差:<br>
-    ↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
+: - 観測・操作できなかったグループ差:\
+    ↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。\
     いグループの固定効果を推定できても、また集まることはない。
 
 ---
 ## どういうときに変量効果を考える必要があるか
 
-データに**擬似反復**が含まれるとき。<br>
+データに**擬似反復**が含まれるとき。\
 ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。
 
 | 植木鉢 | 個体/植木鉢 | 種子/個体 | 疑似反復 | 推定不可 |
@@ -1805,8 +1787,8 @@ e.g.,<br>
 | 20個   | 5個体ずつ   | 1個ずつ   | 植木鉢 | 個体差 |
 | 5個    | 5個体ずつ   | 4個ずつ   | 植木鉢・個体 | – |
 
-疑似反復あり<br>
-→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
+疑似反復あり\
+→ 観測できなかった個体差・場所差(変量効果)を推定可能\
 → そのぶんを差し引いて固定効果を推定したい
 
 
@@ -1897,8 +1879,8 @@ dim(penguins_dropna)
 ---
 ## 🔰 penguinsでGLMの練習
 
-次の課題を解いてみよう。<br>
-(次ページ以降に解答。まずは自力で。)
+次の課題を解いてみよう。\
+(次ページ以降に解答があるけど、まずは自力で。)
 
 1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
 1. 単回帰して、切片と傾きを求める。そして作図。
@@ -1917,8 +1899,8 @@ dim(penguins_dropna)
 #| fig.width: 4.5
 p_penweight = ggplot(penguins_dropna) +
   aes(body_mass_g, flipper_length_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
-  theme_bw(base_size = 20) +
+  geom_point(shape = 16, size = 2, alpha = 0.66) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 p_penweight
 ```
@@ -1944,9 +1926,9 @@ broom::glance(fit1)
 ```{r, penguins-weight-glm}
 #| fig.height: 5
 #| fig.width: 5
-added1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
+aug1 = broom::augment(fit1, type.predict = "response")
 p1 = p_penweight +
-  geom_line(aes(y = pred), data = added1, linewidth = 1, color = "#3366ff")
+  geom_line(aes(y = .fitted), data = aug1, linewidth = 1, color = "#3366ff")
 p1
 ```
 
@@ -1967,7 +1949,7 @@ p_penweight_color
 ---
 ## 重回帰の練習: 2. モデル作成、フィッティング
 
-Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
+Adelieを基準に、ChinstrapとGentooはそれより長め。\
 体重の効果は単回帰のとき(0.0153)より小さい。
 
 ```{r, penguins-fit2}
@@ -1982,9 +1964,9 @@ broom::glance(fit2)
 ```{r, penguins-weight-sp-glm}
 #| fig.height: 5
 #| fig.width: 7
-added2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
+aug2 = broom::augment(fit2, type.predict = "response")
 p2 = p_penweight_color +
-  geom_line(aes(y = pred), data = added2, linewidth = 1)
+  geom_line(aes(y = .fitted), data = aug2, linewidth = 1)
 p2
 ```
 
@@ -1994,7 +1976,7 @@ p2
 ---
 ## 交互作用の練習: モデル作成、フィッティング
 
-Adelieを基準に、Chinstrapの傾きが結構違う。<br>
+Adelieを基準に、Chinstrapの傾きが結構違う。\
 切片の違いは解釈しにくくなった。
 
 ```{r, penguins-fit3}
@@ -2009,16 +1991,16 @@ broom::glance(fit3)
 ```{r, penguins-interaction}
 #| fig.height: 5
 #| fig.width: 7
-added3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
+aug3 = broom::augment(fit3, type.predict = "response")
 p3 = p_penweight_color +
-  geom_line(aes(y = pred), data = added3, linewidth = 1)
+  geom_line(aes(y = .fitted), data = aug3, linewidth = 1)
 p3
 ```
 
 ---
 ## ここまでの3つのモデルでどれがいいか？
 
-AICで選ぶなら交互作用入り重回帰が良さそう。
+AICで選ぶなら交互作用入り重回帰が良さそう → 傾きが種によって違う。
 
 ```{r, penguins-aic}
 #| fig.height: 4
@@ -2042,20 +2024,20 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| cache.vars: [p_bill]
 p_bill = penguins_dropna |>
   ggplot() + aes(bill_length_mm, bill_depth_mm) +
-  geom_point(shape = 16, alpha = 0.66) +
+  geom_point(shape = 16, size = 2, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
 fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
 fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
 fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
-d1 = modelr::add_predictions(penguins_dropna, fit1, type = "response")
-d2 = modelr::add_predictions(penguins_dropna, fit2, type = "response")
-d3 = modelr::add_predictions(penguins_dropna, fit3, type = "response")
-p1 = p_bill + geom_line(aes(y = pred), d1, linewidth = 1, color = "#3366ff")
-p2 = p_bill + aes(color = species) + geom_line(aes(y = pred), d2, linewidth = 1)
-p3 = p_bill + aes(color = species) + geom_line(aes(y = pred), d3, linewidth = 1)
+d1 = broom::augment(fit1, type.predict = "response")
+d2 = broom::augment(fit2, type.predict = "response")
+d3 = broom::augment(fit3, type.predict = "response")
+p1 = p_bill + geom_line(aes(y = .fitted), d1, linewidth = 1, color = "#3366ff")
+p2 = p_bill + aes(color = species) + geom_line(aes(y = .fitted), d2, linewidth = 1)
+p3 = p_bill + aes(color = species) + geom_line(aes(y = .fitted), d3, linewidth = 1)
 labels = sprintf("AIC = %.1f", AIC(fit1, fit2, fit3)$AIC)
 cowplot::plot_grid(p1 + labs(title = labels[1]),
                    p2 + labs(title = labels[2]) + theme(legend.position = "none"),
@@ -2068,8 +2050,8 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
 broom::tidy(fit4)
 broom::glance(fit4)
-added4 = modelr::add_predictions(penguins, fit4)
-p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
+aug4 = broom::augment(fit4, type.predict = "response")
+p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
   scale_color_discrete()
 ```
 
@@ -2077,7 +2059,7 @@ p_bill + geom_line(aes(y = pred, color = sex), data = added4, linewidth = 1) +
 ---
 ## 🔰 重回帰
 
-`pred` で回帰線を引くには `add_predictions()` の使い方に工夫が必要。<br>
+均等に回帰線を引くには `broom::augment()` の使い方に工夫が必要。\
 とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
 
 ```{r, generate-df-beer}

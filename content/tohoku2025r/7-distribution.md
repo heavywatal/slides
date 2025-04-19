@@ -335,16 +335,16 @@ e.g., サイコロを12回投げた結果、学生1000人の身長
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
   <img src="../tohoku2025r/image/hist-income-japan-2022.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2022</cite></figcaption>
   </a>
   </div>
 </div>
 
-目的や状況に応じて使い分けよう。
-
 外れ値に対する応答
 : もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら\
   → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+目的や状況に応じて使い分けよう。
 
 ---
 ## ばらつきを捉える記述統計量

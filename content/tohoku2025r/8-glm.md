@@ -128,7 +128,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
   <div class="column" style="flex-shrink: 1.0;">
 
 <figure style="margin-block: 1rem;">
-<img src="../iwate2023stats/glm.drawio.svg" width="640"><br>
+<img src="../iwate2023stats/glm.drawio.svg" width="640">
 </figure>
 
   </div>
@@ -632,13 +632,13 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 - $\text{BIC} = -2 \log L^* + k \log n$
     - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
-    - データの観測数 $n$ に依存する点でAICと異なる。<br>
+    - データの観測数 $n$ に依存する点でAICと異なる。\
       感覚としては「AICはデータサイズによるペナルティが無い」
     - (周辺尤度の最大化という観点で導出するらしい)
 - [WAIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
   [WBIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
     - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
+    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。\
       そうじゃない場合(現実的には常に)こちらが優位。
     - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
 
