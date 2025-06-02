@@ -13,11 +13,11 @@ draft = false
 -   Website: <https://heavywatal.github.io/slides/english2023r/><br>
     Links to the slides are [at the bottom](<javascript:document.getElementById('slides').scrollIntoView({behavior: 'smooth'});>):
 -   Abstract:<br>
-    Biological research is, roughly speaking, to collect data from organisms and decipher the rule behind them.
+    Biological research is, roughly speaking, about collecting data from organisms and deciphering the rules behind them.
     Data analysis and visualization are therefore essential skills for any researcher in this field.
-    But don't even think about manual works in Excel because they are cumbersome, error-prone, and above all, unreproducible.
-    Let machines do repetitive and boring tasks.
-    Here, we learn how to use R language/environment effectively to prepare and analyze data.
+    But don't even think about doing manual work in Excel because it is cumbersome, error-prone, and above all, unreproducible.
+    Let machines handle repetitive and boring tasks.
+    Here, we learn how to use the R language/environment effectively to prepare and analyze data.
 -   Prerequisite
     - Basic computer skills: browsing webpages, handling files and folders, etc.
     - Preparation of computing environment (described later)
