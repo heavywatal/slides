@@ -44,7 +44,7 @@ draft = false
     - <iconify-icon icon="mdi:microsoft"></iconify-icon>
       Windows 11 (≥24H2)
     - <iconify-icon icon="mdi:apple"></iconify-icon>
-      macOS Sequoia (≥15.4)
+      macOS Sequoia (≥15.5)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
 1.  <https://cran.r-project.org/>
     から最新版の **R本体 (≥ 4.5.0)** をダウンロードしてインストール。
