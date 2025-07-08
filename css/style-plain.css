@@ -1,39 +1,365 @@
 :root {
-  --serif: "Palatino Linotype", Palatino, serif;
-  --sans-serif: "Segoe UI", "Segoe UI Emoji", "Segoe UI Symbol", "Yu Gothic Medium", system-ui, "Apple Color Emoji", "HiraginoSans", sans-serif;
-  --monospace: Menlo, Consolas, "DejaVu Sans Mono", "Yu Gothic Medium", monospace;
-  --main-font-family: var(--sans-serif);
-  --heading-font-family: var(--sans-serif);
-  --background-color: #eee;
-  --foreground-color: #fff;
-  --main-color: #444;
-  --heading-color: var(--main-color);
+  --background-color: hsl(220deg 0% 75% / 25%);
+  --canvas: #fff;
+  --canvas-text: hsl(220deg 0% 27%);
+  --link-text: hsl(220deg 100% 27%);
+}
+
+:root {
+  --serif: "Palatino", "Palatino Linotype", serif;
+  --sans-serif: "Segoe UI", "Yu Gothic-", system-ui, "Hiragino Sans-", sans-serif;
+  --monospace: "Menlo", "Consolas", "Hiragino Sans", "Yu Gothic-", monospace;
 }
 
 @font-face {
-  font-family: "Yu Gothic Medium";
+  font-family: "Hiragino Sans-";
+  font-weight: 100;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W0"), local("Hiragino Sans W0");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 200;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W1"), local("Hiragino Sans W1");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 300;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W2"), local("Hiragino Sans W2");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 400;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W3"), local("Hiragino Sans W3");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 500;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W4"), local("Hiragino Sans W4");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 600;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W5"), local("Hiragino Sans W5");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 700;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W6"), local("Hiragino Sans W6");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 800;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W7"), local("Hiragino Sans W7");
+}
+@font-face {
+  font-family: "Hiragino Sans-";
+  font-weight: 900;
+  size-adjust: 92.3%;
+  src: local("HiraginoSans-W8"), local("Hiragino Sans W8");
+}
+@font-face {
+  font-family: "Yu Gothic-";
+  font-weight: 100;
+  size-adjust: 92.3%;
+  src: local("Yu Gothic Light");
+}
+@font-face {
+  font-family: "Yu Gothic-";
+  font-weight: 200;
+  size-adjust: 92.3%;
+  src: local("Yu Gothic Regular");
+}
+@font-face {
+  font-family: "Yu Gothic-";
+  font-weight: 400;
+  size-adjust: 92.3%;
   src: local("Yu Gothic Medium");
-  font-weight: normal;
-  size-adjust: 92.3%;
 }
 @font-face {
-  font-family: "Yu Gothic Medium";
+  font-family: "Yu Gothic-";
+  font-weight: 700;
+  size-adjust: 92.3%;
   src: local("Yu Gothic Bold");
+}
+blockquote {
+  overflow: auto;
+  border-inline-start: 0.2em solid hsla(0, 0%, 55%, 0.55);
+  margin: 1em 0;
+  padding-inline: 1em;
+}
+blockquote p {
+  margin: 0.5em 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+html {
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--canvas-text);
+  font-family: var(--sans-serif);
+}
+
+a {
+  color: var(--link-text);
+  text-decoration: none;
+}
+a:hover {
+  color: hsl(from var(--link-text) h calc(1.5 * s) l);
+  text-decoration: underline;
+}
+
+ul, ol {
+  padding-inline-start: 1.8em;
+  margin-block: 0.5em;
+}
+li ul, li ol {
+  margin-block: 0;
+}
+
+ul:has(li > input[type=checkbox]) {
+  list-style-type: none;
+  padding-inline-start: 0.3em;
+}
+ul:has(li > input[type=checkbox]) ul {
+  padding-inline-start: 1.8em;
+}
+
+li {
+  margin-block: 0.25em;
+}
+li li, li p {
+  margin-block: 0.2em;
+}
+
+dl {
+  margin-block: 0.5em;
+}
+
+dt {
   font-weight: bold;
-  size-adjust: 92.3%;
+  margin-block: 0.5em 0;
 }
-@font-face {
-  font-family: "HiraginoSans";
-  src: local("HiraginoSans-W3");
-  font-weight: normal;
-  size-adjust: 92.3%;
+
+dd {
+  margin-block: 0.1em;
+  margin-inline-start: 1em;
+  position: relative;
 }
-@font-face {
-  font-family: "HiraginoSans";
-  src: local("HiraginoSans-W6");
+dd p {
+  margin-block: 0.1em;
+}
+dd::before {
+  content: ":";
+  position: absolute;
+  left: -0.9em;
+  opacity: 0.3;
+}
+
+code, pre {
+  font-family: var(--monospace);
+}
+
+:not(pre) > code {
+  font-size: 0.85em;
+  padding: 0.1em 0.2em;
+  background-color: hsla(0, 0%, 60%, 0.1);
+}
+
+pre {
+  font-size: 0.85em;
+  background-color: hsla(0, 0%, 73%, 0.25);
+  padding: 0.375rem 0.5rem;
+  margin-block: 0.3rem;
+  overflow-x: auto;
+}
+pre.chroma {
+  background-color: hsla(0, 0%, 73%, 0.04);
+  box-shadow: inset 0 0 0.4rem hsla(0, 0%, 73%, 0.25);
+}
+.highlight:has(+ pre) > pre {
+  margin-block-end: 0;
+}
+.highlight + pre {
+  margin-block-start: 0;
+  opacity: 0.9;
+}
+
+blockquote {
+  padding-inline-start: 2.4em;
+}
+blockquote::before {
+  content: "“";
+  color: hsla(0, 0%, 55%, 0.55);
+  font-family: serif;
+  font-size: 2em;
+  margin: 0 -1.6rem -4rem;
+  float: left;
+}
+
+table {
+  border-spacing: 1em 0.4em;
+  border-block: 0.05em solid hsla(0, 0%, 55%, 0.55);
+}
+
+th {
+  padding-bottom: 0.3em;
+  border-bottom: 0.1em solid hsla(0, 0%, 55%, 0.55);
+  text-align: start;
+}
+
+kbd {
+  font-family: var(--sans-serif);
+  display: inline-block;
+  vertical-align: middle;
+  font-size: 0.75em;
+  padding: 0.04em 0.24em;
+  margin: -0.16em 0.08em 0 0.04em;
+  box-shadow: 0.04em 0.06em 0.1em var(--canvas-text);
+  border: solid 0.06em hsla(0, 0%, 55%, 0.55);
+  border-radius: 0.18em;
+}
+
+h1,
+h2,
+h3 {
   font-weight: bold;
-  size-adjust: 92.3%;
 }
+
+p {
+  margin-block: 0.7em;
+}
+
+ol {
+  padding-inline-start: 1.5em;
+}
+
+ul {
+  padding-inline-start: 1.3em;
+}
+
+li {
+  margin-block: 0.5em;
+}
+li li, li p {
+  margin-block: 0.4em;
+}
+
+cite {
+  color: #777;
+  font-size: 0.7rem;
+}
+cite a {
+  color: inherit;
+}
+
+figure {
+  display: inline-block;
+  margin: 1rem 0;
+  line-height: 1;
+}
+
+figcaption {
+  text-align: right;
+}
+
+em {
+  font-style: italic;
+}
+
+pre {
+  font-size: 0.78em;
+  line-height: 1.35;
+}
+pre.chroma {
+  line-height: 1.4;
+}
+
+aside {
+  opacity: 0.5;
+}
+
+h1 {
+  font-size: 1.4rem;
+  margin: 0 -1.6rem;
+  padding: 0.8rem 0.8rem;
+  border-inline-start: 0.8rem solid #aaa;
+}
+
+h2 {
+  font-size: 1.4rem;
+  margin: 0 -1.6rem;
+  padding: 0.4rem 0.8rem;
+  border-inline-start: 0.8rem solid #ccc;
+}
+
+h3 {
+  font-size: 1.3rem;
+  margin: 1.2rem 0;
+}
+
+.bubble {
+  position: relative;
+  font-size: 0.92em;
+  padding: 0.2em 0.4em;
+  border-radius: 0.2em;
+  background: rgba(153, 153, 153, 0.4);
+}
+.bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -0.5em;
+  height: 0.5em;
+  aspect-ratio: 1;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+  background: rgba(153, 153, 153, 0.4);
+}
+.bubble[class~=flipY]::after {
+  bottom: unset;
+  top: -0.5em;
+  transform: scaleY(-1);
+}
+.bubble[class~=flipX]::after {
+  transform: translateX(-0.5em) scaleX(-1);
+}
+.bubble[class~=left20]::after {
+  left: 20%;
+}
+.bubble[class~=left30]::after {
+  left: 30%;
+}
+.bubble[class~=left40]::after {
+  left: 40%;
+}
+.bubble[class~=left60]::after {
+  left: 60%;
+}
+.bubble[class~=left70]::after {
+  left: 70%;
+}
+.bubble[class~=left80]::after {
+  left: 80%;
+}
+
 .chroma {
   /* Keyword */
   /* Constant, Type, NameSpace */
@@ -183,245 +509,8 @@
   border-spacing: 0;
 }
 
-body {
-  background-color: var(--background-color);
-}
-
-a {
-  color: #0042ab;
-  text-decoration: none;
-}
-a:hover {
-  opacity: 0.86;
-  text-decoration: underline;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--heading-font-family);
-  font-weight: bold;
-  color: var(--heading-color);
-}
-
-p {
-  margin: 0.7rem 0;
-}
-
-ol {
-  margin: 0.7rem 0;
-  padding-inline-start: 1.5rem;
-}
-
-ul {
-  margin: 0.7rem 0;
-  padding-inline-start: 1.3rem;
-}
-ul.task-list {
-  list-style-type: none;
-  padding-inline-start: 0;
-}
-ul.task-list ul.task-list {
-  padding-inline-start: 1rem;
-}
-
-li {
-  margin-block: 0.5rem;
-}
-li ul {
-  margin: 0;
-}
-li li {
-  margin-block: 0.4rem;
-}
-li p {
-  margin-block: 0.4em;
-}
-
-dl {
-  margin: 0.7rem 0;
-}
-dl dt {
-  font-weight: bold;
-  margin-block-start: 0.6rem;
-}
-dl dd {
-  margin-block: 0.3em;
-  margin-inline: 1em 0;
-  line-height: 1.3em;
-  position: relative;
-}
-dl dd p {
-  margin-block: 0.3em;
-}
-dl dd::before {
-  content: ":";
-  color: #ccc;
-  position: absolute;
-  left: -0.8em;
-}
-
-blockquote {
-  font-style: italic;
-  margin: 1em 0.1em;
-  padding: 0.2em 1.4em 0.1em;
-  border-inline-start: solid 0.2em #ccc;
-  position: relative;
-}
-blockquote::before {
-  content: "“";
-  position: absolute;
-  top: -0.3rem;
-  left: 0.3rem;
-  font-size: 2.4rem;
-  font-family: var(--serif);
-  color: #999;
-}
-
-table {
-  border-spacing: 1em 1ex;
-}
-table thead th {
-  border-bottom: 0.05rem solid var(--main-color);
-}
-
-cite {
-  color: #777;
-  font-size: 0.7rem;
-}
-cite a {
-  color: inherit;
-}
-
-figure {
-  display: inline-block;
-  margin: 1rem 0;
-  line-height: 1;
-}
-
-figcaption {
-  text-align: right;
-}
-
-em {
-  font-style: italic;
-}
-
-code,
-pre {
-  font-family: var(--monospace);
-}
-
-:not(pre) > code {
-  font-size: 0.85em;
-  padding: 0.08rem 0.16rem;
-  background-color: rgba(153, 153, 153, 0.0941176471);
-}
-
-pre {
-  background-color: rgba(153, 153, 153, 0.1333333333);
-  padding: 0.375rem 0.5rem;
-  margin-block: 0.3rem;
-  font-size: 0.78rem;
-  line-height: 1.35;
-  overflow-x: auto;
-}
-pre.chroma {
-  line-height: 1.4;
-  box-shadow: inset 0 0 0.3rem rgba(153, 153, 153, 0.2);
-  background-color: rgba(153, 153, 153, 0.0235294118);
-}
-
-.highlight:has(+ pre) > pre {
-  margin-block-end: 0;
-}
-
-.highlight + pre {
-  margin-block-start: 0;
-  opacity: 0.9;
-}
-
-kbd {
-  font-family: var(--sans-serif);
-  display: inline-block;
-  vertical-align: middle;
-  font-size: 0.75rem;
-  padding: 0.04rem 0.16rem;
-  margin: -0.16rem 0.08rem 0 0;
-  box-shadow: 0.04rem 0.04rem 0.04rem #808080;
-  border: solid 0.04rem #ccc;
-  border-radius: 0.12rem;
-}
-
-aside {
-  opacity: 0.5;
-}
-
-h1 {
-  font-size: 1.4rem;
-  margin: 0 -1.6rem;
-  padding: 0.8rem 0.8rem;
-  border-inline-start: 0.8rem solid #aaa;
-}
-
-h2 {
-  font-size: 1.4rem;
-  margin: 0 -1.6rem;
-  padding: 0.4rem 0.8rem;
-  border-inline-start: 0.8rem solid #ccc;
-}
-
-h3 {
-  font-size: 1.3rem;
-  margin: 1.2rem 0;
-}
-
-.bubble {
-  position: relative;
-  font-size: 0.92em;
-  padding: 0.2em 0.4em;
-  border-radius: 0.2em;
-  background: rgba(153, 153, 153, 0.4);
-}
-.bubble::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: -0.5em;
-  height: 0.5em;
-  aspect-ratio: 1;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-  background: rgba(153, 153, 153, 0.4);
-}
-.bubble[class~=flipY]::after {
-  bottom: unset;
-  top: -0.5em;
-  transform: scaleY(-1);
-}
-.bubble[class~=flipX]::after {
-  transform: translateX(-0.5em) scaleX(-1);
-}
-.bubble[class~=left20]::after {
-  left: 20%;
-}
-.bubble[class~=left30]::after {
-  left: 30%;
-}
-.bubble[class~=left40]::after {
-  left: 40%;
-}
-.bubble[class~=left60]::after {
-  left: 60%;
-}
-.bubble[class~=left70]::after {
-  left: 70%;
-}
-.bubble[class~=left80]::after {
-  left: 80%;
-}
-
 section:first-of-type h1 a {
-  color: var(--heading-color);
+  color: var(--canvas-text);
 }
 section:first-of-type ol li {
   margin-block: 0;
@@ -467,7 +556,7 @@ section:first-of-type ol li {
   position: relative;
 }
 .readmore:hover {
-  background-color: var(--main-color);
+  background-color: var(--canvas-text);
   text-decoration: none;
 }
 .readmore::after {
@@ -492,24 +581,18 @@ section:first-of-type ol li {
   flex: 1 1 100%;
 }
 
-* {
-  box-sizing: border-box;
-}
-
 html,
 body {
   height: 100%;
 }
 
 body {
-  color: var(--main-color);
   margin: 0;
   line-height: 1.4;
-  font-family: var(--main-font-family);
 }
 
 main {
-  background-color: var(--foreground-color);
+  background-color: var(--canvas);
   box-shadow: 0 0 12px #999;
   max-width: 720px;
   min-height: 100%;
