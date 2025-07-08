@@ -656,9 +656,9 @@ $\;\propto\;$
 実行の前後にRを再起動してまっさらにすることを推奨。
 
 1. C++言語を扱うためのツールを用意。
-    - <iconify-icon icon="mdi:apple"></iconify-icon>
+    - <iconify-icon inline icon="bi:apple"></iconify-icon>
       macOS: Command Line Tools (`xcode-select --install`)
-    - <iconify-icon icon="mdi:microsoft"></iconify-icon>
+    - <iconify-icon inline icon="bi:windows"></iconify-icon>
       Windows: [RTools](https://cran.r-project.org/bin/windows/Rtools/)
       (Rのバージョンに合わせる)
 1. [CmdStanR](https://mc-stan.org/cmdstanr/)パッケージをインストール。

@@ -41,18 +41,18 @@ draft = false
 コピーアンドペーストでコードを実行しながら受講することができます。
 
 1.  OSのソフトウェア・アップデートを基本的に全て適用して再起動。
-    - <iconify-icon icon="mdi:microsoft"></iconify-icon>
+    - <iconify-icon inline icon="bi:windows"></iconify-icon>
       Windows 11 (≥23H2)
-    - <iconify-icon icon="mdi:apple"></iconify-icon>
+    - <iconify-icon inline icon="bi:apple"></iconify-icon>
       macOS Sonoma (≥14.5)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
 1.  <https://cran.r-project.org/>
     から最新版の **R本体(≥ 4.4.1)** をダウンロードしてインストール。
     OK連打のデフォルト設定で。
     古いものが既に入っている場合は念のため削除してから。
-    - <iconify-icon icon="mdi:microsoft"></iconify-icon>
+    - <iconify-icon inline icon="bi:windows"></iconify-icon>
       [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.*.*-win.exe`
-    - <iconify-icon icon="mdi:apple"></iconify-icon>
+    - <iconify-icon inline icon="bi:apple"></iconify-icon>
       [Mac](https://cran.r-project.org/bin/macosx/)
       → `R-4.*.*-arm64.pkg` (Apple Silicon) or `R-4.*.*.pkg` (Intel)
 1.  <https://posit.co/download/rstudio-desktop/>
@@ -60,10 +60,10 @@ draft = false
     古いものが既に入っている場合は念のため削除してから。
 1.  開発者ツールをインストール。
     ここでは必須ではないけどいずれ使うことになる。
-    - <iconify-icon icon="mdi:microsoft"></iconify-icon>
+    - <iconify-icon inline icon="bi:windows"></iconify-icon>
       Windows: [**Rtools**](https://cran.r-project.org/bin/windows/Rtools/)
       (R本体のバージョンに合わせる)
-    - <iconify-icon icon="mdi:apple"></iconify-icon>
+    - <iconify-icon inline icon="bi:apple"></iconify-icon>
       Mac: [**Command Line Tools**](https://duckduckgo.com/?q=command+line+tools):
       ターミナルで `xcode-select --install` を実行。
       Xcode環境は不要。

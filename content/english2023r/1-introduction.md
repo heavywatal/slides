@@ -462,7 +462,7 @@ Just repeat forgetting and searching.
 ---
 ## Keyboard shortcuts
 
-Action | <iconify-icon icon="mdi:apple"></iconify-icon> Mac | <iconify-icon icon="mdi:microsoft"></iconify-icon> Windows
+Action | <iconify-icon inline icon="bi:apple"></iconify-icon> Mac | <iconify-icon inline icon="bi:windows"></iconify-icon> Windows
 ------ | ------- | ----
 Switch apps | <kbd>command</kbd><kbd>tab</kbd> | <kbd>alt</kbd><kbd>tab</kbd>
 Quit apps | <kbd>command</kbd><kbd>q</kbd>     | <kbd>alt</kbd><kbd>F4</kbd>
@@ -503,8 +503,8 @@ See https://support.apple.com/HT201236
 ---
 ## Configure RStudio to always start with a clean workspace
 
-<iconify-icon icon="mdi:apple"></iconify-icon> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
-<iconify-icon icon="mdi:microsoft"></iconify-icon> Tools → Global options
+<iconify-icon inline icon="bi:apple"></iconify-icon> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
+<iconify-icon inline icon="bi:windows"></iconify-icon> Tools → Global options
 
 Uncheck "Restore ...". Set "Save workspace ..." to **Never**.
 

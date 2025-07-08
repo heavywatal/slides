@@ -425,8 +425,8 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 ---
 ## 毎回まっさらなワークスペースで始める設定
 
-<iconify-icon icon="mdi:apple"></iconify-icon> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
-<iconify-icon icon="mdi:microsoft"></iconify-icon> Tools → Global options
+<iconify-icon inline icon="bi:apple"></iconify-icon> RStudio → Preferences &nbsp; <kbd>command</kbd><kbd>,</kbd><br>
+<iconify-icon inline icon="bi:windows"></iconify-icon> Tools → Global options
 
 "Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
 
@@ -1919,7 +1919,7 @@ pivot_wider(table2, names_from = type, values_from = count)
 - エラー文やパッケージ名をコピペしてウェブ検索<br>
   → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
   や個人サイトに解決策
-- Slack <iconify-icon icon="mdi:slack"></iconify-icon>
+- Slack <iconify-icon inline icon="bi:slack"></iconify-icon>
   [r-wakalang](https://github.com/tokyor/r-wakalang)
   で質問を投稿する。<br>
   (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)
