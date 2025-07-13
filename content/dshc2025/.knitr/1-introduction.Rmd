@@ -8,7 +8,6 @@
 #| cache: false
 ```
 
-
 ---
 ## データを使ってやりたいこと
 
@@ -91,7 +90,7 @@ diamonds |>
 diamonds |>
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price, color = clarity)) +
-  geom_point(alpha = 0.4, size = 3) +
+  geom_point(shape = 16, size = 3, alpha = 0.4) +
   scale_color_viridis_d(
     guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
   ) +
@@ -105,7 +104,7 @@ diamonds |>
   )
 ```
 
-`carat` が大きいほど `price` も高いらしい。<br>
+`carat` が大きいほど `price` も高いらしい。\
 その度合いは `clarity` によって異なるらしい。
 
 ---
@@ -130,13 +129,13 @@ diamonds |>
 
 Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" align="right" style="margin: 0 -5px;">
 : 数学的な方程式として記述されるもの。
-: e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
-: <br>
+: e.g., Lotka-Volterra eq., <span style="opacity: 0.6;">Hill eq.</span>\
+  <br>
 
 Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" align="right">
 : 数値計算の手続きとして記述されるもの。
-: e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
-: <br>
+: e.g., Schelling’s Segregation Model, <span style="opacity: 0.6;"><em>tumopp</em></span>\
+  <br>
 
 Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" align="right">
 : 具体的な事物で作られるもの。
@@ -156,11 +155,10 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 ---
 ## データ科学における数理モデル
 
-データ生成をうまく真似できそうな仮定の数式表現。<br>
-&nbsp;
+データ生成をうまく真似できそうな仮定の数式表現。
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1200"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1200">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -176,7 +174,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 ---
 ## データ科学における数理モデル
 
-データ生成をうまく真似できそうな仮定の数式表現。<br>
+データ生成をうまく真似できそうな仮定の数式表現。\
 e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
 
 ```{r, lm-diamonds}
@@ -186,7 +184,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 diamonds |>
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price)) +
-  geom_point(alpha = 0.3, size = 3) +
+  geom_point(shape = 16, size = 3, alpha = 0.3) +
   stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
   coord_cartesian(ylim = c(0, 20000)) +
   labs(title = "Diamonds") +
@@ -234,7 +232,7 @@ diamonds |>
 ## モデリングにおける2つのアプローチ
 
 <figure>
-<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1200"><br>
+<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1200">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -255,12 +253,12 @@ diamonds |>
 ---
 ## 現役データサイエンティスト2人に聞きました
 
-- 統計モデルはデータ加工など事前の手続きが多め。<br>
+- 統計モデルはデータ加工など事前の手続きが多め。\
   機械学習は事前の決定が少ないので楽ちん。
-- 「要因の効果はどれくらい？」<br>
-  意思決定をするのは結局人間。物事を分かった上で判断したい。<br>
-  **実務の人への説明**や**意思決定**の場面で解析の解釈性が重要。<br>
-- **仮説があるなら**、それに基づいて統計モデリング。<br>
+- 「要因の効果はどれくらい？」\
+  意思決定をするのは結局人間。物事を分かった上で判断したい。\
+  **実務の人への説明**や**意思決定**の場面で解析の解釈性が重要。
+- **仮説があるなら**、それに基づいて統計モデリング。\
   何もないところからまず機械学習で要因抽出・仮説生成するのもあり。
 - 統計モデル縛り・実行環境縛りなどの案件もある。
 - 分析方針を決める立場の上級職になるつもりなら統計モデルも必要。
@@ -277,8 +275,8 @@ diamonds |>
 </a>
 </figure>
 
-久保先生の"緑本"こと<br>
-「データ解析のための統計モデリング入門」<br>
+久保先生の"緑本"こと\
+「データ解析のための統計モデリング入門」\
 をベースに回帰分析の概要を紹介。
 
 1. イントロ 👈 いまここ
@@ -302,7 +300,7 @@ diamonds |>
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
-- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017<br>
+- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017\
   (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
 
 `r .meta$next_link`

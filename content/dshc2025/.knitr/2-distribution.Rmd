@@ -7,7 +7,7 @@
 #| include: false
 #| cache: false
 library(reticulate)
-reticulate::use_virtualenv("dshc2024")
+reticulate::use_virtualenv("dshc2025")
 ```
 
 
@@ -16,15 +16,15 @@ reticulate::use_virtualenv("dshc2024")
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
 
 **一般化線形モデル GLM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
 
 **一般化線形混合モデル GLMM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
 
 **階層ベイズモデル HBM**
 
@@ -54,13 +54,14 @@ reticulate::use_virtualenv("dshc2024")
     - $y = 3x + 7$
     - $y = 9x^2$
 
+<cite>
 <a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
-
+</cite>
 
 ---
 ## たぶん身長が高いほど体重も重い
 
-なんとなく $y = a x + b$ でいい線が引けそう<br>
+なんとなく $y = a x + b$ でいい線が引けそう\
 &nbsp;
 
 ```{r, df-linear}
@@ -79,7 +80,7 @@ df_weight = tibble::tibble(
 #| fig.width: 5.5
 p_weight = ggplot(df_weight) +
   aes(height, weight) +
-  geom_point(size = 3, alpha = 0.5, shape = 16) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   theme_bw(base_size = 22) +
   theme(panel.grid = element_blank())
 p_weight
@@ -89,7 +90,7 @@ p_weight
 ---
 ## たぶん身長が高いほど体重も重い
 
-なんとなく $y = a x + b$ でいい線が引けそう<br>
+なんとなく $y = a x + b$ でいい線が引けそう\
 じゃあ傾き *a* と切片 *b*、どう決める？
 
 ```{r, weight-lines}
@@ -113,17 +114,17 @@ p_weight +
 #| echo: false
 #| fig.height: 5.5
 #| fig.width: 11
-predict_weight = function(parameters, data) {
+fit_weight = function(parameters, data) {
   parameters[1] + parameters[2] * data$height
 }
 
-add_pred_weight = function(data, parameters) {
-  dplyr::mutate(data, pred = predict_weight(param1, data = data))
+add_fitted_weight = function(data, parameters) {
+  dplyr::mutate(data, .fitted = fit_weight(param1, data = data))
 }
 
 rss_weight = function(parameters, data) {
-  pred = predict_weight(parameters, data)
-  sqdev = (data[["weight"]] - pred)**2
+  .fitted = fit_weight(parameters, data)
+  sqdev = (data[["weight"]] - .fitted)**2
   sum(sqdev)
 }
 # rss_weight(c(40, -5), df_weight)
@@ -135,21 +136,21 @@ rss2 = rss_weight(lm_weight$coefficients, df_weight)
 stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
 
 p1 = p_weight %+%
-  add_pred_weight(df_weight, param1) +
-  geom_line(aes(y = pred), color = "#3366ff", linewidth = 1) +
-  geom_linerange(aes(ymin = weight, ymax = pred), color = "#E69F00", linewidth = 1, alpha = 0.8)
-p2 = p1 %+%
-  (df_weight |> modelr::add_predictions(lm_weight))
+  add_fitted_weight(df_weight, param1) +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 1) +
+  geom_linerange(aes(ymin = weight, ymax = .fitted), color = "#E69F00", linewidth = 1, alpha = 0.8)
+p2 = p1 %+% broom::augment(lm_weight)
 cowplot::plot_grid(nrow = 1L,
   p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
-  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2))
+  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2)
+)
 ```
 
 
 ---
 ## 残差平方和(RSS)が最小となるパラメータを探せ
 
-ランダムに試してみて、上位のものを採用。<br>
+ランダムに試してみて、上位のものを採用。\
 この程度の試行回数では足りなそう。
 
 ```{r, weight-goodlines}
@@ -162,12 +163,11 @@ df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 
   dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
 p_ab = ggplot(df_ab_random) +
   aes(intercept, slope) +
-  geom_point(data = function(x) {
-    dplyr::filter(x, rank(rss) < 6)
-  }, shape = 1, size = 6) +
+  geom_point(data = \(x) dplyr::filter(x, rank(rss) < 6), shape = 1, size = 6) +
   geom_point(aes(color = log10(rss)), shape = 16, size = 3) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid = element_blank(), legend.position = c(0.99, 0.99), legend.justification = c(1, 1))
+  theme_bw(base_size = 22) +
+  theme(panel.grid = element_blank(), legend.justification = c(1, 1),
+    legend.position = "inside", legend.position.inside = c(0.99, 0.99))
 
 df_randmin = df_ab_random |> dplyr::slice_min(rss, n = 5)
 p2 = p_weight + geom_abline(
@@ -180,7 +180,7 @@ cowplot::plot_grid(p_ab, p2, nrow = 1L)
 ---
 ## 残差平方和(RSS)が最小となるパラメータを探せ
 
-**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。<br>
+**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。\
 さっきのランダムよりはちょっとマシか。
 
 ```{r, weight-grid}
@@ -273,12 +273,12 @@ df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
 p_pois = ggplot(df_pois) +
   aes(body_mass, num_seeds) +
   ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
-  geom_point(alpha = 0.5, shape = 16, size = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
   scale_x_continuous(breaks = x_breaks) +
   coord_cartesian(ylim = c(-5, 15)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
-p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
+p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2)
 ```
 
 - 観察データは常に**正の値**なのに予測が負に突入してない？
@@ -293,7 +293,7 @@ p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE)
 #| fig.height: 5.5
 #| fig.width: 11
 p_lm = p_pois +
-  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
                             fill = "#56B4E9AA", linetype = 0)
 # p_lm
@@ -304,7 +304,7 @@ df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L)
 df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
 
 p_poisson = p_pois +
-  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE) +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
   ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass), df_bars,
                             fill = "#56B4E9AA", linetype = 0)
 # p_poisson
@@ -322,15 +322,15 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
 
 **一般化線形モデル GLM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
 
 **一般化線形混合モデル GLMM**
 
-<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
 
 **階層ベイズモデル HBM**
 
@@ -342,7 +342,7 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 
 発生する事象(値)と頻度の関係。
 
-手元のデータを数えて作るのが**経験分布**<br>
+手元のデータを数えて作るのが**経験分布**\
 e.g., サイコロを12回投げた結果、学生1000人の身長
 
 ```{r, distribution}
@@ -355,7 +355,7 @@ p1 = tibble::tibble(face = sample.int(6, 12, replace = TRUE)) |>
   aes(face) +
   geom_bar(aes(y = after_stat(prop))) +
   scale_x_continuous(breaks = seq_len(6L)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.y = element_blank(), panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
@@ -365,12 +365,12 @@ p2 = tibble::tibble(height = rnorm(1000L, c(160, 170), 5.5)) |>
   ggplot() +
   aes(height) +
   geom_histogram(aes(y = after_stat(density)), binwidth = 1, boundary = 0) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), axis.ticks = element_blank())
 cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
 
-一方、少数のパラメータと数式で作るのが**理論分布**。<br>
+一方、少数のパラメータと数式で作るのが**理論分布**。\
 (こちらを単に「確率分布」と呼ぶことが多い印象）
 
 ---
@@ -378,8 +378,8 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 
 $X \sim f(\theta)$
 
-e.g.,<br>
-コインを3枚投げたうち表の出る枚数 $X$ は**二項分布に従う**。<br>
+e.g.,\
+コインを3枚投げたうち表の出る枚数 $X$ は**二項分布に従う**。\
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 <div class="column-container">
@@ -416,8 +416,8 @@ k &\in \{0, 1, 2, \ldots, n\}
 
 コインを3枚投げたうち表の出た枚数 $X$
 
-試行1: **表** 裏 **表** → $X = 2$<br>
-試行2: 裏 裏 裏 → $X = 0$<br>
+試行1: **表** 裏 **表** → $X = 2$\
+試行2: 裏 裏 裏 → $X = 0$\
 試行3: **表** 裏 裏 → $X = 1$ 続けて $2, 1, 3, 0, 2, \ldots$
 
 ```{r, rbinom}
@@ -441,7 +441,7 @@ df_rbinom |>
   geom_col() +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
   facet_wrap(vars(Repl), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -469,10 +469,10 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
   </div>
 </div>
 
-これらはとてもよく似ているので<br>
-**「コインをn枚投げたうち表の出る枚数は二項分布に従う」**<br>
-みたいな言い方をする。逆に言うと<br>
-**「二項分布とはn回試行のうちの成功回数を確率変数とする分布」**<br>
+これらはとてもよく似ているので\
+**「コインをn枚投げたうち表の出る枚数は二項分布に従う」**\
+みたいな言い方をする。逆に言うと\
+**「二項分布とはn回試行のうちの成功回数を確率変数とする分布」**\
 のように理解できる。
 
 ---
@@ -485,14 +485,14 @@ $X \sim \text{Binomial}(n = 3, p = 0.5)$
 $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="960"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="900">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
 こういうふうに現象と対応した確率分布、ほかにもある？
 
 ???
-ただし「これが3連コイントスの真理だ」ではない。<br>
+ただし「これが3連コイントスの真理だ」ではない。\
 あくまで「こう単純化して理解できそう・使えそう」なだけ。
 
 ほかの仮定: コインが立つかも。偏ったコインかも。両表かも。
@@ -540,7 +540,7 @@ dplyr::bind_rows(df_coin, df_dice) |>
   geom_col() +
   scale_y_continuous(limits = c(0, 1), breaks = c(0, 1)) +
   facet_grid(cols = vars(group), scale = "free_x", space = "free_x") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -570,7 +570,7 @@ ggplot(df) +
   scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
   geom_col() +
   facet_grid(cols = vars(p), scales = "free_x", space = "free_x", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -603,7 +603,7 @@ ggplot(df) +
   geom_col() +
   facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
   labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -616,10 +616,9 @@ ggplot(df) +
 🔰 負の二項分布になりそうな例を考えてみよう
 
 <!--
-平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。\
 ($k \to \infty$でポアソン分布と一致)
 -->
-
 
 ---
 ## 二項分布 $~\text{Binomial}(n,~p)$
@@ -641,7 +640,7 @@ ggplot(df) +
   geom_col() +
   facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
   labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
 ```
 
@@ -677,7 +676,7 @@ p_poisson_process = tibble::tibble(y = rev(seq_along(lambda)), lambda) |>
   scale_fill_continuous(guide = guide_legend(label.position = "top", title.vjust = 1), breaks = lambda) +
   scale_y_continuous(limits = c(0.5, 3.5), breaks = NULL) +
   labs(y = NULL, x = "time (space)") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     axis.text.y = element_blank(), axis.ticks = element_blank(), panel.border = element_blank(),
     panel.grid.minor = element_blank(), legend.position = "top"
@@ -688,7 +687,7 @@ p2 = tidyr::crossing(X = seq.int(0L, 20L), lambda) |>
   ggplot() +
   aes(X, Prob) +
   geom_col(aes(fill = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -700,7 +699,7 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 \Pr(X = k \mid \lambda) = \frac {\lambda^k e^{-\lambda}} {k!}
 \\]
 
-二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。<br>
+二項分布の極限 $(\lambda = np;~n \to \infty;~p \to 0)$。\
 めったに起きないことを何回も試行するような感じ。
 
 
@@ -720,7 +719,7 @@ p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -753,7 +752,7 @@ p2 = tidyr::crossing(x = seq(0, 3, length.out = 201), lambda) |>
   ggplot() +
   aes(x, Prob) +
   geom_area(aes(fill = lambda, group = lambda), position = "identity", alpha = 0.5) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -765,14 +764,14 @@ cowplot::plot_grid(p_poisson_process, p2, nrow = 1L, rel_widths = c(4, 3))
 \Pr(x \mid k,~\lambda) = \frac {\lambda^k x^{k - 1} e^{-\lambda x}} {\Gamma(k)}
 \\]
 
-指数分布をkのぶん右に膨らませた感じ。<br>
+指数分布をkのぶん右に膨らませた感じ。\
 shapeパラメータ $k = 1$ のとき指数分布と一致。
 
 
 ---
 ## 正規分布 $~\mathcal{N}(\mu,~\sigma)$
 
-平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。<br>
+平均 $\mu$、標準偏差 $\sigma$ の美しい分布。よく登場する。\
 e.g., $\mu = 50, ~\sigma = 10$ (濃い灰色にデータの95%, 99%が含まれる):
 
 ```{r, gaussian}
@@ -790,7 +789,7 @@ tibble::tibble(x = seq(0, 100, 0.1), Prob = dnorm(x, 50, 10)) |>
   geom_area(data = function(.x) {
     dplyr::filter(.x, dplyr::between(x, ci[1], ci[4]))
   }, alpha = 0.4) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank(), legend.position = "none"
@@ -822,9 +821,9 @@ purrr::map(c(10, 100, 1000, 10000), \(n) {
   aes(X) +
   geom_histogram(bins = 25) +
   facet_wrap(vars(Repl), nrow = 1L, scale = "free_y", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
-    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
   )
 ```
@@ -844,9 +843,9 @@ purrr::map(c(1, 4, 16, 64, 256), \(n) {
   aes(X, Prob) +
   geom_col(width = 1) +
   facet_wrap(vars(n), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
-    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
   )
 ```
@@ -869,9 +868,9 @@ purrr::map(c(1, 4, 16, 64, 256), \(lambda) {
   aes(X, Prob) +
   geom_col(width = 1) +
   facet_wrap(vars(lambda), nrow = 1L, scale = "free", labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
-    panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(),
+    panel.grid.minor = element_blank(), panel.grid.major.x = element_blank(),
     axis.ticks = element_blank()
   )
 ```
@@ -890,7 +889,7 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
   geom_area(aes(fill = k, group = k), position = "identity", alpha = 0.5) +
   scale_fill_viridis_c(trans = "log10", guide = .guide) +
   coord_cartesian(xlim = c(0, 20)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
@@ -902,7 +901,7 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 ## 有名な確率分布対応関係ふりかえり
 
 <figure style="float: right;">
-<img src="../tokiomarine2021/math-model.drawio.svg" width="420"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="420">
 </figure>
 
 離散一様分布
@@ -927,21 +926,21 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 ---
 ## 現実には、確率分布に「従わない」ことが多い
 
-植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
-親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。\
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、\
 極端な値(全部死亡、全部生存)が多かった。
 
 <img `r src_alt_fig_chunk("overdispersion")`>
 
-「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。<br>
+「それはなぜ？」と考えて要因を探るのも統計モデリングの仕事。\
 **「普通はこれに従うはず」を理解してこそ**できる思考。
 
 
 ---
 ## 疑似乱数生成器 Pseudo Random Number Generator
 
-コンピューター上でランダム**っぽい**数値を出力する装置。<br>
-実際には**決定論的**に計算されているので、<br>
+コンピューター上でランダム**っぽい**数値を出力する装置。\
+実際には**決定論的**に計算されているので、\
 シード(出発点)と呼び出し回数が同じなら出る数も同じになる。
 
 ```python
@@ -956,7 +955,7 @@ rng.integers(1, 6, 8)
 # array([1, 4, 4, 3, 3, 5, 1, 4])
 ```
 
-シードに適当な固定値を与えておくことで再現性を保てる。<br>
+シードに適当な固定値を与えておくことで再現性を保てる。\
 ただし「このシードじゃないと良い結果が出ない」はダメ。
 
 さまざまな「分布に従う」乱数を生成することもできる。
@@ -999,8 +998,8 @@ sns.histplot(x=x, discrete=True)
 </a>
 </figure>
 
-久保先生の"緑本"こと<br>
-「データ解析のための統計モデリング入門」<br>
+久保先生の"緑本"こと\
+「データ解析のための統計モデリング入門」\
 をベースに回帰分析の概要を紹介。
 
 1. イントロ
@@ -1023,9 +1022,9 @@ sns.histplot(x=x, discrete=True)
 - [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
 - [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
 - [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
-- 「[進化学実習2024](/slides/tohoku2024r/)」
-  東北大学 理学部生物学科 (2024-04)
-- 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2023/)」
-  石川由希 2023 名古屋大学
+- 「[進化学実習2025](/slides/tohoku2025r/)」
+  東北大学 理学部生物学科 (2025-04)
+- 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2024/)」
+  石川由希 2024 名古屋大学
 
 `r .meta$next_link`

@@ -40,7 +40,7 @@ withr::with_namespace("bayesplot", {
 ---
 ## 説明変数なしのベイズ推定: データ準備
 
-表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。\
 この $p$ をStanで推定してみよう。
 
 ```{r, stan-binom}
@@ -75,7 +75,7 @@ model {
 }
 ```
 
-- いくつかのブロックに分けて記述する:<br>
+- いくつかのブロックに分けて記述する:\
   R/Pythonから受け取る `data`, 推定する `parameter`, 本体の `model`.
 - [変数には型や制約を設定できる](https://mc-stan.org/docs/reference-manual/overview-of-data-types.html)
 - [関数もたくさん用意されている](https://mc-stan.org/docs/functions-reference/)
@@ -114,7 +114,7 @@ model = cmdstanr::cmdstan_model("stan/coin.stan")
 fit = model$sample(coin_data, seed = 24601L)
 ```
 
-いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
+いろいろオプションはあるけど、ここではデフォルトに任せる:\
 `chains`, `inits`, `iter_warmup`, `iter_samples`, `thin`, ...
 
 問題があったら警告してくれるので**ちゃんと読む**。
@@ -122,7 +122,7 @@ fit = model$sample(coin_data, seed = 24601L)
 ---
 ## 説明変数なしのベイズ推定: 結果を眺める
 
-`parameters` ブロックに書いた変数の情報が出てくる。<br>
+`parameters` ブロックに書いた変数の情報が出てくる。\
 乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。
 
 ```{r, stan-binom-fit}
@@ -133,7 +133,7 @@ print(fit)
 
 真の値に近い $p \approx `r true_p`$ が得られた
 (`r round(summary_p[["q5"]], 2)` から
-`r round(summary_p[["q95"]], 2)` である確率が90%)。<br>
+`r round(summary_p[["q95"]], 2)` である確率が90%)。\
 $\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。
 
 `lp__` はlog posterior(対数事後確率)。後述。
@@ -168,7 +168,7 @@ bayesplot::mcmc_acf_bar(draws, pars = params)
 ---
 ## 説明変数なしのベイズ推定: 推定結果確認
 
-サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+サンプルサイズNが小さいせいか裾野の広い推定結果。\
 真の$p$の値も含まれている:
 
 ```{r, stan-binom-hist}
@@ -195,8 +195,8 @@ target += normal_lpdf(theta | 0.0, 10.0)  // prior
 target += normal_lpdf(x | theta, 1.0);    // likelihood
 ```
 
-つまり、事前確率と尤度の対数の和を取っている。<br>
-ベイズの定理により、事後確率はこれに比例する。<br>
+つまり、事前確率と尤度の対数の和を取っている。\
+ベイズの定理により、事後確率はこれに比例する。\
 `lp__` はこの `target` 変数を記録しておいたようなもの。
 
 
@@ -496,7 +496,7 @@ generated quantities {
 ```
 
 [`normal_rng()`](https://mc-stan.org/docs/functions-reference/normal-distribution.html)
-のような乱数生成が使えるのは<br>
+のような乱数生成が使えるのは\
 `generated quantities` ブロックだけ。
 
 (`yrep` を `vector[N]` 型で作ろうとすると怒られる。)
@@ -636,7 +636,7 @@ for (i in 1:3) {
 ---
 ## パラメータの事前分布を明示的に設定できる
 
-が、省略してもStanがデフォルトでうまくやってくれる。<br>
+が、省略してもStanがデフォルトでうまくやってくれる。\
 そのせいで収束が悪いかも、となってから考えても遅くない。
 
 ```stan
@@ -661,12 +661,12 @@ model {
 
 1.  とりあえず**無情報事前分布** $[-\infty, \infty]$。Stanのデフォルト。
 
-1.  収束が悪かったら**弱情報事前分布**を試す。<br>
+1.  収束が悪かったら**弱情報事前分布**を試す。\
     事後分布を更新していったとき**事前分布っぽさが残らない**のが良い。
 
     - 取りうる値を逃すような狭すぎる分布はダメ。
     - 狭すぎるよりはマシだが、広すぎても良くない。
-    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+    - 一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、\
       事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。
 
     おすすめ: [**正規分布**](https://mc-stan.org/docs/functions-reference/normal-distribution.html)

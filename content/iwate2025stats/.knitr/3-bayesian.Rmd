@@ -19,11 +19,12 @@ wtl::knit_engines_set_cache_stan("stan/")
 ```{r, df-seeds-od}
 #| echo: false
 set.seed(24601)
-samplesize = 100L
+sample_size = 100L
 df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
+  z = rnorm(sample_size, 0.5, 3),
   p = wtl::sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
+  y = rbinom(sample_size, 8L, p)
+)
 ```
 ```{r, overdispersion}
 #| echo: false
@@ -34,7 +35,7 @@ p_hat = sum_y / 800
 label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
 tidy_od = df_seeds_od |>
   dplyr::count(y, name = "observed") |>
-  dplyr::mutate(expected = samplesize * dbinom(y, 8, p_hat))
+  dplyr::mutate(expected = sample_size * dbinom(y, 8, p_hat))
 ggplot(tidy_od) +
   geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
   geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
@@ -261,17 +262,17 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ```{r, beer-overdispersion-data}
 #| echo: false
 set.seed(24601)
-samplesize = 300L
+sample_size = 300L
 lambda = 3
 overdisp = 4
 .n = lambda / (overdisp - 1)
 .p = 1 / overdisp
-df_beer_od = tibble::tibble(X = rnbinom(samplesize, size = .n, prob = .p))
+df_beer_od = tibble::tibble(X = rnbinom(sample_size, size = .n, prob = .p))
 lambda_obs = mean(df_beer_od$X)
 df_beer_od_exp = tibble::tibble(
   X = seq.int(0L, 15L),
   prop = dpois(X, lambda_obs),
-  freq = samplesize * prop
+  freq = sample_size * prop
 )
 ```
 
@@ -307,24 +308,7 @@ df_beer_od |>
 成功率pの試行がn回成功するまでの失敗回数X。
 n = 1 のとき幾何分布と一致。
 
-```{r, nbinom}
-#| echo: false
-#| fig.height: 3.8
-#| fig.width: 11
-p = 0.5
-df = purrr::map(seq.int(1, 3), function(n) {
-  tibble::tibble(X = seq.int(0, 10), Prob = dnbinom(X, n, p), n = n)
-}) |>  purrr::list_rbind()
-ggplot(df) +
-  aes(X, Prob) +
-  scale_x_continuous(breaks = df[["X"]]) +
-  scale_y_continuous(breaks = c(0, 1), limits = c(0, 1)) +
-  geom_col() +
-  facet_grid(cols = vars(n), scales = "free_x", space = "free_x", labeller = label_both) +
-  labs(title = paste0("p = ", p)) +
-  theme_bw(base_size = 20) +
-  theme(panel.grid.minor.x = element_blank(), panel.grid.major.x = element_blank(), axis.ticks = element_blank())
-```
+<img `r src_alt_fig_chunk("nbinom")`>
 
 \\[
 \Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
@@ -438,8 +422,8 @@ tibble::tibble(p = seq(0, 1, 0.01), logLik = dbinom(1, 4, p, log = TRUE)) |>
   dplyr::filter(logLik > -1e6) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
+  geom_point(data = \(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
+  geom_vline(data = \(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
   scale_x_continuous(breaks = c(0, 0.5, 1)) +
   theme_bw(base_size = 20) +
   theme(panel.grid.minor.y = element_blank(), axis.ticks = element_blank())
@@ -473,7 +457,8 @@ df_coin = purrr::map(c(0, 1, 2, 3, coin_show), \(i) {
     label = sprintf("%d / %d", k, i),
     p = seq(0, 1, 0.01),
     logLik = dbinom(k, i, p, log = TRUE),
-    Density = dbeta(p, k + 1, i - k + 1))
+    Density = dbeta(p, k + 1, i - k + 1)
+  )
 }) |>
   purrr::list_rbind() |>
   dplyr::mutate(label = factor(label, levels = unique(label)))
@@ -488,8 +473,8 @@ df_coin |>
   dplyr::group_by(label) |>
   ggplot() + aes(p, logLik) +
   geom_line() +
-  geom_point(data = function(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
-  geom_vline(data = function(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
+  geom_point(data = \(.x) {dplyr::slice_max(.x, logLik)}, shape = 16, size = 5, color = "#56B4E9") +
+  geom_vline(data = \(.x) {dplyr::slice_max(.x, logLik)}, aes(xintercept = p), linewidth = 1, color = "#56B4E9") +
   scale_x_continuous(breaks = c(0, 0.5, 1)) +
   facet_wrap(vars(label), nrow = 1L) +
   theme_bw(base_size = 20) +
@@ -568,7 +553,7 @@ ggplot() + aes(x, y) +
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
 <img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="240" align="right"></a>
 
-移項するだけで**ベイズの定理**:<div>
+移項するだけで**ベイズの定理**:
 <div style="margin-block: -0.5em;">
 <span class="bubble left30" style="margin-inline-start: 2em;">事後確率</span>
 <span class="bubble" style="margin-inline-start: 6em;">事前確率</span>
@@ -815,7 +800,7 @@ prior_beta %+%
 | 正規分布 (分散既知) | 正規分布 |
 
 共役事前分布を使うことが常に最善とは限らない。\
-計算コストがかかっても**無情報事前分布**を使う風潮。
+**無情報事前分布**を使って計算機に頑張らせる風潮。
 
 ---
 ## 事後分布を用いた推定
@@ -856,12 +841,14 @@ n_head = 3
 n_total = 12
 df_density = tibble::tibble(
   p = seq(0, 1, 0.001),
-  Density = dbeta(p, n_head, n_total - n_head))
+  Density = dbeta(p, n_head, n_total - n_head)
+)
 
 .theme = theme_minimal(base_size = 20) + theme(
   panel.grid.minor = element_blank(),
   panel.grid.major.y = element_blank(),
-  axis.text = element_blank())
+  axis.text = element_blank()
+)
 
 bound = qbeta(c(0.025, 0.975), n_head, n_total - n_head)
 .f = function(.x) {dplyr::filter(.x, dplyr::between(p, bound[1], bound[2]))}
@@ -1375,7 +1362,8 @@ e.g., `iter_warmup = 200, iter_sampling = 600` で灰色の部分を捨てる:
 cowplot::plot_grid(
   p_trace + annotate("ribbon", x = c(0, t_warmup), ymin = Inf, ymax = -Inf, alpha = 0.3),
   p_hist %+% (df_trace |> dplyr::mutate(init = as.factor(ifelse(t < t_warmup, NA, init)))),
-  nrow = 1L, rel_widths = c(4, 1))
+  nrow = 1L, rel_widths = c(4, 1)
+)
 ```
 
 どれくらい長く捨てるべきかは場合による。
@@ -1394,7 +1382,7 @@ e.g., `thin = 5` で5回に1回だけサンプルする:
 #| fig.width: 7
 p_trace +
   coord_cartesian(ylim = c(0, 1), xlim = c(200, 260)) +
-  geom_point(data = function(.x) {dplyr::filter(.x, t %% 5 == 0)}, alpha = 0.6, size = 3, shape = 16)
+  geom_point(data = \(.x) {dplyr::filter(.x, t %% 5 == 0)}, alpha = 0.6, size = 3, shape = 16)
 ```
 
 間引かなくても大丈夫な場合も、間引いても解決しない場合もある。
@@ -1444,7 +1432,7 @@ model {
 
 ```{r, converge-template}
 #| include: false
-convdata = tibble::lst(N = 10L, x = rep(10L, N))
+conv_data = tibble::lst(N = 10L, x = rep(10L, N))
 myplot_trace = function(fit) {
   s = fit$summary(variables = "lambda")
   stats = sprintf("Rhat = %.4f, N_eff = %.1f", s[["rhat"]], s[["ess_bulk"]])
@@ -1461,7 +1449,7 @@ myplot_trace = function(fit) {
 #| cache_stan: "converge-yes"
 #| stan_save_output_files: "fit_yes"
 mod_yes = cmdstanr::cmdstan_model("stan/converge-yes.stan")
-fit_yes = mod_yes$sample(data = convdata, seed = 24601L, refresh = 0)
+fit_yes = mod_yes$sample(data = conv_data, seed = 24601L, refresh = 0)
 p_yes = myplot_trace(fit_yes)
 ```
 ```{r, converge-no-plot}
@@ -1469,7 +1457,7 @@ p_yes = myplot_trace(fit_yes)
 #| cache_stan: "converge-no"
 #| stan_save_output_files: "fit_no"
 mod_no = cmdstanr::cmdstan_model("stan/converge-no.stan")
-fit_no = mod_no$sample(data = convdata, seed = 24601L, refresh = 0, show_messages = FALSE)
+fit_no = mod_no$sample(data = conv_data, seed = 24601L, refresh = 0, show_messages = FALSE)
 p_no = myplot_trace(fit_no)
 ```
 ```{r, convergence}
@@ -1531,7 +1519,7 @@ $\;\propto\;$
 ---
 ## MCMCソフトウェア
 
-- [BUGS](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
+- [BUGS](https://www.mrc-bsu.cam.ac.uk/software/)
     - クローズドソースで、ほぼWindows専用。
 - [JAGS](https://mcmc-jags.sourceforge.io/)
     - オープンソースで、さまざまなOS・言語から利用可能。
@@ -1845,10 +1833,10 @@ Rと同様、 `slope * x` のようなベクトル演算ができる。
 ```{r, df-lm}
 #| echo: -1
 set.seed(19937)
-samplesize = 50L
+sample_size = 50L
 df_lm = tibble::tibble(
-  x = rnorm(samplesize, 1.70, 0.05),
-  bmi = rnorm(samplesize, 22, 1),
+  x = rnorm(sample_size, 1.70, 0.05),
+  bmi = rnorm(sample_size, 22, 1),
   y = bmi * (x**2)
 )
 ```
@@ -1866,7 +1854,7 @@ df_lm = tibble::tibble(
 #| results: "hide"
 # リストに入れて渡す:
 lm_data = as.list(df_lm)
-lm_data[["N"]] = samplesize
+lm_data[["N"]] = sample_size
 # モデルを実行速度の速い機械語に翻訳(コンパイル):
 lm_model = cmdstanr::cmdstan_model("stan/lm.stan")
 # モデルとデータを使ってMCMCサンプリング:
@@ -2620,17 +2608,18 @@ model {
 #| echo: false
 set.seed(24601)
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
-samplesize = 100L
+sample_size = 100L
 df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
+  z = rnorm(sample_size, 0.5, 3),
   p = sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
+  y = rbinom(sample_size, 8L, p)
+)
 ```
 ```{r, stan-glmm-prep}
 #| cache_stan: "glmm"
 #| stan_save_output_files: "fit"
 #| results: "hide"
-seeds_data = list(y = df_seeds_od$y, N = samplesize)
+seeds_data = list(y = df_seeds_od$y, N = sample_size)
 model = cmdstanr::cmdstan_model("stan/glmm.stan")
 fit = model$sample(data = seeds_data, seed = 19937L, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
@@ -2677,13 +2666,13 @@ cowplot::plot_grid(p_trace, p_hist, ncol = 1L)
 ```{r, beer-overdispersion-data-re}
 #| echo: -1
 set.seed(24601)
-samplesize = 300L
+sample_size = 300L
 lambda = 3
 overdisp = 4
 .n = lambda / (overdisp - 1)
 .p = 1 / overdisp
 df_beer_od = tibble::tibble(
-  X = rnbinom(samplesize, size = .n, prob = .p)
+  X = rnbinom(sample_size, size = .n, prob = .p)
 )
 ```
 

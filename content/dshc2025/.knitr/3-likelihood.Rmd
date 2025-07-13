@@ -13,7 +13,7 @@
 ## 有名な確率分布対応関係ふりかえり
 
 <figure style="float: right;">
-<img src="../tokiomarine2021/math-model.drawio.svg" width="450"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="450">
 </figure>
 
 離散一様分布
@@ -38,7 +38,7 @@
 ---
 ## データに分布をあてはめたい
 
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
+ある植物を50個体調べて、それぞれの種子数Xを数えた。\
 個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
 
 ```{r, df-poisson}
@@ -58,7 +58,7 @@ p_rpois = ggplot(df_rpois) +
   aes(X) +
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   coord_cartesian(xlim = c(0, max_x)) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor = element_blank(),
     panel.grid.major.x = element_blank(), axis.ticks = element_blank()
@@ -66,14 +66,14 @@ p_rpois = ggplot(df_rpois) +
 p_rpois
 ```
 
-カウントデータだし形も<span class="fragment custom blur">ポアソン</span>分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+カウントデータだし形も<span class="fragment custom blur">ポアソン</span>分布っぽい。\
+分布の<span style="color: #3366ff;">パラメータ $\lambda$</span> はどれくらいがいいだろう？
 
 
 ---
 ## データに分布をあてはめたい
 
-ある植物を50個体調べて、それぞれの種子数Xを数えた。<br>
+ある植物を50個体調べて、それぞれの種子数Xを数えた。\
 個体Aは種2個、個体Bは種4個、、、サンプルサイズ n = 50 のデータ。
 
 ```{r, poisson-seed-lambda}
@@ -82,12 +82,13 @@ p_rpois
 #| fig.width: 12
 p_pois = p_rpois +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  geom_point(aes(lambda, 0), data = dplyr::distinct(df_dpois, lambda), size = 5, color = "#3366ff") +
   facet_wrap(vars(lambda), nrow = 1L, labeller = label_both)
 p_pois
 ```
 
-カウントデータだし形もポアソン分布っぽい。<br>
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+カウントデータだし形もポアソン分布っぽい。\
+分布の<span style="color: #3366ff;">パラメータ $\lambda$</span> はどれくらいがいいだろう？
 
 黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
 よく重なるのは $\lambda \approx 3$ くらいか。
@@ -99,14 +100,14 @@ p_pois
 <ruby>尤<rt>もっと</rt></ruby>もらしさ。
 モデルのあてはまりの良さの尺度のひとつ。
 
-**あるモデル$M$の下でそのデータ$D$が観察される確率**。<br>
-定義通り素直に書くと<br>
+**あるモデル$M$の下でそのデータ$D$が観察される確率**。\
+定義通り素直に書くと\
 $\Pr(D \mid M)$
 
-データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:<br>
+データ$D$を固定し、モデル$M$の関数とみなしたものが**尤度関数**:\
 $L(M \mid D)$
 
-モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:<br>
+モデルの構造も固定してパラメータ$\theta$だけ動かす場合はこう書く:\
 $L(\theta \mid D)$ とか $L(\theta)$ とか
 
 
@@ -165,7 +166,7 @@ p_pois +
 ---
 ## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
 
-扱いやすい **対数尤度** (log likelihood) にしてから計算する。<br>
+扱いやすい **対数尤度** (log likelihood) にしてから計算する。\
 一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
 
 <div>\[\begin{split}
@@ -191,13 +192,13 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
   dplyr::mutate(logL = log(L)) |>
   ggplot() +
   aes(lambda, logL) +
-  geom_line() +
-  geom_vline(xintercept = X_mle, color = "#56B4E9", linewidth = 1) +
-  annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#56B4E9") +
-  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
+  geom_line(linewidth = 1) +
+  geom_vline(xintercept = X_mle, color = "#3366ff", linewidth = 2) +
+  annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#3366ff") +
+  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#3366ff",
            x = Inf, y = -Inf, hjust = 1.2, vjust = -0.8, size = 7) +
   labs(y = "log L") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
@@ -205,7 +206,8 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
 
 .df_mle = tibble::tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
 .p_pois_mle = p_rpois +
-  geom_col(data = .df_mle, aes(y = Prob), alpha = 0.5, fill = "#56B4E9")
+  geom_col(data = .df_mle, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  annotate("point", x = X_mle, y = 0, size = 4, color = "#3366ff")
 
 cowplot::plot_grid(p_mle, .p_pois_mle, nrow = 1L, rel_widths = c(2, 1))
 ```
@@ -213,7 +215,7 @@ cowplot::plot_grid(p_mle, .p_pois_mle, nrow = 1L, rel_widths = c(2, 1))
 ---
 ## 最尤推定を使っても“真のλ”は得られない
 
-今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。<br>
+今回のデータは真の生成ルール“$X \sim \text{Poisson}(\lambda = 3.0)$”で作った。\
 「50個体サンプル→最尤推定」を1,000回繰り返してみると:
 
 ```{r, poisson-mle-repl}
@@ -232,9 +234,9 @@ p_repl = df_sum |>
   ggplot() +
   aes(lambda) +
   geom_histogram(bins = 25, center = 3) +
-  annotate("point", x = df_minmax$lambda, y = 0, color = "#56B4E9", size = 8, alpha = 0.5) +
+  annotate("point", x = df_minmax$lambda, y = 0, color = "#3366ff", size = 8, alpha = 0.5) +
   labs(x = "estimated_lambda") +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
@@ -250,7 +252,7 @@ p_minmax = df_repl |>
   geom_bar(aes(y = after_stat(prop)), width = 0.4) +
   geom_col(data = .df_dminmax, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
   facet_wrap(vars(lambda), ncol = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     panel.grid.major.x = element_blank(), axis.ticks = element_blank()
@@ -259,7 +261,7 @@ p_minmax = df_repl |>
 cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 ```
 
-サンプルの取れ方によってはかなりズレた推定をしてしまう。<br>
+サンプルの取れ方によってはかなりズレた推定をしてしまう。\
 (標本データへのあてはまりはかなり良く見えるのに！)
 
 
@@ -271,7 +273,7 @@ cowplot::plot_grid(p_repl, p_minmax, nrow = 1L, rel_widths = c(2, 1))
 ```{r, poisson-mle-nsam}
 #| echo: false
 #| fig.height: 4
-#| fig.width: 11
+#| fig.width: 12
 set.seed(19937)
 nrep = 1000L
 purrr::map(c(5, 50, 500, 5000), \(n) {
@@ -285,27 +287,27 @@ purrr::map(c(5, 50, 500, 5000), \(n) {
   aes(estimated_lambda) +
   geom_histogram(bins = 25, center = 3) +
   facet_wrap(vars(n), nrow = 1L, labeller = label_both) +
-  theme_bw(base_size = 20) +
+  theme_bw(base_size = 22) +
   theme(
     panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
     axis.ticks = element_blank()
   )
 ```
 
-Q. じゃあどれくらいのサンプル数nを確保すればいいのか？<br>
+Q. じゃあどれくらいのサンプル数nを確保すればいいのか？\
 A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 ---
 ## すべてのモデルは間違っている
 
-確率分布がいい感じに最尤推定できたとしても、<br>
+確率分布がいい感じに最尤推定できたとしても、\
 それはあくまでモデル。仮定。近似。
 
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="1080"><br>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1080">
 <figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
 </figure>
 
@@ -333,12 +335,12 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 1. 6の目の出る確率が1/6だとした場合の尤度は?
 1. 6の目の出る確率が0.2だとした場合の尤度は?
 1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
-1. このサイコロで6の目が出る確率を最尤推定しよう。<br>
+1. このサイコロで6の目が出る確率を最尤推定しよう。\
    数学で解ければ**優**。Rで見つければ**良**。目分量・勘で**可**。
 
 ヒント
 : 確率pで当たるクジをn回引いてk回当たる確率、と同じ計算を使う。
-: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。<br>
+: 数学の $\binom 5 2 = {}_5 \mathrm{C} _2 = 10$ はRでは `choose(5, 2)` 。\
   Pythonでは [`scipy.special.comb(5, 2)`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.comb.html).
 
 ```{r, get-likelihood}
