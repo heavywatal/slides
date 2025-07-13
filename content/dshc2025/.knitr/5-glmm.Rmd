@@ -1,0 +1,443 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+#| cache: false
+```
+
+
+---
+## ちょっとずつ線形モデルを発展させていく
+
+<figure style="float: right;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+</a>
+</figure>
+
+久保先生の"緑本"こと<br>
+「[データ解析のための統計モデリング入門](https://kuboweb.github.io/-kubo/ce/IwanamiBook.html)」<br>
+をベースに回帰分析の概要を紹介。
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ いろんな**確率分布**を扱いたい</span>
+
+**一般化線形モデル GLM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ <span style="font-weight: bold; color: #E69F00;">個体差</span>などの変量効果を扱いたい</span>
+
+**一般化線形混合モデル GLMM**
+
+<span style="color: #888888;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+
+**階層ベイズモデル HBM**
+
+
+---
+## n個のうちy個生存。二項分布に従......わない！
+
+植物100個体から8個ずつ種子を取って植えたら全体で半分ちょい発芽。<br>
+親1個体あたりの生存数は<span style="color: #56B4E9;">n=8の二項分布</span>になるはずだけど、<br>
+極端な値(全部死亡、全部生存)が多かった。個体差？
+
+```{r, df-seeds-od}
+#| echo: false
+set.seed(24601)
+sample_size = 100L
+df_seeds_od = tibble::tibble(
+  z = rnorm(sample_size, 0.5, 3),
+  p = wtl::sigmoid(z),
+  y = rbinom(sample_size, 8L, p)
+)
+```
+```{r, overdispersion}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+sum_y = sum(df_seeds_od$y)
+p_hat = sum_y / 800
+label = sprintf("hat(p) == %d/800 %%~~%% %.2f", sum_y, p_hat)
+tidy_od = df_seeds_od |>
+  dplyr::count(y, name = "observed") |>
+  dplyr::mutate(expected = sample_size * dbinom(y, 8, p_hat))
+ggplot(tidy_od) +
+  geom_col(aes(y, observed), width = 0.4, fill = "#333333") +
+  geom_col(aes(y, expected), tidy_od, fill = "#56B4E9", alpha = 0.5, width = 0.8) +
+  annotate("text", label = label, parse = TRUE, color = "#56B4E9",
+           x = -Inf, y = Inf, hjust = -0.1, vjust = 2, size = 6) +
+  labs(x = "# survived seeds", y = "count") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
+
+
+---
+## 個体差をモデルに組み込みたい
+
+各個体の生存率$p_i$をそのままパラメータにすると**過剰適合**。<br>
+「パラメータ数 ≥ サンプルサイズ」の“データ読み上げ”モデル。<br>
+i.e., この個体は4個生き残って生存率0.5だね。次の個体は2個体だから......
+
+```{r, saturated-glmm}
+#| echo: false
+#| fig.height: 3
+#| fig.width: 11
+df_seeds_od |>
+  tibble::rowid_to_column("id") |>
+  ggplot() + aes(id, y / 8) +
+  geom_col(width = 0.6, fill = "#56B4E9", alpha = 0.66) +
+  labs(y = expression(italic(p[i]))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+```
+
+個体の生存能力をもっと少ないパラメータで表現できないか？
+
+
+---
+## 個体差をモデルに組み込みたい
+
+各個体の生存率$p_i$が能力値$z_i$のシグモイド関数で決まると仮定。<br>
+その能力値は全個体共通の正規分布に従うと仮定:
+$z_i \sim \mathcal{N}(\hat z, \sigma)$
+
+```{r, sigmoid}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 11
+z_hat = wtl::logit(p_hat)
+p_sigmoid = df_seeds_od |>
+  ggplot() + aes(z, p) +
+  geom_line(linewidth = 3, alpha = 0.6, color = "#56B4E9") +
+  annotate("line", x = c(-Inf, z_hat, z_hat), y = c(p_hat, p_hat, -Inf), color = "#56B4E9", linewidth = 1) +
+  annotate("point", x = z_hat, y = p_hat, shape = 16, size = 5, color = "#56B4E9") +
+  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
+  labs(x = expression(italic(z[i])), y = expression(italic(p[i]))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank())
+p_normal = tibble::tibble(
+    z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 100),
+    Density = dnorm(z, z_hat, 3)
+  ) |>
+  ggplot() + aes(z, Density) +
+  geom_area(fill = "#56B4E9", alpha = 0.5) +
+  geom_vline(xintercept = z_hat, color = "#56B4E9", linewidth = 1) +
+  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
+  labs(x = expression(italic(z))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+
+cowplot::plot_grid(p_sigmoid, p_normal, nrow = 1L)
+```
+
+パラメータ2つで済む: 平均 $\hat z$, ばらつき $\sigma$ 。
+
+前者は標本平均 $\hat p$ から求まるとして、後者どうする？
+
+---
+## 個体能力のばらつき $\sigma$ が大きいと両端が増える
+
+普通の二項分布は個体差無し $\sigma = 0$ を仮定してるのと同じ。
+
+```{r, alter-sigma}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 11
+sigma = c(0.5, 1.5, 3)
+breaks = qnorm(c(0.2, 0.4, 0.6, 0.8), z_hat, 3)
+.z = seq(min(df_seeds_od$z), max(df_seeds_od$z), 0.1)
+df_z = tidyr::crossing(sigma, z = .z) |>
+  dplyr::mutate(Density = dnorm(z, z_hat, sigma)) |>
+  dplyr::mutate(sigma = ifelse(sigma > 0.1, sigma, 0)) |>
+  dplyr::bind_rows(tibble::tibble(sigma = 0, z = .z, Density = ifelse(abs(z - z_hat) < 0.2, Inf, 0))) |>
+  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf)))
+
+p_z = df_z |>
+  ggplot() + aes(z, Density) +
+  scale_x_continuous(limits = range(df_seeds_od$z), expand = c(0, 0)) +
+  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
+  labs(x = expression(italic(z))) +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
+
+p_z + geom_col(aes(fill = sigma == 0), width = 0.1, alpha = 0.6)
+
+df_unmixed = tibble::tibble(z = seq(min(df_seeds_od$z), max(df_seeds_od$z), length.out = 20)) |>
+  dplyr::mutate(p = wtl::sigmoid(z)) |>
+  purrr::pmap(function(z, p) {
+    tibble::tibble(z, y = seq.int(0L, 8L), Density = dbinom(y, 8L, p))
+  }) |>
+  purrr::list_rbind() |>
+  dplyr::arrange(y)
+
+df_binom = tibble::tibble(
+  sigma = 0,
+  y = seq.int(0, 8),
+  z = z_hat,
+  Density = dbinom(y, 8, p_hat)
+)
+
+df_mixed = tibble::tibble(sigma) |>
+  dplyr::mutate(data = purrr::map(sigma, \(s) {
+    df_unmixed |>
+      dplyr::mutate(w = dnorm(z, z_hat, s), Density = w * Density) |>
+      dplyr::mutate(Density = Density / sum(Density))
+  })) |>
+  tidyr::unnest(data) |>
+  dplyr::bind_rows(df_binom) |>
+  dplyr::mutate(Z = cut(z, c(-Inf, breaks, Inf)))
+
+p_mixed = df_mixed |>
+  ggplot() + aes(y, Density) +
+  facet_wrap(vars(sigma), nrow = 1L, labeller = label_both) +
+  labs(x = "# survived seeds") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
+
+p_mixed + geom_col(aes(fill = sigma == 0), width = 0.4, alpha = 0.66)
+```
+
+---
+## zの値で色分けしてみると想像しやすい
+
+正規分布と二項分布の混ぜ合わせ......?
+
+```{r, alter-sigma-z}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 11
+scale_fill_z = colorspace::scale_fill_discrete_divergingx("Zissou 1")
+p_z + geom_col(aes(fill = Z)) + scale_fill_z
+p_mixed + geom_col(aes(fill = Z), width = 0.4) + scale_fill_z
+```
+
+---
+## 混合分布。ただの二項分布よりも良いあてはまり。
+
+パラメータp(を決めるz)ごとに二項分布を作って、重み付けして足したもの。
+
+```{r, before-mixing}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 11
+df_mixed |>
+  dplyr::filter(sigma == max(sigma)) |>
+  dplyr::group_by(Z) |>
+  dplyr::mutate(Density = Density / sum(Density)) |>
+  dplyr::ungroup() |>
+  ggplot() + aes(y, Density) +
+  geom_col(aes(fill = Z)) +
+  scale_fill_z +
+  facet_wrap(vars(Z), nrow = 1, labeller = label_both) +
+  labs(x = "# survived seeds") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
+```
+
+<div align="center">
+
+```{r, after-mixing}
+#| echo: false
+#| fig.height: 3.5
+#| fig.width: 7
+p1 = df_mixed |>
+  dplyr::filter(sigma == max(sigma)) |>
+  ggplot() + aes(y, Density) +
+  geom_col(aes(fill = Z)) +
+  scale_fill_z +
+  labs(x = "# survived seeds", title = "expected") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
+
+p2 = tidy_od |>
+  ggplot() + aes(y, observed) +
+  geom_col() +
+  labs(x = "# survived seeds", y = "count", title = "observed") +
+  theme_bw(base_size = 20) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.title = element_blank(), legend.position = "top")
+
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+</div>
+
+---
+## 🔰 乱数生成で混合分布を実感してみよう [`@5-glmm.ipynb`](./5-glmm.ipynb)
+
+1. 100個体の能力値zを正規乱数で生成。分布を描く。
+1. 各個体の種子生存率pをシグモイド関数で計算。分布を描く。
+1. そのpを使って実際の生存種子数を二項分布(n = 8)から生成。分布を描く。
+1. 能力の平均や分散の値を変えたらどうなるか見てみる。
+
+<img width="800" `r src_alt_fig_chunk("alter-sigma-z")`>
+<img width="800" `r src_alt_fig_chunk("alter-sigma-z", number = 2L)`>
+
+---
+## ビールの注文数、再び
+
+```{r, beer-overdispersion-data}
+#| echo: false
+set.seed(24601)
+sample_size = 300L
+lambda = 3
+overdisp = 4
+.n = lambda / (overdisp - 1)
+.p = 1 / overdisp
+df_beer_od = tibble::tibble(X = rnbinom(sample_size, size = .n, prob = .p))
+lambda_obs = mean(df_beer_od$X)
+df_beer_od_exp = tibble::tibble(
+  X = seq.int(0L, 15L),
+  prop = dpois(X, lambda_obs),
+  freq = sample_size * prop
+)
+```
+
+お客さんたちが注文したビールの杯数X。平均`r lambda_obs`杯。<br>
+はいはい、<span style="color: #56B4E9;">ポアソン分布</span>でしょ......
+いや、分散が大きいぞ。
+
+```{r, beer-overdispersion}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 6
+df_beer_od |>
+  dplyr::count(X, name = "freq") |>
+  ggplot() +
+  aes(X, freq) +
+  geom_col(data = df_beer_od_exp, fill = "#56B4E9", alpha = 0.66) +
+  geom_col(width = 0.5) +
+  theme_bw(base_size = 20) +
+  theme(
+    panel.grid.minor.x = element_blank(), panel.grid.minor.y = element_blank(),
+    axis.ticks = element_blank(), legend.position = "none"
+  )
+```
+
+全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。<br>
+
+🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。
+
+
+---
+## 負の二項分布 $~\text{NB}(n, p)$
+
+成功率pの試行がn回成功するまでの失敗回数X。
+n = 1 のとき幾何分布と一致。
+
+<img `r src_alt_fig_chunk("nbinom")`>
+
+\\[
+\Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
+\\]
+
+失敗回数ではなく試行回数を変数とする定義もある。
+
+平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。<br>
+($k \to \infty$でポアソン分布と一致)
+
+---
+## 一般化線形混合モデル GLMM
+
+**固定効果(fixed effects)** のみ扱っていたGLMを拡張して、<br>
+**変量効果(random effect)** を混合したモデル。<br>
+<small style="color: #999999;">「混合分布を使うモデル」という意味ではないらしい。</small>
+
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n,~p_i) \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+  + z_{1i} + \ldots \\
+z_{1i} &\sim \mathcal{N}(\mu_1,~\sigma_1)
+\end{split}\]</p>
+
+e.g.,<br>
+個体$i$の種子生存率$p_i$は、<br>
+(固定効果) 体サイズ$x_{1i}$と日当たり$x_{2i}$に依存し、<br>
+(変量効果) よくわからん個体差$z_{1i}$と植木鉢差$z_{2i}$もある。
+
+---
+## 固定効果にするか、変量効果にするか
+
+推定したパラメータを予測に使うなら固定効果
+
+予測に使えそうなので固定効果向き
+: - 観測・操作した連続値変数: 長さ、重さ、温度、etc.
+: - 観測・操作したカテゴリカル変数: 性別、投薬、etc.
+
+予測に使えないので変量効果向き
+: - 観測・操作できなかった個体差:<br>
+    たまたま集まってくれた学生15人 {A, B, C, ...}。<br>
+    Aさんの固定効果を推定できても、Zさんの予測には使えない。
+: - 観測・操作できなかったグループ差:<br>
+    ↑の学生をランダム5人ずつに分けたグループ {い、ろ、は}。<br>
+    いグループの固定効果を推定できても、また集まることはない。
+
+---
+## どういうときに変量効果を考える必要があるか
+
+データに**擬似反復**が含まれるとき。<br>
+ぜんぶ独立のつもりで解析すると推定が偏ったり誤ったり。
+
+| 植木鉢 | 個体/植木鉢 | 種子/個体 | 疑似反復 | 推定不可 |
+| -----  | ----------- | ----------| ---- | ------ |
+| 100個  | 1個体ずつ   | 1個ずつ   | – | 個体差・鉢差 |
+| 25個   | 1個体ずつ   | 4個ずつ   | 個体 | 鉢差 |
+| 20個   | 5個体ずつ   | 1個ずつ   | 植木鉢 | 個体差 |
+| 5個    | 5個体ずつ   | 4個ずつ   | 植木鉢・個体 | – |
+
+疑似反復あり<br>
+→ 観測できなかった個体差・場所差(変量効果)を推定可能<br>
+→ そのぶんを差し引いて固定効果を推定したい
+
+
+---
+## GLMMの問題点・展望
+
+- 最尤推定の計算が難しくなるので、あまり複雑にはできない
+    - ベイズ推定を使えばクリアできる
+- GLMの拡張として理解はできても、実際に書くのは難しめ
+    - 階層ベイズモデルの一種として見るほうが便利
+
+→ ここでGLMMの練習はせず、階層ベイズモデルに進む。
+
+<figure>
+<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
+<img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
+<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+</a>
+</figure>
+
+
+---
+## 一般化線形(混合)モデルまとめ
+
+- 何はともあれ作図して俯瞰
+- GLMは統計モデリングの考え方の根幹
+    - 確率分布・リンク関数・説明変数
+    - 尤度・最尤法によるパラメータ推定
+    - 情報量基準などによるモデル選択
+- GLMMは現実のデータ解析に向けた強化
+    - 疑似反復による変量効果を考慮
+    - 階層ベイズモデルとして扱うほうが楽
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+
+`r .meta$next_link`
