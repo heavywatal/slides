@@ -8,7 +8,7 @@ unlisted = false
 [東京海上 Data Science Hill Climb](https://tokiomarine-dshc.com/)
 
 - 講師: 岩嵜航 (東北大学生命科学研究科)
-- 日程: 2025-08-27, 2025-09-03, 09:30--17:30
+- 日程: 2025 {08-27, 09-03} 09:30--17:30
 - 場所: オンライン
 
 ```{r schedule, echo = FALSE, fig.width = 8, fig.height = 8, dev="svg"}
@@ -71,16 +71,15 @@ DSHC 2025 参加者は
 `preparation.ipynb` が実行できることを確認しておくとなお安心。
 
 手元のmacOSに講義用の仮想環境を用意する一例
-(Colabに合わせて 3.10 を指定してあるが、最新版 ≥3.12 でも大丈夫なはず):
+(Colabに合わせて 3.11 を指定してあるが、最新版 ≥3.13 でも大丈夫なはず):
 ```sh
-brew install pyenv
-env PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install 3.10
-# Rscript -e 'reticulate::install_python("3.10:latest")'
-$(pyenv prefix 3.10)/bin/python3 -m venv ~/.virtualenvs/dshc2024
-source ~/.virtualenvs/dshc2024/bin/activate
-pip3 install -U setuptools pip
-pip3 install -U jupyter seaborn statsmodels cmdstanpy arviz
-jupyter-lab preparation.ipynb
+WORKON_HOME=${HOME}/.virtualenvs
+uv_python=3.11
+uv python install $uv_python
+uv venv -p $uv_python ${WORKON_HOME}/dshc2025
+source ${WORKON_HOME}/dshc2025/bin/activate
+uv pip install -U jupyterlab seaborn statsmodels cmdstanpy arviz
+jupyter lab preparation.ipynb
 ```
 
 

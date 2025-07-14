@@ -127,7 +127,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 成功率pの試行がn回成功するまでの失敗回数X。
 n = 1 のとき幾何分布と一致。
 
-![plot of chunk nbinom](./figure/nbinom-1.png)
+<img src="figure/nbinom-1.png" alt="plot of chunk nbinom">
 
 \\[
 \Pr(X = k \mid n,~p) = \binom {n + k - 1} k p^n (1 - p)^k
@@ -289,7 +289,8 @@ e.g.,\
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
 <img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="240" align="right"></a>
 
-移項するだけで**ベイズの定理**:<div>
+移項するだけで**ベイズの定理**:
+<div>
 <div style="margin-block: -0.5em;">
 <span class="bubble left30" style="margin-inline-start: 2em;">事後確率</span>
 <span class="bubble" style="margin-inline-start: 6em;">事前確率</span>
@@ -489,7 +490,7 @@ e.g.,\
 | 正規分布 (分散既知) | 正規分布 |
 
 共役事前分布を使うことが常に最善とは限らない。\
-計算コストがかかっても**無情報事前分布**を使う風潮。
+**無情報事前分布**を使って計算機に頑張らせる風潮。
 
 ---
 ## 事後分布を用いた推定
@@ -794,7 +795,7 @@ $\;\propto\;$
 ---
 ## MCMCソフトウェア
 
-- [BUGS](https://www.mrc-bsu.cam.ac.uk/software/bugs/)
+- [BUGS](https://www.mrc-bsu.cam.ac.uk/software/)
     - クローズドソースで、ほぼWindows専用。
 - [JAGS](https://mcmc-jags.sourceforge.io/)
     - オープンソースで、さまざまなOS・言語から利用可能。
@@ -1119,10 +1120,10 @@ Rと同様、 `slope * x` のようなベクトル演算ができる。
 
 
 ``` r
-samplesize = 50L
+sample_size = 50L
 df_lm = tibble::tibble(
-  x = rnorm(samplesize, 1.70, 0.05),
-  bmi = rnorm(samplesize, 22, 1),
+  x = rnorm(sample_size, 1.70, 0.05),
+  bmi = rnorm(sample_size, 22, 1),
   y = bmi * (x**2)
 )
 ```
@@ -1138,7 +1139,7 @@ df_lm = tibble::tibble(
 ``` r
 # リストに入れて渡す:
 lm_data = as.list(df_lm)
-lm_data[["N"]] = samplesize
+lm_data[["N"]] = sample_size
 # モデルを実行速度の速い機械語に翻訳(コンパイル):
 lm_model = cmdstanr::cmdstan_model("stan/lm.stan")
 # モデルとデータを使ってMCMCサンプリング:
@@ -1727,7 +1728,7 @@ model {
 
 
 ``` r
-seeds_data = list(y = df_seeds_od$y, N = samplesize)
+seeds_data = list(y = df_seeds_od$y, N = sample_size)
 model = cmdstanr::cmdstan_model("stan/glmm.stan")
 fit = model$sample(data = seeds_data, seed = 19937L, step_size = 0.1, refresh = 0)
 draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
@@ -1766,11 +1767,12 @@ draws = fit$draws(c("z_hat", "sigma", "r[1]", "r[2]"))
 
 ``` r
 sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
-samplesize = 100L
+sample_size = 100L
 df_seeds_od = tibble::tibble(
-  z = rnorm(samplesize, 0.5, 3),
+  z = rnorm(sample_size, 0.5, 3),
   p = sigmoid(z),
-  y = rbinom(samplesize, 8L, p))
+  y = rbinom(sample_size, 8L, p)
+)
 ```
 
 <img src="figure/overdispersion-1.png" alt="plot of chunk overdispersion">
@@ -1782,13 +1784,13 @@ df_seeds_od = tibble::tibble(
 
 
 ``` r
-samplesize = 300L
+sample_size = 300L
 lambda = 3
 overdisp = 4
 .n = lambda / (overdisp - 1)
 .p = 1 / overdisp
 df_beer_od = tibble::tibble(
-  X = rnbinom(samplesize, size = .n, prob = .p)
+  X = rnbinom(sample_size, size = .n, prob = .p)
 )
 ```
 

@@ -1,11 +1,11 @@
 # %% [markdown]
-# # 統計モデリング概論 DSHC 2024
+# # 統計モデリング概論 DSHC 2025
 #
 # 岩嵜 航 (Watal M. Iwasaki, PhD)<br>
 # 東北大学 生命科学研究科 進化ゲノミクス分野 特任助教
 #
-# 2024-08-21 東京海上 Data Science Hill Climb<br>
-# https://heavywatal.github.io/slides/tokiomarine2024/
+# 2025-08-27 東京海上 Data Science Hill Climb<br>
+# https://heavywatal.github.io/slides/dshc2025/
 #
 # # GLM with Python statsmodels
 
@@ -13,7 +13,7 @@
 
 # Google Colab の場合はインストールから:
 # ```
-# %pip install 'matplotlib>=3.9' 'seaborn>=0.13' 'statsmodels>=0.14'
+# !uv pip install 'matplotlib>=3.10' 'seaborn>=0.13' 'statsmodels>=0.15'
 # ```
 
 # %%

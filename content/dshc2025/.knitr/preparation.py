@@ -1,25 +1,22 @@
 # %% [markdown]
-# # 統計モデリング概論 DSHC 2024
+# # 統計モデリング概論 DSHC 2025
 #
 # 岩嵜 航 (Watal M. Iwasaki, PhD)<br>
 # 東北大学 生命科学研究科 進化ゲノミクス分野 特任助教
 #
-# 2024-08-21 東京海上 Data Science Hill Climb<br>
-# https://heavywatal.github.io/slides/tokiomarine2024/
+# 2025-08-27 東京海上 Data Science Hill Climb<br>
+# https://heavywatal.github.io/slides/dshc2025/
 #
 # ## 方針
 # ほかの講義で使っている環境をなるべくそのまま使う。
 
-# ### Google Colab (Python 3.10) を使っている場合
-# 各ipynbファイルの頭に `%pip install` コマンドを置いておくので、事前準備は不要。
+# ### Google Colab (Python 3.11) を使っている場合
+# 必要なパッケージは既にインストール済みなはず。
+# 各ipynbファイルの頭にも `!uv pip install` コマンドを置いておくので、事前準備は不要。
 # 念のため、このファイルが最後まで問題なく動くことを確認する。
 
 # ### ローカルのPythonを使っている場合
 # 以下の手順でパッケージをいくつか追加する。
-
-# ほかの講義で入れたパッケージのバージョンを上げてしまうかもしれないので、
-# 本講義が終わったら、ほかの講義に参加する前に再び
-# `pip3 install -r requirements.txt` を実行して指定バージョンに戻してください。
 
 # %%
 import sys
@@ -29,16 +26,16 @@ print(sys.version)
 # %% [markdown]
 # ## パッケージのインストールと動作確認
 
-# ほかの講義でインストール済みだが古すぎるものを更新:
+# インストール済みでも古すぎたら更新:
 # %%
-# %pip install -U 'seaborn>=0.13'
-# %pip install -U 'matplotlib>=3.9'
+# !uv pip install -U 'seaborn>=0.13'
+# !uv pip install -U 'matplotlib>=3.10'
 
 # %% [markdown]
 # ### [statsmodels](https://www.statsmodels.org)
 
 # %%
-# %pip install 'statsmodels>=0.14'
+# !uv pip install 'statsmodels>=0.14'
 import statsmodels.api as sm
 
 sm.show_versions()
@@ -47,7 +44,7 @@ sm.show_versions()
 # ### [CmdStanPy](https://cmdstanpy.readthedocs.io)
 
 # %%
-# %pip install 'cmdstanpy>=1.2.4'
+# !uv pip install 'cmdstanpy>=1.2.5'
 import cmdstanpy
 
 print(cmdstanpy.__version__)
@@ -89,7 +86,7 @@ fit.summary()
 # ### [ArviZ](https://python.arviz.org/)
 
 # %%
-# %pip install 'arviz>=0.19'
+# !uv pip install 'arviz>=0.22'
 import arviz as az
 
 print(az.__version__)
