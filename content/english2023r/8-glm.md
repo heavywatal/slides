@@ -4,7 +4,6 @@ linktitle = "Statistical modeling 2: linear regression"
 title = "8. Statistical modeling 2: linear regression — Hands-on Introduction to R 2023"
 date = 2023-12-06T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

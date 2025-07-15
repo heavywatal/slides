@@ -7,7 +7,6 @@ type = "reveal"
 draft = false
 +++
 
-<link rel="stylesheet" href="style.css">
 
 # [Rにやらせて楽しよう — データの可視化と下ごしらえ](.)
 

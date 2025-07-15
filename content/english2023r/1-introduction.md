@@ -4,7 +4,6 @@ linktitle = "Introduction: what is data analysis and R basics"
 title = "1. Introduction: what is data analysis and R basics — Hands-on Introduction to R 2023"
 date = 2023-11-27T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

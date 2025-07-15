@@ -7,7 +7,6 @@ type = "reveal"
 draft = false
 +++
 
-<link rel="stylesheet" href="style.css">
 
 # [進化学実習 2022 牧野研](.)
 

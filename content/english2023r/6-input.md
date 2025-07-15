@@ -4,7 +4,6 @@ linktitle = "Data input and interpretation"
 title = "6. Data input and interpretation — Hands-on Introduction to R 2023"
 date = 2023-12-04T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

@@ -4,7 +4,6 @@ linktitle = "一般化線形モデル (GLM)"
 title = "4. 一般化線形モデル (GLM) — 統計モデリング実習 2022 TMDU"
 date = 2023-03-18T14:40:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

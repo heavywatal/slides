@@ -4,7 +4,6 @@ linktitle = "ベイズの定理、事後分布、MCMC"
 title = "6. ベイズの定理、事後分布、MCMC — 統計モデリング概論 DSHC 2024"
 date = 2024-08-28T09:30:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

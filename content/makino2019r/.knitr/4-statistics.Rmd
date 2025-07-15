@@ -7,7 +7,6 @@ type = "reveal"
 draft = false
 +++
 
-<link rel="stylesheet" href="style.css">
 
 # [Hands-on R Lecture for Makino Lab](.)
 

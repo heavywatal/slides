@@ -4,7 +4,6 @@ linktitle = "個体差、一般化線形混合モデル(GLMM)"
 title = "5. 個体差、一般化線形混合モデル(GLMM) — 統計モデリング概論 DSHC 2023"
 date = 2023-08-23T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

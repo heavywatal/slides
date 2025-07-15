@@ -4,7 +4,6 @@ linktitle = "データ入力、データ解釈"
 title = "6. データ入力、データ解釈 — 進化学実習 2023 牧野研 東北大学"
 date = 2023-04-12T14:40:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

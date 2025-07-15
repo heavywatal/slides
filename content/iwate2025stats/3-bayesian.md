@@ -4,7 +4,6 @@ linktitle = "個体差、ベイズ、MCMC"
 title = "3. 個体差、ベイズ、MCMC — 統計モデリング入門 2025 岩手連大"
 date = 2025-06-26T18:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

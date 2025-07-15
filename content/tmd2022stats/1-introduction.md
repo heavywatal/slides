@@ -4,7 +4,6 @@ linktitle = "導入、直線回帰"
 title = "1. 導入、直線回帰 — 統計モデリング実習 2022 TMDU"
 date = 2023-03-11T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

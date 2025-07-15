@@ -4,7 +4,6 @@ linktitle = "発表会"
 title = "9. 発表会 — 進化学実習 2024 牧野研 東北大学"
 date = 2024-04-15T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

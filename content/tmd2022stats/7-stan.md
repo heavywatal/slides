@@ -4,7 +4,6 @@ linktitle = "StanでGLM"
 title = "7. StanでGLM — 統計モデリング実習 2022 TMDU"
 date = 2023-04-01T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

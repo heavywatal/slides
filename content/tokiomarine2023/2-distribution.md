@@ -4,7 +4,6 @@ linktitle = "直線回帰、確率分布、擬似乱数生成"
 title = "2. 直線回帰、確率分布、擬似乱数生成 — 統計モデリング概論 DSHC 2023"
 date = 2023-08-23T10:30:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

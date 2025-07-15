@@ -4,7 +4,6 @@ linktitle = "Data transformation 1: extract, summarize"
 title = "3. Data transformation 1: extract, summarize — Hands-on Introduction to R 2023"
 date = 2023-11-29T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

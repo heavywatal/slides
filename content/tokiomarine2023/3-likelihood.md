@@ -4,7 +4,6 @@ linktitle = "尤度、最尤推定"
 title = "3. 尤度、最尤推定 — 統計モデリング概論 DSHC 2023"
 date = 2023-08-23T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

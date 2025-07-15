@@ -4,7 +4,6 @@ linktitle = "階層ベイズモデル(HBM)"
 title = "8. 階層ベイズモデル(HBM) — 統計モデリング概論 DSHC 2023"
 date = 2023-08-30T15:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

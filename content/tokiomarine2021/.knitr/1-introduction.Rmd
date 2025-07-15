@@ -7,7 +7,6 @@ type = "reveal"
 draft = false
 +++
 
-<link rel="stylesheet" href="style.css">
 
 # [統計モデリング概論 DSHC 2021](.)
 

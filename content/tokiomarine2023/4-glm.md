@@ -4,7 +4,6 @@ linktitle = "一般化線形モデル(GLM)"
 title = "4. 一般化線形モデル(GLM) — 統計モデリング概論 DSHC 2023"
 date = 2023-08-23T14:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

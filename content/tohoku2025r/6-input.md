@@ -4,7 +4,6 @@ linktitle = "データ入力、レポート作成"
 title = "6. データ入力、レポート作成 — 進化学実習 2025 牧野研 東北大学"
 date = 2025-04-10T14:40:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

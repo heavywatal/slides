@@ -4,7 +4,6 @@ linktitle = "Data transformation 2: join, pivot"
 title = "4. Data transformation 2: join, pivot — Hands-on Introduction to R 2023"
 date = 2023-11-30T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

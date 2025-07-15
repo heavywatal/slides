@@ -4,7 +4,6 @@ linktitle = "Data visualization and reporting"
 title = "2. Data visualization and reporting — Hands-on Introduction to R 2023"
 date = 2023-11-28T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

@@ -4,7 +4,6 @@ linktitle = "データの可視化。"
 title = "2. データの可視化。 — 進化学実習 2025 牧野研 東北大学"
 date = 2025-04-08T14:40:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

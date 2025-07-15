@@ -4,7 +4,6 @@ linktitle = "個体差、一般化線形混合モデル (GLMM)"
 title = "5. 個体差、一般化線形混合モデル (GLMM) — 統計モデリング実習 2022 TMDU"
 date = 2023-03-25T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

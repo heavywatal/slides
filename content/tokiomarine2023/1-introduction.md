@@ -4,7 +4,6 @@ linktitle = "導入"
 title = "1. 導入 — 統計モデリング概論 DSHC 2023"
 date = 2023-08-23T09:30:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

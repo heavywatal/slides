@@ -9,7 +9,6 @@ draft = false
 
 # [Hands-on Introduction to R 2020](.)
 
-<link rel="stylesheet" href="style.css">
 
 <div class="author">
 岩嵜 航 (Watal M. Iwasaki)

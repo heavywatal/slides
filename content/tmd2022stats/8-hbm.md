@@ -4,7 +4,6 @@ linktitle = "階層ベイズモデル (HBM)"
 title = "8. 階層ベイズモデル (HBM) — 統計モデリング実習 2022 TMDU"
 date = 2023-04-01T14:40:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

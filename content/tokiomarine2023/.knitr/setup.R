@@ -59,7 +59,6 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
   dplyr::filter(this) |>
   dplyr::select(url, linktitle, title, date, draft) |>
   dplyr::mutate(
-    css = "style.css",
     dpi = knitr::opts_chunk$get("dpi") |> as.integer() |> dplyr::na_if(72L)
   ) |>
   wtl::toTOML()

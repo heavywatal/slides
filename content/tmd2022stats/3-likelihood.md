@@ -4,7 +4,6 @@ linktitle = "尤度、最尤推定"
 title = "3. 尤度、最尤推定 — 統計モデリング実習 2022 TMDU"
 date = 2023-03-18T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

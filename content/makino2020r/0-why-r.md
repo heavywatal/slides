@@ -7,7 +7,6 @@ type = "reveal"
 draft = false
 +++
 
-<link rel="stylesheet" href="style.css">
 
 # [Hands-on Introduction to R 2020](.)
 

@@ -4,7 +4,6 @@ linktitle = "Statistical modeling 1: probability distribution, likelihood"
 title = "7. Statistical modeling 1: probability distribution, likelihood — Hands-on Introduction to R 2023"
 date = 2023-12-05T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

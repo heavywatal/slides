@@ -4,7 +4,6 @@ linktitle = "StanでGLM"
 title = "7. StanでGLM — 統計モデリング概論 DSHC 2024"
 date = 2024-08-28T13:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 

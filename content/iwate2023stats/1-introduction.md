@@ -4,7 +4,6 @@ linktitle = "導入、Rの基礎"
 title = "1. 導入、Rの基礎 — 統計モデリング入門 2023 岩手連大"
 date = 2023-06-21T18:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

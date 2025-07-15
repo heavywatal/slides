@@ -4,7 +4,6 @@ linktitle = "直線回帰、確率分布"
 title = "2. 直線回帰、確率分布 — 統計モデリング入門 2023 岩手連大"
 date = 2023-06-23T18:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

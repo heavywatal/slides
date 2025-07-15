@@ -4,7 +4,6 @@ linktitle = "確率分布、擬似乱数生成"
 title = "2. 確率分布、擬似乱数生成 — 統計モデリング実習 2022 TMDU"
 date = 2023-03-11T14:40:00+09:00
 draft = false
-css = "style.css"
 dpi = 100
 +++
 

@@ -4,7 +4,6 @@ linktitle = "Data cleansing and conversion: numbers, text"
 title = "5. Data cleansing and conversion: numbers, text — Hands-on Introduction to R 2023"
 date = 2023-12-01T16:00:00+09:00
 draft = false
-css = "style.css"
 dpi = 108
 +++
 
