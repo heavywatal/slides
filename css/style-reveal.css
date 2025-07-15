@@ -135,19 +135,18 @@ li ul, li ol {
   margin-block: 0;
 }
 
-ul:has(li > input[type=checkbox]) {
-  list-style-type: none;
-  padding-inline-start: 0.3em;
-}
-ul:has(li > input[type=checkbox]) ul {
-  padding-inline-start: 1.8em;
-}
-
 li {
   margin-block: 0.25em;
 }
 li li, li p {
   margin-block: 0.2em;
+}
+
+ul:has(> li > input[type=checkbox]), ul:has(> li > p > input[type=checkbox]) {
+  list-style-type: none;
+}
+ul > li > input[type=checkbox], ul > li > p > input[type=checkbox] {
+  margin-inline-start: -1.5em;
 }
 
 dl {
@@ -182,6 +181,7 @@ code, pre {
   font-size: 0.85em;
   padding: 0.1em 0.2em;
   background-color: hsla(0, 0%, 60%, 0.1);
+  white-space: pre-wrap;
 }
 
 pre {
@@ -216,8 +216,11 @@ blockquote::before {
 }
 
 table {
-  border-spacing: 1em 0.4em;
-  border-block: 0.05em solid hsla(0, 0%, 55%, 0.55);
+  border-spacing: 0.4em;
+}
+
+th, td {
+  padding-inline: 0.4em;
 }
 
 th {
@@ -238,10 +241,14 @@ kbd {
   border-radius: 0.18em;
 }
 
+sub, sup {
+  line-height: 1;
+}
+
 h1,
 h2,
 h3 {
-  font-weight: bold;
+  font-weight: 600;
 }
 
 p {
@@ -272,8 +279,9 @@ cite a {
 }
 
 figure {
-  display: inline-block;
-  margin: 1rem 0;
+  width: fit-content;
+  margin-inline: 0;
+  margin-block: 0.5rem;
   line-height: 1;
 }
 
@@ -299,14 +307,16 @@ aside {
 
 h1 {
   font-size: 1.4rem;
-  margin: 0 -1.6rem;
+  margin-block: 0 0.5rem;
+  margin-inline: -1.6rem;
   padding: 0.8rem 0.8rem;
   border-inline-start: 0.8rem solid #aaa;
 }
 
 h2 {
   font-size: 1.4rem;
-  margin: 0 -1.6rem;
+  margin-block: 0 0.5rem;
+  margin-inline: -1.6rem;
   padding: 0.4rem 0.8rem;
   border-inline-start: 0.8rem solid #ccc;
 }
@@ -509,6 +519,25 @@ h3 {
   border-spacing: 0;
 }
 
+.readmore {
+  padding-block: 0.3em;
+  padding-inline: 0.7em;
+  border-radius: 0.2em;
+  opacity: 0.45;
+  color: var(--canvas);
+  background-color: var(--canvas-text);
+}
+.readmore:hover {
+  opacity: 0.5;
+  color: var(--canvas);
+  text-decoration: none;
+}
+.readmore::after {
+  content: "❯";
+  color: var(--canvas);
+  margin-inline-start: 0.6em;
+}
+
 section:first-of-type h1 a {
   color: var(--canvas-text);
 }
@@ -517,19 +546,19 @@ section:first-of-type ol li {
 }
 
 .author {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 1.1rem;
-  margin: 1rem 0 0.3rem;
+  margin-block: 1rem 0.2rem;
 }
 
 .affiliation {
   font-size: 0.9rem;
-  margin: 0.3rem 0 1rem;
+  margin-block: 0.2rem 1rem;
   opacity: 0.75;
 }
 
 .footnote {
-  margin: 1rem 0;
+  margin-block: 1rem 0;
 }
 
 .current-deck {
@@ -545,25 +574,6 @@ section:first-of-type ol li {
 }
 .url a {
   color: inherit;
-}
-
-.readmore {
-  padding: 0.3em 1.8em 0.3em 0.8em;
-  border-radius: 0.2em;
-  font-weight: normal;
-  color: #fff;
-  background-color: #aaa;
-  position: relative;
-}
-.readmore:hover {
-  background-color: var(--canvas-text);
-  text-decoration: none;
-}
-.readmore::after {
-  content: "❯";
-  position: absolute;
-  right: 0.5em;
-  color: #fff;
 }
 
 .screenshot {
@@ -618,4 +628,10 @@ section {
 
 .fragment.bold.visible {
   font-weight: bold;
+}
+.fragment.blur {
+  filter: blur(0.25em);
+}
+.fragment.blur.visible {
+  filter: none;
 }
