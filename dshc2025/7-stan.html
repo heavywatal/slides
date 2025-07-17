@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>7. StanでGLM — 統計モデリング概論 DSHC 2025</title>
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="7. StanでGLM — 統計モデリング概論 DSHC 2025">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/dshc2025/7-stan.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/reveal.css">
+<script type="module">
+import { Reveal } from "/slides/lib/reveal.js/reveal.js";
+Reveal.configure({width: 1440, height: 1080});
+</script>
+<style>
+html { font-size: 240%; }
+</style>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script type="module" src="/slides/lib/katex/katex.min.js"></script>
+<link rel="stylesheet" href="/slides/lib/iconify.css">
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="統計モデリング概論-dshc-2025"><a href=".">統計モデリング概論 DSHC 2025</a></h1>
+<div class="author">
+岩嵜 航 (Watal M. Iwasaki, PhD)
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+(Graduate School of Life Sciences, Tohoku University)
+</div>
+<ol>
+<li><a href="1-introduction.html">導入</a>
+<li><a href="2-distribution.html">直線回帰、確率分布、擬似乱数生成</a>
+<li><a href="3-likelihood.html">尤度、最尤推定</a>
+<li><a href="4-glm.html">一般化線形モデル(GLM)</a>
+<li><a href="5-glmm.html">個体差、一般化線形混合モデル(GLMM)</a>
+<li><a href="6-bayesian.html">ベイズの定理、事後分布、MCMC</a>
+<li class="current-deck"><a href="7-stan.html">StanでGLM</a>
+<li><a href="8-hbm.html">階層ベイズモデル(HBM)</a>
+</ol>
+<div class="footnote">
+2025-09-03 東京海上 Data Science Hill Climb<br>
+<a href="https://heavywatal.github.io/slides/dshc2025/">https://heavywatal.github.io/slides/dshc2025/</a>
+</div>
+
+</section>
+<section>
+<h2 id="-とりあえずstanを動かしてみよう">🔰 とりあえずStanを動かしてみよう</h2>
+<pre tabindex="0"><code>This is cmdstanr version 0.9.0
+- CmdStanR documentation and vignettes: mc-stan.org/cmdstanr
+- CmdStan path: /Users/watal/.cmdstan/cmdstan-2.36.0
+- CmdStan version: 2.36.0
+</code></pre><pre tabindex="0"><code>This is bayesplot version 1.13.0
+</code></pre><p>おおまかな流れ:</p>
+<ol>
+<li>データ準備</li>
+<li>Stan言語でモデルを書く</li>
+<li>モデルをコンパイルして機械語に翻訳 → 実行ファイル</li>
+<li>実行ファイルにデータを渡してMCMCサンプリング</li>
+<li>結果を見る</li>
+</ol>
+<p>🔰
+<a href="7-stan.ipynb"><code>7-stan.ipynb</code></a>
+を開き、スライド説明に沿って実行しよう。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-データ準備">説明変数なしのベイズ推定: データ準備</h2>
+<p>表が出る確率 $p=0.7$ のイカサマコインをN回投げたデータを作る。<br>
+この $p$ をStanで推定してみよう。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">true_p</span> <span class="o">=</span> <span class="m">0.7</span>
+</span></span><span class="line"><span class="cl"><span class="n">N</span> <span class="o">=</span> <span class="m">40L</span>
+</span></span><span class="line"><span class="cl"><span class="n">coin_data</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="n">N</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">true_p</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">coin_data</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>$N
+[1] 40
+
+$x
+ [1] 1 0 0 1 1 1 1 0 1 0 1 1 0 1 1 0 1 1 1 1 0 0 1 1 1 1 1 1 1 0 1 1 0 1 1 0 1 1 1 1
+</code></pre><p>Rならlist型、Pythonならdict型にまとめてStanに渡す。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-stan言語でモデル定義">説明変数なしのベイズ推定: Stan言語でモデル定義</h2>
+<p>別ファイルに書いておく。
+e.g., <code>coin.stan</code>:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=0&gt; N;
+  array[N] int x;
+}
+parameters {
+  real&lt;lower=0,upper=1&gt; p;
+}
+model {
+  x ~ binomial(1, p);
+}
+</code></pre><ul>
+<li>いくつかのブロックに分けて記述する:<br>
+R/Pythonから受け取る <code>data</code>, 推定する <code>parameter</code>, 本体の <code>model</code>.</li>
+<li><a href="https://mc-stan.org/docs/reference-manual/overview-of-data-types.html">変数には型や制約を設定できる</a></li>
+<li><a href="https://mc-stan.org/docs/functions-reference/">関数もたくさん用意されている</a></li>
+</ul>
+</section>
+<section>
+<h2 id="stan言語の7種のブロック">Stan言語の7種のブロック</h2>
+<p>順番厳守。よく使うのは<strong>太字のやつ</strong>。</p>
+<ol>
+<li><code>functions {...}</code></li>
+<li><strong><code>data {...}</code></strong></li>
+<li><code>transformed data {...}</code></li>
+<li><strong><code>parameters {...}</code></strong></li>
+<li><code>transformed parameters {...}</code></li>
+<li><strong><code>model {...}</code></strong></li>
+<li><code>generated quantities {...}</code></li>
+</ol>
+<p><a href="https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html">https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html</a></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-mcmcサンプル">説明変数なしのベイズ推定: MCMCサンプル</h2>
+<p>予め実行速度の速い機械語に翻訳(コンパイル):</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/coin.stan&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>モデルとデータを使ってMCMCサンプリング:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit</span> <span class="o">=</span> <span class="n">model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">coin_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">24601L</span><span class="p">)</span>
+</span></span></code></pre></div><p>いろいろオプションはあるけど、ここではデフォルトに任せる:<br>
+<code>chains</code>, <code>inits</code>, <code>iter_warmup</code>, <code>iter_samples</code>, <code>thin</code>, &hellip;</p>
+<p>問題があったら警告してくれるので<strong>ちゃんと読む</strong>。</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-結果を眺める">説明変数なしのベイズ推定: 結果を眺める</h2>
+<p><code>parameters</code> ブロックに書いた変数の情報が出てくる。<br>
+乱数を使った計算なので(乱数シードを固定しない限り)毎回変わる。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code> variable   mean median   sd  mad     q5    q95 rhat ess_bulk ess_tail
+     lp__ -25.61 -25.34 0.70 0.29 -26.99 -25.13 1.00     2012     2035
+     p      0.72   0.72 0.07 0.07   0.60   0.82 1.00     1501     1708
+</code></pre><p>真の値に近い $p \approx 0.7$ が得られた
+(0.6 から
+0.82 である確率が90%)。<br>
+$\hat R$ もほぼ1で $N_\text{eff}$ も大きいのでよさそう。</p>
+<p><code>lp__</code> はlog posterior(対数事後確率)。後述。</p>
+<p>念のため trace plot も確認しておこう→</p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-trace-plot-確認">説明変数なしのベイズ推定: trace plot 確認</h2>
+<p>どのchainも似た範囲を動いていて、しっかり毛虫っぽい:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">draws</span> <span class="o">=</span> <span class="n">fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/stan-binom-traceplot-1.png" alt="plot of chunk stan-binom-traceplot"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-自己相関の確認">説明変数なしのベイズ推定: 自己相関の確認</h2>
+<p>2&ndash;3ステップくらいで自己相関がほぼ消えるので問題なし:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_acf_bar</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/stan-binom-ac-1.png" alt="plot of chunk stan-binom-ac"></p>
+
+</section>
+<section>
+<h2 id="説明変数なしのベイズ推定-推定結果確認">説明変数なしのベイズ推定: 推定結果確認</h2>
+<p>サンプルサイズNが小さいせいか裾野の広い推定結果。<br>
+真の$p$の値も含まれている:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">draws</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">20</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/stan-binom-hist-1.png" alt="plot of chunk stan-binom-hist"></p>
+
+</section>
+<section>
+<h2 id="lp__-log-posterior-とは"><code>lp__</code>: log posterior とは?</h2>
+<p><code>model</code> ブロックに次のように書いてあると:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">model {
+  mu ~ normal(0.0, 10.0);  // prior
+  x ~ normal(mu, 1.0);     // likelihood
+}
+</code></pre><p>内部的には次のような処理が行われている:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">target += normal_lpdf(theta | 0.0, 10.0)  // prior
+target += normal_lpdf(x | theta, 1.0);    // likelihood
+</code></pre><p>つまり、事前確率と尤度の対数の和を取っている。<br>
+ベイズの定理により、事後確率はこれに比例する。<br>
+<code>lp__</code> はこの <code>target</code> 変数を記録しておいたようなもの。</p>
+
+</section>
+<section>
+<h2 id="stanで回帰じゃないパラメータ推定まとめ">Stanで回帰じゃないパラメータ推定、まとめ</h2>
+<p>別ファイルに書いておく。
+e.g., <code>coin.stan</code>:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=0&gt; N;
+  array[N] int x;
+}
+parameters {
+  real&lt;lower=0,upper=1&gt; p;
+}
+model {
+  x ~ binomial(1, p);
+}
+</code></pre><p>Rからデータを渡して走らせる:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">coin_data</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">lst</span><span class="p">(</span><span class="n">N</span> <span class="o">=</span> <span class="m">50L</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="m">0.7</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">coin_model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/binom.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">coin_fit</span> <span class="o">=</span> <span class="n">coin_model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">coin_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">24601L</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="直線回帰するstanコードの例">直線回帰するStanコードの例</h2>
+<p>受け渡しするデータや推定するパラメータがちょっと増えただけ。</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  int&lt;lower=0&gt; N;
+  vector&lt;lower=0&gt;[N] x;
+  vector[N] y;
+}
+
+parameters {
+  real intercept;
+  real slope;
+  real&lt;lower=0&gt; sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+}
+</code></pre><p>Rと同様、 <code>slope * x</code> のようなベクトル演算ができる。</p>
+
+</section>
+<section>
+<h2 id="直線回帰っぽいデータに当てはめてみる">直線回帰っぽいデータに当てはめてみる</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">sample_size</span> <span class="o">=</span> <span class="m">50L</span>
+</span></span><span class="line"><span class="cl"><span class="n">df_lm</span> <span class="o">=</span> <span class="n">tibble</span><span class="o">::</span><span class="nf">tibble</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">x</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="m">1.70</span><span class="p">,</span> <span class="m">0.05</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">bmi</span> <span class="o">=</span> <span class="nf">rnorm</span><span class="p">(</span><span class="n">sample_size</span><span class="p">,</span> <span class="m">22</span><span class="p">,</span> <span class="m">1</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">  <span class="n">y</span> <span class="o">=</span> <span class="n">bmi</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="m">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><img src="figure/weight-lm-1.png" alt="plot of chunk weight-lm">
+
+</section>
+<section>
+<h2 id="操作は回帰じゃないモデルと同じ">操作は回帰じゃないモデルと同じ</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># リストに入れて渡す:</span>
+</span></span><span class="line"><span class="cl"><span class="n">lm_data</span> <span class="o">=</span> <span class="nf">as.list</span><span class="p">(</span><span class="n">df_lm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">lm_data[[</span><span class="s">&#34;N&#34;</span><span class="n">]]</span> <span class="o">=</span> <span class="n">sample_size</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># モデルを実行速度の速い機械語に翻訳(コンパイル):</span>
+</span></span><span class="line"><span class="cl"><span class="n">lm_model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/lm.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># モデルとデータを使ってMCMCサンプリング:</span>
+</span></span><span class="line"><span class="cl"><span class="n">lm_fit</span> <span class="o">=</span> <span class="n">lm_model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">lm_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">19937L</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">lm_fit</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>  variable   mean median    sd   mad     q5    q95 rhat ess_bulk ess_tail
+ lp__      -79.49 -79.16  1.30  1.07 -82.06 -78.08 1.00     1065     1341
+ intercept -68.54 -69.16 14.57 14.59 -91.28 -43.45 1.00      886      777
+ slope      77.87  78.18  8.56  8.58  63.13  91.30 1.00      887      797
+ sigma       3.08   3.04  0.33  0.32   2.62   3.65 1.00     1381     1340
+</code></pre><p>切片と傾きはそれらしき値。
+$\hat R$ や $N_{eff}$ も良さそう。
+もう少し確認しよう。</p>
+</section>
+<section>
+<h2 id="cmdstanによる診断">CmdStanによる診断</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">lm_fit</span><span class="o">$</span><span class="nf">cmdstan_diagnose</span><span class="p">()</span>
+</span></span></code></pre></div><p>satisfactory とか no problems ばかりであることを確認</p>
+<pre tabindex="0"><code>Treedepth satisfactory for all transitions.
+
+No divergent transitions found.
+
+E-BFMI satisfactory.
+
+Effective sample size satisfactory.
+
+Split R-hat values satisfactory all parameters.
+
+Processing complete, no problems detected.
+</code></pre>
+</section>
+<section>
+<h2 id="draws-生のmcmcサンプル"><code>draws</code>: 生のMCMCサンプル</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">lm_draws_array</span> <span class="o">=</span> <span class="n">lm_fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="nf">dim</span><span class="p">(</span><span class="n">lm_draws_array</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] 1000    4    4
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">lm_draws_array</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code># A draws_array: 1000 iterations, 4 chains, and 4 variables
+, , variable = lp__
+
+         chain
+iteration   1   2   3   4
+        1 -79 -79 -78 -82
+        2 -79 -80 -78 -81
+        3 -78 -78 -79 -82
+        4 -78 -78 -79 -82
+        5 -81 -78 -79 -80
+
+, , variable = intercept
+
+         chain
+iteration   1   2   3   4
+        1 -53 -74 -71 -34
+        2 -58 -74 -76 -38
+        3 -65 -74 -62 -36
+        4 -72 -72 -58 -39
+        5 -90 -62 -58 -65
+
+, , variable = slope
+
+         chain
+iteration  1  2  3  4
+        1 68 81 79 57
+        2 72 81 82 60
+        3 76 81 74 59
+        4 80 80 72 61
+        5 90 74 72 76
+
+, , variable = sigma
+
+         chain
+iteration   1   2   3   4
+        1 3.2 2.7 3.1 3.5
+        2 2.8 2.7 2.9 2.9
+        3 2.9 2.7 2.8 2.9
+        4 3.2 2.7 2.8 3.5
+        5 3.7 3.0 2.8 2.6
+
+# ... with 995 more iterations
+</code></pre>
+</section>
+<section>
+<h2 id="draws-dataframeのほうが見やすいかも"><code>draws</code>: data.frameのほうが見やすいかも</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">lm_draws</span> <span class="o">=</span> <span class="n">lm_fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&#34;df&#34;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code># A draws_df: 1000 iterations, 4 chains, and 4 variables
+   lp__ intercept slope sigma
+1   -79       -53    68   3.2
+2   -79       -58    72   2.8
+3   -78       -65    76   2.9
+4   -78       -72    80   3.2
+5   -81       -90    90   3.7
+6   -80       -85    88   3.4
+7   -79       -86    88   3.1
+8   -79       -85    87   3.0
+9   -79       -64    75   2.6
+10  -79       -63    74   3.4
+# ... with 3990 more draws
+# ... hidden reserved variables {&#39;.chain&#39;, &#39;.iteration&#39;, &#39;.draw&#39;}
+</code></pre><p>実体はCmdStanが書き出したCSVファイル:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">lm_fit</span><span class="o">$</span><span class="nf">output_files</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>[1] &#34;/var/folders/**/***/T/Rtmp******/*-2023****-1-******.csv&#34;
+[2] &#34;/var/folders/**/***/T/Rtmp******/*-2023****-2-******.csv&#34;
+[3] &#34;/var/folders/**/***/T/Rtmp******/*-2023****-3-******.csv&#34;
+[4] &#34;/var/folders/**/***/T/Rtmp******/*-2023****-4-******.csv&#34;
+</code></pre>
+</section>
+<section>
+<h2 id="traceplot-サンプル順に-draws-を並べたもの"><code>traceplot</code>: サンプル順に <code>draws</code> を並べたもの</h2>
+<p>どの chain も同じところをうろうろしていればOK。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">params</span> <span class="o">=</span> <span class="nf">names</span><span class="p">(</span><span class="n">lm_model</span><span class="o">$</span><span class="nf">variables</span><span class="p">()</span><span class="o">$</span><span class="n">parameters</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_trace</span><span class="p">(</span><span class="n">lm_draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">,</span> <span class="n">facet_args</span> <span class="o">=</span> <span class="nf">list</span><span class="p">(</span><span class="n">ncol</span> <span class="o">=</span> <span class="m">1</span><span class="p">))</span>
+</span></span></code></pre></div><p><img src="./figure/stan-lm-traceplot-1.png" alt="plot of chunk stan-lm-traceplot"></p>
+
+</section>
+<section>
+<h2 id="各パラメータの事後分布">各パラメータの事後分布</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">mcmc_hist</span><span class="p">(</span><span class="n">lm_draws</span><span class="p">,</span> <span class="n">pars</span> <span class="o">=</span> <span class="n">params</span><span class="p">,</span> <span class="n">bins</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/stan-lm-hist-1.png" alt="plot of chunk stan-lm-hist"></p>
+</section>
+<section>
+<h2 id="posterior-predictive-checking-ppc">Posterior Predictive Checking (PPC)</h2>
+<p>サイズ $S$ のパラメータdrawsと $N$ 個の観察値から
+$S \times N$ 行列の $y_{rep}$ を生成:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">mu_rep</span> <span class="o">=</span> <span class="n">lm_draws</span><span class="o">$</span><span class="n">intercept</span> <span class="o">+</span> <span class="n">lm_draws</span><span class="o">$</span><span class="n">slope</span> <span class="o">%o%</span> <span class="n">df_lm</span><span class="o">$</span><span class="n">x</span>
+</span></span><span class="line"><span class="cl"><span class="n">yrep</span> <span class="o">=</span> <span class="n">mu_rep</span> <span class="o">+</span> <span class="nf">rnorm</span><span class="p">(</span><span class="nf">prod</span><span class="p">(</span><span class="nf">dim</span><span class="p">(</span><span class="n">mu_rep</span><span class="p">)),</span> <span class="m">0</span><span class="p">,</span> <span class="n">lm_draws</span><span class="o">$</span><span class="n">sigma</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">bayesplot</span><span class="o">::</span><span class="nf">ppc_intervals</span><span class="p">(</span><span class="n">y</span> <span class="o">=</span> <span class="n">df_lm[[</span><span class="s">&#34;y&#34;</span><span class="n">]]</span><span class="p">,</span> <span class="n">yrep</span> <span class="o">=</span> <span class="n">yrep</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">x</span> <span class="o">=</span> <span class="n">df_lm[[</span><span class="s">&#34;x&#34;</span><span class="n">]]</span><span class="p">,</span> <span class="n">prob</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">,</span> <span class="n">prob_outer</span> <span class="o">=</span> <span class="m">0.9</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/stan-lm-ppc-1.png" alt="plot of chunk stan-lm-ppc"><img src="./figure/stan-lm-ppc-2.png" alt="plot of chunk stan-lm-ppc"></p>
+<p><a href="http://mc-stan.org/bayesplot/reference/PPC-overview.html">http://mc-stan.org/bayesplot/reference/PPC-overview.html</a></p>
+
+</section>
+<section>
+<h2 id="変数とブロックをうまく使って可読性アップ">変数と<a href="6-bayesian.html#/37">ブロック</a>をうまく使って可読性アップ</h2>
+<p>途中計算に名前をつけることでモデルが読みやすくなる:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">model {
+  vector[N] mu = intercept + slope * x;
+  y ~ normal(mu, sigma);
+}
+</code></pre><p><code>transformed parameters</code> ブロックに書くとさらに見通しがよくなる:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+
+model {
+  y ~ normal(mu, sigma);
+}
+</code></pre><p>見た目が変わるだけでなくMCMCサンプルが記録されるようになる。</p>
+
+</section>
+<section>
+<h2 id="drawsは嵩むが頭は使わずに済む">drawsは嵩むが頭は使わずに済む</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">lmtr_model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/lm-transformed.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">lmtr_fit</span> <span class="o">=</span> <span class="n">lmtr_model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">lm_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">19937L</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">lmtr_draws</span> <span class="o">=</span> <span class="n">lmtr_fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&#34;df&#34;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code># A draws_df: 1000 iterations, 4 chains, and 54 variables
+   lp__ intercept slope sigma mu[1] mu[2] mu[3] mu[4] mu[5] mu[6] mu[7] mu[8] mu[9] mu[10] mu[11] mu[12] mu[13] mu[14] mu[15] mu[16] mu[17] mu[18] mu[19] mu[20] mu[21] mu[22] mu[23] mu[24] mu[25] mu[26] mu[27] mu[28] mu[29] mu[30] mu[31] mu[32] mu[33] mu[34] mu[35] mu[36] mu[37] mu[38] mu[39] mu[40] mu[41] mu[42] mu[43] mu[44] mu[45] mu[46] mu[47] mu[48] mu[49] mu[50]
+1 -79.1     -52.6  68.3  3.25  64.8  69.2  57.9  62.1  64.7  58.7  69.3  61.8  59.3   63.9   67.3   62.5   61.5   64.7   62.9   62.7   66.7   61.5   58.1   57.0   61.7   63.9   64.8   66.1   63.9   61.9   63.7   59.5   70.4   63.8   71.5   67.0   64.5   63.9   68.1   66.6   56.4   65.4   68.6   54.9   64.5   67.0   61.0   62.1   60.5   64.2   67.9   66.6   65.7   62.0
+2 -78.6     -58.4  71.8  2.80  64.9  69.6  57.7  62.1  64.8  58.6  69.7  61.8  59.1   64.0   67.5   62.6   61.5   64.8   62.9   62.7   66.9   61.5   57.9   56.7   61.7   64.0   64.9   66.3   64.0   61.8   63.8   59.3   70.8   63.9   71.9   67.3   64.6   64.0   68.4   66.8   56.2   65.6   69.0   54.6   64.6   67.2   60.9   62.1   60.4   64.3   68.2   66.8   65.8   62.0
+3 -78.1     -64.5  75.6  2.91  65.4  70.3  57.8  62.4  65.2  58.7  70.4  62.0  59.3   64.4   68.1   62.9   61.7   65.3   63.2   63.1   67.5   61.8   57.9   56.7   62.0   64.4   65.4   66.8   64.4   62.1   64.1   59.5   71.6   64.3   72.8   67.9   65.1   64.4   69.0   67.4   56.1   66.1   69.6   54.5   65.0   67.8   61.2   62.4   60.6   64.7   68.8   67.4   66.3   62.2
+4 -78.5     -72.4  80.3  3.20  65.6  70.8  57.6  62.4  65.5  58.5  71.0  62.1  59.1   64.6   68.5   63.0   61.7   65.5   63.3   63.2   67.8   61.8   57.7   56.4   62.0   64.5   65.6   67.1   64.5   62.2   64.3   59.4   72.2   64.4   73.5   68.3   65.3   64.5   69.5   67.7   55.8   66.4   70.1   54.0   65.3   68.2   61.2   62.5   60.6   64.9   69.2   67.7   66.6   62.3
+5 -81.0     -89.7  90.0  3.72  65.0  70.8  56.0  61.4  64.8  57.0  71.0  61.0  57.7   63.9   68.3   62.0   60.7   64.9   62.5   62.3   67.5   60.7   56.1   54.7   60.9   63.8   65.0   66.7   63.8   61.1   63.5   58.0   72.4   63.7   73.8   68.0   64.6   63.8   69.4   67.4   54.0   65.8   70.1   52.0   64.6   67.9   60.0   61.5   59.3   64.2   69.1   67.4   66.1   61.3
+6 -79.6     -84.7  87.6  3.40  65.8  71.5  57.0  62.3  65.6  58.0  71.6  61.9  58.7   64.7   69.0   62.9   61.6   65.7   63.3   63.1   68.2   61.7   57.2   55.8   61.9   64.6   65.8   67.5   64.6   62.1   64.4   59.0   73.0   64.5   74.4   68.7   65.4   64.6   70.1   68.1   55.1   66.6   70.7   53.2   65.4   68.6   60.9   62.4   60.3   65.0   69.8   68.1   66.9   62.2
+# ... with 3994 more draws
+# ... hidden reserved variables {&#39;.chain&#39;, &#39;.iteration&#39;, &#39;.draw&#39;}
+</code></pre><p>この右側の <code>mu</code> 行列はさっき苦労して作った <code>mu_rep</code> と同じ。</p>
+<p>ひょっとして <code>yrep</code> もStanで作れる？</p>
+
+</section>
+<section>
+<h2 id="generated-quantities-ブロックで乱数生成"><code>generated quantities</code> ブロックで乱数生成</h2>
+<p>(<code>data</code> と <code>parameters</code> のブロックは同じなので省略)</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">transformed parameters {
+  vector[N] mu = intercept + slope * x;
+}
+
+model {
+  y ~ normal(mu, sigma);
+}
+
+generated quantities {
+  array[N] real yrep = normal_rng(mu, sigma);
+}
+</code></pre><p><a href="https://mc-stan.org/docs/functions-reference/normal-distribution.html"><code>normal_rng()</code></a>
+のような乱数生成が使えるのは<br>
+<code>generated quantities</code> ブロックだけ。</p>
+<p>(<code>yrep</code> を <code>vector[N]</code> 型で作ろうとすると怒られる。)</p>
+
+</section>
+<section>
+<h2 id="drawsはさらに嵩むがコードは美しくなった">drawsはさらに嵩むがコードは美しくなった</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">lmgen_model</span> <span class="o">=</span> <span class="n">cmdstanr</span><span class="o">::</span><span class="nf">cmdstan_model</span><span class="p">(</span><span class="s">&#34;stan/lm-generated.stan&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">lmgen_fit</span> <span class="o">=</span> <span class="n">lmgen_model</span><span class="o">$</span><span class="nf">sample</span><span class="p">(</span><span class="n">lm_data</span><span class="p">,</span> <span class="n">seed</span> <span class="o">=</span> <span class="m">19937L</span><span class="p">,</span> <span class="n">refresh</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">lmgen_draws</span> <span class="o">=</span> <span class="n">lmgen_fit</span><span class="o">$</span><span class="nf">draws</span><span class="p">(</span><span class="n">format</span> <span class="o">=</span> <span class="s">&#34;df&#34;</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">print</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code># A draws_df: 1000 iterations, 4 chains, and 104 variables
+   lp__ intercept slope sigma mu[1] mu[2] mu[3] mu[4] mu[5] mu[6] mu[7] mu[8] mu[9] mu[10] mu[11] mu[12] mu[13] mu[14] mu[15] mu[16] mu[17] mu[18] mu[19] mu[20] mu[21] mu[22] mu[23] mu[24] mu[25] mu[26] mu[27] mu[28] mu[29] mu[30] mu[31] mu[32] mu[33] mu[34] mu[35] mu[36] mu[37] mu[38] mu[39] mu[40] mu[41] mu[42] mu[43] mu[44] mu[45] mu[46] mu[47] mu[48] mu[49] mu[50] yrep[1] yrep[2] yrep[3] yrep[4] yrep[5] yrep[6] yrep[7] yrep[8] yrep[9] yrep[10] yrep[11] yrep[12] yrep[13] yrep[14] yrep[15] yrep[16] yrep[17] yrep[18] yrep[19] yrep[20] yrep[21] yrep[22] yrep[23] yrep[24] yrep[25] yrep[26] yrep[27] yrep[28] yrep[29] yrep[30] yrep[31] yrep[32] yrep[33] yrep[34] yrep[35] yrep[36] yrep[37] yrep[38] yrep[39] yrep[40] yrep[41] yrep[42] yrep[43] yrep[44] yrep[45] yrep[46] yrep[47] yrep[48] yrep[49] yrep[50]
+1 -79.1     -52.6  68.3  3.25  64.8  69.2  57.9  62.1  64.7  58.7  69.3  61.8  59.3   63.9   67.3   62.5   61.5   64.7   62.9   62.7   66.7   61.5   58.1   57.0   61.7   63.9   64.8   66.1   63.9   61.9   63.7   59.5   70.4   63.8   71.5   67.0   64.5   63.9   68.1   66.6   56.4   65.4   68.6   54.9   64.5   67.0   61.0   62.1   60.5   64.2   67.9   66.6   65.7   62.0    63.7    70.2    60.3    65.1    68.6    55.8    71.9    58.7    59.3     62.6     66.6     63.4     62.8     65.1     61.4     59.7     68.9     60.9     57.3     55.2     62.0     61.5     73.5     74.5     66.2     61.8     67.0     54.7     72.3     63.1     69.9     74.7     62.9     65.7     71.1     68.2     53.4     71.4     67.1     51.9     63.8     67.9     63.0     57.6     64.0     63.0     65.1     66.6     61.9     61.8
+2 -80.1     -46.0  64.3  3.10  64.5  68.7  58.1  62.0  64.4  58.8  68.8  61.7  59.3   63.7   66.9   62.4   61.4   64.4   62.7   62.6   66.3   61.5   58.2   57.2   61.6   63.7   64.5   65.7   63.7   61.8   63.5   59.5   69.8   63.6   70.8   66.7   64.3   63.7   67.7   66.2   56.7   65.1   68.1   55.3   64.2   66.6   61.0   62.0   60.5   63.9   67.4   66.2   65.3   61.9    62.4    70.7    57.1    58.7    71.2    56.6    70.2    61.9    57.0     65.6     70.0     63.5     60.5     60.1     65.3     62.3     70.1     64.9     58.2     56.1     59.3     60.9     64.2     64.3     64.2     62.4     65.3     54.8     70.9     60.6     68.9     70.9     65.6     64.8     68.9     66.5     57.3     64.4     69.5     55.8     64.5     71.4     64.4     63.6     63.8     69.0     70.2     64.8     67.1     61.5
+3 -79.6     -46.3  64.9  3.07  65.3  69.5  58.8  62.7  65.2  59.5  69.6  62.4  60.0   64.5   67.7   63.1   62.2   65.2   63.5   63.3   67.1   62.2   58.9   57.9   62.4   64.4   65.3   66.5   64.4   62.5   64.2   60.2   70.6   64.3   71.6   67.4   65.0   64.4   68.4   67.0   57.4   65.9   69.0   55.9   65.0   67.4   61.7   62.7   61.2   64.7   68.2   67.0   66.1   62.6    64.4    70.6    60.9    66.8    66.5    57.6    72.4    61.6    59.6     63.8     75.2     67.1     58.6     64.2     65.1     68.0     70.2     63.2     56.2     50.7     61.6     63.4     63.7     67.5     63.4     66.6     69.0     61.5     78.4     67.4     71.0     74.4     64.7     62.8     65.0     66.6     56.2     66.2     71.7     55.2     58.9     70.1     65.5     64.7     60.1     65.2     69.3     72.8     60.8     62.8
+4 -78.9     -51.4  67.8  2.98  65.2  69.6  58.3  62.5  65.0  59.1  69.7  62.2  59.7   64.3   67.6   62.9   61.9   65.0   63.2   63.1   67.0   61.9   58.5   57.4   62.1   64.2   65.1   66.4   64.2   62.2   64.0   59.9   70.7   64.1   71.8   67.4   64.9   64.2   68.4   66.9   56.9   65.8   69.0   55.4   64.9   67.3   61.4   62.5   60.9   64.5   68.2   66.9   66.0   62.3    62.7    70.1    55.7    60.4    71.1    62.1    74.3    61.9    57.7     65.0     72.5     67.3     66.1     70.3     66.1     64.1     71.4     58.3     58.5     55.7     64.8     67.7     65.6     66.0     67.0     62.4     60.5     58.5     67.9     61.3     76.9     68.4     60.0     63.6     68.9     67.2     54.2     64.2     71.8     58.7     69.8     67.9     58.5     62.6     61.2     66.3     63.5     73.6     66.5     62.7
+5 -78.7     -53.6  69.2  3.07  65.3  69.8  58.3  62.6  65.2  59.2  69.9  62.2  59.7   64.4   67.8   63.0   62.0   65.2   63.3   63.2   67.2   62.0   58.5   57.4   62.2   64.4   65.3   66.6   64.4   62.3   64.2   59.9   71.0   64.3   72.1   67.6   65.0   64.4   68.7   67.1   56.8   65.9   69.2   55.3   65.0   67.5   61.5   62.6   60.9   64.7   68.4   67.1   66.2   62.4    68.2    65.9    62.6    64.4    63.9    57.3    70.4    55.7    54.6     62.6     65.0     63.3     61.6     69.4     63.5     64.4     69.9     62.2     58.9     57.6     54.9     64.0     60.9     62.3     65.6     64.0     60.8     60.0     67.8     62.9     72.5     66.6     57.6     60.5     69.6     70.4     56.2     66.5     65.5     53.8     65.5     70.4     62.4     59.9     52.9     63.1     63.4     67.2     66.5     57.3
+6 -79.3     -87.7  88.9  3.20  65.0  70.8  56.1  61.5  64.8  57.1  70.9  61.1  57.8   63.9   68.2   62.1   60.7   64.9   62.5   62.3   67.4   60.8   56.3   54.8   61.0   63.8   65.0   66.7   63.8   61.2   63.5   58.1   72.3   63.7   73.7   67.9   64.6   63.8   69.3   67.3   54.1   65.8   70.0   52.2   64.6   67.8   60.1   61.5   59.4   64.2   69.0   67.3   66.1   61.3    61.6    71.3    53.2    61.4    65.5    54.7    67.7    63.4    53.5     67.1     71.4     64.6     57.9     63.0     62.9     57.2     64.8     55.2     53.2     57.6     62.9     55.3     61.4     63.7     64.5     58.9     64.0     58.4     71.0     63.9     71.5     70.2     64.8     63.1     73.5     61.0     60.5     65.7     62.9     51.0     65.3     74.5     54.9     59.7     65.2     61.2     61.8     64.2     65.4     61.0
+# ... with 3994 more draws
+# ... hidden reserved variables {&#39;.chain&#39;, &#39;.iteration&#39;, &#39;.draw&#39;}
+</code></pre><p><code>yrep = lmgen_fit$draws(&quot;yrep&quot;, format = &quot;matrix&quot;)</code>
+を取り出したらあとは <code>bayesplot::ppc_*()</code> に渡すだけ。</p>
+</section>
+<section>
+<h2 id="観察値とは違うxを使ってpredictionすることも可能">観察値とは違うXを使ってPredictionすることも可能</h2>
+<p>観察値の外側とか、均等間隔とか <code>x_tilde</code> を好きに作って渡せる。</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">data {
+  // ...
+  int&lt;lower=0&gt; N_tilde
+  vector[N_tilde] x_tilde;
+}
+// ...
+generated quantities {
+  array[N_tilde] real y_tilde = normal_rng(intercept + slope * x_tilde, sigma);
+}
+</code></pre>
+</section>
+<section>
+<h2 id="変数の型-vector-vs-array">変数の型: <code>vector</code> vs <code>array</code></h2>
+<p><code>vector</code>, <code>row_vector</code>, <code>matrix</code> は実数 <code>real</code> のみで、行列演算できる:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">real x;
+vector[3] v;
+row_vector[3] r;
+matrix[3, 3] m;
+
+x * v  // vector[3]
+r * v  // real
+v * r  // matrix[3, 3]
+m * v  // vector[3]
+m * m  // matrix[3, 3]
+m[1]   // row_vector[3]
+</code></pre><p><code>array</code> に型の制約は無いが、行列演算はできないので自力forループ:</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">array[3] int a;
+array[3] int b;
+for (i in 1:3) {
+  b[i] = 2 * a[i] + 1
+}
+</code></pre>
+</section>
+<section>
+<h2 id="パラメータの事前分布を明示的に設定できる">パラメータの事前分布を明示的に設定できる</h2>
+<p>が、省略してもStanがデフォルトでうまくやってくれる。<br>
+そのせいで収束が悪いかも、となってから考えても遅くない。</p>
+<pre tabindex="0"><code class="language-stan" data-lang="stan">parameters {
+  real intercept;
+  real slope;
+  real&lt;lower=0&gt; sigma;
+}
+
+model {
+  y ~ normal(intercept + slope * x, sigma);
+  intercept ~ normal(0, 100);
+  slope ~ normal(0, 100);
+  sigma ~ student_t(3, 0, 10);
+}
+</code></pre><p>設定したくなったら、どう選ぶか？</p>
+
+</section>
+<section>
+<h2 id="事前分布の選別">事前分布の選別</h2>
+<ol>
+<li>
+<p>とりあえず<strong>無情報事前分布</strong> $[-\infty, \infty]$。Stanのデフォルト。</p>
+</li>
+<li>
+<p>収束が悪かったら<strong>弱情報事前分布</strong>を試す。<br>
+事後分布を更新していったとき<strong>事前分布っぽさが残らない</strong>のが良い。</p>
+<ul>
+<li>取りうる値を逃すような狭すぎる分布はダメ。</li>
+<li>狭すぎるよりはマシだが、広すぎても良くない。</li>
+<li>一様分布 $[a, b]$ は一見無情報っぽくて良さそうだが、<br>
+事後分布に裾野が残ったり絶壁ができたりしがちなので微妙。</li>
+</ul>
+<p>おすすめ: <a href="https://mc-stan.org/docs/functions-reference/normal-distribution.html"><strong>正規分布</strong></a>
+or <a href="https://mc-stan.org/docs/functions-reference/student-t-distribution.html"><strong>Student&rsquo;s t分布</strong></a></p>
+</li>
+</ol>
+<p><cite><a href="https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations">https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations</a></cite></p>
+
+</section>
+<section>
+<h2 id="stanおすすめ弱情報事前分布-students-t分布">Stanおすすめ弱情報事前分布: Student&rsquo;s t分布</h2>
+<p>Student&rsquo;s $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$</p>
+<ul>
+<li>自由度 $3 \le \nu_0 \le 7 $ で適当に固定。
+<ul>
+<li>$\nu = 1$ でコーシー分布。裾野が広すぎて良くないらしい。</li>
+<li>$\nu \to \infty$ で<strong>正規分布</strong>。だいたいこれでいいらしい。</li>
+</ul>
+</li>
+<li>スケール $\sigma$: 「推定したい値は$[-\sigma_0, \sigma_0]$に収まるだろう」という値。</li>
+</ul>
+<p><img src="./figure/studentt-1.png" alt="plot of chunk studentt"></p>
+
+</section>
+<section>
+<h2 id="-stanで一般化線形モデル">🔰 Stanで一般化線形モデル</h2>
+<p>🔰
+<a href="7-stan.ipynb"><code>7-stan.ipynb</code></a>
+を開いて実行していこう。</p>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 2.0;">
+<ul>
+<li>
+<p>直線回帰</p>
+</li>
+<li>
+<p>ポアソン回帰</p>
+</li>
+<li>
+<p>ロジスティック回帰</p>
+</li>
+<li>
+<p>重回帰</p>
+</li>
+<li>
+<p>分散分析</p>
+</li>
+<li>
+<p>共分散分析</p>
+</div>
+<div class="column" style="flex-shrink: 1.0;">
+</li>
+</ul>
+<figure>
+<img src="figure/lm-bad-1.png" alt="plot of chunk lm-bad" height=240>
+<img src="figure/glm-poisson-1.png" alt="plot of chunk glm-poisson" height=240>
+<img src="figure/glm-logistic-1.png" alt="plot of chunk glm-logistic" height=240>
+<img src="figure/multiple-regression-1.png" alt="plot of chunk multiple-regression" height=240>
+<img src="figure/glm-anova-1.png" alt="plot of chunk glm-anova" height=240>
+<img src="figure/glm-ancova-1.png" alt="plot of chunk glm-ancova" height=240>
+</figure>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="-stanでpenguinsの回帰分析をしてみよう">🔰 Stanでpenguinsの回帰分析をしてみよう</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction" height="300">
+<p><a href="4-glm.html#/30">GLM回</a>の練習を参照。</p>
+</section>
+<section>
+<h2 id="-stanでpenguinsの回帰分析をしてみよう">🔰 Stanでpenguinsの回帰分析をしてみよう</h2>
+<a href="https://allisonhorst.github.io/palmerpenguins/">
+<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
+<img src="/slides/image/rstats/lter_penguins.png" width="45%">
+<img src="/slides/image/rstats/culmen_depth.png" width="45%">
+</a>
+<p><code>Stan does not support NA</code> と怒られるので欠損値を取り除いておく:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">get_rdataset</span><span class="p">(</span><span class="s2">&#34;penguins&#34;</span><span class="p">,</span> <span class="s2">&#34;palmerpenguins&#34;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">data</span>
+</span></span><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+</ul>
+<a href="8-hbm.html" class="readmore">
+8. 階層ベイズモデル(HBM)
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>
