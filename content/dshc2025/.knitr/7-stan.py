@@ -30,6 +30,7 @@
 # %%
 # %matplotlib inline
 
+import sys
 from pathlib import Path
 
 import arviz as az
@@ -40,6 +41,8 @@ import seaborn as sns
 import statsmodels.api as sm
 from cmdstanpy import CmdStanModel
 from scipy import special
+
+is_interactive = hasattr(sys, "ps1")
 
 # %% [markdown]
 # ## 説明変数なしのベイズ推定
@@ -96,7 +99,9 @@ model = CmdStanModel(stan_file=stan_file)
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(coin_data, chains=4, iter_sampling=2000)
+fit = model.sample(
+    coin_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+)
 
 # %% [markdown]
 # 結果はchainごとにファイル出力されているらしい。
@@ -171,7 +176,7 @@ model = CmdStanModel(stan_file="stan/lm.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000)
+fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
 
 # %% [markdown]
 # ### 結果の確認
@@ -228,7 +233,7 @@ grid.map(sns.lineplot, "x", "pred")
 # %%
 model = CmdStanModel(stan_file="stan/poisson.stan")
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000)
+fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
 # %%
 fit.summary()
 # %%
@@ -282,7 +287,9 @@ logistic_data.update(df_logistic.to_dict("list"))
 model = CmdStanModel(stan_file="stan/logistic.stan")
 
 # %%
-fit = model.sample(logistic_data, chains=4, iter_sampling=2000)
+fit = model.sample(
+    logistic_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+)
 fit.summary()
 print(fit.diagnose())
 
@@ -335,7 +342,9 @@ multiple_data.update(df_mul.to_dict("list"))
 # %%
 model = CmdStanModel(stan_file="stan/multiple.stan")
 # %%
-fit = model.sample(multiple_data, chains=4, iter_sampling=2000)
+fit = model.sample(
+    multiple_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+)
 fit.summary()
 print(fit.diagnose())
 # %%
@@ -404,7 +413,7 @@ del mydata["weather"]
 # %%
 model = CmdStanModel(stan_file="stan/anova.stan")
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000)
+fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
 fit.summary()
 print(fit.diagnose())
 # %%
@@ -432,7 +441,7 @@ grid.map(sns.scatterplot, "weather", "pred", color="black", marker="x", s=120)
 # %%
 model = CmdStanModel(stan_file="stan/ancova.stan")
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000)
+fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
 fit.summary()
 print(fit.diagnose())
 # %%
@@ -479,7 +488,7 @@ model = CmdStanModel(stan_file="stan/penguins-lm.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(pen_data, chains=4, iter_sampling=2000)
+fit = model.sample(pen_data, chains=4, iter_sampling=2000, show_progress=is_interactive)
 
 # %% [markdown]
 # ### 推定結果の要約と収束診断
@@ -542,7 +551,9 @@ model = CmdStanModel(stan_file="stan/penguins-multiple.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(pen_sp_data, chains=4, iter_sampling=2000)
+fit = model.sample(
+    pen_sp_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+)
 
 # %% [markdown]
 # ### 推定結果の要約と収束診断
