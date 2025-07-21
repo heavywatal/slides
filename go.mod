@@ -5,6 +5,6 @@ go 1.22
 toolchain go1.23.2
 
 require (
-	github.com/heavywatal/hugo-mod-common v0.0.0-20250715041625-b873814f3162 // indirect
-	github.com/heavywatal/hugo-theme-reveal v0.0.0-20250715094557-9431ccdeac62 // indirect
+	github.com/heavywatal/hugo-mod-common v0.0.0-20250721073556-06c3dfefd527 // indirect
+	github.com/heavywatal/hugo-theme-reveal v0.0.0-20250721114559-b558ec6abfec // indirect
 )
