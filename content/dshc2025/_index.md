@@ -15,11 +15,12 @@ unlisted = false
 
 ## 実行環境の準備
 
-DSHC 2025 参加者は
-**[Google Colab](https://colab.research.google.com/?hl=en) さえ利用できればOK**。
-下記の演習資料のリンクから
+DSHC 2025 参加者は**他の講義と同じ Google Cloud Platform (GCP) 環境**を使う。
+下記のリンクから演習資料をダウンロードし、**自分の作業フォルダに保存**しておく。
 `preparation.ipynb` が実行できることを確認しておくとなお安心。
 
+[Google Colab](https://colab.research.google.com/?hl=en)
+でもローカル環境でも実行できる。
 手元のmacOSに講義用の仮想環境を用意する一例
 (Colabに合わせて 3.11 を指定してあるが、最新版 ≥3.13 でも大丈夫なはず):
 ```sh
