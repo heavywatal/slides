@@ -524,7 +524,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -555,11 +555,15 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ---
 ## penguinsデータセット
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 
 ```python
@@ -573,11 +577,15 @@ print(penguins)
 ---
 ## penguinsデータセット
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 
 ```
@@ -972,7 +980,7 @@ e.g.,<br>
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 

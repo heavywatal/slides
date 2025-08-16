@@ -46,7 +46,7 @@ draft = false
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 

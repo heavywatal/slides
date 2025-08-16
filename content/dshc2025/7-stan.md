@@ -127,7 +127,7 @@ model {
 1. **`model {...}`**
 1. `generated quantities {...}`
 
-<https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html>
+<small><https://mc-stan.org/docs/reference-manual/overview-of-stans-program-blocks.html></small>
 
 
 ---
@@ -504,7 +504,7 @@ bayesplot::ppc_intervals(y = df_lm[["y"]], yrep = yrep,
 
 ![plot of chunk stan-lm-ppc](./figure/stan-lm-ppc-1.png)![plot of chunk stan-lm-ppc](./figure/stan-lm-ppc-2.png)
 
-<http://mc-stan.org/bayesplot/reference/PPC-overview.html>
+<small><http://mc-stan.org/bayesplot/reference/PPC-overview.html></small>
 
 
 ---
@@ -706,7 +706,7 @@ model {
     おすすめ: [**正規分布**](https://mc-stan.org/docs/functions-reference/normal-distribution.html)
     or [**Student's t分布**](https://mc-stan.org/docs/functions-reference/student-t-distribution.html)
 
-<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
+<small><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></small>
 
 
 ---
@@ -769,11 +769,15 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 ---
 ## 🔰 Stanでpenguinsの回帰分析をしてみよう
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 <img src="figure/penguins-interaction-1.png" alt="plot of chunk penguins-interaction" height="300">
 
@@ -782,11 +786,15 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 ---
 ## 🔰 Stanでpenguinsの回帰分析をしてみよう
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 

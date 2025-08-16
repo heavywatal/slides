@@ -68,7 +68,7 @@ Just repeat forgetting and searching.
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -81,7 +81,7 @@ reorganization of information → **proper analysis, new hypotheses**
 <figure>
 <a href="https://r4ds.hadley.nz/whole-game">
 <img src="/slides/image/r4ds/data-science-explore.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/whole-game</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/whole-game</small></figcaption>
 </a>
 </figure>
 
@@ -125,11 +125,11 @@ Different data formats from source to source
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
@@ -147,11 +147,11 @@ Different data formats from source to source
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
@@ -169,11 +169,11 @@ Different data formats from source to source
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## tidy data &nbsp; &nbsp; vs &nbsp; &nbsp; messy data
@@ -191,11 +191,11 @@ Different data formats from source to source
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 
 ---
@@ -205,9 +205,7 @@ Different data formats from source to source
 - Each **row** is an **observation**.
 - Each **cell** is a **single value**.
 
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>
-</cite>
+<small style="display: block; text-align: right;"><https://r4ds.hadley.nz/data-tidy.html></small>
 
 
 ```r
@@ -289,9 +287,9 @@ print(VADeaths)
     - Handling outliers and missing values
     - Character manipulation: pattern matching
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## tidyverse: a collection of R packages for data science
@@ -320,7 +318,7 @@ Consistently designed to cover all the processes in data analysis.
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -1253,9 +1251,9 @@ result = diamonds |>
     - Handling outliers and missing values
     - Character manipulation: pattern matching
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---
@@ -1266,7 +1264,7 @@ It is the shortest path to getting data transformation done.
 <figure>
 <a href="https://dplyr.tidyverse.org/">
 <img src="/slides/image/rstats/dplyr-website.png" width="80%">
-<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+<figcaption><small>https://dplyr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -1275,7 +1273,7 @@ It is the shortest path to getting data transformation done.
 <figure style="margin: 0;">
 <a href="https://dplyr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/data-transformation.png" width="100%">
-<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+<figcaption><small>https://dplyr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 

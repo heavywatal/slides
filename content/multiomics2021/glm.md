@@ -56,12 +56,12 @@ draft = false
 回帰のキモは**線ではなく分布**。
 
 <hr>
-<cite>
+<small>
 
 [Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
 の演習無し抜粋バージョン (~2時間 x 2回)。
 
-</cite>
+</small>
 
 
 ---
@@ -469,7 +469,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="600"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -656,7 +656,7 @@ e.g.,<br>
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="60%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 

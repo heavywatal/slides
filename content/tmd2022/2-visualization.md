@@ -51,7 +51,7 @@ draft = false
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -117,9 +117,9 @@ price  0.92 -0.01  0.13  1.00
 ## 平均値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -143,13 +143,13 @@ price  0.92 -0.01  0.13  1.00
 <figure>
 <a href="https://r4ds.had.co.nz/explore-intro.html">
 <img src="/slides/image/r4ds/data-science-explore.png">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/explore-intro.html</small></figcaption>
 </a>
 </figure>
 <figure style="margin-bottom: 32px;">
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/hajimeni-04.svg" width="570" style="margin: -24px -32px -32px -24px;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 
@@ -160,7 +160,7 @@ price  0.92 -0.01  0.13  1.00
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
 <img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 
@@ -194,7 +194,7 @@ price  0.92 -0.01  0.13  1.00
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -314,7 +314,7 @@ R標準のやつとは根本的に違うシステムで作図する。
 
 <figure>
 <img src="/slides/image/rstats/r-graphics.svg">
-<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+<figcaption><small>「<cite>Rグラフィックス</cite>」Murrell著 久保訳 より改変</small></figcaption>
 </figure>
 
 ---
@@ -539,10 +539,7 @@ print(diamonds)
 53940  0.75     Ideal     D     SI2  62.2    55  2757  5.83  5.87  3.64
 ```
 
-<cite>
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a><br>
-<a class="url" href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a>
-</cite>
+<small><https://r4ds.hadley.nz/data-tidy.html>; <https://speakerdeck.com/fnshr/zheng-ran-detatutenani></small>
 
 
 ---
@@ -806,7 +803,7 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 <figure style="margin: 0;">
 <a href="https://ggplot2.tidyverse.org/">
 <img src="/slides/image/cheatsheet/data-visualization.png" width="100%">
-<figcaption class="url">https://ggplot2.tidyverse.org/</figcaption>
+<figcaption><small>https://ggplot2.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 

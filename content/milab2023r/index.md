@@ -85,8 +85,8 @@ Likes
 <figure style="position: absolute; top: 32px; right: 40px;">
 <a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
 <img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="240">
-<figcaption class="url">
-https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
+<figcaption>
+<small>https://en.wikipedia.org/wiki/<wbr>Standing_on_the_shoulders_of_giants</small>
 </figcaption>
 </a>
 </figure>
@@ -210,7 +210,7 @@ price  0.92 -0.01  0.13  1.00
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
   <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  <figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2019</small></figcaption>
   </a>
   </div>
 </div>
@@ -272,9 +272,9 @@ AとBには差がありそう。
 ## 代表値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -325,9 +325,9 @@ Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
 
 ???
 数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
@@ -364,7 +364,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -402,7 +402,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -441,11 +441,11 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -463,11 +463,11 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -485,11 +485,11 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -507,11 +507,11 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 
 ---
@@ -521,9 +521,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 - **横1行**は1つの**観測**
 - **1セル**は1つの**値**
 
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
-</cite>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/tidy-data.html></small>
 
 
 ```r
@@ -621,9 +619,9 @@ print(VADeaths)
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---
@@ -672,7 +670,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -914,7 +912,7 @@ R < 4.2 までよく使われていた `%>%` もほぼ同じ。
 <a href="https://r4ds.had.co.nz/tidy-data.html#longer">
 <img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="600">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#longer</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#longer</small></figcaption>
 </a>
 </figure>
 
@@ -933,7 +931,7 @@ pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
 <a href="https://r4ds.had.co.nz/tidy-data.html#wider">
 <img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="560">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#wider</small></figcaption>
 </a>
 </figure>
 
@@ -971,7 +969,7 @@ pivot_wider(table2, names_from = type, values_from = count)
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -981,7 +979,7 @@ R標準のやつとは根本的に違うシステムで作図する。
 
 <figure>
 <img src="/slides/image/rstats/r-graphics.svg">
-<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+<figcaption><small>「<cite>Rグラフィックス</cite>」Murrell著 久保訳 より改変</small></figcaption>
 </figure>
 
 ---

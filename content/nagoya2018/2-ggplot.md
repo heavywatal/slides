@@ -46,13 +46,13 @@ draft = false
 <figure style="margin-bottom: 32px;">
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/hajimeni-04.svg" width="570" style="margin: -24px -32px -32px -24px;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 <figure>
 <a href="https://r4ds.had.co.nz/explore-intro.html">
 <img src="/slides/image/r4ds/data-science-explore.png">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/explore-intro.html</small></figcaption>
 </a>
 </figure>
 
@@ -63,7 +63,7 @@ draft = false
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
 <img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 
@@ -88,7 +88,7 @@ draft = false
 <figure style="position: relative;">
 <a href="https://www.autodeskresearch.com/publications/samestats">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodeskresearch.com/publications/samestats/</figcaption>
+<figcaption><small>https://www.autodeskresearch.com/publications/samestats/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">

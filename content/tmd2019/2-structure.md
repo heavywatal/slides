@@ -71,7 +71,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -773,7 +773,7 @@ band_members          band_instruments
 <a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
 <img src="/slides/image/r4ds/join.png" height="550">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/relational-data.html#mutating-joins</small></figcaption>
 </a>
 </figure>
 
@@ -794,7 +794,7 @@ data(package = "nycflights13")
 <a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
 <img src="/slides/image/r4ds/relational-nycflights.png" height="320">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</small></figcaption>
 </a>
 </figure>
 
@@ -858,7 +858,7 @@ result = diamonds %>%
 <a href="https://r4ds.had.co.nz/tidy-data.html#gathering">
 <img src="/slides/image/r4ds/tidy-gather.png" width="800">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#gathering</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#gathering</small></figcaption>
 </a>
 </figure>
 
@@ -905,7 +905,7 @@ iris_long = iris %>% head(2L) %>%     # 最初の2行だけ
 <a href="https://r4ds.had.co.nz/tidy-data.html#spreading">
 <img src="/slides/image/r4ds/tidy-spread.png" height="480">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#spreading</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#spreading</small></figcaption>
 </a>
 </figure>
 
@@ -948,7 +948,7 @@ iris_long %>% print() %>%              # さっきlong-formatにしたやつ
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
 <img src="/slides/image/r4ds/tidy-separate.png" width="800">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#separate</small></figcaption>
 </a>
 </figure>
 
@@ -994,7 +994,7 @@ iris_long %>% print() %>%
 <a href="https://r4ds.had.co.nz/tidy-data.html#unite">
 <img src="/slides/image/r4ds/tidy-unite.png" width="800">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#unite</small></figcaption>
 </a>
 </figure>
 
@@ -1007,7 +1007,7 @@ iris_long %>% print() %>%
 <a href="https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/">
 <img src="/slides/image/rstats/nest-pack-chop.png" height="500">
 <br>
-<figcaption class="url">https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</figcaption>
+<figcaption><small>https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</small></figcaption>
 </a>
 </figure>
 

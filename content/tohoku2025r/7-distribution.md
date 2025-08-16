@@ -78,7 +78,7 @@ dpi = 108
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -141,15 +141,15 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 **階層ベイズモデル HBM**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 <hr>
-<cite>
+<small>
 
 [Data Science Hill Climb 2024 (東京海上) での講義 (~12時間)](https://heavywatal.github.io/slides/tokiomarine2024/)
 の抜粋バージョン (~2時間)。
 
-</cite>
+</small>
 
 
 ---
@@ -164,9 +164,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
     - $y = 3x + 7$
     - $y = 9x^2$
 
-<cite>
-<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
-</cite>
+<small><https://r4ds.had.co.nz/model-basics.html></small>
 
 ---
 ## たぶん身長が高いほど体重も重い
@@ -298,7 +296,7 @@ ggplot(mpg_aug) + aes(displ, hwy) + geom_point() +
 
 **階層ベイズモデル HBM**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 
 ---
@@ -334,7 +332,7 @@ e.g., サイコロを12回投げた結果、学生1000人の身長
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
   <img src="../tohoku2025r/image/hist-income-japan-2022.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2022</cite></figcaption>
+  <figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2022</small></figcaption>
   </a>
   </div>
 </div>
@@ -444,7 +442,7 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900">
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 こういうふうに現象と対応した確率分布、ほかにもある？
@@ -860,7 +858,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900">
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 

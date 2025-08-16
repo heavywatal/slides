@@ -80,7 +80,7 @@ draft = false
 
 <figure>
 <img src="image/math-model-biased.drawio.svg"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -97,7 +97,7 @@ e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
 
 <figure>
 <img src="image/error-random-systematic.drawio.svg" width="420"><br>
-<figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uznzCK"><cite>分析者のためのデータ解釈学入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -106,7 +106,7 @@ e.g., 服を着たまま体重測定を10回繰り返す → どれも違う値
 
 <figure style="position: absolute; top: 40px; right: 40px;"><a href="https://en.wikipedia.org/wiki/Survivorship_bias">
 <img src="/slides/image/free/Survivorship-bias.svg" width="300"><br>
-<figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
+<figcaption><small>https://en.wikipedia.org/wiki/Survivorship_bias</small></figcaption>
 </a></figure>
 
 データの採れかたが結果に傾向をもたらしてしまう。
@@ -224,7 +224,7 @@ https://lambtani.hatenablog.jp/entry/2017/05/18/032108
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
   <img src="image/hist-income-japan-2019.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  <figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2019</small></figcaption>
   </a>
   </div>
 </div>
@@ -292,9 +292,9 @@ AとBには差がありそう。
 
 <figure><a href="https://comicalcommet.github.io/r-training-2021/">
 <img src="/slides/image/rstats/comicalcommet-test-chart.jpg" width="90%">
-<figcaption><cite>
+<figcaption><small>
 「Rを用いたデータ解析の基礎と応用」石川由希さん@名古屋大
-</cite></figcaption>
+</small></figcaption>
 </a></figure>
 
 
@@ -360,7 +360,7 @@ $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 <figure style="margin-top: -1em;">
 <a href="http://leeswijzer.org/R/R-top.html">
 <img src="/slides/image/rstats/Mandala2004-small.jpg" width="80%">
-<figcaption><cite>「大統計曼荼羅」三中信宏</cite></figcaption>
+<figcaption><small>「<cite>大統計曼荼羅</cite>」三中信宏</small></figcaption>
 </a>
 </figure>
 
@@ -460,9 +460,9 @@ $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 
 <figure>
 <img src="image/nicholas-cage-drowned.svg" width="100%">
-<figcaption><cite>
+<figcaption><small>
 <a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
-</cite></figcaption>
+</small></figcaption>
 </figure>
 
 このウェブサイトにはジョークとしてこうした例が多数集められている↑
@@ -473,9 +473,9 @@ $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 
 <figure>
 <img src="image/hermeneutics-4-1-5.drawio.svg" width="700">
-<figcaption><cite>
+<figcaption><small>
 <a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
-</cite></figcaption>
+</small></figcaption>
 </figure>
 
 <hr>
@@ -536,7 +536,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -547,7 +547,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -558,7 +558,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -569,7 +569,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -580,7 +580,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 いやいや、欄外に記載するのも不規則でダメですよ。別シートか、別カラムに。
@@ -595,7 +595,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -606,7 +606,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -617,7 +617,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -628,7 +628,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -641,7 +641,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -654,7 +654,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 悪い形に遭遇したときに使える関数:
@@ -665,7 +665,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-2-1-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 
@@ -674,7 +674,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-2-1-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 ---
@@ -684,7 +684,7 @@ Rを使ったデータ前処理を習得した✨<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 ---

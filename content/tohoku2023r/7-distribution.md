@@ -120,9 +120,9 @@ price  0.92 -0.01  0.13  1.00
 ## 代表値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -174,9 +174,9 @@ Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
 
 ???
 数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
@@ -193,7 +193,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="1000"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -226,7 +226,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 
@@ -246,7 +246,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 <figure>
 <img src="../tokiomarine2021/model-approaches.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 ---
@@ -285,12 +285,12 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 回帰のキモは**線ではなく分布**。
 
 <hr>
-<cite>
+<small>
 
 [Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
 の演習無し抜粋バージョン (~2時間 x 2回)。
 
-</cite>
+</small>
 
 
 ---
@@ -305,9 +305,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
     - $y = 3x + 7$
     - $y = 9x^2$
 
-<cite>
-<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
-</cite>
+<small><https://r4ds.had.co.nz/model-basics.html></small>
 
 ---
 ## たぶん身長が高いほど体重も重い
@@ -439,7 +437,7 @@ ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
 
 **階層ベイズモデル HBM**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 
 ---
@@ -532,7 +530,7 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 こういうふうに現象と対応した確率分布、ほかにもある？
@@ -949,7 +947,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 

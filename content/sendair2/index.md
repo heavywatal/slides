@@ -123,7 +123,7 @@ summary(diamonds)
 <figure style="position: relative;">
 <a href="https://www.autodeskresearch.com/publications/samestats">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodeskresearch.com/publications/samestats/</figcaption>
+<figcaption><small>https://www.autodeskresearch.com/publications/samestats/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -144,13 +144,13 @@ summary(diamonds)
 <figure>
 <a href="https://r4ds.had.co.nz/explore-intro.html">
 <img src="/slides/image/r4ds/data-science-explore.png">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/explore-intro.html</small></figcaption>
 </a>
 </figure>
 <figure style="margin-bottom: 32px;">
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/hajimeni-04.svg" width="570" style="margin: -24px -32px -32px -24px;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 
@@ -161,7 +161,7 @@ summary(diamonds)
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
 <img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 
@@ -194,7 +194,7 @@ summary(diamonds)
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -237,7 +237,7 @@ https://heavywatal.github.io/slides/
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
 <img src="/slides/image/rstats/Rlogo.svg" height="200">
-<figcaption class="url">https://cran.r-project.org/</figcaption>
+<figcaption><small>https://cran.r-project.org/</small></figcaption>
 </a>
 </figure>
 
@@ -421,7 +421,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -461,7 +461,7 @@ library(tidyverse)
 <figure>
 <a href="https://mrunadon.github.io/概要をおさえてggplot2を使いこなすチュートリアルとコード集/">
 <img src="image/mrunadon-ggplot2.png">
-<figcaption class="url">https://mrunadon.github.io/概要をおさえてggplot2を使いこなすチュートリアルとコード集/</figcaption>
+<figcaption><small>https://mrunadon.github.io/概要をおさえてggplot2を使いこなすチュートリアルとコード集/</small></figcaption>
 </a>
 </figure>
 
@@ -746,7 +746,7 @@ ggsave("dia4.png", p1 + theme_bw(base_size = 22), width = 4, height = 4)
 <figure style="margin: 0;">
 <a href="https://ggplot2.tidyverse.org/">
 <img src="/slides/image/rstats/data-visualization-2.1-4789.jpg" width="100%">
-<figcaption class="url">https://ggplot2.tidyverse.org/</figcaption>
+<figcaption><small>https://ggplot2.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 

@@ -52,7 +52,7 @@ draft = false
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -118,9 +118,9 @@ price  0.92 -0.01  0.13  1.00
 ## 平均値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -145,7 +145,7 @@ price  0.92 -0.01  0.13  1.00
 <figure>
 <a href="https://r4ds.had.co.nz/explore-intro.html">
 <img src="/slides/image/r4ds/data-science-explore.png">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/explore-intro.html</small></figcaption>
 </a>
 </figure>
 
@@ -188,11 +188,11 @@ price  0.92 -0.01  0.13  1.00
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -210,11 +210,11 @@ price  0.92 -0.01  0.13  1.00
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -232,11 +232,11 @@ price  0.92 -0.01  0.13  1.00
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -254,11 +254,11 @@ price  0.92 -0.01  0.13  1.00
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 
 ---
@@ -268,9 +268,7 @@ price  0.92 -0.01  0.13  1.00
 - **横1行**は1つの**観測**
 - **1セル**は1つの**値**
 
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
-</cite>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/tidy-data.html></small>
 
 
 ```r
@@ -388,7 +386,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 <figure style="float: right; margin: 0.7rem 0 0;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
 <img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="290">
-<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
+<figcaption><small>https://en.wikipedia.org/wiki/Sisyphus</small></figcaption>
 </a>
 </figure>
 
@@ -410,7 +408,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 <figure>
 <img src="/slides/image/tek/finder.png" height="420">
 <img src="/slides/image/tek/fig5.png" height="420">
-<figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
+<figcaption><small>Iwasaki, Kijima, Innan (2019)</small></figcaption>
 </figure>
 
 ---
@@ -429,7 +427,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -446,7 +444,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -458,7 +456,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
 <img src="/slides/image/rstats/Rlogo.svg" height="200">
-<figcaption class="url">https://cran.r-project.org/</figcaption>
+<figcaption><small>https://cran.r-project.org/</small></figcaption>
 </a>
 </figure>
 
@@ -547,7 +545,7 @@ See https://support.apple.com/HT201236
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
      style="object-fit: cover; object-position: top; height: 420px;">
-<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/workflow-projects.html</small></figcaption>
 </a>
 </figure>
 
@@ -986,7 +984,7 @@ y
     <figure>
     <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
     <img src="/slides/image/free/front-row.jpg" height="480">
-    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    <figcaption><small>https://commons.wikimedia.org/wiki/<wbr>File:2012_Super_GT_Sugo_starting_grid.jpg</small></figcaption>
     </a>
     </figure>
   </div>
@@ -994,7 +992,7 @@ y
     <figure>
     <a href="https://en.wikipedia.org/wiki/Rhodes">
     <img src="/slides/image/free/apollon-columns.jpg" height="480">
-    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    <figcaption><small>https://en.wikipedia.org/wiki/Rhodes</small></figcaption>
     </a>
     </figure>
   </div>
@@ -1202,7 +1200,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 

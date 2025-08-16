@@ -706,7 +706,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="800"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -733,11 +733,15 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ---
 ## penguinsデータセット
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 ```r
 install.packages("palmerpenguins")
@@ -750,11 +754,15 @@ print(penguins)
 ---
 ## penguinsデータセット
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 
 ```

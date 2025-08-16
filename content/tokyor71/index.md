@@ -59,7 +59,7 @@ Likes
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="100">
 <img src="/slides/image/tumopp/Chex_Lstep.gif" height="100">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -158,7 +158,7 @@ How can I use them in R?
 ## Create an R+Rcpp package from scratch
 
 Package components
-<cite>(See http://r-pkgs.had.co.nz/ for details)</cite>:
+<small>(See http://r-pkgs.had.co.nz/ for details)</small>:
 ```
 DESCRIPTION  # Package metadata
 LICENSE
@@ -257,9 +257,7 @@ PKG_CPPFLAGS=-DSTRICT_R_HEADERS @CPPFLAGS@
 PKG_LIBS=@LDFLAGS@ @LDLIBS@
 ```
 
-<cite>
-https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup
-</cite>
+<small><https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup></small>
 
 ---
 ## Transform C++ strings to data.frame
@@ -320,9 +318,7 @@ There must be some more efficient ways...
     - **Windows + [Rtools (gcc-4.9)](https://cran.r-project.org/bin/windows/Rtools/): C++11** ❌
     - Windows + WSL + Ubuntu: ❓❓❓
 
-<cite>
-http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/
-</cite>
+<small><http://gallery.rcpp.org/articles/rcpp-and-c++11-c++14-c++17/></small>
 
 🚧 **[Rtools 4 with gcc 8](https://github.com/rwinlib/gcc-8) is under development.**
 (Thanks, Yutani-san!)

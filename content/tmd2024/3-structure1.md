@@ -77,7 +77,7 @@ dpi = 108
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/whole-game.png" width="800">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -90,7 +90,7 @@ dpi = 108
 <figure>
 <a href="https://r4ds.hadley.nz/whole-game">
 <img src="/slides/image/r4ds/whole-game.png" width="100%">
-<figcaption class="url">https://r4ds.hadley.nz/whole-game</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/whole-game</small></figcaption>
 </a>
 </figure>
 
@@ -131,11 +131,11 @@ dpi = 108
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -153,11 +153,11 @@ dpi = 108
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -175,11 +175,11 @@ dpi = 108
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -197,11 +197,11 @@ dpi = 108
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 
 ---
@@ -211,9 +211,7 @@ dpi = 108
 - **横1行**は1つの**観測**
 - **1セル**は1つの**値**
 
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>
-</cite>
+<small style="display: block; text-align: right;"><https://r4ds.hadley.nz/data-tidy.html></small>
 
 
 ``` r
@@ -295,9 +293,9 @@ print(VADeaths)
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## tidyverse: データ科学のためのパッケージ群
@@ -326,7 +324,7 @@ library(tidyverse)  # 一挙に読み込み
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/base.png" width="900">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -1239,9 +1237,9 @@ result = diamonds |>
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---
@@ -1250,7 +1248,7 @@ result = diamonds |>
 <figure>
 <a href="https://dplyr.tidyverse.org/">
 <img src="/slides/image/rstats/dplyr-website.png" width="80%">
-<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+<figcaption><small>https://dplyr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 

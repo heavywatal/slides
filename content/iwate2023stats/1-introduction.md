@@ -118,7 +118,7 @@ price  0.92 -0.01  0.13  1.00
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
   <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  <figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2019</small></figcaption>
   </a>
   </div>
 </div>
@@ -177,9 +177,9 @@ AとBには差がありそう。
 ## 代表値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -230,9 +230,9 @@ Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
 
 ???
 数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
@@ -249,7 +249,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -282,7 +282,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="1100">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 
@@ -311,7 +311,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 <figure>
 <img src="../tokiomarine2021/model-approaches.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 ---
@@ -378,7 +378,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
 <img src="/slides/image/rstats/Rlogo.svg" height="200">
-<figcaption class="url">https://cran.r-project.org/</figcaption>
+<figcaption><small>https://cran.r-project.org/</small></figcaption>
 </a>
 </figure>
 
@@ -433,7 +433,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
   style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
-<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/workflow-projects.html</small></figcaption>
 </a>
 </figure>
 
@@ -878,7 +878,7 @@ y
     <figure>
     <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
     <img src="/slides/image/free/front-row.jpg" height="720">
-    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    <figcaption><small>https://commons.wikimedia.org/wiki/<wbr>File:2012_Super_GT_Sugo_starting_grid.jpg</small></figcaption>
     </a>
     </figure>
   </div>
@@ -886,7 +886,7 @@ y
     <figure>
     <a href="https://en.wikipedia.org/wiki/Rhodes">
     <img src="/slides/image/free/apollon-columns.jpg" height="720">
-    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    <figcaption><small>https://en.wikipedia.org/wiki/Rhodes</small></figcaption>
     </a>
     </figure>
   </div>
@@ -1097,7 +1097,7 @@ library(tidyverse)  # 一挙に読み込み
 <figure style="margin-block: 0;">
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -1129,7 +1129,7 @@ library(tidyverse)  # 一挙に読み込み
 <img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="180">
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="180">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="180">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -1139,7 +1139,7 @@ R標準のやつとは根本的に違うシステムで作図する。
 
 <figure>
 <img src="/slides/image/rstats/r-graphics.svg" height="600">
-<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+<figcaption><small>「<cite>Rグラフィックス</cite>」Murrell著 久保訳 より改変</small></figcaption>
 </figure>
 
 ---
@@ -1347,7 +1347,7 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 <figure style="margin: 0;">
 <a href="https://ggplot2.tidyverse.org/">
 <img src="/slides/image/cheatsheet/data-visualization.png" width="1200">
-<figcaption class="url">https://ggplot2.tidyverse.org/</figcaption>
+<figcaption><small>https://ggplot2.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -1365,7 +1365,7 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png" width="800">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -1404,11 +1404,11 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -1426,11 +1426,11 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -1448,11 +1448,11 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -1470,11 +1470,11 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 1em; left: 2em;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 
 ---
@@ -1484,9 +1484,7 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 - **横1行**は1つの**観測**
 - **1セル**は1つの**値**
 
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
-</cite>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/tidy-data.html></small>
 
 
 ```r
@@ -1582,9 +1580,9 @@ print(VADeaths)
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---
@@ -1851,7 +1849,7 @@ R < 4.2 までよく使われていた `%>%` もほぼ同じ。
 <a href="https://r4ds.had.co.nz/tidy-data.html#longer">
 <img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#longer</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#longer</small></figcaption>
 </a>
 </figure>
 
@@ -1870,7 +1868,7 @@ pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
 <a href="https://r4ds.had.co.nz/tidy-data.html#wider">
 <img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="840">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#wider</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#wider</small></figcaption>
 </a>
 </figure>
 

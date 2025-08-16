@@ -111,9 +111,9 @@ price  0.92 -0.01  0.13  1.00
 ## 要約統計量だけ見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -164,9 +164,9 @@ Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
 
 ???
 数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
@@ -183,7 +183,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="1200"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -216,7 +216,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="1200">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 
@@ -245,7 +245,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 <figure>
 <img src="../tokiomarine2021/model-approaches.drawio.svg" width="1200"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 ---

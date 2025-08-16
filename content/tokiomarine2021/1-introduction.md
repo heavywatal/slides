@@ -105,7 +105,7 @@ print(ggplot2::diamonds)
 <figure style="position: relative;">
 <a href="https://www.autodeskresearch.com/publications/samestats">
 <img src="/slides/image/rstats/datasaurus.png" width="800">
-<figcaption class="url">https://www.autodeskresearch.com/publications/samestats/</figcaption>
+<figcaption><small>https://www.autodeskresearch.com/publications/samestats/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="180"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -156,9 +156,9 @@ Concrete Model 具象モデル<img src="image/weisberg-sfbay.jpg" width="260" al
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
 
 ???
 数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
@@ -176,7 +176,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 <figure>
 <img src="math-model.drawio.svg"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -209,7 +209,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="image/kubo-p2.png" width="100%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 
@@ -238,7 +238,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 <figure>
 <img src="model-approaches.drawio.svg"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 ---
@@ -277,7 +277,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure>
 <a href="https://twitter.com/takehikohayashi/status/1408338198795669507">
 <img src="image/takehikohayashi-1408338198795669507.jpeg" width="100%">
-<figcaption class="url">@takehikohayashi Jun 25, 2021</figcaption>
+<figcaption><small>@takehikohayashi Jun 25, 2021</small></figcaption>
 </a>
 </figure>
 

@@ -181,7 +181,7 @@ Open "Preferences" with <kbd>command</kbd><kbd>,</kbd>
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/rstudio-workspace.png" width="75%"
      style="object-fit: cover; object-position: top; height: 480px;">
-<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/workflow-projects.html</small></figcaption>
 </a>
 </figure>
 
@@ -432,7 +432,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 

@@ -197,7 +197,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="1080">
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 

@@ -214,10 +214,7 @@ exp(x)
 [1]  2.718282  7.389056 20.085537
 ```
 
-<div style="text-align: right;">
-<a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
-https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
-</a></div>
+<small style="display: block; text-align: right;"><https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html></small>
 
 ---
 ## 正規化 (z-score normalization)
@@ -438,10 +435,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 + HELP I'M STUCK
 ```
 
-<div style="text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/strings.html">
-https://r4ds.had.co.nz/strings.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/strings.html></small>
 
 ---
 ## R備え付けの文字列機能は使いにくい
@@ -556,9 +550,7 @@ str_subset(fruit, "^\\w{3,4}$")
 R文字列ではバックスラッシュを重ねる必要がある, e.g., `"\\d"`.<br>
 `\D`, `\S`, `W` のように大文字にすると反転。
 
-<div style="text-align: right;"><a class="url" href="http://userguide.icu-project.org/strings/regexp">
-http://userguide.icu-project.org/strings/regexp
-</a></div>
+<small style="display: block; text-align: right;"><http://userguide.icu-project.org/strings/regexp></small>
 
 問: `str_subset(fruit, "PATTERN")` をいろいろ試してみよう
 
@@ -771,9 +763,7 @@ levels(iris[["Species"]])
 [1] "setosa"     "versicolor" "virginica" 
 ```
 
-<a class="url" href="https://r4ds.had.co.nz/factors.html">
-https://r4ds.had.co.nz/factors.html
-</a>
+<small><https://r4ds.had.co.nz/factors.html></small>
 
 
 ---

@@ -99,11 +99,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## tidy data &nbsp; vs &nbsp; messy data
@@ -121,11 +121,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## tidy data &nbsp; vs &nbsp; messy data
@@ -143,11 +143,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## tidy data &nbsp; vs &nbsp; messy data
@@ -165,11 +165,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## Today we learn data preparation
@@ -227,7 +227,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/wrangle-intro.html">
 <img src="/slides/image/r4ds/data-science-wrangle.png">
-<figcaption class="url">https://r4ds.had.co.nz/wrangle-intro.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/wrangle-intro.html</small></figcaption>
 </a>
 </figure>
 
@@ -920,7 +920,7 @@ iris_long %>% print() %>%
 <a href="https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/">
 <img src="/slides/image/rstats/nest-pack-chop.png" height="500">
 <br>
-<figcaption class="url">https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</figcaption>
+<figcaption><small>https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</small></figcaption>
 </a>
 </figure>
 

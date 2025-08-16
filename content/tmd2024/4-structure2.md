@@ -48,9 +48,9 @@ dpi = 108
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## dplyr --- data.frameの高速処理担当
@@ -246,7 +246,7 @@ band_members          band_instruments
 <a href="https://r4ds.hadley.nz/joins.html">
 <img src="/slides/image/r4ds/join-venn.png" width="100%">
 <br>
-<figcaption class="url">https://r4ds.hadley.nz/joins.html</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/joins.html</small></figcaption>
 </a>
 </figure>
 
@@ -274,7 +274,7 @@ data(package = "nycflights13")
 <a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
 <img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.hadley.nz/joins.html#fig-flights-relationships</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/joins.html#fig-flights-relationships</small></figcaption>
 </a>
 </figure>
 
@@ -330,7 +330,7 @@ data(package = "nycflights13")
 <a href="https://r4ds.hadley.nz/data-tidy.html#sec-pivoting">
 <img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="900">
 <br>
-<figcaption class="url">https://r4ds.hadley.nz/data-tidy.html#sec-pivoting</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/data-tidy.html#sec-pivoting</small></figcaption>
 </a>
 </figure>
 
@@ -440,7 +440,7 @@ relig_long = relig_income[1:2, 1:4] |> print() |>
 <a href="https://r4ds.hadley.nz/data-tidy.html#widening-data">
 <img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="840">
 <br>
-<figcaption class="url">https://r4ds.hadley.nz/data-tidy.html#widening-data</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/data-tidy.html#widening-data</small></figcaption>
 </a>
 </figure>
 
@@ -646,7 +646,7 @@ print(us_rent_income)
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
 <img src="/slides/image/cheatsheet/tidyr-separate.png" height="240">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#separate</small></figcaption>
 </a>
 </figure>
 
@@ -677,7 +677,7 @@ table3 |> tidyr::separate(rate, into = c("cases", "population"), sep = "/")
 <img src="/slides/image/cheatsheet/tidyr-unite.png" height="240" style="vertical-align: top;">
 <span style="display: inline-block; margin-inline: -2.7rem 0 ; transform: translate(0, 0.2em); color: #ffffff; background-color: #808080; padding: 0.05rem; font-size: 0.9em; font-weight: bold;">YEAR</span>
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#unite</small></figcaption>
 </a>
 </figure>
 
@@ -756,7 +756,7 @@ print(world_bank_pop)
 <a href="https://www.tidyverse.org/blog/2019/09/tidyr-1-0-0/">
 <img src="/slides/image/rstats/nest-pack-chop.png" height="600">
 <br>
-<figcaption class="url">https://www.tidyverse.org/blog/2019/09/tidyr-1-0-0/</figcaption>
+<figcaption><small>https://www.tidyverse.org/blog/2019/09/tidyr-1-0-0/</small></figcaption>
 </a>
 </figure>
 
@@ -825,9 +825,9 @@ mpg_nested$data[[1]]
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---
@@ -836,7 +836,7 @@ mpg_nested$data[[1]]
 <figure>
 <a href="https://dplyr.tidyverse.org/">
 <img src="/slides/image/rstats/dplyr-website.png" width="80%">
-<figcaption class="url">https://dplyr.tidyverse.org/</figcaption>
+<figcaption><small>https://dplyr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 

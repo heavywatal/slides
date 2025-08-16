@@ -72,7 +72,7 @@ dpi = 100
 
 **階層ベイズモデル HBM**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 
 ---
@@ -165,7 +165,7 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="900"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 こういうふうに現象と対応した確率分布、ほかにもある？

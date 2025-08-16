@@ -58,18 +58,18 @@ dpi = 108
 
 **階層ベイズモデル HBM**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 <hr>
 
 <span style="font-weight: bold; color: #56B4E9;">確率分布</span>に長い時間を割いたけど、元はと言えば**回帰**したいのでした。
 
-<cite>
+<small>
 
 [Data Science Hill Climb 2024 (東京海上) での講義 (~12時間)](https://heavywatal.github.io/slides/tokiomarine2024/)
 の抜粋バージョン (~2時間)。
 
-</cite>
+</small>
 
 
 ---
@@ -652,7 +652,7 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="960">
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -683,11 +683,15 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ---
 ## penguinsデータセット
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 ```r
 install.packages("palmerpenguins")
@@ -700,11 +704,15 @@ print(penguins)
 ---
 ## penguinsデータセット
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 
 ```

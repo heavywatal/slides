@@ -48,7 +48,7 @@ Graduate School of Life Sciences, Tohoku University
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -68,9 +68,9 @@ The slope seems to differ by `clarity`.
 Interesting relationships may be overlooked without visualization.
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="86%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="20%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -83,7 +83,7 @@ Interesting relationships may be overlooked without visualization.
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
 <img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">
-<figcaption class="url">https://tsutawarudesign.com/</figcaption>
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
 </a>
 </figure>
 
@@ -186,7 +186,7 @@ Any useful package to draw beautiful graphs easily?
 <img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="200">
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="200">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="200">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -196,7 +196,7 @@ No problem. Underlying systems are fundamentally different:
 
 <figure>
 <img src="/slides/image/rstats/r-graphics.svg" height="600">
-<figcaption><cite>「Rグラフィックス」Murrell著 久保訳 より改変</cite></figcaption>
+<figcaption><small>「<cite>Rグラフィックス</cite>」Murrell著 久保訳 より改変</small></figcaption>
 </figure>
 
 ---
@@ -418,9 +418,7 @@ print(diamonds)
 53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
 ```
 
-<cite>
-<a class="url" href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>
-</cite>
+<small><https://r4ds.hadley.nz/data-tidy.html></small>
 
 
 ---
@@ -783,7 +781,7 @@ See [the official document](https://ggplot2.tidyverse.org/reference/index.html).
 <figure style="margin: 0;">
 <a href="https://ggplot2.tidyverse.org/">
 <img src="/slides/image/cheatsheet/data-visualization.png" width="100%">
-<figcaption class="url">https://ggplot2.tidyverse.org/</figcaption>
+<figcaption><small>https://ggplot2.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 

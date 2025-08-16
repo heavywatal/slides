@@ -56,12 +56,12 @@ draft = false
 回帰のキモは**線ではなく分布**。
 
 <hr>
-<cite>
+<small>
 
 [Data Science Hill Climb 2021 (東京海上) での講義 (~6時間)](https://heavywatal.github.io/slides/tokiomarine2021/)
 の演習無し抜粋バージョン (~2時間 x 2回)。
 
-</cite>
+</small>
 
 
 ---
@@ -808,11 +808,15 @@ rstan::stan_hist(fit, bins = 30)
 ---
 ## 線形回帰のベイズ推定: データ準備
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 ![plot of chunk stan-penguins-glm](figure/stan-penguins-glm-1.png)
 
@@ -820,11 +824,15 @@ rstan::stan_hist(fit, bins = 30)
 ---
 ## 線形回帰のベイズ推定: データ準備
 
+<figure>
 <a href="https://allisonhorst.github.io/palmerpenguins/">
-<cite>https://allisonhorst.github.io/palmerpenguins/</cite><br>
 <img src="/slides/image/rstats/lter_penguins.png" width="45%">
 <img src="/slides/image/rstats/culmen_depth.png" width="45%">
+<figcaption>
+<small>https://allisonhorst.github.io/palmerpenguins/</small>
+</figcaption>
 </a>
+</figure>
 
 `Stan does not support NA` と怒られるので欠損値を取り除いておく:
 
@@ -1012,7 +1020,7 @@ p_penweight + aes(color = species, group = species) +
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 
@@ -1211,7 +1219,7 @@ convergence, Rhat=1).
 
     おすすめ: **Student's t分布**、正規分布、指数分布など。
 
-<cite><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></cite>
+<small><https://github.com/stan-dev/stan/wiki/Prior-Choice-Recommendations></small>
 
 
 ---
@@ -1293,7 +1301,7 @@ model {
 <figure>
 <a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
 <img src="../tokiomarine2021/image/kubo-p2.png" width="100%">
-<figcaption class="url">久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</figcaption>
+<figcaption><small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 

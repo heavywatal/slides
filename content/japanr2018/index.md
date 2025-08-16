@@ -148,10 +148,10 @@ e.g., [Eigen](http://eigen.tuxfamily.org), [nlohmann/json](https://github.com/nl
       e.g., `git`, `cmake`, etc.
 
 
-<cite>
-http://r-pkgs.had.co.nz/src.html#make<br>
-https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup
-</cite>
+<small>
+<http://r-pkgs.had.co.nz/src.html#make><br>
+<https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Configure-and-cleanup>
+</small>
 
 
 ---

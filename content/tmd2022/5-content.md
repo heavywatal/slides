@@ -67,7 +67,7 @@ draft = false
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -95,9 +95,9 @@ draft = false
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## tidyverse: データ科学のためのパッケージ群
@@ -253,9 +253,7 @@ exp(x)
 [1]  2.718282  7.389056 20.085537
 ```
 
-<div style="text-align: right;"><a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
-https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
-</a></div>
+<small style="display: block; text-align: right;"><https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html></small>
 
 ---
 ## data.frameは列vectorの集まり
@@ -574,9 +572,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 + HELP I'M STUCK
 ```
 
-<div style="text-align: right;"><a class="url" href=https://r4ds.had.co.nz/strings.html>
-https://r4ds.had.co.nz/strings.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/strings.html></small>
 
 ---
 ## R備え付けの文字列機能は使いにくい
@@ -618,7 +614,7 @@ https://r4ds.had.co.nz/strings.html
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings.png" width="90%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<figcaption><small>https://stringr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -709,9 +705,7 @@ str_subset(fruit, "^\\w{3,4}$")
 | `^`  | 行頭   | | `XXX(?=YYY)`  | YYYに先立つXXX |
 | `$`  | 行末   | | `(?<=YYY)XXX`  | YYYに続くXXX |
 
-<div style="text-align: right;"><a class="url" href="https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters">
-https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters
-</a></div>
+<small style="display: block; text-align: right;"><https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters></small>
 
 Rの`"普通の文字列"`ではバックスラッシュを重ねる必要がある: `"^\\d"`.
 <aside style="font-size: 0.9rem; color: #888888;">
@@ -727,7 +721,7 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<figcaption><small>https://stringr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -972,9 +966,7 @@ as.integer(y1)                          # 整数型に変換可能
 
 🔰 `iris` に含まれる因子型を確認しよう: `str(iris)`
 
-<div style="text-align: right;"><a class="url" href="https://r4ds.had.co.nz/factors.html">
-https://r4ds.had.co.nz/factors.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/factors.html></small>
 
 ---
 ## 因子型 `factor`: 文字列との違い1
@@ -1265,9 +1257,9 @@ Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
     - 文字列処理: 正規表現によるパターンマッチ
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---
@@ -1284,7 +1276,7 @@ Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 

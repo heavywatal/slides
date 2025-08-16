@@ -74,7 +74,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -87,7 +87,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/explore-intro.html">
 <img src="/slides/image/r4ds/data-science-explore.png">
-<figcaption class="url">https://r4ds.had.co.nz/explore-intro.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/explore-intro.html</small></figcaption>
 </a>
 </figure>
 
@@ -119,9 +119,7 @@ library(tidyverse)
 - **横1行**は1つの**観測**
 - **1セル**は1つの**値**
 
-<cite style="display: block; text-align: right;">
-<a class="url" href="https://r4ds.had.co.nz/tidy-data.html">https://r4ds.had.co.nz/tidy-data.html</a>
-</cite>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/tidy-data.html></small>
 
 
 ```r
@@ -158,11 +156,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -180,11 +178,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -202,11 +200,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 ---
 ## 整然データ tidy data &nbsp; vs &nbsp; 雑然データ messy data
@@ -224,11 +222,11 @@ print(diamonds)
     </div>
   </div>
 </div>
-<cite style="position: absolute; bottom: 18px; right: 24px;">
-<a class="url" href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
-西原史暁「整然データとは何か」https://id.fnshr.info/2017/01/09/tidy-data-intro/
+<small style="position: absolute; bottom: 1rem; left: 2rem;">
+<a href="https://id.fnshr.info/2017/01/09/tidy-data-intro/">
+西原史暁「<cite>整然データとは何か</cite>」https://id.fnshr.info/2017/01/09/tidy-data-intro/
 </a>
-</cite>
+</small>
 
 
 ---
@@ -296,9 +294,9 @@ VADeaths
     - 外れ値・欠損値に対処
     - 文字列から数値や日時を抜き出す
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## tidyverseに便利な道具が揃ってる
@@ -322,7 +320,7 @@ library(tidyverse)
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -1239,7 +1237,7 @@ band_members          band_instruments
 <a href="https://r4ds.had.co.nz/relational-data.html#mutating-joins">
 <img src="/slides/image/r4ds/join.png" height="550">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#mutating-joins</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/relational-data.html#mutating-joins</small></figcaption>
 </a>
 </figure>
 
@@ -1260,7 +1258,7 @@ data(package = "nycflights13")
 <a href="https://r4ds.had.co.nz/relational-data.html#nycflights13-relational">
 <img src="/slides/image/r4ds/relational-nycflights.png" height="320">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/relational-data.html#nycflights13-relational</small></figcaption>
 </a>
 </figure>
 
@@ -1324,7 +1322,7 @@ result = diamonds %>%
 <a href="https://r4ds.had.co.nz/tidy-data.html#gathering">
 <img src="/slides/image/r4ds/tidy-gather.png" width="800">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#gathering</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#gathering</small></figcaption>
 </a>
 </figure>
 
@@ -1370,7 +1368,7 @@ iris_long = iris %>% head(2L) %>%    # 最初の2行だけ
 <a href="https://r4ds.had.co.nz/tidy-data.html#spreading">
 <img src="/slides/image/r4ds/tidy-spread.png" height="480">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#spreading</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#spreading</small></figcaption>
 </a>
 </figure>
 
@@ -1413,7 +1411,7 @@ iris_long %>% print() %>%                    # さっき縦長にしたやつ
 <a href="https://r4ds.had.co.nz/tidy-data.html#separate">
 <img src="/slides/image/r4ds/tidy-separate.png" width="800">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#separate</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#separate</small></figcaption>
 </a>
 </figure>
 
@@ -1459,7 +1457,7 @@ iris_long %>% print() %>%
 <a href="https://r4ds.had.co.nz/tidy-data.html#unite">
 <img src="/slides/image/r4ds/tidy-unite.png" width="800">
 <br>
-<figcaption class="url">https://r4ds.had.co.nz/tidy-data.html#unite</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#unite</small></figcaption>
 </a>
 </figure>
 
@@ -1472,7 +1470,7 @@ iris_long %>% print() %>%
 <a href="https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/">
 <img src="/slides/image/rstats/nest-pack-chop.png" height="500">
 <br>
-<figcaption class="url">https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</figcaption>
+<figcaption><small>https://www.tidyverse.org/articles/2019/09/tidyr-1-0-0/</small></figcaption>
 </a>
 </figure>
 
@@ -1883,9 +1881,9 @@ tidy_anscombe %>%
     - 外れ値・欠損値に対処
     - 文字列から数値や日時を抜き出す
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## 変数/オブジェクトの型 (先週のおさらい)
@@ -2034,10 +2032,7 @@ exp(x)
 [1]  2.718282  7.389056 20.085537
 ```
 
-<div style="text-align: right;">
-<a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
-https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
-</a></div>
+<small style="display: block; text-align: right;"><https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html></small>
 
 ---
 ## 正規化 (z-score normalization)
@@ -2258,10 +2253,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 + HELP I'M STUCK
 ```
 
-<div style="text-align: right;">
-<a class="url" href=https://r4ds.had.co.nz/strings.html>
-https://r4ds.had.co.nz/strings.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/strings.html></small>
 
 ---
 ## R備え付けの文字列機能は使いにくい
@@ -2376,9 +2368,7 @@ str_subset(fruit, "^\\w{3,4}$")
 R文字列ではバックスラッシュを重ねる必要がある, e.g., `"\\d"`.<br>
 `\D`, `\S`, `W` のように大文字にすると反転。
 
-<div style="text-align: right;"><a class="url" href="http://userguide.icu-project.org/strings/regexp">
-http://userguide.icu-project.org/strings/regexp
-</a></div>
+<small style="display: block; text-align: right;"><http://userguide.icu-project.org/strings/regexp></small>
 
 問: `str_subset(fruit, "PATTERN")` をいろいろ試してみよう
 
@@ -2591,9 +2581,7 @@ levels(iris[["Species"]])
 [1] "setosa"     "versicolor" "virginica" 
 ```
 
-<div style="text-align: right;"><a class="url" href="https://r4ds.had.co.nz/factors.html">
-https://r4ds.had.co.nz/factors.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/factors.html></small>
 
 
 ---

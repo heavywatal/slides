@@ -105,7 +105,7 @@ Regression
 
 **Hierarchical Bayesian Model (HBM)**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 
 ---
@@ -120,9 +120,7 @@ Regression
     - $y = 3x + 7$
     - $y = 9x^2$
 
-<cite>
-<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
-</cite>
+<small><https://r4ds.had.co.nz/model-basics.html></small>
 
 ---
 ## Can see a strong pattern: the taller the heavier
@@ -261,7 +259,7 @@ ggplot(mpg_added) + aes(displ, hwy) + geom_point() +
 
 **Hierarchical Bayesian Model (HBM)**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 
 ---
@@ -357,7 +355,7 @@ Sample from binomial distribution with $n = 3, p = 0.5$
 
 <figure>
 <img src="../english2023r/image/math-model.drawio.svg" width="900"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 Any other probability distributions related to real phenomena like this?
@@ -770,7 +768,7 @@ A. Depends on what you estimate, acceptable error range, etc.
 
 <figure>
 <img src="../english2023r/image/math-model.drawio.svg" width="900"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 

@@ -48,7 +48,7 @@ Graduate School of Life Sciences, Tohoku University
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -300,7 +300,7 @@ Ministry of Internal affairs and Communication published a document in 2020.<br>
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-2-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -311,7 +311,7 @@ Useful functions to handle bad forms:
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-2-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -324,7 +324,7 @@ No unit, no comma, no space should be included in a cell.
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-3-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -337,7 +337,7 @@ No unit, no comma, no space should be included in a cell.
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-3-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -350,7 +350,7 @@ No footnote should be included in a table.
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-3-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -363,7 +363,7 @@ Useful functions to handle bad forms:
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-5-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -374,7 +374,7 @@ Useful functions to handle bad forms:
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-5-3.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -385,7 +385,7 @@ Useful functions to handle bad forms:
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-4-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -396,7 +396,7 @@ Useful functions to handle bad forms:
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-4-2.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -409,7 +409,7 @@ They are not recognized automatically.
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-6-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -422,7 +422,7 @@ Stick to only ASCII characters whenever possible.
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-1-10-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 Useful functions to handle bad forms:
@@ -435,7 +435,7 @@ For that matter, one sheet in one file.
 
 <figure><a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">
 <img src="/slides/image/soumu_go_jp/soumu_data-2-2-1.webp" width = 80%>
-<figcaption><cite>総務省 2020「統計表における機械判読可能なデータの表記方法の統一ルール」より</cite></figcaption>
+<figcaption><small>総務省 2020「<cite>統計表における機械判読可能なデータの表記方法の統一ルール</cite>」より</small></figcaption>
 </a></figure>
 
 ---
@@ -526,7 +526,7 @@ Whole population and phenomena themselves cannot be observed.
 
 <figure>
 <img src="../english2023r/image/math-model-biased.drawio.svg" width="1080"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -543,7 +543,7 @@ e.g., Weigh yourself 10 times with your clothes on.
 
 <figure>
 <img src="../english2023r/image/error-random-systematic.drawio.svg" width="640"><br>
-<figcaption><cite>「分析者のためのデータ解釈学入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uznzCK"><cite>分析者のためのデータ解釈学入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -552,7 +552,7 @@ e.g., Weigh yourself 10 times with your clothes on.
 
 <figure style="position: absolute; top: 40px; right: 40px;"><a href="https://en.wikipedia.org/wiki/Survivorship_bias">
 <img src="/slides/image/free/Survivorship-bias.svg" width="400"><br>
-<figcaption class="url">https://en.wikipedia.org/wiki/Survivorship_bias</figcaption>
+<figcaption><small>https://en.wikipedia.org/wiki/Survivorship_bias</small></figcaption>
 </a></figure>
 
 Survivorship bias
@@ -655,7 +655,7 @@ mode
   <div class="column">
   <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
   <img src="../tohoku2022r/image/hist-income-japan-2019.png" width="100%" style="">
-  <figcaption><cite>所得金額階級別世帯数の頻度分布 厚生労働省 国民生活基礎調査 2019</cite></figcaption>
+  <figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2019</small></figcaption>
   </a>
   </div>
 </div>
@@ -859,9 +859,9 @@ Number of drowned people and the films in which Nicolas Cage appeared.
 
 <figure>
 <img src="../tohoku2022r/image/nicholas-cage-drowned.svg" width="1200">
-<figcaption><cite>
+<figcaption><small>
 <a href="https://www.tylervigen.com/spurious-correlations">https://www.tylervigen.com/spurious-correlations</a>
-</cite></figcaption>
+</small></figcaption>
 </figure>
 
 
@@ -870,9 +870,9 @@ Number of drowned people and the films in which Nicolas Cage appeared.
 
 <figure>
 <img src="../tohoku2022r/image/hermeneutics-4-1-5.drawio.svg" width="1200">
-<figcaption><cite>
+<figcaption><small>
 <a href="https://amzn.to/3uznzCK">「分析者のためのデータ解釈学入門」江崎貴裕 2020</a>より改変
-</cite></figcaption>
+</small></figcaption>
 </figure>
 
 <hr>

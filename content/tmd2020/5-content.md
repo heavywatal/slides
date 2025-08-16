@@ -52,9 +52,9 @@ draft = false
     - 外れ値・欠損値に対処
     - 文字列から数値や日時を抜き出す
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## tidyverse: データ科学のためのパッケージ群
@@ -234,9 +234,7 @@ exp(x)
 [1]  2.718282  7.389056 20.085537
 ```
 
-<div style="text-align: right;"><a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
-https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
-</a></div>
+<small style="display: block; text-align: right;"><https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html></small>
 
 ---
 ## 正規化 (z-score normalization)
@@ -519,9 +517,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 + HELP I'M STUCK
 ```
 
-<div style="text-align: right;"><a class="url" href=https://r4ds.had.co.nz/strings.html>
-https://r4ds.had.co.nz/strings.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/strings.html></small>
 
 ---
 ## R備え付けの文字列機能は使いにくい
@@ -563,7 +559,7 @@ https://r4ds.had.co.nz/strings.html
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings.png" width="90%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<figcaption><small>https://stringr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -658,9 +654,7 @@ str_subset(fruit, "^\\w{3,4}$")
 `r"(raw文字列)"`を使う場合はひとつでいい: `r"(\d$)"`.<br>
 大文字にすると反転: `\D`, `\S`, `\W`.
 
-<div style="text-align: right;"><a class="url" href="http://userguide.icu-project.org/strings/regexp">
-http://userguide.icu-project.org/strings/regexp
-</a></div>
+<small style="display: block; text-align: right;"><http://userguide.icu-project.org/strings/regexp></small>
 
 
 ---
@@ -669,7 +663,7 @@ http://userguide.icu-project.org/strings/regexp
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<figcaption><small>https://stringr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -898,9 +892,7 @@ as.integer(f1)                          # 整数型に変換可能
 
 🔰 `diamonds` や `iris` に含まれる因子型を確認しよう
 
-<div style="text-align: right;"><a class="url" href="https://r4ds.had.co.nz/factors.html">
-https://r4ds.had.co.nz/factors.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.had.co.nz/factors.html></small>
 
 ---
 ## 因子型 `factor`: 文字列との違い1

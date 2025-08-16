@@ -67,7 +67,7 @@ Just repeat forgetting and searching.
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -95,9 +95,9 @@ Just repeat forgetting and searching.
     - Handling outliers and missing values
     - Character manipulation: pattern matching
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 ---
 ## tidyverse: a collection of R packages for data science
@@ -126,7 +126,7 @@ Consistently designed to cover all the processes in data analysis.
 <figure style="margin-block: 0;">
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.hadley.nz/intro</figcaption>
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -254,9 +254,7 @@ exp(x)
 [1]  2.718282  7.389056 20.085537
 ```
 
-<div style="text-align: right;"><a class="url" href="https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html">
-https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html
-</a></div>
+<small style="display: block; text-align: right;"><https://stat.ethz.ch/R-manual/R-patched/library/base/html/00Index.html></small>
 
 ---
 ## data.frame is a set of column vectors
@@ -554,9 +552,7 @@ Calm down, and push <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>.
 + HELP I'M STUCK
 ```
 
-<div style="text-align: right;"><a class="url" href=https://r4ds.hadley.nz/strings.html>
-https://r4ds.hadley.nz/strings.html
-</a></div>
+<small style="display: block; text-align: right;"><https://r4ds.hadley.nz/strings.html></small>
 
 ---
 ## Base R functions for characters are hard to use
@@ -710,9 +706,7 @@ What do `^`, `$`, and other symbols mean?
   </div>
 </div>
 
-<div style="text-align: right;"><a class="url" href="https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters">
-https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters
-</a></div>
+<small style="display: block; text-align: right;"><https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expression-metacharacters></small>
 
 [escape sequence](https://duckduckgo.com/?q=escape+sequence)
 : `"\n"` is a line break; `"\t"` is a tab; **`"\d"` is invalid**.
@@ -723,7 +717,7 @@ https://unicode-org.github.io/icu/userguide/strings/regexp.html#regular-expressi
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="100%">
-<figcaption class="url">https://stringr.tidyverse.org/</figcaption>
+<figcaption><small>https://stringr.tidyverse.org/</small></figcaption>
 </a>
 </figure>
 
@@ -1260,9 +1254,9 @@ and keep them within reach.
     - Handling outliers and missing values
     - Character manipulation: pattern matching
 
-<cite style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
 本橋智光「前処理大全」
-</a></cite>
+</a></small>
 
 
 ---

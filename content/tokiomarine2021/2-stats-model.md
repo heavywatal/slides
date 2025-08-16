@@ -81,7 +81,7 @@ draft = false
 
 **階層ベイズモデル HBM**
 
-<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012 より改変</cite>
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 
 ---
@@ -96,7 +96,7 @@ draft = false
     - $y = 3x + 7$
     - $y = 9x^2$
 
-<a href="https://r4ds.had.co.nz/model-basics.html" class="url">https://r4ds.had.co.nz/model-basics.html</a>
+<small><https://r4ds.had.co.nz/model-basics.html></small>
 
 
 ---
@@ -259,7 +259,7 @@ $n = 3, p = 0.5$ の二項分布で説明・再現できるぞ
 
 <figure>
 <img src="math-model.drawio.svg" width="600"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 こういうふうに現象と対応した確率分布、ほかにもある？
@@ -652,7 +652,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 <figure>
 <img src="math-model.drawio.svg" width="600"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 

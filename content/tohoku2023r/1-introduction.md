@@ -140,9 +140,9 @@ price  0.92 -0.01  0.13  1.00
 ## 代表値ばかり見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
-<a href="https://www.autodesk.com/research/publications/same-stats-different-graphs">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption class="url">https://www.autodesk.com/research/publications/same-stats-different-graphs</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -193,9 +193,9 @@ Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
-<cite>
-Weisberg 2012 "Simulation and Similarity" (科学とモデル)
-</cite>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
 
 ???
 数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
@@ -212,7 +212,7 @@ Weisberg 2012 "Simulation and Similarity" (科学とモデル)
 
 <figure>
 <img src="../tokiomarine2021/math-model.drawio.svg" width="1100"><br>
-<figcaption><cite>「データ分析のための数理モデル入門」江崎貴裕 2020 より改変</cite></figcaption>
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
 
@@ -261,8 +261,8 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 <figure style="position: absolute; top: 2em; right: 1.5em;">
 <a href="https://en.wikipedia.org/wiki/Standing_on_the_shoulders_of_giants">
 <img src="/slides/image/free/Orion_aveugle_cherchant_le_soleil.jpg" width="320">
-<figcaption class="url">
-https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
+<figcaption>
+<small>https://en.wikipedia.org/wiki/<wbr>Standing_on_the_shoulders_of_giants</small>
 </figcaption>
 </a>
 </figure>
@@ -352,7 +352,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <figure style="float: right; margin: 0.7rem 0 0;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
 <img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="420">
-<figcaption class="url">https://en.wikipedia.org/wiki/Sisyphus</figcaption>
+<figcaption><small>https://en.wikipedia.org/wiki/Sisyphus</small></figcaption>
 </a>
 </figure>
 
@@ -374,7 +374,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <figure>
 <img src="/slides/image/tek/finder.png" height="630">
 <img src="/slides/image/tek/fig5.png" height="630">
-<figcaption class="url">Iwasaki, Kijima, Innan (2019)</figcaption>
+<figcaption><small>Iwasaki, Kijima, Innan (2019)</small></figcaption>
 </figure>
 
 ---
@@ -389,7 +389,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="180">
 <img src="/slides/image/tumopp/Chex_Lconst.gif" height="180">
 <img src="/slides/image/tumopp/Chex_Llinear.gif" height="180">
-<figcaption class="url">Iwasaki and Innan (2017)</figcaption>
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
 </figure>
 
 ---
@@ -406,7 +406,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -418,7 +418,7 @@ https://en.wikipedia.org/wiki/<br>Standing_on_the_shoulders_of_giants
 <figure style="float: right;">
 <a href="https://cran.r-project.org/">
 <img src="/slides/image/rstats/Rlogo.svg" height="300">
-<figcaption class="url">https://cran.r-project.org/</figcaption>
+<figcaption><small>https://cran.r-project.org/</small></figcaption>
 </a>
 </figure>
 
@@ -548,7 +548,7 @@ source("https://example.com/sice/report.R")
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
   style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
-<figcaption class="url">https://r4ds.had.co.nz/workflow-projects.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/workflow-projects.html</small></figcaption>
 </a>
 </figure>
 
@@ -994,7 +994,7 @@ y
     <figure>
     <a href="https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg">
     <img src="/slides/image/free/front-row.jpg" height="720">
-    <figcaption class="url">https://commons.wikimedia.org/wiki/File:2012_Super_GT_Sugo_starting_grid.jpg</figcaption>
+    <figcaption><small>https://commons.wikimedia.org/wiki/<wbr>File:2012_Super_GT_Sugo_starting_grid.jpg</small></figcaption>
     </a>
     </figure>
   </div>
@@ -1002,7 +1002,7 @@ y
     <figure>
     <a href="https://en.wikipedia.org/wiki/Rhodes">
     <img src="/slides/image/free/apollon-columns.jpg" height="720">
-    <figcaption class="url">https://en.wikipedia.org/wiki/Rhodes</figcaption>
+    <figcaption><small>https://en.wikipedia.org/wiki/Rhodes</small></figcaption>
     </a>
     </figure>
   </div>
@@ -1204,7 +1204,7 @@ library(tidyverse)  # 一挙に読み込み
 <figure style="margin-block: 0;">
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png" width="800">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
@@ -1266,7 +1266,7 @@ library(tidyverse)  # 一挙に読み込み
 <figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png" width="720">
-<figcaption class="url">https://r4ds.had.co.nz/introduction.html</figcaption>
+<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
 </a>
 </figure>
 
