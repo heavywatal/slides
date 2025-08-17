@@ -245,6 +245,33 @@ sub, sup {
   line-height: 1;
 }
 
+figcaption {
+  contain: inline-size;
+}
+
+figure {
+  margin-block: 0.5em;
+  margin-inline: 0;
+  width: fit-content;
+}
+figure:has(blockquote) {
+  margin-block: 1em;
+  border-inline-start: 0.2rem solid hsla(0, 0%, 55%, 0.55);
+}
+figure:has(blockquote) figcaption {
+  padding-block: 0.5em;
+  padding-inline: 2.4rem 1rem;
+}
+figure > blockquote {
+  border-inline-start: none;
+}
+figure > blockquote:has(+ figcaption) {
+  margin-block-end: -0.5em;
+}
+figure > figcaption + blockquote {
+  margin-block-start: -0.5em;
+}
+
 h1,
 h2,
 h3 {
@@ -270,17 +297,11 @@ li li, li p {
   margin-block: 0.4em;
 }
 
-figure {
-  width: fit-content;
-  margin-inline: 0;
-  margin-block: 0.5rem;
+figure:has(img) {
   line-height: 1;
 }
-
-figcaption {
+figure:has(img) figcaption {
   text-align: right;
-  contain: inline-size;
-  max-inline-size: 100%;
 }
 
 pre {
