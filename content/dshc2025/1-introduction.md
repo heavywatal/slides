@@ -207,30 +207,6 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 
 ---
-## 本講義の主題: 回帰
-
-単純な直線あてはめから出発し、ちょっとずつ統計モデリング。
-
-<figure>
-<a href="https://kuboweb.github.io/-kubo/ce/LinksGlm.html">
-<img src="../tokiomarine2021/image/kubo-p2.png" width="1200">
-<figcaption>
-<small>久保さん https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small>
-</figcaption>
-</a>
-</figure>
-
----
-## 何でもかんでも直線あてはめではよろしくない
-
-<p><img src="figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
-
-- 観察データは常に**正の値**なのに予測が負に突入してない？
-- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
-- **データに合わせた統計モデルを使うとマシ**
-
-
----
 ## 回帰は教師あり機械学習の一種とも言える
 
 <figure>
@@ -279,28 +255,54 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 
 ---
-## 本講義のお品書き
+## 本講義の主題: 回帰
 
-<figure style="float: right;">
+久保先生の[<abbr title="データ解析のための統計モデリング入門">緑本</abbr>](https://amzn.to/33suMIZ)に沿ってちょっとずつ線形モデルを発展させていく。
+
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
-<img src="../tokiomarine2021/image/kubo-book.jpg" width="400" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
 </a>
 </figure>
 
-久保先生の"緑本"こと\
-「データ解析のための統計モデリング入門」\
-をベースに回帰分析の概要を紹介。
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-1. イントロ 👈 いまここ
-1. 統計モデルの基本
-    - 直線回帰
-    - 確率変数・**確率分布** 👈 次回の主役
-    - 尤度・最尤推定
-1. 一般化線形モデル、混合モデル
-1. ベイズ統計、階層ベイズモデル
+  <div class="column" style="flex-basis: fit-content;">
 
-回帰のキモは**線ではなく分布**
+**線形モデル LM** (単純な直線あてはめ)
 
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
+</p>
+
+**一般化線形モデル GLM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b style="color: #E69F00;">個体差</b>などの変量効果を扱いたい
+</p>
+
+**一般化線形混合モデル GLMM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b style="color: #B2001D;">自由なモデリング</b>を！
+</p>
+
+**階層ベイズモデル HBM**
+
+  </div>
+  <div class="column" style="flex-basis: fit-content;">
+
+<div style="text-align: right;">
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+</div>
+
+  </div>
+</div>
 
 
 ---
