@@ -146,7 +146,7 @@ hist(iris$Petal.Length)
 ## ggplot2: tidyverseの可視化担当
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
 </a>
 
 - "The <strong><u>G</u></strong>rammar of <strong><u>G</u></strong>raphics" という体系に基づく設計
@@ -162,7 +162,7 @@ hist(iris$Petal.Length)
 ## ggplot2: tidyverseの可視化担当
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
 </a>
 
 - "The <strong><u>G</u></strong>rammar of <strong><u>G</u></strong>raphics" という体系に基づく設計
@@ -824,7 +824,7 @@ ggplot2を[さらに拡張するパッケージも続々](https://exts.ggplot2.t
 : 地図 [`geom_sf`](https://ggplot2.tidyverse.org/reference/ggsf.html#examples)
 : 学術論文向けのいろいろ [ggpubr](https://github.com/kassambara/ggpubr)
 
-<img src="/slides/image/tumopp/driver.gif" align="right" height="200">
+<img src="/slides/image/tumopp/driver.gif" style="float: right;" height="200">
 
 ggplot2は3Dが苦手
 : 本当に3Dが必要? 色分けやファセットで足りない?
@@ -863,7 +863,7 @@ ggplot2は3Dが苦手
 ## おしながき: Rによるデータ可視化とレポート作成
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
 </a>
 
 ### ✅ データ解析全体の流れ。可視化だいじ
@@ -904,7 +904,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ## Quarto Document として研究ノートを作る
 
 <a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+<img src="/_img/hex-stickers/quarto.webp" width="160" style="float: right;">
 </a>
 
 プログラミングからレポート作成まで一元管理できて楽ちん。
@@ -916,7 +916,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 <hr>
 
 <a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" style="float: right;">
 </a>
 
 Quarto Markdown (`.qmd`)

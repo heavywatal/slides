@@ -449,7 +449,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ## Quarto Document として研究ノートを作る
 
 <a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+<img src="/_img/hex-stickers/quarto.webp" width="160" style="float: right;">
 </a>
 
 プログラミングからレポート作成まで一元管理できて楽ちん。
@@ -461,7 +461,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 <hr>
 
 <a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" style="float: right;">
 </a>
 
 Quarto Markdown (`.qmd`)

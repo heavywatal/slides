@@ -164,17 +164,17 @@ is the process of summarizing data and making inferences based on it.
 
 Simplified and idealized structures to represent a target system.
 
-Mathematical Models<img src="../tokiomarine2021/image/hill-equation.png" width="210" align="right" style="margin: 0 -5px;">
+Mathematical Models<img src="../tokiomarine2021/image/hill-equation.png" width="210" style="float: right; margin: 0 -5px;">
 : abstract structures written as mathematical representations.
 : e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
 : <br>
 
-Computational Models<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" align="right">
+Computational Models<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" style="float: right;">
 : sets of procedures to describe the behavior of a system
 : e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
 : <br>
 
-Concrete Models<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" align="right">
+Concrete Models<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" style="float: right;">
 : made of physical objects
 : e.g., San Francisco Bay-Delta Model
 
@@ -1095,7 +1095,7 @@ write.csv(iris, "iris.csv")
 ```
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
 but they are difficult to use properly.<br>
@@ -1141,7 +1141,7 @@ Wait. Using packages before understanding base R?
 ## tidyverse: a collection of R packages for data science
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" style="float: right;">
 </a>
 
 ```r

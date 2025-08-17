@@ -1119,7 +1119,7 @@ write.csv(iris, "iris.csv")
 ```
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
 なんか**左端の列**とか **"引用符"** が勝手に作られたりいろいろ不便。
@@ -1164,7 +1164,7 @@ update.packages()          # たまには更新しよう
 ## tidyverse: データ科学のためのパッケージ群
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" style="float: right;">
 </a>
 
 ```r

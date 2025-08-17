@@ -41,7 +41,7 @@ draft = false
 ## Stan
 
 <a href="https://mc-stan.org/">
-<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+<img src="/slides/image/stan/logo_name.png" width="120" style="float: right;">
 </a>
 
 - Stan言語で**モデルを柔軟に記述**できる。

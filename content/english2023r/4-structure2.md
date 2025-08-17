@@ -58,7 +58,7 @@ Graduate School of Life Sciences, Tohoku University
 ## dplyr --- plyer for data.frames
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="180" style="float: right;">
 </a>
 
 A consistent set of verbs/functions for data manipulation.
@@ -292,7 +292,7 @@ data(package = "nycflights13")
 ## tidyr --- transformer of data.frame
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="180" style="float: right;">
 </a>
 
 Pivoting
@@ -906,7 +906,7 @@ print(VADeaths)
 ```
 
 ↓ *mise en place* &nbsp;🔪&nbsp; put everything in place
-<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" align="right" width="540" style="margin-block-start: 4em;">
+<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" width="540" style="float: right; margin-block-start: 4em;">
 
 
 ```

@@ -113,7 +113,7 @@ draft = false
 ## ggplot2とは
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" style="float: right;">
 </a>
 
 - tidyverseパッケージ群のひとつ
@@ -416,7 +416,7 @@ ggplot2は単なるパッケージからプラットフォームに
   [@yutannihilationさんの記事](https://notchained.hatenablog.com/entry/2015/12/17/010904)
   とかを参考に。
 
-<img src="/slides/image/tumopp/driver.gif" align="right" height="200">
+<img src="/slides/image/tumopp/driver.gif" style="float: right;" height="200">
 
 もちろん地図とかもできる
 : [OK, Google. "ggplot 地図"](https://www.google.co.jp/search?q=ggplot+%E5%9C%B0%E5%9B%B3)

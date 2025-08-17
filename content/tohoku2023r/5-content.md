@@ -101,7 +101,7 @@ dpi = 108
 ## tidyverse: データ科学のためのパッケージ群
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" style="float: right;">
 </a>
 
 ```r
@@ -580,7 +580,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 ## stringr --- 文字列処理パッケージ
 
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/stringr.webp" width="180" style="float: right;">
 </a>
 
 -   tidyverseの一部
@@ -883,7 +883,7 @@ stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角�
 ## 文字列から別の型に
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
 これはstringrではなくreadrの担当:
@@ -1064,7 +1064,7 @@ y3 < "Sep"
 ## tidyverse の因子型担当は forcats
 
 <a href="https://forcats.tidyverse.org/">
-<img src="/_img/hex-stickers/forcats.webp" width="180" align="right">
+<img src="/_img/hex-stickers/forcats.webp" width="180" style="float: right;">
 </a>
 
 - `fct_relevel()`: 手動で順序設定
@@ -1153,7 +1153,7 @@ unclass(lt) |> as_tibble()
 ## lubridate --- 日時型処理パッケージ
 
 <a href="https://lubridate.tidyverse.org/">
-<img src="/_img/hex-stickers/lubridate.webp" width="180" align="right">
+<img src="/_img/hex-stickers/lubridate.webp" width="180" style="float: right;">
 </a>
 
 日時型への変換:

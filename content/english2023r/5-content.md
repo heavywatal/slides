@@ -103,7 +103,7 @@ Just repeat forgetting and searching.
 ## tidyverse: a collection of R packages for data science
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" style="float: right;">
 </a>
 
 ```r
@@ -582,7 +582,7 @@ Calm down, and push <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>.
 ## stringr: part of tidyverse for character processing
 
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/stringr.webp" width="180" style="float: right;">
 </a>
 
 -   Consistent function and argument names.
@@ -894,7 +894,7 @@ stringi::stri_trans_nfkc(c("ｶﾀｶﾅ", "４２"))  # 半角カナ・全角�
 ## Converting strings to something else
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
 It is not stringr's job, but readr's:
@@ -1080,7 +1080,7 @@ y3 < "Sep"
 ## forcats: part of tidyverse for factor type
 
 <a href="https://forcats.tidyverse.org/">
-<img src="/_img/hex-stickers/forcats.webp" width="180" align="right">
+<img src="/_img/hex-stickers/forcats.webp" width="180" style="float: right;">
 </a>
 
 - `fct_reorder()`: by another variable.
@@ -1169,7 +1169,7 @@ Who is in charge of date-time in tidyverse?
 ## lubridate --- tidyverse package for date and time
 
 <a href="https://lubridate.tidyverse.org/">
-<img src="/_img/hex-stickers/lubridate.webp" width="180" align="right">
+<img src="/_img/hex-stickers/lubridate.webp" width="180" style="float: right;">
 </a>
 
 convert character/numeric vectors to POSIXct date times:

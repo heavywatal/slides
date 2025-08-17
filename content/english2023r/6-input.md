@@ -57,7 +57,7 @@ Graduate School of Life Sciences, Tohoku University
 ## Read/write data.frame
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
 - `readxl` package helps reading `.xlsx`, but...

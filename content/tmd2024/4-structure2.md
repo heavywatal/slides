@@ -56,7 +56,7 @@ dpi = 108
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="180" style="float: right;">
 </a>
 
 シンプルな関数がたくさん。繋げて使う (piping)
@@ -299,7 +299,7 @@ data(package = "nycflights13")
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="180" style="float: right;">
 </a>
 
 横広から縦長に
@@ -897,7 +897,7 @@ print(VADeaths)
 ```
 
 ↓ 下ごしらえ: 作図・解析で使いやすい整然データに
-<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" align="right" width="540" style="margin-block-start: 3em;">
+<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" width="540" style="float: right; margin-block-start: 3em;">
 
 
 ```

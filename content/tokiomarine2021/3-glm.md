@@ -820,7 +820,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
 ![plot of chunk before-mixing](figure/before-mixing-1.png)
 
-<div align="center">
+<div style="text-align: center;">
 
 ![plot of chunk after-mixing](figure/after-mixing-1.png)
 

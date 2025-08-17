@@ -590,7 +590,7 @@ for Bayesian modeling and inference.
 ---
 ## `ts`: time series (時系列型)
 
-<span style="float: right">2.1.13</span>
+<span style="float: right;">2.1.13</span>
 
 `vector` with labels and print format.
 
@@ -627,7 +627,7 @@ is.character(timeser)
 ---
 ## Random Number Generator (乱数生成器)
 
-<span style="float: right">2.1.15</span>
+<span style="float: right;">2.1.15</span>
 
 `r` + 分布の名前 + `(length, parameters, ...)`
 
@@ -658,7 +658,7 @@ rnorm(5L, mean = 50, sd = 10)
 ---
 ## Random Number Generator (乱数生成器)
 
-<span style="float: right">2.1.15</span>
+<span style="float: right;">2.1.15</span>
 
 内部状態が同じなら、生成される乱数も同じ。
 
@@ -690,7 +690,7 @@ rnorm(5L, 0, 1)  # 同じ結果
 ---
 ## For-loop
 
-<span style="float: right">2.1.16</span>
+<span style="float: right;">2.1.16</span>
 
 Rではほぼ使わないけど、この教科書では使いたいらしい。
 
@@ -710,7 +710,7 @@ for (i in seq(1, 3)) {
 ---
 ## Histogram
 
-<span style="float: right">2.2.2</span>
+<span style="float: right;">2.2.2</span>
 
 連続値をいくつかのbinに区切って数えたもの
 
@@ -725,7 +725,7 @@ ggplot(diamonds) + aes(x = price) +
 ---
 ## Kernel Density Estimation (カーネル密度推定)
 
-<span style="float: right">2.2.3</span>
+<span style="float: right;">2.2.3</span>
 
 ヒストグラムを正規分布で滑らかにしたもの
 
@@ -743,7 +743,7 @@ ggplot(diamonds) + aes(x = price) +
 ---
 ## Summary Statistics (要約統計量)
 
-<span style="float: right">2.2.4, 5</span>
+<span style="float: right;">2.2.4, 5</span>
 
 
 ```r
@@ -777,7 +777,7 @@ quantile(diamonds[["price"]], probs = c(0.25, 0.75))
 ---
 ## Correlation (相関)
 
-<span style="float: right">2.2.6</span>
+<span style="float: right;">2.2.6</span>
 
 
 ```r
@@ -807,7 +807,7 @@ cor(diamonds[["carat"]], diamonds[["price"]])
 ---
 ## Autocorrelation (自己相関)
 
-<span style="float: right">2.2.7</span>
+<span style="float: right;">2.2.7</span>
 
 時系列データにおいて、n時点前の値との相関を取ったもの。<br>
 1次の自己相関 = 1時点前との相関

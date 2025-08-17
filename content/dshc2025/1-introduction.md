@@ -112,9 +112,7 @@ price  0.92 -0.01  0.13  1.00
 <figure style="position: relative;">
 <a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
 <img src="/slides/image/rstats/datasaurus.png" width="95%">
-<figcaption>
-<small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small>
-</figcaption>
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
 </a>
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
@@ -151,17 +149,17 @@ price  0.92 -0.01  0.13  1.00
 
 対象システムを単純化・理想化して扱いやすくしたもの
 
-Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" align="right" style="margin: 0 -5px;">
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" style="float: right; margin: 0 -5px;">
 : 数学的な方程式として記述されるもの。
 : e.g., Lotka-Volterra eq., <span style="opacity: 0.6;">Hill eq.</span>\
   <br>
 
-Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" align="right">
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" style="float: right;">
 : 数値計算の手続きとして記述されるもの。
 : e.g., Schelling’s Segregation Model, <span style="opacity: 0.6;"><em>tumopp</em></span>\
   <br>
 
-Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" align="right">
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" style="float: right;">
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 

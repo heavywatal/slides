@@ -274,7 +274,7 @@ boxplot(Petal.Width ~ Species, data = iris)
 ## ggplot2
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" style="float: right;">
 </a>
 
 - tidyverseパッケージ群のひとつ
@@ -826,7 +826,7 @@ ggplot2を[さらに拡張するパッケージも続々](https://exts.ggplot2.t
 : 地図 [`geom_sf`](https://ggplot2.tidyverse.org/reference/ggsf.html#examples)
 : 学術論文向けのいろいろ [ggpubr](https://github.com/kassambara/ggpubr)
 
-<img src="/slides/image/tumopp/driver.gif" align="right" height="200">
+<img src="/slides/image/tumopp/driver.gif" style="float: right;" height="200">
 
 ggplot2は3Dが苦手
 : 本当に3Dが必要? 色分けやファセットで足りない?
@@ -838,7 +838,7 @@ ggplot2は3Dが苦手
 ## 本日2時限目の話題: Rによるデータ可視化
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" style="float: right;">
 </a>
 
 ### ✅ まずデータ全体を可視化してみるのがだいじ

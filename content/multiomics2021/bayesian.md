@@ -140,7 +140,7 @@ draft = false
 : $\text{Prob}(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\text{Prob}(\textcolor{#0072B2}{B}) = \text{Prob}(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\text{Prob}(\textcolor{#E69F00}{A})$
 
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
-<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="150" align="right"></a>
+<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="150" style="float: right;"></a>
 
 移項するだけで**ベイズの定理**:
 <img src="../tokiomarine2021/bayes.drawio.svg" style="padding-left: 1rem;">
@@ -368,7 +368,7 @@ $\text{Prob}(M \mid P)$ 真陽性率(検査陽性の人が実際に感染者で�
 ## MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo
 
 <a href="https://en.wikipedia.org/wiki/Andrey_Markov">
-<img src="../tokiomarine2021/image/AAMarkov.jpg" height="180" align="right"></a>
+<img src="../tokiomarine2021/image/AAMarkov.jpg" height="180" style="float: right;"></a>
 
 マルコフ連鎖
 : 次の時点の挙動が現在の値だけで決定されるような確率過程。
@@ -434,7 +434,7 @@ e.g., 確率密度分布に従って変数Xを集める(棄却サンプリング
 
 (N次元球の体積 / N次元の立方体) はゼロに近づいていく。
 
-<img src="figure/circle-1.png" width="210" align="right">
+<img src="figure/circle-1.png" width="210" style="float: right;">
 
 - 2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$
 - 3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$
@@ -607,7 +607,7 @@ https://ill-identified.hatenablog.com/entry/2020/05/21/001158
 ## Stan
 
 <a href="https://mc-stan.org/">
-<img src="/slides/image/stan/logo_name.png" width="120" align="right">
+<img src="/slides/image/stan/logo_name.png" width="120" style="float: right;">
 </a>
 
 - Stan言語でモデルを書く

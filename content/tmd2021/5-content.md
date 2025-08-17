@@ -106,7 +106,7 @@ draft = false
 - シンプルな関数を繋げて使うデザイン
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="320" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="320" style="float: right;">
 </a>
 
 ```r
@@ -596,7 +596,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 ## stringr --- 文字列処理パッケージ
 
 <a href="https://stringr.tidyverse.org/">
-<img src="/_img/hex-stickers/stringr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/stringr.webp" width="120" style="float: right;">
 </a>
 
 
@@ -895,7 +895,7 @@ stringi::stri_trans_nfkc("ｶﾀｶﾅ")  # 半角カナを全角に
 ## 文字列から別の型に
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="120" style="float: right;">
 </a>
 
 
@@ -1078,7 +1078,7 @@ y3 < "Sep"
 ## tidyverse の因子型担当は forcats
 
 <a href="https://forcats.tidyverse.org/">
-<img src="/_img/hex-stickers/forcats.webp" width="120" align="right">
+<img src="/_img/hex-stickers/forcats.webp" width="120" style="float: right;">
 </a>
 
 
@@ -1172,7 +1172,7 @@ unclass(lt) %>% as_tibble()
 ## lubridate --- 日時型処理パッケージ
 
 <a href="https://lubridate.tidyverse.org/">
-<img src="/_img/hex-stickers/lubridate.webp" width="120" align="right">
+<img src="/_img/hex-stickers/lubridate.webp" width="120" style="float: right;">
 </a>
 
 

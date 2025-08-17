@@ -164,17 +164,17 @@ print(ggplot2::diamonds)
 
 対象システムを単純化・理想化して扱いやすくしたもの
 
-Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="150" align="right" style="margin: 0 -5px;">
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="150" style="float: right; margin: 0 -5px;">
 : 数学的な方程式として記述されるもの。
 : e.g., Lotka-Volterra eq., <span style="color: #888;">Hill eq.</span>
 : <br>
 
-Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="140" align="right">
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="140" style="float: right;">
 : 数値計算の手続きとして記述されるもの。
 : e.g., Schelling’s Segregation Model, <span style="color: #888;"><em>tumopp</em></span>
 : <br>
 
-Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="260" align="right">
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="260" style="float: right;">
 : 具体的な事物で作られるもの。
 : e.g., San Francisco Bay-Delta Model
 
@@ -188,7 +188,6 @@ Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.
 数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
 
 プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
-<img src="../lifesci2020seminar/image/schelling-segregation.gif" width="160" align="right" style="margin: -20px -15px; height: 160px; object-fit: cover;">
 
 ---
 ## ウェットな実験もモデルの一種と見なせる
@@ -1154,7 +1153,7 @@ update.packages()          # たまには更新しよう
 ## tidyverse
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" style="float: right;">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群
@@ -1180,7 +1179,7 @@ library(tidyverse)
 ## tidyverse
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" style="float: right;">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群

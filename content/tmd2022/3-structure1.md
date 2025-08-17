@@ -294,7 +294,7 @@ print(VADeaths)
 ## tidyverse: データ科学のためのパッケージ群
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" style="float: right;">
 </a>
 
 - 統一的な使い勝手
@@ -326,7 +326,7 @@ update.packages(ask = "no", type = "binary")
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" style="float: right;">
 </a>
 
 シンプルな関数がたくさん。繋げて使う (piping)

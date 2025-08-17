@@ -30,7 +30,7 @@ Sendai.R #2 初心者セッション
 ---
 ## Who am I?
 
-<img src="/slides/image/profile/google-map.png" height="580" align="right">
+<img src="/slides/image/profile/google-map.png" height="580" style="float: right;">
 Watal M. Iwasaki = 岩嵜 航<br>
 https://heavywatal.github.io/
 
@@ -41,7 +41,7 @@ Postdoc in SOKENDAI, Hayama
 : Evolution of diversity within a tumor/cancer.
 : Population genetics of Pacific bluefin tuna. 🐟
 
-<img src="/slides/image/profile/bicycle.jpg" height="220" align="right" style="transform: translate(-10px, 0px);">
+<img src="/slides/image/profile/bicycle.jpg" height="220" style="float: right; transform: translate(-10px, 0px);">
 Asst. Prof. in Tohoku University
 : Genomics of Rice 🍚, etc.
 
@@ -402,7 +402,7 @@ update.packages()            # たまには更新しよう
 ## tidyverse
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
+<img src="/slides/image/rstats/hex-badges.png" width="260" style="float: right;">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群
@@ -429,7 +429,7 @@ library(tidyverse)
 ## ggplot2とは
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="120" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="120" style="float: right;">
 </a>
 
 - tidyverseパッケージ群のひとつ
@@ -785,7 +785,7 @@ ggplot2を[さらに拡張するパッケージも続々](https://exts.ggplot2.t
 : グラフ/ネットワーク ggraph
 : 系統樹 ggtree
 
-<img src="/slides/image/tumopp/driver.gif" align="right" height="200">
+<img src="/slides/image/tumopp/driver.gif" style="float: right;" height="200">
 
 もちろん地図とかも描ける
 : [OK, Google. "ggplot 地図"](https://www.google.co.jp/search?q=ggplot+%E5%9C%B0%E5%9B%B3)

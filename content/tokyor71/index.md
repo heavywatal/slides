@@ -28,7 +28,7 @@ SOKENDAI, The Graduate University for Advanced Studies
 ---
 ## <img src="/slides/heavywatal.svg" height="48" style="vertical-align: text-bottom;"> @heavywatal
 
-<img src="/slides/image/profile/google-map.png" height="580" align="right">
+<img src="/slides/image/profile/google-map.png" height="580" style="float: right;">
 Watal M. Iwasaki = 岩嵜 航<br>
 https://heavywatal.github.io/
 
@@ -38,7 +38,8 @@ PhD in Life Sciences, Tohoku University, Sendai
 Postdoc in SOKENDAI, Hayama
 : Evolution of diversity within a tumor/cancer.
 
-<img src="/slides/image/profile/bicycle.jpg" height="220" align="right" style="transform: translate(-10px, 40px);">
+<img src="/slides/image/profile/bicycle.jpg" height="220" style="float: right; transform: translate(-10px, 40px);">
+
 Likes
 : 🍺 Beer, Sake, Whisky, Cooking
 : ♬ Heavy Metal, Classical, Folk

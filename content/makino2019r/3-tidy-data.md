@@ -209,7 +209,7 @@ VADeaths
 ## tidyverseに便利な道具が揃ってる
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges.png" width="260" align="right">
+<img src="/slides/image/rstats/hex-badges.png" width="260" style="float: right;">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群
@@ -237,7 +237,7 @@ library(tidyverse)
 ## dplyr --- data.frameの高速処理担当
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="120" style="float: right;">
 </a>
 
 シンプルな関数がたくさん。<br>
@@ -794,7 +794,7 @@ band_members %>% full_join(band_instruments, by = "name")
 ## tidyr --- data.frameの変形・整形担当
 
 <a href="https://tidyr.tidyverse.org/">
-<img src="/_img/hex-stickers/tidyr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/tidyr.webp" width="120" style="float: right;">
 </a>
 
 横長から縦長に
@@ -966,7 +966,7 @@ iris_nested$data[[1L]]
 ## purrr
 
 <a href="https://purrr.tidyverse.org/">
-<img src="/_img/hex-stickers/purrr.webp" width="120" align="right">
+<img src="/_img/hex-stickers/purrr.webp" width="120" style="float: right;">
 </a>
 
 listやループの処理担当。

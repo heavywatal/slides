@@ -107,7 +107,7 @@ dpi = 108
 : $\Pr(\textcolor{#E69F00}{A},~\textcolor{#0072B2}{B}) = \Pr(\textcolor{#E69F00}{A} \mid \textcolor{#0072B2}{B})~\Pr(\textcolor{#0072B2}{B}) = \Pr(\textcolor{#0072B2}{B} \mid \textcolor{#E69F00}{A})~\Pr(\textcolor{#E69F00}{A})$
 
 <a href="https://en.wikipedia.org/wiki/Thomas_Bayes">
-<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="240" align="right"></a>
+<img src="../tokiomarine2021/image/Thomas_Bayes.gif" height="240" style="float: right;"></a>
 
 移項するだけで**ベイズの定理**:<div>
 <div style="margin-block: -0.5em;">
@@ -372,7 +372,7 @@ dpi = 108
 ## MCMC: <u>M</u>arcov <u>C</u>hain <u>M</u>onte <u>C</u>arlo
 
 <a href="https://en.wikipedia.org/wiki/Andrey_Markov">
-<img src="../tokiomarine2021/image/AAMarkov.jpg" height="270" align="right"></a>
+<img src="../tokiomarine2021/image/AAMarkov.jpg" height="270" style="float: right;"></a>
 
 マルコフ連鎖
 : 次の時点の挙動が現在の値だけで決定されるような確率過程。
@@ -444,7 +444,7 @@ $\;\sim\;$
 
 (N次元球の体積 / N次元の立方体) はゼロに近づいていく。
 
-<img src="figure/circle-1.png" alt="plot of chunk circle" align="right">
+<img src="figure/circle-1.png" alt="plot of chunk circle" style="float: right;">
 
 - 2次元: $\frac {\pi r ^ 2} {(2r) ^ 2} = \frac \pi 4 \approx 0.79$
 - 3次元: $\frac {\frac 4 3 \pi r ^ 3} {(2r) ^ 3} = \frac \pi 6 \approx 0.52$
@@ -632,7 +632,7 @@ $\;\propto\;$
 ## Stan
 
 <a href="https://mc-stan.org/">
-<img src="/slides/image/stan/logo_name.png" width="180" align="right">
+<img src="/slides/image/stan/logo_name.png" width="180" style="float: right;">
 </a>
 
 - Stan言語で**モデルを柔軟に記述**できる。

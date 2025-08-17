@@ -1182,7 +1182,7 @@ update.packages()          # たまには更新しよう
 ## tidyverse
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" style="float: right;">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群
@@ -1208,7 +1208,7 @@ library(tidyverse)
 ## tidyverse
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="300" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="300" style="float: right;">
 </a>
 
 Rでデータを上手に扱うためのパッケージ群

@@ -151,7 +151,7 @@ Any useful package to draw beautiful graphs easily?
 ## ggplot2: a tidyverse member in charge of graphics
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
 </a>
 
 - can draw many types of graphs in a **rational** and **consistent** manner.
@@ -166,7 +166,7 @@ Any useful package to draw beautiful graphs easily?
 ## ggplot2: a tidyverse member in charge of graphics
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
 </a>
 
 - can draw many types of graphs in a **rational** and **consistent** manner.
@@ -820,7 +820,7 @@ ggsave("diamonds-cut-price.png", p, width = 12, height = 9)
 : [ggtree](https://github.com/YuLab-SMU/ggtree): Phylogenetic trees
 : [ggpubr](https://github.com/kassambara/ggpubr): Academic publication
 
-<img src="/slides/image/tumopp/driver.gif" align="right" height="320">
+<img src="/slides/image/tumopp/driver.gif" style="float: right;" height="320">
 
 ggplot2 does not support 3D plotting.
 : Really need 3D? Aes and facet will do in most cases.
@@ -847,7 +847,7 @@ Take a close look at the details 👀
 ### ✅ Draw graphs in a consistent manner with ggplot2
 
 <a href="https://ggplot2.tidyverse.org/">
-<img src="/_img/hex-stickers/ggplot2.webp" width="180" align="right">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
 </a>
 
 - Aesthetic mapping and faceting play key roles
@@ -884,7 +884,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ## Quarto Document
 
 <a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+<img src="/_img/hex-stickers/quarto.webp" width="160" style="float: right;">
 </a>
 
 You can unify management of programming and reporting.
@@ -896,7 +896,7 @@ You can unify management of programming and reporting.
 <hr>
 
 <a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" style="float: right;">
 </a>
 
 Quarto Markdown (`.qmd`)

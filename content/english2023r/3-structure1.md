@@ -256,7 +256,7 @@ print(VADeaths)
 ```
 
 ↓ *mise en place* &nbsp;🔪&nbsp; put everything in place
-<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" align="right" width="540" style="margin-block-start: 4em;">
+<img src="figure/vadeaths-plot-1.png" alt="plot of chunk vadeaths-plot" width="540" style="float: right; margin-block-start: 4em;">
 
 
 ```
@@ -295,7 +295,7 @@ print(VADeaths)
 ## tidyverse: a collection of R packages for data science
 
 <a href="https://www.tidyverse.org/">
-<img src="/slides/image/rstats/hex-badges8.png" width="33%" align="right">
+<img src="/slides/image/rstats/hex-badges8.png" width="33%" style="float: right;">
 </a>
 
 ```r
@@ -326,7 +326,7 @@ Consistently designed to cover all the processes in data analysis.
 ## dplyr --- plyer for data.frames
 
 <a href="https://dplyr.tidyverse.org/">
-<img src="/_img/hex-stickers/dplyr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/dplyr.webp" width="180" style="float: right;">
 </a>
 
 A consistent set of verbs/functions for data manipulation.

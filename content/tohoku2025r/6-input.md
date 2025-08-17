@@ -58,7 +58,7 @@ dpi = 108
 ## data.frameの読み書き
 
 <a href="https://readr.tidyverse.org/">
-<img src="/_img/hex-stickers/readr.webp" width="180" align="right">
+<img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
 - readxlパッケージを使えば `.xlsx` ファイルも読める、けど
@@ -547,7 +547,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 ## Quarto Document として研究ノートを作る
 
 <a href="https://quarto.org/">
-<img src="/_img/hex-stickers/quarto.webp" width="160" align="right">
+<img src="/_img/hex-stickers/quarto.webp" width="160" style="float: right;">
 </a>
 
 プログラミングからレポート作成まで一元管理できて楽ちん。
@@ -559,7 +559,7 @@ ggplot(mpg) + aes(displ, hwy) + geom_point(aes(color = drv))
 <hr>
 
 <a href="https://rmarkdown.rstudio.com/">
-<img src="/_img/hex-stickers/rmarkdown.webp" width="160" align="right">
+<img src="/_img/hex-stickers/rmarkdown.webp" width="160" style="float: right;">
 </a>
 
 Quarto Markdown (`.qmd`)
