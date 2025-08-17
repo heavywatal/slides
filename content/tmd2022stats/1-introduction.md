@@ -444,7 +444,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 "Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
      style="object-fit: cover; object-position: top; height: 480px;">
@@ -1103,7 +1103,7 @@ library(tidyverse)  # 一挙に読み込み
 
 一貫したデザインでデータ解析の様々な工程をカバー
 
-<figure style="margin-block: 0;">
+<figure>
 <a href="https://r4ds.had.co.nz/introduction.html">
 <img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
@@ -1371,13 +1371,18 @@ cowplot::plot_grid(pAB, p3, labels = c("", "C"), ncol = 1L)
 出発点となるデータはさまざま
 : 実験ノート、フィールドノート、データベース、...
 
-> Happy families are all alike;<br>
-> every unhappy family is unhappy in its own way<br>
-> --- Leo Tolstoy "Anna Karenina"
+<figure>
 
-> tidy datasets are all alike,<br>
-> but every messy dataset is messy in its own way<br>
-> --- Hadley Wickham
+> Happy families are all alike;\
+> every unhappy family is unhappy in its own way
+<figcaption>— Leo Tolstoy, <cite>Anna Karenina</cite></figcaption>
+</figure>
+<figure>
+
+> tidy datasets are all alike,\
+> but every messy dataset is messy in its own way
+<figcaption>— Hadley Wickham, creator of tidyverse</figcaption>
+</figure>
 
 
 ---

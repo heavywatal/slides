@@ -244,7 +244,7 @@ band_members          band_instruments
 ---
 ## joinまとめ
 
-<figure style="margin-block: 1em;">
+<figure>
 <a href="https://r4ds.hadley.nz/joins.html">
 <img src="/slides/image/r4ds/join-venn.png" width="100%">
 <br>
@@ -272,7 +272,7 @@ data(package = "nycflights13")
 # airlines, airports, flights, planes, weather
 ```
 
-<figure style="margin-block: 1em;">
+<figure>
 <a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
 <img src="/slides/image/r4ds/relational-nycflights13.png" width="900">
 <br>

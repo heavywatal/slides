@@ -76,7 +76,7 @@ dpi = 108
 ---
 ## そうは言ってもセンスでしょ? --- NO!
 
-<figure style="float: right; width: 670px; margin: 1rem 0;">
+<figure style="float: right; width: 670px;">
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
 <img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">

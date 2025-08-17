@@ -144,7 +144,7 @@ brew cask install r rstudio
 
 **Uncheck** "Restore ...", Choose **Never** for "Save workspace ...".
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png" width="75%"
      style="object-fit: cover; object-position: top; height: 450px;">

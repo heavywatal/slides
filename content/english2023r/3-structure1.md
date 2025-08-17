@@ -100,13 +100,18 @@ Similar data formats required for visualization and analysis
 Different data formats from source to source
 : lab notebooks, fieldnotes, databases, etc.
 
-> Happy families are all alike;<br>
-> every unhappy family is unhappy in its own way<br>
-> --- Leo Tolstoy "Anna Karenina"
+<figure>
 
-> tidy datasets are all alike,<br>
-> but every messy dataset is messy in its own way<br>
-> --- Hadley Wickham, creator of tidyverse
+> Happy families are all alike;\
+> every unhappy family is unhappy in its own way
+<figcaption>— Leo Tolstoy, <cite>Anna Karenina</cite></figcaption>
+</figure>
+<figure>
+
+> tidy datasets are all alike,\
+> but every messy dataset is messy in its own way
+<figcaption>— Hadley Wickham, creator of tidyverse</figcaption>
+</figure>
 
 
 ---
@@ -315,7 +320,7 @@ library(tidyverse)  # load core packages at once
 
 Consistently designed to cover all the processes in data analysis.
 
-<figure style="margin-block: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>

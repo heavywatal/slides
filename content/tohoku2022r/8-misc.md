@@ -355,12 +355,12 @@ $1 - (1 - 0.05)^{10} \simeq 0.40$ まで上昇。<br>
 
 > データの荒波を泳ぎきってもどこにも「究極の真実」などありはしないのだ。
 > 統計学はそのときその場かぎりでの「最良の結論」を導くための方便に過ぎないのだ。
-> ------ [三中信宏「統計思考の世界」](https://amzn.to/3urpls1)
+> <small>------ [三中信宏 <cite>統計思考の世界</cite>](https://amzn.to/3urpls1)</small>
 
-<figure style="margin-top: -1em;">
+<figure>
 <a href="http://leeswijzer.org/R/R-top.html">
-<img src="/slides/image/rstats/Mandala2004-small.jpg" width="80%">
-<figcaption><small>「<cite>大統計曼荼羅</cite>」三中信宏</small></figcaption>
+<img src="/slides/image/rstats/Mandala2004-small.jpg" width="800">
+<figcaption><small>三中信宏 <cite>大統計曼荼羅</cite></small></figcaption>
 </a>
 </figure>
 

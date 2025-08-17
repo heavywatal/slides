@@ -279,7 +279,7 @@ from observation of animals' behaviors and positions in a zoological park.
 
 The position and behavior of every individual were recorded.<br>
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/dir-0826.png" class="screenshot" height="750">
 <img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="660"
      style="position: absolute; left: 270px; top: 50px;">
@@ -319,7 +319,7 @@ Many files and many tabs —— are they all correct?
 The files are the crystal of blood, sweat, and tears,<br>
 but cannot be opened after free trial of the app.
 
-<figure style="position: relative; margin: 1em 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
 <img src="/slides/image/messy/photoshop.jpg" width="780"
      style="position: absolute; left: 200px; top: -10px;">
@@ -507,7 +507,7 @@ See https://support.apple.com/HT201236
 
 Uncheck "Restore ...". Set "Save workspace ..." to **Never**.
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/workflow-scripts.html#fig-blank-slate">
 <img src="/slides/image/rstudio/preferences-workspace.png"
   style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
@@ -1161,7 +1161,7 @@ library(tidyverse)  # load core packages at once
 
 Consistently designed to cover all the processes in data analysis.
 
-<figure style="margin-block: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="800">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>

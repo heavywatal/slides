@@ -97,7 +97,7 @@ draft = false
 週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
 <img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
      style="position: absolute; left: 270px; top: 50px;">
@@ -136,7 +136,7 @@ draft = false
 
 泣きながら何十枚も...。無料期間が終わって今は使えない...。
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
 <img src="/slides/image/messy/photoshop.jpg" width="530"
      style="position: absolute; left: 200px; top: -10px;">
@@ -374,13 +374,18 @@ print(ggplot2::diamonds)
 出発点となるデータはさまざま
 : 実験ノート、フィールドノート、データベース、...
 
-> Happy families are all alike;<br>
-> every unhappy family is unhappy in its own way<br>
-> --- Leo Tolstoy "Anna Karenina"
+<figure>
 
-> tidy datasets are all alike,<br>
-> but every messy dataset is messy in its own way<br>
-> --- Hadley Wickham
+> Happy families are all alike;\
+> every unhappy family is unhappy in its own way
+<figcaption>— Leo Tolstoy, <cite>Anna Karenina</cite></figcaption>
+</figure>
+<figure>
+
+> tidy datasets are all alike,\
+> but every messy dataset is messy in its own way
+<figcaption>— Hadley Wickham, creator of tidyverse</figcaption>
+</figure>
 
 
 ---
@@ -581,7 +586,7 @@ See https://support.apple.com/HT201236
 
 "Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://r4ds.had.co.nz/workflow-projects.html">
 <img src="/slides/image/rstudio/preferences-workspace.png"
      style="object-fit: cover; object-position: top; height: 420px;">

@@ -43,7 +43,7 @@ draft = false
 
 情報の整理 → **正しい解析・新しい発見**
 
-<figure style="margin-bottom: 32px;">
+<figure>
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/hajimeni-04.svg" width="570" style="margin: -24px -32px -32px -24px;">
 <figcaption><small>https://tsutawarudesign.com/</small></figcaption>

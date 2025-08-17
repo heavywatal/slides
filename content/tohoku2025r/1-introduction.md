@@ -286,7 +286,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 週に1回、各個体の位置と行動を種ごとのファイルに記録。\
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/dir-0826.png" class="screenshot" height="750">
 <img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="660"
      style="position: absolute; left: 270px; top: 50px;">
@@ -325,7 +325,7 @@ e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B 
 
 泣きながら何十枚も...。無料期間が終わって今は使えない...。
 
-<figure style="position: relative; margin: 1em 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
 <img src="/slides/image/messy/photoshop.jpg" width="780"
      style="position: absolute; left: 200px; top: -10px;">
@@ -529,7 +529,7 @@ source("https://example.com/sice/report.R")
 
 "Restore ..." の**チェックを外し**て、 "Save ..." の**Never**を選択
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/workflow-scripts.html#fig-blank-slate">
 <img src="/slides/image/rstudio/preferences-workspace.png"
   style="object-fit: cover; object-position: top; width: 32em; height: 16em;">
@@ -1187,7 +1187,7 @@ library(tidyverse)  # 一挙に読み込み
 
 一貫したデザインでデータ解析の様々な工程をカバー
 
-<figure style="margin-block: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="800">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>

@@ -128,7 +128,7 @@ print(diamonds)
 <figcaption><small>https://r4ds.had.co.nz/explore-intro.html</small></figcaption>
 </a>
 </figure>
-<figure style="margin-bottom: 32px;">
+<figure>
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/hajimeni-04.svg" width="570" style="margin: -24px -32px -32px -24px;">
 <figcaption><small>https://tsutawarudesign.com/</small></figcaption>
@@ -138,7 +138,7 @@ print(diamonds)
 ---
 ## そうは言ってもセンスでしょ? --- NO!
 
-<figure style="float: right; width: 450px; margin: 1rem 0;">
+<figure style="float: right; width: 450px;">
 <a href="https://tsutawarudesign.com/">
 <img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
 <img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">

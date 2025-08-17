@@ -614,7 +614,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 ---
 ## stringr --- 文字列処理パッケージ
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings.png" width="90%">
 <figcaption><small>https://stringr.tidyverse.org/</small></figcaption>
@@ -721,7 +721,7 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 ---
 ## 正規表現: チートシート (1卓に1枚！)
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
 <figcaption><small>https://stringr.tidyverse.org/</small></figcaption>

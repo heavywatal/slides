@@ -92,13 +92,18 @@ draft = false
 出発点となるデータはさまざま
 : 実験ノート、フィールドノート、データベース、...
 
-> Happy families are all alike;<br>
-> every unhappy family is unhappy in its own way<br>
-> --- Leo Tolstoy "Anna Karenina"
+<figure>
 
-> tidy datasets are all alike,<br>
-> but every messy dataset is messy in its own way<br>
-> --- Hadley Wickham, creator of tidyverse
+> Happy families are all alike;\
+> every unhappy family is unhappy in its own way
+<figcaption>— Leo Tolstoy, <cite>Anna Karenina</cite></figcaption>
+</figure>
+<figure>
+
+> tidy datasets are all alike,\
+> but every messy dataset is messy in its own way
+<figcaption>— Hadley Wickham, creator of tidyverse</figcaption>
+</figure>
 
 
 ---

@@ -76,7 +76,7 @@ draft = false
 週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/dir-0826.png" class="screenshot" height="500">
 <img src="/slides/image/messy/file-0826-zebra.png" class="screenshot" height="450"
      style="position: absolute; left: 270px; top: 50px;">
@@ -115,7 +115,7 @@ draft = false
 
 泣きながら何十枚も...。無料期間が終わって今は使えない...。
 
-<figure style="position: relative; margin: 20px 0;">
+<figure style="position: relative;">
 <img src="/slides/image/messy/file-z-z2-habitat.png" class="screenshot" width="105%">
 <img src="/slides/image/messy/photoshop.jpg" width="530"
      style="position: absolute; left: 200px; top: -10px;">

@@ -133,7 +133,7 @@ library(tidyverse)  # 一挙に読み込み
 
 一貫したデザインでデータ解析の様々な工程をカバー
 
-<figure style="margin-block: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/base.png" width="900">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
@@ -615,7 +615,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
     -   入力に `NA` が含まれる場合は対応する出力も `NA`
 -   [公式ドキュメント](https://stringr.tidyverse.org/)を見れば全容が掴める
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings.png" width="40%">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="40%">
@@ -723,7 +723,7 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 ---
 ## 正規表現: チートシート
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="90%">
 <figcaption><small>https://stringr.tidyverse.org/</small></figcaption>

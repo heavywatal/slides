@@ -123,7 +123,7 @@ library(tidyverse)  # load core packages at once
 
 Consistently designed to cover all the processes in data analysis.
 
-<figure style="margin-block: 0;">
+<figure>
 <a href="https://r4ds.hadley.nz/intro">
 <img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
@@ -592,7 +592,7 @@ Calm down, and push <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>.
     -   A missing value `NA` in input remains `NA` in output.
 -   Well-documented on [the official website](https://stringr.tidyverse.org/).
 
-<figure style="margin: 0;">
+<figure>
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings.png" width="40%">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="40%">
@@ -714,6 +714,7 @@ What do `^`, `$`, and other symbols mean?
 
 
 ---
+
 <figure style="margin: 0;">
 <a href="https://stringr.tidyverse.org/">
 <img src="/slides/image/cheatsheet/strings-regex.png" width="100%">
