@@ -67,12 +67,18 @@ html { font-size: 240%; }
 
 </section>
 <section>
-<h2 id="ちょっとずつ線形モデルを発展させていく">ちょっとずつ線形モデルを発展させていく</h2>
-<figure style="float: right;">
+<h2 id="本講義の主題-回帰">本講義の主題: 回帰</h2>
+<p>久保先生の<a href="https://amzn.to/33suMIZ"><abbr title="データ解析のための統計モデリング入門">緑本</abbr></a>に沿ってちょっとずつ線形モデルを発展させていく。</p>
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
 <img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
 </a>
 </figure>
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+  <div class="column" style="flex-basis: fit-content;">
 <p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
 <p style="opacity: 0.7; margin-inline-start: 2em;">
 ↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
@@ -86,7 +92,15 @@ html { font-size: 240%; }
 ↓ もっと<b>自由なモデリング</b>を！
 </p>
 <p><strong>階層ベイズモデル HBM</strong></p>
-<p><small>「<cite><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a></cite>」久保拓弥 2012 より改変</small></p>
+  </div>
+  <div class="column" style="flex-basis: fit-content;">
+<div style="text-align: right;">
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+</div>
+  </div>
+</div>
 <hr>
 <p><span style="font-weight: bold; color: #56B4E9;">確率分布</span>に長い時間を割いたけど、元はと言えば<strong>回帰</strong>したいのでした。</p>
 
@@ -523,7 +537,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 \text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
 \end{split}\]</p>
 <ul>
-<li><strong>AICが小さいほど予測精度の良いモデル</strong>。
+<li>AICは <strong>予測の悪さ</strong> の相対的指標。小さいほど良い。
 <ul>
 <li>尤度は上げたい。</li>
 <li>パラメータ数 $k$ が増えるとペナルティ。</li>
@@ -532,8 +546,8 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <li>どのデータに対する当てはまりを目指すかという観点
 <ul>
 <li>「手元のデータ」に対する対数尤度は $\log L^*$</li>
-<li>「真のメカニズムから出てくる未来のデータ」に対する<br>
-平均対数尤度の推定量は $(\log L^* - k)$<br>
+<li>「真のメカニズムから出てくる新規データ」に対する<br>
+平均対数尤度の推定量(予測の良さ)は $(\log L^* - k)$<br>
 (Kullback&ndash;Leibler情報量を使って導出するらしい)</li>
 </ul>
 </li>
@@ -543,14 +557,14 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </span></span></code></pre></div>
 </section>
 <section>
-<h2 id="無駄な説明変数の追加でaic増加">無駄な説明変数の追加でAIC増加</h2>
+<h2 id="aicを比べることで予測に役立つ変数を選択できる">AICを比べることで予測に役立つ変数を選択できる</h2>
 <p>ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。<br>
-観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。</p>
+観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加 → 不要な変数だ</p>
 <p><img src="./figure/many-models-aic-1.png" alt="plot of chunk many-models-aic"></p>
 
 </section>
 <section>
-<h2 id="ほかの情報量基準">ほかの情報量基準</h2>
+<h2 id="そのほかの変数選択の手法">そのほかの変数選択の手法</h2>
 <ul>
 <li>$\text{BIC} = -2 \log L^* + k \log n$
 <ul>
@@ -564,9 +578,12 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <a href="https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html">WBIC</a>
 <ul>
 <li>AIC, BICを一般化し、広く使えるようにしたもの。</li>
-<li>理想的な条件ではそれぞれAIC, BICとほぼ同じ。<br>
-そうじゃない場合(現実的には常に)こちらが優位。</li>
-<li>WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。</li>
+</ul>
+</li>
+<li><abbr title="Least Absolute Shrinkage and Selection Operator">LASSO</abbr>
+<ul>
+<li>回帰係数が0になるような推定で実質的に変数選択を行う。</li>
+<li>正則化パラメータ $\lambda$ の調整・決定が必要。</li>
 </ul>
 </li>
 </ul>
@@ -587,11 +604,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 <section>
 <h2 id="現実的な注意点悩みどころ">現実的な注意点・悩みどころ</h2>
 <ul>
-<li><strong>多重共線性</strong>(multicollinearity):
-<ul>
-<li>説明変数同士が強い相関関係にあるとマズいので予め取り除く。</li>
-</ul>
-</li>
+<li><strong>交互作用</strong>を入れると解釈が難しくなる。</li>
 <li>変数変換:
 <ul>
 <li>気安くやるべきじゃない。でも対数変換などはしばしば有用。</li>
@@ -603,18 +616,70 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </li>
 </ul>
 </li>
-<li><strong>交互作用</strong>を入れると解釈が難しくなる。</li>
+<li><strong>多重共線性</strong> (multicollinearity):
+<ul>
+<li>説明変数同士が強い相関関係にあると推定が不安定になる。</li>
+<li>相関係数や VIF (Variance Inflation Factor) などを確認。</li>
+<li>(理解や説明を目指さず、予測だけが目的なら害は案外小さい)</li>
 </ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="多重共線性-multicollinearity">多重共線性 multicollinearity</h2>
+<p>平均気温、最低気温、最高気温、それぞれ単回帰ならどれでもよさそう:</p>
+<p><img src="./figure/multico-simple-1.png" alt="plot of chunk multico-simple"></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">beer_sales</span> <span class="o">~</span> <span class="n">mean_temp</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_multico</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">coef</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)   mean_temp 
+  66.777865    3.173736 
+</code></pre><p>強い相関関係にある説明変数を一緒に使って重回帰すると変な結果に:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">beer_sales</span> <span class="o">~</span> <span class="n">mean_temp</span> <span class="o">+</span> <span class="n">min_temp</span> <span class="o">+</span> <span class="n">max_temp</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_multico</span><span class="p">)</span> <span class="o">|&gt;</span> <span class="nf">coef</span><span class="p">()</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)   mean_temp    min_temp    max_temp 
+ 51.8168872   7.2381353  -3.6617486  -0.3912664 
+</code></pre>
+</section>
+<section>
+<h2 id="多重共線性はaicで取り除ききれない">多重共線性はAICで取り除ききれない</h2>
+<p>相関のある説明変数は「無駄な説明変数」よりも厄介。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">glm_multico</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">beer_sales</span> <span class="o">~</span> <span class="n">mean_temp</span> <span class="o">+</span> <span class="n">min_temp</span> <span class="o">+</span> <span class="n">max_temp</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_multico</span><span class="p">)</span> <span class="o">|&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">MASS</span><span class="o">::</span><span class="nf">stepAIC</span><span class="p">()</span>      <span class="c1"># AICが下がるように変数を1つずつ除去していく</span>
+</span></span></code></pre></div><pre tabindex="0"><code>Start:  AIC=1507.93
+beer_sales ~ mean_temp + min_temp + max_temp
+
+            Df Deviance    AIC
+- max_temp   1    20957 1506.0
+&lt;none&gt;            20954 1507.9
+- min_temp   1    21175 1508.0
+- mean_temp  1    21408 1510.2
+
+Step:  AIC=1505.96
+beer_sales ~ mean_temp + min_temp
+
+            Df Deviance    AIC
+&lt;none&gt;            20957 1506.0
+- min_temp   1    21179 1506.1
+- mean_temp  1    21726 1511.2
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">glm_multico</span> <span class="o">|&gt;</span> <span class="nf">coef</span><span class="p">()</span>  <span class="c1"># 負の係数が勝ち残る...?</span>
+</span></span></code></pre></div><pre tabindex="0"><code>(Intercept)   mean_temp    min_temp 
+  49.997759    6.857172   -3.670698 
+</code></pre><p>回帰の結果だけ見ると案外悪くない (予測への悪影響は案外小さそう):</p>
+<p><img src="./figure/multicollinearity-1.png" alt="plot of chunk multicollinearity"></p>
 
 </section>
 <section>
 <h2 id="一般化線形モデル座学まとめ">一般化線形モデル座学まとめ</h2>
 <ul>
-<li>何はともあれ散布図を描く</li>
-<li>適切な確率分布・リンク関数・説明変数を考える</li>
-<li>パラメータを最尤推定する</li>
-<li>尤度は「手元のデータへのあてはまり」</li>
-<li>モデルを比較するときは情報量基準を参考にする</li>
+<li>何はともあれ散布図を描いて俯瞰</li>
+<li>適切な<strong>確率分布</strong>・<strong>リンク関数</strong>・<strong>説明変数</strong>を考える</li>
+<li>説明変数を絞り、<strong>過学習</strong>・<strong>多重共線性</strong>を避ける
+<ul>
+<li><strong>尤度</strong>: 手元のデータへのあてはまり</li>
+<li><strong>AIC</strong>: 新規データへの予測の悪さ</li>
+<li>ほかにもモデルを評価する指標はいろいろある</li>
+<li>機械的なモデル選択が理解の役に立つとは限らない</li>
+</ul>
+</li>
 </ul>
 <hr>
 <p>☕️ 休憩 + 質疑応答</p>
@@ -734,9 +799,9 @@ species[T.Gentoo]        15.677470
 body_mass_g               0.008402
 dtype: float64
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">llf</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>-1059.718313189737
+</span></span></code></pre></div><pre tabindex="0"><code>-1059.7183131897368
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">aic</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>2127.436626379474
+</span></span></code></pre></div><pre tabindex="0"><code>2127.4366263794736
 </code></pre>
 </section>
 <section>
@@ -810,12 +875,14 @@ e.g., <a href="https://vincentarelbundock.github.io/Rdatasets/articles/data.html
 <section>
 <h2 id="一般化線形モデルglmまとめ">一般化線形モデル(GLM)まとめ</h2>
 <ul>
-<li>何はともあれ作図して俯瞰</li>
-<li>GLMは統計モデリングの考え方の根幹
+<li>何はともあれ散布図を描いて俯瞰</li>
+<li>適切な<strong>確率分布</strong>・<strong>リンク関数</strong>・<strong>説明変数</strong>を考える</li>
+<li>説明変数を絞り、<strong>過学習</strong>・<strong>多重共線性</strong>を避ける
 <ul>
-<li>確率分布・リンク関数・説明変数</li>
-<li>尤度・最尤法によるパラメータ推定</li>
-<li>情報量基準などによるモデル選択</li>
+<li><strong>尤度</strong>: 手元のデータへのあてはまり</li>
+<li><strong>AIC</strong>: 新規データへの予測の悪さ</li>
+<li>ほかにもモデルを評価する指標はいろいろある</li>
+<li>機械的なモデル選択が理解の役に立つとは限らない</li>
 </ul>
 </li>
 </ul>
