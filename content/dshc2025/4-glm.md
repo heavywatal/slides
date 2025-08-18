@@ -44,7 +44,7 @@ dpi = 108
 <figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
 <img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
-<figcaption><small>https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
 </a>
 </figure>
 
@@ -539,13 +539,13 @@ result.llf  # log likelihood
 \text{AIC} = -2 (\log L^* - k) = -2 \log L^* + 2k
 \end{split}\]</p>
 
-- **AICが小さいほど予測精度の良いモデル**。
+- AICは **予測の悪さ** の相対的指標。小さいほど良い。
     - 尤度は上げたい。
     - パラメータ数 $k$ が増えるとペナルティ。
 - どのデータに対する当てはまりを目指すかという観点
     - 「手元のデータ」に対する対数尤度は $\log L^*$
-    - 「真のメカニズムから出てくる未来のデータ」に対する\
-      平均対数尤度の推定量は $(\log L^* - k)$\
+    - 「真のメカニズムから出てくる新規データ」に対する\
+      平均対数尤度の推定量(予測の良さ)は $(\log L^* - k)$\
       (Kullback--Leibler情報量を使って導出するらしい)
 
 
@@ -559,15 +559,16 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 
 
 ---
-## 無駄な説明変数の追加でAIC増加
+## AICを比べることで予測に役立つ変数を選択できる
 
 ある植物が作る種の数 $y$ は個体のサイズ $x$ に応じて増える。\
-観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加。
+観察時に着てた服の色 $x_2$ を追加したモデルはAICが増加 → 不要な変数だ
 
 ![plot of chunk many-models-aic](./figure/many-models-aic-1.png)
 
+
 ---
-## ほかの情報量基準
+## そのほかの変数選択の手法
 
 - $\text{BIC} = -2 \log L^* + k \log n$
     - パラメータ数 $k$ でペナルティを付けるのはAICと同じ。
@@ -577,9 +578,9 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 - [WAIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/waic2011.html),
   [WBIC](https://warp.ndl.go.jp/info:ndljp/pid/12597014/watanabe-www.math.dis.titech.ac.jp/users/swatanab/wbic2012.html)
     - AIC, BICを一般化し、広く使えるようにしたもの。
-    - 理想的な条件ではそれぞれAIC, BICとほぼ同じ。\
-      そうじゃない場合(現実的には常に)こちらが優位。
-    - WAICは予測の良さ、WBICは真のモデルへの近さ、を表す。
+- <abbr title="Least Absolute Shrinkage and Selection Operator">LASSO</abbr>
+    - 回帰係数が0になるような推定で実質的に変数選択を行う。
+    - 正則化パラメータ $\lambda$ の調整・決定が必要。
 
 
 ---
@@ -599,24 +600,103 @@ https://www.slideshare.net/logics-of-blue/1-6aic
 ---
 ## 現実的な注意点・悩みどころ
 
-- **多重共線性**(multicollinearity):
-  - 説明変数同士が強い相関関係にあるとマズいので予め取り除く。
+- **交互作用**を入れると解釈が難しくなる。
 - 変数変換:
   - 気安くやるべきじゃない。でも対数変換などはしばしば有用。
   - **割り算はなるべく避ける**。二項分布やオフセット項を検討。
     - 誤差のある観測値同士を割った値、その確率分布は扱いにくい。
     - 情報が失われる:「5打数2安打」と「500打数200安打」
-- **交互作用**を入れると解釈が難しくなる。
+- **多重共線性** (multicollinearity):
+  - 説明変数同士が強い相関関係にあると推定が不安定になる。
+  - 相関係数や VIF (Variance Inflation Factor) などを確認。
+  - (理解や説明を目指さず、予測だけが目的なら害は案外小さい)
+
+
+---
+## 多重共線性 multicollinearity
+
+平均気温、最低気温、最高気温、それぞれ単回帰ならどれでもよさそう:
+
+
+
+![plot of chunk multico-simple](./figure/multico-simple-1.png)
+
+
+``` r
+glm(beer_sales ~ mean_temp, data = df_multico) |> coef()
+```
+
+```
+(Intercept)   mean_temp 
+  66.777865    3.173736 
+```
+
+強い相関関係にある説明変数を一緒に使って重回帰すると変な結果に:
+
+
+``` r
+glm(beer_sales ~ mean_temp + min_temp + max_temp, data = df_multico) |> coef()
+```
+
+```
+(Intercept)   mean_temp    min_temp    max_temp 
+ 51.8168872   7.2381353  -3.6617486  -0.3912664 
+```
+
+---
+## 多重共線性はAICで取り除ききれない
+
+相関のある説明変数は「無駄な説明変数」よりも厄介。
+
+
+``` r
+glm_multico = glm(beer_sales ~ mean_temp + min_temp + max_temp, data = df_multico) |>
+  MASS::stepAIC()      # AICが下がるように変数を1つずつ除去していく
+```
+
+```
+Start:  AIC=1507.93
+beer_sales ~ mean_temp + min_temp + max_temp
+
+            Df Deviance    AIC
+- max_temp   1    20957 1506.0
+<none>            20954 1507.9
+- min_temp   1    21175 1508.0
+- mean_temp  1    21408 1510.2
+
+Step:  AIC=1505.96
+beer_sales ~ mean_temp + min_temp
+
+            Df Deviance    AIC
+<none>            20957 1506.0
+- min_temp   1    21179 1506.1
+- mean_temp  1    21726 1511.2
+```
+
+``` r
+glm_multico |> coef()  # 負の係数が勝ち残る...?
+```
+
+```
+(Intercept)   mean_temp    min_temp 
+  49.997759    6.857172   -3.670698 
+```
+
+回帰の結果だけ見ると案外悪くない (予測への悪影響は案外小さそう):
+
+![plot of chunk multicollinearity](./figure/multicollinearity-1.png)
 
 
 ---
 ## 一般化線形モデル座学まとめ
 
-- 何はともあれ散布図を描く
-- 適切な確率分布・リンク関数・説明変数を考える
-- パラメータを最尤推定する
-- 尤度は「手元のデータへのあてはまり」
-- モデルを比較するときは情報量基準を参考にする
+- 何はともあれ散布図を描いて俯瞰
+- 適切な**確率分布**・**リンク関数**・**説明変数**を考える
+- 説明変数を絞り、**過学習**・**多重共線性**を避ける
+  - **尤度**: 手元のデータへのあてはまり
+  - **AIC**: 新規データへの予測の悪さ
+  - ほかにもモデルを評価する指標はいろいろある
+  - 機械的なモデル選択が理解の役に立つとは限らない
 
 <hr>
 
@@ -799,7 +879,7 @@ print(results2.llf)
 ```
 
 ```
--1059.718313189737
+-1059.7183131897368
 ```
 
 ``` python
@@ -807,7 +887,7 @@ print(results2.aic)
 ```
 
 ```
-2127.436626379474
+2127.4366263794736
 ```
 
 
@@ -925,11 +1005,14 @@ diamonds = sm.datasets.get_rdataset("diamonds", "ggplot2").data
 ---
 ## 一般化線形モデル(GLM)まとめ
 
-- 何はともあれ作図して俯瞰
-- GLMは統計モデリングの考え方の根幹
-    - 確率分布・リンク関数・説明変数
-    - 尤度・最尤法によるパラメータ推定
-    - 情報量基準などによるモデル選択
+- 何はともあれ散布図を描いて俯瞰
+- 適切な**確率分布**・**リンク関数**・**説明変数**を考える
+- 説明変数を絞り、**過学習**・**多重共線性**を避ける
+  - **尤度**: 手元のデータへのあてはまり
+  - **AIC**: 新規データへの予測の悪さ
+  - ほかにもモデルを評価する指標はいろいろある
+  - 機械的なモデル選択が理解の役に立つとは限らない
+
 
 ---
 ## 参考文献

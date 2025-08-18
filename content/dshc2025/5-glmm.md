@@ -44,7 +44,7 @@ dpi = 108
 <figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
 <img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
-<figcaption><small>https://kuboweb.github.io/-kubo/ce/LinksGlm.html</small></figcaption>
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
 </a>
 </figure>
 
@@ -189,7 +189,7 @@ n = 1 のとき幾何分布と一致。
 
 失敗回数ではなく試行回数を変数とする定義もある。
 
-平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。\
+平均$\lambda$がガンマ分布でばらついた過分散ポアソン分布、とも解釈できる。\
 ($k \to \infty$でポアソン分布と一致)
 
 ---
