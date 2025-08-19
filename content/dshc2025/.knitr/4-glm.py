@@ -28,6 +28,7 @@ import seaborn as sns
 import statsmodels.api as sm
 import statsmodels.formula.api as smf
 from scipy import special
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 rng = np.random.default_rng(seed=24601)
 print(sys.version)
@@ -112,6 +113,7 @@ _dic = {
 }
 df_mul = pd.DataFrame(_dic)
 print(df_mul)
+variance_inflation_factor(df_mul.drop("beer_sales", axis=1), 0)
 # %%
 fig, ax = plt.subplots(ncols=2)
 sns.scatterplot(df_mul, x="temperature", y="beer_sales", hue="humidity", ax=ax[0])
