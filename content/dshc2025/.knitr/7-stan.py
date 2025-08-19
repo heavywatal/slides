@@ -30,6 +30,7 @@
 # %%
 # %matplotlib inline
 
+import os
 import sys
 from pathlib import Path
 
@@ -43,6 +44,7 @@ from cmdstanpy import CmdStanModel
 from scipy import special
 
 is_interactive = hasattr(sys, "ps1")
+parallel_chains = 1 if os.getenv("GOOGLE_CLOUD_PROJECT") else None
 
 # %% [markdown]
 # ## 説明変数なしのベイズ推定
@@ -100,7 +102,11 @@ model = CmdStanModel(stan_file=stan_file)
 # ### MCMCサンプル
 # %%
 fit = model.sample(
-    coin_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+    coin_data,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
 )
 
 # %% [markdown]
@@ -176,7 +182,13 @@ model = CmdStanModel(stan_file="stan/lm.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
+fit = model.sample(
+    mydata,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
+)
 
 # %% [markdown]
 # ### 結果の確認
@@ -233,7 +245,13 @@ grid.map(sns.lineplot, "x", "pred")
 # %%
 model = CmdStanModel(stan_file="stan/poisson.stan")
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
+fit = model.sample(
+    mydata,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
+)
 # %%
 fit.summary()
 # %%
@@ -288,7 +306,11 @@ model = CmdStanModel(stan_file="stan/logistic.stan")
 
 # %%
 fit = model.sample(
-    logistic_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+    logistic_data,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
 )
 fit.summary()
 print(fit.diagnose())
@@ -343,7 +365,11 @@ multiple_data.update(df_mul.to_dict("list"))
 model = CmdStanModel(stan_file="stan/multiple.stan")
 # %%
 fit = model.sample(
-    multiple_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+    multiple_data,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
 )
 fit.summary()
 print(fit.diagnose())
@@ -413,7 +439,13 @@ del mydata["weather"]
 # %%
 model = CmdStanModel(stan_file="stan/anova.stan")
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
+fit = model.sample(
+    mydata,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
+)
 fit.summary()
 print(fit.diagnose())
 # %%
@@ -441,7 +473,13 @@ grid.map(sns.scatterplot, "weather", "pred", color="black", marker="x", s=120)
 # %%
 model = CmdStanModel(stan_file="stan/ancova.stan")
 # %%
-fit = model.sample(mydata, chains=4, iter_sampling=2000, show_progress=is_interactive)
+fit = model.sample(
+    mydata,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
+)
 fit.summary()
 print(fit.diagnose())
 # %%
@@ -488,7 +526,13 @@ model = CmdStanModel(stan_file="stan/penguins-lm.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(pen_data, chains=4, iter_sampling=2000, show_progress=is_interactive)
+fit = model.sample(
+    pen_data,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
+)
 
 # %% [markdown]
 # ### 推定結果の要約と収束診断
@@ -552,7 +596,11 @@ model = CmdStanModel(stan_file="stan/penguins-multiple.stan")
 # ### MCMCサンプル
 # %%
 fit = model.sample(
-    pen_sp_data, chains=4, iter_sampling=2000, show_progress=is_interactive
+    pen_sp_data,
+    chains=4,
+    iter_sampling=2000,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
 )
 
 # %% [markdown]

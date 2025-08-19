@@ -22,6 +22,7 @@
 # %%
 # %matplotlib inline
 
+import os
 import sys
 from pathlib import Path
 
@@ -33,6 +34,7 @@ from cmdstanpy import CmdStanModel
 from scipy import special, stats
 
 is_interactive = hasattr(sys, "ps1")
+parallel_chains = 1 if os.getenv("GOOGLE_CLOUD_PROJECT") else None
 rng = np.random.default_rng(seed=24601)
 
 # %% [markdown]
@@ -61,7 +63,9 @@ model = CmdStanModel(stan_file="stan/glmm.stan")
 # %% [markdown]
 # ### MCMCサンプル
 # %%
-fit = model.sample(mydata, show_progress=is_interactive)
+fit = model.sample(
+    mydata, show_progress=is_interactive, parallel_chains=parallel_chains
+)
 
 # %% [markdown]
 # ### 推定結果の要約と収束診断
@@ -121,7 +125,9 @@ sns.histplot(df_beer_od, x="X", discrete=True, color="#333")
 # Stanでモデルを記述し、コンパイルして、MCMCサンプリング
 # %%
 model = CmdStanModel(stan_file="stan/beer-od.stan")
-fit = model.sample(data_beer_od, show_progress=is_interactive)
+fit = model.sample(
+    data_beer_od, show_progress=is_interactive, parallel_chains=parallel_chains
+)
 
 # %% [markdown]
 # 結果を確認

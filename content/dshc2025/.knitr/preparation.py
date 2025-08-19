@@ -69,6 +69,8 @@ import os
 
 from cmdstanpy import CmdStanModel, cmdstan_path
 
+parallel_chains = 1 if os.getenv("GOOGLE_CLOUD_PROJECT") else None
+
 # specify locations of Stan program file and data
 stan_file = os.path.join(cmdstan_path(), "examples", "bernoulli", "bernoulli.stan")
 data_file = os.path.join(cmdstan_path(), "examples", "bernoulli", "bernoulli.data.json")
@@ -77,7 +79,12 @@ data_file = os.path.join(cmdstan_path(), "examples", "bernoulli", "bernoulli.dat
 model = CmdStanModel(stan_file=stan_file)
 
 # obtain a posterior sample from the model conditioned on the data
-fit = model.sample(chains=4, data=data_file, show_progress=is_interactive)
+fit = model.sample(
+    chains=4,
+    data=data_file,
+    show_progress=is_interactive,
+    parallel_chains=parallel_chains,
+)
 
 # summarize the results (wraps CmdStan `bin/stansummary`):
 fit.summary()
