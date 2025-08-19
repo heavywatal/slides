@@ -730,7 +730,7 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 を開いて実行していこう。
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
+  <div style="flex: none;">
 
 - 直線回帰
 - ポアソン回帰
@@ -740,7 +740,7 @@ Student's $t(\nu=\nu_0, \mu = 0, \sigma = \sigma_0)$
 - 共分散分析
 
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 <figure>
 <img src="figure/lm-bad-1.png" alt="plot of chunk lm-bad" height=240>
 <img src="figure/glm-poisson-1.png" alt="plot of chunk glm-poisson" height=240>

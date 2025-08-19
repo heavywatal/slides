@@ -52,7 +52,7 @@ dpi = 108
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-  <div class="column" style="flex-basis: fit-content;">
+  <div>
 
 **線形モデル LM** (単純な直線あてはめ)
 
@@ -75,13 +75,11 @@ dpi = 108
 **階層ベイズモデル HBM**
 
   </div>
-  <div class="column" style="flex-basis: fit-content;">
+  <div style="text-align: right;">
 
-<div style="text-align: right;">
 <p>最小二乗法<br><br><br></p>
 <p>最尤推定法<br><br><br><br></p>
 <p>MCMC</p>
-</div>
 
   </div>
 </div>
@@ -91,7 +89,7 @@ dpi = 108
 ## コイントス4回、たまたま表が1回だったら
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
+  <div class="column">
 
 最尤推定
 : 推定結果は最も尤もらしい1点。
@@ -108,7 +106,7 @@ dpi = 108
   p = 0.6 とかである可能性もまあある。
 
   </div>
-  <div class="column" style="flex-shrink: 1.4;">
+  <div>
 
 ![plot of chunk freq-vs-bayes](./figure/freq-vs-bayes-1.png)![plot of chunk freq-vs-bayes](./figure/freq-vs-bayes-2.png)
 
@@ -373,7 +371,7 @@ dpi = 108
 ## 事後分布を用いた推定
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 
 区間推定
 : 幅のある推定値を提示
@@ -389,7 +387,7 @@ dpi = 108
   事後期待値 (<u>E</u>xpected <u>A</u> <u>P</u>osteriori)
 
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div style="margin-block: -0.5em;">
 
 ![plot of chunk integrate](./figure/integrate-1.png)
 

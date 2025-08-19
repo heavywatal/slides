@@ -247,7 +247,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 
 
 <div class="column-container">
-  <div class="column" style="height: 440px; overflow: scroll; flex-shrink: 1.2;">
+  <div style="flex: none; height: 440px; overflow: scroll;">
 
 
 ```
@@ -280,12 +280,12 @@ trials,survived
 ```
 
   </div>
-  <div class="column">
+  <div>
 
 ![plot of chunk distribution-datasets-plot](./figure/distribution-datasets-plot-1.png)
 
   </div>
-  <div class="column">
+  <div>
 
 ![plot of chunk distribution-datasets-mle](./figure/distribution-datasets-mle-1.png)
 

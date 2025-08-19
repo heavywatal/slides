@@ -52,7 +52,7 @@ dpi = 108
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 0% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-  <div class="column" style="flex-basis: fit-content;">
+  <div>
 
 **線形モデル LM** (単純な直線あてはめ)
 
@@ -75,13 +75,11 @@ dpi = 108
 **階層ベイズモデル HBM**
 
   </div>
-  <div class="column" style="flex-basis: fit-content;">
+  <div style="text-align: right;">
 
-<div style="text-align: right;">
 <p>最小二乗法<br><br><br></p>
 <p>最尤推定法<br><br><br><br></p>
 <p>MCMC</p>
-</div>
 
   </div>
 </div>
@@ -236,7 +234,7 @@ dtype: float64
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 0% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-  <div class="column" style="flex-basis: fit-content;">
+  <div>
 
 **線形モデル LM** (単純な直線あてはめ)
 
@@ -259,13 +257,11 @@ dtype: float64
 **階層ベイズモデル HBM**
 
   </div>
-  <div class="column" style="flex-basis: fit-content;">
+  <div style="text-align: right;">
 
-<div style="text-align: right;">
 <p>最小二乗法<br><br><br></p>
 <p>最尤推定法<br><br><br><br></p>
 <p>MCMC</p>
-</div>
 
   </div>
 </div>
@@ -293,13 +289,13 @@ e.g.,\
 コインを3枚投げたうち表の出る枚数 $X$ は**二項分布に従う**。\
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
-<div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
+<div class="column-container" style="justify-content: unset;">
+  <div>
 
 ![plot of chunk dbinom](./figure/dbinom-1.png)
 
   </div>
-  <div class="column" style="padding-top: 10px;">
+  <div style="padding-top: 10px;">
 \[\begin{split}
 \Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
 k &\in \{0, 1, 2, \ldots, n\}
@@ -331,11 +327,11 @@ k &\in \{0, 1, 2, \ldots, n\}
 - コインを3枚投げたうち表の出る枚数 $X$
 - $n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$
 
-<div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
+<div class="column-container" style="justify-content: unset;">
+  <div>
 <img src="figure/dbinom-1.png" alt="plot of chunk dbinom">
   </div>
-  <div class="column" style="padding-top: 10px;">
+  <div style="padding-top: 10px;">
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 &nbsp;&nbsp; ↓ サンプル

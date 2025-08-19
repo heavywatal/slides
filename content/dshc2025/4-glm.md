@@ -52,7 +52,7 @@ dpi = 108
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-  <div class="column" style="flex-basis: fit-content;">
+  <div>
 
 **線形モデル LM** (単純な直線あてはめ)
 
@@ -75,13 +75,11 @@ dpi = 108
 **階層ベイズモデル HBM**
 
   </div>
-  <div class="column" style="flex-basis: fit-content;">
+  <div style="text-align: right;">
 
-<div style="text-align: right;">
 <p>最小二乗法<br><br><br></p>
 <p>最尤推定法<br><br><br><br></p>
 <p>MCMC</p>
-</div>
 
   </div>
 </div>
@@ -131,15 +129,15 @@ y_i &\sim \textcolor{#56B4E9}{\text{Poisson}}(\textcolor{#3366ff}{\lambda_i}) \\
 個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。\
 平均値の対数$\log(\textcolor{#3366ff}{\lambda_i})$は**その個体の大きさ$x_i$に比例**する。
 
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
+<div class="column-container" style="justify-content: unset;">
+  <div>
 
 <figure style="margin-block: 1rem;">
 <img src="../iwate2023stats/glm.drawio.svg" width="640">
 </figure>
 
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 
 
 ![plot of chunk glm-poisson](./figure/glm-poisson-1.png)
@@ -175,7 +173,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 何かの成否に対する何かの因子の影響、とか
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div>
 
 客$n_i$人中$y_i$人がビールを注文。\
 その日$i$の気温$x_i$によって割合が変化。
@@ -189,7 +187,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 ロジスティック関数↑
 
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 
 
 ![plot of chunk glm-logistic](./figure/glm-logistic-1.png)
@@ -212,7 +210,7 @@ Xが1増えるとオッズがe^a倍に増える。
 何かの成否に対する何かの因子の影響、とか
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div>
 
 風が吹けば桶屋が儲かる。
 
@@ -226,7 +224,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 ロジスティック関数↑
 
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 
 
 ![plot of chunk wind](./figure/wind-1.png)
@@ -242,7 +240,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 - リンク関数: **恒等関数**(なにもせずそのまま)
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div class="column" style="padding-top: 0.5rem;">
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
@@ -250,7 +248,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 \end{split}\]</p>
 
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div class="column">
 
 
 ![plot of chunk glm-weight](./figure/glm-weight-1.png)
@@ -269,7 +267,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 <span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div style="padding-top: 0.5rem;">
 
 | 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
 | ---- | :-: | :---: | :---: |
@@ -283,7 +281,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \end{split}\]</p>
 
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div>
 
 
 
@@ -305,7 +303,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div style="padding-top: 0.5rem;">
 
 | 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
 | ---- | :-: | :---: | :---: |
@@ -319,7 +317,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \end{split}\]</p>
 
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div>
 
 
 ![plot of chunk glm-ancova](./figure/glm-ancova-1.png)
@@ -337,7 +335,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 e.g., ビール売上の温度依存性が天気によって異なる。
 
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
+  <div style="padding-top: 0.5rem;">
 
 | 天気 | $x_1$ |
 | ---- | :---: |
@@ -353,7 +351,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。
 
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div>
 
 
 ![plot of chunk interaction](./figure/interaction-1.png)
@@ -879,7 +877,7 @@ print(results2.llf)
 ```
 
 ```
--1059.7183131897368
+-1059.718313189737
 ```
 
 ``` python
@@ -887,7 +885,7 @@ print(results2.aic)
 ```
 
 ```
-2127.4366263794736
+2127.436626379474
 ```
 
 

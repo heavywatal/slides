@@ -52,7 +52,7 @@ dpi = 108
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-  <div class="column" style="flex-basis: fit-content;">
+  <div>
 
 **線形モデル LM** (単純な直線あてはめ)
 
@@ -75,13 +75,11 @@ dpi = 108
 **階層ベイズモデル HBM**
 
   </div>
-  <div class="column" style="flex-basis: fit-content;">
+  <div style="text-align: right;">
 
-<div style="text-align: right;">
 <p>最小二乗法<br><br><br></p>
 <p>最尤推定法<br><br><br><br></p>
 <p>MCMC</p>
-</div>
 
   </div>
 </div>
