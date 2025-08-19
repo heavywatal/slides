@@ -78,7 +78,7 @@ html { font-size: 240%; }
 <div class="column-container" style="position: relative; padding-inline: 0.75em;">
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
 <div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
-  <div class="column" style="flex-basis: fit-content;">
+  <div>
 <p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
 <p style="opacity: 0.7; margin-inline-start: 2em;">
 ↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
@@ -93,12 +93,10 @@ html { font-size: 240%; }
 </p>
 <p><strong>階層ベイズモデル HBM</strong></p>
   </div>
-  <div class="column" style="flex-basis: fit-content;">
-<div style="text-align: right;">
+  <div style="text-align: right;">
 <p>最小二乗法<br><br><br></p>
 <p>最尤推定法<br><br><br><br></p>
 <p>MCMC</p>
-</div>
   </div>
 </div>
 <hr>
@@ -134,13 +132,13 @@ y_i &\sim \textcolor{#56B4E9}{\text{Poisson}}(\textcolor{#3366ff}{\lambda_i}) \\
 <h2 id="説明変数が1つある一般化線形モデル">説明変数が1つある一般化線形モデル</h2>
 <p>個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。<br>
 平均値の対数$\log(\textcolor{#3366ff}{\lambda_i})$は<strong>その個体の大きさ$x_i$に比例</strong>する。</p>
-<div class="column-container">
-  <div class="column" style="flex-shrink: 1.0;">
+<div class="column-container" style="justify-content: unset;">
+  <div>
 <figure style="margin-block: 1rem;">
 <img src="../iwate2023stats/glm.drawio.svg" width="640">
 </figure>
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 <p><img src="./figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
   </div>
 </div>
@@ -166,7 +164,7 @@ y_i &\sim \text{Poisson}(\lambda_i) \\
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div>
 <p>客$n_i$人中$y_i$人がビールを注文。<br>
 その日$i$の気温$x_i$によって割合が変化。</p>
 <p>\[\begin{split}
@@ -176,7 +174,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 <p>ロジスティック関数↑</p>
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 <p><img src="./figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
   </div>
 </div>
@@ -190,7 +188,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 </ul>
 <p>何かの成否に対する何かの因子の影響、とか</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div>
 <p>風が吹けば桶屋が儲かる。</p>
 <p>\[\begin{split}
 y_i &\sim \text{Bernoulli}(p_i) \\
@@ -200,7 +198,7 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 \end{split}\]</p>
 <p>ロジスティック関数↑</p>
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div>
 <p><img src="./figure/wind-1.png" alt="plot of chunk wind"></p>
   </div>
 </div>
@@ -213,13 +211,13 @@ p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
 <li>リンク関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
 </ul>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div class="column" style="padding-top: 0.5rem;">
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 \operatorname{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
 \end{split}\]</p>
   </div>
-  <div class="column" style="flex-shrink: 1.0;">
+  <div class="column">
 <p><img src="./figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
   </div>
 </div>
@@ -232,7 +230,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 <p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等リンク</strong>のGLM、と解釈可能。<br>
 <span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div style="padding-top: 0.5rem;">
 <table>
   <thead>
       <tr>
@@ -268,7 +266,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
 \end{split}\]</p>
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div>
 <p><img src="./figure/glm-anova-1.png" alt="plot of chunk glm-anova"></p>
   </div>
 </div>
@@ -281,7 +279,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 <p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
 正規分布・等分散・恒等リンクなどが仮定される。</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 1rem;">
+  <div style="padding-top: 0.5rem;">
 <table>
   <thead>
       <tr>
@@ -317,7 +315,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 \mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
 \end{split}\]</p>
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div>
 <p><img src="./figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
   </div>
 </div>
@@ -329,7 +327,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 <p>ある説明変数の効果が、別の説明変数によって異なる。<br>
 e.g., ビール売上の温度依存性が天気によって異なる。</p>
 <div class="column-container">
-  <div class="column" style="flex-shrink: 1.0; padding-top: 0.1rem;">
+  <div style="padding-top: 0.5rem;">
 <table>
   <thead>
       <tr>
@@ -355,7 +353,7 @@ y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
 <p>雨の日は $x_{1i} = 0$ のため $\beta_0,~\beta_2$ の項だけ。<br>
 晴れの日はそれに加えて $\beta_1,~\beta_{1,2}$ の項も。</p>
   </div>
-  <div class="column" style="flex-shrink: 1.3;">
+  <div>
 <p><img src="./figure/interaction-1.png" alt="plot of chunk interaction"></p>
   </div>
 </div>
@@ -799,9 +797,9 @@ species[T.Gentoo]        15.677470
 body_mass_g               0.008402
 dtype: float64
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">llf</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>-1059.7183131897368
+</span></span></code></pre></div><pre tabindex="0"><code>-1059.718313189737
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">results2</span><span class="o">.</span><span class="n">aic</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>2127.4366263794736
+</span></span></code></pre></div><pre tabindex="0"><code>2127.436626379474
 </code></pre>
 </section>
 <section>
