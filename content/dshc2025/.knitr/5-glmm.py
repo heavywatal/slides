@@ -26,7 +26,7 @@ rng = np.random.default_rng(seed=24601)
 print(sys.version)
 
 # %% [markdown]
-# # 乱数生成で混合分布を実感してみよう
+# ## 乱数生成で混合分布を実感してみよう
 #
 # 1. 100個体の能力値zを正規乱数で生成。分布を描く。
 
@@ -70,6 +70,35 @@ sns.histplot(x=y, discrete=True)
 
 # %%
 
+# %% [markdown]
+# ## 過分散のポアソン分布
+#
+# まずは普通のポアソン分布を描いてみる。
+
+# %%
+
+sample_size = 400
+mean = 2.74
+sns.histplot(x=rng.poisson(mean, sample_size), discrete=True)
+
+# %% [markdown]
+# ガンマ分布の平均は shape * scale 。
+# 平均を固定しつつ尖り具合 shape (k) を変えるには scale = mean / shape とする。
+# shape を 1000, 100, 10, 1 と変えてみてガンマ分布の形の変化を見てみる。
+# %%
+
+shape = 1000
+scale = mean / shape
+lambdas = rng.gamma(shape, scale, sample_size)
+sns.histplot(x=lambdas, binrange=(0, 10))
+
+# %% [markdown]
+# ばらつきのある lambda からポアソン乱数を生成し、普通のポアソン分布と比較。
+# 大きい shape から徐々に小さくしていき、形の変化を見てみる。
+# %%
+
+sns.histplot(x=rng.poisson(mean, sample_size), discrete=True)
+sns.histplot(x=rng.poisson(lambdas), discrete=True)
 
 # %%
 

@@ -100,6 +100,16 @@ _y = rng.binomial(trials, true_p, sample_size)
 df_seeds = pd.DataFrame({"trials": trials, "survived": _y})
 print(df_seeds)
 
+# %% tags=["remove_cell"]
+sns.histplot(data=df_seeds, x="survived", discrete=True, binrange=(0, trials))
+
+x = np.arange(0, trials + 1)
+p = 0.8
+y = special.comb(trials, x) * (p**x) * ((1 - p) ** (trials - x))
+sns.histplot(data=df_seeds, x="survived", discrete=True, binrange=(0, trials))
+sns.barplot(x=x, y=y * sample_size)
+
+
 # %%
 # Plot data distribution
 

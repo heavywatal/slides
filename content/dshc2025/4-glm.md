@@ -98,7 +98,7 @@ $X \sim f(\theta) $
 e.g., ある植物が作る種の数$X$は<span style="color: #3366ff;">平均値$\lambda$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う:
 
 <div>\[\begin{split}
-X \sim \textcolor{#56B4E9}{\text{Poisson}}(\textcolor{#3366ff}{\lambda_i})
+X \sim \textcolor{#56B4E9}{\text{Poisson}}(\textcolor{#3366ff}{\lambda})
 \end{split}\]</div>
 
 
@@ -644,7 +644,7 @@ glm(beer_sales ~ mean_temp + min_temp + max_temp, data = df_multico) |> coef()
 ---
 ## 多重共線性はAICで取り除ききれない
 
-相関のある説明変数は「無駄な説明変数」よりも厄介。
+相関のある説明変数は「単に無駄」な説明変数よりも厄介。
 
 
 ``` r

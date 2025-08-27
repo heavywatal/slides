@@ -158,7 +158,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 1. 能力の平均や分散の値を変えたらどうなるか見てみる。
 
 ---
-## ビールの注文数、再び
+## 過分散のポアソン分布？
 
 
 
@@ -168,6 +168,7 @@ $z_i \sim \mathcal{N}(\hat z, \sigma)$
 
 ![plot of chunk beer-overdispersion](./figure/beer-overdispersion-1.png)
 
+しかしポアソン分布には分散だけを変えるパラメーターは無い。\
 全員が同じ平均注文数$\lambda$を持つという仮定が間違ってたのかも。
 
 🔰 平均注文数がガンマ分布に従うと仮定して、乱数生成してみよう。
