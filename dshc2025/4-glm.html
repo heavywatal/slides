@@ -109,7 +109,7 @@ html { font-size: 240%; }
 $X \sim f(\theta) $</p>
 <p>e.g., ある植物が作る種の数$X$は<span style="color: #3366ff;">平均値$\lambda$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う:</p>
 <div>\[\begin{split}
-X \sim \textcolor{#56B4E9}{\text{Poisson}}(\textcolor{#3366ff}{\lambda_i})
+X \sim \textcolor{#56B4E9}{\text{Poisson}}(\textcolor{#3366ff}{\lambda})
 \end{split}\]</div>
 <p><img src="./figure/only-dist-1.png" alt="plot of chunk only-dist"></p>
 <p>これを一般化線形モデル(GLM)として見ることもできる→</p>
@@ -639,7 +639,7 @@ $\log L^* (M_1) \text{ vs. } \log L^* (M_2) \text{ vs. } \log L^* (M_3) \ldots$<
 </section>
 <section>
 <h2 id="多重共線性はaicで取り除ききれない">多重共線性はAICで取り除ききれない</h2>
-<p>相関のある説明変数は「無駄な説明変数」よりも厄介。</p>
+<p>相関のある説明変数は「単に無駄」な説明変数よりも厄介。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">glm_multico</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">beer_sales</span> <span class="o">~</span> <span class="n">mean_temp</span> <span class="o">+</span> <span class="n">min_temp</span> <span class="o">+</span> <span class="n">max_temp</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">df_multico</span><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="n">MASS</span><span class="o">::</span><span class="nf">stepAIC</span><span class="p">()</span>      <span class="c1"># AICが下がるように変数を1つずつ除去していく</span>
 </span></span></code></pre></div><pre tabindex="0"><code>Start:  AIC=1507.93
