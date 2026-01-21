@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>Rによる統計モデリング入門 2026 栃木県</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="Rによる統計モデリング入門 2026 栃木県">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tochigi2026/">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script type="module" src="/slides/lib/katex/katex.min.js"></script>
+<link rel="stylesheet" href="/slides/lib/iconify.css">
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-plain.css">
+</head>
+<body>
+<main>
+<header>
+<h1>Rによる統計モデリング入門 2026 栃木県</h1>
+</header>
+<ul>
+<li>講師: 岩嵜航 (東北大学 生命科学研究科)</li>
+<li>日程: 2026年2月3日</li>
+<li>場所: 栃木県農業総合研究センター (remote)</li>
+</ul>
+<h2 id="概要">概要</h2>
+<ul>
+<li>授業内容:<br>
+何らかの現象を理解・説明しようとするとき、その全てをあるがままに捉えることはできません。
+扱いやすいように単純化・理想化したモデルを作り、限られたデータを通して統計的に解釈するのが科学のやり方です。
+また、正しい結論を導くためには、データをいろいろな角度から可視化して全体の構造を見渡すことが特に重要です。
+しかし作図にせよ統計処理にせよ、
+「エクセルであれをあっちにコピペして、メニューからあれを選択して&hellip;」
+といった手作業でやるのは大変ですし、再現性が無いため科学の手続きとしても問題です。
+いつでもだれでも再検証したり使いまわしたりできるように、
+規則性のある退屈な仕事は機械に任せるのが得策です。
+本講義では、近年さらに易しくなったR言語を用いることで、
+生データから効果的な作図まで簡単に辿り着けるということを体験してもらいます。</li>
+<li>受講するうえで必要になる前提知識
+<ul>
+<li>ファイル、フォルダ、クリックなど一般的なパソコンの基礎知識と経験</li>
+</ul>
+</li>
+<li>参考書
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://r4ds.hadley.nz/">Hadley Wickham et al. &ldquo;R for Data Science&rdquo;</a></li>
+</ul>
+</li>
+<li>講義資料置き場: <a href="https://heavywatal.github.io/slides/tochigi2026/">https://heavywatal.github.io/slides/tochigi2026/</a></li>
+</ul>
+<h2 id="実習環境の設定">実習環境の設定</h2>
+<ol>
+<li>
+<p>OSのソフトウェア・アップデートを基本的に全て適用して再起動。</p>
+<ul>
+<li><iconify-icon inline icon="bi:windows"></iconify-icon>
+Windows 11 (≥25H2)</li>
+<li><iconify-icon inline icon="bi:apple"></iconify-icon>
+macOS Tahoe (≥26.2)</li>
+</ul>
+</li>
+<li>
+<p>ファイル名の末尾(<code>.pdf</code> とか <code>.png</code> とか)の<a href="https://duckduckgo.com/?q=%E6%8B%A1%E5%BC%B5%E5%AD%90+%E8%A1%A8%E7%A4%BA">拡張子を常時表示する</a>ようにOSを設定。</p>
+</li>
+<li>
+<p><a href="https://cran.r-project.org/">https://cran.r-project.org/</a>
+から最新版の <strong>R本体 (≥ 4.5.2)</strong> をダウンロードしてインストール。
+OK連打のデフォルト設定で。
+古いものが既に入っている場合は念のため削除してから。</p>
+<ul>
+<li><iconify-icon inline icon="bi:windows"></iconify-icon>
+<a href="https://cran.r-project.org/bin/windows/base">Windows → base</a> → <code>R-4.5.2-win.exe</code></li>
+<li><iconify-icon inline icon="bi:apple"></iconify-icon>
+<a href="https://cran.r-project.org/bin/macosx/">Mac</a>
+→ <code>R-4.5.2-arm64.pkg</code> (Apple Silicon) or <code>R-4.5.2-x86_64.pkg</code> (Intel)</li>
+</ul>
+</li>
+<li>
+<p><a href="https://posit.co/download/rstudio-desktop/">https://posit.co/download/rstudio-desktop/</a>
+から最新版の <strong>RStudio (≥ 2026.01.0)</strong> をダウンロードしてインストール。
+古いものが既に入っている場合は念のため削除してから。</p>
+</li>
+<li>
+<p>RStudioを起動。初回は「開発元の不明なアプリ」を許可するような操作が必要かも。</p>
+</li>
+<li>
+<p>次の2行をコピーし、RStudio左側のConsoleにペーストして実行:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">options</span><span class="p">(</span><span class="n">repos</span> <span class="o">=</span> <span class="nf">getOption</span><span class="p">(</span><span class="s">&#34;repos&#34;</span><span class="p">,</span> <span class="nf">c</span><span class="p">(</span><span class="n">CRAN</span> <span class="o">=</span> <span class="s">&#34;https://cloud.r-project.org&#34;</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">install.packages</span><span class="p">(</span><span class="s">&#34;tidyverse&#34;</span><span class="p">,</span> <span class="n">type</span> <span class="o">=</span> <span class="s">&#34;binary&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p>パッケージがたくさんインストールされる。
+何か訊かれたら <code>yes</code> と回答。
+エラーや警告らしきものがあれば全文コピーしておく。</p>
+</li>
+<li>
+<p>Consoleで次の2行を実行してメッセージとバージョンを確認:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>── Attaching core tidyverse packages ──── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.6
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.1     ✔ tibble    3.3.1
+✔ lubridate 1.9.4     ✔ tidyr     1.3.2
+✔ purrr     1.2.1     
+</code></pre></li>
+<li>
+<p>過去にインストールした古いものがある場合は更新:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">update.packages</span><span class="p">(</span><span class="n">type</span> <span class="o">=</span> <span class="s">&#34;binary&#34;</span><span class="p">)</span>
+</span></span></code></pre></div></li>
+</ol>
+<h3 id="エラーや警告が出たら">エラーや警告が出たら</h3>
+<ol>
+<li>
+<p>実習当日に教員やTAに相談。全員の環境を確認してから進みます。</p>
+</li>
+<li>
+<p><strong>バージョン確認</strong>。OS、R、RStudioなどのソフトウェアが古すぎるかも。
+それらが十分に新しければ、次に挙げる日本語やOneDriveの問題は対処済みのはず。</p>
+</li>
+<li>
+<p>手元のコンピューターの<strong>ホームフォルダ</strong>(Windowsの場合 <code>%USERPROFILE%</code>)を確認。
+新しくターミナルを開いて <code>pwd</code> コマンドを実行。
+ここに半角アルファベットじゃない文字(日本語とか記号とか空白とか)が含まれている場合、不具合の原因になりがち。
+ここだけ修正するのはかなり難しい
+(ユーザー名のフルネーム表示は変更できるけどそれは無関係)。
+新しいユーザーアカウントを作って引っ越すとか、
+OSをクリーンインストールするとかしてやり直したほうが結局早そう。
+<strong>半角アルファベット小文字のみ</strong>で短いものを推奨。</p>
+<ul>
+<li>✅ Good: <code>watal</code>, <code>tamakino</code></li>
+<li>❌ Bad: <code>岩嵜航</code>, <code>Watal Iwasaki</code>, <code>heavy.watal</code></li>
+</ul>
+<p>Windowsのホームフォルダ(<code>%USERPROFILE%</code>)はログインの仕方で決まるっぽい:</p>
+<ul>
+<li>✅ <strong>Microsoftアカウント</strong>(<code>example@outlook.jp</code>)でログイン:
+<code>C:/Users/examp/</code> (ユーザー名が漢字だろうがなんだろうが、<strong>メールアドレスの最初の5文字</strong>が使われるのでセーフ)</li>
+<li>Microsoftアカウントを使わず、<strong>ローカルユーザー</strong>としてログイン
+<ul>
+<li>✅ 半角英字のみのユーザー名なら問題ない: <code>C:/Users/goodname/</code></li>
+<li>❌ 漢字など全角文字を含むアカウント名: <code>C:/Users/朗軽 遊佐/</code><br>
+RとRStudioは既に対応済みだけど、Quarto(あるいはPandoc?)は未対応らしくてエラー。
+他のソフトウェアでも不具合が出る危険あり。
+ローカルユーザーを作ったあとでMicrosoftアカウントと紐付けても直らなそう。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Windowsの場合OneDriveが悪さしているかも。
+参考:</p>
+<ul>
+<li><a href="https://ryotamugiyama.com/blog/2020-08-03-Rinstall.html">https://ryotamugiyama.com/blog/2020-08-03-Rinstall.html</a></li>
+<li><a href="https://okumuralab.org/~okumura/stat/R-win.html">https://okumuralab.org/~okumura/stat/R-win.html</a></li>
+<li><a href="https://yukiyanai.github.io/jp/resources/">https://yukiyanai.github.io/jp/resources/</a></li>
+</ul>
+</li>
+</ol>
+<h2 id="講義資料">講義資料</h2>
+<p><kbd>←</kbd><kbd>→</kbd>キーで戻る・進むスライド形式。</p>
+
+<ul>
+</ul>
+</main>
+</body>
+</html>

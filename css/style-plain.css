@@ -276,6 +276,23 @@ figure > figcaption + blockquote {
   margin-block-start: -0.5em;
 }
 
+details {
+  interpolate-size: allow-keywords;
+}
+details summary {
+  cursor: pointer;
+}
+details::details-content {
+  overflow: clip;
+  transition-duration: 100ms;
+  transition-property: content-visibility, block-size;
+  transition-behavior: allow-discrete;
+  block-size: 0;
+}
+details[open]::details-content {
+  block-size: auto;
+}
+
 h1,
 h2,
 h3 {
