@@ -7,3 +7,930 @@
 #| include: false
 #| cache: false
 ```
+---
+## データを使ってやりたいこと
+
+- 現象を**理解**したい
+- 将来を**予測**したい
+- ものを**分類・判別**したい
+- 挙動を**制御**したい
+- 新しい何かを**生成**したい
+
+そのために解析は必要？
+未加工の生データこそ宝？
+
+???
+よりよい職場に転職したい
+
+---
+## データ解析って必要？ 生データ見ればいいべ？
+
+往々にして複雑過ぎ、情報多すぎ、そのままでは手に負えない
+
+```{r, diamonds}
+print(ggplot2::diamonds)
+```
+
+ダイヤモンド53,940個について10項目の値を持つデータセット
+
+---
+## 要約統計量を見てみよう
+
+各列の**平均**とか**標準偏差**とか:
+
+```{r, summary-diamonds}
+#| echo: false
+dia_cols = c("carat", "depth", "table", "price")
+diamonds |>
+  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
+  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
+```
+
+大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+```{r, cov-diamonds}
+#| echo: false
+diamonds |>
+  dplyr::select(all_of(dia_cols)) |>
+  scale() |>
+  cov() |>
+  wtl::printmat("%.2f", upper = FALSE)
+```
+
+<hr>
+
+**生のままよりは把握しやすい**かも。
+
+
+---
+## 分布を特徴づける代表値 central tendency
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+
+平均値 mean
+: 和を観察数で割る
+
+中央値 median
+: 順に並べて真ん中
+
+最頻値 mode
+: 最も頻度が高い値
+
+  </div>
+  <div class="column">
+  <a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+  <img src="../tohoku2025r/image/hist-income-japan-2022.png" width="100%" style="">
+  <figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2022</small></figcaption>
+  </a>
+  </div>
+</div>
+
+外れ値に対する応答
+: もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら\
+  → 県民の**平均**資産は4000万円上昇。**中央値**・**最頻値**はほぼそのまま。
+
+目的や状況に応じて使い分けよう。
+
+
+---
+## ばらつきを捉える記述統計量
+
+分散 variance
+: 平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$
+: これの平方根が**標準偏差 (standard deviation)**。
+
+Percentile, Quantile (四分位)
+: 小さい順にならべて上位何%にあるか。
+: 中央値 = 50th percentile = 第二四分位(Q2)
+
+```{r, quantile}
+#| fig.width: 12
+#| fig.height: 4
+#| echo: false
+set.seed(24601)
+df = tibble::tibble(x = rnorm(200)) |>
+  dplyr::filter(abs(x) < 2) |>
+  dplyr::mutate(x = x + 3)
+probs = c(min = 0, Q1 = 0.25, Q2 = 0.5, Q3 = 0.75, max = 1)
+dfq = df |>
+  dplyr::reframe(x = quantile(x, probs)) |>
+  dplyr::mutate(name = names(probs), percent = sprintf("%d%%", 100 * probs))
+
+p_hist = ggplot(df) + aes(x) +
+  geom_histogram(bins = 30) +
+  theme_void()
+built = ggplot_build(p_hist)
+bdata = built$data[[1]]
+xlim = bdata |> dplyr::select(xmin, xmax) |> range()
+p_box = ggplot(df) + aes(x) +
+  geom_boxplot() +
+  geom_rug(sides = "t", length = unit(0.08, "npc"), alpha = 0.66) +
+  geom_point(aes(y = -0.6), data = dfq, shape = 17, size = 6) +
+  geom_text(aes(y = -0.84, label = name), data = dfq, size = 8) +
+  geom_text(aes(y = -1.16, label = percent), data = dfq, size = 8) +
+  coord_cartesian(xlim = xlim, ylim = c(-1.2, 0.5)) +
+  theme_void()
+cowplot::plot_grid(p_hist, p_box, ncol = 1L)
+```
+
+---
+## ばらつきの様子は大小の判断にも重要
+
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1;">
+観測値1つずつ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+群内のばらつき大きい。<br>
+群間の差は微妙か。
+</div>
+<div class="column" style="flex-shrink: 1;">
+ばらつき小さい。<br>
+AとBには差がありそう。
+</div>
+</div>
+
+```{r, comparison}
+#| fig.width: 12
+#| fig.height: 4
+#| echo: false
+set.seed(19937)
+n = 20
+df1 = tibble::tibble(x = c("A", "B"), y = c(42, 51))
+df2 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = runif(n, 42 - 20, 42 + 20)),
+  tibble::tibble(x = "B", y = runif(n, 51 - 20, 51 + 20)))
+df3 = dplyr::bind_rows(
+  tibble::tibble(x = "A", y = rnorm(n, 42, 1)),
+  tibble::tibble(x = "B", y = rnorm(n, 51, 1)))
+.lim = c(0, max(df2$y, df3$y))
+.th = list(coord_cartesian(ylim = .lim),
+  theme_classic(base_size = 20),
+  theme(legend.position = "none", axis.title = element_blank()))
+
+p1 = ggplot(df1) + aes(x, y, color = x) +
+  geom_point(shape = 16, size = 5) +
+  .th
+p2 = ggplot(df2) + aes(x, y, color = x) +
+  geom_jitter(height = 0, width = 0.2, shape = 16, size = 4, alpha = 0.66) +
+  .th
+cowplot::plot_grid(p1, p2, p2 %+% df3, nrow = 1)
+```
+
+「こんなことがたまたま起こる確率はすごく低いです！」\
+をちゃんと示す手続きが**統計的仮説検定**。
+
+<hr>
+
+でも要約統計量とか検定結果だけを見て判断するのは危険...
+
+
+---
+## 要約統計量だけ見て可視化を怠ると構造を見逃す
+
+<figure style="position: relative;">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
+<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+
+---
+## データ可視化は理解の第一歩
+
+情報をうまく絞って整理 → **直感的にわかる**
+
+```{r, simplify-diamonds}
+#| echo: false
+#| fig.height: 6
+#| fig.width: 7
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
+  ggplot(aes(carat, price, color = clarity)) +
+  geom_point(shape = 16, size = 3, alpha = 0.4) +
+  scale_color_viridis_d(
+    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
+  ) +
+  labs(title = "Diamonds") +
+  theme_gray(base_size = 22) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "#bbbbbb"),
+    legend.key = element_rect(fill = "#bbbbbb"),
+    axis.ticks = element_blank()
+  )
+```
+
+`carat` が大きいほど `price` も高いらしい。\
+その度合いは `clarity` によって異なるらしい。
+
+---
+## 統計とは
+
+データをうまくまとめ、それに基づいて推論するための手法。
+
+- **記述統計**: データそのものを要約する
+    - 要約統計量 (e.g., 平均、標準偏差、etc.)
+    - 作図、作表
+- **推測統計**: データの背後にある母集団・生成過程を考える
+    - 数理モデル
+    - 確率分布
+    - パラメータ(母数)
+
+「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
+
+---
+## モデルとは
+
+対象システムを単純化・理想化して扱いやすくしたもの
+
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" style="float: right; margin: 0 -5px;">
+: 数学的な方程式として記述されるもの。
+: e.g., Lotka-Volterra eq., <span style="opacity: 0.6;">Hill eq.</span>\
+  <br>
+
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" style="float: right;">
+: 数値計算の手続きとして記述されるもの。
+: e.g., Schelling’s Segregation Model, <span style="opacity: 0.6;"><em>tumopp</em></span>\
+  <br>
+
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" style="float: right;">
+: 具体的な事物で作られるもの。
+: e.g., San Francisco Bay-Delta Model
+
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
+
+???
+数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
+解析的に解くことを諦めて計算機にやらせるという点で実装方法は異なるが、
+数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
+
+プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。
+
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1200">
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
+</figure>
+
+
+???
+
+確率モデル: 決定論的なモデルじゃなくて確率論的なゆらぎを導入したもの。
+ただし、大塚淳さんの定義は異なる。
+帰納推論を可能にする枠組みとして自然の斉一性(ヒューム)を仮定した上で、
+データを生成している真の現象を確率用語で記述したものが確率モデルだ、という感じ。
+そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。\
+e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
+
+```{r, lm-diamonds}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
+  ggplot(aes(carat, price)) +
+  geom_point(shape = 16, size = 3, alpha = 0.3) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  coord_cartesian(ylim = c(0, 20000)) +
+  labs(title = "Diamonds") +
+  theme_classic(base_size = 22)
+```
+
+新しく採れたダイヤモンドの価格予想とかにも使える。
+
+このように「YをXの関数として表す」ようなモデルを**回帰**と呼ぶ。
+
+
+---
+## 何でもかんでも直線あてはめではよろしくない
+
+```{r, df-pois}
+#| echo: false
+set.seed(24601)
+n = 300L
+a = 3
+b = -3
+df_pois = tibble::tibble(
+  body_mass = runif(n, 0.4, 1.7),
+  num_seeds = rpois(n, exp(a * body_mass + b))
+)
+```
+```{r, lm-bad}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 5.5
+x_breaks = c(0.5, 1.0, 1.5)
+coeff = lm(num_seeds ~ body_mass, data = df_pois)$coefficients
+df_lm = tidyr::crossing(body_mass = x_breaks, num_seeds = seq(-5, 20, 0.1)) |>
+  dplyr::mutate(density = dnorm(num_seeds, coeff[1] + coeff[2] * body_mass, 1.4)) |>
+  dplyr::filter(density > 1e-4)
+
+p_pois = ggplot(df_pois) +
+  aes(body_mass, num_seeds) +
+  ggridges::geom_vridgeline(data = df_lm, aes(width = density * 0.4, group = body_mass), linetype = 0, alpha = 0) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  scale_x_continuous(breaks = x_breaks) +
+  coord_cartesian(ylim = c(-5, 15)) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank())
+p_pois + stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2)
+```
+
+- 観察データは常に**正の値**なのに予測が負に突入してない？
+- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
+
+
+---
+## 何でもかんでも直線あてはめではよろしくない
+
+```{r, glm-better}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 11
+p_lm = p_pois +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, linewidth = 2) +
+  ggridges::geom_vridgeline(aes(width = density * 0.4, group = body_mass), df_lm,
+                            fill = "#56B4E9AA", linetype = 0)
+# p_lm
+
+df_ridges = tidyr::crossing(body_mass = x_breaks, num_seeds = seq_len(30L) - 1L) |>
+  dplyr::mutate(density = dpois(num_seeds, exp(a * body_mass + b))) |>
+  dplyr::filter(density > 1e-4)
+df_bars = df_ridges |> wtl::ridges2bars(num_seeds, density)
+
+p_poisson = p_pois +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
+  ggridges::geom_vridgeline(aes(width = density * 0.5, group = body_mass), df_bars,
+                            fill = "#56B4E9AA", linetype = 0)
+# p_poisson
+
+cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
+```
+
+- 観察データは常に**正の値**なのに予測が負に突入してない？
+- **縦軸は整数**。しかもの**ばらつき**が横軸に応じて変化？
+- **データに合わせた統計モデルを使うとマシ**
+
+
+---
+## 統計モデリングの教科書決定版: 久保先生の[<abbr title="データ解析のための統計モデリング入門">緑本</abbr>](https://amzn.to/33suMIZ)
+
+ちょっとずつ線形モデルを発展させていく。
+
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
+</a>
+</figure>
+
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+
+  <div>
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
+</p>
+
+**一般化線形モデル GLM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b style="color: #E69F00;">個体差</b>などの変量効果を扱いたい
+</p>
+
+**一般化線形混合モデル GLMM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b style="color: #B2001D;">自由なモデリング</b>を！
+</p>
+
+**階層ベイズモデル HBM**
+
+  </div>
+  <div style="text-align: right;">
+
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+
+  </div>
+</div>
+
+<hr>
+
+今回はごく一部のみチラ見せ。理解を目指さなくていいです。
+
+
+---
+## 説明変数が1つある一般化線形モデル GLM
+
+個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。\
+平均値の対数$\log(\textcolor{#3366ff}{\lambda_i})$は**その個体の大きさ$x_i$に比例**する。
+
+<div class="column-container" style="justify-content: unset;">
+  <div>
+
+<figure style="margin-block: 1rem;">
+<img src="../iwate2023stats/glm.drawio.svg" width="640">
+</figure>
+
+  </div>
+  <div>
+
+```{r, df-seeds}
+#| include: false
+#| cache.vars: ["df_seeds", "a", "b"]
+set.seed(24601)
+n = 300L
+a = 3
+b = -3
+df_seeds = tibble::tibble(
+  body_mass = runif(n, 0.4, 1.7),
+  num_seeds = rpois(n, exp(a * body_mass + b))
+) |>
+  print()
+```
+```{r, glm-poisson}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 5
+#| fig.width: 5
+x_breaks = c(0.5, 1.0, 1.5)
+df_ridges = tidyr::crossing(x = x_breaks, y = seq_len(30L) - 1L) |>
+  dplyr::mutate(density = dpois(y, exp(a * x + b))) |>
+  dplyr::filter(density > 1e-4)
+df_bars = df_ridges |> wtl::ridges2bars(y, density)
+
+p_pois = ggplot(df_seeds) + aes(body_mass, num_seeds) +
+  geom_point(shape = 16, size = 2, alpha = 0.5) +
+  scale_x_continuous(breaks = x_breaks) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank())
+
+p_pois +
+  stat_smooth(formula = y ~ x, method = glm, method.args = list(family = poisson), se = FALSE, linewidth = 2) +
+  ggridges::geom_vridgeline(aes(x, y, width = density * 0.5, group = x),
+    data = df_bars, fill = "#56B4E9AA", linetype = 0)
+```
+
+  </div>
+</div>
+
+この場合は**単回帰**。説明変数が複数あると**重回帰**。
+
+
+---
+## 複数の説明変数を同時に扱う重回帰
+
+<p>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\end{split}\]</p>
+
+気温も湿度も高いほどビールが売れる架空データ:
+
+```{r, df-beer}
+#| include: false
+#| cache.vars: "df_beer"
+set.seed(24601)
+n = 200L
+true_coef = c(3, 0.05, 0.006)
+df_beer = tibble::tibble(
+  temperature = runif(n, 8, 32),
+  humidity = runif(n, 20, 80),
+  beer_sales = rpois(n, exp(true_coef[1] + true_coef[2] * temperature + true_coef[3] * humidity))
+) |>
+  print()
+```
+```{r, multiple-regression}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 5
+#| fig.width: 10
+glm_multi = glm(beer_sales ~ temperature + humidity, family = poisson, data = df_beer)
+
+df_aug = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5)) |>
+  broom::augment(glm_multi, newdata = _, type.predict = "response")
+
+p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
+  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  scale_color_viridis_c(option = "cividis", direction = -1) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
+p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
+  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  scale_color_viridis_c(option = "turbo") +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
+
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+ほかの**確率分布**と**リンク関数**を使う例を見てみよう。
+
+
+---
+## ロジスティック回帰
+
+- 確率分布: **二項分布**
+- リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
+
+何かの成否に対する何かの因子の影響、とか
+
+<div class="column-container">
+  <div>
+
+客$n_i$人中$y_i$人がビールを注文。\
+その日$i$の気温$x_i$によって割合が変化。
+
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n_i,~p_i) \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+
+ロジスティック関数↑
+
+  </div>
+  <div>
+
+```{r, df-logistic}
+#| include: false
+#| cache.vars: ["df_logistic", "n"]
+set.seed(24601)
+sigmoid = function(x, gain = 1) {1 / (1 + exp(-gain * x))}
+nrep = 200L
+n = 10L
+df_logistic = tibble::tibble(
+  x = runif(nrep, -10, 35),
+  logit_p = -3 + 0.3 * x,
+  p = sigmoid(logit_p),
+  y = rbinom(nrep, n, p),
+  response = matrix(c(y, n - y), ncol = 2)
+) |>
+  print()
+```
+```{r, glm-logistic}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 5
+#| fig.width: 5
+glm_logistic = glm(response ~ x, df_logistic, family = binomial)
+df_aug = broom::augment(glm_logistic, type.predict = "response") |>
+  dplyr::mutate(y_prop = response[, 1] / rowSums(response))
+
+coef = glm_logistic$coefficients
+
+x_breaks = c(-10, 0, 10, 20, 30)
+df_ridges = tidyr::crossing(x = x_breaks, y = seq.int(0, n)) |>
+  dplyr::mutate(p = sigmoid(coef[1] + coef[2] * x), density = dbinom(y, n, p)) |>
+  dplyr::filter(density > 1e-4)
+df_bars = df_ridges |> wtl::ridges2bars(y, density)
+
+ggplot(df_aug) + aes(x, y_prop) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  ggridges::geom_vridgeline(aes(y = y / n, width = density * 6, group = x), df_bars, fill = "#56B4E9AA", linetype = 0) +
+  geom_line(aes(y = .fitted), linewidth = 2, color = "#3366ff", alpha = 0.8) +
+  scale_x_continuous(breaks = x_breaks) +
+  scale_y_continuous(breaks = seq(0, 1, 0.2)) +
+  labs(x = "temperature", y = "beer_sales") +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+```
+
+  </div>
+</div>
+
+???
+ロジット = 対数オッズ
+オッズ = 失敗の何倍成功しやすいか
+Xが1増えるとオッズがe^a倍に増える。
+
+
+---
+## ロジスティック回帰 (狭義)
+
+- 確率分布: **ベルヌーイ分布** ($n = 1$ の二項分布)
+- リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$
+
+何かの成否に対する何かの因子の影響、とか
+
+<div class="column-container">
+  <div>
+
+風が吹けば桶屋が儲かる。
+
+<p>\[\begin{split}
+y_i &\sim \text{Bernoulli}(p_i) \\
+  &= \text{Binomial}(1,~p_i) \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+
+ロジスティック関数↑
+
+  </div>
+  <div>
+
+```{r, df-wind}
+#| include: false
+#| cache.vars: "df_wind"
+set.seed(24601)
+n = 200
+df_wind = tibble::tibble(
+  max_wind = runif(n, 0, 40),
+  bucket_sales = rbinom(n, 1L, sigmoid(max_wind - 20, 0.2)) + 0L) |>
+  print()
+```
+```{r, wind}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 4
+#| fig.width: 5
+glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = "binomial")
+
+coef = glm_bernoulli$coefficients
+x_breaks = c(0, 10, 20, 30, 40)
+df_ridges = tidyr::crossing(x = x_breaks, y = c(0, 1)) |>
+  dplyr::mutate(p = sigmoid(coef[1] + coef[2] * x), density = dbinom(y, 1, p)) |>
+  dplyr::filter(density > 1e-4)
+df_bars = df_ridges |> wtl::ridges2bars(y, density, width = 0.2)
+
+broom::augment(glm_bernoulli, type.predict = "response") |>
+  ggplot() + aes(max_wind, bucket_sales) +
+  geom_point(shape = 124, size = 8, alpha = 0.3) +
+  ggridges::geom_vridgeline(aes(x, y, width = density * 6, group = x),
+    data = df_bars, fill = "#56B4E9AA", linetype = 0) +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.8) +
+  scale_y_continuous(breaks = c(0, 1)) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+```
+
+  </div>
+</div>
+
+
+---
+## 一般線形モデル (“化”無し) はGLMの一種
+
+- 確率分布: **正規分布**
+- リンク関数: **恒等関数**(なにもせずそのまま)
+
+<div class="column-container">
+  <div class="column" style="padding-top: 0.5rem;">
+
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
+\operatorname{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+
+  </div>
+  <div class="column">
+
+```{r, df-weight}
+#| include: false
+#| cache.vars: "df_weight"
+set.seed(19937)
+n = 50
+df_weight = tibble::tibble(
+  height = rnorm(n, 1.70, 0.05),
+  bmi = rnorm(n, 22, 1),
+  weight = bmi * (height**2)
+) |>
+  print()
+```
+```{r, glm-weight}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 4
+#| fig.width: 4
+fit = lm(weight ~ height, df_weight)
+coef = coef(fit)
+
+x_breaks = c(1.65, 1.7, 1.75)
+df_ridges = tidyr::crossing(height = x_breaks, weight = seq(50, 80, 0.2)) |>
+  dplyr::mutate(density = dnorm(weight, coef[1] + coef[2] * height, 1.8)) |>
+  dplyr::filter(density > 1e-4)
+
+ggplot(df_weight) + aes(height, weight) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  ggridges::geom_vridgeline(aes(width = density * 0.08, group = height),
+    data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, linewidth = 2) +
+  scale_x_continuous(breaks = x_breaks) +
+  theme_bw(base_size = 22) + theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank())
+```
+
+  </div>
+</div>
+
+最小二乗法の直線あてはめと結果的に同じになる。
+
+<small style="opacity: 0.7;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small>
+
+---
+## 分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM
+
+**質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。\
+<span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
+
+<div class="column-container">
+  <div style="padding-top: 0.5rem;">
+
+| 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
+| ---- | :-: | :---: | :---: |
+| ☁️ くもり | | 0 | 0 |
+| ☀️ 晴れ | | 1 | 0 |
+| ☔️ 雨 | | 0 | 1 |
+
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
+\end{split}\]</p>
+
+  </div>
+  <div>
+
+```{r, df-ancova}
+#| include: false
+#| cache.vars: ["df_ancova", "weather_levels"]
+set.seed(19937)
+n = 200L
+b = c(70, 3, 20, -20)  # true coef
+weather_levels = c("rainy", "cloudy", "sunny")
+df_ancova = tibble::tibble(
+    temperature = runif(n, 8, 32),
+    weather = factor(sample(weather_levels, n, TRUE), levels = weather_levels)
+  ) |>
+  dplyr::mutate(name = weather, value = 1L) |>
+  tidyr::pivot_wider(values_fill = 0L) |>
+  dplyr::select(!cloudy) |>
+  dplyr::mutate(mu = b[1] + b[2] * temperature + b[3] * sunny + b[4] * rainy) |>
+  dplyr::mutate(beer_sales = rnorm(n, mu, 10)
+) |>
+  print()
+```
+
+```{r, glm-anova}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 4.5
+#| fig.width: 4.5
+lm_anova = lm(beer_sales ~ weather, df_ancova)
+
+df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_levels), beer_sales = seq(50, 200, 1)) |>
+  broom::augment(lm_anova, newdata = _, type.predict = "response") |>
+  dplyr::mutate(density = dnorm(beer_sales, .fitted, 10)) |>
+  dplyr::filter(density > 1e-4)
+
+.avg_rainy = coef(lm_anova)[1L]
+.avg_cloudy = sum(coef(lm_anova)[c(1L, 2L)])
+.avg_sunny = sum(coef(lm_anova)[c(1L, 3L)])
+
+dfl = tibble::tribble(
+  ~x, ~xend, ~y, ~yend,
+  -Inf, Inf, .avg_cloudy, .avg_cloudy,
+  1.5, 2.5, .avg_sunny, .avg_sunny,
+  2.5, 3.5, .avg_rainy, .avg_rainy
+)
+
+dfa = tibble::tribble(
+  ~x, ~xend, ~y, ~yend,
+  1.75, 1.75, .avg_cloudy, .avg_sunny,
+  2.75, 2.75, .avg_cloudy, .avg_rainy
+)
+
+dfs = tibble::tribble(
+  ~x, ~y, ~label,
+  0.6, .avg_cloudy + (.avg_sunny - .avg_cloudy) * 0.3, "beta[0]",
+  1.55, (.avg_cloudy + .avg_sunny) / 2, "beta[1]",
+  2.55, (.avg_cloudy + .avg_rainy) / 2, "beta[2]"
+)
+
+set.seed(1)
+.arr = grid::arrow(length = grid::unit(0.15, "inches"))
+df_ancova |>
+  ggplot() + aes(weather, beer_sales, color = weather) +
+  ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
+    data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
+  annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#3366ffAA", linewidth = 2) +
+  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#3366ffAA", linewidth = 1.5) +
+  annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 8, alpha = 0.8) +
+  geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
+  scale_color_viridis_d() +
+  scale_x_discrete(limits = c("cloudy", "sunny", "rainy")) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), panel.grid.major.y = element_blank(),
+        legend.position = "none")
+```
+
+  </div>
+</div>
+
+くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。
+
+GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。
+
+
+---
+## 共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM
+
+**質的変数と量的変数を両方**含むGLM、と解釈可能。\
+正規分布・等分散・恒等リンクなどが仮定される。
+
+
+<div class="column-container">
+  <div style="padding-top: 0.5rem;">
+
+| 天気 | → | $x_1$ ☀️ 晴れ | $x_2$ ☔️ 雨 |
+| ---- | :-: | :---: | :---: |
+| ☁️ くもり | | 0 | 0 |
+| ☀️ 晴れ | | 1 | 0 |
+| ☔️ 雨 | | 0 | 1 |
+
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
+\end{split}\]</p>
+
+  </div>
+  <div>
+
+
+```{r, glm-ancova}
+#| echo: false
+#| cache.vars: []
+#| fig.height: 4.5
+#| fig.width: 4.5
+lm_ancova = lm(beer_sales ~ temperature + weather, df_ancova)
+df_aug = broom::augment(lm_ancova, type.predict = "response")
+
+ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
+  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
+  geom_point(shape = 16, size = 3, alpha = 0.6) +
+  scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
+        legend.position = "inside", legend.position.inside = c(0.01, 0.99))
+```
+
+  </div>
+</div>
+
+GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。
+
+
+---
+## 一般化線形モデル(GLM)ふりかえり
+
+確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
+特定の組み合わせには名前がある。
+
+| 名前 | 確率分布 | リンク関数 | 説明変数 |
+| ---- | -------- | -------- | -------- |
+|ポアソン回帰|ポアソン分布|log| |
+|ロジスティック回帰|二項分布|logit| |
+|一般線形回帰|正規分布|恒等| |
+|分散分析|正規分布|恒等|質的変数|
+|共分散分析|正規分布|恒等|質的変数+量的変数|
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017\
+  (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
+
+`r .meta$next_link`
