@@ -491,14 +491,18 @@ Windowsなら<a href="https://colororacle.org/">Color Oracle</a>が使えそう�
 <h2 id="scale_color_-を省略できるように設定可能"><code>scale_color_*</code> を省略できるように設定可能</h2>
 <p>連続値viridis, 離散値Okabe-Itoをデフォルトにする例:</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">(</span><span class="s">&#34;Okabe-Ito&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">options</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.continuous.colour</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.continuous.fill</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.discrete.colour</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.discrete.fill</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">theme_palette</span> <span class="o">=</span> <span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.colour.continuous</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.fill.continuous</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.colour.discrete</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.fill.discrete</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span></code></pre></div><p><code>options()</code> による設定はRを終了するまで有効。</p>
+</span></span><span class="line"><span class="cl"><span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme_set</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme_get</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme_palette</span><span class="p">)</span>
+</span></span></code></pre></div><p><code>theme_set()</code> による設定はRを終了するまで有効。</p>
 <p>スクリプトの先頭に書いておいて毎回設定することを推奨。</p>
+<hr>
+<p><code>options(ggplot2.continuous.colour = &quot;viridis&quot;)</code>
+は古い(&lt;4.0.0)。</p>
 
 </section>
 <section>
