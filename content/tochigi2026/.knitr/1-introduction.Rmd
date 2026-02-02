@@ -591,7 +591,7 @@ df_logistic = tibble::tibble(
   logit_p = -3 + 0.3 * x,
   p = sigmoid(logit_p),
   y = rbinom(nrep, n, p),
-  response = matrix(c(y, n - y), ncol = 2)
+  response = cbind(y, fail = n - y)
 ) |>
   print()
 ```
@@ -672,7 +672,7 @@ df_wind = tibble::tibble(
 #| cache.vars: []
 #| fig.height: 4
 #| fig.width: 5
-glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = "binomial")
+glm_bernoulli = glm(bucket_sales ~ max_wind, df_wind, family = binomial)
 
 coef = glm_bernoulli$coefficients
 x_breaks = c(0, 10, 20, 30, 40)
@@ -809,9 +809,9 @@ df_ridges = tidyr::crossing(weather = factor(weather_levels, levels = weather_le
   dplyr::mutate(density = dnorm(beer_sales, .fitted, 10)) |>
   dplyr::filter(density > 1e-4)
 
-.avg_rainy = coef(lm_anova)[1L]
-.avg_cloudy = sum(coef(lm_anova)[c(1L, 2L)])
-.avg_sunny = sum(coef(lm_anova)[c(1L, 3L)])
+.avg_rainy = coef(lm_anova)["(Intercept)"]
+.avg_cloudy = .avg_rainy + coef(lm_anova)["weathercloudy"]
+.avg_sunny = .avg_rainy + coef(lm_anova)["weathersunny"]
 
 dfl = tibble::tribble(
   ~x, ~xend, ~y, ~yend,
