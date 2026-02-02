@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>1. データ解析入門 — Rによる統計モデリング入門 2026 栃木県</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="1. データ解析入門 — Rによる統計モデリング入門 2026 栃木県">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tochigi2026/1-introduction.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/dist/reveal.css">
+<script type="module">
+import { Reveal } from "/slides/lib/reveal.js/reveal.js";
+Reveal.configure({width: 1440, height: 1080});
+</script>
+<style>
+html { font-size: 240%; }
+</style>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script type="module" src="/slides/lib/katex/katex.min.js"></script>
+<link rel="stylesheet" href="/slides/lib/iconify.css">
+<script defer src="/slides/lib/reload-img-onclick.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="rによる統計モデリング入門-2026-栃木県"><a href=".">Rによる統計モデリング入門 2026 栃木県</a></h1>
+<div class="author">
+岩嵜 航
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+<ol>
+<li class="current-deck"><a href="1-introduction.html">データ解析入門</a>
+<li><a href="2-r.html">Rの基本</a>
+<li><a href="3-visualization.html">Rによるデータ可視化</a>
+</ol>
+<div class="footnote">
+2026-02-03 栃木県農業総合研究センター (remote)<br>
+<a href="https://heavywatal.github.io/slides/tochigi2026/">https://heavywatal.github.io/slides/tochigi2026/</a>
+</div>
+
+</section>
+<section>
+<h2 id="本日のおしながき">本日のおしながき</h2>
+<p>岡本さんからご依頼いただいた内容をもとに構成</p>
+<blockquote>
+<p>前半は統計そのもののお話を中心にしていただき、後半にRの使い方を</p>
+</blockquote>
+<blockquote>
+<p>今回は「<strong>90分で、Rの苦手意識を払拭する</strong>」ことが目標です。</p>
+</blockquote>
+<dl>
+<dt>90分6–8コマの講義からの<del>やや無理のある</del>ダイジェスト</dt>
+<dd>科学研究におけるデータ解析とモデル</dd>
+<dd>データ可視化の重要性</dd>
+<dd>Rを使う心構えと基本操作</dd>
+</dl>
+<p>すべてを理解しようとせず「<strong>あとで調べればいいや</strong>」くらいの気持ちで。<br>
+「<strong>Rができる人にはできそう</strong>」というイメージが持てればOK👍</p>
+
+</section>
+<section>
+<h2 id="研究という仕事をざっくり捉えると">研究という仕事をざっくり捉えると</h2>
+<ol>
+<li>課題を見つける、仮説を立てる</li>
+<li>実験🧫・観察🔬・文献📚などからデータを集める</li>
+<li><strong>データを整理・解析して仮説を検証する</strong></li>
+<li><strong>結果を報告する</strong>、1に戻る</li>
+</ol>
+<p>つまり、</p>
+<ul>
+<li>白衣を着て分子実験をやる人も、野山を駆け回って観察する人も、<br>
+そのパートは研究の半分くらい。</li>
+<li>残り半分はデータの整理・解析・報告。<br>
+→ しかし軽視されがち。ここを<strong>ちゃんと、でも楽に</strong>やりたい。</li>
+</ul>
+</section>
+<section>
+<h2 id="データ解析って必要-生データ見ればいいべ">データ解析って必要？ 生データ見ればいいべ？</h2>
+<p>生のままでは複雑過ぎ、情報多すぎ、何もわからない。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price    x    y    z
+    1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+    2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+    3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+    4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+   --                                                               
+53937  0.72      Good     D     SI1  63.1    55  2757 5.69 5.75 3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
+</code></pre><p>ダイヤモンド53,940個について10項目の値を持つデータセット</p>
+
+</section>
+<section>
+<h2 id="要約統計量を見てみよう">要約統計量を見てみよう</h2>
+<p>各列の<strong>平均</strong>とか<strong>標準偏差</strong>とか:</p>
+<pre tabindex="0"><code>  stat carat depth table    price
+1 mean  0.80 61.75 57.46  3932.80
+2   sd  0.47  1.43  2.23  3989.44
+3  max  5.01 79.00 95.00 18823.00
+4  min  0.20 43.00 43.00   326.00
+</code></pre><p>大きさ <code>carat</code> と価格 <code>price</code> の<strong>相関係数</strong>はかなり高い:</p>
+<pre tabindex="0"><code>      carat depth table price
+carat  1.00                  
+depth  0.03  1.00            
+table  0.18 -0.30  1.00      
+price  0.92 -0.01  0.13  1.00
+</code></pre><hr>
+<p><strong>生のままよりは把握しやすい</strong>かも。</p>
+
+</section>
+<section>
+<h2 id="分布を特徴づける代表値-central-tendency">分布を特徴づける代表値 central tendency</h2>
+<div class="column-container">
+  <div class="column" style="flex-shrink: 1.6;">
+<dl>
+<dt>平均値 mean</dt>
+<dd>和を観察数で割る</dd>
+<dt>中央値 median</dt>
+<dd>順に並べて真ん中</dd>
+<dt>最頻値 mode</dt>
+<dd>最も頻度が高い値
+</div>
+<div class="column">
+<a href="https://www.mhlw.go.jp/toukei/list/20-21.html">
+<img src="../tohoku2025r/image/hist-income-japan-2022.png" width="100%" style="">
+<figcaption><small><cite>所得金額階級別世帯数の頻度分布</cite> 厚生労働省 国民生活基礎調査 2022</small></figcaption>
+</a>
+</div>
+</dd>
+</dl>
+</div>
+<dl>
+<dt>外れ値に対する応答</dt>
+<dd>もし総資産額20兆円の大富豪が鳥取県に引っ越してきたら<br>
+→ 県民の<strong>平均</strong>資産は4000万円上昇。<strong>中央値</strong>・<strong>最頻値</strong>はほぼそのまま。</dd>
+</dl>
+<p>目的や状況に応じて使い分けよう。</p>
+</section>
+<section>
+<h2 id="ばらつきを捉える記述統計量">ばらつきを捉える記述統計量</h2>
+<dl>
+<dt>分散 variance</dt>
+<dd>平均値からの差の自乗の平均。 $\frac 1 n \sum _i ^n (X_i - \bar X)^2$</dd>
+<dd>これの平方根が<strong>標準偏差 (standard deviation)</strong>。</dd>
+<dt>Percentile, Quantile (四分位)</dt>
+<dd>小さい順にならべて上位何%にあるか。</dd>
+<dd>中央値 = 50th percentile = 第二四分位(Q2)</dd>
+</dl>
+<p><img src="./figure/quantile-1.png" alt="plot of chunk quantile"></p>
+</section>
+<section>
+<h2 id="ばらつきの様子は大小の判断にも重要">ばらつきの様子は大小の判断にも重要</h2>
+<div class="column-container" style="padding-left: 10px;">
+<div class="column" style="flex-shrink: 1;">
+観測値1つずつ。<br>
+たまたまかも。
+</div>
+<div class="column" style="flex-shrink: 1;">
+群内のばらつき大きい。<br>
+群間の差は微妙か。
+</div>
+<div class="column" style="flex-shrink: 1;">
+群内のばらつき小さい。<br>
+群間には差がありそう。
+</div>
+</div>
+<p><img src="./figure/comparison-1.png" alt="plot of chunk comparison"></p>
+<p>「こんなことがたまたま起こる確率はすごく低いです！」<br>
+をちゃんと示す手続きが<strong>統計的仮説検定</strong>。</p>
+<hr>
+<p>でも要約統計量とか検定結果だけを見て判断するのは危険&hellip;</p>
+
+</section>
+<section>
+<h2 id="要約統計量だけ見て可視化を怠ると構造を見逃す">要約統計量だけ見て可視化を怠ると構造を見逃す</h2>
+<figure style="position: relative;">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
+<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+</section>
+<section>
+<h2 id="データ可視化は理解の第一歩">データ可視化は理解の第一歩</h2>
+<p>情報をうまく絞って整理 → <strong>直感的にわかる</strong></p>
+<p><img src="./figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds"></p>
+<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
+その度合いは <code>clarity</code> によって異なるらしい。</p>
+
+</section>
+<section>
+<h2 id="統計とは">統計とは</h2>
+<p>データをうまくまとめ、それに基づいて推論するための手法。</p>
+<ul>
+<li><strong>記述統計</strong>: データそのものを要約する
+<ul>
+<li>要約統計量 (e.g., 平均、標準偏差、etc.)</li>
+<li>作図、作表</li>
+</ul>
+</li>
+<li><strong>推測統計</strong>: データの背後にある母集団・生成過程を考える
+<ul>
+<li>数理モデル</li>
+<li>確率分布</li>
+<li>パラメータ(母数)</li>
+</ul>
+</li>
+</ul>
+<p>「グラフを眺めてなんとなく分かる」以上の分析には<strong>モデル</strong>が必要</p>
+
+</section>
+<section>
+<h2 id="モデルとは">モデルとは</h2>
+<p>対象システムを単純化・理想化して扱いやすくしたもの</p>
+<dl>
+<dt>Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" style="float: right; margin: 0 -5px;"></dt>
+<dd>数学的な方程式として記述されるもの。</dd>
+<dd>e.g., Lotka-Volterra eq., <span style="opacity: 0.6;">Hill eq.</span><br>
+<br></dd>
+<dt>Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" style="float: right;"></dt>
+<dd>数値計算の手続きとして記述されるもの。</dd>
+<dd>e.g., Schelling’s Segregation Model, <span style="opacity: 0.6;"><em>tumopp</em></span><br>
+<br></dd>
+<dt>Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" style="float: right;"></dt>
+<dd>具体的な事物で作られるもの。</dd>
+<dd>e.g., San Francisco Bay-Delta Model</dd>
+</dl>
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
+</section>
+<section>
+<h2 id="ウェットな実験もモデルの一種と見なせる">ウェットな実験もモデルの一種と見なせる</h2>
+<p>対象システムを単純化・理想化して扱いやすくしたもの<br>
+→ 自然ではありえない状況にしてでも、見たい関係を見る<br>
+→ 「Xを変えればYが変わる」という<strong>還元的な理解の1ステップ</strong></p>
+<ul>
+<li>ノイズをなるべく除去
+<ul>
+<li>栄養や温度など、<strong>環境を揃える</strong></li>
+<li>近親交配を繰り返して純系を作り、<strong>遺伝的背景を揃える</strong></li>
+</ul>
+</li>
+<li>興味のある要因のみ変えて、表現型の違いを評価
+<ul>
+<li><strong>遺伝子</strong>1つ2つだけ改変</li>
+<li>投与する<strong>薬剤</strong>の種類・量を変えてみる</li>
+<li><strong>栄養塩</strong>の濃度と<strong>光</strong>の強さを変えてみる</li>
+</ul>
+</li>
+</ul>
+<p>ドライの理論研究者を指して「モデル屋」と呼びがちだが、<br>
+広い意味では生物学者みんな「モデル屋」。</p>
+
+</section>
+<section>
+<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
+<p>データ生成をうまく真似できそうな仮定の数式表現。</p>
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1200">
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
+</figure>
+</section>
+<section>
+<h2 id="データ科学における数理モデル">データ科学における数理モデル</h2>
+<p>データ生成をうまく真似できそうな仮定の数式表現。<br>
+e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$</p>
+<p><img src="./figure/lm-diamonds-1.png" alt="plot of chunk lm-diamonds"></p>
+<p>新しく採れたダイヤモンドの価格予想とかにも使える。</p>
+<p>このように「YをXの関数として表す」ようなモデルを<strong>回帰</strong>と呼ぶ。</p>
+
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<p><img src="./figure/lm-bad-1.png" alt="plot of chunk lm-bad"></p>
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
+</ul>
+</section>
+<section>
+<h2 id="何でもかんでも直線あてはめではよろしくない">何でもかんでも直線あてはめではよろしくない</h2>
+<p><img src="./figure/glm-better-1.png" alt="plot of chunk glm-better"></p>
+<ul>
+<li>観察データは常に<strong>正の値</strong>なのに予測が負に突入してない？</li>
+<li><strong>縦軸は整数</strong>。しかもの<strong>ばらつき</strong>が横軸に応じて変化？</li>
+<li><strong>データに合わせた統計モデルを使うとマシ</strong></li>
+</ul>
+</section>
+<section>
+<h2 id="統計モデリングの教科書決定版-久保先生の">統計モデリングの教科書決定版: 久保先生の<a href="https://amzn.to/33suMIZ"><abbr title="データ解析のための統計モデリング入門">緑本</abbr></a></h2>
+<p>ちょっとずつ線形モデルを発展させていく。</p>
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
+</a>
+</figure>
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+  <div>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
+</p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b style="color: #E69F00;">個体差</b>などの変量効果を扱いたい
+</p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b style="color: #B2001D;">自由なモデリング</b>を！
+</p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+  </div>
+  <div style="text-align: right;">
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+  </div>
+</div>
+<hr>
+<p>今回はごく一部のみチラ見せ。理解を目指さなくていいです。</p>
+
+</section>
+<section>
+<h2 id="説明変数が1つある一般化線形モデル-glm">説明変数が1つある一般化線形モデル GLM</h2>
+<p>個体$i$の種子数$y_i$は<span style="color: #3366ff;">平均値$\lambda_i$</span>の<span style="color: #56B4E9;">ポアソン分布</span>に従う。<br>
+平均値の対数$\log(\textcolor{#3366ff}{\lambda_i})$は<strong>その個体の大きさ$x_i$に比例</strong>する。</p>
+<div class="column-container" style="justify-content: unset;">
+  <div>
+<figure style="margin-block: 1rem;">
+<img src="../iwate2023stats/glm.drawio.svg" width="640">
+</figure>
+  </div>
+  <div>
+<p><img src="./figure/glm-poisson-1.png" alt="plot of chunk glm-poisson"></p>
+  </div>
+</div>
+<p>この場合は<strong>単回帰</strong>。説明変数が複数あると<strong>重回帰</strong>。</p>
+
+</section>
+<section>
+<h2 id="複数の説明変数を同時に扱う重回帰">複数の説明変数を同時に扱う重回帰</h2>
+<p>\[\begin{split}
+y_i &\sim \text{Poisson}(\lambda_i) \\
+\log(\lambda_i) &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \ldots
+\end{split}\]</p>
+<p>気温も湿度も高いほどビールが売れる架空データ:</p>
+<p><img src="./figure/multiple-regression-1.png" alt="plot of chunk multiple-regression"></p>
+<p>ほかの<strong>確率分布</strong>と<strong>リンク関数</strong>を使う例を見てみよう。</p>
+
+</section>
+<section>
+<h2 id="ロジスティック回帰">ロジスティック回帰</h2>
+<ul>
+<li>確率分布: <strong>二項分布</strong></li>
+<li>リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div>
+<p>客$n_i$人中$y_i$人がビールを注文。<br>
+その日$i$の気温$x_i$によって割合が変化。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Binomial}(n_i,~p_i) \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+<p>ロジスティック関数↑</p>
+  </div>
+  <div>
+<p><img src="./figure/glm-logistic-1.png" alt="plot of chunk glm-logistic"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="ロジスティック回帰-狭義">ロジスティック回帰 (狭義)</h2>
+<ul>
+<li>確率分布: <strong>ベルヌーイ分布</strong> ($n = 1$ の二項分布)</li>
+<li>リンク関数: $\operatorname{logit}(p) = \log \frac {p} {1 - p}$</li>
+</ul>
+<p>何かの成否に対する何かの因子の影響、とか</p>
+<div class="column-container">
+  <div>
+<p>風が吹けば桶屋が儲かる。</p>
+<p>\[\begin{split}
+y_i &\sim \text{Bernoulli}(p_i) \\
+  &= \text{Binomial}(1,~p_i) \\
+\operatorname{logit}(p_i) &= \beta_0 + \beta_1 x_i \\
+p_i &= \frac 1 {1 + e^{-(\beta_0 + \beta_1 x_i)}}
+\end{split}\]</p>
+<p>ロジスティック関数↑</p>
+  </div>
+  <div>
+<p><img src="./figure/wind-1.png" alt="plot of chunk wind"></p>
+  </div>
+</div>
+
+</section>
+<section>
+<h2 id="一般線形モデル-化無し-はglmの一種">一般線形モデル (“化”無し) はGLMの一種</h2>
+<ul>
+<li>確率分布: <strong>正規分布</strong></li>
+<li>リンク関数: <strong>恒等関数</strong>(なにもせずそのまま)</li>
+</ul>
+<div class="column-container">
+  <div class="column" style="padding-top: 0.5rem;">
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
+\operatorname{identity}(\mu_i) &= \beta_0 + \beta_1 x_i
+\end{split}\]</p>
+  </div>
+  <div class="column">
+<p><img src="./figure/glm-weight-1.png" alt="plot of chunk glm-weight"></p>
+  </div>
+</div>
+<p>最小二乗法の直線あてはめと結果的に同じになる。</p>
+<p><small style="opacity: 0.7;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small></p>
+
+</section>
+<section>
+<h2 id="分散分析-analysis-of-variance-anova-as-glm">分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM</h2>
+<p><strong>質的な説明変数</strong>を持つ<strong>正規分布・恒等リンク</strong>のGLM、と解釈可能。<br>
+<span title="ダミー変数とも呼ばれる"><strong>指示変数</strong></span> (0 or 1) に変換してから重回帰する。</p>
+<div class="column-container">
+  <div style="padding-top: 0.5rem;">
+<table>
+  <thead>
+      <tr>
+          <th>天気</th>
+          <th style="text-align: center">→</th>
+          <th style="text-align: center">$x_1$ ☀️ 晴れ</th>
+          <th style="text-align: center">$x_2$ ☔️ 雨</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>☁️ くもり</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">0</td>
+          <td style="text-align: center">0</td>
+      </tr>
+      <tr>
+          <td>☀️ 晴れ</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">1</td>
+          <td style="text-align: center">0</td>
+      </tr>
+      <tr>
+          <td>☔️ 雨</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">0</td>
+          <td style="text-align: center">1</td>
+      </tr>
+  </tbody>
+</table>
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i}
+\end{split}\]</p>
+  </div>
+  <div>
+<p><img src="./figure/glm-anova-1.png" alt="plot of chunk glm-anova"></p>
+  </div>
+</div>
+<p>くもり☁️ $\beta_0$ を基準に、晴れの効果☀️ $\beta_1$ と雨の効果☔️ $\beta_2$ が求まる。</p>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="共分散分析-analysis-of-covariance-ancova-as-glm">共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM</h2>
+<p><strong>質的変数と量的変数を両方</strong>含むGLM、と解釈可能。<br>
+正規分布・等分散・恒等リンクなどが仮定される。</p>
+<div class="column-container">
+  <div style="padding-top: 0.5rem;">
+<table>
+  <thead>
+      <tr>
+          <th>天気</th>
+          <th style="text-align: center">→</th>
+          <th style="text-align: center">$x_1$ ☀️ 晴れ</th>
+          <th style="text-align: center">$x_2$ ☔️ 雨</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>☁️ くもり</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">0</td>
+          <td style="text-align: center">0</td>
+      </tr>
+      <tr>
+          <td>☀️ 晴れ</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">1</td>
+          <td style="text-align: center">0</td>
+      </tr>
+      <tr>
+          <td>☔️ 雨</td>
+          <td style="text-align: center"></td>
+          <td style="text-align: center">0</td>
+          <td style="text-align: center">1</td>
+      </tr>
+  </tbody>
+</table>
+<p>\[\begin{split}
+y_i &\sim \mathcal{N}(\mu_i,\sigma^2) \\
+\mu_i &= \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i}
+\end{split}\]</p>
+  </div>
+  <div>
+<p><img src="./figure/glm-ancova-1.png" alt="plot of chunk glm-ancova"></p>
+  </div>
+</div>
+<p>GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリングできる。</p>
+
+</section>
+<section>
+<h2 id="一般化線形モデルglmふりかえり">一般化線形モデル(GLM)ふりかえり</h2>
+<p>確率分布・リンク関数を変えて柔軟にモデリングできる。<br>
+特定の組み合わせには名前がある。</p>
+<table>
+  <thead>
+      <tr>
+          <th>名前</th>
+          <th>確率分布</th>
+          <th>リンク関数</th>
+          <th>説明変数</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ポアソン回帰</td>
+          <td>ポアソン分布</td>
+          <td>log</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>ロジスティック回帰</td>
+          <td>二項分布</td>
+          <td>logit</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>一般線形回帰</td>
+          <td>正規分布</td>
+          <td>恒等</td>
+          <td></td>
+      </tr>
+      <tr>
+          <td>分散分析</td>
+          <td>正規分布</td>
+          <td>恒等</td>
+          <td>質的変数</td>
+      </tr>
+      <tr>
+          <td>共分散分析</td>
+          <td>正規分布</td>
+          <td>恒等</td>
+          <td>質的変数+量的変数</td>
+      </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2 id="統計モデリングの教科書決定版-久保先生の">統計モデリングの教科書決定版: 久保先生の<a href="https://amzn.to/33suMIZ"><abbr title="データ解析のための統計モデリング入門">緑本</abbr></a></h2>
+<p>ちょっとずつ線形モデルを発展させていく。</p>
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
+</a>
+</figure>
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+  <div>
+<p><strong>線形モデル LM</strong> (単純な直線あてはめ)</p>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
+</p>
+<p><strong>一般化線形モデル GLM</strong></p>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b style="color: #E69F00;">個体差</b>などの変量効果を扱いたい
+</p>
+<p><strong>一般化線形混合モデル GLMM</strong></p>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b style="color: #B2001D;">自由なモデリング</b>を！
+</p>
+<p><strong>階層ベイズモデル HBM</strong></p>
+  </div>
+  <div style="text-align: right;">
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+  </div>
+</div>
+<hr>
+<p>今回はごく一部のみチラ見せ。理解を目指さなくていいです。</p>
+
+</section>
+<section>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a href="https://amzn.to/33suMIZ">データ解析のための統計モデリング入門</a> 久保拓弥 2012</li>
+<li><a href="https://amzn.to/3uwx7Pb">StanとRでベイズ統計モデリング</a> 松浦健太郎 2016</li>
+<li><a href="https://amzn.to/3o1eCzP">RとStanではじめる ベイズ統計モデリングによるデータ分析入門</a> 馬場真哉 2019</li>
+<li><a href="https://amzn.to/3uCxTKo">データ分析のための数理モデル入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3uznzCK">分析者のためのデータ解釈学入門</a> 江崎貴裕 2020</li>
+<li><a href="https://amzn.to/3ty80Kv">統計学を哲学する</a> 大塚淳 2020</li>
+<li><a href="https://amzn.to/2Q0f6JQ">科学とモデル&mdash;シミュレーションの哲学 入門</a> Michael Weisberg 2017<br>
+(原著: <a href="https://amzn.to/3bdvhuI">Simulation and Similarity</a> 2013)</li>
+</ul>
+<a href="2-r.html" class="readmore">
+2. Rの基本
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>
