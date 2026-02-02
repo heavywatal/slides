@@ -1069,19 +1069,19 @@ $y = 136.7 + 0.0153 x$</p>
 </span></span><span class="line"><span class="cl">  <span class="n">logit_p</span> <span class="o">=</span> <span class="m">-3</span> <span class="o">+</span> <span class="m">0.3</span> <span class="o">*</span> <span class="n">x</span><span class="p">,</span>
 </span></span><span class="line"><span class="cl">  <span class="n">p</span> <span class="o">=</span> <span class="nf">sigmoid</span><span class="p">(</span><span class="n">logit_p</span><span class="p">),</span>
 </span></span><span class="line"><span class="cl">  <span class="n">y</span> <span class="o">=</span> <span class="nf">rbinom</span><span class="p">(</span><span class="n">nrep</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">  <span class="n">response</span> <span class="o">=</span> <span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">y</span><span class="p">),</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="n">response</span> <span class="o">=</span> <span class="nf">cbind</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">fail</span> <span class="o">=</span> <span class="n">n</span> <span class="o">-</span> <span class="n">y</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="o">|&gt;</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">print</span><span class="p">()</span>
-</span></span></code></pre></div><pre tabindex="0"><code>            x    logit_p          p  y response[,1] [,2]
-  1  7.951271 -0.6146188 0.35100632  4            4    6
-  2 -6.003840 -4.8011520 0.00815325  0            0   10
-  3 22.409698  3.7229095 0.97640654 10           10    0
-  4 34.508895  7.3526686 0.99935953 10           10    0
- --                                                     
-197 24.277180  4.2831541 0.98638875 10           10    0
-198 19.128721  2.7386162 0.93926720  8            8    2
-199  1.015520 -2.6953441 0.06324865  0            0   10
-200 34.259733  7.2779199 0.99930986 10           10    0
+</span></span></code></pre></div><pre tabindex="0"><code>            x    logit_p          p  y response[,y] [,fail]
+  1  7.951271 -0.6146188 0.35100632  4            4       6
+  2 -6.003840 -4.8011520 0.00815325  0            0      10
+  3 22.409698  3.7229095 0.97640654 10           10       0
+  4 34.508895  7.3526686 0.99935953 10           10       0
+ --                                                        
+197 24.277180  4.2831541 0.98638875 10           10       0
+198 19.128721  2.7386162 0.93926720  8            8       2
+199  1.015520 -2.6953441 0.06324865  0            0      10
+200 34.259733  7.2779199 0.99930986 10           10       0
 </code></pre>
 </section>
 <section>
@@ -1093,7 +1093,8 @@ $y = 136.7 + 0.0153 x$</p>
 </ul>
 <p>今回の場合、成功回数 <code>y</code> だけをformulaに入れると怒られる</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">glm</span><span class="p">(</span><span class="n">y</span> <span class="o">~</span> <span class="n">x</span><span class="p">,</span> <span class="n">df_logistic</span><span class="p">,</span> <span class="n">family</span> <span class="o">=</span> <span class="n">binomial</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>Error in eval(family$initialize): y values must be 0 &lt;= y &lt;= 1
+</span></span></code></pre></div><pre tabindex="0"><code>Error:
+! y values must be 0 &lt;= y &lt;= 1
 </code></pre><p>ので失敗回数もモデルに含むよう <code>response ~ x</code> とする。</p>
 <p>(今回のように試行回数が10回固定じゃなくても使える、ということ)</p>
 
