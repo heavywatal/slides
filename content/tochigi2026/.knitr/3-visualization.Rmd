@@ -607,17 +607,23 @@ p + colorspace::scale_colour_discrete_divergingx("Zissou 1")             + labs(
 連続値viridis, 離散値Okabe-Itoをデフォルトにする例:
 ```r
 grDevices::palette("Okabe-Ito")
-options(
-  ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis",
-  ggplot2.discrete.colour = grDevices::palette()[-1],
-  ggplot2.discrete.fill = grDevices::palette()[-1]
+theme_palette = ggplot2::theme(
+  palette.colour.continuous = "viridis",
+  palette.fill.continuous = "viridis",
+  palette.colour.discrete = grDevices::palette()[-1],
+  palette.fill.discrete = grDevices::palette()[-1]
 )
+ggplot2::theme_set(ggplot2::theme_get() + theme_palette)
 ```
 
-`options()` による設定はRを終了するまで有効。
+`theme_set()` による設定はRを終了するまで有効。
 
 スクリプトの先頭に書いておいて毎回設定することを推奨。
+
+<hr>
+
+`options(ggplot2.continuous.colour = "viridis")`
+は古い(<4.0.0)。
 
 
 ---

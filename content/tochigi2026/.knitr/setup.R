@@ -1,4 +1,3 @@
-grDevices::palette("Okabe-Ito")
 withr::local_options(
   mc.cores = parallel::detectCores(),
   wtl.printdf.summarize = FALSE,
@@ -10,12 +9,16 @@ withr::local_options(
   dplyr.summarise.inform = FALSE,
   readr.num_columns = 0L,
   readr.show_progress = FALSE,
-  readr.show_col_types = FALSE,
-  ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis",
-  ggplot2.discrete.colour = grDevices::palette()[-1],
-  ggplot2.discrete.fill = grDevices::palette()[-1]
+  readr.show_col_types = FALSE
 )
+grDevices::palette("Okabe-Ito")
+theme_palette = ggplot2::theme(
+  palette.colour.continuous = "viridis",
+  palette.fill.continuous = "viridis",
+  palette.colour.discrete = grDevices::palette()[-1],
+  palette.fill.discrete = grDevices::palette()[-1]
+)
+ggplot2::theme_set(ggplot2::theme_get() + theme_palette)
 withr::local_package("tibble")
 withr::local_package("ggplot2")
 registerS3method("print", "tbl", wtl::printdf)
