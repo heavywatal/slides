@@ -575,15 +575,15 @@ df_aug = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5))
   broom::augment(glm_multi, newdata = _, type.predict = "response")
 
 p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
-  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
   geom_point(shape = 16, size = 3, alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
   scale_color_viridis_c(option = "cividis", direction = -1) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
         legend.position = "inside", legend.position.inside = c(0.01, 0.99))
 p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
-  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
   geom_point(shape = 16, size = 3, alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
   scale_color_viridis_c(option = "turbo") +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
@@ -933,8 +933,8 @@ lm_ancova = lm(beer_sales ~ temperature + weather, df_ancova)
 df_aug = broom::augment(lm_ancova, type.predict = "response")
 
 ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
-  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
   geom_point(shape = 16, size = 3, alpha = 0.6) +
+  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
   scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
