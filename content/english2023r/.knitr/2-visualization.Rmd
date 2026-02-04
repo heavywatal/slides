@@ -487,11 +487,11 @@ pL = ggplot(mpg) +
 pC = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv)) +
-  scale_color_discrete(type = NULL)  # to show bad default
+  scale_colour_hue()  # to show bad default
 pR = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = cyl)) +
-  scale_color_continuous(type = NULL)  # to show bad default
+  scale_color_gradient()  # to show bad default
 cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ```
 
@@ -518,7 +518,7 @@ pmpg = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv), size = 4, alpha = 0.66) +
   theme_minimal(base_size = 18) + theme(legend.position = "bottom")
-pmpg + scale_color_discrete(type = NULL) + labs(title = "Original")
+pmpg + scale_color_hue() + labs(title = "Original")
 pmpg + scale_color_discrete(type = colorspace::deutan(scales::hue_pal()(3L))) + labs(title = "Deuteranope")
 pmpg + scale_color_discrete(type = colorspace::tritan(scales::hue_pal()(3L))) + labs(title = "Tritanope")
 ```
