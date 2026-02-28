@@ -8,7 +8,9 @@ draft = false
 1.  開講年度 / Academic Year: 2026
 2.  講義名 / Cource title: 生物統計学 Biostatistics
 3.  開講学期 / Term: 前学期 1st half (7月28, 29, 30, 31日)
-4.  代表教員 / Main Instructor: 大槻久 (総合研究大学院大学)
+4.  代表教員 / Main Instructor:
+    - 岩嵜航 (東北大学 生命科学研究科)
+    - Watal M. Iwasaki (Graduate School of Life Sciences, Tohoku University)
 5.  授業の概要 / Outline:
     - 生物学における研究とは、大雑把に言うと
       「生物に関するデータを集め、その背後にある理（ことわり）を読み解くこと」です。
@@ -89,7 +91,7 @@ draft = false
     - [本橋智光「前処理大全」](https://www.amazon.co.jp/dp/4774196479?&linkCode=ll1&tag=heavywatal-22&linkId=71fd11103334f289e47373a7205d8392&language=ja_JP&ref_=as_li_ss_tl)
     - [Hadley Wickham et al. "R for Data Science"](https://r4ds.hadley.nz/)
 12. 他コース学生が履修する際の注意事項 / Notes for students from other programs:
-    - 事前に代表教員（大槻）にメールでコンタクトを取ること。
+    - 事前に代表教員（大槻・岩嵜）にメールでコンタクトを取ること。
     - Contact Prof. Ohtsuki in advance in email.
 13. 授業を担当する教員 / Lecturers:
     - 岩嵜航 (東北大学 生命科学研究科 助教)
