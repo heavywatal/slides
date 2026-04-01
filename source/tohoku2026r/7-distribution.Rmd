@@ -11,7 +11,7 @@
 ---
 ## 作業再開、出欠確認
 
-1. `r-training-2025.Rproj` をダブルクリック。\
+1. `r-training-2026.Rproj` をダブルクリック。\
    正しい working directory でRStudioが起動される。
 1. [初日と同じ手順](1-introduction.html#/28)で出欠確認。
 1. 今日のぶんのスクリプトを新規作成し、好きな名前で保存。
@@ -103,34 +103,59 @@ diamonds |>
 
 
 ---
-## ちょっとずつ線形モデルを発展させていく
+## よりよい回帰をめざして
 
-<figure style="float: right;">
+久保先生の[<abbr title="データ解析のための統計モデリング入門">緑本</abbr>](https://amzn.to/33suMIZ)に沿ってちょっとずつ線形モデルを発展させていく。
+
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
 <a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
 <img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
 </a>
 </figure>
 
-**線形モデル LM** (単純な直線あてはめ)　[(👈 #7 今回)](7-distribution.html)
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 0% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな確率分布を扱いたい</span>
+  <div>
 
-**一般化線形モデル GLM** [(#8 次回)](8-glm.html)
+**線形モデル LM** (単純な直線あてはめ)
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b>確率分布</b>を扱いたい
+</p>
+
+**一般化線形モデル GLM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b>個体差</b>などの変量効果を扱いたい
+</p>
 
 **一般化線形混合モデル GLMM**
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b>自由なモデリング</b>を！
+</p>
 
 **階層ベイズモデル HBM**
+
+  </div>
+  <div style="text-align: right;">
+
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+
+  </div>
+</div>
 
 <small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
 
 <hr>
 <small>
 
-[Data Science Hill Climb 2024 (東京海上) での講義 (~12時間)](https://heavywatal.github.io/slides/tokiomarine2024/)
+[Data Science Hill Climb 2025 での講義 (~12時間)](https://heavywatal.github.io/slides/dshc2025/)
 の抜粋バージョン (~2時間)。
 
 </small>
@@ -149,6 +174,7 @@ diamonds |>
     - $y = 9x^2$
 
 <small><https://r4ds.had.co.nz/model-basics.html></small>
+
 
 ---
 ## たぶん身長が高いほど体重も重い
@@ -237,7 +263,6 @@ cowplot::plot_grid(nrow = 1L,
   p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2)
 )
 ```
-
 
 
 ---
@@ -407,23 +432,52 @@ cowplot::plot_grid(p_lm, p_poisson, nrow = 1L)
 
 
 ---
-## ちょっとずつ線形モデルを発展させていく
+## よりよい回帰をめざして
+
+久保先生の[<abbr title="データ解析のための統計モデリング入門">緑本</abbr>](https://amzn.to/33suMIZ)に沿ってちょっとずつ線形モデルを発展させていく。
+
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
+</a>
+</figure>
+
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 0% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+
+  <div>
 
 **線形モデル LM** (単純な直線あてはめ)
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ いろんな<span class="fragment highlight-blue custom bold">確率分布</span>を扱いたい</span>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
+</p>
 
 **一般化線形モデル GLM**
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ 個体差などの変量効果を扱いたい</span>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b>個体差</b>などの変量効果を扱いたい
+</p>
 
 **一般化線形混合モデル GLMM**
 
-<span style="opacity: 0.6;">&nbsp; &nbsp; ↓ もっと自由なモデリングを！</span>
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b>自由なモデリング</b>を！
+</p>
 
 **階層ベイズモデル HBM**
 
-<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
+  </div>
+  <div style="text-align: right;">
+
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+
+  </div>
+</div>
 
 
 ---
@@ -583,8 +637,8 @@ e.g.,\
 コインを3枚投げたうち表の出る枚数 $X$ は**二項分布に従う**。\
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
-<div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
+<div class="column-container" style="justify-content: unset;">
+  <div>
 
 ```{r, dbinom}
 #| echo: false
@@ -602,7 +656,7 @@ tibble(X = seq(0, 3), Prob = dbinom(X, size, p), obs = Inf) |>
 ```
 
   </div>
-  <div class="column" style="padding-top: 10px;">
+  <div style="padding-top: 10px;">
 \[\begin{split}
 \Pr(X = k) &= \binom n k p^k (1 - p)^{n - k} \\
 k &\in \{0, 1, 2, \ldots, n\}
@@ -657,11 +711,11 @@ df_rbinom |>
 - コインを3枚投げたうち表の出る枚数 $X$
 - $n = 3, p = 0.5$ の二項分布からサンプルする乱数 $X$
 
-<div class="column-container">
-  <div class="column" style="flex-shrink: 2.0;">
+<div class="column-container" style="justify-content: unset;">
+  <div>
 <img `r src_alt_fig_chunk("dbinom")`>
   </div>
-  <div class="column" style="padding-top: 10px;">
+  <div style="padding-top: 10px;">
 $X \sim \text{Binomial}(n = 3, p = 0.5)$
 
 &nbsp;&nbsp; ↓ サンプル
@@ -817,7 +871,7 @@ ggplot(df) +
 🔰 負の二項分布になりそうな例を考えてみよう
 
 <!--
-平均$\lambda$がガンマ分布でばらついたポアソン分布、とも解釈できる。\
+平均$\lambda$がガンマ分布でばらついた過分散ポアソン分布、とも解釈できる。\
 ($k \to \infty$でポアソン分布と一致)
 -->
 
@@ -1102,7 +1156,7 @@ tidyr::crossing(x = seq(0, 25, length.out = 300), k = 10**seq.int(0, 3)) |>
 ## 有名な確率分布対応関係ふりかえり
 
 <figure style="float: right;">
-<img src="../tokiomarine2021/math-model.drawio.svg" width="420">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="450">
 </figure>
 
 離散一様分布
@@ -1255,8 +1309,7 @@ p_rpois
 ```
 
 カウントデータだし形も<span class="fragment custom blur">ポアソン</span>分布っぽい。\
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
-
+分布の<span style="color: #3366ff;">パラメータ $\lambda$</span> はどれくらいがいいだろう？
 
 
 ---
@@ -1271,12 +1324,13 @@ p_rpois
 #| fig.width: 12
 p_pois = p_rpois +
   geom_col(data = df_dpois, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  geom_point(aes(lambda, 0), data = dplyr::distinct(df_dpois, lambda), size = 5, color = "#3366ff") +
   facet_wrap(vars(lambda), nrow = 1L, labeller = label_both)
 p_pois
 ```
 
 カウントデータだし形もポアソン分布っぽい。\
-分布のパラメータ $\lambda$ はどれくらいがいいだろう？
+分布の<span style="color: #3366ff;">パラメータ $\lambda$</span> はどれくらいがいいだろう？
 
 黒が観察データ。<span style="color: #56B4E9;">青がポアソン分布</span>。
 よく重なるのは $\lambda \approx 3$ くらいか。
@@ -1352,7 +1406,7 @@ p_pois +
 この中では $\lambda = 3$ がいいけど、より尤もらしい値を求めたい。
 
 ---
-## 最尤推定 <u>M</u>aximum <u>L</u>ikelihood <u>E</u>stimation
+## 最尤推定 <span class="mark-initial">Maximum</span> <span class="mark-initial">Likelihood</span> <span class="mark-initial">Estimation</span>
 
 扱いやすい **対数尤度** (log likelihood) にしてから計算する。\
 一階微分が0になる $\lambda$ を求めると...**標本平均**と一致。
@@ -1381,9 +1435,9 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
   ggplot() +
   aes(lambda, logL) +
   geom_line(linewidth = 1) +
-  geom_vline(xintercept = X_mle, color = "#56B4E9", linewidth = 2) +
-  annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#56B4E9") +
-  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#56B4E9",
+  geom_vline(xintercept = X_mle, color = "#3366ff", linewidth = 2) +
+  annotate("point", x = X_mle, y = log(L_mle), size = 4, color = "#3366ff") +
+  annotate("text", label = sprintf("lambda = %.2f", X_mle), color = "#3366ff",
            x = Inf, y = -Inf, hjust = 1.2, vjust = -0.8, size = 7) +
   labs(y = "log L") +
   theme_bw(base_size = 22) +
@@ -1394,7 +1448,8 @@ p_mle = tibble::tibble(lambda = seq(1, 5, 0.1), L = purrr::map_dbl(lambda, calc_
 
 .df_mle = tibble::tibble(lambda = X_mle, X = seq(0, 11), Prob = dpois(X, lambda))
 .p_pois_mle = p_rpois +
-  geom_col(data = .df_mle, aes(y = Prob), alpha = 0.5, fill = "#56B4E9")
+  geom_col(data = .df_mle, aes(y = Prob), alpha = 0.5, fill = "#56B4E9") +
+  annotate("point", x = X_mle, y = 0, size = 4, color = "#3366ff")
 
 cowplot::plot_grid(p_mle, .p_pois_mle, nrow = 1L, rel_widths = c(2, 1))
 ```
@@ -1421,7 +1476,7 @@ p_repl = df_sum |>
   ggplot() +
   aes(lambda) +
   geom_histogram(bins = 25, center = 3) +
-  annotate("point", x = df_minmax$lambda, y = 0, color = "#56B4E9", size = 8, alpha = 0.5) +
+  annotate("point", x = df_minmax$lambda, y = 0, color = "#3366ff", size = 8, alpha = 0.5) +
   labs(x = "estimated_lambda") +
   theme_bw(base_size = 22) +
   theme(
@@ -1494,7 +1549,7 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 > All models are wrong, but some are useful. --- George E. P. Box
 
 <figure>
-<img src="../tokiomarine2021/math-model.drawio.svg" width="900">
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1080">
 <figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
 </figure>
 
@@ -1520,11 +1575,8 @@ A. 推定したい統計量とか、許容できる誤差とかによる。
 サイコロを10回振ったら6の目が3回出た。
 
 1. 6の目の出る確率が1/6だとした場合の尤度は?
-
 1. 6の目の出る確率が0.2だとした場合の尤度は?
-
 1. 横軸を6の目の出る確率、縦軸を対数尤度とするグラフを描こう。
-
 1. このサイコロで6の目が出る確率を最尤推定しよう。\
    数学で解ければ**優**。Rで見つければ**良**。目分量・勘で**可**。
 
@@ -1576,7 +1628,7 @@ tidy_seeds = df_seeds |>
 ```
 
 <div class="column-container">
-  <div class="column" style="height: 440px; overflow: scroll; flex-shrink: 1.2;">
+  <div style="flex: none; height: 440px; overflow: scroll;">
 
 ```{r, distribution-datasets-print}
 #| echo: false
@@ -1585,7 +1637,7 @@ df_seeds |> readr::write_csv(stdout())
 ```
 
   </div>
-  <div class="column">
+  <div>
 
 ```{r, distribution-datasets-plot}
 #| echo: false
@@ -1601,7 +1653,7 @@ ggplot(tidy_seeds) +
 ```
 
   </div>
-  <div class="column">
+  <div>
 
 ```{r, distribution-datasets-mle}
 #| echo: false
