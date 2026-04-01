@@ -10,3 +10,719 @@ data(band_members, band_instruments, band_instruments2, package = "dplyr")
 data(relig_income, population, us_rent_income, fish_encounters,
      table2, table3, table4a, table5, package = "tidyr")
 ```
+
+---
+## 前処理は大きく2つに分けられる
+
+- **データ構造を対象とする処理** — 第3, 4回 本日の話題
+    - 使いたい部分だけ抽出
+    - グループごとに特徴を要約
+    - 何かの順に並べ替え
+    - **異なるテーブルの結合** 👈 第4回ここから
+    - **変形: 縦長 ↔ 横広**
+- データ内容を対象とする処理 <span style="opacity: 0.6;">— 第5回</span>
+    - 数値の変換: 対数、正規化
+    - 外れ値・欠損値への対処
+    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
+    - 文字列処理: 正規表現によるパターンマッチ
+
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></small>
+
+---
+## dplyr --- data.frameの高速処理担当
+
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="180" style="float: right;">
+</a>
+
+シンプルな関数がたくさん。繋げて使う (piping)
+
+抽出
+: 列: `select()`,
+: 行: `filter()`, `distinct()`, `slice()`
+
+要約・集計
+: `group_by()`, `summarize()`, `count()`
+
+並べ替え
+: `arrange()`, `relocate()`
+
+列の追加・変更
+: `mutate()`, `rename()`
+
+結合
+: 行方向: `bind_rows()`
+: 列方向: `left_join()`, `inner_join()`, `full_join()`
+
+
+---
+## 行の結合: `bind_rows()`
+
+例。先頭と末尾を6行ずつ取って縦並びで結合する:
+```{r, bind-rows}
+dplyr::bind_rows(head(diamonds), tail(diamonds))
+```
+
+🔰 `mpg` で同様に3行ずつ取って結合してみよう
+
+
+---
+## 列の結合: `bind_cols()`
+
+例。3行2列の表を横並びで結合する:
+```{r, bind-cols}
+dplyr::bind_cols(band_members, band_instruments2)
+```
+```
+band_members          band_instruments2
+   name    band         artist  plays
+  <chr>   <chr>          <chr>  <chr>
+1  Mick  Stones       1   John guitar
+2  John Beatles       2   Paul   bass
+3  Paul Beatles       3  Keith guitar
+```
+
+**中身が合ってなくても**行数が合ってれば成功してしまう。\
+共通する列を**糊しろ**にして結合したい場合は `*_join()` 関数 →
+
+
+---
+## 共通する列で結合: `full_join()`
+
+他方に無い部分を `NA` で補完して**左右とも全行**保持:
+```{r, full-join}
+dplyr::full_join(band_members, band_instruments, by = "name")
+```
+```
+band_members          band_instruments
+   name    band          name  plays
+  <chr>   <chr>         <chr>  <chr>
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+```
+
+🔰 結合前と結合後の表を手元でも確認しよう
+
+---
+## 共通する列で結合: `full_join()`
+
+結合に使う列の名前が違ってても大丈夫:
+```{r, full-join-by}
+dplyr::full_join(band_members, band_instruments2, by = c(name = "artist"))
+```
+```
+band_members          band_instruments2
+   name    band         artist  plays
+  <chr>   <chr>          <chr>  <chr>
+1  Mick  Stones       1   John guitar
+2  John Beatles       2   Paul   bass
+3  Paul Beatles       3  Keith guitar
+```
+
+🔰 結合前と結合後の表を手元でも確認しよう
+
+---
+## 共通する列で結合: `left_join()`
+
+右側に無い部分を `NA` で補完して**左側だけ全行**保持:
+```{r, left-join}
+dplyr::left_join(band_members, band_instruments, by = "name")
+```
+```
+band_members          band_instruments
+   name    band          name  plays
+  <chr>   <chr>         <chr>  <chr>
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+```
+
+その逆は `right_join()`
+
+🔰 結合前と結合後の表を手元でも確認しよう
+
+---
+## 共通する列で結合: `inner_join()`
+
+左右ともに**共通する値のある行だけ**保持:
+```{r, inner-join}
+dplyr::inner_join(band_members, band_instruments, by = "name")
+```
+```
+band_members          band_instruments
+   name    band          name  plays
+  <chr>   <chr>         <chr>  <chr>
+1  Mick  Stones       1  John guitar
+2  John Beatles       2  Paul   bass
+3  Paul Beatles       3 Keith guitar
+```
+
+🔰 結合前と結合後の表を手元でも確認しよう
+
+---
+## joinまとめ
+
+<figure>
+<a href="https://r4ds.hadley.nz/joins.html">
+<img src="/slides/image/r4ds/join-venn.png" width="100%">
+<figcaption><small>https://r4ds.hadley.nz/joins.html</small></figcaption>
+</a>
+</figure>
+
+
+生命科学における `left_join()` の例
+
+左: **興味のある遺伝子**の発現データ\
+右: **全遺伝子**のアノテーション情報
+
+&nbsp; ↓ `left_join`(by = "遺伝子名")
+
+**興味のある遺伝子**の発現+アノテーション
+
+---
+## join例題: `nycflights13` データセット
+
+```r
+# install.packages("nycflights13")
+library(nycflights13)
+data(package = "nycflights13")
+# airlines, airports, flights, planes, weather
+```
+
+<figure>
+<a href="https://r4ds.hadley.nz/joins.html#fig-flights-relationships">
+<img src="/slides/image/r4ds/relational-nycflights13.png" width="890">
+<figcaption><small>https://r4ds.hadley.nz/joins.html#fig-flights-relationships</small></figcaption>
+</a>
+</figure>
+
+🔰 JFK空港発の100席以上の飛行機で最も多い目的地はどこ？
+
+↓ こんな結果が出るように頑張れ ↓
+
+```{r, nycflights13}
+#| echo: false
+withr::with_package("nycflights13", {
+  flights |>
+    dplyr::filter(origin == "JFK") |>
+    dplyr::inner_join(planes, by = "tailnum") |>
+    dplyr::filter(seats > 100) |>
+    dplyr::count(origin, dest, sort = TRUE) |>
+    dplyr::left_join(airports, by = dplyr::join_by(dest == faa))
+})
+```
+
+
+---
+## tidyr --- data.frameの変形・整形担当
+
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="180" style="float: right;">
+</a>
+
+横広から縦長に
+: `pivot_longer()`, <del><code>gather()</code></del>
+
+縦長から横広に
+: `pivot_wider()`, <del><code>spread()</code></del>
+
+列を分離、結合
+: `separate()`, `unite()`
+
+入れ子構造をつくる、解消する
+: `nest()`, `unnest()`
+
+*etc.*
+
+- こういう変形なしでそのまま使えるデータは激レア
+- エクセルでポチポチやらず、tidyrで手続きを記述しよう
+- ちょっとハードルは高いけど、使えるようになると**強い**💪
+
+---
+## `pivot_longer()` 横広から縦長に
+
+複数列にまたがる値を1列にする。\
+そのラベルも合わせて移動。
+
+<figure>
+<a href="https://r4ds.hadley.nz/data-tidy.html#sec-pivoting">
+<img src="/slides/image/cheatsheet/tidyr-pivot_longer.png" width="900">
+<figcaption><small>https://r4ds.hadley.nz/data-tidy.html#sec-pivoting</small></figcaption>
+</a>
+</figure>
+
+```r
+table4a
+pivot_longer(table4a, 2:3, names_to = "year", values_to = "cases")
+```
+
+🔰 変形前と変形後を手元のRで確認してみよう。
+
+
+---
+## `pivot_longer()` 横広から縦長に: `relig_income` の例
+
+宗教と収入の関係を調査したデータ。\
+世帯数のカウントが複数列にまたがっている。
+
+```{r, relig-income}
+print(relig_income)
+```
+
+---
+## `pivot_longer()` 横広から縦長に: `relig_income` の例
+
+宗教と収入の関係を調査したデータ。\
+こうなってたらggplotできるのに。
+
+<div class="column-container">
+<div class="column">
+
+```{r, pivot-longer}
+#| include: false
+relig_long = relig_income[1:2, 1:4] |> print() |>
+  tidyr::pivot_longer(!religion, names_to = "income", values_to = "count") |>
+  print()
+```
+```{r, relig-long}
+print(relig_long)
+```
+
+🔰 次ページの答えを見ず自力でやってみよう
+
+</div>
+<div class="column">
+
+```{r, relig-income-plot}
+#| echo: false
+#| fig.width: 4.5
+#| fig.height: 6
+relig_income |>
+  tidyr::pivot_longer(!religion, names_to = "income", values_to = "count") |>
+  dplyr::mutate(income = dplyr::na_if(income, "Don't know/refused")) |>
+  dplyr::mutate(income = factor(income, levels = rev(unique(income)))) |>
+  ggplot() +
+  aes(count, religion) +
+  geom_col(aes(fill = income), position = "fill", orientation = "y") +
+  scale_fill_viridis_d(na.value = "#cccccc") +
+  scale_y_discrete(limits = rev(relig_income$religion)) +
+  theme_classic() +
+  theme(axis.title = element_blank())
+```
+
+</div>
+</div>
+
+---
+## `pivot_longer()` 横広から縦長に: `relig_income` の例
+
+複数列にまたがっている世帯数カウントを `count` 1列に移動。\
+列名になってた収入帯を `income` 列に移動。
+
+```{r, pivot-longer}
+```
+
+移動する列を指定する `!religion` のところは直接 `2:10` とかも可。
+
+
+---
+## `pivot_wider()` 縦長から横広に
+
+1列に収まっていた値を複数列の行列に変換。\
+そのラベルを列の名前にする。
+
+<figure>
+<a href="https://r4ds.hadley.nz/data-tidy.html#widening-data">
+<img src="/slides/image/cheatsheet/tidyr-pivot_wider.png" width="840">
+<figcaption><small>https://r4ds.hadley.nz/data-tidy.html#widening-data</small></figcaption>
+</a>
+</figure>
+
+```r
+pivot_wider(table2, names_from = type, values_from = count)
+```
+
+🔰 変形前と変形後を手元のRで確認してみよう。
+
+---
+## `pivot_wider()` 縦長から横広に: `fish_encounters`
+
+発信器のついた魚が観測地点を通過したことを記録したデータ。\
+既にggplotしやすそうな形だけど、あえて1魚1行の横広にしたい。
+
+<div class="column-container">
+<div class="column">
+
+```{r, fish-encounters}
+print(fish_encounters)
+```
+
+</div>
+<div class="column">
+
+```r
+print(fish_wide)
+```
+```{r, fish-wide}
+#| echo: false
+fish_encounters |>
+  tidyr::pivot_wider(names_from = station, values_from = seen)
+```
+
+</div>
+</div>
+
+🔰 次ページの答えを見ず自力でやってみよう
+
+---
+## `pivot_wider()` 縦長から横広に: `fish_encounters`
+
+観測地点 `station` を列名に移動。\
+観察されたかどうか `seen` を各列に移動。存在しなければ `NA`
+
+```{r, pivot-wider}
+fish_encounters |>
+  tidyr::pivot_wider(names_from = station, values_from = seen)
+```
+
+`values_fill = 0` とすれば `NA` じゃなく `0` で埋められる。
+
+---
+## `pivot_wider()` 縦長から横広に: 練習問題1
+
+```{r, population}
+print(population)
+```
+
+🔰 1国のデータが1行になるように変形しよう↓
+```{r, wider-goal1}
+#| echo: false
+population |> tidyr::pivot_wider(names_from = "year", values_from = "population")
+```
+
+---
+## `pivot_wider()` 縦長から横広に: 練習問題2
+
+```{r, population2}
+print(population)
+```
+
+🔰 1年のデータが1行になるように変形しよう↓
+```{r, wider-goal2}
+#| echo: false
+population |> tidyr::pivot_wider(names_from = "country", values_from = "population")
+```
+
+
+---
+## `pivot_wider()` 縦長から横広に: 練習問題3
+
+```{r, us-rent-income}
+print(us_rent_income)
+```
+
+🔰 `income` と `rent` の推定値がそれぞれ列となるように変形しよう
+```{r, wider-goal3}
+#| echo: false
+us_rent_income |>
+  dplyr::select(!moe) |>
+  tidyr::pivot_wider(names_from = "variable", values_from = "estimate")
+```
+
+
+---
+## `separate()` 列を分離
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#separate">
+<img src="/slides/image/cheatsheet/tidyr-separate.png" height="240">
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#separate</small></figcaption>
+</a>
+</figure>
+
+```{r, separate}
+table3 |> tidyr::separate(rate, into = c("cases", "population"), sep = "/")
+```
+
+`sep` は指定しなくてもデフォルトで記号や空白を認識してくれる。
+
+🔰 変形前と変形後を手元のRで確認してみよう。
+
+---
+## `unite()` 列を融合
+
+<figure>
+<a href="https://r4ds.had.co.nz/tidy-data.html#unite">
+<img src="/slides/image/cheatsheet/tidyr-unite.png" height="240" style="vertical-align: top;">
+<span style="display: inline-block; margin-inline: -2.7rem 0 ; transform: translate(0, 0.2em); color: #ffffff; background-color: #808080; padding: 0.05rem; font-size: 0.9em; font-weight: bold;">YEAR</span>
+<figcaption><small>https://r4ds.had.co.nz/tidy-data.html#unite</small></figcaption>
+</a>
+</figure>
+
+```{r, unite}
+table5 |> tidyr::unite(YEAR, century, year, sep = "") |>
+  dplyr::mutate(YEAR = as.integer(YEAR))
+```
+
+**結合直後は文字列**になっているので数値なら忘れずに変換。
+
+🔰 変形前と変形後を手元のRで確認してみよう。
+
+---
+## `separate()` / `unite()` 練習問題
+
+🔰 `table3` の `rate` を分割したあと、また元に戻してみよう。
+
+🔰 `table3` の `year` を分割して `table5` を作ってみよう。
+
+```{r, table3-practice}
+print(table3)
+```
+
+---
+## `nest()` 入れ子にする
+
+グループ毎にdata.frameを区切ってlist型の列に入れる。
+
+<figure>
+<a href="https://www.tidyverse.org/blog/2019/09/tidyr-1-0-0/">
+<img src="/slides/image/rstats/nest-pack-chop.png" height="540">
+<figcaption><small>https://www.tidyverse.org/blog/2019/09/tidyr-1-0-0/</small></figcaption>
+</a>
+</figure>
+
+<div>
+<a href="https://purrr.tidyverse.org/">
+<img src="/_img/hex-stickers/purrr.webp" width="180" style="vertical-align: middle;">
+purrrパッケージ</a>と共に扱えるようになると強力 (今回は紹介だけ)
+</div>
+
+---
+## `nest()` 入れ子にする
+
+グループ毎にdata.frameを区切ってlist型の列に入れる。
+
+```{r, nest}
+mpg_nested = mpg |> tidyr::nest(data = !drv) |> print()
+mpg_nested$data[[1]]
+```
+
+
+---
+## 前処理は大きく2つに分けられる
+
+<div style="float: right;">
+<a href="https://dplyr.tidyverse.org/">
+<img src="/_img/hex-stickers/dplyr.webp" width="180">
+</a><br>
+<a href="https://tidyr.tidyverse.org/">
+<img src="/_img/hex-stickers/tidyr.webp" width="180">
+</a>
+</div>
+
+- **データ構造を対象とする処理** 👈 第3, 4回 本日の話題
+    - 使いたい部分だけ抽出 --- `select()`, `filter()`
+    - グループごとに特徴を要約 --- `group_by()`, `summarize()`
+    - 何かの順に並べ替え --- `arrange()`, `relocate()`
+    - 異なるテーブルの結合 --- `*_join()`
+    - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
+- データ内容を対象とする処理 — 第5回
+    - 数値の変換: 対数、正規化
+    - 外れ値・欠損値への対処
+    - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
+    - 文字列処理: 正規表現によるパターンマッチ
+
+<small style="display: block; text-align: right;"><a href="https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b">
+本橋智光「前処理大全」
+</a></small>
+
+
+---
+## 憶えなくていい。公式サイトなどを見ながら作業
+
+<figure>
+<a href="https://dplyr.tidyverse.org/">
+<img src="/slides/image/rstats/dplyr-website.png" width="80%">
+<figcaption><small>https://dplyr.tidyverse.org/</small></figcaption>
+</a>
+</figure>
+
+
+
+---
+## 🔰 課題1: `economics` を変形して作図しよう
+
+```r
+print(economics)
+```
+
+```{r, economics-longer}
+#| echo: false
+#| fig.height: 4.5
+#| fig.width: 8
+wtl::printdf(economics, n = 4L)
+economics |>
+  tidyr::pivot_longer(!date) |>
+  ggplot() +
+  aes(date, value) +
+  geom_line() +
+  facet_grid(rows = vars(name), scales = "free_y")
+```
+
+---
+## 少し前に出てきたこれ、そろそろできるのでは
+
+```{r, before-tidy}
+print(VADeaths)
+```
+
+↓ 下ごしらえ: 作図・解析で使いやすい整然データに
+<img `r src_alt_fig_chunk("vadeaths-plot")` width="540" style="float: right; margin-block-start: 3em;">
+
+```{r, after-tidy}
+#| echo: false
+va_deaths = as.data.frame(VADeaths) |>  # data.frameに変換
+  tibble::rownames_to_column("age") |>  # 行名を列に
+  tidyr::pivot_longer(                  # 縦長に変形したい
+    !age,                               # age以外の列に入ってる値を移動
+    names_to = c("region", "sex"),      # 元の列名を2つに分離
+    names_sep = " ",                    # スペースで切る
+    values_to = "death") |>             # 値の行き先の列名
+  tidyr::separate(age, c("lbound", "ubound"), "-", convert = TRUE) |>
+  print()
+
+# 別解
+.devnull = as.data.frame(VADeaths) |>
+  tibble::rownames_to_column("age") |>
+  tidyr::pivot_longer(!age, names_to = "region_sex", values_to = "death") |>
+  tidyr::separate(region_sex, c("region", "sex")) |>
+  tidyr::separate(age, c("lbound", "ubound"), convert = TRUE)
+```
+
+---
+## 🔰 課題2: `VADeaths` を縦長にしてggplotしてみよう
+
+```{r, vadeaths-rownames}
+VADeaths |> as.data.frame() |>       # dplyr/tidyrで扱うのはdata.frame
+  tibble::rownames_to_column("age")  # 行名は扱いにくいので普通の列に
+```
+
+<div class="column-container">
+  <div class="column" style="flex-shrink: 0.8; min-width: 0;">
+
+```{r, vadeaths-class}
+class(VADeaths)
+rownames(VADeaths)
+```
+
+  </div>
+  <div class="column">
+
+```{r, vadeaths-plot}
+#| fig.height: 3.8
+#| fig.width: 5.7
+#| echo: false
+ggplot(va_deaths) +
+  aes(lbound, death) +
+  geom_point(aes(color = sex, shape = region), size = 5) +
+  theme_classic(base_size = 20)
+```
+
+  </div>
+</div>
+
+---
+## 🔰 課題3: `anscombe` を縦長にしてggplotしてみよう
+
+```r
+anscombe |> tibble::rowid_to_column("id")   # IDをつけておく
+```
+```{r, anscombe}
+#| echo: false
+anscombe |> tibble::rowid_to_column("id") |> wtl::printdf(n = 6L)
+```
+
+```{r, anscombe-plot}
+#| fig.height: 3.6
+#| fig.width: 12
+#| echo: false
+tidy_anscombe = anscombe |>
+  tidyr::pivot_longer(                       # 縦長に変形したい
+    everything(),                     # すべての列について
+    names_to = c(".value", "group"),  # 新しい列名
+    names_sep = 1L,                   # 切る位置
+    names_transform = list(group = as.integer)) |> # 型変換
+  dplyr::arrange(group)                      # グループごとに並べる
+
+# 別解
+tidy_anscombe = anscombe |>
+  tibble::rowid_to_column("id") |>
+  tidyr::pivot_longer(!id) |>
+  tidyr::separate(name, c("axis", "group"), sep = 1) |>
+  tidyr::pivot_wider(names_from = "axis", values_from = "value") |>
+  dplyr::arrange(group)
+
+ggplot(tidy_anscombe) + aes(x, y) +
+  geom_point(size = 3) +
+  stat_smooth(method = lm, formula = y ~ x, se = FALSE, fullrange = TRUE) +
+  facet_wrap(vars(group), nrow = 1L) +
+  theme_bw(base_size = 20)
+```
+
+---
+## 🔰 課題4: `anscombe` の要約統計量を計算しよう
+
+4組のx-yは、平均・分散・相関係数がほぼ同じ？
+
+```{r, anscombe-summarize}
+#| echo: false
+tidy_anscombe |>
+  dplyr::group_by(group) |>   # group列でグループ化して
+  dplyr::summarize(            # x, y列を使ってsummarize
+    mean_x = mean(x),
+    mean_y = mean(y),
+    sd_x = sd(x),
+    sd_y = sd(y),
+    cor_xy = cor(x, y)
+  )
+```
+
+
+---
+## 今日の残り時間
+
+- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
+- 4つの課題を協力/手分けして解く。
+- TAが評価して合格した班から解散。
+- 残ってほかの課題に取り組んでもOK。
+- 遅くとも17:50には部屋を閉めたい。
+
+
+---
+## Reference
+
+R for Data Science --- Hadley Wickham et al.
+: <https://r4ds.hadley.nz>,
+  [Paperback](https://amzn.to/4cpL6w8),
+  [日本語版書籍](https://amzn.to/2yyFRKt)
+
+[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)\
+[RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
+
+整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
+: [Speaker Deck](https://speakerdeck.com/fnshr/zheng-ran-detatutenani),
+  [Colorless Green Ideas](https://id.fnshr.info/2017/01/09/tidy-data-intro/)
+
+Older versions
+: 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
+   岩嵜航 2018
+: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
+: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2024/)」
+   岩嵜航 2024 東京医科歯科大
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2024/)」
+   石川由希 2024 名古屋大学
+
+`r .meta$next_link`
