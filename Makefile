@@ -40,5 +40,5 @@ ${SYNC_ROOT}/%: | content/%
 .PHONY: working
 working:
 	@ls -l $@
-	$(MAKE) -C $@/.knitr
+	$(MAKE) -C $@
 	$(MAKE) all

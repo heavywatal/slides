@@ -39,7 +39,7 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 
 .meta = list()
 .meta$course = "進化学実習 2026 牧野研 東北大学"
-.meta$prefix = normalizePath("..") |> basename()
+.meta$prefix = basename(getwd())
 .meta$data = "metadata.csv" |>
   readr::read_csv(locale = readr::locale(tz = "Asia/Tokyo")) |>
   tibble::rowid_to_column("id") |>

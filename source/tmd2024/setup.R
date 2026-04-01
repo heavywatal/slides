@@ -1,3 +1,4 @@
+grDevices::palette("Okabe-Ito")
 withr::local_options(
   mc.cores = parallel::detectCores(),
   wtl.printdf.summarize = FALSE,
@@ -9,16 +10,12 @@ withr::local_options(
   dplyr.summarise.inform = FALSE,
   readr.num_columns = 0L,
   readr.show_progress = FALSE,
-  readr.show_col_types = FALSE
+  readr.show_col_types = FALSE,
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis",
+  ggplot2.discrete.colour = grDevices::palette()[-1],
+  ggplot2.discrete.fill = grDevices::palette()[-1]
 )
-grDevices::palette("Okabe-Ito")
-theme_palette = ggplot2::theme(
-  palette.colour.continuous = "viridis",
-  palette.fill.continuous = "viridis",
-  palette.colour.discrete = grDevices::palette()[-1],
-  palette.fill.discrete = grDevices::palette()[-1]
-)
-ggplot2::theme_set(ggplot2::theme_get() + theme_palette)
 withr::local_package("tibble")
 withr::local_package("ggplot2")
 registerS3method("print", "tbl", wtl::printdf)
@@ -38,8 +35,8 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 }
 
 .meta = list()
-.meta$course = "Rによる統計モデリング入門 2026 栃木県"
-.meta$prefix = normalizePath("..") |> basename()
+.meta$course = "Rによるデータ前処理実習2024"
+.meta$prefix = basename(getwd())
 .meta$data = "metadata.csv" |>
   readr::read_csv(locale = readr::locale(tz = "Asia/Tokyo")) |>
   tibble::rowid_to_column("id") |>
@@ -53,11 +50,11 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
     li = stringr::str_glue("<li{attr}><a href=\"{outfile}\">{linktitle}</a>")
   )
 .meta$toc = paste(c("<ol>", .meta$data$li, "</ol>"), collapse = "\n")
-.meta$footnote = .meta$data |>
-  dplyr::filter(this) |>
-  dplyr::pull(date) |>
-  as.Date() |>
-  paste0(" 栃木県農業総合研究センター (remote)<br>")
+.meta$footnote = .meta$data |> dplyr::filter(this) |>
+  dplyr::pull(date) |> as.Date() |>
+  paste0(" 東京医科歯科大学 M&Dタワー<br>")
+.meta$href_prev = with(.meta$data, {outfile[id[this] - 1]})
+.meta$href_next = with(.meta$data, {outfile[id[this] + 1]})
 .meta$next_link = '<a href="{outfile}" class="readmore">\n{id}. {linktitle}\n</a>' |>
   stringr::str_glue_data(.x = dplyr::filter(.meta$data, id == id[this] + 1))
 .meta$front_matter = .meta$data |>

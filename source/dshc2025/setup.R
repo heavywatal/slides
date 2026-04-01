@@ -36,7 +36,7 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 
 .meta = list()
 .meta$course = "統計モデリング概論 DSHC 2025"
-.meta$prefix = normalizePath("..") |> basename()
+.meta$prefix = basename(getwd())
 .meta$data = "metadata.csv" |>
   readr::read_csv(locale = readr::locale(tz = "Asia/Tokyo")) |>
   tibble::rowid_to_column("id") |>

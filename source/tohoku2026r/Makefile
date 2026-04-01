@@ -1,4 +1,4 @@
-DESTINATION := ..
+DESTINATION := ../../content/$(notdir ${CURDIR})
 SOURCES := $(wildcard *.Rmd)
 KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 $(info SOURCES = ${SOURCES})

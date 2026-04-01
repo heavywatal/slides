@@ -35,8 +35,8 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 }
 
 .meta = list()
-.meta$course = "統計モデリング入門 2025 岩手連大"
-.meta$prefix = normalizePath("..") |> basename()
+.meta$course = "進化学実習 2025 牧野研 東北大学"
+.meta$prefix = basename(getwd())
 .meta$data = "metadata.csv" |>
   readr::read_csv(locale = readr::locale(tz = "Asia/Tokyo")) |>
   tibble::rowid_to_column("id") |>
@@ -52,9 +52,7 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 .meta$toc = paste(c("<ol>", .meta$data$li, "</ol>"), collapse = "\n")
 .meta$footnote = .meta$data |> dplyr::filter(this) |>
   dplyr::pull(date) |> as.Date() |>
-  paste0(" 岩手大学 連合農学研究科<br>")
-.meta$href_prev = with(.meta$data, {outfile[id[this] - 1]})
-.meta$href_next = with(.meta$data, {outfile[id[this] + 1]})
+  paste0(" 東北大学 理学部生物学科 進化学実習<br>")
 .meta$next_link = '<a href="{outfile}" class="readmore">\n{id}. {linktitle}\n</a>' |>
   stringr::str_glue_data(.x = dplyr::filter(.meta$data, id == id[this] + 1))
 .meta$front_matter = .meta$data |>

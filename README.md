@@ -6,7 +6,7 @@ https://heavywatal.github.io/slides/
 ## Framework
 
 1.  [knitr](https://yihui.org/knitr/)
-    interprets code chunks in R Markdown source (`content/*/.knitr/**.Rmd`),
+    interprets code chunks in R Markdown source (`source/*/*.Rmd`),
     and generates Markdown files (`content/*/*.md`) and figures (`content/*/figure/*`).
 2.  [Hugo](https://gohugo.io/)
     converts Markdown files (`content/*/*.md`) to HTML files (`public/*/*.html`).
