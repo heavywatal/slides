@@ -11,7 +11,7 @@ all: development
 	@:
 
 development:
-	hugo
+	hugo --environment development
 
 benchmark:
 	hugo --templateMetrics --templateMetricsHints
@@ -23,10 +23,10 @@ server:
 	hugo server -p 8080
 
 clean:
-	hugo --gc --cleanDestinationDir
+	hugo --environment development --gc --cleanDestinationDir
 
 public:
-	hugo --cleanDestinationDir --environment public
+	hugo --cleanDestinationDir
 
 image: ${IMG_DSTS}
 	rsync -auvC ${SYNC_ROOT}-static/ static/
