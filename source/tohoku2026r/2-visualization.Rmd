@@ -27,17 +27,7 @@
 </figure>
 
 ---
-## 作図してみると全体像・構造が見やすい
-
-情報の整理 → **正しい解析・新しい発見・仮説生成**
-
-<img `r src_alt_fig_chunk("simplify-diamonds")`>
-
-`carat` が大きいほど `price` も高いらしい。\
-その度合いは `clarity` によって異なるらしい。
-
----
-## 代表値ばかり見て可視化を怠ると構造を見逃す
+## 要約統計量だけ見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
 <a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
@@ -47,6 +37,16 @@
 <img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
      style="position: absolute; left: 0; top: 0; z-index: 255;">
 </figure>
+
+---
+## 作図してみると全体像・構造が見やすい
+
+情報の整理 → **正しい解析・新しい発見・仮説生成**
+
+<img `r src_alt_fig_chunk("simplify-diamonds")`>
+
+`carat` が大きいほど `price` も高いらしい。\
+その度合いは `clarity` によって異なるらしい。
 
 ---
 ## そうは言ってもセンスでしょ? --- NO!
@@ -143,13 +143,7 @@ ggplot(iris) + aes(Petal.Length) +
 - 単にいろんなグラフを「描ける」だけじゃなく\
   **一貫性のある文法で合理的に描ける**
 
-<figure>
-<!--
-<a href="https://www.amazon.co.jp/dp/B00HWUVHXK/ref=as_li_ss_il?ie=UTF8&linkCode=li3&tag=heavywatal-22&linkId=d63d3627df82c09b0bb5ca8f47ee19cc&language=ja_JP" target="_blank"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&ASIN=B00HWUVHXK&Format=_SL250_&ID=AsinImage&MarketPlace=JP&ServiceVersion=20070822&WS=1&tag=heavywatal-22&language=ja_JP" ></a><img src="https://ir-jp.amazon-adsystem.com/e/ir?t=heavywatal-22&language=ja_JP&l=li3&o=9&a=B00HWUVHXK" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
-<img src="/slides/image/nagoya/iris.png" width="24%">
-<img src="/slides/image/nagoya/binhex.png" width="24%">
-<img src="/slides/image/nagoya/faithful.png" width="24%">
--->
+<figure style="margin-block-start: 2em;">
 <img src="/slides/image/tumopp/paper/Fig1.png" height="360">
 <img src="/slides/image/tumopp/param-p.png" height="360">
 <img src="/slides/image/tumopp/param-k.png" height="360"><br>
@@ -572,7 +566,7 @@ colorspace::swatchplot(`ggplot2 default (bad)` = scales::hue_pal()(7L), cvd = TR
 #| fig.height: 4
 #| fig.width: 6
 p = ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = clarity))
+    geom_point(mapping = aes(color = clarity))
 p + scale_color_viridis_d(option = "inferno")                            + labs(title = "inferno")
 p + scale_color_brewer(palette = "YlGnBu")                               + labs(title = "YlGnBu")
 ```
@@ -588,7 +582,7 @@ p + scale_color_brewer(palette = "YlGnBu")                               + labs(
 #| fig.height: 4
 #| fig.width: 6
 p = ggplot(diamonds) + aes(carat, price) +
-  geom_point(mapping = aes(color = price))
+    geom_point(mapping = aes(color = price))
 p + scale_color_viridis_c(option = "inferno")                            + labs(title = "inferno")
 p + scale_color_distiller(palette = "YlGnBu")                            + labs(title = "YlGnBu")
 ```
@@ -927,7 +921,7 @@ cowplot::plot_grid(p_iris, p_diamonds, p_mpg, nrow = 1L)
 - 模写の課題を `ggsave()` まできっちりやる。
 - TAが班の代表画像を評価し、合格した班から解散。
 - 残ってほかの課題に取り組んでもOK。
-- 遅くとも17:50には部屋を閉めたい。
+- 遅くとも17:50には部屋を閉めたい。TAの給料は17:00まで。
 
 
 ---
@@ -938,14 +932,13 @@ R for Data Science --- Hadley Wickham et al.
   [Paperback](https://amzn.to/4cpL6w8)
 : [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
 
-Older versions
+Other versions
 : 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
    岩嵜航 2018
-: 「Rを用いたデータ解析の基礎と応用」石川由希 2019 名古屋大学
-: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2024/)」
-   岩嵜航 2024 東京医科歯科大
 : 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2025/)」
    石川由希 名古屋大学
+: 「[Rによるデータ前処理実習](https://heavywatal.github.io/slides/tmd2024/)」
+   岩嵜航 2024 東京医科歯科大
 
 ggplot2公式ドキュメント
 : https://ggplot2.tidyverse.org/
