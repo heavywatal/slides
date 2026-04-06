@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head prefix="og: http://ogp.me/ns#">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<title>2. データの可視化。 — 進化学実習 2026 牧野研 東北大学</title>
+<link rel="icon" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="author" content="Watal M. Iwasaki">
+<meta property="og:title" content="2. データの可視化。 — 進化学実習 2026 牧野研 東北大学">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://heavywatal.github.io/slides/tohoku2026r/2-visualization.html">
+<meta property="og:image" content="https://avatars.githubusercontent.com/heavywatal">
+<meta property="og:description" content="">
+<meta property="og:site_name" content="Slide decks — Heavy Watal">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@heavywatal">
+<meta name="twitter:creator" content="@heavywatal">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-V60H2JH0G6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-V60H2JH0G6');
+</script>
+<link rel="stylesheet" href="/slides/lib/reveal.js/dist/reveal.css">
+<script type="module">
+import { Reveal } from "/slides/lib/reveal.js/reveal.js";
+Reveal.configure({width: 1440, height: 1080});
+</script>
+<style>
+html { font-size: 240%; }
+</style>
+<link rel="stylesheet" href="/slides/lib/katex/katex.min.css">
+<script type="module" src="/slides/lib/katex/katex.min.js"></script>
+<link rel="stylesheet" href="/slides/lib/iconify.css">
+<script type="module" src="/slides/lib/reload-img.js"></script>
+<link rel="stylesheet" href="/slides/css/style-reveal.css">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+<section>
+<h1 id="進化学実習-2026-牧野研-東北大学"><a href=".">進化学実習 2026 牧野研 東北大学</a></h1>
+<div class="author">
+岩嵜 航
+</div>
+<div class="affiliation">
+東北大学 生命科学研究科 進化ゲノミクス分野 牧野研 特任助教
+</div>
+<ol>
+<li><a href="1-introduction.html">導入: データ解析の全体像。Rの基本。</a>
+<li class="current-deck"><a href="2-visualization.html">データの可視化。</a>
+<li><a href="3-structure1.html">データ構造の処理1: 抽出、集約など。</a>
+<li><a href="4-structure2.html">データ構造の処理2: 結合、変形など。</a>
+<li><a href="5-content.html">データ内容の処理: 数値、文字列など。</a>
+<li><a href="6-input.html">データ入力、レポート作成</a>
+<li><a href="7-distribution.html">統計モデリング1: 確率分布、尤度</a>
+<li><a href="8-glm.html">統計モデリング2: 一般化線形モデル</a>
+<li><a href="9-report.html">発表会</a>
+</ol>
+<div class="footnote">
+2026-04-08 東北大学 理学部生物学科 進化学実習<br>
+<a href="https://heavywatal.github.io/slides/tohoku2026r/">https://heavywatal.github.io/slides/tohoku2026r/</a>
+</div>
+
+</section>
+<section>
+<h2 id="データ解析のおおまかな流れ">データ解析のおおまかな流れ</h2>
+<ol>
+<li>コンピュータ環境の整備 ✅</li>
+<li>データの取得、読み込み ⬜</li>
+<li>探索的データ解析
+<ul>
+<li>前処理、加工 (地味。意外と重い) ⬜ 次回</li>
+<li><strong>可視化、仮説生成</strong> (派手！楽しい！) ⬜ 👈今回</li>
+<li>統計解析、仮説検証 (みんな勉強したがる) ⬜</li>
+</ul>
+</li>
+<li>報告、発表 ⬜ Quarto楽しい</li>
+</ol>
+<figure>
+<a href="https://r4ds.hadley.nz/intro">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="要約統計量だけ見て可視化を怠ると構造を見逃す">要約統計量だけ見て可視化を怠ると構造を見逃す</h2>
+<figure style="position: relative;">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
+<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+</section>
+<section>
+<h2 id="作図してみると全体像構造が見やすい">作図してみると全体像・構造が見やすい</h2>
+<p>情報の整理 → <strong>正しい解析・新しい発見・仮説生成</strong></p>
+<img src="figure/simplify-diamonds-1.png" alt="plot of chunk simplify-diamonds">
+<p><code>carat</code> が大きいほど <code>price</code> も高いらしい。<br>
+その度合いは <code>clarity</code> によって異なるらしい。</p>
+
+</section>
+<section>
+<h2 id="そうは言ってもセンスでしょ--no">そうは言ってもセンスでしょ? &mdash; NO!</h2>
+<figure style="float: right; width: 670px;">
+<a href="https://tsutawarudesign.com/">
+<img src="/slides/image/tsutawaru/title-13.svg" style="margin: 0 -20px 0 0;">
+<img src="/slides/image/tsutawaru/hajimeni-03.svg" style="margin: 0 -20px 0 0;">
+<figcaption><small>https://tsutawarudesign.com/</small></figcaption>
+</a>
+</figure>
+<p>ある程度は<strong>テクニック</strong>であり<strong>教養</strong>。<br>
+デザインの基本的なルールを<br>
+知りさえすれば誰でも上達する。</p>
+</section>
+<section>
+<h2 id="おしながき-rによるデータ可視化">おしながき: Rによるデータ可視化</h2>
+<h3 id="-データ解析全体の流れ可視化だいじ">✅ <del>データ解析全体の流れ。可視化だいじ</del></h3>
+<h3 id="-一貫性のある文法で合理的に描けるggplot2">⬜ 一貫性のある文法で合理的に描けるggplot2</h3>
+
+</section>
+<section>
+<h2 id="iris-アヤメ属3種150個体の測定データ"><code>iris</code>: アヤメ属3種150個体の測定データ</h2>
+<p>Rに最初から入ってて、例としてよく使われる。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">iris</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>    Sepal.Length Sepal.Width Petal.Length Petal.Width   Species
+  1          5.1         3.5          1.4         0.2    setosa
+  2          4.9         3.0          1.4         0.2    setosa
+  3          4.7         3.2          1.3         0.2    setosa
+  4          4.6         3.1          1.5         0.2    setosa
+ --                                                            
+147          6.3         2.5          5.0         1.9 virginica
+148          6.5         3.0          5.2         2.0 virginica
+149          6.2         3.4          5.4         2.3 virginica
+150          5.9         3.0          5.1         1.8 virginica
+</code></pre><p>長さ150の数値ベクトル4本と因子ベクトル1本。</p>
+
+</section>
+<section>
+<h2 id="r標準のグラフィックス">R標準のグラフィックス</h2>
+<p>描けるっちゃ描けるけど。カスタマイズしていくのは難しい。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">boxplot</span><span class="p">(</span><span class="n">Petal.Width</span> <span class="o">~</span> <span class="n">Species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">iris</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">plot</span><span class="p">(</span><span class="n">iris</span><span class="o">$</span><span class="n">Sepal.Length</span><span class="p">,</span> <span class="n">iris</span><span class="o">$</span><span class="n">Sepal.Width</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">hist</span><span class="p">(</span><span class="n">iris</span><span class="o">$</span><span class="n">Petal.Length</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/base-plot-iris-1.png" alt="plot of chunk base-plot-iris"><img src="./figure/base-plot-iris-2.png" alt="plot of chunk base-plot-iris"><img src="./figure/base-plot-iris-3.png" alt="plot of chunk base-plot-iris"></p>
+<p>きれいなグラフを簡単に描けるパッケージを使いたい。</p>
+
+</section>
+<section>
+<h2 id="ggplot2-tidyverseの可視化担当">ggplot2: tidyverseの可視化担当</h2>
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
+</a>
+<ul>
+<li>&ldquo;The <span class="mark-initial">Grammar</span> of <span class="mark-initial">Graphics</span>&rdquo; という体系に基づく設計</li>
+<li>単にいろんなグラフを「描ける」だけじゃなく<br>
+<strong>一貫性のある文法で合理的に描ける</strong></li>
+</ul>
+<br>
+<p><img src="./figure/ggplot-iris-1.png" alt="plot of chunk ggplot-iris"><img src="./figure/ggplot-iris-2.png" alt="plot of chunk ggplot-iris"><img src="./figure/ggplot-iris-3.png" alt="plot of chunk ggplot-iris"></p>
+</section>
+<section>
+<h2 id="ggplot2-tidyverseの可視化担当">ggplot2: tidyverseの可視化担当</h2>
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
+</a>
+<ul>
+<li>&ldquo;The <span class="mark-initial">Grammar</span> of <span class="mark-initial">Graphics</span>&rdquo; という体系に基づく設計</li>
+<li>単にいろんなグラフを「描ける」だけじゃなく<br>
+<strong>一貫性のある文法で合理的に描ける</strong></li>
+</ul>
+<figure style="margin-block-start: 2em;">
+<img src="/slides/image/tumopp/paper/Fig1.png" height="360">
+<img src="/slides/image/tumopp/param-p.png" height="360">
+<img src="/slides/image/tumopp/param-k.png" height="360"><br>
+<img src="/slides/image/tumopp/paper/Fig3.png" height="180">
+<img src="/slides/image/tumopp/Cmoore_Lconst.gif" height="180">
+<img src="/slides/image/tumopp/Cmoore_Llinear.gif" height="180">
+<img src="/slides/image/tumopp/Chex_Lconst.gif" height="180">
+<img src="/slides/image/tumopp/Chex_Llinear.gif" height="180">
+<figcaption><small>Iwasaki and Innan (2017)</small></figcaption>
+</figure>
+</section>
+<section>
+<h2 id="いきなりggplot2から使い始めても大丈夫">いきなりggplot2から使い始めても大丈夫</h2>
+<p>R標準のやつとは根本的に違うシステムで作図する。</p>
+<figure>
+<img src="/slides/image/rstats/r-graphics.svg" height="600">
+<figcaption><small>「<cite>Rグラフィックス</cite>」Murrell著 久保訳 より改変</small></figcaption>
+</figure>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<img src="/slides/image/rstats/ggplot-layers.png" height="930">
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span>             <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># aes(x = carat, y = price) +       # carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># geom_point() +                    # 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus1-1.png" alt="plot of chunk ggplot-plus1"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span>         <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># geom_point() +                    # 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus2-1.png" alt="plot of chunk ggplot-plus2"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span>                      <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus3-1.png" alt="plot of chunk ggplot-plus3"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span>          <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus4-1.png" alt="plot of chunk ggplot-plus4"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span> <span class="o">+</span>        <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span>         <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus5-1.png" alt="plot of chunk ggplot-plus5"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span> <span class="o">+</span>        <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>       <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">2e4</span><span class="p">))</span>   <span class="c1"># y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># theme_classic(base_size = 20)     # クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus6-1.png" alt="plot of chunk ggplot-plus6"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">stat_smooth</span><span class="p">(</span><span class="n">method</span> <span class="o">=</span> <span class="n">lm</span><span class="p">)</span> <span class="o">+</span>        <span class="c1"># 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>       <span class="c1"># clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">2e4</span><span class="p">))</span> <span class="o">+</span> <span class="c1"># y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>     <span class="c1"># クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus7-1.png" alt="plot of chunk ggplot-plus7"></p>
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>           <span class="c1"># diamondsデータでキャンバス準備</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>       <span class="c1"># carat,price列をx,y軸にmapping</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>                    <span class="c1"># 散布図を描く</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># stat_smooth(method = lm) +        # 直線回帰を追加</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># facet_wrap(vars(clarity)) +       # clarity列に応じてパネル分割</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># coord_cartesian(ylim = c(0, 2e4)) + # y軸の表示範囲を狭く</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_classic</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>     <span class="c1"># クラシックなテーマで</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-plus8-1.png" alt="plot of chunk ggplot-plus8"></p>
+</section>
+<section>
+<h2 id="途中経過オブジェクトを取っておける">途中経過オブジェクトを取っておける</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p1</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">diamonds</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p2</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">=</span> <span class="n">p2</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">p4</span> <span class="o">=</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">p3</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/ggplot-object-1.png" alt="plot of chunk ggplot-object"></p>
+<p>この <code>p3</code> は後で使います。</p>
+
+</section>
+<section>
+<h2 id="ひとまずggplotしてみよう">ひとまずggplotしてみよう</h2>
+<p>自動車のスペックに関するデータ <code>mpg</code> を使って。</p>
+<pre tabindex="0"><code>    manufacturer  model displ year cyl      trans drv cty hwy fl   class
+  1         audi     a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+  2         audi     a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+ --                                                                     
+233   volkswagen passat   2.8 1999   6 manual(m5)   f  18  26  p midsize
+234   volkswagen passat   3.6 2008   6   auto(s6)   f  17  26  p midsize
+</code></pre><p>🔰 排気量 <code>displ</code> と市街地燃費 <code>cty</code> の関係を散布図で。</p>
+<p><img src="./figure/ggplot-mpg-1.png" alt="plot of chunk ggplot-mpg"></p>
+
+</section>
+<section>
+<h2 id="よくあるエラー">よくあるエラー</h2>
+<p>関数名を <code>ggplot2</code> と書いちゃうと勘違い:</p>
+<pre tabindex="0"><code>&gt; ggplot2(diamonds)
+Error in ggplot2(diamonds) : could not find function &#34;ggplot2&#34;
+</code></pre><p><strong>ggplot2</strong> はパッケージ名。<br>
+今度こそ関数名は合ってるはずなのに&hellip;</p>
+<pre tabindex="0"><code>&gt; ggplot(diamonds)
+Error in ggplot(diamonds) : could not find function &#34;ggplot&#34;
+</code></pre><p>パッケージ読み込みを忘れてた。新しくRを起動するたびに必要:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span> <span class="c1"># 安全のおまじない</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>  <span class="c1"># including ggplot2</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>    <span class="c1"># OK!</span>
+</span></span></code></pre></div><p>そのほか <a href="https://comicalcommet.github.io/r-training-2025/R_training_2024_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a> を参照。</p>
+
+</section>
+<section>
+<h2 id="ggplot-に渡すのは整然データ-tidy-data"><code>ggplot()</code> に渡すのは整然データ tidy data</h2>
+<ul>
+<li>1行は1つの観測</li>
+<li>1列は1つの変数</li>
+<li>1セルは1つの値</li>
+<li>この列をX軸、この列をY軸、この列で色わけ、と指定できる！</li>
+</ul>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>      carat       cut color clarity depth table price    x    y    z
+    1  0.23     Ideal     E     SI2  61.5    55   326 3.95 3.98 2.43
+    2  0.21   Premium     E     SI1  59.8    61   326 3.89 3.84 2.31
+    3  0.23      Good     E     VS1  56.9    65   327 4.05 4.07 2.31
+    4  0.29   Premium     I     VS2  62.4    58   334 4.20 4.23 2.63
+   --                                                               
+53937  0.72      Good     D     SI1  63.1    55  2757 5.69 5.75 3.61
+53938  0.70 Very Good     D     SI1  62.8    60  2757 5.66 5.68 3.56
+53939  0.86   Premium     H     SI2  61.0    58  2757 6.15 6.12 3.74
+53940  0.75     Ideal     D     SI2  62.2    55  2757 5.83 5.87 3.64
+</code></pre><p><small><a href="https://r4ds.hadley.nz/data-tidy.html">https://r4ds.hadley.nz/data-tidy.html</a>; <a href="https://speakerdeck.com/fnshr/zheng-ran-detatutenani">https://speakerdeck.com/fnshr/zheng-ran-detatutenani</a></small></p>
+</section>
+<section>
+<h2 id="aesthetic-mapping-でデータと見せ方を紐付け">Aesthetic mapping でデータと見せ方を紐付け</h2>
+<p><code>aes()</code> の中で列名を指定する。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">cut</span><span class="p">))</span>
+</span></span></code></pre></div><p><img src="./figure/aes-map-1.png" alt="plot of chunk aes-map"></p>
+
+</section>
+<section>
+<h2 id="データによらず一律でaestheticsを変える">データによらず一律でaestheticsを変える</h2>
+<p><code>aes()</code> の外で値を指定する。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;darkorange&#34;</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">6</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.4</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/aes-nomap-1.png" alt="plot of chunk aes-nomap"></p>
+
+</section>
+<section>
+<h2 id="外の-aes-は全ての-geom_-に波及する">外の <code>aes()</code> は全ての <code>geom_*()</code> に波及する</h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">()</span>             <span class="c1"># NO color</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">carat</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">price</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">()</span> <span class="o">+</span>          <span class="c1"># color</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_line</span><span class="p">()</span>             <span class="c1"># color</span>
+</span></span></code></pre></div><p><img src="./figure/aes-global-local-1.png" alt="plot of chunk aes-global-local"><img src="./figure/aes-global-local-2.png" alt="plot of chunk aes-global-local"></p>
+</section>
+<section>
+<h2 id="aesthetics一覧"><a href="https://ggplot2.tidyverse.org/articles/ggplot2-specs.html">aesthetics一覧</a></h2>
+<ul>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_colour_fill_alpha.html">色・透明度を変える</a>
+<ul>
+<li><code>color</code>: 点、線、文字の色</li>
+<li><code>fill</code>: 面の色</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_alpha.html"><code>alpha</code></a>: 不透明度 (0が透明、1が不透明)</li>
+</ul>
+</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_linetype_size_shape.html">大きさ・形を変える</a>
+<ul>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_size.html"><code>size</code></a>,
+<a href="https://ggplot2.tidyverse.org/reference/scale_shape.html"><code>shape</code></a>: 点の大きさや形</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/scale_linewidth.html"><code>linewidth</code></a>,
+<a href="https://ggplot2.tidyverse.org/reference/scale_linetype.html"><code>linetype</code></a>: 線の太さや種類</li>
+</ul>
+</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_group_order.html">単にグループ分けする</a>
+<ul>
+<li><code>group</code>: 折れ線グラフやポリゴンの切り分けなど</li>
+</ul>
+</li>
+<li><a href="https://ggplot2.tidyverse.org/reference/aes_position.html">座標、始点、終点</a>
+<ul>
+<li><strong><code>x</code></strong>, <strong><code>y</code></strong>, <code>xmin</code>, <code>xmax</code>, <code>ymin</code>, <code>ymax</code>, <code>xend</code>, <code>yend</code></li>
+</ul>
+</li>
+</ul>
+
+</section>
+<section>
+<h2 id="点と線と文字は-color-面は-fill">点と線と文字は <code>color</code>, 面は <code>fill</code></h2>
+<p>不透明度は <code>alpha</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">cut</span><span class="p">,</span> <span class="n">carat</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;royalblue&#34;</span><span class="p">,</span> <span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;gold&#34;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.5</span><span class="p">,</span> <span class="n">linewidth</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/fill-1.png" alt="plot of chunk fill"></p>
+
+</section>
+<section>
+<h2 id="色の変え方の練習">色の変え方の練習</h2>
+<p>自動車のスペックに関するデータ <code>mpg</code> を使って。</p>
+<pre tabindex="0"><code>    manufacturer  model displ year cyl      trans drv cty hwy fl   class
+  1         audi     a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+  2         audi     a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+ --                                                                     
+233   volkswagen passat   2.8 1999   6 manual(m5)   f  18  26  p midsize
+234   volkswagen passat   3.6 2008   6   auto(s6)   f  17  26  p midsize
+</code></pre><p>🔰 排気量 <code>displ</code> と市街地燃費 <code>cty</code> の関係を青い散布図で描こう<br>
+🔰 駆動方式 <code>drv</code> やシリンダー数 <code>cyl</code> によって色を塗り分けしてみよう</p>
+<p><img src="./figure/ggplot-mpg-color-1.png" alt="plot of chunk ggplot-mpg-color"></p>
+
+</section>
+<section>
+<h2 id="色の見え方は人によって違う">色の見え方は人によって違う</h2>
+<p><span style="color: #F8766D;">赤</span>
+<span style="color: #00BA38;">緑</span>
+<span style="color: #619CFF;">青</span>の3色を使った先ほどの図は多くの人には問題なさそう。<br>
+しかし5%くらいの人には右のように
+<span style="color: #B6A86A;">赤</span>
+<span style="color: #AC9C45;">緑</span>
+<span style="color: #5A96FD;">青</span> や
+<span style="color: #FF6074;">赤</span>
+<span style="color: #00B5A0;">緑</span>
+<span style="color: #00B2C1;">青</span>の2色に見えている。</p>
+<p><img src="./figure/color-vision-diversity-1.png" alt="plot of chunk color-vision-diversity"><img src="./figure/color-vision-diversity-2.png" alt="plot of chunk color-vision-diversity"><img src="./figure/color-vision-diversity-3.png" alt="plot of chunk color-vision-diversity"></p>
+<p>MacやiOSなら<a href="https://michelf.ca/projects/sim-daltonism/">Sim Daltonism</a>というアプリでシミュレーションできる。<br>
+Windowsなら<a href="https://colororacle.org/">Color Oracle</a>が使えそう。</p>
+
+</section>
+<section>
+<h2 id="多様性を前提によく考えられたパレットもある">多様性を前提によく考えられたパレットもある</h2>
+<p>Sequential palette:<br>
+<img src="./figure/palette-sequential-1.png" alt="plot of chunk palette-sequential"><img src="./figure/palette-sequential-2.png" alt="plot of chunk palette-sequential"><img src="./figure/palette-sequential-3.png" alt="plot of chunk palette-sequential"></p>
+<p>Diverging palette:<br>
+<img src="./figure/palette-diverging-1.png" alt="plot of chunk palette-diverging"><img src="./figure/palette-diverging-2.png" alt="plot of chunk palette-diverging"><img src="./figure/palette-diverging-3.png" alt="plot of chunk palette-diverging"></p>
+<p>Qualitative (categorical, discrete) palette:<br>
+<img src="./figure/palette-qualitative-1.png" alt="plot of chunk palette-qualitative"><img src="./figure/palette-qualitative-2.png" alt="plot of chunk palette-qualitative"><img src="./figure/palette-qualitative-3.png" alt="plot of chunk palette-qualitative"></p>
+
+</section>
+<section>
+<h2 id="色パレットの変更-scale_color_">色パレットの変更 <code>scale_color_*()</code></h2>
+<p><a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html">viridis</a>
+と
+<a href="https://colorbrewer2.org/#type=diverging&amp;scheme=RdYlBu&amp;n=5">ColorBrewer</a>
+のパレットはggplot2に組み込まれているので簡単。<br>
+上記リンクから名前を探して、<code>option =</code> か <code>palette =</code> で指定。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">clarity</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="nf">scale_color_viridis_d</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;inferno&#34;</span><span class="p">)</span>                            <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;inferno&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="nf">scale_color_brewer</span><span class="p">(</span><span class="n">palette</span> <span class="o">=</span> <span class="s">&#34;YlGnBu&#34;</span><span class="p">)</span>                               <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;YlGnBu&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/scale-color-1.png" alt="plot of chunk scale-color"><img src="./figure/scale-color-2.png" alt="plot of chunk scale-color"></p>
+
+</section>
+<section>
+<h2 id="連続値continuousと離散値discreteを区別する">連続値(continuous)と離散値(discrete)を区別する</h2>
+<p>渡す値とscale関数が合ってないと怒られる:<br>
+<code>Error: Continuous value supplied to discrete scale</code></p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">geom_point</span><span class="p">(</span><span class="n">mapping</span> <span class="o">=</span> <span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">price</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="nf">scale_color_viridis_c</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;inferno&#34;</span><span class="p">)</span>                            <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;inferno&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="nf">scale_color_distiller</span><span class="p">(</span><span class="n">palette</span> <span class="o">=</span> <span class="s">&#34;YlGnBu&#34;</span><span class="p">)</span>                            <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;YlGnBu&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/scale-color-continuous-1.png" alt="plot of chunk scale-color-continuous"><img src="./figure/scale-color-continuous-2.png" alt="plot of chunk scale-color-continuous"></p>
+<ul>
+<li>discrete: <code>scale_color_viridis_d()</code>, <code>scale_color_brewer()</code></li>
+<li>continuous: <code>scale_color_viridis_c()</code>, <code>scale_color_distiller()</code></li>
+<li>binned: <code>scale_color_viridis_b()</code>, <code>scale_color_fermenter()</code></li>
+</ul>
+
+</section>
+<section>
+<h2 id="viridisやbrewer以外のパレットを使うには">viridisやbrewer以外のパレットを使うには</h2>
+<p>R標準の <code>palette.colors()</code> や
+<a href="https://colorspace.r-forge.r-project.org/articles/ggplot2_color_scales.html">colorspaceパッケージ</a>
+を使う。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">mpg</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">displ</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">cty</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">drv</span><span class="p">),</span> <span class="n">size</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.66</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="nf">scale_color_discrete</span><span class="p">(</span><span class="n">type</span> <span class="o">=</span> <span class="nf">palette.colors</span><span class="p">(</span><span class="m">9L</span><span class="p">,</span> <span class="s">&#34;Okabe-Ito&#34;</span><span class="p">)</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">)</span>     <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;Okabe-Ito&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="nf">scale_color_discrete</span><span class="p">(</span><span class="n">type</span> <span class="o">=</span> <span class="nf">palette.colors</span><span class="p">(</span><span class="m">8L</span><span class="p">,</span> <span class="s">&#34;R4&#34;</span><span class="p">)</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">)</span>            <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;R4&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">p</span> <span class="o">+</span> <span class="n">colorspace</span><span class="o">::</span><span class="nf">scale_colour_discrete_divergingx</span><span class="p">(</span><span class="s">&#34;Zissou 1&#34;</span><span class="p">)</span>             <span class="o">+</span> <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;Zissou 1&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/other-palettes-1.png" alt="plot of chunk other-palettes"><img src="./figure/other-palettes-2.png" alt="plot of chunk other-palettes"><img src="./figure/other-palettes-3.png" alt="plot of chunk other-palettes"></p>
+<p>自分で全色個別指定もできるが、専門家の考えたセットを使うのが無難。</p>
+
+</section>
+<section>
+<h2 id="scale_color_-を省略できるように設定可能"><code>scale_color_*</code> を省略できるように設定可能</h2>
+<p>連続値viridis, 離散値Okabe-Itoをデフォルトにする例:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">(</span><span class="s">&#34;Okabe-Ito&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">theme_palette</span> <span class="o">=</span> <span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.colour.continuous</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.fill.continuous</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.colour.discrete</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.fill.discrete</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme_set</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme_get</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme_palette</span><span class="p">)</span>
+</span></span></code></pre></div><p><code>theme_set()</code> による設定はRを終了するまで有効。</p>
+<p>スクリプトの先頭に書いておいて毎回設定することを推奨。</p>
+<hr>
+<p><code>options(ggplot2.continuous.colour = &quot;viridis&quot;)</code>
+は古い(&lt;4.0.0)。</p>
+
+</section>
+<section>
+<h2 id="値に応じてパネル切り分け-1変数facet">値に応じてパネル切り分け (1変数facet)</h2>
+<p>ggplotの真骨頂！
+これをR標準機能でやるのは結構たいへん。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">),</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">4L</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/facet-wrap-1.png" alt="plot of chunk facet-wrap"></p>
+
+</section>
+<section>
+<h2 id="値に応じてパネル切り分け-2変数facet">値に応じてパネル切り分け (≥2変数facet)</h2>
+<p>ggplotの真骨頂！
+これをR標準機能でやるのは結構たいへん。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">+</span> <span class="nf">facet_grid</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">),</span> <span class="nf">vars</span><span class="p">(</span><span class="n">cut</span><span class="p">))</span>
+</span></span></code></pre></div><p><img src="./figure/facet-grid-1.png" alt="plot of chunk facet-grid"></p>
+
+</section>
+<section>
+<h2 id="多変量データの俯瞰5次元くらいまで有効">多変量データの俯瞰、5次元くらいまで有効</h2>
+<p><img src="./figure/facet-diamonds-1.png" alt="plot of chunk facet-diamonds"></p>
+</section>
+<section>
+<h2 id="値に応じたfacetの練習">値に応じたfacetの練習</h2>
+<p>自動車のスペックに関するデータ <code>mpg</code> を使って。</p>
+<pre tabindex="0"><code>    manufacturer  model displ year cyl      trans drv cty hwy fl   class
+  1         audi     a4   1.8 1999   4   auto(l5)   f  18  29  p compact
+  2         audi     a4   1.8 1999   4 manual(m5)   f  21  29  p compact
+ --                                                                     
+233   volkswagen passat   2.8 1999   6 manual(m5)   f  18  26  p midsize
+234   volkswagen passat   3.6 2008   6   auto(s6)   f  17  26  p midsize
+</code></pre><p>🔰 駆動方式 <code>drv</code> やシリンダー数 <code>cyl</code> によってfacetしてみよう</p>
+<p><img src="./figure/ggplot-mpg-facet-1.png" alt="plot of chunk ggplot-mpg-facet"></p>
+
+</section>
+<section>
+<h2 id="値を変えず座標軸を変える-scale_-coord_">値を変えず座標軸を変える <a href="https://ggplot2.tidyverse.org/reference/#section-scales"><code>scale_*</code></a>, <a href="https://ggplot2.tidyverse.org/reference/#section-coordinate-systems"><code>coord_*</code></a></h2>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span> <span class="nf">aes</span><span class="p">(</span><span class="n">carat</span><span class="p">,</span> <span class="n">price</span><span class="p">)</span> <span class="o">+</span> <span class="nf">geom_point</span><span class="p">(</span><span class="n">alpha</span> <span class="o">=</span> <span class="m">0.25</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_x_log10</span><span class="p">()</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_y_log10</span><span class="p">(</span><span class="n">breaks</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">5</span><span class="p">,</span> <span class="m">10</span><span class="p">)</span> <span class="o">*</span> <span class="m">1000</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">xlim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0.1</span><span class="p">,</span> <span class="m">10</span><span class="p">),</span> <span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">800</span><span class="p">,</span> <span class="m">12000</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;Diamonds&#34;</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s">&#34;Size (carat)&#34;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&#34;Price (USD)&#34;</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/scale-axis-1.png" alt="plot of chunk scale-axis"></p>
+</section>
+<section>
+<h2 id="データと関係ない部分の見た目を調整-theme">データと関係ない部分の見た目を調整 <code>theme</code></h2>
+<p><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">既存の <code>theme_*()</code></a>
+をベースに、<a href="https://ggplot2.tidyverse.org/reference/theme.html"><code>theme()</code></a>関数で微調整。</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p3</span> <span class="o">+</span> <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span> <span class="o">+</span> <span class="nf">theme</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">panel.background</span> <span class="o">=</span> <span class="nf">element_rect</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="s">&#34;khaki&#34;</span><span class="p">),</span>      <span class="c1"># 箱</span>
+</span></span><span class="line"><span class="cl">  <span class="n">panel.grid</span>       <span class="o">=</span> <span class="nf">element_line</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">&#34;royalblue&#34;</span><span class="p">),</span> <span class="c1"># 線</span>
+</span></span><span class="line"><span class="cl">  <span class="n">axis.title.x</span>     <span class="o">=</span> <span class="nf">element_text</span><span class="p">(</span><span class="n">size</span> <span class="o">=</span> <span class="m">32</span><span class="p">),</span>           <span class="c1"># 文字</span>
+</span></span><span class="line"><span class="cl">  <span class="n">axis.text.y</span>      <span class="o">=</span> <span class="nf">element_blank</span><span class="p">()</span>                    <span class="c1"># 消す</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/theme-1.png" alt="plot of chunk theme"></p>
+
+</section>
+<section>
+<h2 id="基本的な使い方-指示を--で重ねていく">基本的な使い方: 指示を <code>+</code> で重ねていく</h2>
+<img src="/slides/image/rstats/ggplot-layers.png" height="930">
+</section>
+<section>
+<h2 id="論文のfigureみたいに並べる">論文のFigureみたいに並べる</h2>
+<p>別のパッケージ
+(<a href="https://wilkelab.org/cowplot/">cowplot</a>
+や
+<a href="https://patchwork.data-imaginist.com/">patchwork</a>)
+の助けを借りて</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">pAB</span> <span class="o">=</span> <span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">p3</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;A&#34;</span><span class="p">,</span> <span class="s">&#34;B&#34;</span><span class="p">),</span> <span class="n">nrow</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">cowplot</span><span class="o">::</span><span class="nf">plot_grid</span><span class="p">(</span><span class="n">pAB</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;&#34;</span><span class="p">,</span> <span class="s">&#34;C&#34;</span><span class="p">),</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">1L</span><span class="p">)</span>
+</span></span></code></pre></div><p><img src="./figure/cowplot-1.png" alt="plot of chunk cowplot"></p>
+
+</section>
+<section>
+<h2 id="ファイル名もサイズも再現可能な作図">ファイル名もサイズも再現可能な作図</h2>
+<p><code>width</code>や<code>height</code>が小さいほど、文字・点・線が相対的に大きく</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1"># 7inch x 300dpi = 2100px四方 (デフォルト)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia1.png&#34;</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span> <span class="c1"># width = 7, height = 7, dpi = 300</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 4     x 300    = 1200  全体7/4倍ズーム</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia2.png&#34;</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span> <span class="c1"># dpi = 300</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 2     x 600    = 1200  全体をさらに2倍ズーム</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia3.png&#34;</span><span class="p">,</span> <span class="n">p3</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">dpi</span> <span class="o">=</span> <span class="m">600</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 4     x 300    = 1200  テーマを使って文字だけ拡大</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;dia4.png&#34;</span><span class="p">,</span> <span class="n">p3</span> <span class="o">+</span> <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">22</span><span class="p">),</span> <span class="n">width</span> <span class="o">=</span> <span class="m">4</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">4</span><span class="p">)</span>
+</span></span></code></pre></div><figure>
+<img src="../sendair2/image/dia1.png" width="24%">
+<img src="../sendair2/image/dia2.png" width="24%">
+<img src="../sendair2/image/dia3.png" width="24%">
+<img src="../sendair2/image/dia4.png" width="24%">
+</figure>
+</section>
+<section>
+<h2 id="日本語が豆腐にならないための設定">日本語が◻️◻️◻️豆腐にならないための設定</h2>
+<p>環境設定 → General → Graphics → Backend: <a href="https://ragg.r-lib.org/"><strong>AGG</strong></a></p>
+<img src="/slides/image/rstudio/options-graphics-agg.png" width="80%">
+<p>英数字以外を使わずに済ませられればそれに越したことはないけど&hellip;</p>
+
+</section>
+<section>
+<h2 id="他にどんな種類の-geom_-が使える">他にどんな種類の <code>geom_*()</code> が使える？</h2>
+<p>なんでもある。
+<a href="https://ggplot2.tidyverse.org/reference/index.html">公式サイト</a>を見に行こう。</p>
+<figure>
+<img src="/slides/image/rstats/ggplot2-reference-geoms.png" width="80%">
+</figure>
+</section>
+<section>
+<figure style="margin: 0;">
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/slides/image/cheatsheet/data-visualization.png" width="100%">
+<figcaption><small>https://ggplot2.tidyverse.org/</small></figcaption>
+</a>
+</figure>
+</section>
+<section>
+<h2 id="微調整してくと最終的に長いコードになるね">微調整してくと最終的に長いコードになるね&hellip;</h2>
+<p>うん。でもすべての点について後から確認できるし、使い回せる！</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">diamonds</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_jitter</span><span class="p">(</span><span class="nf">aes</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="n">cut</span><span class="p">),</span> <span class="n">height</span> <span class="o">=</span> <span class="m">0.2</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.1</span><span class="p">,</span> <span class="n">stroke</span> <span class="o">=</span> <span class="m">0</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">geom_boxplot</span><span class="p">(</span><span class="n">fill</span> <span class="o">=</span> <span class="kc">NA</span><span class="p">,</span> <span class="n">outlier.shape</span> <span class="o">=</span> <span class="kc">NA</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">scale_color_viridis_d</span><span class="p">(</span><span class="n">option</span> <span class="o">=</span> <span class="s">&#34;plasma&#34;</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">facet_wrap</span><span class="p">(</span><span class="nf">vars</span><span class="p">(</span><span class="n">clarity</span><span class="p">))</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">coord_cartesian</span><span class="p">(</span><span class="n">xlim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0</span><span class="p">,</span> <span class="m">20000</span><span class="p">),</span> <span class="n">ylim</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="m">0.5</span><span class="p">,</span> <span class="m">5.5</span><span class="p">),</span> <span class="n">expand</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">labs</span><span class="p">(</span><span class="n">title</span> <span class="o">=</span> <span class="s">&#34;Diamonds&#34;</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="s">&#34;Cut&#34;</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">&#34;Price (USD)&#34;</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">16</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">theme</span><span class="p">(</span><span class="n">legend.position</span> <span class="o">=</span> <span class="s">&#34;none&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="n">axis.ticks</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">panel.grid.major.y</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">panel.spacing.x</span> <span class="o">=</span> <span class="n">grid</span><span class="o">::</span><span class="nf">unit</span><span class="p">(</span><span class="m">3</span><span class="p">,</span> <span class="s">&#34;lines&#34;</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">        <span class="n">plot.margin</span> <span class="o">=</span> <span class="n">grid</span><span class="o">::</span><span class="nf">unit</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">2</span><span class="p">,</span> <span class="m">0.5</span><span class="p">,</span> <span class="m">0.5</span><span class="p">),</span> <span class="s">&#34;lines&#34;</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">ggsave</span><span class="p">(</span><span class="s">&#34;diamonds-cut-price.png&#34;</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="m">12</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="m">9</span><span class="p">)</span>
+</span></span></code></pre></div>
+</section>
+<section>
+<h2 id="発展的な内容">発展的な内容</h2>
+<dl>
+<dt>ggplot2を<a href="https://exts.ggplot2.tidyverse.org/">さらに拡張するパッケージも続々</a></dt>
+<dd>アニメーション <a href="https://gganimate.com/">gganimate</a></dd>
+<dd>重なりを避けてラベル付け <a href="https://ggrepel.slowkow.com/">ggrepel</a></dd>
+<dd>グラフ/ネットワーク <a href="https://ggraph.data-imaginist.com/">ggraph</a></dd>
+<dd>系統樹 <a href="https://github.com/YuLab-SMU/ggtree">ggtree</a></dd>
+<dd>地図 <a href="https://ggplot2.tidyverse.org/reference/ggsf.html#examples"><code>geom_sf</code></a></dd>
+<dd>学術論文向けのいろいろ <a href="https://github.com/kassambara/ggpubr">ggpubr</a></dd>
+</dl>
+<img src="/slides/image/tumopp/driver.gif" style="float: right;" height="200">
+<dl>
+<dt>ggplot2は3Dが苦手</dt>
+<dd>本当に3Dが必要? 色分けやファセットで足りない?</dd>
+<dd>別のパッケージでやる:
+<a href="http://rgl.neoscientists.org/gallery.shtml">rgl</a>,
+<a href="https://plotly.com/r/3d-charts/">plotly</a>, etc.</dd>
+</dl>
+
+</section>
+<section>
+<h2 id="-1日目の課題-模写">🔰 1日目の課題: 模写</h2>
+<p>下図になるべく似るように作図・調整してください。<br>
+関数やオプションについてはggplot2公式サイトやチートシートを参考に。</p>
+<p><img src="./figure/ggplot-homework-1.png" alt="plot of chunk ggplot-homework"></p>
+<p>細かい設定まで見逃さないように、<strong>班で協力</strong>しましょう。<br>
+個人でレポートの採点をしたあと、<strong>班ごとにボーナス</strong>を加算します。</p>
+
+</section>
+<section>
+<h2 id="おしながき-rによるデータ可視化">おしながき: Rによるデータ可視化</h2>
+<a href="https://ggplot2.tidyverse.org/">
+<img src="/_img/hex-stickers/ggplot2.webp" width="180" style="float: right;">
+</a>
+<h3 id="-データ解析全体の流れ可視化だいじ">✅ データ解析全体の流れ。可視化だいじ</h3>
+<h3 id="一貫性のある文法で合理的に描けるggplot2">✅一貫性のある文法で合理的に描けるggplot2</h3>
+<ul>
+<li>aesthetic mapping が鍵</li>
+<li>色覚多様性を意識</li>
+<li>画像出力まできっちりプログラミング</li>
+</ul>
+
+</section>
+<section>
+<h2 id="今日の残り時間">今日の残り時間</h2>
+<ul>
+<li>班やTAに相談し、消化しきれなかった部分をなるべく解消する。</li>
+<li>模写の課題を <code>ggsave()</code> まできっちりやる。</li>
+<li>TAが班の代表画像を評価し、合格した班から解散。</li>
+<li>残ってほかの課題に取り組んでもOK。</li>
+<li>遅くとも17:50には部屋を閉めたい。TAの給料は17:00まで。</li>
+</ul>
+
+</section>
+<section>
+<h2 id="参考">参考</h2>
+<dl>
+<dt>R for Data Science &mdash; Hadley Wickham et al.</dt>
+<dd><a href="https://r4ds.hadley.nz">https://r4ds.hadley.nz</a>,
+<a href="https://amzn.to/4cpL6w8">Paperback</a></dd>
+<dd><a href="https://amzn.to/2yyFRKt">日本語版書籍(Rではじめるデータサイエンス)</a></dd>
+<dt>Other versions</dt>
+<dd>「<a href="https://heavywatal.github.io/slides/nagoya2018/">Rにやらせて楽しよう — データの可視化と下ごしらえ</a>」
+岩嵜航 2018</dd>
+<dd>「<a href="https://comicalcommet.github.io/r-training-2025/">Rを用いたデータ解析の基礎と応用</a>」
+石川由希 名古屋大学</dd>
+<dd>「<a href="https://heavywatal.github.io/slides/tmd2024/">Rによるデータ前処理実習</a>」
+岩嵜航 2024 東京医科歯科大</dd>
+<dt>ggplot2公式ドキュメント</dt>
+<dd><a href="https://ggplot2.tidyverse.org/">https://ggplot2.tidyverse.org/</a></dd>
+</dl>
+<a href="3-structure1.html" class="readmore">
+3. データ構造の処理1: 抽出、集約など。
+</a>
+
+</section>
+</div>
+</div>
+</body>
+</html>
