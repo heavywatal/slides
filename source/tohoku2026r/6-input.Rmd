@@ -72,10 +72,10 @@ fs::dir_create("data")  # Create directory
 
 🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
 
-🔰 それらを別の名前で読み込み直してみよう。
+🔰 それらを別の名前の変数に読み込んでみよう。
 
 ---
-## 🔰 最終課題予告
+## 最終課題予告
 
 <iframe width="1080" height="810" src="#/29"></iframe>
 
@@ -86,8 +86,8 @@ fs::dir_create("data")  # Create directory
 
 2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県\
 <small style="opacity: 0.7;">
-(今はe-Statの不具合で落とせないっぽいので
-<a href="tblT001082C04.txt" download="tblT001082C04.txt">📄ここに置いときます</a>)
+(e-Statの不具合で落とせない場合の予備
+<a href="../tohoku2025r/tblT001082C04.txt" download="tblT001082C04.txt">📄ここに置いときます</a>)
 </small>
 
 うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
@@ -215,9 +215,7 @@ Rを使ったデータ前処理を習得した✨\
 - dplyrやtidyrで手に負えないほど不規則では困る。\
   Excelで手作業するなんて言語道断！
 
-自分が一次データを作る立場なら、どう気をつけたらいいか？
-
-<br>
+#### 自分が一次データを作る立場なら、どう気をつけたらいいか？
 
 総務省が2020年に発表して「全国民が見るべき」と話題になった\
 [「統計表における機械判読可能なデータの表記方法の統一ルール」](https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html)
@@ -392,7 +390,7 @@ Rを使ったデータ前処理を習得した✨\
 1. 1つのシート(ファイル)には1つの表
 1. 1行目は列名
 
-🔰 総務省ルールの「修正後」にまだ残る改善点を最大3つ列挙しよう。
+🔰 総務省ルールの図「修正後」にもまだ悪い点がたくさん。3つ列挙しよう。
 
 
 ---
@@ -414,7 +412,7 @@ SEPT1,4-14
 ```
 1.  ↑からのコピペで `excel.csv` という名のプレーンテキストを作成。
 1.  Excelでそれで開き、日付になることを確認。
-1.  それを別名のCSVとして保存し、テキストの中身を確認してレポート。
+1.  Excelで別名のCSVとして保存し、テキストの中身を確認してレポート。
 
 
 ---
@@ -423,14 +421,16 @@ SEPT1,4-14
 - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
 - [e-gov データポータル](https://data.e-gov.go.jp/data/dataset?res_format=CSV): 中央行政
 - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
-- [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+- [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)、
+  [環境省](https://www.env.go.jp/sogodb/)、
+  [農水省](https://www.maff.go.jp/j/tokei/index.html)
 - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
 - ほか、なんでも興味のあるデータ
 
 発表・レポートの条件
 : 最低1枚の図と、そこに至る読み込み→前処理→可視化のコード。
 : グラフから読み取れることを一言。
-: 4日目に習う統計解析も組み込めたら理想的だが。
+: 4日目に習う統計解析も組み込めたら理想的だが配点は小さめ。
 
 週明けに発表会をやります。
 
@@ -580,10 +580,30 @@ RStudio_version = system2("/Applications/RStudio.app/Contents/MacOS/RStudio", "-
    <img src="/slides/image/rstudio/new-markdown.png" width="60%">
 1. ["markdown 記法"で検索](https://duckduckgo.com/?q=markdown+syntax)して何か書く。
    最低限、次の概念を含むように:
-   - 見出し1, 2, 3
-   - コードブロック、インラインコード
-   - 箇条書き (番号あり・なし)
+   - `# タイトル`, `## 大見出し`, `### 小見出し`
+   - `` `インラインコード` ``, `` ```コードブロック``` ``
+   - `- 箇条書き`, `1. 番号付きリスト`
 1. <kbd>Preview</kbd>ボタンで確認
+
+
+---
+## Markdown記法で書くときの注意
+
+- 半角スペースが足りない: `##見出し未遂` `-箇条書き未遂` `1.番号付きリスト未遂`
+- 日本語の中黒「・」を使った箇条書きもどきはNG。
+- 行末 `\` による改行を使った段落もどきはNG。空行で改段落。
+- 見た目の装飾はQuartoに任せ、セマンティクス(意味)を意識しよう。
+  - `# 文書タイトル` (全体で1つまで。使わないことも)
+  - `## 大きなセクションの見出し` (基本はこれだけでも十分)
+  - `### その中のサブセクションの見出し`
+  - `` `inline code` ``
+  - ````
+    ```
+    code block
+    ```
+    ````
+  - > `> block quote (引用)`
+
 
 ---
 ## Quarto Document を作ってみよう
@@ -645,7 +665,7 @@ R code chunk
   - `{ID}-{name}-day{d}.html`, e.g., `C0SB0000-iwasaki-day3.html`
   - `embed-resources: true` で画像などを埋め込んだ独立HTML。
 - 評価ポイント
-  - エラーも警告も無くコードが走る。
+  - 上記様式を守り、エラーも警告も無くコードが走る。
   - 文書の構造や図が視覚的に見やすく整理されている。
   - 半年後の自分が読んでわかるような `# 親切コメント`。
 - 手抜きポイント
@@ -681,12 +701,13 @@ format:
 library(conflicted)
 library(tidyverse)
 grDevices::palette("Okabe-Ito")
-options(
-  ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis",
-  ggplot2.discrete.colour = grDevices::palette()[-1],
-  ggplot2.discrete.fill = grDevices::palette()[-1]
+theme_palette = ggplot2::theme(
+  palette.colour.continuous = "viridis",
+  palette.fill.continuous = "viridis",
+  palette.colour.discrete = grDevices::palette()[-1],
+  palette.fill.discrete = grDevices::palette()[-1]
 )
+ggplot2::theme_set(ggplot2::theme_get() + theme_palette)
 knitr::opts_chunk$set(dev = "ragg_png")  # ggplot 日本語
 ```
 
@@ -698,7 +719,7 @@ knitr::opts_chunk$set(dev = "ragg_png")  # ggplot 日本語
 - **個人で課題1(組み込みデータの可視化)に取り組む。**
   - ある程度できたら班内で見せ合い、よかった部分を自分のに取り込む。
   - TAが評価して合格した班から解散。
-- **最終課題は週明け火曜に発表してもらえればいいので今日は未完成でOK**。
+- **最終課題は水曜に発表してもらえればいいので今日は未完成でOK**。
   - 居残って取り組んでもOK。
 - 遅くとも17:50には部屋を閉めたい。TAの給料は17:00まで。
 
