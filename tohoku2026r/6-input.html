@@ -130,11 +130,11 @@ html { font-size: 240%; }
 </span></span></code></pre></div><p><a href="https://comicalcommet.github.io/r-training-2025/R_training_2025_7.html">よくあるエラー集 (石川由希さん@名古屋大)</a>
 を読んでおきましょう。</p>
 <p>🔰 これまでに登場したデータを <code>data/</code> 以下に書き出してみよう。</p>
-<p>🔰 それらを別の名前で読み込み直してみよう。</p>
+<p>🔰 それらを別の名前の変数に読み込んでみよう。</p>
 
 </section>
 <section>
-<h2 id="-最終課題予告">🔰 最終課題予告</h2>
+<h2 id="最終課題予告">最終課題予告</h2>
 <iframe width="1080" height="810" src="#/29"></iframe>
 <p>読み込み → 前処理 → 可視化 → 余裕でクリア、、、となるか？</p>
 </section>
@@ -142,8 +142,8 @@ html { font-size: 240%; }
 <h2 id="実演-e-stat-国勢調査-csv">実演: <a href="https://www.e-stat.go.jp/gis/statmap-search?page=1&amp;type=1&amp;toukeiCode=00200521">e-Stat 国勢調査</a> CSV</h2>
 <p>2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県<br>
 <small style="opacity: 0.7;">
-(今はe-Statの不具合で落とせないっぽいので
-<a href="tblT001082C04.txt" download="tblT001082C04.txt">📄ここに置いときます</a>)
+(e-Statの不具合で落とせない場合の予備
+<a href="../tohoku2025r/tblT001082C04.txt" download="tblT001082C04.txt">📄ここに置いときます</a>)
 </small></p>
 <p>うまくすれば次のような人口ピラミッドを描けるはずのファイルだが&hellip;</p>
 <img src="figure/estat-plot-1.png" alt="plot of chunk estat-plot">
@@ -278,8 +278,7 @@ html { font-size: 240%; }
 <li>dplyrやtidyrで手に負えないほど不規則では困る。<br>
 Excelで手作業するなんて言語道断！</li>
 </ul>
-<p>自分が一次データを作る立場なら、どう気をつけたらいいか？</p>
-<br>
+<h4 id="自分が一次データを作る立場ならどう気をつけたらいいか">自分が一次データを作る立場なら、どう気をつけたらいいか？</h4>
 <p>総務省が2020年に発表して「全国民が見るべき」と話題になった<br>
 <a href="https://www.soumu.go.jp/menu_news/s-news/01toukatsu01_02000186.html">「統計表における機械判読可能なデータの表記方法の統一ルール」</a>
 から抜粋。</p>
@@ -438,7 +437,7 @@ Excelで手作業するなんて言語道断！</li>
 <li>1つのシート(ファイル)には1つの表</li>
 <li>1行目は列名</li>
 </ol>
-<p>🔰 総務省ルールの「修正後」にまだ残る改善点を最大3つ列挙しよう。</p>
+<p>🔰 総務省ルールの図「修正後」にもまだ悪い点がたくさん。3つ列挙しよう。</p>
 
 </section>
 <section>
@@ -457,7 +456,7 @@ SEPT1,4-14
 </code></pre><ol>
 <li>↑からのコピペで <code>excel.csv</code> という名のプレーンテキストを作成。</li>
 <li>Excelでそれで開き、日付になることを確認。</li>
-<li>それを別名のCSVとして保存し、テキストの中身を確認してレポート。</li>
+<li>Excelで別名のCSVとして保存し、テキストの中身を確認してレポート。</li>
 </ol>
 
 </section>
@@ -467,7 +466,9 @@ SEPT1,4-14
 <li><a href="https://www.e-stat.go.jp/">e-Stat</a>: 政府統計の総合窓口</li>
 <li><a href="https://data.e-gov.go.jp/data/dataset?res_format=CSV">e-gov データポータル</a>: 中央行政</li>
 <li><a href="https://odcs.bodik.jp/">BODIKオープンデータカタログサイト</a>: 地方自治体</li>
-<li><a href="https://www.data.jma.go.jp/gmd/risk/obsdl/index.php">気象庁</a></li>
+<li><a href="https://www.data.jma.go.jp/gmd/risk/obsdl/index.php">気象庁</a>、
+<a href="https://www.env.go.jp/sogodb/">環境省</a>、
+<a href="https://www.maff.go.jp/j/tokei/index.html">農水省</a></li>
 <li><a href="https://www.data.gov/">DATA.GOV</a>: U.S. Government’s open data</li>
 <li>ほか、なんでも興味のあるデータ</li>
 </ul>
@@ -475,7 +476,7 @@ SEPT1,4-14
 <dt>発表・レポートの条件</dt>
 <dd>最低1枚の図と、そこに至る読み込み→前処理→可視化のコード。</dd>
 <dd>グラフから読み取れることを一言。</dd>
-<dd>4日目に習う統計解析も組み込めたら理想的だが。</dd>
+<dd>4日目に習う統計解析も組み込めたら理想的だが配点は小さめ。</dd>
 </dl>
 <p>週明けに発表会をやります。</p>
 </section>
@@ -597,14 +598,40 @@ Quarto CLIをRコマンドで呼べるようにするだけ。</li>
 <li><a href="https://duckduckgo.com/?q=markdown+syntax">&ldquo;markdown 記法&quot;で検索</a>して何か書く。
 最低限、次の概念を含むように:
 <ul>
-<li>見出し1, 2, 3</li>
-<li>コードブロック、インラインコード</li>
-<li>箇条書き (番号あり・なし)</li>
+<li><code># タイトル</code>, <code>## 大見出し</code>, <code>### 小見出し</code></li>
+<li><code>`インラインコード`</code>, <code>```コードブロック```</code></li>
+<li><code>- 箇条書き</code>, <code>1. 番号付きリスト</code></li>
 </ul>
 </li>
 <li><kbd>Preview</kbd>ボタンで確認</li>
 </ol>
 
+</section>
+<section>
+<h2 id="markdown記法で書くときの注意">Markdown記法で書くときの注意</h2>
+<ul>
+<li>半角スペースが足りない: <code>##見出し未遂</code> <code>-箇条書き未遂</code> <code>1.番号付きリスト未遂</code></li>
+<li>日本語の中黒「・」を使った箇条書きもどきはNG。</li>
+<li>行末 <code>\</code> による改行を使った段落もどきはNG。空行で改段落。</li>
+<li>見た目の装飾はQuartoに任せ、セマンティクス(意味)を意識しよう。
+<ul>
+<li><code># 文書タイトル</code> (全体で1つまで。使わないことも)</li>
+<li><code>## 大きなセクションの見出し</code> (基本はこれだけでも十分)</li>
+<li><code>### その中のサブセクションの見出し</code></li>
+<li><code>`inline code`</code></li>
+<li>
+<pre tabindex="0"><code>```
+code block
+```
+</code></pre></li>
+<li>
+<blockquote>
+<p><code>&gt; block quote (引用)</code></p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
 </section>
 <section>
 <h2 id="quarto-document-を作ってみよう">Quarto Document を作ってみよう</h2>
@@ -672,7 +699,7 @@ e.g., <code>report.qmd</code></li>
 </li>
 <li>評価ポイント
 <ul>
-<li>エラーも警告も無くコードが走る。</li>
+<li>上記様式を守り、エラーも警告も無くコードが走る。</li>
 <li>文書の構造や図が視覚的に見やすく整理されている。</li>
 <li>半年後の自分が読んでわかるような <code># 親切コメント</code>。</li>
 </ul>
@@ -706,12 +733,13 @@ e.g., <code>report.qmd</code></li>
 </span></span></span></code></pre></div><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">conflicted</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">(</span><span class="s">&#34;Okabe-Ito&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nf">options</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.continuous.colour</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.continuous.fill</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.discrete.colour</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">  <span class="n">ggplot2.discrete.fill</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span>
+</span></span><span class="line"><span class="cl"><span class="n">theme_palette</span> <span class="o">=</span> <span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.colour.continuous</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.fill.continuous</span> <span class="o">=</span> <span class="s">&#34;viridis&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.colour.discrete</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">  <span class="n">palette.fill.discrete</span> <span class="o">=</span> <span class="n">grDevices</span><span class="o">::</span><span class="nf">palette</span><span class="p">()</span><span class="n">[</span><span class="m">-1</span><span class="n">]</span>
 </span></span><span class="line"><span class="cl"><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme_set</span><span class="p">(</span><span class="n">ggplot2</span><span class="o">::</span><span class="nf">theme_get</span><span class="p">()</span> <span class="o">+</span> <span class="n">theme_palette</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">knitr</span><span class="o">::</span><span class="n">opts_chunk</span><span class="o">$</span><span class="nf">set</span><span class="p">(</span><span class="n">dev</span> <span class="o">=</span> <span class="s">&#34;ragg_png&#34;</span><span class="p">)</span>  <span class="c1"># ggplot 日本語</span>
 </span></span></code></pre></div>
 </section>
@@ -725,7 +753,7 @@ e.g., <code>report.qmd</code></li>
 <li>TAが評価して合格した班から解散。</li>
 </ul>
 </li>
-<li><strong>最終課題は週明け火曜に発表してもらえればいいので今日は未完成でOK</strong>。
+<li><strong>最終課題は水曜に発表してもらえればいいので今日は未完成でOK</strong>。
 <ul>
 <li>居残って取り組んでもOK。</li>
 </ul>
