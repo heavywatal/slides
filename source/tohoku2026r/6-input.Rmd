@@ -172,7 +172,7 @@ tidy_miyagi = raw_miyagi |>
   tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
   tidyr::separate(category, c("sex", "age"), 1) |>
   dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
-  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  tidyr::separate(age, c("lower", "upper"), "[〜~]", fill = "right") |>
   dplyr::mutate(lower = readr::parse_number(lower),
                 upper = readr::parse_number(upper)) |>
   dplyr::filter((upper - lower) < 5 | lower == 75) |>
@@ -432,7 +432,7 @@ SEPT1,4-14
 : グラフから読み取れることを一言。
 : 4日目に習う統計解析も組み込めたら理想的だが配点は小さめ。
 
-週明けに発表会をやります。
+最終日に発表会をやります。
 
 
 
