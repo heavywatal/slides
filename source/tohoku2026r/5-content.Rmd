@@ -145,7 +145,7 @@ x < 5           # それぞれの要素を比較
 ---
 ## 数値: numeric型
 
-普通は倍精度浮動小数点型 `double` として扱われる:
+普通は実数(倍精度浮動小数点)型 `double` として扱われる:
 
 ```{r, numeric}
 answer = 42
@@ -186,14 +186,14 @@ exp(x)
 dia = diamonds    # 別名コピー
 
 # dollar演算子 $ で指定
-dia$price = 146.8 * dia$price
+dia$price = 159.1 * dia$price
 
 # 名前を [[文字列]] で指定
-dia[["price"]] = 146.8 * dia[["price"]]
+dia[["price"]] = 159.1 * dia[["price"]]
 
 # dplyr::mutate with pipe
 dia = diamonds |>
-  dplyr::mutate(price = 146.8 * price) |>
+  dplyr::mutate(price = 159.1 * price) |>
   dplyr::filter(carat > 1) |>
   dplyr::summarize(avg_price = mean(price))
 ```
@@ -337,7 +337,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 
     ```{r, base-str-na}
     x = c(1, 2, NA)
-    y = c("a", NA, "c")
+    y = c("a", "NA", "c")
     paste(x, y)  # NA is not distinguished from character "NA"
     ```
 
@@ -349,7 +349,7 @@ y = 'If I want to include a "quote" inside a string, I use single quotes'
 </a>
 
 -   関数や引数の名前に一貫性があって分かりやすい
--   対象文字列が一貫して第一引数なので `|>` able
+-   対象文字列が一貫して第一引数なので `|>` friendly
 -   引数オブジェクトの各要素の名前や位置を保持する
     -   長さゼロの入力からは長さゼロの出力
     -   入力に `NA` が含まれる場合は対応する出力も `NA`
@@ -693,25 +693,34 @@ cowplot::plot_grid(p1, p2, nrow = 1L)
 ---
 ## factorで順序を変えて作図する練習
 
-🔰 `mpg` で次のような図を描いてみよう
+🔰 右の図になるように前処理を書き加えよう。
+
+```r
+mpg |>
+  ggplot() + aes(y = class) + geom_bar(aes(fill = drv)) +
+  theme_classic(base_size = 20) +
+  theme(axis.line.y = element_blank(), axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(), legend.position = "top")
+```
 
 ```{r, plot-factor}
 #| echo: false
 #| fig.width: 5
 #| fig.height: 5
-mpg |>
-  dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
-  dplyr::mutate(class = forcats::fct_infreq(class)) |>
+p = mpg |>
   ggplot() +
   aes(y = class) +
   geom_bar(aes(fill = drv)) +
   theme_classic(base_size = 20) +
-  theme(panel.grid = element_blank(), axis.title.y = element_blank(),
-        axis.line.y = element_blank(), axis.ticks.y = element_blank(),
-        legend.position = "top")
+  theme(axis.line.y = element_blank(), axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(), legend.position = "top")
+p
+p %+% {
+  mpg |>
+  dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
+  dplyr::mutate(class = forcats::fct_infreq(class))
+}
 ```
-
-ヒント: 使うのは [`geom_bar()`](https://ggplot2.tidyverse.org/reference/geom_bar.html)
 
 
 ---
@@ -764,12 +773,11 @@ lubridate::wday(today, label = TRUE)
 </a><br>
 </div>
 
-- 正規化・欠損値処理は目的に応じて検討
+- 欠損値処理は目的に応じて検討
 - vectorには**型**がある: 文字列、数値、因子、日時、etc.
 - 文字列を扱うには [stringr](https://stringr.tidyverse.org/)
     - **正規表現**は一度習得すれば超強力
-- 因子を扱うには [forcats](https://forcats.tidyverse.org/)
-    - 知っておくとたまに便利。苦手なら全部文字列にしてもいい。
+- 図の中の並び順を調整するには [forcats](https://forcats.tidyverse.org/) で因子型
 - 日時を扱うには [lubridate](https://lubridate.tidyverse.org/)
 
 各パッケージの[チートシート.pdf](https://www.rstudio.com/resources/cheatsheets/)を手元に持っておくと便利。
@@ -830,7 +838,6 @@ lubridate::wday(today, label = TRUE)
 
 ```r
 dplyr::storms
-dplyr::starwars
 tidyr::billboard
 tidyr::cms_patient_experience
 tidyr::cms_patient_care
@@ -846,6 +853,8 @@ ggplot2::msleep
 ggplot2::txhousing
 ```
 
+[実習スライドを頭から読み返す](1-introduction.html)のもオススメ。\
+1周目には受け止めきれなかったものが見えてくるかも。
 
 ---
 ## Reference
