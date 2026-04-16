@@ -17,7 +17,7 @@ benchmark:
 	hugo --templateMetrics --templateMetricsHints
 
 watch:
-	hugo --watch
+	hugo --environment development --watch
 
 server:
 	hugo server -p 8080

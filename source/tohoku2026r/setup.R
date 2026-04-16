@@ -63,8 +63,12 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
 .meta$front_matter = .meta$data |>
   dplyr::filter(this) |>
   dplyr::select(url, linktitle, title, date, draft) |>
-  dplyr::mutate(
-    dpi = knitr::opts_chunk$get("dpi") |> as.integer() |> dplyr::na_if(72L)
+  as.list() |>
+  purrr::list_assign(
+    params = list(
+      dev.css = "projector.css",
+      dpi = knitr::opts_chunk$get("dpi") |> as.integer() |> dplyr::na_if(72L)
+    )
   ) |>
   wtl::toTOML()
 
