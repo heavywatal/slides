@@ -1497,7 +1497,7 @@ glm(y ~ x, df_logistic, family = binomial)
 冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。\
 これらの変数の間に、なんらかの関係は見られるだろうか？
 
-[adventure.tsv](adventure.tsv)
+[adventure.tsv](../tohoku2025r/adventure.tsv)
 
 ```{r, adventure-data}
 #| echo: false
@@ -1522,9 +1522,8 @@ dfout = dfraw |> dplyr::mutate(
     route = ifelse(via_cave, "cave", "field"),
     .before = encounter
   ) |>
-  dplyr::select(!lambda & !is_mage & !via_cave)
-
-readr::write_tsv(dfout, "../adventure.tsv") |> print()
+  dplyr::select(!lambda & !is_mage & !via_cave) |>
+  print()
 ```
 
 ```{r, adventure-analysis}
