@@ -603,7 +603,7 @@ r-training-2026/           # プロジェクトの最上階
 
 ```r
 student_id = "C0SB0000"   # 自分のIDに書き換えてください
-source("https://scorpion.biology.tohoku.ac.jp/sice/report.R")
+source("https://example.com/sice/report.R")
 ```
 
 `Hello, C0SB0000.`
