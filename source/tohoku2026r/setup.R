@@ -1,4 +1,4 @@
-withr::local_options(
+options(
   mc.cores = parallel::detectCores(),
   wtl.printdf.summarize = FALSE,
   wtl.printdf.classes = FALSE,
@@ -11,21 +11,19 @@ withr::local_options(
   readr.show_progress = FALSE,
   readr.show_col_types = FALSE
 )
+library("tibble") # nolint
+library("ggplot2") # nolint
 grDevices::palette("Okabe-Ito")
-theme_palette = ggplot2::theme(
+theme_palette = theme(
   palette.colour.continuous = "viridis",
   palette.fill.continuous = "viridis",
   palette.colour.discrete = grDevices::palette()[-1],
   palette.fill.discrete = grDevices::palette()[-1]
 )
-ggplot2::theme_set(ggplot2::theme_get() + theme_palette)
-withr::local_package("tibble")
-withr::local_package("ggplot2")
+theme_set(theme_get() + theme_palette)
 registerS3method("print", "tbl", wtl::printdf)
 registerS3method("print", "tbl_df", wtl::printdf)
 knitr::opts_chunk$set(comment = "")
-knitr::opts_chunk$set(message = NA)
-knitr::opts_chunk$set(warning = NA)
 knitr::opts_chunk$set(dev = "ragg_png")
 knitr::opts_chunk$set(dpi = 108)
 knitr::opts_chunk$set(fig.process = wtl::oxipng)
