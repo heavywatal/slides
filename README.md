@@ -29,47 +29,57 @@ and [others supported in `rmarkdown` package](https://bookdown.org/yihui/rmarkdo
 
 ```r
 install.packages("pak")
+pak::pak("knitr")
+pak::pak("tidyverse")
+pak::pak("tidymodels")
+pak::pak("cowplot")
+pak::pak(c("ggrepel", "ggridges"))
+pak::pak("nycflights13")
+pak::pak("gifski")
 pak::repo_add(stan = "https://stan-dev.r-universe.dev")
-pak::pkg_install("knitr")
-pak::pkg_install("tidyverse")
-pak::pkg_install("tidymodels")
-pak::pkg_install("cowplot")
-pak::pkg_install(c("ggrepel", "ggridges"))
-pak::pkg_install("nycflights13")
-pak::pkg_install("gifski")
-pak::pkg_install(c("cmdstanr", "bayesplot"))
-pak::pkg_install(c("rstan", "rstanarm", "tidybayes"))
-pak::pkg_install("heavywatal/rwtl")
+pak::pak(c("cmdstanr", "bayesplot"))
+pak::pak(c("rstan", "rstanarm", "tidybayes"))
+pak::pak("heavywatal/rwtl")
 ```
 
 
 ## Save as PDF
 
-Use [decktape](https://github.com/astefanutti/decktape):
+Use [decktape](https://github.com/astefanutti/decktape)
+(See below for installation):
 ```sh
-nvm use stable
 decktape --help
 
-URL=https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html
+URL=https://heavywatal.github.io/slides/tohoku2026r/1-introduction.html
 PDF=1-introduction.pdf
 decktape -s 960x720 reveal "$URL" "$PDF"
 
 # or directly
-decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2024r/1-introduction.html 1-introduction.pdf
-decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2024/R_training_2024_1.html R_training_1.pdf
+decktape -s 960x720 reveal https://heavywatal.github.io/slides/tohoku2026r/1-introduction.html 1-introduction.pdf
+decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2025/R_training_2025_1.html R_training_1.pdf
 ```
 
 ### Install decktape with node
 
-1. Install [nvm](https://github.com/nvm-sh/nvm).
-   Your shell profile (e.g., `~/.bashrc`) will be updated automatically to add following lines:
+1. Install [pnpm](https://pnpm.io/):
    ```sh
-   export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
+   curl -fsSL https://get.pnpm.io/install.sh | sh -
    ```
-1. Restart your shell/terminal to reload the updated profile.
-1. Install [node](https://nodejs.org/): `nvm install --lts --latest-npm`
-1. Activate the installed node temporarily: `nvm use stable`
+   Add the following lines to your shell profile (e.g., `~/.bashrc`):
+   ```sh
+   export PNPM_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/pnpm"
+   PATH="$PNPM_HOME:$PATH"
+   ```
+1. Install [node](https://nodejs.org/):
+   ```sh
+   pnpm env use --global lts
+   ```
 1. Install [decktape](https://github.com/astefanutti/decktape):
-   `npm install -g decktape`
-1. Run `hash -r` or restart your shell/terminal to reload `$PATH`.
+   ```sh
+   pnpm add -g decktape
+   ```
+1. Approve build scripts of puppeteer if prompted:
+   ```sh
+   pnpm approve-builds -g
+   # pick puppeteer and approve it
+   ```
