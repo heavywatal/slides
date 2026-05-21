@@ -818,16 +818,16 @@ print(penguins)
 
 
 ```
-      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
-  1    Adelie Torgersen           39.1          18.7               181        3750   male 2007
-  2    Adelie Torgersen           39.5          17.4               186        3800 female 2007
-  3    Adelie Torgersen           40.3          18.0               195        3250 female 2007
-  4    Adelie Torgersen             NA            NA                NA          NA     NA 2007
- --                                                                                           
-341 Chinstrap     Dream           43.5          18.1               202        3400 female 2009
-342 Chinstrap     Dream           49.6          18.2               193        3775   male 2009
-343 Chinstrap     Dream           50.8          19.0               210        4100   male 2009
-344 Chinstrap     Dream           50.2          18.7               198        3775 female 2009
+      species    island bill_len bill_dep flipper_len body_mass    sex year
+  1    Adelie Torgersen     39.1     18.7         181      3750   male 2007
+  2    Adelie Torgersen     39.5     17.4         186      3800 female 2007
+  3    Adelie Torgersen     40.3     18.0         195      3250 female 2007
+  4    Adelie Torgersen       NA       NA          NA        NA     NA 2007
+ --                                                                        
+341 Chinstrap     Dream     43.5     18.1         202      3400 female 2009
+342 Chinstrap     Dream     49.6     18.2         193      3775   male 2009
+343 Chinstrap     Dream     50.8     19.0         210      4100   male 2009
+344 Chinstrap     Dream     50.2     18.7         198      3775 female 2009
 ```
 
 ---
@@ -841,20 +841,22 @@ penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
 ```
 
 ```
-   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex year
- 1  Adelie Torgersen             NA            NA                NA          NA  NA 2007
- 2  Adelie Torgersen           34.1          18.1               193        3475  NA 2007
- 3  Adelie Torgersen           42.0          20.2               190        4250  NA 2007
- 4  Adelie Torgersen           37.8          17.1               186        3300  NA 2007
---                                                                                      
- 8  Gentoo    Biscoe           46.2          14.4               214        4650  NA 2008
- 9  Gentoo    Biscoe           47.3          13.8               216        4725  NA 2009
-10  Gentoo    Biscoe           44.5          15.7               217        4875  NA 2009
-11  Gentoo    Biscoe             NA            NA                NA          NA  NA 2009
+   species    island bill_len bill_dep flipper_len body_mass  sex year
+1   Adelie Torgersen       NA       NA          NA        NA <NA> 2007
+2   Adelie Torgersen     34.1     18.1         193      3475 <NA> 2007
+3   Adelie Torgersen     42.0     20.2         190      4250 <NA> 2007
+4   Adelie Torgersen     37.8     17.1         186      3300 <NA> 2007
+5   Adelie Torgersen     37.8     17.3         180      3700 <NA> 2007
+6   Adelie     Dream     37.5     18.9         179      2975 <NA> 2007
+7   Gentoo    Biscoe     44.5     14.3         216      4100 <NA> 2007
+8   Gentoo    Biscoe     46.2     14.4         214      4650 <NA> 2008
+9   Gentoo    Biscoe     47.3     13.8         216      4725 <NA> 2009
+10  Gentoo    Biscoe     44.5     15.7         217      4875 <NA> 2009
+11  Gentoo    Biscoe       NA       NA          NA        NA <NA> 2009
 ```
 
 ``` r
-penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+penguins_dropna = penguins |> tidyr::drop_na(body_mass)
 dim(penguins_dropna)
 ```
 
@@ -868,7 +870,7 @@ dim(penguins_dropna)
 次の課題を解いてみよう。\
 (次ページ以降に解答があるけど、まずは自力で。)
 
-1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
+1. `body_mass` を横軸、 `flipper_len` を縦軸に、まず作図。
 1. 単回帰して、切片と傾きを求める。そして作図。
 1. `species` で色分けして作図。
 1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
@@ -883,7 +885,7 @@ dim(penguins_dropna)
 
 ``` r
 p_penweight = ggplot(penguins_dropna) +
-  aes(body_mass_g, flipper_length_mm) +
+  aes(body_mass, flipper_len) +
   geom_point(shape = 16, size = 2, alpha = 0.66) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
@@ -901,14 +903,14 @@ $y = 136.7 + 0.0153 x$
 
 
 ``` r
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
+fit1 = glm(flipper_len ~ body_mass, data = penguins_dropna)
 broom::tidy(fit1)
 ```
 
 ```
          term     estimate   std.error statistic       p.value
 1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
-2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
+2   body_mass   0.01527592 0.000466836  32.72223 4.370681e-107
 ```
 
 ``` r
@@ -958,14 +960,14 @@ Adelieを基準に、ChinstrapとGentooはそれより長め。\
 
 
 ``` r
-fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
+fit2 = glm(flipper_len ~ body_mass + species, data = penguins_dropna)
 broom::tidy(fit2)
 ```
 
 ```
               term     estimate    std.error statistic       p.value
 1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
-2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+2        body_mass 8.402113e-03 0.0006338976 13.254686  1.401600e-32
 3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
 4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
 ```
@@ -1003,18 +1005,18 @@ Adelieを基準に、Chinstrapの傾きが結構違う。\
 
 
 ``` r
-fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
+fit3 = glm(flipper_len ~ body_mass * species, data = penguins_dropna)
 broom::tidy(fit3)
 ```
 
 ```
-                          term      estimate    std.error statistic       p.value
-1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
-2                  body_mass_g   0.006676867 0.0009522935  7.011354  1.301783e-11
-3             speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
-4                speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
-5 body_mass_g:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
-6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
+                        term      estimate    std.error statistic       p.value
+1                (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
+2                  body_mass   0.006676867 0.0009522935  7.011354  1.301783e-11
+3           speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
+4              speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
+5 body_mass:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
+6    body_mass:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
 ```
 
 ``` r

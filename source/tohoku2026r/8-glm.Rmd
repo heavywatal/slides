@@ -1186,6 +1186,7 @@ print(penguins)
 ```
 ```{r, penguins}
 #| include: false
+penguins = tibble::as_tibble(penguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 ```
 
@@ -1214,7 +1215,7 @@ print(penguins)
 
 ```{r, penguins-dropna}
 penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
-penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+penguins_dropna = penguins |> tidyr::drop_na(body_mass)
 dim(penguins_dropna)
 ```
 
@@ -1224,7 +1225,7 @@ dim(penguins_dropna)
 次の課題を解いてみよう。\
 (次ページ以降に解答があるけど、まずは自力で。)
 
-1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
+1. `body_mass` を横軸、 `flipper_len` を縦軸に、まず作図。
 1. 単回帰して、切片と傾きを求める。そして作図。
 1. `species` で色分けして作図。
 1. `species` も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。
@@ -1240,7 +1241,7 @@ dim(penguins_dropna)
 #| fig.height: 4.5
 #| fig.width: 4.5
 p_penweight = ggplot(penguins_dropna) +
-  aes(body_mass_g, flipper_length_mm) +
+  aes(body_mass, flipper_len) +
   geom_point(shape = 16, size = 2, alpha = 0.66) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
@@ -1255,7 +1256,7 @@ p_penweight
 $y = 136.7 + 0.0153 x$
 
 ```{r, penguins-fit1}
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
+fit1 = glm(flipper_len ~ body_mass, data = penguins_dropna)
 broom::tidy(fit1)
 broom::glance(fit1)
 ```
@@ -1295,7 +1296,7 @@ Adelieを基準に、ChinstrapとGentooはそれより長め。\
 体重の効果は単回帰のとき(0.0153)より小さい。
 
 ```{r, penguins-fit2}
-fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
+fit2 = glm(flipper_len ~ body_mass + species, data = penguins_dropna)
 broom::tidy(fit2)
 broom::glance(fit2)
 ```
@@ -1322,7 +1323,7 @@ Adelieを基準に、Chinstrapの傾きが結構違う。\
 切片の違いは解釈しにくくなった。
 
 ```{r, penguins-fit3}
-fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
+fit3 = glm(flipper_len ~ body_mass * species, data = penguins_dropna)
 broom::tidy(fit3)
 broom::glance(fit3)
 ```
@@ -1365,15 +1366,15 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| fig.width: 11
 #| cache.vars: [p_bill]
 p_bill = penguins_dropna |>
-  ggplot() + aes(bill_length_mm, bill_depth_mm) +
+  ggplot() + aes(bill_len, bill_dep) +
   geom_point(shape = 16, size = 2, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
+fit1 = glm(bill_dep ~ bill_len, data = penguins_dropna)
+fit2 = glm(bill_dep ~ bill_len + species, data = penguins_dropna)
+fit3 = glm(bill_dep ~ bill_len + species + bill_len:species, data = penguins_dropna)
 d1 = broom::augment(fit1, type.predict = "response")
 d2 = broom::augment(fit2, type.predict = "response")
 d3 = broom::augment(fit3, type.predict = "response")
@@ -1389,7 +1390,7 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 ```{r, penguins-multiple}
 #| echo: false
 #| include: false
-fit4 = glm(bill_depth_mm ~ bill_length_mm + sex, data = penguins)
+fit4 = glm(bill_dep ~ bill_len + sex, data = penguins)
 broom::tidy(fit4)
 broom::glance(fit4)
 aug4 = broom::augment(fit4, type.predict = "response")
