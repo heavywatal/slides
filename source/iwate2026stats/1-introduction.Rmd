@@ -1,0 +1,654 @@
+```{r, setup-common}
+#| file: "setup.R"
+#| echo: false
+#| results: "asis"
+```
+```{r, setup-local}
+#| include: false
+#| cache: false
+```
+
+---
+## データを使ってやりたいこと
+
+- 現象を**理解**したい
+- 将来を**予測**したい
+- ものを**分類・判別**したい
+- 挙動を**制御**したい
+- 新しい何かを**生成**したい
+
+そのために解析は必要？
+未加工の生データこそ宝？
+
+???
+よりよい職場に転職したい
+
+---
+## データ解析って必要？ 生データ見ればいいべ？
+
+生のままでは複雑過ぎ、情報多すぎ、何もわからない。
+
+```{r, diamonds}
+print(ggplot2::diamonds)
+```
+
+ダイヤモンド53,940個について10項目の値を持つデータセット
+
+---
+## 要約統計量を見てみよう
+
+各列の**平均**とか**標準偏差**とか:
+
+```{r, summary-diamonds}
+#| echo: false
+dia_cols = c("carat", "depth", "table", "price")
+diamonds |>
+  dplyr::summarize(dplyr::across(all_of(dia_cols), list(mean = mean, sd = sd, max = max, min = min))) |>
+  tidyr::pivot_longer(everything(), names_to = c(".value", "stat"), names_sep = "_") |>
+  dplyr::mutate(dplyr::across(where(is.numeric), \(x) round(x, digits = 2)))
+```
+
+大きさ `carat` と価格 `price` の**相関係数**はかなり高い:
+```{r, cov-diamonds}
+#| echo: false
+diamonds |>
+  dplyr::select(all_of(dia_cols)) |>
+  scale() |>
+  cov() |>
+  wtl::printmat("%.2f", upper = FALSE)
+```
+
+<hr>
+
+**生のままよりは把握しやすい**かも。
+
+しかし要注意...
+
+
+---
+## 要約統計量だけ見て可視化を怠ると構造を見逃す
+
+<figure style="position: relative;">
+<a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
+<img src="/slides/image/rstats/datasaurus.png" width="95%">
+<figcaption><small>https://www.research.autodesk.com/publications/same-stats-different-graphs/</small></figcaption>
+</a>
+<img src="/slides/image/rstats/DataDino-600x455.gif" width="22%"
+     style="position: absolute; left: 0; top: 0; z-index: 255;">
+</figure>
+
+
+---
+## データ可視化は理解の第一歩
+
+情報をうまく絞って整理 → **直感的にわかる**
+
+```{r, simplify-diamonds}
+#| echo: false
+#| fig.height: 6
+#| fig.width: 7
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
+  ggplot(aes(carat, price, color = clarity)) +
+  geom_point(shape = 16, size = 3, alpha = 0.4) +
+  scale_color_viridis_d(
+    guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
+  ) +
+  labs(title = "Diamonds") +
+  theme_gray(base_size = 22) +
+  theme(
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "#bbbbbb"),
+    legend.key = element_rect(fill = "#bbbbbb"),
+    axis.ticks = element_blank()
+  )
+```
+
+`carat` が大きいほど `price` も高いらしい。\
+その度合いは `clarity` によって異なるらしい。
+
+---
+## 統計とは
+
+データをうまくまとめ、それに基づいて推論するための手法。
+
+- **記述統計**: データそのものを要約する
+    - 要約統計量 (e.g., 平均、標準偏差、etc.)
+    - 作図、作表
+- **推測統計**: データの背後にある母集団・生成過程を考える
+    - 数理モデル
+    - 確率分布
+    - パラメータ(母数)
+
+「グラフを眺めてなんとなく分かる」以上の分析には**モデル**が必要
+
+---
+## モデルとは
+
+対象システムを単純化・理想化して扱いやすくしたもの
+
+Mathematical Model 数理モデル<img src="../tokiomarine2021/image/hill-equation.png" width="210" style="float: right; margin: 0 -5px;">
+: 数学的な方程式として記述されるもの。
+: e.g., Lotka-Volterra eq., <span style="opacity: 0.6;">Hill eq.</span>\
+  <br>
+
+Computational Model 数値計算モデル<img src="/slides/image/tumopp/Chex_Lconst.gif" width="210" style="float: right;">
+: 数値計算の手続きとして記述されるもの。
+: e.g., Schelling’s Segregation Model, <span style="opacity: 0.6;"><em>tumopp</em></span>\
+  <br>
+
+Concrete Model 具象モデル<img src="../tokiomarine2021/image/weisberg-sfbay.jpg" width="330" style="float: right;">
+: 具体的な事物で作られるもの。
+: e.g., San Francisco Bay-Delta Model
+
+<small>
+<a href="https://amzn.to/3bdvhuI">Weisberg 2012 <cite>Simulation and Similarity (科学とモデル)</cite></a>
+</small>
+
+???
+数理モデルが決定論的、数値計算が確率論的、になる場合が多いけど必ずしもそうではない。
+解析的に解くことを諦めて計算機にやらせるという点で実装方法は異なるが、
+数理的に記述して解釈するという大枠では同じとみなしたほうがいいかもしれない。
+
+プラモデル: 車や飛行機の重さ・材質は無視して色や形を模倣
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。
+
+<figure>
+<img src="../tokiomarine2021/math-model.drawio.svg" width="1200">
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
+</figure>
+
+
+???
+
+確率モデル: 決定論的なモデルじゃなくて確率論的なゆらぎを導入したもの。
+ただし、大塚淳さんの定義は異なる。
+帰納推論を可能にする枠組みとして自然の斉一性(ヒューム)を仮定した上で、
+データを生成している真の現象を確率用語で記述したものが確率モデルだ、という感じ。
+そこからさらに強い仮定としてパラメトリックな確率分布を生成元としたのが統計モデル。
+
+---
+## データ科学における数理モデル
+
+データ生成をうまく真似できそうな仮定の数式表現。\
+e.g., 大きいほど高く売れる: $\text{price} = A \times \text{carat} + B + \epsilon$
+
+```{r, lm-diamonds}
+#| echo: false
+#| fig.height: 5
+#| fig.width: 6
+diamonds |>
+  dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
+  ggplot(aes(carat, price)) +
+  geom_point(shape = 16, size = 3, alpha = 0.3) +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE) +
+  coord_cartesian(ylim = c(0, 20000)) +
+  labs(title = "Diamonds") +
+  theme_classic(base_size = 22)
+```
+
+新しく採れたダイヤモンドの価格予想とかにも使える。
+
+このように「YをXの関数として表す」ようなモデルを**回帰**と呼ぶ。
+
+
+---
+## 回帰は教師あり機械学習の一種とも言える
+
+<figure>
+<img src="../tokiomarine2021/regression-in-ml.drawio.svg" width="1200">
+</figure>
+
+でも統計モデリングはいわゆる“機械学習”とは違う気もする...?
+
+
+---
+## モデリングにおける2つのアプローチ
+
+<figure>
+<img src="../tokiomarine2021/model-approaches.drawio.svg" width="1200">
+<figcaption><small>「<a href="https://amzn.to/3uCxTKo"><cite>データ分析のための数理モデル入門</cite></a>」江崎貴裕 2020 より改変</small></figcaption>
+</figure>
+
+---
+## どっちも知っておいて使い分けたい
+
+項目       | 統計モデリング | 近年の機械学習
+---------- | -------------- | ----------------
+モデル構造 | 単純化したい | 性能のためなら複雑化
+モデル解釈 | **ここが強み** | 難しい。重視しない。途上。
+予測・生成 | うまくすれば頑健 | **主目的**。強力。高精度
+データ量   | 少なくてもそれなり | 大量に必要
+計算量     | 場合による  | 場合による
+例 | 一般化線形モデル<br>階層ベイズモデル | ランダムフォレスト<br>ニューラルネットワーク
+
+教科書的には概ねこんな感じとして、実際の仕事ではどうだろう？
+
+---
+## 現役データサイエンティスト2人に聞きました
+
+- 統計モデルはデータ加工など事前の手続きが多め。\
+  機械学習は事前の決定が少ないので楽ちん。
+- 「要因の効果はどれくらい？」\
+  意思決定をするのは結局人間。物事を分かった上で判断したい。\
+  **実務の人への説明**や**意思決定**の場面で解析の解釈性が重要。
+- **仮説があるなら**、それに基づいて統計モデリング。\
+  何もないところからまず機械学習で要因抽出・仮説生成するのもあり。
+- 統計モデル縛り・実行環境縛りなどの案件もある。
+- 分析方針を決める立場の上級職になるつもりなら統計モデルも必要。
+
+協力: [`@kato_kohaku`](https://twitter.com/kato_kohaku)さん、[`@teuder`](https://twitter.com/teuder)さん
+
+
+---
+## 統計モデリングの教科書決定版: 久保先生の[<abbr title="データ解析のための統計モデリング入門">緑本</abbr>](https://amzn.to/33suMIZ)
+
+ちょっとずつ線形モデルを発展させていく。
+
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
+</a>
+</figure>
+
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 100% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+
+  <div>
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b style="color: #56B4E9">確率分布</b>を扱いたい
+</p>
+
+**一般化線形モデル GLM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b style="color: #E69F00;">個体差</b>などの変量効果を扱いたい
+</p>
+
+**一般化線形混合モデル GLMM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b style="color: #B2001D;">自由なモデリング</b>を！
+</p>
+
+**階層ベイズモデル HBM**
+
+  </div>
+  <div style="text-align: right;">
+
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+
+  </div>
+</div>
+
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
+
+
+---
+## 余裕があれば、手元でRを動かして体感しよう！
+
+1.  こういう枠が出てきたら、自分のRスクリプトに**コピペして保存**:
+    ```r
+    head(iris)
+    ```
+1.  **実行してコンソールを確認**。思ったとおりの出力？\
+    `Error` や `Warning` があったらよく読んで対処する。
+1.  🔰若葉マークの練習問題があれば解いてみる。\
+    そこまでのコードの**コピペ＋改変**でできるはず。
+
+<br>
+<hr>
+
+Rの基礎、データ前処理、データ可視化などについては別資料を参照:\
+<https://heavywatal.github.io/slides/tohoku2026r/1-introduction.html>
+
+
+
+---
+## Rとは
+
+統計解析と作図の機能が充実したプログラミング言語・環境
+
+<figure style="float: right;">
+<a href="https://cran.r-project.org/">
+<img src="/slides/image/rstats/Rlogo.svg" height="200">
+<figcaption><small>https://cran.r-project.org/</small></figcaption>
+</a>
+</figure>
+
+クロスプラットフォーム
+: Linux, Mac, Windows で動く
+
+オープンソース
+: 永久に無償で、すべての機能を使える。
+: 集合知によって常に進化している。
+
+コミュニティ
+: 相談できる人や参考になるウェブサイトがたくさん見つかる。
+
+他のプログラミング言語でもいいよ:
+[Python](https://www.python.org/)とか[Julia](https://julialang.org/)とか。
+
+
+---
+## よりよい回帰をめざして
+
+久保先生の[<abbr title="データ解析のための統計モデリング入門">緑本</abbr>](https://amzn.to/33suMIZ)に沿ってちょっとずつ線形モデルを発展させていく。
+
+<figure style="float: right; margin-inline-start: 0.5em; margin-block: 0;">
+<a href="https://kuboweb.github.io/-kubo/ce/IwanamiBook.html">
+<img src="../tokiomarine2021/image/kubo-book.jpg" width="360" alt="データ解析のための統計モデリング入門 久保拓弥 2012">
+<figcaption><small>https://kuboweb.github.io/-kubo/ce/IwanamiBook.html</small></figcaption>
+</a>
+</figure>
+
+<div class="column-container" style="position: relative; padding-inline: 0.75em;">
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 12em; background-color: hsl(80deg 0% 50% / 10%); border-radius: 0 0 0 87.5%;"></div>
+<div style="position: absolute; top: 0; right: 0; width: 100%; height: 3em; background-color: hsl(80deg 100% 50% / 15%); border-radius: 0 0 0 87.5%;"></div>
+
+  <div>
+
+**線形モデル LM** (単純な直線あてはめ)
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ いろんな<b>確率分布</b>を扱いたい
+</p>
+
+**一般化線形モデル GLM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ <b>個体差</b>などの変量効果を扱いたい
+</p>
+
+**一般化線形混合モデル GLMM**
+
+<p style="opacity: 0.7; margin-inline-start: 2em;">
+↓ もっと<b>自由なモデリング</b>を！
+</p>
+
+**階層ベイズモデル HBM**
+
+  </div>
+  <div style="text-align: right;">
+
+<p>最小二乗法<br><br><br></p>
+<p>最尤推定法<br><br><br><br></p>
+<p>MCMC</p>
+
+  </div>
+</div>
+
+<small>「<cite>[データ解析のための統計モデリング入門](https://amzn.to/33suMIZ)</cite>」久保拓弥 2012 より改変</small>
+
+
+---
+## 直線あてはめ: 統計モデルの出発点
+
+<img `r src_alt_fig_chunk("weight-lm")`>
+
+- 身長が高いほど体重も重い。いい感じ。
+
+(説明のために作った架空のデータ。今後もほぼそうです)
+
+
+---
+## 回帰モデルの2段階
+
+1. Define a **family of models**: だいたいどんな形か、式をたてる
+    - 直線: $y = a_1 + a_2 x$
+    - 対数: $\log(y) = a_1 + a_2 x$
+    - 二次曲線: $y = a_1 + a_2 x^2$
+
+2. Generate a **fitted model**: データに合うようにパラメータを調整
+    - $y = 3x + 7$
+    - $y = 9x^2$
+
+<small><https://r4ds.had.co.nz/model-basics.html></small>
+
+---
+## たぶん身長が高いほど体重も重い
+
+なんとなく $y = a x + b$ でいい線が引けそう\
+&nbsp;
+
+```{r, df-linear}
+#| echo: false
+set.seed(19937)
+n = 50
+df_weight = tibble::tibble(
+  height = rnorm(n, 1.70, 0.05),
+  bmi = rnorm(n, 22, 1),
+  weight = bmi * (height**2)
+)
+```
+```{r, weight-height}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 5.5
+p_weight = ggplot(df_weight) +
+  aes(height, weight) +
+  geom_point(shape = 16, size = 3, alpha = 0.5) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid = element_blank())
+p_weight
+```
+
+
+---
+## たぶん身長が高いほど体重も重い
+
+なんとなく $y = a x + b$ でいい線が引けそう\
+じゃあ傾き *a* と切片 *b*、どう決める？
+
+```{r, weight-lines}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 5.5
+set.seed(19937)
+df_ab = tibble(intercept = runif(n, -50, 50), slope = runif(n, -200, 200)) |>
+  dplyr::mutate(intercept = intercept - 1.7 * slope + 50)
+p_weight +
+  geom_abline(data = df_ab, aes(intercept = intercept, slope = slope), color = "#3366ff", linewidth = 1, alpha = 0.5)
+```
+
+
+---
+## 最小二乗法 (Ordinary Least Square: OLS)
+
+<span style="color: #3366ff">回帰直線</span>からの<strong style="color: #E69F00">残差</strong>平方和(RSS)を最小化する。
+
+```{r, weight-residual}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 11
+fit_weight = function(parameters, data) {
+  parameters[1] + parameters[2] * data$height
+}
+
+add_fitted_weight = function(data, parameters) {
+  dplyr::mutate(data, .fitted = fit_weight(param1, data = data))
+}
+
+rss_weight = function(parameters, data) {
+  .fitted = fit_weight(parameters, data)
+  sqdev = (data[["weight"]] - .fitted)**2
+  sum(sqdev)
+}
+# rss_weight(c(40, -5), df_weight)
+
+param1 = c(10, 30)
+lm_weight = lm(weight ~ height, data = df_weight)
+rss1 = rss_weight(param1, df_weight)
+rss2 = rss_weight(lm_weight$coefficients, df_weight)
+stopifnot(abs(sum(lm_weight$residuals**2) - rss2) < 1e-6)
+
+p1 = p_weight %+%
+  add_fitted_weight(df_weight, param1) +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 1) +
+  geom_linerange(aes(ymin = weight, ymax = .fitted), color = "#E69F00", linewidth = 1, alpha = 0.8)
+p2 = p1 %+% broom::augment(lm_weight)
+cowplot::plot_grid(nrow = 1L,
+  p1 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss1), size = 8, hjust = -0.1, vjust = 2),
+  p2 + annotate("text", x = -Inf, y = Inf, label = sprintf("RSS = %.1f", rss2), size = 8, hjust = -0.1, vjust = 2)
+)
+```
+
+
+---
+## 残差平方和(RSS)が最小となるパラメータを探せ
+
+ランダムに試してみて、上位のものを採用。\
+この程度の試行回数では足りなそう。
+
+```{r, weight-goodlines}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 11
+set.seed(19937)
+n = 200
+df_ab_random = tibble::tibble(intercept = runif(n, -200, 100), slope = runif(n, 0, 150)) |>
+  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
+p_ab = ggplot(df_ab_random) +
+  aes(intercept, slope) +
+  geom_point(data = \(x) dplyr::filter(x, rank(rss) < 6), shape = 1, size = 6) +
+  geom_point(aes(color = log10(rss)), shape = 16, size = 3) +
+  theme_bw(base_size = 22) +
+  theme(panel.grid = element_blank(), legend.justification = c(1, 1),
+    legend.position = "inside", legend.position.inside = c(0.99, 0.99))
+
+df_randmin = df_ab_random |> dplyr::slice_min(rss, n = 5)
+p2 = p_weight + geom_abline(
+  aes(slope = slope, intercept = intercept),
+  data = df_randmin, color = "#3366ff", alpha = 0.5, linewidth = 1
+)
+cowplot::plot_grid(p_ab, p2, nrow = 1L)
+```
+
+---
+## 残差平方和(RSS)が最小となるパラメータを探せ
+
+**グリッドサーチ**: パラメータ空間の一定範囲内を均等に試す。\
+さっきのランダムよりはちょっとマシか。
+
+```{r, weight-grid}
+#| echo: false
+#| fig.height: 5.5
+#| fig.width: 11
+df_ab_grid = tidyr::crossing(intercept = seq(-100, -30, 4), slope = seq(50, 100, 4)) |>
+  dplyr::mutate(rss = purrr::map2_dbl(intercept, slope, ~ rss_weight(c(.x, .y), data = df_weight)))
+
+p1 = p_ab %+% df_ab_grid
+
+df_gridmin = df_ab_grid |> dplyr::slice_min(rss, n = 5)
+p2 = p_weight + geom_abline(
+  aes(slope = slope, intercept = intercept),
+  data = df_gridmin, color = "#3366ff", alpha = 0.5, linewidth = 1
+)
+cowplot::plot_grid(p1, p2, nrow = 1L)
+```
+
+こうした**最適化**の手法はいろいろあるけど、ここでは扱わない。
+
+
+---
+## これくらいなら一瞬で計算してもらえる
+
+```{r, ols}
+par_init = c(intercept = 0, slope = 0)
+result = optim(par_init, fn = rss_weight, data = df_weight)
+result$par
+```
+
+```{r, weight-lm}
+#| echo: false
+#| fig.height: 4
+#| fig.width: 4
+label = sprintf("y = %.1f x + %.1f", result$par["slope"], result$par["intercept"])
+p_weight +
+  stat_smooth(formula = y ~ x, method = lm, se = FALSE, color = "#3366ff", alpha = 0.5) +
+  annotate("text", x = -Inf, y = Inf, hjust = -0.1, vjust = 2, label = label, size = 6, color = "#3366ff")
+```
+
+上記コードは最適化一般の書き方。覚えなくていい。\
+回帰が目的なら次ページのようにするのが楽 →
+
+
+---
+## `lm()` で直線あてはめしてみる
+
+架空のデータを作る(乱数生成については後述):
+```{r, generate-df-linear}
+#| ref.label: "df-linear"
+#| echo: -1
+#| eval: false
+```
+
+データと関係式(`Y ~ X` の形)を `lm()` に渡して係数を読む:
+```{r, lm-demo}
+fit = lm(data = df_weight, formula = weight ~ height)
+coef(fit)
+```
+
+せっかくなので作図もやってみる→
+
+---
+## `lm()` の結果をggplotする
+
+```{r, lm-ggplot}
+#| fig.height: 3
+#| fig.width: 3
+df_aug = broom::augment(fit, type.predict = "response")
+head(df_aug, 3L)
+ggplot(df_aug) +
+  aes(height, weight) +
+  geom_point() +
+  geom_line(aes(y = .fitted), linewidth = 1, color = "#3366ff")
+```
+
+---
+## 🔰 ほかのデータでも `lm()` を試してみよう
+
+```{r, lm-mpg}
+#| fig.height: 3
+#| fig.width: 3
+fit = lm(data = mpg, formula = hwy ~ displ)
+broom::tidy(fit)
+
+mpg_aug = broom::augment(fit, type.predict = "response")
+ggplot(mpg_aug) + aes(displ, hwy) + geom_point() +
+  geom_line(aes(y = .fitted), linewidth = 1, color = "#3366ff")
+```
+
+🔰 `diamonds` などほかのデータでも `lm()` を試してみよう。
+
+
+---
+## 参考文献
+
+- [データ解析のための統計モデリング入門](https://amzn.to/33suMIZ) 久保拓弥 2012
+- [StanとRでベイズ統計モデリング](https://amzn.to/3uwx7Pb) 松浦健太郎 2016
+- [RとStanではじめる ベイズ統計モデリングによるデータ分析入門](https://amzn.to/3o1eCzP) 馬場真哉 2019
+- [データ分析のための数理モデル入門](https://amzn.to/3uCxTKo) 江崎貴裕 2020
+- [分析者のためのデータ解釈学入門](https://amzn.to/3uznzCK) 江崎貴裕 2020
+- [統計学を哲学する](https://amzn.to/3ty80Kv) 大塚淳 2020
+- [科学とモデル---シミュレーションの哲学 入門](https://amzn.to/2Q0f6JQ) Michael Weisberg 2017\
+  (原著: [Simulation and Similarity](https://amzn.to/3bdvhuI) 2013)
+- 「[進化学実習2026](/slides/tohoku2026r/)」
+  東北大学 理学部生物学科 (2026-04)
+- 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2025/)」
+  石川由希 2025 名古屋大学
+- 「[統計モデリング概論 DSHC 2025](/slides/tokiomarine2025/)」
+  東京海上 [DSHC](https://tokiomarine-dshc.com/) (2025-08)
+
+`r .meta$next_link`
