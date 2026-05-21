@@ -763,33 +763,35 @@ beer_sales ~ mean_temp + min_temp
 </figcaption>
 </a>
 </figure>
-<pre tabindex="0"><code>      species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g    sex year
-  1    Adelie Torgersen           39.1          18.7               181        3750   male 2007
-  2    Adelie Torgersen           39.5          17.4               186        3800 female 2007
-  3    Adelie Torgersen           40.3          18.0               195        3250 female 2007
-  4    Adelie Torgersen             NA            NA                NA          NA     NA 2007
- --                                                                                           
-341 Chinstrap     Dream           43.5          18.1               202        3400 female 2009
-342 Chinstrap     Dream           49.6          18.2               193        3775   male 2009
-343 Chinstrap     Dream           50.8          19.0               210        4100   male 2009
-344 Chinstrap     Dream           50.2          18.7               198        3775 female 2009
+<pre tabindex="0"><code>      species    island bill_len bill_dep flipper_len body_mass    sex year
+  1    Adelie Torgersen     39.1     18.7         181      3750   male 2007
+  2    Adelie Torgersen     39.5     17.4         186      3800 female 2007
+  3    Adelie Torgersen     40.3     18.0         195      3250 female 2007
+  4    Adelie Torgersen       NA       NA          NA        NA     NA 2007
+ --                                                                        
+341 Chinstrap     Dream     43.5     18.1         202      3400 female 2009
+342 Chinstrap     Dream     49.6     18.2         193      3775   male 2009
+343 Chinstrap     Dream     50.8     19.0         210      4100   male 2009
+344 Chinstrap     Dream     50.2     18.7         198      3775 female 2009
 </code></pre>
 </section>
 <section>
 <h2 id="欠損値のある行を取り除いておく">欠損値のある行を取り除いておく</h2>
 <p>性別はとりあえず使わないので、体長関連だけでも。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">dplyr</span><span class="o">::</span><span class="nf">filter</span><span class="p">(</span><span class="n">dplyr</span><span class="o">::</span><span class="nf">if_any</span><span class="p">(</span><span class="nf">everything</span><span class="p">(),</span> <span class="n">is.na</span><span class="p">))</span>
-</span></span></code></pre></div><pre tabindex="0"><code>   species    island bill_length_mm bill_depth_mm flipper_length_mm body_mass_g sex year
- 1  Adelie Torgersen             NA            NA                NA          NA  NA 2007
- 2  Adelie Torgersen           34.1          18.1               193        3475  NA 2007
- 3  Adelie Torgersen           42.0          20.2               190        4250  NA 2007
- 4  Adelie Torgersen           37.8          17.1               186        3300  NA 2007
---                                                                                      
- 8  Gentoo    Biscoe           46.2          14.4               214        4650  NA 2008
- 9  Gentoo    Biscoe           47.3          13.8               216        4725  NA 2009
-10  Gentoo    Biscoe           44.5          15.7               217        4875  NA 2009
-11  Gentoo    Biscoe             NA            NA                NA          NA  NA 2009
-</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">)</span>
+</span></span></code></pre></div><pre tabindex="0"><code>   species    island bill_len bill_dep flipper_len body_mass  sex year
+1   Adelie Torgersen       NA       NA          NA        NA &lt;NA&gt; 2007
+2   Adelie Torgersen     34.1     18.1         193      3475 &lt;NA&gt; 2007
+3   Adelie Torgersen     42.0     20.2         190      4250 &lt;NA&gt; 2007
+4   Adelie Torgersen     37.8     17.1         186      3300 &lt;NA&gt; 2007
+5   Adelie Torgersen     37.8     17.3         180      3700 &lt;NA&gt; 2007
+6   Adelie     Dream     37.5     18.9         179      2975 &lt;NA&gt; 2007
+7   Gentoo    Biscoe     44.5     14.3         216      4100 &lt;NA&gt; 2007
+8   Gentoo    Biscoe     46.2     14.4         214      4650 &lt;NA&gt; 2008
+9   Gentoo    Biscoe     47.3     13.8         216      4725 &lt;NA&gt; 2009
+10  Gentoo    Biscoe     44.5     15.7         217      4875 &lt;NA&gt; 2009
+11  Gentoo    Biscoe       NA       NA          NA        NA &lt;NA&gt; 2009
+</code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">penguins_dropna</span> <span class="o">=</span> <span class="n">penguins</span> <span class="o">|&gt;</span> <span class="n">tidyr</span><span class="o">::</span><span class="nf">drop_na</span><span class="p">(</span><span class="n">body_mass</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="nf">dim</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>[1] 342   8
 </code></pre>
@@ -799,7 +801,7 @@ beer_sales ~ mean_temp + min_temp
 <p>次の課題を解いてみよう。<br>
 (次ページ以降に解答があるけど、まずは自力で。)</p>
 <ol>
-<li><code>body_mass_g</code> を横軸、 <code>flipper_length_mm</code> を縦軸に、まず作図。</li>
+<li><code>body_mass</code> を横軸、 <code>flipper_len</code> を縦軸に、まず作図。</li>
 <li>単回帰して、切片と傾きを求める。そして作図。</li>
 <li><code>species</code> で色分けして作図。</li>
 <li><code>species</code> も説明変数に加えて重回帰し、切片と傾きを求める。そして作図。</li>
@@ -810,7 +812,7 @@ beer_sales ~ mean_temp + min_temp
 <h2 id="単回帰の練習-1-まず作図">単回帰の練習: 1. まず作図</h2>
 <p>どうやら、重いペンギンほど翼長も長い。</p>
 <div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">p_penweight</span> <span class="o">=</span> <span class="nf">ggplot</span><span class="p">(</span><span class="n">penguins_dropna</span><span class="p">)</span> <span class="o">+</span>
-</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass_g</span><span class="p">,</span> <span class="n">flipper_length_mm</span><span class="p">)</span> <span class="o">+</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">aes</span><span class="p">(</span><span class="n">body_mass</span><span class="p">,</span> <span class="n">flipper_len</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">geom_point</span><span class="p">(</span><span class="n">shape</span> <span class="o">=</span> <span class="m">16</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="m">2</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="m">0.66</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">theme_bw</span><span class="p">(</span><span class="n">base_size</span> <span class="o">=</span> <span class="m">22</span><span class="p">)</span> <span class="o">+</span>
 </span></span><span class="line"><span class="cl">  <span class="nf">theme</span><span class="p">(</span><span class="n">panel.grid.minor</span> <span class="o">=</span> <span class="nf">element_blank</span><span class="p">())</span>
@@ -822,11 +824,11 @@ beer_sales ~ mean_temp + min_temp
 <h2 id="単回帰の練習-2-モデル作成フィッティング">単回帰の練習: 2. モデル作成、フィッティング</h2>
 <p>とりあえずデフォルトの正規分布・恒等リンク。
 $y = 136.7 + 0.0153 x$</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit1</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_len</span> <span class="o">~</span> <span class="n">body_mass</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>         term     estimate   std.error statistic       p.value
 1 (Intercept) 136.72955927 1.996835406  68.47312 5.712947e-201
-2 body_mass_g   0.01527592 0.000466836  32.72223 4.370681e-107
+2   body_mass   0.01527592 0.000466836  32.72223 4.370681e-107
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit1</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC     BIC deviance df.residual nobs
 1      67426.54     341 -1145.518 2297.035 2308.54  16250.3         340  342
@@ -855,11 +857,11 @@ $y = 136.7 + 0.0153 x$</p>
 <h2 id="重回帰の練習-2-モデル作成フィッティング">重回帰の練習: 2. モデル作成、フィッティング</h2>
 <p>Adelieを基準に、ChinstrapとGentooはそれより長め。<br>
 体重の効果は単回帰のとき(0.0153)より小さい。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit2</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_len</span> <span class="o">~</span> <span class="n">body_mass</span> <span class="o">+</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>              term     estimate    std.error statistic       p.value
 1      (Intercept) 1.588603e+02 2.3865766963 66.564071 2.450113e-196
-2      body_mass_g 8.402113e-03 0.0006338976 13.254686  1.401600e-32
+2        body_mass 8.402113e-03 0.0006338976 13.254686  1.401600e-32
 3 speciesChinstrap 5.597440e+00 0.7882166229  7.101398  7.334777e-12
 4    speciesGentoo 1.567747e+01 1.0906590679 14.374308  6.800823e-37
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit2</span><span class="p">)</span>
@@ -881,15 +883,15 @@ $y = 136.7 + 0.0153 x$</p>
 <h2 id="交互作用の練習-モデル作成フィッティング">交互作用の練習: モデル作成、フィッティング</h2>
 <p>Adelieを基準に、Chinstrapの傾きが結構違う。<br>
 切片の違いは解釈しにくくなった。</p>
-<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_length_mm</span> <span class="o">~</span> <span class="n">body_mass_g</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">fit3</span> <span class="o">=</span> <span class="nf">glm</span><span class="p">(</span><span class="n">flipper_len</span> <span class="o">~</span> <span class="n">body_mass</span> <span class="o">*</span> <span class="n">species</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">penguins_dropna</span><span class="p">)</span>
 </span></span><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">tidy</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
-</span></span></code></pre></div><pre tabindex="0"><code>                          term      estimate    std.error statistic       p.value
-1                  (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
-2                  body_mass_g   0.006676867 0.0009522935  7.011354  1.301783e-11
-3             speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
-4                speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
-5 body_mass_g:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
-6    body_mass_g:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
+</span></span></code></pre></div><pre tabindex="0"><code>                        term      estimate    std.error statistic       p.value
+1                (Intercept) 165.244812649 3.5508916651 46.536146 1.561669e-148
+2                  body_mass   0.006676867 0.0009522935  7.011354  1.301783e-11
+3           speciesChinstrap -13.863939075 7.3012647809 -1.898841  5.844186e-02
+4              speciesGentoo   6.059375933 6.0508813200  1.001404  3.173522e-01
+5 body_mass:speciesChinstrap   0.005228197 0.0019486293  2.683013  7.657147e-03
+6    body_mass:speciesGentoo   0.002362269 0.0013525781  1.746494  8.163897e-02
 </code></pre><div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">broom</span><span class="o">::</span><span class="nf">glance</span><span class="p">(</span><span class="n">fit3</span><span class="p">)</span>
 </span></span></code></pre></div><pre tabindex="0"><code>  null.deviance df.null    logLik      AIC      BIC deviance df.residual nobs
 1      67426.54     341 -1055.711 2125.422 2152.265 9611.166         336  342
