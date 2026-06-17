@@ -631,7 +631,7 @@ draws_cred = fit_cred$draws(format = "df") |> print()
 
 .probs = c(lower = 0.025, median = 0.5, upper = 0.975)
 df_quant = draws_cred |>
-  dplyr::reframe(dplyr::across(starts_with("y_tilde"), quantile, probs = .probs)) |>
+  dplyr::reframe(dplyr::across(starts_with("y_tilde"), \(x) quantile(x, probs = .probs))) |>
   dplyr::mutate(label = names(.probs)) |>
   tidyr::pivot_longer(!label, names_to = "x", values_to = "y") |>
   dplyr::mutate(x = data_cred[["x_tilde"]][readr::parse_number(x)]) |>

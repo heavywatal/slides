@@ -513,12 +513,13 @@ df_density = tibble::tibble(
   Density = dbeta(p, n_head, n_total - n_head)
 )
 
-.theme = theme_minimal(base_size = 20) + theme(
+.theme = theme_minimal(base_size = 18) + theme(
   panel.grid.minor = element_blank(),
   panel.grid.major.y = element_blank(),
   axis.text = element_blank()
 )
 
+.coord = coord_cartesian(xlim = c(-0.1, 0.8))
 bound = qbeta(c(0.025, 0.975), n_head, n_total - n_head)
 .f = function(.x) {dplyr::filter(.x, dplyr::between(p, bound[1], bound[2]))}
 .g = function(.x) {dplyr::mutate(.x, Density = ifelse(dplyr::between(p, bound[1], bound[2]), 0, Density))}
@@ -528,10 +529,11 @@ p_eti = df_density |>
   geom_line(color = "#999999", linewidth = 1) +
   geom_area(data = .f, fill = "#56B4E9", alpha = 0.5) +
   geom_area(data = .g, fill = "#333333", alpha = 0.8) +
-  annotate("text", x = bound[1], y = 0.7, label = "2.5%", color = "#333333", hjust = 1) +
+  annotate("text", x = bound[1], y = 1.2, label = "2.5%", color = "#333333", hjust = 1) +
   annotate("text", x = bound[2], y = 0.7, label = "2.5%", color = "#333333", hjust = 0) +
   scale_x_continuous(breaks = bound) +
   labs(title = "Equal-Tailed Interval (ETI)", x = "Parameter") +
+  .coord +
   .theme + theme(panel.grid.major = element_line(color = "#56B4E9"))
 
 hdi_lb = hdi_lowerbound(df_density$Density)
@@ -545,6 +547,7 @@ p_hdi = df_density |>
   geom_hline(aes(yintercept = hdi_lb), color = "#444444", linewidth = 1, linetype = "dashed") +
   scale_x_continuous(breaks = range_hdi) +
   labs(title = "Highest Density Interval (HDI)", x = "Parameter") +
+  .coord +
   .theme + theme(panel.grid.major = element_line(color = "#56B4E9"))
 
 .map = function(.x) {dplyr::slice_max(.x, Density)}
@@ -574,6 +577,7 @@ p_point = df_density |>
   ggrepel::geom_text_repel(aes(y = 0.45, label = "MED"), .med, color = .colors["med"], size = 5, nudge_x = 0.1) +
   ggrepel::geom_text_repel(aes(y = 0.25, label = "EAP"), .eap, color = .colors["eap"], size = 5, nudge_x = 0.2) +
   labs(title = "Point Estimation", x = "Parameter") +
+  .coord +
   .theme + theme(panel.grid = element_blank())
 cowplot::plot_grid(p_eti, p_hdi, p_point, ncol = 1L)
 ```
