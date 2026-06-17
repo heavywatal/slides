@@ -28,17 +28,17 @@ and [others supported in `rmarkdown` package](https://bookdown.org/yihui/rmarkdo
 ## R packages used in `*.Rmd`
 
 ```r
+install.packages("knitr")
+install.packages("tidyverse")
+install.packages("tidymodels")
+install.packages("cowplot")
+install.packages(c("ggrepel", "ggridges"))
+install.packages("nycflights13")
+install.packages("gifski")
+install.packages("cmdstanr", repos = c('https://stan-dev.r-universe.dev', getOption("repos")))
+install.packages("bayesplot")
+install.packages(c("rstan", "rstanarm", "tidybayes"))
 install.packages("pak")
-pak::pak("knitr")
-pak::pak("tidyverse")
-pak::pak("tidymodels")
-pak::pak("cowplot")
-pak::pak(c("ggrepel", "ggridges"))
-pak::pak("nycflights13")
-pak::pak("gifski")
-pak::repo_add(stan = "https://stan-dev.r-universe.dev")
-pak::pak(c("cmdstanr", "bayesplot"))
-pak::pak(c("rstan", "rstanarm", "tidybayes"))
 pak::pak("heavywatal/rwtl")
 ```
 
@@ -68,7 +68,7 @@ decktape -s 800x600 automatic https://comicalcommet.github.io/r-training-2025/R_
    Add the following lines to your shell profile (e.g., `~/.bashrc`):
    ```sh
    export PNPM_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/pnpm"
-   PATH="$PNPM_HOME:$PATH"
+   PATH="$PNPM_HOME/bin:$PATH"
    ```
 1. Install [node](https://nodejs.org/):
    ```sh
