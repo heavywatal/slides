@@ -56,7 +56,7 @@ draft = false
       [Mac](https://cran.r-project.org/bin/macosx/)
       → `R-4.6.0-arm64.pkg` (Apple Silicon) or `R-4.6.0-x86_64.pkg` (Intel)
 1.  <https://posit.co/download/rstudio-desktop/>
-    から最新版の **RStudio (≥ 2026.04.0)** をダウンロードしてインストール。
+    から最新版の **RStudio (≥ 2026.05.1)** をダウンロードしてインストール。
     古いものが既に入っている場合は念のため削除してから。
 1.  開発者ツールをインストール。
     ここでは必須ではないけどいずれ使うことになる。
