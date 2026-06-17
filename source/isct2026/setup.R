@@ -54,7 +54,7 @@ src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
   dplyr::filter(this) |>
   dplyr::pull(date) |>
   as.Date() |>
-  paste0(" 東京医科歯科大学 M&Dタワー<br>")
+  paste0(" 東京科学大学 M&Dタワー<br>")
 .meta$href_prev = with(.meta$data, {
   outfile[id[this] - 1]
 })
