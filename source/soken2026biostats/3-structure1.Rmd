@@ -8,15 +8,6 @@
 #| cache: false
 ```
 
----
-## 作業再開、出欠確認
-
-1. `r-training-2026.Rproj` をダブルクリック。\
-   正しい working directory でRStudioが起動される。
-1. [初日と同じ手順](1-introduction.html#/37)で出欠確認。
-1. 今日のぶんのスクリプトを新規作成し、好きな名前で保存。
-1. [tidyverseの読み込み](2-visualization.html#/23)や[パレット設定](2-visualization.html#/36)など、
-   おまじないをまず実行。
 
 
 ---
@@ -645,6 +636,14 @@ vectorを受け取って1つの値を返す集約関数:\
 
 🔰 `mpg` の**市街地(cty)と高速道路(hwy)の燃費平均値**を計算しよう
 
+<hr>
+<aside>
+
+複数の値を返す関数で集約する場合は亜種 `reframe()` を使う。\
+e.g., `range()`, `quantile()`, etc.
+</aside>
+
+
 ---
 ## 要約・集計: `summarize()`
 
@@ -672,21 +671,6 @@ result = diamonds |>
 ```
 
 🔰 `mpg` の**各数値列の最大値を駆動方式ごとに**計算しよう
-
-
----
-## 要約・集計: `reframe()`
-
-複数の値を返す関数で集約すると、結果は複数行にまたがる:
-```{r, reframe}
-quantile(diamonds$price)
-
-result = diamonds |>
-  dplyr::reframe(across(where(is.numeric), quantile)) |>
-  print()
-```
-
-🔰 `mpg` の**各数値列の `range()` を駆動方式ごとに**計算しよう
 
 
 ---

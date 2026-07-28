@@ -1412,141 +1412,6 @@ p_bill + geom_line(aes(y = .fitted, color = sex), data = aug4, linewidth = 1) +
   - 機械的なモデル選択が理解の役に立つとは限らない
 
 
----
-## 今日の残り時間
-
-- 班やTAに相談し、消化しきれなかった部分をなるべく解消する。
-- 今日の課題1と2はレポート向けなので、後回しでもいい。
-- **明日発表する最終課題に取り組み、だいたい形になった人から解散。**
-  - Quartoのオプションや体裁が大丈夫か、TAに確認してもらう。
-- 遅くとも17:50には部屋を閉めたい。TAの給料は17:00まで。
-
-
----
-## 補遺
-
-ここ以降の練習問題はレポートに入れなくてもいいです。\
-入れてもいいですが。
-
-
----
-## 🔰 重回帰
-
-均等に回帰線を引くには `broom::augment()` の使い方に工夫が必要。\
-とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
-
-```{r, generate-df-beer}
-#| ref.label: "df-beer"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 ロジスティック回帰
-
-次ページにヒント。
-
-```{r, generate-df-logistic}
-#| ref.label: "df-logistic"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## ロジスティック回帰のヒント
-
-左辺の応答変数に指定できるのはだいたい次の2種類:
-- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
-- 1列目が成功回数、2列目が失敗回数の整数matrix
-
-今回の場合、成功回数 `y` だけをformulaに入れると怒られる
-```{r, logistic-error}
-#| error: true
-glm(y ~ x, df_logistic, family = binomial)
-```
-ので失敗回数もモデルに含むよう `response ~ x` とする。
-
-(今回のように試行回数が10回固定じゃなくても使える、ということ)
-
-
----
-## 🔰 共分散分析: GLM with 質的変数 + 量的変数
-
-まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
-
-```{r, generate-df-ancova}
-#| ref.label: "df-ancova"
-#| echo: -1
-#| cache.vars: []
-```
-
----
-## 🔰 交互作用
-
-
-```{r, generate-df-interact}
-#| ref.label: "df-interact"
-#| echo: -1
-#| cache.vars: []
-```
-
-
----
-## 🔰 架空データでGLM
-
-宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。\
-冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。\
-これらの変数の間に、なんらかの関係は見られるだろうか？
-
-[adventure.tsv](../tohoku2025r/adventure.tsv)
-
-```{r, adventure-data}
-#| echo: false
-set.seed(19937)
-samplesize = 1000L
-b0 = 0.7
-b1 = 0.01
-b2 = -0.5
-b3 = 0.02
-b12 = 0.03
-
-dfraw = tibble::tibble(
-  level = sample.int(50L, samplesize, replace = TRUE),
-  is_mage = rbinom(samplesize, 1, 0.4),
-  via_cave = rbinom(samplesize, 1, ifelse(is_mage, 0.5, 0.3)),
-  lambda = exp(b0 + b1 * level + b2 * is_mage + b3 * via_cave + b12 * level * is_mage),
-  encounter = rpois(samplesize, lambda)
-)
-
-dfout = dfraw |> dplyr::mutate(
-    job = ifelse(is_mage, "mage", "fighter"),
-    route = ifelse(via_cave, "cave", "field"),
-    .before = encounter
-  ) |>
-  dplyr::select(!lambda & !is_mage & !via_cave) |>
-  print()
-```
-
-```{r, adventure-analysis}
-#| include: false
-fit = glm(encounter ~ level + job + route + level:job, data = dfout, family = poisson)
-summary(fit)
-df_aug = broom::augment(fit, type.predict = "response")
-
-p_enc = ggplot(df_aug) +
-  aes(level, encounter, color = job) +
-  geom_point() +
-  geom_line(aes(y = .fitted)) +
-  facet_wrap(vars(route))
-
-p_route = ggplot(df_aug) +
-  aes(job, fill = job) +
-  geom_bar() +
-  facet_wrap(vars(route))
-```
-
-
-
 
 ---
 ## 本講義の主題: 回帰
@@ -1995,6 +1860,132 @@ e.g.,\
 - GLMMは現実のデータ解析に向けた強化
     - 疑似反復による変量効果を考慮
     - 階層ベイズモデルとして扱うほうが楽
+
+
+
+---
+## 補遺
+
+ここ以降の練習問題はレポートに入れなくてもいいです。\
+入れてもいいですが。
+
+
+---
+## 🔰 重回帰
+
+均等に回帰線を引くには `broom::augment()` の使い方に工夫が必要。\
+とりあえず `geom_point()` で"回帰点々"を表示してみるとこまでで可とする。
+
+```{r, generate-df-beer}
+#| ref.label: "df-beer"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 ロジスティック回帰
+
+次ページにヒント。
+
+```{r, generate-df-logistic}
+#| ref.label: "df-logistic"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## ロジスティック回帰のヒント
+
+左辺の応答変数に指定できるのはだいたい次の2種類:
+- 成功を1、失敗を0で表す整数vector (狭義のロジスティック回帰)
+- 1列目が成功回数、2列目が失敗回数の整数matrix
+
+今回の場合、成功回数 `y` だけをformulaに入れると怒られる
+```{r, logistic-error}
+#| error: true
+glm(y ~ x, df_logistic, family = binomial)
+```
+ので失敗回数もモデルに含むよう `response ~ x` とする。
+
+(今回のように試行回数が10回固定じゃなくても使える、ということ)
+
+
+---
+## 🔰 共分散分析: GLM with 質的変数 + 量的変数
+
+まずはweatherだけで分散分析、次にtemperatureを入れて共分散分析。
+
+```{r, generate-df-ancova}
+#| ref.label: "df-ancova"
+#| echo: -1
+#| cache.vars: []
+```
+
+---
+## 🔰 交互作用
+
+
+```{r, generate-df-interact}
+#| ref.label: "df-interact"
+#| echo: -1
+#| cache.vars: []
+```
+
+
+---
+## 🔰 架空データでGLM
+
+宿屋の主人が宿泊客の冒険者に話を聞いてデータを集めた。\
+冒険者の**レベル**、**職業**、通ってきた**ルート**、魔物との**遭遇回数**。\
+これらの変数の間に、なんらかの関係は見られるだろうか？
+
+[adventure.tsv](../tohoku2025r/adventure.tsv)
+
+```{r, adventure-data}
+#| echo: false
+set.seed(19937)
+samplesize = 1000L
+b0 = 0.7
+b1 = 0.01
+b2 = -0.5
+b3 = 0.02
+b12 = 0.03
+
+dfraw = tibble::tibble(
+  level = sample.int(50L, samplesize, replace = TRUE),
+  is_mage = rbinom(samplesize, 1, 0.4),
+  via_cave = rbinom(samplesize, 1, ifelse(is_mage, 0.5, 0.3)),
+  lambda = exp(b0 + b1 * level + b2 * is_mage + b3 * via_cave + b12 * level * is_mage),
+  encounter = rpois(samplesize, lambda)
+)
+
+dfout = dfraw |> dplyr::mutate(
+    job = ifelse(is_mage, "mage", "fighter"),
+    route = ifelse(via_cave, "cave", "field"),
+    .before = encounter
+  ) |>
+  dplyr::select(!lambda & !is_mage & !via_cave) |>
+  print()
+```
+
+```{r, adventure-analysis}
+#| include: false
+fit = glm(encounter ~ level + job + route + level:job, data = dfout, family = poisson)
+summary(fit)
+df_aug = broom::augment(fit, type.predict = "response")
+
+p_enc = ggplot(df_aug) +
+  aes(level, encounter, color = job) +
+  geom_point() +
+  geom_line(aes(y = .fitted)) +
+  facet_wrap(vars(route))
+
+p_route = ggplot(df_aug) +
+  aes(job, fill = job) +
+  geom_bar() +
+  facet_wrap(vars(route))
+```
+
 
 
 ---

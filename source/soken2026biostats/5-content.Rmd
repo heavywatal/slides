@@ -11,16 +11,6 @@ data(table4a, package = "tidyr")
 data(fruit, package = "stringr")
 ```
 
----
-## 作業再開、出欠確認
-
-1. `r-training-2026.Rproj` をダブルクリック。\
-   正しい working directory でRStudioが起動される。
-1. [初日と同じ手順](1-introduction.html#/37)で出欠確認。
-1. 今日のぶんのスクリプトを新規作成し、好きな名前で保存。
-1. [tidyverseの読み込み](2-visualization.html#/23)や[パレット設定](2-visualization.html#/36)など、
-   おまじないをまず実行。
-
 
 ---
 ## 前回までのまとめ
@@ -236,6 +226,29 @@ starwars |> tidyr::replace_na(list(hair_color = "!!", homeworld = "!!"))
 ```
 
 ---
+## 欠損値の補完 `dplyr::coalesce()`
+
+先に指定したvectorの値が `NA` なら次のvectorの値を採用:
+
+```{r, coalesce}
+df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
+df |> dplyr::mutate(y = dplyr::coalesce(y, z))
+```
+
+異なる型を混ぜると怒られる:
+```{r, coalesce-type}
+#| error: true
+df |> dplyr::mutate(x = dplyr::coalesce(x, y))
+```
+
+🔰 `starwars` で**髪色の欠損値を肌色で補おう**
+
+```{r, starwars-coalesce}
+#| echo: false
+starwars |> dplyr::mutate(hair_color = dplyr::coalesce(hair_color, skin_color))
+```
+
+---
 ## 欠損値とみなす `dplyr::na_if()`
 
 特定の値を `NA` に置き換える:
@@ -253,29 +266,6 @@ starwars |> dplyr::mutate(
   hair_color = dplyr::na_if(hair_color, "none"),
   skin_color = dplyr::na_if(skin_color, "none")
 )
-```
-
----
-## 欠損値の補完 `dplyr::coalesce()`
-
-先に指定したvectorの値が `NA` なら次のvectorの値を採用:
-
-```{r, coalesce}
-df = tibble::tibble(x = c(1, 2, NA), y = c("a", NA, "c"), z = c("D", "E", NA))
-df |> dplyr::mutate(y_or_z = dplyr::coalesce(y, z))
-```
-
-異なる型を混ぜると怒られる:
-```{r, coalesce-type}
-#| error: true
-df |> dplyr::mutate(x_or_y = dplyr::coalesce(x, y))
-```
-
-🔰 `starwars` で**髪色の欠損値を肌色で補おう**
-
-```{r, starwars-coalesce}
-#| echo: false
-starwars |> dplyr::mutate(hair_color = dplyr::coalesce(hair_color, skin_color))
 ```
 
 ---
@@ -305,7 +295,7 @@ starwars |> dplyr::mutate(height = height * dplyr::if_else(species == "Droid", 1
 
 ```{r, string}
 x = "This is a string"
-y = 'If I want to include a "quote" inside a string, I use single quotes'
+y = 'Use single quotes if you want to include a "quote" in a string'
 ```
 
 閉じそびれると変な状態になるので、落ち着いて <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>
@@ -434,11 +424,11 @@ Rの`"普通の文字列"`ではバックスラッシュを重ねる必要があ
 
 - "o" を含むもの
 - "o" で始まるもの
-- "berry" で終わるもの
+- "er" で終わるもの
 - "c" で始まり "r" で終わるもの
 - 空白を含むもの、含まないもの
 
-🔰 `starnames = starwars[["name"]]` として次のマッチにも挑戦:
+🔰 `starwars$name` に対して次のマッチにも挑戦:
 
 - 数字を含むもの、含まないもの
 - 3語以上のもの
@@ -526,7 +516,7 @@ See [selection helpers](https://tidyselect.r-lib.org/reference/language.html) fo
 ```{r, upperlower}
 fruit4 = head(fruit, 4L)
 stringr::str_to_upper(fruit4)              # 大文字に
-stringr::str_pad(fruit4, 8, "left", "_")   # 幅を埋めて指定幅に
+stringr::str_pad(fruit4, 8, "left", "_")   # 指定幅にして空白を埋める
 stringr::str_trim("  word  ")              # 前後のスペースを除去
 ```
 
@@ -647,7 +637,7 @@ y3 < "Sep"
 ```
 
 🔰 `diamonds` に含まれるordered型を確認しよう: `str(diamonds)`\
-🔰 `cut` がPremium以上の行だけ抜き出す、とか。
+🔰 `cut` がPremium以上の行だけ抜き出してみよう
 
 ---
 ## tidyverse の因子型担当は forcats
@@ -730,7 +720,7 @@ p %+% {
 - POSIXlt: list(秒, 分, 時, 日, 月, 年, ...)。単位ごとに抜き出しやすい。
 
 ```{r, datetime}
-now = "2026-04-13 15:30:00"
+now = "2026-07-29 15:30:00"
 ct = as.POSIXct(now)
 unclass(ct)
 lt = as.POSIXlt(now)
@@ -748,12 +738,12 @@ unclass(lt) |> as_tibble()
 
 日時型への変換:
 ```{r, lubridate-parse}
-lubridate::ymd(c("20260413", "2026-04-13", "24/04/13"))
+lubridate::ymd(c("20260729", "2026-07-29", "24/07/29"))
 ```
 
 日時型から単位ごとに値を取得:
 ```{r, lubridate-get}
-today = lubridate::ymd(20260413)
+today = lubridate::ymd(20260729)
 lubridate::month(today)
 lubridate::wday(today, label = TRUE)
 ```
@@ -816,7 +806,7 @@ lubridate::wday(today, label = TRUE)
 
 
 ---
-## 🔰 3日目の課題1: 組み込みデータをいじくり倒してみよう
+## 🔰 2日目の最終課題: 組み込みデータをいじくり倒してみよう
 
 <div style="float: right;">
 <a href="https://dplyr.tidyverse.org/">
@@ -852,6 +842,18 @@ ggplot2::midwest
 ggplot2::msleep
 ggplot2::txhousing
 ```
+
+
+---
+## 今日の残り時間
+
+- 誰かに相談しつつ、消化しきれなかった部分をなるべく解消する。
+- 構造処理の4つの課題を協力/手分けして解く。
+- 課題の出来を評価し、合格した班から個人課題に進む。
+- **個人で今日の最終課題(組み込みデータの可視化)に取り組む。**
+  - ある程度できたら班内で見せ合い、よかった部分を自分のに取り込む。
+  - 課題の出来を評価し、合格した班から解散。
+- 遅くとも17:50には部屋を閉める。
 
 [実習スライドを頭から読み返す](1-introduction.html)のもオススメ。\
 1周目には受け止めきれなかったものが見えてくるかも。
