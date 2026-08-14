@@ -887,7 +887,13 @@ penguins_dropna = penguins.dropna()
 ```
 ```{r, penguins-dropna-stan}
 #| echo: false
-withr::local_package("palmerpenguins")
+penguins = tibble::as_tibble(penguins) |>
+  dplyr::rename(
+    bill_length_mm = bill_len,
+    bill_depth_mm = bill_dep,
+    flipper_length_mm = flipper_len,
+    body_mass_g = body_mass
+  )
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
 ```

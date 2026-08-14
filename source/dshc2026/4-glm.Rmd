@@ -6,8 +6,8 @@
 ```{r, setup-local}
 #| include: false
 #| cache: false
-library(reticulate)
-reticulate::use_virtualenv("dshc2025")
+library(reticulate) # nolint: unused_import_linter
+reticulate::use_virtualenv("dshc2026")
 ```
 
 
@@ -100,6 +100,7 @@ p_pois +
 ```
 
 これを一般化線形モデル(GLM)として見ることもできる→
+
 
 ---
 ## 一般化線形モデル(GLM)として記述してみる
@@ -218,15 +219,15 @@ df_aug = tidyr::crossing(temperature = seq(8, 32, 2), humidity = seq(20, 80, 5))
   broom::augment(glm_multi, newdata = _, type.predict = "response")
 
 p1 = ggplot(df_beer) + aes(temperature, beer_sales, color = humidity) +
-  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
   geom_point(shape = 16, size = 3, alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = humidity), alpha = 0.7, linewidth = 1) +
   scale_color_viridis_c(option = "cividis", direction = -1) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
         legend.position = "inside", legend.position.inside = c(0.01, 0.99))
 p2 = ggplot(df_beer) + aes(humidity, beer_sales, color = temperature) +
-  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
   geom_point(shape = 16, size = 3, alpha = 0.5) +
+  geom_line(data = df_aug, aes(y = .fitted, group = temperature), alpha = 0.7, linewidth = 1) +
   scale_color_viridis_c(option = "turbo") +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
@@ -387,7 +388,7 @@ broom::augment(glm_bernoulli, type.predict = "response") |>
 - リンク関数: **恒等関数**(なにもせずそのまま)
 
 <div class="column-container">
-  <div class="column" style="padding-top: 0.5rem;">
+  <div style="padding-top: 0.5rem;">
 
 <p>\[\begin{split}
 y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
@@ -395,7 +396,7 @@ y_i &\sim \mathcal{N}(\mu_i,~\sigma^2) \\
 \end{split}\]</p>
 
   </div>
-  <div class="column">
+  <div>
 
 ```{r, df-weight}
 #| include: false
@@ -439,7 +440,7 @@ ggplot(df_weight) + aes(height, weight) +
 <small style="opacity: 0.7;">単回帰・重回帰と言ったとき一般線形モデルを前提とする人もいる。</small>
 
 ---
-## 分散分析 (<u>An</u>alysis <u>o</u>f <u>va</u>riance, ANOVA) as GLM
+## 分散分析 (Analysis of Variance, ANOVA) as GLM
 
 **質的な説明変数**を持つ**正規分布・恒等リンク**のGLM、と解釈可能。\
 <span title="ダミー変数とも呼ばれる">**指示変数**</span> (0 or 1) に変換してから重回帰する。
@@ -543,7 +544,7 @@ GLMなら確率分布・リンク関数を変えてもっと柔軟にモデリ�
 
 
 ---
-## 共分散分析 (<u>An</u>alysis of <u>cova</u>riance, ANCOVA) as GLM
+## 共分散分析 (Analysis of Covariance, ANCOVA) as GLM
 
 **質的変数と量的変数を両方**含むGLM、と解釈可能。\
 正規分布・等分散・恒等リンクなどが仮定される。
@@ -576,8 +577,8 @@ lm_ancova = lm(beer_sales ~ temperature + weather, df_ancova)
 df_aug = broom::augment(lm_ancova, type.predict = "response")
 
 ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
-  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
   geom_point(shape = 16, size = 3, alpha = 0.6) +
+  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
   scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
@@ -641,8 +642,8 @@ lm_int = lm(beer_sales ~ temperature * weather, df_interact)
 df_aug = broom::augment(lm_int)
 
 ggplot(df_aug) + aes(temperature, beer_sales, color = weather) +
-  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
   geom_point(shape = 16, size = 3, alpha = 0.6) +
+  geom_line(aes(y = .fitted, group = weather), alpha = 0.7, linewidth = 2) +
   scale_color_viridis_d(guide = guide_legend(reverse = TRUE, title = NULL)) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.justification = c(0, 1),
@@ -875,8 +876,8 @@ labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), name
 
 p_plant = broom::augment(models$null, type.predict = "response", data = df_plant) |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.7) +
   geom_point(shape = 16, size = 3, alpha = 0.6) +
+  geom_line(aes(y = .fitted), color = "#3366ff", linewidth = 2, alpha = 0.7) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
@@ -933,10 +934,10 @@ labels = setNames(sprintf("logLik = %.1f", purrr::map_dbl(models, logLik)), name
 p_plant = df_plant |>
   broom::augment(models$null, data = _, type.predict = "response") |>
   ggplot() + aes(x, y) +
-  geom_line(aes(y = .fitted), linewidth = 1.6, alpha = 0.6) +
   geom_point(shape = 16, size = 2, alpha = 0.6) +
+  geom_line(aes(y = .fitted), linewidth = 1.6, alpha = 0.6) +
   scale_y_continuous(expand = expansion(mult = c(0.05, 0.30))) +
-  theme_bw(base_size = 21) +
+  theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank(), legend.position = "none")
 
 p_null = p_plant +
@@ -1173,13 +1174,13 @@ print(penguins)
 ```
 ```{r, penguins}
 #| include: false
-withr::local_package("palmerpenguins")
+penguins = tibble::as_tibble(penguins)
 penguins_colors = c(Adelie = "darkorange", Chinstrap = "purple", Gentoo = "cyan4")
 ```
 ```{r, penguins-dropna}
 #| include: false
 penguins |> dplyr::filter(dplyr::if_any(everything(), is.na))
-penguins_dropna = penguins |> tidyr::drop_na(body_mass_g)
+penguins_dropna = penguins |> tidyr::drop_na(body_mass)
 dim(penguins_dropna)
 ```
 
@@ -1206,7 +1207,7 @@ print(penguins)
 
 🔰
 [`4-glm.ipynb`](./4-glm.ipynb)
-に戻り、次の課題を解いてみよう。<br>
+に戻り、次の課題を解いてみよう。\
 (次ページ以降に解答。まずは自力で。)
 
 1. `body_mass_g` を横軸、 `flipper_length_mm` を縦軸に、まず作図。
@@ -1236,7 +1237,7 @@ grid.map(sns.scatterplot, "body_mass_g", "flipper_length_mm")
 #| fig.height: 4.5
 #| fig.width: 4.5
 p_penweight = ggplot(penguins_dropna) +
-  aes(body_mass_g, flipper_length_mm) +
+  aes(body_mass, flipper_len) +
   geom_point(shape = 16, size = 2, alpha = 0.66) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
@@ -1261,7 +1262,7 @@ print(results1.aic)
 
 ```{r, penguins-fit1}
 #| include: false
-fit1 = glm(flipper_length_mm ~ body_mass_g, data = penguins_dropna)
+fit1 = glm(flipper_len ~ body_mass, data = penguins_dropna)
 broom::tidy(fit1)
 broom::glance(fit1)
 ```
@@ -1326,7 +1327,7 @@ print(results2.aic)
 
 ```{r, penguins-fit2}
 #| include: false
-fit2 = glm(flipper_length_mm ~ body_mass_g + species, data = penguins_dropna)
+fit2 = glm(flipper_len ~ body_mass + species, data = penguins_dropna)
 broom::tidy(fit2)
 broom::glance(fit2)
 ```
@@ -1371,7 +1372,7 @@ print(results3.aic)
 
 ```{r, penguins-fit3}
 #| include: false
-fit3 = glm(flipper_length_mm ~ body_mass_g * species, data = penguins_dropna)
+fit3 = glm(flipper_len ~ body_mass * species, data = penguins_dropna)
 broom::tidy(fit3)
 broom::glance(fit3)
 ```
@@ -1429,15 +1430,15 @@ cowplot::plot_grid(p1 + labs(title = labels[1]),
 #| fig.width: 11
 #| cache.vars: [p_bill]
 p_bill = penguins_dropna |>
-  ggplot() + aes(bill_length_mm, bill_depth_mm) +
+  ggplot() + aes(bill_len, bill_dep) +
   geom_point(shape = 16, size = 2, alpha = 0.66) +
   scale_color_manual(values = penguins_colors) +
   theme_bw(base_size = 22) +
   theme(panel.grid.minor = element_blank())
 
-fit1 = glm(bill_depth_mm ~ bill_length_mm, data = penguins_dropna)
-fit2 = glm(bill_depth_mm ~ bill_length_mm + species, data = penguins_dropna)
-fit3 = glm(bill_depth_mm ~ bill_length_mm + species + bill_length_mm:species, data = penguins_dropna)
+fit1 = glm(bill_dep ~ bill_len, data = penguins_dropna)
+fit2 = glm(bill_dep ~ bill_len + species, data = penguins_dropna)
+fit3 = glm(bill_dep ~ bill_len + species + bill_len:species, data = penguins_dropna)
 d1 = broom::augment(fit1, type.predict = "response")
 d2 = broom::augment(fit2, type.predict = "response")
 d3 = broom::augment(fit3, type.predict = "response")

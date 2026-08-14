@@ -112,4 +112,4 @@ sns.histplot(x=rng.poisson(lambdas), discrete=True)
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownParameterType=false
 # pyright: reportUnknownVariableType=false
-# ruff: noqa: E402 ANN001 ANN201
+# ruff: noqa: ANN001 ANN201

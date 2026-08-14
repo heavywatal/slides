@@ -94,7 +94,7 @@ fit.summary()
 # ### [ArviZ](https://python.arviz.org/)
 
 # %%
-# !uv pip install 'arviz>=1.2'
+# !uv pip install 'arviz==0.23.4'
 import arviz as az
 
 print(az.__version__)
@@ -112,4 +112,4 @@ az.plot_trace(cmdstanpy_data)
 # pyright: reportUnknownArgumentType=false
 # pyright: reportUnknownMemberType=false
 # pyright: reportUnknownVariableType=false
-# ruff: noqa: E402
+# ruff: noqa: E402 PTH118

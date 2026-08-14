@@ -22,7 +22,7 @@
 # Google Colab の場合はインストールから:
 # ```py
 # !uv pip install 'matplotlib>=3.11' 'seaborn>=0.13' 'statsmodels>=0.14'
-# !uv pip install 'arviz>=1.2' 'cmdstanpy>=1.3'
+# !uv pip install 'arviz==0.23.4' 'cmdstanpy>=1.3'
 # import cmdstanpy
 # cmdstanpy.install_cmdstan()
 # ```

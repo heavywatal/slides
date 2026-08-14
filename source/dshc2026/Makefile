@@ -1,12 +1,12 @@
-DESTINATION := ../../content/$(notdir ${CURDIR})
+SLUG := $(notdir ${CURDIR})
+DESTINATION := ../../content/${SLUG}
 SOURCES := $(wildcard *.Rmd)
 KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 $(info SOURCES = ${SOURCES})
 $(info KNITTED = ${KNITTED})
 PYPERCENT := $(wildcard *.py)
 NOTEBOOKS := $(addprefix ${DESTINATION}/,$(PYPERCENT:.py=.ipynb))
-PARENTDIR = $(dir $(CURDIR))
-SLUG := $(notdir $(PARENTDIR:/=))
+$(info NOTEBOOKS = ${NOTEBOOKS})
 SHARE_DIR := ${HOME}/My Drive/Colab Notebooks/${SLUG}
 
 .DEFAULT_GOAL := all

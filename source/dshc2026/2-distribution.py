@@ -57,7 +57,7 @@ print(result.params)
 # pred = slope * x + intercept
 
 # %%
-df_pred = df_pois.assign(pred=lambda _: result.predict(_))
+df_pred = df_pois.assign(pred=result.predict)
 print(df_pred)
 
 # %% [markdown]

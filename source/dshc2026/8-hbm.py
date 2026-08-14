@@ -14,7 +14,7 @@
 # Google Colab の場合はインストールから:
 # ```py
 # !uv pip install 'matplotlib>=3.11' 'seaborn>=0.13' 'statsmodels>=0.14'
-# !uv pip install 'arviz>=1.2' 'cmdstanpy>=1.3'
+# !uv pip install 'arviz==0.23.4' 'cmdstanpy>=1.3'
 # import cmdstanpy
 # cmdstanpy.install_cmdstan()
 # ```
@@ -24,7 +24,6 @@
 
 import os
 import sys
-from pathlib import Path
 
 import arviz as az
 import numpy as np
@@ -99,7 +98,7 @@ sns.scatterplot(df_exp, x="y", y="count", color="#56B4E9", s=120)
 # %% [markdown]
 # 事後予測分布を描いてみる。
 # %%
-draws = fit.draws_pd("yrep")
+draws = fit.draws_pd("yrep").astype(int)
 yrep = draws.apply(np.bincount, 1)
 yrep[0:200].apply(sns.scatterplot, color="#56B4E9", alpha=0.05)
 sns.scatterplot(np.bincount(df_obs["y"]), color="black")
@@ -143,7 +142,7 @@ az.plot_trace(stan_data)
 # %% [markdown]
 # 事後予測分布を描いてみる。
 # %%
-draws = fit.draws_pd("yrep")
+draws = fit.draws_pd("yrep").astype(int)
 yrep = draws.apply(np.bincount, 1)
 yrep[0:200].apply(sns.scatterplot, color="#56B4E9", alpha=0.05)
 sns.scatterplot(np.bincount(X), color="black")
