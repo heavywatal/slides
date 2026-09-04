@@ -308,7 +308,8 @@ grid.add_legend()
 # まずデータをダウンロード。
 
 # %%
-penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", cache=True).data
+penguins = sns.load_dataset("penguins")
+# penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", cache=True).data
 print(penguins)
 
 

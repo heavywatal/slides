@@ -525,7 +525,8 @@ df_ancova |>
   ggridges::geom_vridgeline(aes(width = density * 6, group = weather),
     data = df_ridges, fill = "#56B4E9AA", linetype = 0) +
   annotate("segment", x = dfl$x, xend = dfl$xend, y = dfl$y, yend = dfl$yend, color = "#3366ffAA", linewidth = 2) +
-  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend, arrow = .arr, color = "#3366ffAA", linewidth = 1.5) +
+  annotate("segment", x = dfa$x, xend = dfa$xend, y = dfa$y, yend = dfa$yend,
+           arrow = .arr, color = "#3366ffAA", linewidth = 1.5) +
   annotate("text", x = dfs$x, y = dfs$y, label = dfs$label, parse = TRUE, size = 8, alpha = 0.8) +
   geom_jitter(width = 0.08, height = 0, alpha = 0.66, shape = 16, size = 3) +
   scale_color_viridis_d() +
@@ -744,9 +745,10 @@ model = smf.glm(formula, data=r.df_weight, family=gaussian)
 とりあえず当てはめと作図だけ。\
 結果の解釈やモデルの評価はこの後。
 
+<aside>
 <hr>
-
-☕️ 休憩 + 質疑応答
+<small>☕️ 休憩 + 質疑応答</small>
+</aside>
 
 
 
@@ -1148,9 +1150,10 @@ cowplot::plot_grid(.p_mean, .p_min, .p_max, nrow = 1L)
   - ほかにもモデルを評価する指標はいろいろある
   - 機械的なモデル選択が理解の役に立つとは限らない
 
+<aside>
 <hr>
-
-☕️ 休憩 + 質疑応答
+<small>☕️ 休憩 + 質疑応答</small>
+</aside>
 
 
 
@@ -1168,8 +1171,8 @@ cowplot::plot_grid(.p_mean, .p_min, .p_max, nrow = 1L)
 </figure>
 
 ```{python pypenguins, results = "hide", cache = FALSE}
-import statsmodels.api as sm
-penguins = sm.datasets.get_rdataset("penguins", "palmerpenguins", True).data
+import seaborn as sns
+penguins = sns.load_dataset("penguins")
 print(penguins)
 ```
 ```{r, penguins}
