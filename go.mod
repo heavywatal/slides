@@ -6,5 +6,5 @@ toolchain go1.23.2
 
 require (
 	github.com/heavywatal/hugo-mod-common v0.0.0-20260813035457-723ceb970ef5 // indirect
-	github.com/heavywatal/hugo-theme-reveal v0.0.0-20260513091916-e45c4974a5db // indirect
+	github.com/heavywatal/hugo-theme-reveal v0.0.0-20260916071625-c6f770404660 // indirect
 )
