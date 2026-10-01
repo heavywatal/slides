@@ -12,7 +12,7 @@
 ## 作業再開
 
 1. このページを手元のウェブブラウザで開く。
-1. 先日作った `r-training-2024.Rproj` をダブルクリック。<br>
+1. 先日作った `r-training-2026.Rproj` をダブルクリック。<br>
    正しい working directory でRStudioが起動される。
 1. 今日のぶんのスクリプトを新規作成し、好きな名前で保存。
 1. [tidyverse読み込みやパレット設定などのおまじない](2-visualization.html#/36)をまず実行。
@@ -21,22 +21,6 @@
 <img src="/slides/image/rstudio/getwd.png" style="width: 75%;">
 </figure>
 
-
----
-## 前回までのまとめ
-
-### ✅ データ解析全体の流れ。可視化だいじ
-
-### ✅ Rを使えば無料で楽に再現可能な解析が可能
-
-### ✅ Rの基礎
-
-- 調べ方さえわかれば、全部覚えなくても大丈夫
-- エラーは日常茶飯事。落ち着いて読み取ろう
-- まず**Rスクリプト**に書いてから、**コンソール**で実行
-- 便利な**パッケージ**を使おう
-
-### ✅ 一貫性のある文法で合理的に描けるggplot2
 
 ---
 ## データ解析のおおまかな流れ
@@ -64,7 +48,7 @@
 
 <figure>
 <a href="https://r4ds.hadley.nz/whole-game">
-<img src="/slides/image/r4ds/whole-game.png" width="100%">
+<img src="/slides/image/r4ds/data-science-explore.png" width="720">
 <figcaption><small>https://r4ds.hadley.nz/whole-game</small></figcaption>
 </a>
 </figure>
@@ -202,13 +186,13 @@ print(ggplot2::diamonds)
 
 x軸、y軸、色分け、パネル分けなどを列の名前で指定して簡単作図:
 
-```r
+```{r, tidy-data-benefit}
+#| fig.height: 5.5
+#| fig.width: 9
 ggplot(diamonds) + aes(x = carat, y = price) +
   geom_point(mapping = aes(color = color, size = clarity)) +
   facet_wrap(vars(cut))
 ```
-
-<img src="figure/tidy-data-benefit-1.png" alt="plot of chunk tidy-data-benefit">
 
 ---
 ## 目標: 生データを下ごしらえして食べやすい形に
@@ -238,7 +222,7 @@ VADeaths |>
     - 何かの順に並べ替え
     - 異なるテーブルの結合
     - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 来週</span>
+- データ内容を対象とする処理 <span style="opacity: 0.6;">— 第5回 明日</span>
     - 数値の変換: 対数、正規化
     - 外れ値・欠損値への対処
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
@@ -256,7 +240,7 @@ VADeaths |>
 </a>
 
 ```r
-install.packages("tidyverse")
+# install.packages("tidyverse") # 済んでるはず
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
@@ -272,7 +256,7 @@ withr::with_namespace("tidyverse", {
 
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
-<img src="/slides/image/r4ds/base.png" width="900">
+<img src="/slides/image/r4ds/data-science.png" width="720">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
@@ -309,7 +293,7 @@ withr::with_namespace("tidyverse", {
 
 パッケージを読み込んで、データを見てみる
 ```r
-# install.packages("tidyverse")
+# install.packages("tidyverse") # 済んでるはず
 library(conflicted) # 安全のおまじない
 library(tidyverse)
 print(diamonds)
@@ -332,7 +316,7 @@ print(diamonds)
 dplyr::filter(diamonds, carat > 3)
 ```
 
-**同名の関数と衝突**する場合(ここではR標準の `stats::filter()`)、<br>
+**同名の関数と衝突**する場合(ここではR標準の `stats::filter()`)、\
 「私が使いたいのは **dplyrのほうの `filter()`** です」と明示したい。
 
 そうじゃなくても「この関数はあのパッケージ由来」が分かって便利。
@@ -350,7 +334,7 @@ result = diamonds |>                   # 生データから出発して
   print()                              # 表示してみる
 ```
 
-この見慣れぬ記号 `|>` は何？<br>
+この見慣れぬ記号 `|>` は何？\
 (`select()` など個々の関数は後で触れるとして)
 
 ---
@@ -367,15 +351,15 @@ potatoes |> cut() |> fry() |> season("salt") |> eat()
 ```
 
 🔰 パイプを使わない形に書き換え、出力を確認しよう:
-```{r, pipe-practice}
+```{r, letters}
 seq(1, 6) |> sum()
 letters |> toupper() |> head(3)
 ```
 
-↓解答例<br>
-↓<br>
-↓<br>
-```{r, pipe-answers}
+解答例\
+↓\
+↓
+```r
 sum(seq(1, 6))
 head(toupper(letters), 3)
 ```
@@ -422,7 +406,7 @@ result = dplyr::summarize(              # 平均を計算
 result = dplyr::summarize(dplyr::group_by(dplyr::filter(dplyr::select(diamonds, carat, cut, price), carat > 1), cut), mean(price))
 ```
 
-論理の流れとプログラムの流れが合わず、目が行ったり来たり。<br>
+論理の流れとプログラムの流れが合わず、目が行ったり来たり。\
 さっきのほうがぜんぜんマシ。
 
 ---
@@ -438,14 +422,16 @@ result = diamonds |>
   print()                               # 表示してみる
 ```
 
-tidyverseパッケージ群はこういう使い方をしやすい設計。<br>
+tidyverseパッケージ群はこういう使い方をしやすい設計。\
 使わなければならないわけではないが、読めたほうがいい。
 
-<div style="font-size: 0.8em; color: #888888;">
+<div style="font-size: 0.8em; opacity: 0.6;">
 
-R < 4.2 までよく使われていた `%>%` もほぼ同じ。
+R < 4.2 までよく使われていた `%>%` もほぼ同じ。\
+[計算順序が四則演算や論理演算より先](https://stat.ethz.ch/R-manual/R-patched/library/base/html/Syntax.html)であることに注意。
 
 </div>
+
 
 ---
 ## 列の抽出: `select()`
@@ -547,18 +533,6 @@ result = diamonds |>
 ---
 ## 行の抽出: `filter()`
 
-複数の値のうち**どれかに一致する行**のみ残す:
-```{r, filter-in}
-result = diamonds |>
-  dplyr::filter(cut %in% c("Ideal", "Good")) |>
-  print()
-```
-
-🔰 `starwars` の**目の色が青か赤のキャラクタ**を抽出してみよう
-
----
-## 行の抽出: `filter()`
-
 2つの条件を**両方満たす行**のみ残す (AND):
 ```{r, filter-and}
 result = diamonds |>
@@ -580,6 +554,18 @@ result = diamonds |>
 ```
 
 🔰 `starwars` の**身長200以上または体重100以上のキャラ**を抽出しよう
+
+---
+## 行の抽出: `filter()`
+
+複数の値のうち**どれかに一致する行**のみ残す:
+```{r, filter-in}
+result = diamonds |>
+  dplyr::filter(cut %in% c("Ideal", "Good")) |>
+  print()
+```
+
+🔰 `starwars` の**目の色が青か赤のキャラクタ**を抽出してみよう
 
 ---
 ## 上位/下位の行の抽出: `slice_max()`, `slice_min()`
@@ -609,19 +595,6 @@ result = diamonds |>
 
 🔰 `starwars` の**ジェンダーごとに身長が低い3名ずつ**抽出してみよう
 
----
-## 先頭/末尾の行の抽出: `slice_head()`, `slice_tail()`
-
-**各グループの先頭**を `n` 行または割合 `prop` で抽出:
-```{r, group-slice-head}
-result = diamonds |>
-  dplyr::group_by(cut) |>
-  dplyr::slice_head(n = 3L) |>
-  print()
-```
-
-🔰 `starwars` の**ジェンダーごとに先頭3名ずつ**抽出してみよう
-
 
 ---
 ## そのほかの `slice*()` 系
@@ -638,6 +611,7 @@ result = diamonds |>
 
 **任意のX番目の行**を抽出: `dplyr::slice(X)`
 
+**先頭/末尾のn行**の抽出: `slice_head()`, `slice_tail()`
 
 ---
 ## 要約・集計: `summarize()`
@@ -649,10 +623,18 @@ result = diamonds |>
   print()
 ```
 
-vectorを受け取って1つの値を返す集約関数:<br>
+vectorを受け取って1つの値を返す集約関数:\
 `min()`, `max()`, `mean()`, `median()`, `var()`, `sd()`, etc.
 
 🔰 `mpg` の**市街地(cty)と高速道路(hwy)の燃費平均値**を計算しよう
+
+<hr>
+<aside>
+
+複数の値を返す関数で集約する場合は亜種 `reframe()` を使う。\
+e.g., `range()`, `quantile()`, etc.
+</aside>
+
 
 ---
 ## 要約・集計: `summarize()`
@@ -684,21 +666,6 @@ result = diamonds |>
 
 
 ---
-## 要約・集計: `reframe()`
-
-複数の値を返す関数で集約すると、結果は複数行にまたがる:
-```{r, reframe}
-quantile(diamonds$price)
-
-result = diamonds |>
-  dplyr::reframe(across(where(is.numeric), quantile)) |>
-  print()
-```
-
-🔰 `mpg` の**各数値列の `range()` を駆動方式ごとに**計算しよう
-
-
----
 ## 要約・集計: `count()`
 
 指定した列の組み合わせ出現数を数える:
@@ -709,22 +676,6 @@ result = diamonds |>
 ```
 
 🔰 `starwars` の**性とジェンダーの組み合わせ**を数えてみよう
-
-
----
-## 重複行の除去: `distinct()`
-
-指定した列に関してユニークな行のみ残す:
-```{r, distinct}
-result = diamonds |>
-  dplyr::distinct(cut, color) |>
-  print()
-```
-
-`.keep_all = TRUE`
-オプションを付けると指定しなかった列も残せる。
-
-🔰 `starwars` の**性とジェンダーの組み合わせ**だけ残してみよう
 
 
 ---
@@ -761,11 +712,12 @@ result = diamonds |>
 ```{r, mutate}
 result = diamonds |>
   dplyr::mutate(ratio = price / carat,
-                price = 105.59 * price) |>
+                price = 159.1 * price) |>
   print()
 ```
 
-🔰 `starwars` の**身長をメートルで表してBMIを計算**してみよう
+🔰 `starwars` の**身長をメートルで表してBMIを計算**してみよう\
+(右端に追加されると結果を確認しにくいですね？)
 
 
 ---
@@ -792,7 +744,7 @@ result = diamonds |>
     - **何かの順に並べ替え** 👈 第3回 ここまで紹介
     - 異なるテーブルの結合
     - 変形: 縦長 ↔ 横広
-- データ内容を対象とする処理 <span style="color: #888888;">— 第5回 来週</span>
+- データ内容を対象とする処理 <span style="opacity: 0.6;">— 第5回</span>
     - 数値の変換: 対数、正規化
     - 外れ値・欠損値への対処
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
@@ -815,14 +767,14 @@ result = diamonds |>
 
 
 ---
-## 参考
+## Reference
 
 R for Data Science --- Hadley Wickham et al.
 : <https://r4ds.hadley.nz>,
-  [Paperback](https://amzn.to/4cpL6w8)
-: [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+  [Paperback](https://amzn.to/4cpL6w8),
+  [日本語版書籍](https://amzn.to/2yyFRKt)
 
-[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
+[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)\
 [RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
 
 整然データとは何か --- [@f_nisihara](https://twitter.com/f_nisihara)
@@ -832,7 +784,7 @@ R for Data Science --- Hadley Wickham et al.
 Other versions
 : 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
    岩嵜航 2018
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2024/)」
-   石川由希 2024 名古屋大学
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2025/)」
+   石川由希 名古屋大学
 
 `r .meta$next_link`

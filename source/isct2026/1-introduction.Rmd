@@ -67,7 +67,7 @@ diamonds |>
 しかし要注意......
 
 ---
-## 代表値ばかり見て可視化を怠ると構造を見逃す
+## 要約統計量だけ見て可視化を怠ると構造を見逃す
 
 <figure style="position: relative;">
 <a href="https://www.research.autodesk.com/publications/same-stats-different-graphs/">
@@ -91,7 +91,7 @@ diamonds |>
 diamonds |>
   dplyr::filter(clarity %in% c("I1", "SI2", "IF")) |>
   ggplot(aes(carat, price, color = clarity)) +
-  geom_point(alpha = 0.4, size = 3) +
+  geom_point(shape = 16, size = 3, alpha = 0.4) +
   scale_color_viridis_d(
     guide = guide_legend(reverse = TRUE, override.aes = list(alpha = 1))
   ) +
@@ -105,7 +105,7 @@ diamonds |>
   )
 ```
 
-`carat` が大きいほど `price` も高いらしい。<br>
+`carat` が大きいほど `price` も高いらしい。\
 その度合いは `clarity` によって異なるらしい。
 
 ---
@@ -115,12 +115,12 @@ diamonds |>
 
 <figure>
 <a href="https://r4ds.hadley.nz/whole-game">
-<img src="/slides/image/r4ds/whole-game.png" width="100%">
+<img src="/slides/image/r4ds/data-science-explore.png" width="720">
 <figcaption><small>https://r4ds.hadley.nz/whole-game</small></figcaption>
 </a>
 </figure>
 
-可視化だいじ。わかった。<br>
+可視化だいじ。わかった。\
 でも**データ分析に費やす労力の8割は前処理**らしいよ。。。
 
 
@@ -262,6 +262,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
   facet_wrap(vars(cut))
 ```
 
+
 ---
 ## 本日1時限目の話題
 
@@ -280,7 +281,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 ---
 ## Rを使わなかった場合の悲劇の例
 
-動物園の混合展示で、各種動物はどのように分布・行動しているか、<br>
+動物園の混合展示で、各種動物はどのように分布・行動しているか、\
 それらを決める要因は何か。膨大な観察データに基づく超大作卒論。
 
 <figure>
@@ -290,7 +291,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 ---
 ## 生データ: ここはまだそんなに悪くない
 
-週に1回、各個体の位置と行動を種ごとのファイルに記録。<br>
+週に1回、各個体の位置と行動を種ごとのファイルに記録。\
 タブは個体、A列B列はXY座標でそれ以降の列は行動、各行はある時刻。
 
 <figure style="position: relative;">
@@ -345,7 +346,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 
 <figure style="float: right; margin: 0.7rem 0 0;">
 <a href="https://en.wikipedia.org/wiki/Sisyphus">
-<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="450">
+<img src="/slides/image/free/Punishment_sisyph.jpg" alt="Punishment sisyph.jpg" height="480">
 <figcaption><small>https://en.wikipedia.org/wiki/Sisyphus</small></figcaption>
 </a>
 </figure>
@@ -356,7 +357,7 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 - ミスを発見 → **初めからやり直し**
 - 新データ追加 → **初めからやり直し**
 - 熟練してもツラいまま
-- そのときの自分しかできない、記録に残らない<br>
+- そのときの自分しかできない、記録に残らない\
   → **検証のしようがない**
 - 卒論なら努力賞でいいかもしれないけど、科学の手続きとしては問題。
 
@@ -393,16 +394,8 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 - 一度書いたプログラムは、データが変わっても**使いまわせる**。
 - **自分以外の人でも再現・検証**できる
 - **きれいな図を簡単に**描ける
-- 部分的に改変しながらいろんな解析を試せる。<br>
-  → **仮説検証** だけでなく、 **仮説生成(探索的データ解析)** もやりやすい
 - やれば上達する。どんどん楽になる！
 
-<figure>
-<a href="https://r4ds.hadley.nz/intro">
-<img src="/slides/image/r4ds/base.png" width="800">
-<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
-</a>
-</figure>
 
 ---
 ## Rとは
@@ -425,6 +418,8 @@ ggplot(diamonds) + aes(x = carat, y = price) +
 
 コミュニティ
 : 相談できる人や参考になるウェブサイトがたくさん見つかる。
+
+<hr>
 
 他のプログラミング言語でもいいよ:
 [Python](https://www.python.org/)とか[Julia](https://julialang.org/)とか。
@@ -475,6 +470,11 @@ See https://support.apple.com/HT201236
 [RStudio Desktop](https://www.rstudio.com/)
 : Rをより快適に使うための総合開発環境 (IDE)
 : 必須じゃないけど便利なので結構みんな使ってる。
+: <small>[VS Code](https://code.visualstudio.com/docs/languages/r)
+  やその亜種
+  [Positron](https://positron.posit.co/),
+  [Cursor](https://cursor.com/)
+  なども人気。</small>
 
 <img src="/slides/image/rstudio/rstudio-300x260.png">
 
@@ -519,8 +519,8 @@ hist(iris$Petal.Length)
 ---
 ## "Project" を新規作成する
 
-File → New Project... → New Directory → New Project →<br>
-→ Directory name: `r-training-2024`<br>
+File → New Project... → New Directory → New Project →\
+→ Directory name: `r-training-2026`\
 → as subdirectory of: `~/project` or `C:/Users/yourname/project`
 
 <img src="/slides/image/rstudio/create-new-project.png" class="screenshot"
@@ -561,7 +561,7 @@ Execute them with <kbd>ctrl</kbd><kbd>return</kbd>
     - 書いたスクリプトは財産
     - 保存しておけばまた使い回せる
 
-🔰 いろんな四則演算を試して `hello.R` に保存してみよう。<br>
+🔰 いろんな四則演算を試して `hello.R` に保存してみよう。\
 e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 
 ---
@@ -570,20 +570,20 @@ e.g., `1 + 2 + 3`, `3 * 7 * 2`, `4 / 2`, `4 / 3`, etc.
 スクリプト、データ、結果を分けて整理する例:
 
 ```
-r-training-2024/           # プロジェクトの最上階
-├── r-training-2024.Rproj  # これダブルクリックでRStudioを起動
+r-training-2026/           # プロジェクトの最上階
+├── r-training-2026.Rproj  # これダブルクリックでRStudioを起動
 ├── hello.R
 ├── transform.R            # データ整理・変形のスクリプト
 ├── visualize.R            # 作図のスクリプト
 ├── data/                  # 元データを置くところ
-│   ├── iris.tsv
-│   └── diamonds.xlsx
+│   ├── iris.tsv
+│   └── diamonds.xlsx
 └── output/                # 結果の出力先
     ├── iris-petal.png
     └── iris-summary.tsv
 ```
 
-プロジェクト最上階を**作業ディレクトリ**とし、<br>
+プロジェクト最上階を**作業ディレクトリ**とし、\
 ファイル読み書きの基準にする。(後で詳しく)
 
 ほんの一例です。好きな構造に決めてください。
@@ -614,6 +614,10 @@ r-training-2024/           # プロジェクトの最上階
 : あなたの問題は全世界のRユーザーが既に通った道。
 : 日本語で、英語で、エラー文そのもので検索すれば解決策に当たる。
 
+AIの使い方には注意
+: ✅ コードを解説・提案してもらう → 理解・コードが蓄積
+: 💩 LLMに計算させる → それっぽい値をでっちあげ。理解も再現性も無し
+
 
 ---
 ## この実習の取り組み方
@@ -624,14 +628,13 @@ r-training-2024/           # プロジェクトの最上階
     ```r
     head(iris)
     ```
-1.  **実行してコンソールを確認**。思ったとおりの出力？<br>
-    `Error` や `Warning` があったらよく読んで対処する。<br>
-    (無視していい `Warning` もたまーにあるけど)
-1.  🔰若葉マークの練習問題があれば解いてみる。<br>
-    そこまでのコードの**コピペ＋改変**でできるはず。
+1.  **実行してコンソールを確認**。思ったとおりの出力？\
+    `Error` や `Warning` があったらよく読んで対処する。
+1.  🔰若葉マークの練習問題があれば解いてみる。\
+    そこまでのコードの**コピペ＋改変**でできるはず。\
+    (AIに相談してもいいけど、この実習ではかえって遠回り)
 
-疑問・困りごとがある場合は**気軽に割り込んで**ください。<br>
-TAがいるならTAが、リモートならChat欄が随時受付中です。
+疑問・困りごとがある場合は**気軽に割り込んで**ください。
 
 
 ---
@@ -644,7 +647,7 @@ y = 5        # Create y
 y            # What's in y?
 ```
 
-Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。<br>
+Rでは代入演算子として矢印 `<-` も使えるけど私は `=` 推奨。\
 `#` 記号より右はRに無視される。コメントを書くのに便利。
 
 ```{r, sum}
@@ -657,7 +660,7 @@ x + y
 ---
 ## 基本的な演算
 
-`+` とか `*` のような演算子(operator)を変数の間に置く。<br>
+`+` とか `*` のような演算子(operator)を変数の間に置く。
 
 ```r
 10 + 3    # addition
@@ -720,6 +723,28 @@ as.character(x)
 🔰 さっき作った `y` にも同じ関数を適用してみよう。
 
 ---
+## 文字列: character型 (string)
+
+ダブルクォートで囲む。シングルクォートも使える。
+
+```{r, string}
+x = "This is a string"
+y = 'Use single quotes if you want to include a "quote" in a string'
+```
+
+閉じそびれると変な状態になるので、落ち着いて <kbd>esc</kbd> or <kbd>ctrl</kbd><kbd>c</kbd>
+
+```
+> "This is a string without a closing quote
++
++
++ HELP I'M STUCK
+```
+
+<small style="display: block; text-align: right;"><https://r4ds.hadley.nz/strings.html></small>
+
+
+---
 ## 変数/オブジェクトの型
 
 - `vector`: 基本型。一次元の配列。
@@ -730,14 +755,14 @@ as.character(x)
 - `array`: 多次元配列。`vector`同様、全要素が同じ型。
     - `matrix`: 行列 = 二次元の配列。
 - `list`: 異なる型でも詰め込める太っ腹ベクトル。
-- **`data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** <br>
+- **`data.frame`: 同じ長さのベクトルを並べた長方形のテーブル。重要。** \
   **`tibble`** とか **`tbl_df`** と呼ばれる亜種もあるけどほぼ同じ。
 
 
 ---
 ## vector: 一次元の配列
 
-1個の値でもベクトル扱い。<br>
+1個の値でもベクトル扱い。\
 同じ長さ(または長さ1)の相手との計算が得意。
 
 ```{r, vector}
@@ -786,7 +811,7 @@ z
 ---
 ## matrix: 二次元の配列 (行列)
 
-1本のvectorを折り曲げて長方形にしたもの。<br>
+1本のvectorを折り曲げて長方形にしたもの。\
 中身は全て同じ型。機械学習とか画像処理とかで使う。
 
 ```{r, matrix}
@@ -826,7 +851,7 @@ y
 ---
 ## data.frame: 長方形のテーブル (重要!)
 
-同じ長さの列vectorを複数束ねた長方形の表。<br>
+同じ長さの列vectorを複数束ねた長方形の表。\
 e.g., 長さ150の数値ベクトル4本と因子ベクトル1本:
 
 ```{r, dataframe}
@@ -835,7 +860,7 @@ iris = tibble::as_tibble(iris)
 print(iris)
 ```
 
-`iris` はアヤメ属3種150個体に関する測定データ。<br>
+`iris` はアヤメ属3種150個体に関する測定データ。\
 Rに最初から入ってて、例としてよく使われる。
 
 ---
@@ -854,7 +879,7 @@ View(iris)      # RStudioで閲覧
 str(iris)       # 構造が分かる形で表示
 ```
 
-🔰 ほかのデータもいろいろ見てみよう。
+ほかのデータもいろいろ見てみよう。
 e.g., `mtcars`, `quakes`, [`data()`](https://stat.ethz.ch/R-manual/R-devel/library/datasets/html/00Index.html)
 
 ---
@@ -876,7 +901,7 @@ iris[["Petal.Length"]]     # Petal.Length列
 iris[["Petal.Length"]][2]  # Petal.Length列の2番目
 ```
 
-結果がdata.frameになるかvectorになるか曖昧で危険、非推奨:
+結果がdata.frameになるかvectorになるか曖昧で危険、**非推奨**:
 ```r
 iris[, 3]                  # 3列目
 iris[, "Petal.Length"]     # Petal.Length列
@@ -907,7 +932,7 @@ print(mydata)
 ---
 ## data.frameの読み書き
 
-Rには `read.csv()` とか `write.csv()` とかが標準装備されてるけど、、、
+Rには `read.csv()` とか `write.csv()` が標準装備されてるけど**非推奨**:
 
 ```r
 write.csv(iris, "iris.csv")
@@ -923,7 +948,7 @@ write.csv(iris, "iris.csv")
 <img src="/_img/hex-stickers/readr.webp" width="180" style="float: right;">
 </a>
 
-なんか**左端の列**とか **"引用符"** が勝手に作られたりいろいろ不便。
+なんか**左端の列**とか **"引用符"** が勝手に作られ、不便で危険。
 
 `readr` というパッケージを使えばそういう悩みから解放される。
 
@@ -969,12 +994,13 @@ update.packages()          # たまには更新しよう
 </a>
 
 ```r
-install.packages("tidyverse")
+# install.packages("tidyverse") # 済んでるはず
 library(conflicted) # 安全のおまじない
 library(tidyverse)  # 一挙に読み込み
 ```
 ```{r, tidyverse-message}
 #| echo: false
+#| R.options: {cli.width: 60}
 withr::with_namespace("tidyverse", {
   cat(tidyverse_attach_message(core), sep = "\n")
 })
@@ -984,7 +1010,7 @@ withr::with_namespace("tidyverse", {
 
 <figure>
 <a href="https://r4ds.hadley.nz/intro">
-<img src="/slides/image/r4ds/base.png" width="900">
+<img src="/slides/image/r4ds/data-science.png" width="800">
 <figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
@@ -996,18 +1022,18 @@ withr::with_namespace("tidyverse", {
 - エラーのほとんどは凡ミス由来。よく確認しよう。
     - エラー文をちゃんと読む: `No such file or directory`
     - 変数の中身を確かめる: `str(iris)`, `attributes(iris)`
-    - [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2024/R_training_2024_7.html)
+    - [よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2025/R_training_2025_7.html)
       をチェックする
-- エラー文やパッケージ名をコピペしてウェブ検索<br>
+- エラー文やパッケージ名をコピペしてウェブ検索\
   → [StackOverflow](https://stackoverflow.com/questions/tagged/r)
   や個人サイトに解決策
 - Slack <iconify-icon inline icon="bi:slack"></iconify-icon>
   [r-wakalang](https://github.com/tokyor/r-wakalang)
-  で質問を投稿する。<br>
+  で質問を投稿する。\
   (質問に飢えた優しいワニが多数生息 👀 &nbsp; 👀 &nbsp; 👀 &nbsp; 👀)
 - 状況再現できる小さな例
   [(reprex)](https://reprex.tidyverse.org/)
-  を添えると回答を得やすい。<br>
+  を添えると回答を得やすい。\
   (これを準備してるうちに問題が切り分けられて自己解決したり)
 - パッケージの公式ドキュメントをちゃんと読む
 - R(Studio)内のヘルプを読む: `?sum`, `help.start()`

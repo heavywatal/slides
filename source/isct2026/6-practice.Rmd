@@ -17,13 +17,13 @@
 1. 探索的データ解析
     - **前処理、加工** ✅ 完全に理解した
     - 可視化、仮説生成 ✅ 完全に理解した
-    - 統計解析、仮説検証
-1. 報告、発表
+    - 統計解析、仮説検証 ⬜ 最後にやる
+1. 報告、発表 ⬜ Quarto楽しい
 
 <figure>
-<a href="https://r4ds.had.co.nz/introduction.html">
-<img src="/slides/image/r4ds/whole-game.png" width="800">
-<figcaption><small>https://r4ds.had.co.nz/introduction.html</small></figcaption>
+<a href="https://r4ds.hadley.nz/intro">
+<img src="/slides/image/r4ds/data-science.png" width="720">
+<figcaption><small>https://r4ds.hadley.nz/intro</small></figcaption>
 </a>
 </figure>
 
@@ -37,7 +37,7 @@
 
 - readxlパッケージを使えば `.xlsx` ファイルも読める、けど
 - カンマ区切り(CSV)とかタブ区切り(TSV)のテキストが無難。
-- R標準の関数ではなく [readr](https://readr.tidyverse.org/) パッケージを使う。
+- R標準の関数ではなく readr パッケージを使う。
 - ファイル名は**作業ディレクトリ**からの**相対パス**で指定。
 
     ```r
@@ -68,22 +68,22 @@ fs::dir_ls("data")      # List files in "./data"
 fs::dir_create("data")  # Create directory
 ```
 
-[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2024/R_training_2024_7.html)
+[よくあるエラー集 (石川由希さん@名古屋大)](https://comicalcommet.github.io/r-training-2025/R_training_2025_7.html)
 を読んでおきましょう。
 
 🔰 これまでに登場したデータを `data/` 以下に書き出してみよう。
 
-🔰 それらを別の名前で読み込み直してみよう。
+🔰 それらを別の名前の変数に読み込んでみよう。
 
 
 ---
 ## Excelの親切あるいは裏切りに要注意
 
-表形式のファイルを閲覧・作成するソフトとしてよく普及。<br>
+表形式のファイルを閲覧・作成するソフトとしてよく普及。\
 しかし**親切設計がユーザーに牙を剥く**！
 
 - 文字列が勝手に日付になる: `22-4`, `4-14`
-- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`<br>
+- 遺伝子名が勝手に日付になる: `MARCH1`, `SEPT1`\
   ([2020年、これを避けるために改名された](https://www.theverge.com/2020/8/6/21355674/human-genes-rename-microsoft-excel-misreading-dates))
 
 🔰 CSVファイルを読み書きして恐怖を体感しよう:
@@ -95,18 +95,20 @@ SEPT1,4-14
 ```
 1.  ↑からのコピペで `excel.csv` という名のプレーンテキストを作成。
 1.  Excelでそれで開き、日付になることを確認。
-1.  それを別名のCSVとして保存し、テキストの中身を確認。
+1.  Excelで別名のCSVとして保存し、テキストの中身を確認。
 
 
 ---
-## 🔰 3日目の課題: オープンデータを拾って可視化しよう。
+## 🔰 課題: オープンデータを拾って可視化しよう。
 
 - 自分がこれから解析したいデータ (もし手元にあれば)
 - 何か適当なパブリックデータ。例えば:
     - [e-Stat](https://www.e-stat.go.jp/): 政府統計の総合窓口
-    - [data.go.jp データカタログサイト](https://www.data.go.jp/data/dataset?res_format=CSV): 中央省庁
+    - [e-gov データポータル](https://data.e-gov.go.jp/data/dataset?res_format=CSV): 中央行政
     - [BODIKオープンデータカタログサイト](https://odcs.bodik.jp/): 地方自治体
-    - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)
+    - [気象庁](https://www.data.jma.go.jp/gmd/risk/obsdl/index.php)、
+      [環境省](https://www.env.go.jp/sogodb/)、
+      [農水省](https://www.maff.go.jp/j/tokei/index.html)
     - [DATA.GOV](https://www.data.gov/): U.S. Government’s open data
 - (苦肉の策) Rやパッケージに付属のデータ
     - `diamonds`, `starwars`, `mpg`, etc. See `data()`
@@ -119,11 +121,21 @@ SEPT1,4-14
 ---
 ## 実演: [e-Stat 国勢調査](https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521) CSV
 
-2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県
+2020年 → 小地域 → 年齢（５歳階級、４区分）別、男女別人口 → 宮城県\
+<small style="opacity: 0.7;">
+(e-Statの不具合で落とせない場合の予備
+<a href="../tohoku2025r/tblT001082C04.txt" download="tblT001082C04.txt">📄ここに置いときます</a>)
+</small>
 
 うまくすれば次のような人口ピラミッドを描けるはずのファイルだが...
 
 <img `r src_alt_fig_chunk("estat-plot")`>
+
+```{r, estat-setup}
+#| cache: false
+#| include: false
+options(wtl.printdf.classes = TRUE)
+```
 
 ---
 ## オープンデータを入手できても簡単には読み込めない
@@ -143,9 +155,9 @@ readLines(infile, 5L) |> t() |> t() |>
   prmatrix(rowlab = rep("", 5), collab = "", quote = FALSE)
 ```
 
-メニューから "File → **Reopen with Encoding...**" を選択。<br>
-たいてい、古い日本語ファイルにありがちな**SHIFT-JIS**が正解。<br>
-(もっと古いファイルならEUC-JPとかの場合もある。)
+メニューから "File → **Reopen with Encoding...**" を選択。\
+古い日本語ファイルにありがちなのは**SHIFT-JIS**。\
+<small style="opacity: 0.7;">(もっと古いファイルならEUC-JPとかの場合もある。)</small>
 
 ---
 ## 文字コードを指定して読み込み
@@ -196,7 +208,7 @@ tidy_miyagi = raw_miyagi |>
   tidyr::pivot_longer(!CITYNAME, names_to = "category", values_to = "count") |>
   tidyr::separate(category, c("sex", "age"), 1) |>
   dplyr::mutate(age = stringi::stri_trans_nfkc(age)) |>
-  tidyr::separate(age, c("lower", "upper"), "〜", fill = "right") |>
+  tidyr::separate(age, c("lower", "upper"), "[〜~]", fill = "right") |>
   dplyr::mutate(lower = readr::parse_number(lower),
                 upper = readr::parse_number(upper)) |>
   dplyr::filter((upper - lower) < 5 | lower == 75) |>
@@ -222,10 +234,11 @@ tidy_miyagi = tidy_miyagi |>
 tidy_miyagi |>
   dplyr::mutate(count = ifelse(sex == "男", -1, 1) * count) |>
   ggplot() +
-  geom_col(aes(age, count, fill = sex)) +
+  geom_col(aes(count, age, fill = sex), orientation = "y") +
   facet_wrap(vars(CITYNAME), nrow = 4L) +
-  coord_flip() + theme_minimal(base_size = 15)
+  theme_minimal(base_size = 15)
 ```
+
 
 ---
 ## 残り時間のお品書き
@@ -248,11 +261,11 @@ tidy_miyagi |>
 ---
 ## 🔰 2週目の課題
 
+<iframe width="400" height="300" src="./4-structure2.html#/31"></iframe>
 <iframe width="400" height="300" src="./4-structure2.html#/32"></iframe>
 <iframe width="400" height="300" src="./4-structure2.html#/33"></iframe>
 <iframe width="400" height="300" src="./4-structure2.html#/35"></iframe>
 <iframe width="400" height="300" src="./4-structure2.html#/36"></iframe>
-<iframe width="400" height="300" src="./4-structure2.html#/37"></iframe>
 
 
 ---
@@ -270,27 +283,25 @@ tidy_miyagi |>
 
 R for Data Science --- Hadley Wickham et al.
 : <https://r4ds.hadley.nz>,
-  [Paperback](https://amzn.to/4cpL6w8)
-: [日本語版書籍(Rではじめるデータサイエンス)](https://amzn.to/2yyFRKt)
+  [Paperback](https://amzn.to/4cpL6w8),
+  [日本語版書籍](https://amzn.to/2yyFRKt)
 
-[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)<br>
+[前処理大全 --- 本橋智光](https://www.amazon.co.jp/dp/4774196479/ref=as_li_ss_tl?ie=UTF8&linkCode=ll1&tag=heavywatal-22&linkId=8a3fd4e9a0c944b1b41242bbab8d147b)\
 [RユーザのためのRStudio[実践]入門 (宇宙船本) --- 松村ら](https://amzn.to/2Yy5LND)
 
 Official documents:
 : [tidyverse](https://www.tidyverse.org/),
-  [ggplot2](https://ggplot2.tidyverse.org/),
   [dplyr](https://dplyr.tidyverse.org/),
   [tidyr](https://tidyr.tidyverse.org/),
-  [readr](https://readr.tidyverse.org/),
   [stringr](https://stringr.tidyverse.org/),
   [forcats](https://forcats.tidyverse.org/),
-  [lubridate](https://lubridate.tidyverse.org/),
+  [lubridate](https://lubridate.tidyverse.org/)
 
 Other versions
 : 「[Rにやらせて楽しよう — データの可視化と下ごしらえ](https://heavywatal.github.io/slides/nagoya2018/)」
    岩嵜航 2018
-: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2024/)」
-   石川由希 2024 名古屋大学
+: 「[Rを用いたデータ解析の基礎と応用](https://comicalcommet.github.io/r-training-2025/)」
+   石川由希 名古屋大学
 
 <a href="." class="readmore">
 目次に戻る

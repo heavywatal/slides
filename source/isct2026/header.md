@@ -9,7 +9,7 @@
 </div>
 
 <div class="affiliation">
-東北大学 生命科学研究科 進化ゲノミクス分野 特任助教<br>
+東北大学 生命科学研究科 特任准教授<br>
 (Graduate School of Life Sciences, Tohoku University)
 </div>
 
