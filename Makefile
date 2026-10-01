@@ -37,8 +37,13 @@ content/%/image: ${SYNC_ROOT}/%
 ${SYNC_ROOT}/%: | content/%
 	mkdir $@
 
-.PHONY: working
+.PHONY: working module
 working:
 	@ls -l $@
 	$(MAKE) -C $@
 	$(MAKE) all
+
+module:
+	mv config/_default/module.toml config/_default/module-disabled.toml
+	hugo mod get -u ./... && hugo mod tidy
+	mv config/_default/module-disabled.toml config/_default/module.toml
