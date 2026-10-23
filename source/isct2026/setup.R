@@ -23,13 +23,12 @@ registerS3method("print", "tbl_df", wtl::printdf)
 knitr::opts_chunk$set(comment = "")
 knitr::opts_chunk$set(message = NA)
 knitr::opts_chunk$set(warning = NA)
-knitr::opts_chunk$set(dev = "ragg_png")
+knitr::opts_chunk$set(dev = "ragg_webp")
 knitr::opts_chunk$set(dpi = 108)
-knitr::opts_chunk$set(fig.process = wtl::oxipng)
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 set.seed(24601)
 
-src_alt_fig_chunk = function(label, ext = "png", number = 1L) {
+src_alt_fig_chunk = function(label, ext = "webp", number = 1L) {
   src = knitr::fig_chunk(label, ext, number)
   paste0('src="', src, '" alt="plot of chunk ', label, '"')
 }

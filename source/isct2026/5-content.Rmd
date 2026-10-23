@@ -708,7 +708,7 @@ mpg |>
 
 ```{r, plot-factor}
 #| echo: false
-#| fig.width: 5
+#| fig.width: 10
 #| fig.height: 5
 p = mpg |>
   ggplot() +
@@ -717,12 +717,12 @@ p = mpg |>
   theme_classic(base_size = 20) +
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank(),
         axis.title.y = element_blank(), legend.position = "top")
-p
-p %+% {
+.p2 = p %+% {
   mpg |>
   dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
   dplyr::mutate(class = forcats::fct_infreq(class))
 }
+cowplot::plot_grid(p, .p2, nrow = 1L)
 ```
 
 
@@ -807,7 +807,7 @@ lubridate::wday(today, label = TRUE)
     - 何かの順に並べ替え --- `arrange()`, `relocate()`
     - 異なるテーブルの結合 --- `*_join()`
     - 変形: 縦長 ↔ 横広 --- `pivot_longer()`, `pivot_wider()`
-- **データ内容を対象とする処理** — 👈 第5回 本日の話題
+- **データ内容を対象とする処理** 👈 第5回 本日の話題
     - 数値の変換: 対数、正規化
     - 外れ値・欠損値への対処
     - 型変換: 連続変数、カテゴリカル変数、指示変数、因子、日時
