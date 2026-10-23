@@ -1,10 +1,10 @@
-DIR_NAME := $(notdir ${CURDIR})
-DESTINATION := ../../content/${DIR_NAME}
+SLUG := $(notdir ${CURDIR})
+DESTINATION := ../../content/${SLUG}
 SOURCES := $(wildcard *.Rmd)
 KNITTED := $(addprefix ${DESTINATION}/,$(SOURCES:.Rmd=.md))
 $(info SOURCES = ${SOURCES})
 $(info KNITTED = ${KNITTED})
-SHARE_DIR := ${HOME}/My\ Drive/Shared/${DIR_NAME}
+SHARE_DIR := ${HOME}/My\ Drive/Shared/${SLUG}
 
 .DEFAULT_GOAL := all
 .PHONY: all clean
