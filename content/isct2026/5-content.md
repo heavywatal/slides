@@ -978,6 +978,7 @@ mpg_fct = mpg |>
 ```
 
 ![plot of chunk factor-plot](figure/factor-plot-1.webp)
+![plot of chunk factor-plot](figure/factor-plot-2.webp)
 
 ---
 ## 順序つき因子型 `ordered`
@@ -1034,6 +1035,7 @@ mpg |>
 ```
 
 ![plot of chunk fct-infreq](figure/fct-infreq-1.webp)
+![plot of chunk fct-infreq](figure/fct-infreq-2.webp)
 
 ほかに `fct_reorder()`, `fct_relevel()` なども。
 [公式サイト](https://forcats.tidyverse.org/)参照。

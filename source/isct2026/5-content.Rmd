@@ -622,7 +622,7 @@ mpg_fct = mpg |>
 ```
 
 ```{r, factor-plot}
-#| fig.width: 7
+#| fig.width: 4
 #| fig.height: 4
 #| echo: false
 set.seed(1)
@@ -633,7 +633,8 @@ p1 = mpg |>
   labs(x = "drv") +
   theme_classic(base_size = 24) +
   theme(legend.position = "none")
-cowplot::plot_grid(p1 + ggtitle("mpg"), p1 %+% mpg_fct + ggtitle("mpg_fct"), nrow = 1L)
+p1 + ggtitle("mpg")
+p1 %+% mpg_fct + ggtitle("mpg_fct")
 ```
 
 ---
@@ -671,22 +672,21 @@ mpg |>
 ```
 
 ```{r, fct-infreq}
-#| fig.width: 8
+#| fig.width: 4
 #| fig.height: 4
 #| echo: false
-p1 = diamonds |>
+diamonds |>
   dplyr::mutate(color = forcats::fct_infreq(color)) |>
   ggplot() + aes(y = color) + geom_bar() +
   labs(title = "fct_infreq(color)") +
   theme_minimal(base_size = 20)
-p2 = mpg |>
+mpg |>
   dplyr::mutate(fl = forcats::fct_lump(fl, n = 2)) |>
   ggplot() + aes(fl, cty, fill = fl) +
   geom_dotplot(binaxis = "y", stackdir = "center", binwidth = 0.5, stroke = 0) +
   labs(title = "fct_lump(fl)") +
   theme_minimal(base_size = 20) +
   theme(legend.position = "none")
-cowplot::plot_grid(p1, p2, nrow = 1L)
 ```
 
 ほかに `fct_reorder()`, `fct_relevel()` なども。
@@ -708,7 +708,7 @@ mpg |>
 
 ```{r, plot-factor}
 #| echo: false
-#| fig.width: 10
+#| fig.width: 5
 #| fig.height: 5
 p = mpg |>
   ggplot() +
@@ -717,12 +717,11 @@ p = mpg |>
   theme_classic(base_size = 20) +
   theme(axis.line.y = element_blank(), axis.ticks.y = element_blank(),
         axis.title.y = element_blank(), legend.position = "top")
-.p2 = p %+% {
+p %+% {
   mpg |>
   dplyr::mutate(drv = forcats::fct_relevel(drv, "f", "r", "4")) |>
   dplyr::mutate(class = forcats::fct_infreq(class))
 }
-cowplot::plot_grid(p, .p2, nrow = 1L)
 ```
 
 

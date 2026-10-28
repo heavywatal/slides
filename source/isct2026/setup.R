@@ -25,6 +25,7 @@ knitr::opts_chunk$set(message = NA)
 knitr::opts_chunk$set(warning = NA)
 knitr::opts_chunk$set(dev = "ragg_webp")
 knitr::opts_chunk$set(dpi = 108)
+knitr::opts_chunk$set(fig.sep = "\n")
 knitr::opts_chunk$set(cache = TRUE, autodep = TRUE)
 set.seed(24601)
 

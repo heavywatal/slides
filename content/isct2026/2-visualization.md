@@ -154,6 +154,8 @@ hist(iris$Petal.Length)
 <br>
 
 ![plot of chunk ggplot-iris](figure/ggplot-iris-1.webp)
+![plot of chunk ggplot-iris](figure/ggplot-iris-2.webp)
+![plot of chunk ggplot-iris](figure/ggplot-iris-3.webp)
 
 
 ---
@@ -445,7 +447,8 @@ ggplot(diamonds) +
 ---
 ## 外の `aes()` は全ての `geom_*()` に波及する
 
-```r
+
+``` r
 ggplot(diamonds) +
   aes(x = carat, y = price) +
   geom_point(aes(color = clarity)) +
@@ -455,7 +458,9 @@ ggplot(diamonds) +
   geom_point() +          # color
   geom_line()             # color
 ```
+
 ![plot of chunk aes-global-local](figure/aes-global-local-1.webp)
+![plot of chunk aes-global-local](figure/aes-global-local-2.webp)
 
 ---
 ## [aesthetics一覧](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html)
@@ -508,6 +513,8 @@ ggplot(diamonds) +
 🔰 駆動方式 `drv` やシリンダー数 `cyl` によって色を塗り分けしてみよう
 
 ![plot of chunk ggplot-mpg-color](figure/ggplot-mpg-color-1.webp)
+![plot of chunk ggplot-mpg-color](figure/ggplot-mpg-color-2.webp)
+![plot of chunk ggplot-mpg-color](figure/ggplot-mpg-color-3.webp)
 
 ---
 ## 色の見え方は人によって違う
@@ -524,6 +531,8 @@ ggplot(diamonds) +
 <span style="color: #00B2C1;">青</span>の2色に見えている。
 
 ![plot of chunk color-vision-diversity](figure/color-vision-diversity-1.webp)
+![plot of chunk color-vision-diversity](figure/color-vision-diversity-2.webp)
+![plot of chunk color-vision-diversity](figure/color-vision-diversity-3.webp)
 
 MacやiOSなら[Sim Daltonism](https://michelf.ca/projects/sim-daltonism/)というアプリでシミュレーションできる。\
 Windowsなら[Color Oracle](https://colororacle.org/)が使えそう。
@@ -536,18 +545,15 @@ Sequential palette:\
 ![plot of chunk palette-sequential](figure/palette-sequential-2.webp)
 ![plot of chunk palette-sequential](figure/palette-sequential-3.webp)
 
-
 Diverging palette:\
 ![plot of chunk palette-diverging](figure/palette-diverging-1.webp)
 ![plot of chunk palette-diverging](figure/palette-diverging-2.webp)
 ![plot of chunk palette-diverging](figure/palette-diverging-3.webp)
 
-
 Qualitative (categorical, discrete) palette:\
 ![plot of chunk palette-qualitative](figure/palette-qualitative-1.webp)
 ![plot of chunk palette-qualitative](figure/palette-qualitative-2.webp)
 ![plot of chunk palette-qualitative](figure/palette-qualitative-3.webp)
-
 
 ---
 ## 色パレットの変更 `scale_color_*()`
@@ -558,13 +564,16 @@ Qualitative (categorical, discrete) palette:\
 のパレットはggplot2に組み込まれているので簡単。\
 上記リンクから名前を探して、`option =` か `palette =` で指定。
 
-```r
+
+``` r
 p = ggplot(diamonds) + aes(carat, price) +
     geom_point(mapping = aes(color = clarity))
-p + scale_color_viridis_d(option = "inferno")
-p + scale_color_brewer(palette = "YlGnBu")
+p + scale_color_viridis_d(option = "inferno")                            + labs(title = "inferno")
+p + scale_color_brewer(palette = "YlGnBu")                               + labs(title = "YlGnBu")
 ```
+
 ![plot of chunk scale-color](figure/scale-color-1.webp)
+![plot of chunk scale-color](figure/scale-color-2.webp)
 
 ---
 ## 連続値(continuous)と離散値(discrete)を区別する
@@ -572,13 +581,16 @@ p + scale_color_brewer(palette = "YlGnBu")
 渡す値とscale関数が合ってないと怒られる:\
 `Error: Continuous value supplied to discrete scale`
 
-```r
+
+``` r
 p = ggplot(diamonds) + aes(carat, price) +
     geom_point(mapping = aes(color = price))
-p + scale_color_viridis_c(option = "inferno")
-p + scale_color_distiller(palette = "YlGnBu")
+p + scale_color_viridis_c(option = "inferno")                            + labs(title = "inferno")
+p + scale_color_distiller(palette = "YlGnBu")                            + labs(title = "YlGnBu")
 ```
+
 ![plot of chunk scale-color-continuous](figure/scale-color-continuous-1.webp)
+![plot of chunk scale-color-continuous](figure/scale-color-continuous-2.webp)
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
 - continuous: `scale_color_viridis_c()`, `scale_color_distiller()`
@@ -591,15 +603,19 @@ R標準の `palette.colors()` や
 [colorspaceパッケージ](https://colorspace.r-forge.r-project.org/articles/ggplot2_color_scales.html)
 を使う。
 
-```r
+
+``` r
 p = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv), size = 4, alpha = 0.66)
-p + scale_color_discrete(type = palette.colors(9L, "Okabe-Ito")[-1])
-p + scale_color_discrete(type = palette.colors(8L, "R4")[-1])
-p + colorspace::scale_colour_discrete_divergingx("Zissou 1")
+p + scale_color_discrete(type = palette.colors(9L, "Okabe-Ito")[-1])     + labs(title = "Okabe-Ito")
+p + scale_color_discrete(type = palette.colors(8L, "R4")[-1])            + labs(title = "R4")
+p + colorspace::scale_colour_discrete_divergingx("Zissou 1")             + labs(title = "Zissou 1")
 ```
+
 ![plot of chunk other-palettes](figure/other-palettes-1.webp)
+![plot of chunk other-palettes](figure/other-palettes-2.webp)
+![plot of chunk other-palettes](figure/other-palettes-3.webp)
 
 自分で全色個別指定もできるが、専門家の考えたセットを使うのが無難。
 

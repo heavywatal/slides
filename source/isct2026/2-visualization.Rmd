@@ -91,7 +91,6 @@ print(iris)
 描けるっちゃ描けるけど。カスタマイズしていくのは難しい。
 
 ```{r, base-plot-iris}
-#| eval: false
 #| fig.show: "hold"
 #| fig.height: 4
 #| fig.width: 4
@@ -99,10 +98,6 @@ boxplot(Petal.Width ~ Species, data = iris)
 plot(iris$Sepal.Length, iris$Sepal.Width)
 hist(iris$Petal.Length)
 ```
-
-![plot of chunk base-plot-iris](figure/base-plot-iris-1.webp)
-![plot of chunk base-plot-iris](figure/base-plot-iris-2.webp)
-![plot of chunk base-plot-iris](figure/base-plot-iris-3.webp)
 
 きれいなグラフを簡単に描けるパッケージを使いたい。
 
@@ -121,19 +116,19 @@ hist(iris$Petal.Length)
 
 ```{r, ggplot-iris}
 #| echo: false
+#| fig.show: "hold"
 #| fig.height: 4
-#| fig.width: 12
+#| fig.width: 4
 set.seed(1)
 .theme = theme_classic(base_size = 20) + theme(legend.position = "none")
-.p1 = ggplot(iris) + aes(Species, Petal.Width) +
+ggplot(iris) + aes(Species, Petal.Width) +
   geom_boxplot(aes(fill = Species), outlier.shape = NA) +
   geom_jitter(width = 0.2, height = 0, shape = 16, size = 2, alpha = 0.33) +
   .theme
-.p2 = ggplot(iris) + aes(Sepal.Length, Sepal.Width) +
+ggplot(iris) + aes(Sepal.Length, Sepal.Width) +
   geom_point(aes(color = Species), shape = 16, size = 3, alpha = 0.66) + .theme
-.p3 = ggplot(iris) + aes(Petal.Length) +
+ggplot(iris) + aes(Petal.Length) +
   geom_histogram(aes(fill = Species), boundary = 1, binwidth = 0.5) + .theme
-cowplot::plot_grid(.p1, .p2, .p3, nrow = 1L)
 ```
 
 
@@ -415,30 +410,18 @@ ggplot(diamonds) +
 ---
 ## 外の `aes()` は全ての `geom_*()` に波及する
 
-```r
-ggplot(diamonds) +
-  aes(x = carat, y = price) +
-  geom_point(aes(color = clarity)) +
-  geom_line()             # NO color
-ggplot(diamonds) +
-  aes(x = carat, y = price, color = clarity) +
-  geom_point() +          # color
-  geom_line()             # color
-```
 ```{r, aes-global-local}
-#| echo: false
 #| fig.show: "hold"
 #| fig.height: 4.8
-#| fig.width: 12
-.p1 = ggplot(diamonds) +
+#| fig.width: 6
+ggplot(diamonds) +
   aes(x = carat, y = price) +
   geom_point(aes(color = clarity)) +
   geom_line()             # NO color
-.p2 = ggplot(diamonds) +
+ggplot(diamonds) +
   aes(x = carat, y = price, color = clarity) +
   geom_point() +          # color
   geom_line()             # color
-cowplot::plot_grid(.p1, .p2, nrow = 1L)
 ```
 
 ---
@@ -488,19 +471,18 @@ wtl::printdf(mpg, n = 4)
 ```{r, ggplot-mpg-color}
 #| echo: false
 #| fig.height: 3
-#| fig.width: 10
-pL = ggplot(mpg) +
+#| fig.width: 3
+ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(color = "blue")
-pC = ggplot(mpg) +
+ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv)) +
   scale_colour_hue()  # to show bad default
-pR = ggplot(mpg) +
+ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = cyl)) +
   scale_color_gradient()  # to show bad default
-cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ```
 
 ---
@@ -520,15 +502,14 @@ cowplot::plot_grid(pL, pC, pR, nrow = 1L)
 ```{r, color-vision-diversity}
 #| echo: false
 #| fig.height: 5
-#| fig.width: 12
+#| fig.width: 4
 pmpg = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv), size = 4, alpha = 0.66) +
   theme_minimal(base_size = 20) + theme(legend.position = "bottom")
-.p1 = pmpg + scale_color_hue() + labs(title = "Original")
-.p2 = pmpg + scale_color_discrete(type = colorspace::deutan(scales::hue_pal()(3L))) + labs(title = "Deuteranope")
-.p3 = pmpg + scale_color_discrete(type = colorspace::tritan(scales::hue_pal()(3L))) + labs(title = "Tritanope")
-cowplot::plot_grid(.p1, .p2, .p3, nrow = 1L)
+pmpg + scale_color_hue() + labs(title = "Original")
+pmpg + scale_color_discrete(type = colorspace::deutan(scales::hue_pal()(3L))) + labs(title = "Deuteranope")
+pmpg + scale_color_discrete(type = colorspace::tritan(scales::hue_pal()(3L))) + labs(title = "Tritanope")
 ```
 
 MacやiOSなら[Sim Daltonism](https://michelf.ca/projects/sim-daltonism/)というアプリでシミュレーションできる。\
@@ -538,11 +519,7 @@ Windowsなら[Color Oracle](https://colororacle.org/)が使えそう。
 ## 多様性を前提によく考えられたパレットもある
 
 Sequential palette:\
-![plot of chunk palette-sequential](figure/palette-sequential-1.webp)
-![plot of chunk palette-sequential](figure/palette-sequential-2.webp)
-![plot of chunk palette-sequential](figure/palette-sequential-3.webp)
 ```{r, palette-sequential}
-#| eval: false
 #| echo: false
 #| fig.width: 4
 #| fig.height: 1.95
@@ -553,11 +530,7 @@ colorspace::swatchplot(`ggplot2 default` = gradient_pal(seq(0, 1, length.out = 7
 ```
 
 Diverging palette:\
-![plot of chunk palette-diverging](figure/palette-diverging-1.webp)
-![plot of chunk palette-diverging](figure/palette-diverging-2.webp)
-![plot of chunk palette-diverging](figure/palette-diverging-3.webp)
 ```{r, palette-diverging}
-#| eval: false
 #| echo: false
 #| fig.width: 4
 #| fig.height: 1.95
@@ -568,11 +541,7 @@ colorspace::swatchplot(`rainbow (very bad)` = rainbow(7), cvd = TRUE)
 ```
 
 Qualitative (categorical, discrete) palette:\
-![plot of chunk palette-qualitative](figure/palette-qualitative-1.webp)
-![plot of chunk palette-qualitative](figure/palette-qualitative-2.webp)
-![plot of chunk palette-qualitative](figure/palette-qualitative-3.webp)
 ```{r, palette-qualitative}
-#| eval: false
 #| echo: false
 #| fig.width: 4
 #| fig.height: 1.95
@@ -591,22 +560,14 @@ colorspace::swatchplot(`ggplot2 default (bad)` = scales::hue_pal()(7L), cvd = TR
 のパレットはggplot2に組み込まれているので簡単。\
 上記リンクから名前を探して、`option =` か `palette =` で指定。
 
-```r
-p = ggplot(diamonds) + aes(carat, price) +
-    geom_point(mapping = aes(color = clarity))
-p + scale_color_viridis_d(option = "inferno")
-p + scale_color_brewer(palette = "YlGnBu")
-```
 ```{r, scale-color}
-#| echo: false
 #| fig.show: "hold"
 #| fig.height: 4
-#| fig.width: 12
+#| fig.width: 6
 p = ggplot(diamonds) + aes(carat, price) +
     geom_point(mapping = aes(color = clarity))
-.p1 = p + scale_color_viridis_d(option = "inferno")                            + labs(title = "inferno")
-.p2 = p + scale_color_brewer(palette = "YlGnBu")                               + labs(title = "YlGnBu")
-cowplot::plot_grid(.p1, .p2, nrow = 1L)
+p + scale_color_viridis_d(option = "inferno")                            + labs(title = "inferno")
+p + scale_color_brewer(palette = "YlGnBu")                               + labs(title = "YlGnBu")
 ```
 
 ---
@@ -615,22 +576,14 @@ cowplot::plot_grid(.p1, .p2, nrow = 1L)
 渡す値とscale関数が合ってないと怒られる:\
 `Error: Continuous value supplied to discrete scale`
 
-```r
-p = ggplot(diamonds) + aes(carat, price) +
-    geom_point(mapping = aes(color = price))
-p + scale_color_viridis_c(option = "inferno")
-p + scale_color_distiller(palette = "YlGnBu")
-```
 ```{r, scale-color-continuous}
-#| echo: false
 #| fig.show: "hold"
 #| fig.height: 4
-#| fig.width: 12
+#| fig.width: 6
 p = ggplot(diamonds) + aes(carat, price) +
     geom_point(mapping = aes(color = price))
-.p1 = p + scale_color_viridis_c(option = "inferno")                            + labs(title = "inferno")
-.p2 = p + scale_color_distiller(palette = "YlGnBu")                            + labs(title = "YlGnBu")
-cowplot::plot_grid(.p1, .p2, nrow = 1L)
+p + scale_color_viridis_c(option = "inferno")                            + labs(title = "inferno")
+p + scale_color_distiller(palette = "YlGnBu")                            + labs(title = "YlGnBu")
 ```
 
 - discrete: `scale_color_viridis_d()`, `scale_color_brewer()`
@@ -644,26 +597,16 @@ R標準の `palette.colors()` や
 [colorspaceパッケージ](https://colorspace.r-forge.r-project.org/articles/ggplot2_color_scales.html)
 を使う。
 
-```r
-p = ggplot(mpg) +
-  aes(x = displ, y = cty) +
-  geom_point(aes(color = drv), size = 4, alpha = 0.66)
-p + scale_color_discrete(type = palette.colors(9L, "Okabe-Ito")[-1])
-p + scale_color_discrete(type = palette.colors(8L, "R4")[-1])
-p + colorspace::scale_colour_discrete_divergingx("Zissou 1")
-```
 ```{r, other-palettes}
-#| echo: false
 #| fig.show: "hold"
 #| fig.height: 3.2
-#| fig.width: 12
+#| fig.width: 4
 p = ggplot(mpg) +
   aes(x = displ, y = cty) +
   geom_point(aes(color = drv), size = 4, alpha = 0.66)
-.p1 = p + scale_color_discrete(type = palette.colors(9L, "Okabe-Ito")[-1])     + labs(title = "Okabe-Ito")
-.p2 = p + scale_color_discrete(type = palette.colors(8L, "R4")[-1])            + labs(title = "R4")
-.p3 = p + colorspace::scale_colour_discrete_divergingx("Zissou 1")             + labs(title = "Zissou 1")
-cowplot::plot_grid(.p1, .p2, .p3, nrow = 1L)
+p + scale_color_discrete(type = palette.colors(9L, "Okabe-Ito")[-1])     + labs(title = "Okabe-Ito")
+p + scale_color_discrete(type = palette.colors(8L, "R4")[-1])            + labs(title = "R4")
+p + colorspace::scale_colour_discrete_divergingx("Zissou 1")             + labs(title = "Zissou 1")
 ```
 
 自分で全色個別指定もできるが、専門家の考えたセットを使うのが無難。
