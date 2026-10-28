@@ -1147,7 +1147,7 @@ Levels: Sun < Mon < Tue < Wed < Thu < Fri < Sat
 - 図の中の並び順を調整するには [forcats](https://forcats.tidyverse.org/) で因子型
 - 日時を扱うには [lubridate](https://lubridate.tidyverse.org/)
 
-各パッケージの[チートシート.pdf](https://www.rstudio.com/resources/cheatsheets/)を手元に持っておくと便利。
+各パッケージの[チートシート.pdf](https://opensource.posit.co/resources/cheatsheets/)を手元に持っておくと便利。
 
 
 ---

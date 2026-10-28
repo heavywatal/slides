@@ -600,7 +600,7 @@ p + scale_color_distiller(palette = "YlGnBu")                            + labs(
 ## viridisやbrewer以外のパレットを使うには
 
 R標準の `palette.colors()` や
-[colorspaceパッケージ](https://colorspace.r-forge.r-project.org/articles/ggplot2_color_scales.html)
+[colorspaceパッケージ](https://zeileis.codeberg.page/colorspace/)
 を使う。
 
 
@@ -699,7 +699,7 @@ p3 + facet_grid(vars(clarity), vars(cut))
 
 
 ---
-## 値を変えず座標軸を変える [`scale_*`](https://ggplot2.tidyverse.org/reference/#section-scales), [`coord_*`](https://ggplot2.tidyverse.org/reference/#section-coordinate-systems)
+## 値を変えず座標軸を変える [`scale_*`](https://ggplot2.tidyverse.org/reference/#scales), [`coord_*`](https://ggplot2.tidyverse.org/reference/#coordinate-systems)
 
 
 ``` r
@@ -789,7 +789,7 @@ ggsave("dia4.png", p3 + theme_bw(base_size = 22), width = 4, height = 4)
 ## 他にどんな種類の `geom_*()` が使える？
 
 なんでもある。
-[公式サイト](https://ggplot2.tidyverse.org/reference/index.html)を見に行こう。
+[公式サイト](https://ggplot2.tidyverse.org/reference/)を見に行こう。
 
 <figure>
 <img src="/slides/image/rstats/ggplot2-reference-geoms.png" width="80%">
@@ -845,7 +845,7 @@ ggplot2を[さらに拡張するパッケージも続々](https://exts.ggplot2.t
 ggplot2は3Dが苦手
 : 本当に3Dが必要? 色分けやファセットで足りない?
 : 別のパッケージでやる:
-  [rgl](http://rgl.neoscientists.org/gallery.shtml),
+  [rgl](https://dmurdoch.github.io/rgl/),
   [plotly](https://plotly.com/r/3d-charts/), etc.
 
 

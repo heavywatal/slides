@@ -43,16 +43,16 @@ draft = false
     - <iconify-icon inline icon="bi:apple"></iconify-icon>
       macOS Tahoe (≥26.2)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
-1.  <https://cran.r-project.org/>
+1.  <https://cloud.r-project.org/>
     から最新版の **R本体 (≥ 4.5.2)** をダウンロードしてインストール。
     OK連打のデフォルト設定で。
     古いものが既に入っている場合は念のため削除してから。
     - <iconify-icon inline icon="bi:windows"></iconify-icon>
-      [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.5.2-win.exe`
+      [Windows → base](https://cloud.r-project.org/bin/windows/base) → `R-4.5.2-win.exe`
     - <iconify-icon inline icon="bi:apple"></iconify-icon>
-      [Mac](https://cran.r-project.org/bin/macosx/)
+      [Mac](https://cloud.r-project.org/bin/macosx/)
       → `R-4.5.2-arm64.pkg` (Apple Silicon) or `R-4.5.2-x86_64.pkg` (Intel)
-1.  <https://posit.co/download/rstudio-desktop/>
+1.  <https://posit.co/products/open-source/rstudio>
     から最新版の **RStudio (≥ 2026.01.0)** をダウンロードしてインストール。
     古いものが既に入っている場合は念のため削除してから。
 1.  RStudioを起動。初回は「開発元の不明なアプリ」を許可するような操作が必要かも。

@@ -71,22 +71,22 @@ draft = false
     - <iconify-icon inline icon="bi:apple"></iconify-icon>
       macOS Tahoe (≥26.3)
 1.  ファイル名の末尾(`.pdf` とか `.png` とか)の[拡張子を常時表示する](https://duckduckgo.com/?q=拡張子+表示)ようにOSを設定。
-1.  <https://cran.r-project.org/>
+1.  <https://cloud.r-project.org/>
     から最新版の **R本体 (≥ 4.5.3)** をダウンロードしてインストール。
     OK連打のデフォルト設定で。
     古いものが既に入っている場合は念のため削除してから。
     - <iconify-icon inline icon="bi:windows"></iconify-icon>
-      [Windows → base](https://cran.r-project.org/bin/windows/base) → `R-4.5.3-win.exe`
+      [Windows → base](https://cloud.r-project.org/bin/windows/base) → `R-4.5.3-win.exe`
     - <iconify-icon inline icon="bi:apple"></iconify-icon>
-      [Mac](https://cran.r-project.org/bin/macosx/)
+      [Mac](https://cloud.r-project.org/bin/macosx/)
       → `R-4.5.3-arm64.pkg` (Apple Silicon) or `R-4.5.3-x86_64.pkg` (Intel)
-1.  <https://posit.co/download/rstudio-desktop/>
+1.  <https://posit.co/products/open-source/rstudio/>
     から最新版の **RStudio (≥ 2026.01.2)** をダウンロードしてインストール。
     古いものが既に入っている場合は念のため削除してから。
 1.  開発者ツールをインストール。
     ここでは必須ではないけどいずれ使うことになる。
     - <iconify-icon inline icon="bi:windows"></iconify-icon>
-      Windows: [**Rtools**](https://cran.r-project.org/bin/windows/Rtools/)
+      Windows: [**Rtools**](https://cloud.r-project.org/bin/windows/Rtools/)
       (R本体のバージョンに合わせる)
     - <iconify-icon inline icon="bi:apple"></iconify-icon>
       Mac: [**Command Line Tools**](https://duckduckgo.com/?q=command+line+tools):

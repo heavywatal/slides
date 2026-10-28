@@ -471,11 +471,11 @@ See https://support.apple.com/HT201236
 ---
 ## R環境のセットアップ
 
-[R本体](https://cran.rstudio.com/)
+[R本体](https://cloud.r-project.org/)
 : コマンドを解釈して実行するコア部分。
 : よく使われる関数なども標準パッケージとして同梱。
 
-[RStudio Desktop](https://www.rstudio.com/)
+[RStudio Desktop](https://posit.co/products/open-source/rstudio/)
 : Rをより快適に使うための総合開発環境 (IDE)
 : 必須じゃないけど便利なので結構みんな使ってる。
 : <small>[VS Code](https://code.visualstudio.com/docs/languages/r)
@@ -1151,7 +1151,7 @@ Standard Packages
 
 Contributed Packages
 : 有志により開発され、
-  [CRAN](https://cran.rstudio.com/web/packages/index.html)
+  [CRAN](https://cloud.r-project.org/web/packages/)
   にまとめて公開されている。
 : 要インストール。使う前に読み込むおまじないが必要。
 
